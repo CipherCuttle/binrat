@@ -8,11 +8,20 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts",
-    "check": "pnpm build && pnpm test"
+    "check": "pnpm build && pnpm test",
+    "backfill": "tsx src/cli.ts backfill",
+    "watch": "tsx src/cli.ts watch",
+    "inspect": "tsx src/cli.ts inspect"
+  },
+  "dependencies": {
+    "better-sqlite3": "12.10.1",
+    "viem": "2.56.3"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "9.6.0",
     "@types/node": "20.19.43",
     "tsx": "4.20.5",
     "typescript": "5.8.3"
-  }
+  },
+  "pnpm": { "onlyBuiltDependencies": ["better-sqlite3"] }
 }
