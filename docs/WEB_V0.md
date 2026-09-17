@@ -38,7 +38,7 @@ V0 is intentionally one page plus an interactive detail drawer:
 - red is semantic: active scanning, findings, warnings;
 - no glossy coins, Web3 gradients, chrome logos, astronauts, generic circuit-board imagery, or finance-dashboard styling.
 
-The checked-in SVG is a temporary code-friendly pixel mark. Replace it with the canonical generated rat artwork once a binary asset path is available; do not redesign the mascot on this branch.
+The canonical source mascot is the approved 512×512 generated BINRAT artwork. The web shell serves a byte-verified 128×128 q40 WebP derivative at `web/binrat-mascot-128.webp`, enlarged with `image-rendering: pixelated`. Source and derivative digests are frozen in `docs/BRAND_ASSET.md`. Do not redesign or silently replace the mascot without an explicit brand decision.
 
 ## Fixture boundary
 
@@ -75,6 +75,8 @@ No framework is introduced for V0.
 web/index.html
    |
    +-- web/styles.css
+   +-- web/evidence-semantics.css
+   +-- web/binrat-mascot-128.webp
    +-- web/app.js
           |
           +-- web/fixtures.js
@@ -87,6 +89,7 @@ The future live-data integration replaces `fixtures.js` with a read-only API ada
 - fixture feed is understandable in under 10 seconds;
 - cards expose creator history before generic contract boilerplate;
 - detail drawer clearly distinguishes observation, coverage, Trash Trail, and receipt;
+- byte-verified canonical mascot derivative is used in the hero;
 - mobile layout remains usable;
 - keyboard Enter/Space opens a bag and Escape closes the drawer;
 - reduced-motion preference disables animation;

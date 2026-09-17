@@ -1,10 +1,14 @@
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../web/styles.css', import.meta.url), 'utf8');
 const semanticCss = readFileSync(new URL('../web/evidence-semantics.css', import.meta.url), 'utf8');
 const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
+const mascotUrl = new URL('../web/binrat-mascot-128.webp', import.meta.url);
+const expectedMascotSha256 = '91a1c123e6d3d82443407625ee43b790f07fb36b0bc55c63b9640d816ccb1987';
 
 const requiredHtml = [
   'BINRAT',
@@ -14,7 +18,8 @@ const requiredHtml = [
   'HOW HE DIGS',
   'CLAIM BOUNDARY',
   'He gets the scraps.',
-  'You get the receipts.'
+  'You get the receipts.',
+  './binrat-mascot-128.webp'
 ];
 
 for (const marker of requiredHtml) {
@@ -23,10 +28,20 @@ for (const marker of requiredHtml) {
 
 if (!css.includes('--red: #ff2638')) throw new Error('WEB_BRAND_RED_DRIFT');
 if (!css.includes('--dumpster: #263b35')) throw new Error('WEB_DUMPSTER_GREEN_DRIFT');
+if (!css.includes('image-rendering: pixelated')) throw new Error('WEB_PIXEL_MASCOT_RENDERING_MISSING');
 if (!semanticCss.includes('.evidence-item.observed')) throw new Error('WEB_OBSERVATIONAL_SEMANTICS_MISSING');
 if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('0 NOTED CONDITIONS')) throw new Error('WEB_ZERO_CONDITION_COPY_MISSING');
+
+if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
+if (statSync(mascotUrl).size !== 4284) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
+const mascotDigest = createHash('sha256').update(readFileSync(mascotUrl)).digest('hex');
+if (mascotDigest !== expectedMascotSha256) throw new Error(`WEB_CANONICAL_MASCOT_DIGEST_DRIFT:${mascotDigest}`);
+if (!brandAssetReceipt.includes(expectedMascotSha256)) throw new Error('WEB_CANONICAL_MASCOT_RECEIPT_DRIFT');
+if (!brandAssetReceipt.includes('183dbb65cae463541f788603e01677e5987603c56d706b13266804b9fbd2c9af')) {
+  throw new Error('WEB_CANONICAL_MASCOT_SOURCE_RECEIPT_DRIFT');
+}
 
 const prohibitedClaims = [
   'BUY_ELIGIBLE',
