@@ -7,8 +7,8 @@ const semanticCss = readFileSync(new URL('../web/evidence-semantics.css', import
 const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
-const mascotUrl = new URL('../web/binrat-mascot-512.webp', import.meta.url);
-const expectedMascotSha256 = '0828922dddcdc94d9831d2b907245b71460c3fb5552077c3528d96c00a7581d0';
+const mascotUrl = new URL('../web/binrat-mascot-384.webp', import.meta.url);
+const expectedMascotSha256 = '196c45bae2126195edcb5bd1df0b7fb9f210e2d236c1b457c9119c2a61a7657d';
 
 const requiredHtml = [
   'BINRAT',
@@ -19,7 +19,7 @@ const requiredHtml = [
   'CLAIM BOUNDARY',
   'He gets the scraps.',
   'You get the receipts.',
-  './binrat-mascot-512.webp'
+  './binrat-mascot-384.webp'
 ];
 
 for (const marker of requiredHtml) {
@@ -34,7 +34,7 @@ if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP
 if (!app.includes('0 NOTED CONDITIONS')) throw new Error('WEB_ZERO_CONDITION_COPY_MISSING');
 
 if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
-if (statSync(mascotUrl).size !== 133364) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
+if (statSync(mascotUrl).size !== 40244) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
 const mascotDigest = createHash('sha256').update(readFileSync(mascotUrl)).digest('hex');
 if (mascotDigest !== expectedMascotSha256) throw new Error(`WEB_CANONICAL_MASCOT_DIGEST_DRIFT:${mascotDigest}`);
 if (!brandAssetReceipt.includes(expectedMascotSha256)) throw new Error('WEB_CANONICAL_MASCOT_RECEIPT_DRIFT');
