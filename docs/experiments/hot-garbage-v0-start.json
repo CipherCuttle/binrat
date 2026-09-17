@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "binrat.hot-garbage-72h.prereg.v0",
+  "startedAt": "2026-09-17T18:09:12.623Z",
+  "windowHours": 72,
+  "chainId": 5042,
+  "launcher": "0x24196cd6e534cfce8f480b53e70809b68ea86f29",
+  "startBlock": "21368003",
+  "startBlockHash": "0x8f744c7fda8a6958af94eb0e0c58ac3bd712b2c6b18161d99e48e7a91bd5eed9",
+  "rpc": {
+    "url": "https://rpc.arc-scan.org",
+    "clientVersion": "arcscan-rpc-gateway/1"
+  },
+  "arcPadSnapshot": {
+    "status": {
+      "ok": true,
+      "chainId": 5042,
+      "chainName": "Arc",
+      "db": "up",
+      "rpc": "up",
+      "currentBlock": 21368003,
+      "launchesTo": 21368001,
+      "swapsTo": 21367961,
+      "holdersTo": 21326872,
+      "lastIndexedBlock": 21368001,
+      "blockLag": 2,
+      "lastTradeAgeSec": 910,
+      "indexerGaps": 0,
+      "tokens": 172,
+      "trades24h": 156
+    },
+    "apiServedAt": 1789668552558,
+    "apiState": "fresh",
+    "latestLaunch": {
+      "token": "0x250bBc2bE73C7B52B440c976eBf7209a141f4801",
+      "creator": "0xd254f684F2f9D6ea15e92296A5e4261c05d22384",
+      "blockNumber": "21326570",
+      "symbol": "CASHKID"
+    }
+  },
+  "decisionRules": {
+    "arcPadOnlyContinue": ">=25 launches in window",
+    "addSecondSource": "10-24 launches in window",
+    "arcPadOnlyTooSparse": "<10 launches in window"
+  },
+  "claimBoundary": "ArcPad creator is an onchain address reported by TokenCreated, not proof of human identity, EOA ownership, or ultimate deploying actor."
+}
