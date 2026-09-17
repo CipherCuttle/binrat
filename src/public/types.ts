@@ -2,6 +2,7 @@ import type { Hex } from '../core/types.js';
 
 export const PUBLIC_FEED_SCHEMA_VERSION = 'binrat.public-feed/0.1' as const;
 export const PUBLIC_PROJECTION_VERSION = 'BINRAT_PUBLIC_PROJECTION_V0' as const;
+export const PUBLIC_HISTORY_COVERAGE_V0 = 'UNVERIFIED' as const;
 
 export type PublicCoverage = 'COMPLETE' | 'PARTIAL' | 'UNVERIFIED';
 export type PublicEvidenceState = 'OBSERVED' | 'NOTED' | 'UNKNOWN';
@@ -43,7 +44,7 @@ export interface PublicBag {
   };
   trashTrail: {
     priorLaunchCount: number;
-    coverage: PublicCoverage;
+    coverage: typeof PUBLIC_HISTORY_COVERAGE_V0;
     prior: PublicTrashTrailItem[];
   };
   evidence: PublicEvidenceItem[];
@@ -54,7 +55,7 @@ export interface PublicProjectionReceipt {
   chainId: number;
   asOfBlock: string;
   asOfBlockHash: Hex;
-  historyCoverage: PublicCoverage;
+  historyCoverage: typeof PUBLIC_HISTORY_COVERAGE_V0;
   inputDigest: string;
   outputDigest: string;
   receiptId: string;
@@ -65,7 +66,7 @@ export interface PublicFeed {
   chainId: number;
   asOfBlock: string;
   asOfBlockHash: Hex;
-  historyCoverage: PublicCoverage;
+  historyCoverage: typeof PUBLIC_HISTORY_COVERAGE_V0;
   bags: PublicBag[];
   receipt: PublicProjectionReceipt;
 }
