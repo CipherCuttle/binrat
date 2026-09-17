@@ -1,10 +1,12 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../web/styles.css', import.meta.url), 'utf8');
 const semanticCss = readFileSync(new URL('../web/evidence-semantics.css', import.meta.url), 'utf8');
 const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
+const mascotUrl = new URL('../web/binrat-mascot-512.png', import.meta.url);
 
 const requiredHtml = [
   'BINRAT',
@@ -14,7 +16,8 @@ const requiredHtml = [
   'HOW HE DIGS',
   'CLAIM BOUNDARY',
   'He gets the scraps.',
-  'You get the receipts.'
+  'You get the receipts.',
+  './binrat-mascot-512.png'
 ];
 
 for (const marker of requiredHtml) {
@@ -27,6 +30,12 @@ if (!semanticCss.includes('.evidence-item.observed')) throw new Error('WEB_OBSER
 if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('0 NOTED CONDITIONS')) throw new Error('WEB_ZERO_CONDITION_COPY_MISSING');
+
+if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
+if (statSync(mascotUrl).size !== 564458) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
+if (!brandAssetReceipt.includes('183dbb65cae463541f788603e01677e5987603c56d706b13266804b9fbd2c9af')) {
+  throw new Error('WEB_CANONICAL_MASCOT_RECEIPT_DRIFT');
+}
 
 const prohibitedClaims = [
   'BUY_ELIGIBLE',
