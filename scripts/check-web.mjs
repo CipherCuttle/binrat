@@ -32,11 +32,15 @@ if (!css.includes('--dumpster: #263b35')) throw new Error('WEB_DUMPSTER_GREEN_DR
 if (!css.includes('image-rendering: pixelated')) throw new Error('WEB_PIXEL_MASCOT_RENDERING_MISSING');
 if (!semanticCss.includes('.evidence-item.observed')) throw new Error('WEB_OBSERVATIONAL_SEMANTICS_MISSING');
 if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
+if (!fixtures.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_FIELD_MISSING');
+if (/^\s*creator\s*:/m.test(fixtures)) throw new Error('WEB_AMBIGUOUS_CREATOR_FIELD_REINTRODUCED');
 if (!dataSource.includes("WEB_DATA_SOURCE_MODE = 'FIXTURE'")) throw new Error('WEB_DATA_SOURCE_MODE_DRIFT');
 if (!dataSource.includes("from './fixtures.js'")) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
 if (dataSource.includes('fetch(')) throw new Error('WEB_FIXTURE_SOURCE_NETWORK_ACCESS');
 if (!app.includes("from './data-source.js'")) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes("feed?.mode !== 'FIXTURE'")) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
+if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
+if (app.includes('bag.creator')) throw new Error('WEB_AMBIGUOUS_CREATOR_RENDERING_REINTRODUCED');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('0 NOTED CONDITIONS')) throw new Error('WEB_ZERO_CONDITION_COPY_MISSING');
 
