@@ -31,6 +31,8 @@ The joke is the rat. The evidence boundary is not a joke.
 
 > 🐀 dumpster rat on Arc // digs through new launches // follows reported creator addresses // keeps receipts // $BINRAT NOT LIVE
 
+The exact X handle `@binrat` is **not available for BINRAT branding** as of the 2026-09-17 check; it resolves to an existing account. Do not claim, link, or imply ownership of `@binrat`. A distinct official handle must be selected and verified before public launch materials link to X.
+
 ## Prelaunch pinned-post draft
 
 > 🐀 BINRAT
@@ -67,14 +69,17 @@ The launch-announcement template remains blocked until all of the following are 
 
 1. 72-hour HOT GARBAGE evidence gate has matured and been evaluated;
 2. exact-name/ticker collision sweep has been repeated immediately before launch;
-3. explicit owner token-launch authority exists;
-4. final contract/source has been independently verified;
-5. canonical site and repository are updated with the identical address in one bounded release;
-6. no claim is made about returns, price appreciation, safety, staking yield, guaranteed liquidity, or investment performance.
+3. official social handles and canonical site have been verified immediately before launch;
+4. explicit owner token-launch authority exists;
+5. final contract/source has been independently verified;
+6. canonical site and repository are updated with the identical address in one bounded release;
+7. no claim is made about returns, price appreciation, safety, staking yield, guaranteed liquidity, or investment performance.
 
 ## Collision note
 
 A preliminary search on 2026-09-17 did not surface an obvious active exact-name BINRAT crypto project on general search or major token-index search results. This is not authoritative proof of global uniqueness and must be repeated immediately before launch.
+
+The exact X handle `@binrat` is already occupied. Product/ticker identity and social-handle availability are separate checks.
 
 ## Prohibited presentation
 
@@ -85,6 +90,7 @@ Do not publish:
 - `100x` / moon promises;
 - presale language while presale status is NONE;
 - a contract address before explicit launch authority;
+- links to an unverified social account;
 - fake holder utility;
 - fake live-feed screenshots;
 - wallet-connect prompts before wallet functionality is deliberately authorized;
