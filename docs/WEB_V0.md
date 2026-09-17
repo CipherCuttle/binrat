@@ -38,7 +38,7 @@ V0 is intentionally one page plus an interactive detail drawer:
 - red is semantic: active scanning, findings, warnings;
 - no glossy coins, Web3 gradients, chrome logos, astronauts, generic circuit-board imagery, or finance-dashboard styling.
 
-The canonical source mascot is the approved 512×512 generated BINRAT artwork. The web shell serves its verified q96 WebP derivative at `web/binrat-mascot-512.webp`. Source and derivative digests are frozen in `docs/BRAND_ASSET.md`. Do not redesign or silently replace the mascot without an explicit brand decision.
+The canonical source mascot is the approved 512×512 generated BINRAT artwork. The web shell serves a verified 384×384 q80 WebP derivative at `web/binrat-mascot-384.webp`. Source and derivative digests are frozen in `docs/BRAND_ASSET.md`. Do not redesign or silently replace the mascot without an explicit brand decision.
 
 ## Fixture boundary
 
@@ -76,7 +76,7 @@ web/index.html
    |
    +-- web/styles.css
    +-- web/evidence-semantics.css
-   +-- web/binrat-mascot-512.webp
+   +-- web/binrat-mascot-384.webp
    +-- web/app.js
           |
           +-- web/fixtures.js
