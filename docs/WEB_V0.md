@@ -79,10 +79,14 @@ web/index.html
    +-- web/binrat-mascot-128.webp
    +-- web/app.js
           |
-          +-- web/fixtures.js
+          +-- web/data-source.js   <-- only browser data-source boundary
+                    |
+                    +-- web/fixtures.js   <-- only authorized V0 source
 ```
 
-The future live-data integration replaces `fixtures.js` with a read-only API adapter. DOM structure and product semantics should not depend on the data source.
+The internal/public evidence boundary is defined separately in `docs/PUBLIC_READ_PLANE.md` and `src/public/*`.
+
+A future live-data integration must replace the implementation behind `web/data-source.js`, not bypass it. During the 72-hour experiment the adapter is frozen to `FIXTURE` mode and performs no network fetch.
 
 ## Acceptance
 
@@ -90,6 +94,8 @@ The future live-data integration replaces `fixtures.js` with a read-only API ada
 - cards expose creator history before generic contract boilerplate;
 - detail drawer clearly distinguishes observation, coverage, Trash Trail, and receipt;
 - byte-verified canonical mascot derivative is used in the hero;
+- browser data comes through `web/data-source.js` only;
+- fixture adapter remains fail-closed and network-free;
 - mobile layout remains usable;
 - keyboard Enter/Space opens a bag and Escape closes the drawer;
 - reduced-motion preference disables animation;
