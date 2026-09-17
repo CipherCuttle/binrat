@@ -1,4 +1,4 @@
-import { hotGarbageFixtures } from './fixtures.js';
+import { loadDumpsterFeed } from './data-source.js';
 
 const grid = document.querySelector('#garbage-grid');
 const drawer = document.querySelector('#drawer');
@@ -7,11 +7,35 @@ const drawerClose = document.querySelector('#drawer-close');
 const backdrop = document.querySelector('#backdrop');
 const randomBag = document.querySelector('#random-bag');
 let returnFocus = null;
+let bags = [];
 
-renderFeed();
+await bootstrap();
+
+async function bootstrap() {
+  try {
+    const feed = await loadDumpsterFeed();
+    if (feed?.mode !== 'FIXTURE') throw new Error('WEB_DATA_SOURCE_NOT_AUTHORIZED');
+    if (!Array.isArray(feed?.bags)) throw new Error('WEB_DATA_SOURCE_INVALID');
+    bags = feed.bags;
+    renderFeed();
+  } catch (error) {
+    renderUnavailable(error);
+  }
+}
+
+function renderUnavailable(error) {
+  bags = [];
+  randomBag.disabled = true;
+  grid.replaceChildren();
+  const panel = document.createElement('div');
+  panel.className = 'data-unavailable';
+  panel.textContent = 'DUMPSTER DATA UNAVAILABLE — fixture source failed closed.';
+  grid.append(panel);
+  console.error(error);
+}
 
 function renderFeed() {
-  grid.innerHTML = hotGarbageFixtures.map(renderCard).join('');
+  grid.innerHTML = bags.map(renderCard).join('');
   for (const button of grid.querySelectorAll('[data-bag-id]')) {
     button.addEventListener('click', () => openBag(button.dataset.bagId, button));
   }
@@ -45,7 +69,7 @@ function metric(label, value) {
 }
 
 function openBag(id, origin = document.activeElement) {
-  const bag = hotGarbageFixtures.find((item) => item.id === id);
+  const bag = bags.find((item) => item.id === id);
   if (!bag) return;
   returnFocus = origin instanceof HTMLElement ? origin : null;
 
@@ -114,7 +138,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 randomBag.addEventListener('click', () => {
-  const bag = hotGarbageFixtures[Math.floor(Math.random() * hotGarbageFixtures.length)];
+  if (bags.length === 0) return;
+  const bag = bags[Math.floor(Math.random() * bags.length)];
   openBag(bag.id, randomBag);
 });
 
