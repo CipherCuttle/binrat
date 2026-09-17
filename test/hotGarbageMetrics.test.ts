@@ -5,6 +5,7 @@ import {
   computeHistoricalCreatorOpportunity,
   computeHotGarbageMetrics,
   decideHotGarbage,
+  gateHotGarbageDecision,
   reconcileTokenSets
 } from '../src/experiment/hotGarbageMetrics.js';
 
@@ -78,6 +79,11 @@ test('volume gates are frozen at 10 and 25 launches', () => {
   assert.equal(decideHotGarbage(10), 'ADD_SECOND_SOURCE');
   assert.equal(decideHotGarbage(24), 'ADD_SECOND_SOURCE');
   assert.equal(decideHotGarbage(25), 'CONTINUE_ARCPAD_ONLY');
+});
+
+test('failed evidence gate overrides a positive volume candidate', () => {
+  assert.equal(gateHotGarbageDecision('CONTINUE_ARCPAD_ONLY', false), 'EVIDENCE_GATE_FAILED');
+  assert.equal(gateHotGarbageDecision('CONTINUE_ARCPAD_ONLY', true), 'CONTINUE_ARCPAD_ONLY');
 });
 
 test('reconciliation is case-insensitive and reports both directional capture rates', () => {
