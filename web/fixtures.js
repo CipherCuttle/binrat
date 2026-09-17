@@ -8,15 +8,15 @@ export const hotGarbageFixtures = [
     creator: '0xa71b000000000000000000000000000000000001',
     block: '21,400,118',
     coverage: 'PARTIAL',
-    flags: 2,
+    notedConditions: 2,
     priorLaunches: 8,
     mature24h: 6,
     unresolved: 2,
     concentration: '61%',
     evidence: [
-      { tone: 'warn', text: 'same ArcPad-reported creator address appears on 8 earlier launches' },
-      { tone: 'warn', text: 'top 5 non-system wallets hold 61% in this fixture' },
-      { tone: 'good', text: 'reverse trade observation exists in this fixture' },
+      { tone: 'noted', text: 'same ArcPad-reported creator address appears on 8 earlier launches' },
+      { tone: 'noted', text: 'top 5 non-system wallets hold 61% in this fixture' },
+      { tone: 'observed', text: 'reverse trade observation exists in this fixture' },
       { tone: 'unknown', text: '2 historical outcomes are not mature yet' }
     ],
     trail: [
@@ -36,18 +36,18 @@ export const hotGarbageFixtures = [
     creator: '0xb82c000000000000000000000000000000000002',
     block: '21,399,804',
     coverage: 'COMPLETE',
-    flags: 0,
+    notedConditions: 0,
     priorLaunches: 0,
     mature24h: 0,
     unresolved: 0,
     concentration: '18%',
     evidence: [
-      { tone: 'good', text: 'no prior ArcPad launch found for this reported creator address' },
-      { tone: 'good', text: 'holder concentration fixture is comparatively low' },
+      { tone: 'observed', text: 'no prior ArcPad launch is present in this fixture for the reported creator address' },
+      { tone: 'observed', text: 'top 5 non-system wallets hold 18% in this fixture' },
       { tone: 'unknown', text: 'no 24h outcome exists yet because the launch is fresh' }
     ],
     trail: [],
-    note: 'clean bag. still a bag.',
+    note: 'new bag. not enough history yet.',
     receipt: 'receipt_fixture_leftovr_002'
   },
   {
@@ -59,14 +59,14 @@ export const hotGarbageFixtures = [
     creator: '0xc93d000000000000000000000000000000000003',
     block: '21,398,770',
     coverage: 'PARTIAL',
-    flags: 1,
+    notedConditions: 1,
     priorLaunches: 3,
     mature24h: 2,
     unresolved: 1,
     concentration: '43%',
     evidence: [
-      { tone: 'warn', text: 'reported creator address has prior ArcPad history' },
-      { tone: 'good', text: '2 mature historical observations are available' },
+      { tone: 'noted', text: 'reported creator address appears on 3 earlier ArcPad fixture launches' },
+      { tone: 'observed', text: '2 mature historical observations are available' },
       { tone: 'unknown', text: '1 historical launch remains unresolved' }
     ],
     trail: [
