@@ -64,6 +64,7 @@ function ageLabel(item) {
 }
 const search = document.querySelector("#bag-search");
 const latestBag = document.querySelector("#latest-bag");
+const liveRail = document.querySelector("#live-rail");
 const pageSurfaces = [
   ...document.querySelectorAll(
     "body > header, body > main, body > footer, .skip-link",
@@ -108,6 +109,7 @@ async function bootstrap() {
     activeMode = feed.mode;
     available = true;
     applyMode(feed);
+    renderLiveRail(feed);
     randomBag.disabled = bags.length === 0;
     renderIntake();
     renderFeed();
@@ -128,6 +130,7 @@ function renderUnavailable(error) {
     copy().unavailable;
   latestBag.innerHTML =
     '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
+  liveRail.innerHTML = '<span class="live-rail-dot offline" aria-hidden="true"></span><strong>OFFLINE</strong><span>ARC 5042</span><span>LIVE INDEX NOT AVAILABLE</span>';
   document.querySelector("#feed-count").textContent = "INDEX UNAVAILABLE";
   for (const element of document.querySelectorAll(".filter-button span")) {
     element.textContent = "—";
@@ -184,6 +187,9 @@ function renderFeed() {
     link.addEventListener("click", (event) => event.stopPropagation());
     link.addEventListener("keydown", (event) => event.stopPropagation());
   }
+  for (const image of grid.querySelectorAll("[data-token-image]")) {
+    image.addEventListener("error", () => image.remove(), { once: true });
+  }
 }
 
 function renderCard(bag) {
@@ -196,7 +202,7 @@ function renderCard(bag) {
   return `
     <article class="bag-card" tabindex="0" role="button" aria-haspopup="dialog" data-bag-id="${escapeHtml(bag.id)}" data-noted="${noted}" aria-label="Open ${escapeHtml(bag.symbol)} ${copy().report}">
       <div class="feed-cell feed-age" data-label="AGE / BLOCK"><span>BLK</span>${escapeHtml(bag.block)}</div>
-      <div class="feed-cell feed-token" data-label="TOKEN"><h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3><div class="token-name">${escapeHtml(bag.name)}</div><code>${escapeHtml(shortAddress(bag.token))}</code></div>
+      <div class="feed-cell feed-token" data-label="TOKEN"><div class="feed-token-main">${renderTokenThumb(bag)}<div class="feed-token-copy"><h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3><div class="token-name">${escapeHtml(bag.name)}</div><code>${escapeHtml(shortAddress(bag.token))}</code></div></div></div>
       <div class="feed-cell feed-creator" data-label="ARCPAD-REPORTED CREATOR"><code title="${escapeHtml(bag.reportedCreatorAddress)}">${escapeHtml(shortAddress(bag.reportedCreatorAddress))}</code><span>${bag.priorLaunches > 0 ? "REPEAT ADDRESS" : "NO PRIOR BAG IN INDEX"}</span></div>
       <div class="feed-cell feed-prior" data-label="PRIOR BAGS"><strong>${escapeHtml(bag.priorLaunches)}</strong><span>INDEXED</span></div>
       <div class="feed-cell feed-socials" data-label="SOCIALS">${renderSocials(bag)}</div>
@@ -246,6 +252,21 @@ function summarizeEvidence(bag) {
   if (states.has("noted")) return "NOTED";
   if (states.has("unknown")) return "UNKNOWN";
   return "OBSERVED";
+}
+
+function renderLiveRail(feed) {
+  if (!liveRail) return;
+  if (activeMode === "LIVE") {
+    liveRail.innerHTML = `<span class="live-rail-dot" aria-hidden="true"></span><strong>LIVE</strong><span>ARC 5042</span><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>BLOCK ${escapeHtml(feed.asOfBlock)}</span><span>HISTORY ${escapeHtml(feed.historyCoverage)}</span>`;
+    return;
+  }
+  liveRail.innerHTML = `<span class="live-rail-dot fixture" aria-hidden="true"></span><strong>FIXTURE</strong><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>SYNTHETIC DATA</span>`;
+}
+
+function renderTokenThumb(bag) {
+  const src = safeExternalUrl(bag.imageUri);
+  const mark = String(bag.symbol || "?").trim().slice(0, 2).toUpperCase() || "?";
+  return `<span class="token-thumb" aria-hidden="true"><span>${escapeHtml(mark)}</span>${src ? `<img src="${escapeHtml(src)}" alt="" width="44" height="44" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-token-image />` : ""}</span>`;
 }
 
 function renderSocials(bag) {

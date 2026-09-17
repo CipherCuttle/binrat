@@ -60,7 +60,7 @@ export function adaptPublicFeed(feed) {
       trail.prior.length !== trail.priorLaunchCount ||
       !Array.isArray(bag.evidence) ||
       !bag.metadata ||
-      !["website", "twitter", "telegram"].every(
+      !["imageUri", "website", "twitter", "telegram"].every(
         (key) => typeof bag.metadata[key] === "string",
       ) ||
       !bag.evidence.every(
@@ -105,6 +105,7 @@ export function adaptPublicFeed(feed) {
         tone: item.state.toLowerCase(),
         text: item.text,
       })),
+      imageUri: bag.metadata.imageUri,
       socials: {
         website: bag.metadata.website,
         twitter: bag.metadata.twitter,

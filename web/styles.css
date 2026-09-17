@@ -2460,3 +2460,102 @@ body {
     font-size: 12px;
   }
 }
+
+
+/* Live launch identity polish: scan faster without adding unsupported market data. */
+.live-rail {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-height: 38px;
+  margin-bottom: 0;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  background: #151a16;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.045em;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.live-rail > * {
+  flex: 0 0 auto;
+}
+.live-rail strong {
+  color: var(--good);
+  font-size: 12px;
+  font-weight: 500;
+}
+.live-rail > span:not(.live-rail-dot),
+.live-rail > strong {
+  padding: 0 12px;
+}
+.live-rail > span:not(.live-rail-dot) + span,
+.live-rail > strong + span {
+  border-left: 1px solid var(--line);
+}
+.live-rail-dot {
+  width: 7px;
+  height: 7px;
+  margin-left: 12px;
+  background: var(--good);
+  box-shadow: 0 0 0 3px #a8b79512;
+}
+.live-rail-dot.fixture {
+  background: var(--orange);
+  box-shadow: none;
+}
+.live-rail-dot.offline {
+  background: var(--unknown);
+  box-shadow: none;
+}
+.feed-token-main {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.feed-token-copy {
+  min-width: 0;
+}
+.token-thumb {
+  position: relative;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border: 1px solid #455044;
+  background: #202620;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: -0.04em;
+}
+.token-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: auto;
+}
+@media (max-width: 760px) {
+  .live-rail {
+    margin-inline: 0;
+    font-size: 10px;
+  }
+  .live-rail strong {
+    font-size: 11px;
+  }
+  .live-rail > span:not(.live-rail-dot),
+  .live-rail > strong {
+    padding-inline: 10px;
+  }
+  .token-thumb {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+  }
+}
