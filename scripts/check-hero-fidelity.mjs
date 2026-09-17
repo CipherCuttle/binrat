@@ -13,9 +13,15 @@ for (const marker of ['./binrat-hero.svg', './hero-fidelity.css', 'width="512"',
 if (!css.includes('image-rendering: auto')) throw new Error('HERO_FIDELITY_INTERPOLATION_MISSING');
 if (css.includes('image-rendering: pixelated')) throw new Error('HERO_FIDELITY_PIXEL_FORCING_REINTRODUCED');
 
-const match = svg.match(/href="data:image\/webp;base64,([A-Za-z0-9+/=]+)"/);
-if (!match) throw new Error('HERO_FIDELITY_EMBEDDED_WEBP_MISSING');
-const bytes = Buffer.from(match[1], 'base64');
+const prefix = 'href="data:image/webp;base64,';
+const start = svg.indexOf(prefix);
+if (start < 0) throw new Error('HERO_FIDELITY_EMBEDDED_WEBP_MISSING');
+const payloadStart = start + prefix.length;
+const payloadEnd = svg.indexOf('"', payloadStart);
+if (payloadEnd < 0) throw new Error('HERO_FIDELITY_EMBEDDED_WEBP_UNTERMINATED');
+const encoded = svg.slice(payloadStart, payloadEnd).replace(/\s+/g, '');
+if (!/^[A-Za-z0-9+/=]+$/.test(encoded)) throw new Error('HERO_FIDELITY_EMBEDDED_WEBP_INVALID_BASE64');
+const bytes = Buffer.from(encoded, 'base64');
 if (bytes.length !== 30850) throw new Error(`HERO_FIDELITY_BYTE_SIZE_DRIFT:${bytes.length}`);
 const digest = createHash('sha256').update(bytes).digest('hex');
 const expected = 'f1cd98539d4eade13204904e0c707d81cf9de9be7451ee746e92b10189a2c648';
