@@ -53,6 +53,12 @@ It does **not** expose or infer:
 - price prediction;
 - outcome, distribution, or sellability claims that are not yet part of the frozen projection contract.
 
+## Launch identity law
+
+Before publication, `PUBLIC_PROJECTION_V0` independently rederives both canonical launch identity and source-event identity from their frozen authority fields.
+
+A supplied `launchId` or `eventId` is not trusted merely because it arrived from an internal caller. Any identity drift fails closed before provenance is evaluated.
+
 ## Creator semantics
 
 The public field is named:
@@ -67,7 +73,7 @@ The only claim V0 makes is that ArcPad reported the address on the launch event 
 
 A supplied provenance fact is not trusted merely because its visible creator/block fields match a launch.
 
-Before publication, `PUBLIC_PROJECTION_V0` independently rebuilds the expected provenance fact from the authoritative launch observation and requires the supplied fact to match the deterministic:
+Before publication, `PUBLIC_PROJECTION_V0` independently rebuilds the expected provenance fact from the canonical launch observation and requires the supplied fact to match the deterministic:
 
 - fact kind;
 - fact ID;
@@ -119,6 +125,7 @@ No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARB
 - deterministic output independent of input ordering;
 - future-dated launch/fact input fails closed;
 - malformed as-of chain authority fails closed;
+- noncanonical launch/event identity fails closed after independent rederivation;
 - mismatched provenance authority fails closed;
 - provenance fact ID/digest drift fails closed after independent reconstruction;
 - public field is `reportedCreatorAddress`;
