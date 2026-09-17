@@ -11,7 +11,8 @@
     "check": "pnpm build && pnpm test",
     "backfill": "tsx src/cli.ts backfill",
     "watch": "tsx src/cli.ts watch",
-    "inspect": "tsx src/cli.ts inspect"
+    "inspect": "tsx src/cli.ts inspect",
+    "experiment:finalize": "tsx src/experiment/finalizeHotGarbage.ts"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
