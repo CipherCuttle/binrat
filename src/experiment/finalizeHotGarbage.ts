@@ -12,6 +12,7 @@ import {
   computeHistoricalCreatorOpportunity,
   computeHotGarbageMetrics,
   decideHotGarbage,
+  gateHotGarbageDecision,
   reconcileTokenSets
 } from './hotGarbageMetrics.js';
 
@@ -107,11 +108,12 @@ if (!canonicalStart.hash || canonicalStart.hash.toLowerCase() !== start.startBlo
 const targetEndSeconds = BigInt(Math.floor(endAtMs / 1000));
 const head = await retryTransient(() => client.getBlock({ blockTag: 'latest' }));
 if (!head.hash) throw new Error('ARC_HEAD_HASH_MISSING');
-if (head.timestamp < targetEndSeconds && !ALLOW_EARLY) {
+const maturedWindow = head.timestamp >= targetEndSeconds;
+if (!maturedWindow && !ALLOW_EARLY) {
   throw new Error(`EXPERIMENT_CHAIN_TIME_NOT_MATURE:headTimestamp=${head.timestamp}:target=${targetEndSeconds}`);
 }
 
-const searchTargetSeconds = ALLOW_EARLY && head.timestamp < targetEndSeconds ? head.timestamp : targetEndSeconds;
+const searchTargetSeconds = maturedWindow ? targetEndSeconds : head.timestamp;
 const endBlock = await findLastBlockAtOrBefore(client, startBlock, head.number, searchTargetSeconds);
 const canonicalEnd = await retryTransient(() => client.getBlock({ blockNumber: endBlock }));
 if (!canonicalEnd.hash) throw new Error(`EXPERIMENT_END_BLOCK_HASH_MISSING:block=${endBlock}`);
@@ -155,10 +157,11 @@ try {
   const captureGatePass =
     reconciliation.onchainCapturePercentAgainstApi >= 99 &&
     reconciliation.apiCapturePercentAgainstOnchain >= 99;
-  const verdict = captureGatePass ? volumeDecisionCandidate : 'EVIDENCE_GATE_FAILED';
+  const verdict = gateHotGarbageDecision(volumeDecisionCandidate, captureGatePass, maturedWindow);
 
   const report = {
     schemaVersion: 'binrat.hot-garbage-72h.result.v0',
+    evidenceStatus: maturedWindow ? 'MATURED_WINDOW' : 'EARLY_SMOKE_ONLY',
     finalizedAt: new Date().toISOString(),
     preregistration: {
       startedAt: start.startedAt,
@@ -173,7 +176,9 @@ try {
       blockTimestamp: new Date(Number(canonicalEnd.timestamp) * 1000).toISOString(),
       observedHeadBlock: head.number.toString(),
       observedHeadHash: head.hash.toLowerCase(),
-      timestampResolutionNote: 'Arc block timestamps are second-resolution; the block boundary is the last timestamp <= the preregistered end instant.'
+      timestampResolutionNote: maturedWindow
+        ? 'Arc block timestamps are second-resolution; the block boundary is the last timestamp <= the preregistered end instant.'
+        : 'EARLY SMOKE ONLY: the temporary boundary is the latest observed block timestamp, not the preregistered 72-hour end.'
     },
     reconstruction: {
       batchBlocks: BATCH_BLOCKS.toString(),
@@ -193,6 +198,7 @@ try {
       pagesRead: apiSnapshot.pagesRead
     },
     gates: {
+      maturedWindow,
       captureGatePercent: 99,
       captureGatePass,
       volumeDecisionCandidate
