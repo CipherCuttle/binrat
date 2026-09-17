@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../web/styles.css', import.meta.url), 'utf8');
 const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'utf8');
+const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 
 const requiredHtml = [
   'BINRAT',
@@ -21,10 +22,19 @@ for (const marker of requiredHtml) {
 
 if (!css.includes('--red: #ff2638')) throw new Error('WEB_BRAND_RED_DRIFT');
 if (!css.includes('--dumpster: #263b35')) throw new Error('WEB_DUMPSTER_GREEN_DRIFT');
-if (!fixtures.includes('FIXTURE / PRODUCT-SHELL ONLY')) {
-  // The exact stamp is rendered in app.js; fixtures must still be obviously synthetic addresses.
-  if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
+if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
+if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
+
+const prohibitedClaims = [
+  'BUY_ELIGIBLE',
+  'SAFE SCORE',
+  'RUG PROBABILITY',
+  'SCAM PROBABILITY',
+  'GUARANTEED SAFE'
+];
+const corpus = `${html}\n${fixtures}\n${app}`.toUpperCase();
+for (const claim of prohibitedClaims) {
+  if (corpus.includes(claim)) throw new Error(`WEB_CLAIM_BOUNDARY_VIOLATION:${claim}`);
 }
-if (/BUY|SELL|SAFE SCORE|RUG PROBABILITY/i.test(html)) throw new Error('WEB_CLAIM_BOUNDARY_VIOLATION');
 
 console.log('BINRAT web invariants: PASS');
