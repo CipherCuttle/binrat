@@ -1,6 +1,6 @@
 import type { Hex, LaunchObserved } from '../core/types.js';
 import { sha256Hex } from '../evidence/canonical.js';
-import type { ProvenanceFact } from '../intelligence/provenance.js';
+import { buildProvenanceFact, type ProvenanceFact } from '../intelligence/provenance.js';
 import {
   PUBLIC_FEED_SCHEMA_VERSION,
   PUBLIC_HISTORY_COVERAGE_V0,
@@ -23,7 +23,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
   const launches = [...input.launches].sort(compareLaunchesAscending);
   const facts = [...input.facts].sort(compareFactsAscending);
 
-  validateInput(input, launches, facts);
+  await validateInput(input, launches, facts);
 
   const factByLaunchId = new Map(facts.map((fact) => [fact.launchId, fact]));
   const launchesByCreator = new Map<string, LaunchObserved[]>();
@@ -170,7 +170,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
   return { ...outputMaterial, asOfBlockHash: outputMaterial.asOfBlockHash as Hex, receipt };
 }
 
-function validateInput(input: PublicProjectionInput, launches: LaunchObserved[], facts: ProvenanceFact[]): void {
+async function validateInput(input: PublicProjectionInput, launches: LaunchObserved[], facts: ProvenanceFact[]): Promise<void> {
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) throw new Error('PUBLIC_CHAIN_ID_INVALID');
   if (input.asOfBlock < 0n) throw new Error('PUBLIC_AS_OF_BLOCK_INVALID');
   if (!/^0x[0-9a-fA-F]{64}$/.test(input.asOfBlockHash)) throw new Error('PUBLIC_AS_OF_BLOCK_HASH_INVALID');
@@ -204,6 +204,15 @@ function validateInput(input: PublicProjectionInput, launches: LaunchObserved[],
       fact.sourceEventId !== launch.eventId
     ) {
       throw new Error(`PUBLIC_FACT_AUTHORITY_MISMATCH:${fact.factId}`);
+    }
+
+    const expectedFact = await buildProvenanceFact(launch);
+    if (
+      fact.kind !== expectedFact.kind ||
+      fact.factId !== expectedFact.factId ||
+      fact.evidenceDigest !== expectedFact.evidenceDigest
+    ) {
+      throw new Error(`PUBLIC_FACT_INTEGRITY_MISMATCH:${fact.factId}`);
     }
   }
 }
