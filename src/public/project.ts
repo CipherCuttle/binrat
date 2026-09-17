@@ -1,3 +1,4 @@
+import { deriveEventId, deriveLaunchId } from '../core/identity.js';
 import type { Hex, LaunchObserved } from '../core/types.js';
 import { sha256Hex } from '../evidence/canonical.js';
 import { buildProvenanceFact, type ProvenanceFact } from '../intelligence/provenance.js';
@@ -182,6 +183,22 @@ async function validateInput(input: PublicProjectionInput, launches: LaunchObser
     if (launch.chainId !== input.chainId) throw new Error(`PUBLIC_CHAIN_MISMATCH:${launch.launchId}`);
     if (launch.source !== 'ARCPAD') throw new Error(`PUBLIC_SOURCE_UNSUPPORTED:${launch.launchId}`);
     if (launch.blockNumber > input.asOfBlock) throw new Error(`PUBLIC_FUTURE_LAUNCH:${launch.launchId}`);
+
+    const expectedLaunchId = await deriveLaunchId({
+      chainId: launch.chainId,
+      launcher: launch.launcher,
+      txHash: launch.txHash,
+      token: launch.token
+    });
+    const expectedEventId = await deriveEventId({
+      chainId: launch.chainId,
+      launcher: launch.launcher,
+      txHash: launch.txHash,
+      logIndex: launch.logIndex
+    });
+    if (launch.launchId !== expectedLaunchId || launch.eventId !== expectedEventId) {
+      throw new Error(`PUBLIC_LAUNCH_IDENTITY_MISMATCH:${launch.launchId}`);
+    }
   }
 
   for (const fact of facts) {
