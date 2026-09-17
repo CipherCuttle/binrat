@@ -1,4 +1,5 @@
 import { loadDumpsterFeed } from './data-source.js';
+import { buildShareCardModel, buildSharePostText } from './share-card.js';
 
 const grid = document.querySelector('#garbage-grid');
 const drawer = document.querySelector('#drawer');
@@ -83,6 +84,8 @@ function openBag(id, origin = document.activeElement) {
       `).join('')
     : '<div class="empty-trail">No earlier ArcPad fixture launch is attached to this reported creator address. This is absence of fixture history, not positive evidence.</div>';
 
+  const share = buildShareCardModel(bag);
+
   drawerContent.innerHTML = `
     <p class="drawer-kicker">TRASH TRAIL // FIXTURE REPORT</p>
     <h2>${escapeHtml(bag.symbol)}</h2>
@@ -110,12 +113,60 @@ function openBag(id, origin = document.activeElement) {
       </dl>
       <span class="fixture-stamp">NOT LIVE EVIDENCE</span>
     </div>
+
+    <section class="share-tools" aria-label="Share card fixture preview">
+      <h3>SHARE CARD // FIXTURE PREVIEW</h3>
+      ${renderShareCard(share)}
+      <div class="share-actions">
+        <button class="button ghost" type="button" data-copy-post>COPY POST</button>
+      </div>
+      <div class="share-copy-status" aria-live="polite"></div>
+    </section>
   `;
+
+  const copyButton = drawerContent.querySelector('[data-copy-post]');
+  const copyStatus = drawerContent.querySelector('.share-copy-status');
+  copyButton?.addEventListener('click', () => copySharePost(bag, copyStatus));
 
   drawer.classList.add('open');
   drawer.setAttribute('aria-hidden', 'false');
   backdrop.hidden = false;
   drawerClose.focus();
+}
+
+function renderShareCard(card) {
+  return `
+    <div class="share-card" data-share-card-version="${escapeHtml(card.version)}">
+      <div class="share-card-copy">
+        <div class="share-card-kicker">🔥🗑️ HOT GARBAGE // ${escapeHtml(card.stamp)}</div>
+        <h4 class="share-card-symbol">${escapeHtml(card.symbol)}</h4>
+        <div class="share-card-metrics">
+          <div class="share-card-metric"><span>REPORTED CREATOR</span><b>${escapeHtml(card.creatorShort)}</b></div>
+          <div class="share-card-metric"><span>PRIOR BAGS</span><b>${escapeHtml(card.priorLaunches)}</b></div>
+          <div class="share-card-metric"><span>COVERAGE</span><b>${escapeHtml(card.coverage)}</b></div>
+        </div>
+        <p class="share-card-note">binrat: “${escapeHtml(card.note)}”</p>
+      </div>
+      <div class="share-card-rat" aria-hidden="true">
+        <img src="./binrat-mascot-128.webp" alt="" width="128" height="128" />
+      </div>
+      <div class="share-card-footer">
+        <span>${escapeHtml(card.receipt)}</span>
+        <span>${escapeHtml(card.footer)}</span>
+      </div>
+    </div>
+  `;
+}
+
+async function copySharePost(bag, statusNode) {
+  const text = buildSharePostText(bag);
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('CLIPBOARD_UNAVAILABLE');
+    await navigator.clipboard.writeText(text);
+    statusNode.textContent = 'COPIED // fixture stamp included';
+  } catch {
+    statusNode.textContent = 'COPY UNAVAILABLE // select the fixture card manually';
+  }
 }
 
 function closeDrawer() {
