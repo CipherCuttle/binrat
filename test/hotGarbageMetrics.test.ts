@@ -86,6 +86,11 @@ test('failed evidence gate overrides a positive volume candidate', () => {
   assert.equal(gateHotGarbageDecision('CONTINUE_ARCPAD_ONLY', true), 'CONTINUE_ARCPAD_ONLY');
 });
 
+test('early smoke never emits an experiment verdict even when evidence capture passes', () => {
+  assert.equal(gateHotGarbageDecision('CONTINUE_ARCPAD_ONLY', true, false), 'EARLY_SMOKE_ONLY');
+  assert.equal(gateHotGarbageDecision('ARCPAD_ONLY_TOO_SPARSE', true, false), 'EARLY_SMOKE_ONLY');
+});
+
 test('reconciliation is case-insensitive and reports both directional capture rates', () => {
   const a = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as Hex;
   const b = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' as Hex;
