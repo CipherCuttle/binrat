@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
@@ -6,7 +7,8 @@ const semanticCss = readFileSync(new URL('../web/evidence-semantics.css', import
 const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
-const mascotUrl = new URL('../web/binrat-mascot-512.png', import.meta.url);
+const mascotUrl = new URL('../web/binrat-mascot-512.webp', import.meta.url);
+const expectedMascotSha256 = '0828922dddcdc94d9831d2b907245b71460c3fb5552077c3528d96c00a7581d0';
 
 const requiredHtml = [
   'BINRAT',
@@ -17,7 +19,7 @@ const requiredHtml = [
   'CLAIM BOUNDARY',
   'He gets the scraps.',
   'You get the receipts.',
-  './binrat-mascot-512.png'
+  './binrat-mascot-512.webp'
 ];
 
 for (const marker of requiredHtml) {
@@ -32,9 +34,12 @@ if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP
 if (!app.includes('0 NOTED CONDITIONS')) throw new Error('WEB_ZERO_CONDITION_COPY_MISSING');
 
 if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
-if (statSync(mascotUrl).size !== 564458) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
+if (statSync(mascotUrl).size !== 133364) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
+const mascotDigest = createHash('sha256').update(readFileSync(mascotUrl)).digest('hex');
+if (mascotDigest !== expectedMascotSha256) throw new Error(`WEB_CANONICAL_MASCOT_DIGEST_DRIFT:${mascotDigest}`);
+if (!brandAssetReceipt.includes(expectedMascotSha256)) throw new Error('WEB_CANONICAL_MASCOT_RECEIPT_DRIFT');
 if (!brandAssetReceipt.includes('183dbb65cae463541f788603e01677e5987603c56d706b13266804b9fbd2c9af')) {
-  throw new Error('WEB_CANONICAL_MASCOT_RECEIPT_DRIFT');
+  throw new Error('WEB_CANONICAL_MASCOT_SOURCE_RECEIPT_DRIFT');
 }
 
 const prohibitedClaims = [
