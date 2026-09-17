@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { createPublicClient, http, type PublicClient } from 'viem';
 import { ArcPadLaunchSource } from '../arc/arcpadSource.js';
-import { ARC_CHAIN_ID, arcMainnet } from '../arc/chain.js';
+import { ARCPAD_LAUNCHER, ARC_CHAIN_ID, arcMainnet } from '../arc/chain.js';
 import type { Hex } from '../core/types.js';
 import type { LaunchSource } from '../core/ports.js';
 import { syncLaunches } from '../indexer/syncLaunches.js';
@@ -40,6 +40,22 @@ interface ArcPadTokensPage {
   nextAfter?: string | number | null;
   state?: string;
   servedAt?: number;
+}
+
+class RetryingLaunchSource implements LaunchSource {
+  constructor(private readonly inner: LaunchSource) {}
+  getHeadBlockNumber() { return retryTransient(() => this.inner.getHeadBlockNumber()); }
+  getBlockHash(blockNumber: bigint) { return retryTransient(() => this.inner.getBlockHash(blockNumber)); }
+  assertAuthority(blockNumber: bigint) { return retryTransient(() => this.inner.assertAuthority(blockNumber)); }
+  catchUp(fromBlock: bigint, toBlock: bigint) { return retryTransient(() => this.inner.catchUp(fromBlock, toBlock)); }
+}
+
+class CappedLaunchSource implements LaunchSource {
+  constructor(private readonly inner: LaunchSource, private readonly syntheticHead: bigint) {}
+  async getHeadBlockNumber() { return this.syntheticHead; }
+  getBlockHash(blockNumber: bigint) { return this.inner.getBlockHash(blockNumber); }
+  assertAuthority(blockNumber: bigint) { return this.inner.assertAuthority(blockNumber); }
+  catchUp(fromBlock: bigint, toBlock: bigint) { return this.inner.catchUp(fromBlock, toBlock); }
 }
 
 const start = JSON.parse(readFileSync(START_RECEIPT_PATH, 'utf8')) as StartReceipt;
@@ -150,22 +166,6 @@ try {
   rmSync(dir, { recursive: true, force: true });
 }
 
-class RetryingLaunchSource implements LaunchSource {
-  constructor(private readonly inner: LaunchSource) {}
-  getHeadBlockNumber() { return retryTransient(() => this.inner.getHeadBlockNumber()); }
-  getBlockHash(blockNumber: bigint) { return retryTransient(() => this.inner.getBlockHash(blockNumber)); }
-  assertAuthority(blockNumber: bigint) { return retryTransient(() => this.inner.assertAuthority(blockNumber)); }
-  catchUp(fromBlock: bigint, toBlock: bigint) { return retryTransient(() => this.inner.catchUp(fromBlock, toBlock)); }
-}
-
-class CappedLaunchSource implements LaunchSource {
-  constructor(private readonly inner: LaunchSource, private readonly syntheticHead: bigint) {}
-  async getHeadBlockNumber() { return this.syntheticHead; }
-  getBlockHash(blockNumber: bigint) { return this.inner.getBlockHash(blockNumber); }
-  assertAuthority(blockNumber: bigint) { return this.inner.assertAuthority(blockNumber); }
-  catchUp(fromBlock: bigint, toBlock: bigint) { return this.inner.catchUp(fromBlock, toBlock); }
-}
-
 async function findLastBlockAtOrBefore(
   rpc: PublicClient,
   startBlock: bigint,
@@ -251,9 +251,10 @@ function isTransient(error: unknown): boolean {
 function validateStart(value: StartReceipt): void {
   if (value.schemaVersion !== 'binrat.hot-garbage-72h.prereg.v0') throw new Error('START_SCHEMA_UNSUPPORTED');
   if (value.chainId !== ARC_CHAIN_ID) throw new Error(`START_CHAIN_ID_INVALID:${value.chainId}`);
+  if (value.launcher.toLowerCase() !== ARCPAD_LAUNCHER.toLowerCase()) throw new Error(`START_LAUNCHER_INVALID:${value.launcher}`);
   if (!Number.isFinite(value.windowHours) || value.windowHours <= 0) throw new Error('START_WINDOW_INVALID');
   if (!/^0x[0-9a-fA-F]{64}$/.test(value.startBlockHash)) throw new Error('START_BLOCK_HASH_INVALID');
-  if (!/^0x[0-9a-fA-F]{40}$/.test(value.launcher)) throw new Error('START_LAUNCHER_INVALID');
+  if (!/^0x[0-9a-fA-F]{40}$/.test(value.launcher)) throw new Error('START_LAUNCHER_FORMAT_INVALID');
   if (!/^\d+$/.test(value.startBlock)) throw new Error('START_BLOCK_INVALID');
   if (!Number.isFinite(Date.parse(value.startedAt))) throw new Error('START_TIME_INVALID');
 }
