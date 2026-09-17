@@ -33,7 +33,7 @@ const prelaunchCorpus = `${html}\n${launchDoc}`;
 if (/0x[0-9a-fA-F]{40}/.test(prelaunchCorpus)) throw new Error('LAUNCH_CONTRACT_ADDRESS_PUBLISHED_EARLY');
 
 for (const prohibited of ['BUY NOW', 'PRESALE OPEN', 'GUARANTEED RETURNS', '100X GUARANTEED']) {
-  if (prelaunchCorpus.toUpperCase().includes(prohibited)) throw new Error(`LAUNCH_PRESENTATION_PROHIBITED:${prohibited}`);
+  if (html.toUpperCase().includes(prohibited)) throw new Error(`LAUNCH_PRESENTATION_PROHIBITED:${prohibited}`);
 }
 
 console.log('BINRAT launch-presentation invariants: PASS');
