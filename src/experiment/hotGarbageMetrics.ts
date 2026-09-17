@@ -19,6 +19,13 @@ export interface HotGarbageMetrics {
   };
 }
 
+export interface HistoricalCreatorOpportunity {
+  windowCreatorAddressesWithPriorArcPadLaunch: number;
+  windowLaunchesWithPriorArcPadLaunch: number;
+  totalPriorArcPadLaunchesForWindowCreators: number;
+  maxPriorArcPadLaunchesForOneWindowCreator: number;
+}
+
 export interface Reconciliation {
   onchainCount: number;
   apiCount: number;
@@ -65,6 +72,29 @@ export function computeHotGarbageMetrics(launches: readonly LaunchObserved[]): H
       withTelegram,
       withAnySocialOrWebsite
     }
+  };
+}
+
+export function computeHistoricalCreatorOpportunity(
+  windowLaunches: readonly LaunchObserved[],
+  priorArcPadCreatorAddresses: readonly Hex[]
+): HistoricalCreatorOpportunity {
+  const priorCounts = new Map<string, number>();
+  for (const creator of priorArcPadCreatorAddresses) {
+    const key = creator.toLowerCase();
+    priorCounts.set(key, (priorCounts.get(key) ?? 0) + 1);
+  }
+
+  const windowCreators = new Set(windowLaunches.map((launch) => launch.creator.toLowerCase()));
+  const creatorsWithPrior = [...windowCreators].filter((creator) => (priorCounts.get(creator) ?? 0) > 0);
+  const launchesWithPrior = windowLaunches.filter((launch) => (priorCounts.get(launch.creator.toLowerCase()) ?? 0) > 0);
+  const relevantPriorCounts = creatorsWithPrior.map((creator) => priorCounts.get(creator) ?? 0);
+
+  return {
+    windowCreatorAddressesWithPriorArcPadLaunch: creatorsWithPrior.length,
+    windowLaunchesWithPriorArcPadLaunch: launchesWithPrior.length,
+    totalPriorArcPadLaunchesForWindowCreators: relevantPriorCounts.reduce((sum, count) => sum + count, 0),
+    maxPriorArcPadLaunchesForOneWindowCreator: relevantPriorCounts.length === 0 ? 0 : Math.max(...relevantPriorCounts)
   };
 }
 
