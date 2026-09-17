@@ -302,3 +302,33 @@
 .share-card-kicker {
   overflow-wrap: anywhere;
 }
+
+/* Share preview remains compact without using unreadable type. */
+.share-tools h3 {
+  font-size: 12px;
+}
+.share-card-kicker,
+.share-card-metric span,
+.share-card-footer {
+  font-size: 10px;
+}
+.share-card-metric b,
+.share-copy-status {
+  font-size: 11px;
+}
+.share-card-note {
+  font-size: 12px;
+}
+@media (max-width: 520px) {
+  .share-card-kicker,
+  .share-card-metric span,
+  .share-card-footer {
+    font-size: 10px;
+  }
+  .share-card-metric b {
+    font-size: 11px;
+  }
+  .share-card-note {
+    font-size: 11px;
+  }
+}

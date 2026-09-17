@@ -1,73 +1,109 @@
-import { loadDumpsterFeed, WEB_DATA_SOURCE_MODE } from './data-source.js';
-import { buildShareCardModel, buildSharePostText } from './share-card.js';
+import { loadDumpsterFeed, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
-const grid = document.querySelector('#garbage-grid');
-const drawer = document.querySelector('#drawer');
-const drawerContent = document.querySelector('#drawer-content');
-const drawerClose = document.querySelector('#drawer-close');
-const backdrop = document.querySelector('#backdrop');
-const randomBag = document.querySelector('#random-bag');
+const grid = document.querySelector("#garbage-grid");
+const drawer = document.querySelector("#drawer");
+const drawerContent = document.querySelector("#drawer-content");
+const drawerClose = document.querySelector("#drawer-close");
+const backdrop = document.querySelector("#backdrop");
+const randomBag = document.querySelector("#random-bag");
 let returnFocus = null;
 let bags = [];
-let activeFilter = 'all';
+let activeFilter = "all";
 let activeMode = null;
 let available = false;
 const modeCopy = {
   FIXTURE: {
-    header: 'FIXTURE MODE', desk: 'PUBLIC PREVIEW / NO LIVE TOKEN DATA', status: 'DETERMINISTIC FIXTURES',
-    detail: 'Real interface. Synthetic bags.', end: 'END OF FIXTURE INDEX', bagLabel: 'FIXTURE BAGS',
-    report: 'FIXTURE REPORT', token: 'TOKEN ADDRESS / FIXTURE', source: 'FIXTURE / PRODUCT-SHELL ONLY',
-    stamp: 'NOT LIVE EVIDENCE', scope: 'this fixture', launch: 'Launch in this fixture',
-    empty: 'NO FIXTURE BAGS INDEXED', unavailable: 'FIXTURE SOURCE NOT AVAILABLE'
+    header: "FIXTURE MODE",
+    desk: "PUBLIC PREVIEW / NO LIVE TOKEN DATA",
+    status: "DETERMINISTIC FIXTURES",
+    detail: "Real interface. Synthetic bags.",
+    end: "END OF FIXTURE INDEX",
+    bagLabel: "FIXTURE BAGS",
+    report: "FIXTURE REPORT",
+    token: "TOKEN ADDRESS / FIXTURE",
+    source: "FIXTURE / PRODUCT-SHELL ONLY",
+    stamp: "NOT LIVE EVIDENCE",
+    scope: "this fixture",
+    launch: "Launch in this fixture",
+    empty: "NO FIXTURE BAGS INDEXED",
+    unavailable: "FIXTURE SOURCE NOT AVAILABLE",
   },
   LIVE: {
-    header: 'LIVE INDEX', desk: 'LIVE // PUBLIC PROJECTION V0', status: 'PUBLIC PROJECTION / ARC 5042',
-    detail: 'HISTORY COVERAGE: UNVERIFIED', end: 'END OF CURRENT INDEX', bagLabel: 'INDEXED BAGS',
-    report: 'PUBLIC PROJECTION', token: 'TOKEN ADDRESS / OBSERVED ON ARC', source: 'LIVE // PUBLIC PROJECTION V0',
-    stamp: 'PUBLIC EVIDENCE', scope: 'this projection', launch: 'Observed on Arc',
-    empty: 'NO BAGS IN CURRENT INDEX WINDOW', unavailable: 'LIVE INDEX NOT AVAILABLE'
-  }
+    header: "LIVE INDEX",
+    desk: "LIVE // PUBLIC PROJECTION V0",
+    status: "PUBLIC PROJECTION / ARC 5042",
+    detail: "HISTORY COVERAGE: UNVERIFIED",
+    end: "END OF CURRENT INDEX",
+    bagLabel: "INDEXED BAGS",
+    report: "PUBLIC PROJECTION",
+    token: "TOKEN ADDRESS / OBSERVED ON ARC",
+    source: "LIVE // PUBLIC PROJECTION V0",
+    stamp: "PUBLIC EVIDENCE",
+    scope: "this projection",
+    launch: "Observed on Arc",
+    empty: "NO BAGS IN CURRENT INDEX WINDOW",
+    unavailable: "LIVE INDEX NOT AVAILABLE",
+  },
 };
-function copy() { return modeCopy[activeMode ?? WEB_DATA_SOURCE_MODE]; }
+function copy() {
+  return modeCopy[activeMode ?? WEB_DATA_SOURCE_MODE];
+}
 function applyMode(feed) {
-  for (const element of document.querySelectorAll('[data-mode-copy]')) {
+  for (const element of document.querySelectorAll("[data-mode-copy]")) {
     element.textContent = copy()[element.dataset.modeCopy];
   }
   document.body.dataset.mode = activeMode;
-  document.querySelector('[data-mode-copy="detail"]').textContent = activeMode === 'LIVE'
-    ? `HISTORY: UNVERIFIED / AS OF BLOCK ${feed.asOfBlock}` : copy().detail;
+  document.querySelector('[data-mode-copy="detail"]').textContent =
+    activeMode === "LIVE"
+      ? `HISTORY: UNVERIFIED / AS OF BLOCK ${feed.asOfBlock}`
+      : copy().detail;
 }
-function ageLabel(item) { return activeMode === 'LIVE' ? item.age : `${item.age} AGO`; }
-const search = document.querySelector('#bag-search');
-const latestBag = document.querySelector('#latest-bag');
+function ageLabel(item) {
+  return activeMode === "LIVE" ? item.age : `${item.age} AGO`;
+}
+const search = document.querySelector("#bag-search");
+const latestBag = document.querySelector("#latest-bag");
 const pageSurfaces = [
   ...document.querySelectorAll(
-    'body > header, body > main, body > footer, .skip-link',
+    "body > header, body > main, body > footer, .skip-link",
   ),
 ];
 
 await bootstrap();
-if (WEB_DATA_SOURCE_MODE === 'LIVE') {
+if (WEB_DATA_SOURCE_MODE === "LIVE") {
   let checking = false;
   setInterval(async () => {
     if (document.hidden || checking) return;
     checking = true;
     try {
-      const response = await fetch('/api/health', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+      const response = await fetch("/api/health", {
+        cache: "no-store",
+        signal: AbortSignal.timeout(10000),
+      });
       const health = await response.json();
-      if (!response.ok || !health.ok || !health.indexReady || health.chainId !== 5042) throw new Error('LIVE_INDEX_NOT_AVAILABLE');
-      if (!drawer.classList.contains('open')) await bootstrap();
-    } catch (error) { renderUnavailable(error); }
-    finally { checking = false; }
+      if (
+        !response.ok ||
+        !health.ok ||
+        !health.indexReady ||
+        health.chainId !== 5042
+      )
+        throw new Error("LIVE_INDEX_NOT_AVAILABLE");
+      if (!drawer.classList.contains("open")) await bootstrap();
+    } catch (error) {
+      renderUnavailable(error);
+    } finally {
+      checking = false;
+    }
   }, 15000);
 }
 
 async function bootstrap() {
   try {
     const feed = await loadDumpsterFeed();
-    if (!['FIXTURE', 'LIVE'].includes(feed?.mode))
-      throw new Error('WEB_DATA_SOURCE_NOT_AUTHORIZED');
-    if (!Array.isArray(feed?.bags)) throw new Error('WEB_DATA_SOURCE_INVALID');
+    if (!["FIXTURE", "LIVE"].includes(feed?.mode))
+      throw new Error("WEB_DATA_SOURCE_NOT_AUTHORIZED");
+    if (!Array.isArray(feed?.bags)) throw new Error("WEB_DATA_SOURCE_INVALID");
     bags = feed.bags;
     activeMode = feed.mode;
     available = true;
@@ -85,24 +121,23 @@ function renderUnavailable(error) {
   bags = [];
   closeDrawer();
   randomBag.disabled = true;
-  document.body.dataset.mode = 'UNAVAILABLE';
-  for (const element of document.querySelectorAll('[data-mode-copy]')) element.textContent = 'INDEX UNAVAILABLE';
-  document.querySelector('[data-mode-copy="header"]').textContent = copy().unavailable;
-  latestBag.innerHTML = '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
-  document.querySelector('#feed-count').textContent = 'INDEX UNAVAILABLE';
-  document.querySelector('#all-count').textContent = '—';
-  document.querySelector('#history-count').textContent = '—';
+  document.body.dataset.mode = "UNAVAILABLE";
+  for (const element of document.querySelectorAll("[data-mode-copy]"))
+    element.textContent = "INDEX UNAVAILABLE";
+  document.querySelector('[data-mode-copy="header"]').textContent =
+    copy().unavailable;
+  latestBag.innerHTML =
+    '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
+  document.querySelector("#feed-count").textContent = "INDEX UNAVAILABLE";
+  for (const element of document.querySelectorAll(".filter-button span")) {
+    element.textContent = "—";
+  }
   grid.innerHTML = `<div class="data-unavailable">DUMPSTER DATA UNAVAILABLE<br/>${copy().unavailable}</div>`;
   console.error(error);
 }
 
 function renderIntake() {
-  document.querySelector('#all-count').textContent = String(
-    bags.length,
-  ).padStart(2, '0');
-  document.querySelector('#history-count').textContent = String(
-    bags.filter((bag) => bag.priorLaunches > 0).length,
-  ).padStart(2, '0');
+  updateFilterCounts();
   const latest = bags[0];
   if (!latest) {
     latestBag.innerHTML = `<span class="intake-loading">${copy().empty}</span>`;
@@ -114,8 +149,8 @@ function renderIntake() {
       <b>${escapeHtml(latest.symbol)}</b><span class="intake-note">${escapeHtml(latest.note)}</span>
       <span class="intake-block">BLOCK / ${escapeHtml(latest.block)}</span><span class="intake-open">INSPECT RECEIPT ↗</span>
     </button>`;
-  const button = latestBag.querySelector('button');
-  button.addEventListener('click', () => openBag(latest.id, button));
+  const button = latestBag.querySelector("button");
+  button.addEventListener("click", () => openBag(latest.id, button));
 }
 
 function renderFeed() {
@@ -123,25 +158,31 @@ function renderFeed() {
   const query = search.value.trim().toLowerCase();
   const visible = bags.filter(
     (bag) =>
-      (activeFilter !== 'history' || bag.priorLaunches > 0) &&
-      [bag.symbol, bag.name, bag.reportedCreatorAddress].some((value) =>
-        String(value).toLowerCase().includes(query),
+      matchesFilter(bag, activeFilter) &&
+      [bag.symbol, bag.name, bag.reportedCreatorAddress, bag.token].some(
+        (value) => String(value).toLowerCase().includes(query),
       ),
   );
   grid.innerHTML = visible.length
-    ? visible.map(renderCard).join('')
-    : bags.length === 0 ? `<div class="empty-feed">${copy().empty}</div>` : '<div class="empty-feed">No bags match this dig.<button type="button" id="clear-search">CLEAR FILTERS ↗</button></div>';
-  document.querySelector('#feed-count').textContent =
-    `${String(visible.length).padStart(2, '0')} / ${String(bags.length).padStart(2, '0')} ${copy().bagLabel}`;
-  grid.querySelector('#clear-search')?.addEventListener('click', () => {
-    search.value = '';
-    setFilter('all');
+    ? `${renderFeedHeader()}${visible.map(renderCard).join("")}`
+    : bags.length === 0
+      ? `<div class="empty-feed">${copy().empty}</div>`
+      : '<div class="empty-feed">No bags match this dig.<button type="button" id="clear-search">CLEAR FILTERS ↗</button></div>';
+  document.querySelector("#feed-count").textContent =
+    `${String(visible.length).padStart(2, "0")} / ${String(bags.length).padStart(2, "0")} ${copy().bagLabel}`;
+  grid.querySelector("#clear-search")?.addEventListener("click", () => {
+    search.value = "";
+    setFilter("all");
     search.focus();
   });
-  for (const button of grid.querySelectorAll('[data-bag-id]')) {
-    button.addEventListener('click', () =>
+  for (const button of grid.querySelectorAll("[data-bag-id]")) {
+    button.addEventListener("click", () =>
       openBag(button.dataset.bagId, button),
     );
+  }
+  for (const link of grid.querySelectorAll("[data-social-link]")) {
+    link.addEventListener("click", (event) => event.stopPropagation());
+    link.addEventListener("keydown", (event) => event.stopPropagation());
   }
 }
 
@@ -151,18 +192,85 @@ function renderCard(bag) {
     Number.isInteger(bag.notedConditions) && bag.notedConditions >= 0
       ? bag.notedConditions
       : 0;
-  const serial = String(bags.indexOf(bag) + 1).padStart(3, '0');
+  const evidenceState = summarizeEvidence(bag);
   return `
     <article class="bag-card" tabindex="0" role="button" aria-haspopup="dialog" data-bag-id="${escapeHtml(bag.id)}" data-noted="${noted}" aria-label="Open ${escapeHtml(bag.symbol)} ${copy().report}">
-      <div class="card-top"><span class="card-serial">BAG / ${serial}</span><span class="age">${escapeHtml(ageLabel(bag))} ↙</span></div>
-      <div class="token-heading"><div><h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3><div class="token-name">${escapeHtml(bag.name)}</div></div><span class="inspect-arrow" aria-hidden="true">↗</span></div>
-      <div class="creator-line"><span>ARCPAD-REPORTED CREATOR ADDRESS</span><code>${escapeHtml(shortAddress(bag.reportedCreatorAddress))}</code></div>
-      <div class="card-intelligence"><div class="prior-metric"><strong>${escapeHtml(bag.priorLaunches)}</strong><span>PRIOR INDEXED<br/>BAGS</span></div><div class="coverage-metric"><span>RECORD COVERAGE</span><span class="coverage ${coverage}">${coverage}</span></div></div>
-      <div class="metric-table">${metric('24H MATURE', activeMode === 'LIVE' ? 'NOT PROJECTED' : `${bag.mature24h}/${bag.priorLaunches || 0}`)}${metric('TOP 5', bag.concentration)}</div>
-      <div class="condition-strip"><span class="condition-count">${noted === 0 ? '0 NOTED CONDITIONS' : `${noted} NOTED CONDITION${noted === 1 ? '' : 'S'}`}</span><span class="observation-count">${bag.evidence.length} RECORDS</span></div>
-      <div class="rat-note"><span>RAT NOTE /</span> “${escapeHtml(bag.note)}”</div>
-      <div class="card-footer"><span>BLK ${escapeHtml(bag.block)}</span><span>OPEN RECEIPT ↗</span></div>
+      <div class="feed-cell feed-age" data-label="AGE / BLOCK"><span>BLK</span>${escapeHtml(bag.block)}</div>
+      <div class="feed-cell feed-token" data-label="TOKEN"><h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3><div class="token-name">${escapeHtml(bag.name)}</div><code>${escapeHtml(shortAddress(bag.token))}</code></div>
+      <div class="feed-cell feed-creator" data-label="ARCPAD-REPORTED CREATOR"><code title="${escapeHtml(bag.reportedCreatorAddress)}">${escapeHtml(shortAddress(bag.reportedCreatorAddress))}</code><span>${bag.priorLaunches > 0 ? "REPEAT ADDRESS" : "NO PRIOR BAG IN INDEX"}</span></div>
+      <div class="feed-cell feed-prior" data-label="PRIOR BAGS"><strong>${escapeHtml(bag.priorLaunches)}</strong><span>INDEXED</span></div>
+      <div class="feed-cell feed-socials" data-label="SOCIALS">${renderSocials(bag)}</div>
+      <div class="feed-cell feed-evidence" data-label="EVIDENCE STATE"><span class="evidence-summary ${evidenceState.toLowerCase()}">${evidenceState}</span><small>${coverage} HISTORY</small></div>
+      <div class="feed-cell feed-inspect" data-label="INSPECT"><span>OPEN FILE</span><b aria-hidden="true">↗</b></div>
+      <div class="feed-mobile-note"><span>RAT NOTE /</span> “${escapeHtml(bag.note)}”</div>
     </article>`;
+}
+
+function renderFeedHeader() {
+  return `<div class="feed-table-head" aria-hidden="true">
+    <span>AGE / BLOCK</span><span>TOKEN</span><span>ARCPAD-REPORTED CREATOR</span><span>PRIOR BAGS</span><span>SOCIALS</span><span>EVIDENCE STATE</span><span>INSPECT</span>
+  </div>`;
+}
+
+function matchesFilter(bag, filter) {
+  if (filter === "repeat") return bag.priorLaunches > 0;
+  if (filter === "noted") return bag.notedConditions > 0;
+  if (filter === "socials") return hasSocials(bag);
+  if (filter === "unknown")
+    return bag.evidence.some((item) => item.tone === "unknown");
+  return true;
+}
+
+function updateFilterCounts() {
+  const counts = {
+    all: bags.length,
+    repeat: bags.filter((bag) => matchesFilter(bag, "repeat")).length,
+    noted: bags.filter((bag) => matchesFilter(bag, "noted")).length,
+    socials: bags.filter((bag) => matchesFilter(bag, "socials")).length,
+    unknown: bags.filter((bag) => matchesFilter(bag, "unknown")).length,
+  };
+  for (const [filter, count] of Object.entries(counts)) {
+    document.querySelector(`[data-filter="${filter}"] span`).textContent =
+      String(count).padStart(2, "0");
+  }
+}
+
+function hasSocials(bag) {
+  return Object.values(bag.socials ?? {}).some((value) =>
+    String(value ?? "").trim(),
+  );
+}
+
+function summarizeEvidence(bag) {
+  const states = new Set(bag.evidence.map((item) => item.tone));
+  if (states.has("noted")) return "NOTED";
+  if (states.has("unknown")) return "UNKNOWN";
+  return "OBSERVED";
+}
+
+function renderSocials(bag) {
+  const labels = { website: "WEB", twitter: "X", telegram: "TG" };
+  const links = Object.entries(bag.socials ?? {}).flatMap(([kind, value]) => {
+    const href = safeExternalUrl(value);
+    return href
+      ? [
+          `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" data-social-link>${labels[kind]}</a>`,
+        ]
+      : [];
+  });
+  if (links.length) return links.join("");
+  return hasSocials(bag)
+    ? "<span>REPORTED / NO SAFE LINK</span>"
+    : "<span>NONE REPORTED</span>";
+}
+
+function safeExternalUrl(value) {
+  try {
+    const url = new URL(String(value));
+    return ["http:", "https:"].includes(url.protocol) ? url.href : null;
+  } catch {
+    return null;
+  }
 }
 
 function shortAddress(value) {
@@ -172,34 +280,30 @@ function shortAddress(value) {
     : address;
 }
 
-function metric(label, value) {
-  return `<div class="metric-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`;
-}
-
 function setFilter(value) {
   activeFilter = value;
-  for (const button of document.querySelectorAll('[data-filter]')) {
+  for (const button of document.querySelectorAll("[data-filter]")) {
     const active = button.dataset.filter === value;
-    button.classList.toggle('active', active);
-    button.setAttribute('aria-pressed', String(active));
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
   }
   renderFeed();
 }
 
-search.addEventListener('input', renderFeed);
-for (const button of document.querySelectorAll('[data-filter]')) {
-  button.addEventListener('click', () => setFilter(button.dataset.filter));
+search.addEventListener("input", renderFeed);
+for (const button of document.querySelectorAll("[data-filter]")) {
+  button.addEventListener("click", () => setFilter(button.dataset.filter));
 }
 if (
-  matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)')
+  matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)")
     .matches
 ) {
-  grid.addEventListener('pointermove', (event) => {
-    const card = event.target.closest('.bag-card');
+  grid.addEventListener("pointermove", (event) => {
+    const card = event.target.closest(".bag-card");
     if (!card) return;
     const rect = card.getBoundingClientRect();
-    card.style.setProperty('--pointer-x', `${event.clientX - rect.left}px`);
-    card.style.setProperty('--pointer-y', `${event.clientY - rect.top}px`);
+    card.style.setProperty("--pointer-x", `${event.clientX - rect.left}px`);
+    card.style.setProperty("--pointer-y", `${event.clientY - rect.top}px`);
   });
 }
 
@@ -220,26 +324,26 @@ function openBag(id, origin = document.activeElement) {
         </div>
       `,
         )
-        .join('')
+        .join("")
     : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
 
   const share = buildShareCardModel(bag);
 
   drawerContent.innerHTML = `
     <p class="drawer-kicker">TRASH TRAIL // ${copy().report}</p>
-    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${String(bags.indexOf(bag) + 1).padStart(3, '0')}</b></div></div>
+    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${String(bags.indexOf(bag) + 1).padStart(3, "0")}</b></div></div>
     <div class="address creator-address"><span>ArcPad-reported creator address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
     <div class="address"><span>${copy().token}</span><code>${escapeHtml(bag.token)}</code></div>
-    ${activeMode === 'LIVE' ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ''}
+    ${activeMode === "LIVE" ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ""}
     <div class="drawer-note"><span>RAT NOTE / PRESENTATION, NOT A VERDICT</span>“${escapeHtml(bag.note)}”</div>
     <div class="file-section-heading"><h3>01 / OBSERVATIONS</h3><span>${bag.evidence.length} RECORDS</span></div>
     <div class="evidence-list">
-      ${bag.evidence.map((item) => `<div class="evidence-item ${normalizeTone(item.tone)}"><span class="evidence-label">${normalizeTone(item.tone).toUpperCase()}</span><span>${escapeHtml(item.text)}</span></div>`).join('')}
+      ${bag.evidence.map((item) => `<div class="evidence-item ${normalizeTone(item.tone)}"><span class="evidence-label">${normalizeTone(item.tone).toUpperCase()}</span><span>${escapeHtml(item.text)}</span></div>`).join("")}
     </div>
 
     <div class="trail">
       <div class="file-section-heading"><h3>02 / TRASH TRAIL</h3><span>${escapeHtml(bag.priorLaunches)} PRIOR INDEXED BAGS</span></div>
-      <p class="trail-summary">Same reported address. Not a claim of human identity. ${bag.trail.length} earlier bag${bag.trail.length === 1 ? '' : 's'} shown in ${copy().scope}.</p>
+      <p class="trail-summary">Same reported address. Not a claim of human identity. ${bag.trail.length} earlier bag${bag.trail.length === 1 ? "" : "s"} shown in ${copy().scope}.</p>
       <div class="trail-rows"><div class="trail-row current"><strong>${escapeHtml(bag.symbol)} / CURRENT BAG</strong><span class="trail-age">${escapeHtml(ageLabel(bag))}</span><span class="trail-outcome">${copy().launch}</span><span class="coverage ${normalizeCoverage(bag.coverage)}">${normalizeCoverage(bag.coverage)}</span></div>${trail}</div>
     </div>
 
@@ -250,7 +354,7 @@ function openBag(id, origin = document.activeElement) {
         <dt>coverage</dt><dd>${escapeHtml(normalizeCoverage(bag.coverage))}</dd>
         <dt>source class</dt><dd>${copy().source}</dd>
         <dt>launch block</dt><dd>${escapeHtml(bag.block)}</dd>
-        ${activeMode === 'LIVE' ? `<dt>as-of block</dt><dd>${escapeHtml(bag.asOfBlock)}</dd><dt>as-of hash</dt><dd>${escapeHtml(bag.asOfBlockHash)}</dd>` : ''}
+        ${activeMode === "LIVE" ? `<dt>as-of block</dt><dd>${escapeHtml(bag.asOfBlock)}</dd><dt>as-of hash</dt><dd>${escapeHtml(bag.asOfBlockHash)}</dd>` : ""}
       </dl>
       <span class="fixture-stamp">${copy().stamp}</span><span class="receipt-bars" aria-hidden="true"></span>
     </div>
@@ -265,21 +369,21 @@ function openBag(id, origin = document.activeElement) {
     </section>
   `;
 
-  const copyButton = drawerContent.querySelector('[data-copy-post]');
-  const copyStatus = drawerContent.querySelector('.share-copy-status');
-  copyButton?.addEventListener('click', () => copySharePost(bag, copyStatus));
+  const copyButton = drawerContent.querySelector("[data-copy-post]");
+  const copyStatus = drawerContent.querySelector(".share-copy-status");
+  copyButton?.addEventListener("click", () => copySharePost(bag, copyStatus));
 
   drawer.inert = false;
   pageSurfaces.forEach((surface) => {
     surface.inert = true;
   });
-  document.body.classList.add('drawer-open');
+  document.body.classList.add("drawer-open");
   drawer.scrollTop = 0;
-  drawer.classList.add('open');
-  drawer.setAttribute('aria-hidden', 'false');
+  drawer.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
   backdrop.hidden = false;
   requestAnimationFrame(() => {
-    if (drawer.classList.contains('open'))
+    if (drawer.classList.contains("open"))
       drawerClose.focus({ preventScroll: true });
   });
 }
@@ -312,34 +416,33 @@ async function copySharePost(bag, statusNode) {
   const text = buildSharePostText(bag);
   try {
     if (!navigator.clipboard?.writeText)
-      throw new Error('CLIPBOARD_UNAVAILABLE');
+      throw new Error("CLIPBOARD_UNAVAILABLE");
     await navigator.clipboard.writeText(text);
     statusNode.textContent = `COPIED // ${copy().report} stamp included`;
   } catch {
-    statusNode.textContent =
-      'COPY UNAVAILABLE // select the card manually';
+    statusNode.textContent = "COPY UNAVAILABLE // select the card manually";
   }
 }
 
 function closeDrawer() {
-  const wasOpen = drawer.classList.contains('open');
-  drawer.classList.remove('open');
+  const wasOpen = drawer.classList.contains("open");
+  drawer.classList.remove("open");
   drawer.inert = true;
   pageSurfaces.forEach((surface) => {
     surface.inert = false;
   });
-  document.body.classList.remove('drawer-open');
-  drawer.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove("drawer-open");
+  drawer.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   if (wasOpen && returnFocus?.isConnected) returnFocus.focus();
   returnFocus = null;
 }
 
-drawerClose.addEventListener('click', closeDrawer);
-backdrop.addEventListener('click', closeDrawer);
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeDrawer();
-  if (event.key === 'Tab' && drawer.classList.contains('open')) {
+drawerClose.addEventListener("click", closeDrawer);
+backdrop.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeDrawer();
+  if (event.key === "Tab" && drawer.classList.contains("open")) {
     const focusable = [
       ...drawer.querySelectorAll('button, a[href], input, [tabindex="0"]'),
     ];
@@ -354,18 +457,18 @@ document.addEventListener('keydown', (event) => {
     }
   }
   if (
-    event.key === '/' &&
+    event.key === "/" &&
     !event.ctrlKey &&
     !event.metaKey &&
     !event.altKey &&
-    !drawer.classList.contains('open') &&
-    !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)
+    !drawer.classList.contains("open") &&
+    !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)
   ) {
     event.preventDefault();
     search.focus();
   }
   if (
-    (event.key === 'Enter' || event.key === ' ') &&
+    (event.key === "Enter" || event.key === " ") &&
     document.activeElement?.dataset?.bagId
   ) {
     event.preventDefault();
@@ -373,27 +476,27 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-randomBag.addEventListener('click', () => {
+randomBag.addEventListener("click", () => {
   if (bags.length === 0) return;
   const bag = bags[Math.floor(Math.random() * bags.length)];
   openBag(bag.id, randomBag);
 });
 
 function normalizeCoverage(value) {
-  return ['COMPLETE', 'PARTIAL', 'UNVERIFIED'].includes(value)
+  return ["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value)
     ? value
-    : 'UNVERIFIED';
+    : "UNVERIFIED";
 }
 
 function normalizeTone(value) {
-  return ['observed', 'noted', 'unknown'].includes(value) ? value : 'unknown';
+  return ["observed", "noted", "unknown"].includes(value) ? value : "unknown";
 }
 
 function escapeHtml(value) {
   return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }

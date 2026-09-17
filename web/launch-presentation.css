@@ -189,3 +189,44 @@
     margin-top: -10px;
   }
 }
+
+/* Readable status surface. */
+.token-status-lede {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.token-stamp,
+.utility-heading h3,
+.token-status-item b {
+  font-size: 12px;
+}
+.utility-heading > span,
+.utility-row > span,
+.utility-note,
+.token-status-item span,
+.anti-scam-strip {
+  font-size: 11px;
+}
+.utility-row p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (max-width: 520px) {
+  .token-status-lede {
+    font-size: 13px;
+  }
+  .utility-heading h3,
+  .token-status-item b {
+    font-size: 12px;
+  }
+  .utility-heading > span,
+  .utility-row > span,
+  .utility-note,
+  .token-status-item span,
+  .anti-scam-strip {
+    font-size: 10px;
+  }
+  .utility-row p {
+    font-size: 12px;
+  }
+}

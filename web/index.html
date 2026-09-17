@@ -56,15 +56,15 @@
         ><a href="#token-status">03 / $BINRAT</a>
       </nav>
       <div class="network-pill">
-        <span class="status-dot"></span><b data-mode-copy="header">INDEX CONNECTING</b
+        <span class="status-dot"></span
+        ><b data-mode-copy="header">INDEX CONNECTING</b
         ><span class="network-id">ARC / 5042</span>
       </div>
     </header>
     <main id="top">
       <div class="desk-bar shell">
         <span>BINRAT TERMINAL <b>/ 001</b></span
-        ><span data-mode-copy="desk">WAITING FOR PUBLIC INDEX</span
-        >
+        ><span data-mode-copy="desk">WAITING FOR PUBLIC INDEX</span>
       </div>
       <section class="hero shell" aria-labelledby="hero-title">
         <div class="hero-copy">
@@ -129,7 +129,10 @@
             </h2>
           </div>
           <p class="section-meta">
-            <span data-mode-copy="status">INDEX CONNECTING</span><br /><span data-mode-copy="detail">Waiting for a committed checkpoint.</span>
+            <span data-mode-copy="status">INDEX CONNECTING</span><br /><span
+              data-mode-copy="detail"
+              >Waiting for a committed checkpoint.</span
+            >
           </p>
         </div>
         <div class="feed-toolbar">
@@ -139,13 +142,34 @@
               data-filter="all"
               aria-pressed="true"
             >
-              ALL BAGS <span id="all-count">—</span></button
+              NEW <span id="all-count">—</span></button
             ><button
               class="filter-button"
-              data-filter="history"
+              data-filter="repeat"
               aria-pressed="false"
             >
-              WITH HISTORY <span id="history-count">—</span>
+              REPEAT CREATORS <span id="repeat-count">—</span>
+            </button>
+            <button
+              class="filter-button"
+              data-filter="noted"
+              aria-pressed="false"
+            >
+              NOTED <span id="noted-count">—</span>
+            </button>
+            <button
+              class="filter-button"
+              data-filter="socials"
+              aria-pressed="false"
+            >
+              HAS SOCIALS <span id="socials-count">—</span>
+            </button>
+            <button
+              class="filter-button"
+              data-filter="unknown"
+              aria-pressed="false"
+            >
+              UNKNOWN <span id="unknown-count">—</span>
             </button>
           </div>
           <label class="feed-search"
@@ -153,8 +177,8 @@
             ><input
               id="bag-search"
               type="search"
-              placeholder="Ticker / creator address"
-              aria-label="Search by ticker, name or reported creator address"
+              placeholder="Token / creator / address"
+              aria-label="Search by ticker, name, token address or reported creator address"
               autocomplete="off"
               spellcheck="false"
             /><span class="search-key" aria-hidden="true">/</span></label
@@ -164,7 +188,10 @@
         <div id="garbage-grid" class="garbage-grid" aria-live="polite"></div>
         <div class="feed-bottom">
           <span id="feed-count">Loading bags…</span
-          ><span><span data-mode-copy="end">WAITING FOR INDEX</span> <span class="tiny-cross">+</span></span>
+          ><span
+            ><span data-mode-copy="end">WAITING FOR INDEX</span>
+            <span class="tiny-cross">+</span></span
+          >
         </div>
         <p class="feed-boundary">
           Coverage describes the record, never the token. Open a bag to inspect
