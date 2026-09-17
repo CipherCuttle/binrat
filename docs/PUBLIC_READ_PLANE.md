@@ -63,6 +63,22 @@ Never `deployer`, `owner`, `person`, or `walletOwner`.
 
 The only claim V0 makes is that ArcPad reported the address on the launch event and, where evidence exists, that the same reported address appears on earlier launches present in the projection input.
 
+## Provenance integrity law
+
+A supplied provenance fact is not trusted merely because its visible creator/block fields match a launch.
+
+Before publication, `PUBLIC_PROJECTION_V0` independently rebuilds the expected provenance fact from the authoritative launch observation and requires the supplied fact to match the deterministic:
+
+- fact kind;
+- fact ID;
+- evidence digest;
+- creator address;
+- block number/hash;
+- log index;
+- source event ID.
+
+Fact identity or digest drift fails closed. A projection receipt may cite only provenance facts whose identity and digest have been independently reconstructed.
+
 ## Coverage law
 
 `PUBLIC_PROJECTION_V0` **cannot claim complete history coverage**.
@@ -103,7 +119,8 @@ No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARB
 - deterministic output independent of input ordering;
 - future-dated launch/fact input fails closed;
 - malformed as-of chain authority fails closed;
-- mismatched provenance fails closed;
+- mismatched provenance authority fails closed;
+- provenance fact ID/digest drift fails closed after independent reconstruction;
 - public field is `reportedCreatorAddress`;
 - V0 history coverage is always `UNVERIFIED`;
 - absent history is always `UNKNOWN` in V0;
