@@ -1,8 +1,11 @@
 import { createReadStream, statSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { extname, join, normalize } from 'node:path';
+import { dirname, extname, join, normalize, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('../web/', import.meta.url).pathname;
+const here = dirname(fileURLToPath(import.meta.url));
+const root = join(here, '..', 'web');
+const rootPrefix = `${root}${sep}`;
 const port = Number(process.env.PORT ?? 4173);
 
 const types = {
@@ -15,11 +18,11 @@ const types = {
 
 createServer((request, response) => {
   const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
-  const requested = url.pathname === '/' ? '/index.html' : url.pathname;
-  const safe = normalize(requested).replace(/^(\.\.[/\\])+/, '');
+  const requested = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
+  const safe = normalize(requested);
   const file = join(root, safe);
 
-  if (!file.startsWith(root)) {
+  if (file !== root && !file.startsWith(rootPrefix)) {
     response.writeHead(403).end('forbidden');
     return;
   }
