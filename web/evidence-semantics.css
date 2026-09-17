@@ -1,35 +1,36 @@
+/* Evidence accents describe recorded conditions, never an investment verdict. */
 :root {
-  --observed: #b9aea8;
-  --noted: #d9a25f;
+  --observed: #a8b795;
+  --noted: #ef7b72;
 }
-
-.bag-card[data-noted="1"]::after,
-.bag-card[data-noted="2"]::after {
-  border-top-color: rgba(217, 162, 95, .72);
+.bag-card:not([data-noted="0"]) {
+  border-top-color: #91544a;
 }
-
-.condition-count {
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.bag-card[data-noted="1"] .condition-count,
-.bag-card[data-noted="2"] .condition-count {
+.bag-card:not([data-noted="0"]) .condition-count {
   color: var(--noted);
 }
-
-.evidence-item.observed { border-left: 3px solid var(--observed); }
-.evidence-item.noted { border-left: 3px solid var(--noted); }
-.evidence-item.unknown { border-left: 3px solid var(--unknown); }
-
-.evidence-label {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--muted);
-  font-size: 8px;
-  font-weight: 900;
-  letter-spacing: .12em;
+.condition-count::before {
+  content: "·";
+  margin-right: 5px;
 }
-
-.evidence-item.noted .evidence-label { color: var(--noted); }
+.bag-card:not([data-noted="0"]) .condition-count::before {
+  content: "+";
+}
+.evidence-item.observed {
+  border-left: 2px solid var(--observed);
+}
+.evidence-item.noted {
+  border-left: 2px solid var(--noted);
+}
+.evidence-item.unknown {
+  border-left: 2px solid var(--unknown);
+}
+.evidence-item.observed .evidence-label {
+  color: var(--observed);
+}
+.evidence-item.noted .evidence-label {
+  color: var(--noted);
+}
+.evidence-item.unknown .evidence-label {
+  color: var(--unknown);
+}
