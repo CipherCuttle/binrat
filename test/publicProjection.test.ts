@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { deriveEventId, deriveLaunchId } from '../src/core/identity.js';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { buildProvenanceFact } from '../src/intelligence/provenance.js';
 import { projectPublicFeed } from '../src/public/project.js';
@@ -9,26 +10,28 @@ const CREATOR_A = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as Hex;
 const CREATOR_B = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' as Hex;
 const AS_OF_HASH = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' as Hex;
 
-function launch(input: {
-  id: string;
+async function launch(input: {
   block: bigint;
   logIndex: number;
   token: Hex;
   creator: Hex;
   symbol: string;
-}): LaunchObserved {
+}): Promise<LaunchObserved> {
   const blockHex = input.block.toString(16).padStart(64, '0');
-  const txTail = input.logIndex.toString(16).padStart(64, '0');
+  const launcher = '0x1111111111111111111111111111111111111111' as Hex;
+  const txHash = `0x${blockHex}` as Hex;
+  const launchId = await deriveLaunchId({ chainId: CHAIN_ID, launcher, txHash, token: input.token });
+  const eventId = await deriveEventId({ chainId: CHAIN_ID, launcher, txHash, logIndex: input.logIndex });
   return {
-    launchId: input.id,
-    eventId: `event:${input.id}`,
+    launchId,
+    eventId,
     chainId: CHAIN_ID,
     blockNumber: input.block,
     blockHash: `0x${blockHex}` as Hex,
     observedAtMs: 1_000,
     source: 'ARCPAD',
-    launcher: '0x1111111111111111111111111111111111111111',
-    txHash: `0x${txTail}` as Hex,
+    launcher,
+    txHash,
     logIndex: input.logIndex,
     token: input.token,
     creator: input.creator,
@@ -43,10 +46,10 @@ function launch(input: {
 }
 
 test('public projection is deterministic and makes reported-creator semantics explicit', async () => {
-  const a1 = launch({ id: 'a1', block: 100n, logIndex: 0, token: '0x1000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'OLD1' });
-  const a2 = launch({ id: 'a2', block: 101n, logIndex: 0, token: '0x1000000000000000000000000000000000000002', creator: CREATOR_A, symbol: 'OLD2' });
-  const b1 = launch({ id: 'b1', block: 102n, logIndex: 0, token: '0x2000000000000000000000000000000000000001', creator: CREATOR_B, symbol: 'OTHER' });
-  const a3 = launch({ id: 'a3', block: 103n, logIndex: 0, token: '0x1000000000000000000000000000000000000003', creator: CREATOR_A, symbol: 'NEW' });
+  const a1 = await launch({ block: 100n, logIndex: 0, token: '0x1000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'OLD1' });
+  const a2 = await launch({ block: 101n, logIndex: 0, token: '0x1000000000000000000000000000000000000002', creator: CREATOR_A, symbol: 'OLD2' });
+  const b1 = await launch({ block: 102n, logIndex: 0, token: '0x2000000000000000000000000000000000000001', creator: CREATOR_B, symbol: 'OTHER' });
+  const a3 = await launch({ block: 103n, logIndex: 0, token: '0x1000000000000000000000000000000000000003', creator: CREATOR_A, symbol: 'NEW' });
   const launches = [a1, a2, b1, a3];
   const facts = await Promise.all(launches.map(buildProvenanceFact));
 
@@ -64,11 +67,11 @@ test('public projection is deterministic and makes reported-creator semantics ex
   assert.deepEqual(forward, reversed);
   assert.equal(forward.historyCoverage, 'UNVERIFIED');
   assert.equal(forward.receipt.historyCoverage, 'UNVERIFIED');
-  assert.equal(forward.bags[0]?.id, 'a3');
+  assert.equal(forward.bags[0]?.id, a3.launchId);
   assert.equal(forward.bags[0]?.reportedCreatorAddress, CREATOR_A);
   assert.equal(forward.bags[0]?.trashTrail.priorLaunchCount, 2);
   assert.equal(forward.bags[0]?.trashTrail.coverage, 'UNVERIFIED');
-  assert.deepEqual(forward.bags[0]?.trashTrail.prior.map((item) => item.launchId), ['a1', 'a2']);
+  assert.deepEqual(forward.bags[0]?.trashTrail.prior.map((item) => item.launchId), [a1.launchId, a2.launchId]);
   assert.equal(forward.bags[0]?.evidence.find((item) => item.code === 'REPORTED_CREATOR_PRIOR_LAUNCHES')?.state, 'NOTED');
   assert.match(forward.receipt.receiptId, /^binrat-public:[0-9a-f]{64}$/);
 
@@ -80,7 +83,7 @@ test('public projection is deterministic and makes reported-creator semantics ex
 });
 
 test('absence of prior history is always unknown in PUBLIC_PROJECTION_V0', async () => {
-  const only = launch({ id: 'only', block: 100n, logIndex: 0, token: '0x3000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'ONLY' });
+  const only = await launch({ block: 100n, logIndex: 0, token: '0x3000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'ONLY' });
   const fact = await buildProvenanceFact(only);
 
   const feed = await projectPublicFeed({
@@ -97,7 +100,7 @@ test('absence of prior history is always unknown in PUBLIC_PROJECTION_V0', async
 });
 
 test('public projection fails closed on future or mismatched provenance input', async () => {
-  const item = launch({ id: 'future', block: 101n, logIndex: 0, token: '0x4000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'FUTURE' });
+  const item = await launch({ block: 101n, logIndex: 0, token: '0x4000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'FUTURE' });
   const fact = await buildProvenanceFact(item);
 
   await assert.rejects(
@@ -124,8 +127,35 @@ test('public projection fails closed on future or mismatched provenance input', 
   );
 });
 
+test('public projection recomputes launch and event identity', async () => {
+  const item = await launch({ block: 105n, logIndex: 0, token: '0x4500000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'IDENTITY' });
+  const fact = await buildProvenanceFact(item);
+
+  await assert.rejects(
+    projectPublicFeed({
+      chainId: CHAIN_ID,
+      asOfBlock: 105n,
+      asOfBlockHash: AS_OF_HASH,
+      launches: [{ ...item, launchId: `${item.launchId}:tampered` }],
+      facts: [fact]
+    }),
+    /PUBLIC_LAUNCH_IDENTITY_MISMATCH/
+  );
+
+  await assert.rejects(
+    projectPublicFeed({
+      chainId: CHAIN_ID,
+      asOfBlock: 105n,
+      asOfBlockHash: AS_OF_HASH,
+      launches: [{ ...item, eventId: `${item.eventId}:tampered` }],
+      facts: [fact]
+    }),
+    /PUBLIC_LAUNCH_IDENTITY_MISMATCH/
+  );
+});
+
 test('public projection recomputes provenance fact identity and digest', async () => {
-  const item = launch({ id: 'integrity', block: 110n, logIndex: 0, token: '0x5000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'HASH' });
+  const item = await launch({ block: 110n, logIndex: 0, token: '0x5000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'HASH' });
   const fact = await buildProvenanceFact(item);
 
   await assert.rejects(
