@@ -87,7 +87,7 @@ function openBag(id, origin = document.activeElement) {
     <p class="drawer-kicker">TRASH TRAIL // FIXTURE REPORT</p>
     <h2>${escapeHtml(bag.symbol)}</h2>
     <div class="address">TOKEN ${escapeHtml(bag.token)}</div>
-    <div class="address">ARCPAD-REPORTED CREATOR ${escapeHtml(bag.creator)}</div>
+    <div class="address">ARCPAD-REPORTED CREATOR ${escapeHtml(bag.reportedCreatorAddress)}</div>
 
     <div class="drawer-note">“${escapeHtml(bag.note)}”</div>
 
