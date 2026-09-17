@@ -9,7 +9,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts",
     "web:serve": "node scripts/serve-web.mjs",
-    "web:check": "node --check web/fixtures.js && node --check web/app.js && node scripts/check-web.mjs",
+    "web:check": "node --check web/fixtures.js && node --check web/data-source.js && node --check web/app.js && node scripts/check-web.mjs",
     "check": "pnpm build && pnpm test && pnpm web:check",
     "backfill": "tsx src/cli.ts backfill",
     "watch": "tsx src/cli.ts watch",
