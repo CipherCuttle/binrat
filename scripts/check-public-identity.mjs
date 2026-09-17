@@ -11,8 +11,11 @@ for (const marker of [
   if (!policy.includes(marker)) throw new Error(`PUBLIC_IDENTITY_POLICY_DRIFT:${marker}`);
 }
 
-if (/href=["']https:\/\/(?:www\.)?x\.com\//i.test(html)) {
-  throw new Error('PUBLIC_IDENTITY_X_LINK_PUBLISHED_BEFORE_OWNERSHIP');
+// Until ownership is verified, the public HTML is intentionally self-contained.
+// This fails closed on accidental social/domain publication through any absolute anchor,
+// not only x.com specifically.
+if (/href=["']https?:\/\//i.test(html)) {
+  throw new Error('PUBLIC_IDENTITY_ABSOLUTE_OUTBOUND_LINK_PUBLISHED_BEFORE_OWNERSHIP');
 }
 
 if (/<link[^>]+rel=["']canonical["'][^>]*>/i.test(html)) {
@@ -21,6 +24,10 @@ if (/<link[^>]+rel=["']canonical["'][^>]*>/i.test(html)) {
 
 if (/<meta[^>]+property=["']og:url["'][^>]*>/i.test(html)) {
   throw new Error('PUBLIC_IDENTITY_OG_URL_PUBLISHED_BEFORE_OWNERSHIP');
+}
+
+if (/<meta[^>]+name=["']twitter:(?:site|creator)["'][^>]*>/i.test(html)) {
+  throw new Error('PUBLIC_IDENTITY_SOCIAL_HANDLE_METADATA_PUBLISHED_BEFORE_OWNERSHIP');
 }
 
 const ownershipClaims = [
