@@ -1,16 +1,17 @@
 export const SHARE_CARD_VERSION = 'BINRAT_SHARE_CARD_V0';
-export const SHARE_CARD_MODE = 'FIXTURE';
+export const SHARE_CARD_MODES = ['FIXTURE', 'LIVE'];
 
 export function buildShareCardModel(bag) {
   if (!bag || typeof bag !== 'object') throw new Error('SHARE_CARD_BAG_REQUIRED');
 
+  if (!SHARE_CARD_MODES.includes(bag.mode)) throw new Error('SHARE_CARD_MODE_INVALID');
   const priorLaunches = nonNegativeInt(bag.priorLaunches);
   const coverage = normalizeCoverage(bag.coverage);
   const reportedCreatorAddress = normalizeAddress(bag.reportedCreatorAddress);
 
   return Object.freeze({
     version: SHARE_CARD_VERSION,
-    mode: SHARE_CARD_MODE,
+    mode: bag.mode,
     symbol: cleanText(bag.symbol, '$UNKNOWN'),
     reportedCreatorAddress,
     creatorShort: shortAddress(reportedCreatorAddress),
@@ -18,7 +19,7 @@ export function buildShareCardModel(bag) {
     coverage,
     note: cleanText(bag.note, 'still digging.'),
     receipt: cleanText(bag.receipt, 'receipt_unavailable'),
-    stamp: 'FIXTURE // NOT LIVE EVIDENCE',
+    stamp: bag.mode === 'LIVE' ? 'LIVE // PUBLIC PROJECTION' : 'FIXTURE // NOT LIVE EVIDENCE',
     footer: 'HE GETS THE SCRAPS. YOU GET THE RECEIPTS.'
   });
 }
@@ -30,7 +31,7 @@ export function buildSharePostText(bag) {
     '',
     `${card.symbol} hit THE DUMPSTER.`,
     `ArcPad-reported creator: ${card.creatorShort}`,
-    `prior indexed bags in this fixture: ${card.priorLaunches}`,
+    `${card.mode === 'LIVE' ? 'prior indexed bags' : 'prior indexed bags in this fixture'}: ${card.priorLaunches}`,
     `coverage: ${card.coverage}`,
     '',
     `binrat: “${card.note}”`,

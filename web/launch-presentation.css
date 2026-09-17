@@ -1,88 +1,232 @@
 .token-status-section {
-  margin-bottom: 90px;
-  padding: 34px;
-  border: 1px solid rgba(213, 190, 174, .18);
-  background:
-    linear-gradient(135deg, rgba(38, 59, 53, .22), rgba(10, 8, 10, .9) 58%),
-    #111012;
-  box-shadow: 10px 10px 0 rgba(23, 18, 25, .9);
-}
-
-.token-status-section h2 {
-  margin: 0;
-  max-width: 900px;
-  font-size: clamp(42px, 7vw, 88px);
-  line-height: .9;
-  letter-spacing: -.065em;
-}
-
-.token-status-lede {
-  max-width: 820px;
-  margin: 22px 0 28px;
-  color: #aaa09b;
-  font-size: 13px;
-  line-height: 1.75;
-}
-
-.token-status-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--line);
-  background: rgba(10, 8, 10, .42);
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 60px;
+  background: #191f1b;
+  border: 1px solid #3d493a;
+  padding: 30px;
 }
-
-.token-status-item {
-  min-height: 112px;
-  padding: 18px;
-  border-right: 1px solid var(--line);
+.token-intro h2 {
+  font-family:
+    Plex Condensed,
+    sans-serif;
+  font-size: 47px;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
 }
-
-.token-status-item:last-child { border-right: 0; }
-
-.token-status-item span {
-  display: block;
+.token-status-lede {
+  max-width: 350px;
+  font-size: 11px;
+  line-height: 1.8;
   color: var(--muted);
+  margin: 17px 0;
+}
+.token-stamp {
+  display: inline-block;
+  color: var(--orange);
+  border: 1px solid #776345;
+  background: #28281f;
+  padding: 8px 10px;
   font-size: 9px;
-  letter-spacing: .13em;
+  letter-spacing: 0.04em;
 }
-
-.token-status-item b {
-  display: block;
-  margin-top: 25px;
-  color: var(--bone);
-  font-size: 16px;
-  letter-spacing: -.025em;
+.utility-heading {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
-
-.token-status-item b.alert { color: var(--red); }
-
-.anti-scam-strip {
-  margin-top: 16px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 38, 56, .45);
-  background: rgba(53, 16, 22, .82);
-  color: #f2b5bb;
+.utility-heading h3 {
   font-size: 10px;
-  font-weight: 800;
-  line-height: 1.55;
-  letter-spacing: .08em;
+  font-weight: 500;
 }
-
-@media (max-width: 820px) {
-  .token-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .token-status-item:nth-child(2) { border-right: 0; }
-  .token-status-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+.utility-heading > span {
+  font-size: 7px;
+  color: var(--orange);
 }
-
+.utility-row {
+  display: grid;
+  grid-template-columns: 115px 1fr;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding: 15px 0;
+}
+.utility-row > span {
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--good);
+}
+.utility-row p {
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--bone);
+}
+.utility-note {
+  font-size: 8px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-top: 12px;
+  max-width: 420px;
+}
+.token-status-grid {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-block: 1px solid var(--line);
+}
+.token-status-item {
+  padding: 12px 18px;
+  border-right: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+.token-status-item:first-child {
+  padding-left: 0;
+}
+.token-status-item:last-child {
+  border: 0;
+  padding-right: 0;
+}
+.token-status-item span {
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.token-status-item b {
+  font-size: 8px;
+  font-weight: 500;
+}
+.anti-scam-strip {
+  grid-column: 1/-1;
+  font-size: 8px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-top: -16px;
+}
+@media (max-width: 1100px) {
+  .token-status-section {
+    gap: 24px 35px;
+    padding: 25px;
+  }
+  .token-status-item {
+    flex-direction: column;
+    gap: 8px;
+    align-items: start;
+  }
+  .utility-row {
+    grid-template-columns: 95px 1fr;
+    gap: 10px;
+  }
+}
+@media (max-width: 760px) {
+  .token-status-section {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 22px;
+  }
+  .token-intro h2 {
+    font-size: 42px;
+  }
+  .token-status-lede {
+    max-width: none;
+  }
+  .utility-row {
+    grid-template-columns: 115px 1fr;
+  }
+  .utility-note {
+    max-width: none;
+  }
+}
 @media (max-width: 520px) {
-  .token-status-section { padding: 24px 18px; }
-  .token-status-grid { grid-template-columns: 1fr; }
+  .token-status-section {
+    padding: 20px 17px;
+    gap: 23px;
+  }
+  .token-intro h2 {
+    font-size: 42px;
+  }
+  .token-status-lede {
+    font-size: 10px;
+  }
+  .utility-heading h3 {
+    font-size: 9px;
+  }
+  .utility-heading > span {
+    font-size: 6px;
+  }
+  .utility-row {
+    grid-template-columns: 82px 1fr;
+    gap: 12px;
+  }
+  .utility-row > span {
+    font-size: 7px;
+  }
+  .utility-row p {
+    font-size: 9px;
+  }
+  .token-status-grid {
+    grid-template-columns: 1fr;
+  }
   .token-status-item,
-  .token-status-item:nth-child(2) {
-    min-height: 88px;
+  .token-status-item:first-child,
+  .token-status-item:last-child {
+    flex-direction: row;
+    align-items: center;
+    padding: 11px 0;
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
-  .token-status-item:last-child { border-bottom: 0; }
-  .token-status-item b { margin-top: 15px; }
+  .token-status-item:last-child {
+    border: 0;
+  }
+  .anti-scam-strip {
+    font-size: 7px;
+    margin-top: -10px;
+  }
+}
+
+/* Readable status surface. */
+.token-status-lede {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.token-stamp,
+.utility-heading h3,
+.token-status-item b {
+  font-size: 12px;
+}
+.utility-heading > span,
+.utility-row > span,
+.utility-note,
+.token-status-item span,
+.anti-scam-strip {
+  font-size: 11px;
+}
+.utility-row p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (max-width: 520px) {
+  .token-status-lede {
+    font-size: 13px;
+  }
+  .utility-heading h3,
+  .token-status-item b {
+    font-size: 12px;
+  }
+  .utility-heading > span,
+  .utility-row > span,
+  .utility-note,
+  .token-status-item span,
+  .anti-scam-strip {
+    font-size: 10px;
+  }
+  .utility-row p {
+    font-size: 12px;
+  }
 }
