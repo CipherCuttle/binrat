@@ -2,28 +2,30 @@
 
 ## Product thesis
 
-BINRAT is an autonomous launch-intelligence memecoin project on Arc. The mascot is a cyber-rat living in a dumpster. New launches are garbage bags; BINRAT digs through them, remembers who threw them out, and keeps the receipts.
+BINRAT is an autonomous launch-intelligence memecoin project on Arc. The mascot is a cyber-rat living in a dumpster. New launches are garbage bags; BINRAT digs through them, remembers which creator addresses recur, and keeps the receipts.
 
 **Brand:** BINRAT  
 **Ticker:** `$BINRAT`  
 **Feed:** HOT GARBAGE  
-**Creator/deployer history:** TRASH TRAIL  
+**Creator-address history:** TRASH TRAIL  
 **Evidence artifact:** RECEIPT  
 **Primary line:** He gets the scraps. You get the receipts.
 
 ## User problem
 
-A user looking at a new memecoin currently has to manually combine launchpad data, explorer history, creator wallets, holder distribution, social metadata, and later price/liquidity outcomes. BINRAT turns that into one factual, time-bound trail.
+A user looking at a new memecoin currently has to manually combine launchpad data, explorer history, creator addresses, holder distribution, social metadata, and later price/liquidity outcomes. BINRAT turns that into one factual, time-bound trail.
 
 ## V0 user value
 
 For each ArcPad launch, BINRAT answers:
 
 1. What exactly launched and in which transaction/block?
-2. Which wallet created it?
-3. What else did that wallet create before this launch?
+2. Which creator address did ArcPad report in the launch event?
+3. What earlier ArcPad launches reported that same creator address?
 4. Is historical coverage complete, partial, or unresolved?
 5. Can the underlying facts be replayed from a deterministic receipt later?
+
+The ArcPad-reported creator address is an onchain address, not proof of a human identity, EOA wallet, or ultimate deploying actor.
 
 V0 does **not** classify safety or recommend trades.
 
