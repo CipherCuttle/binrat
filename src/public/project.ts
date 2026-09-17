@@ -3,9 +3,9 @@ import { sha256Hex } from '../evidence/canonical.js';
 import type { ProvenanceFact } from '../intelligence/provenance.js';
 import {
   PUBLIC_FEED_SCHEMA_VERSION,
+  PUBLIC_HISTORY_COVERAGE_V0,
   PUBLIC_PROJECTION_VERSION,
   type PublicBag,
-  type PublicCoverage,
   type PublicFeed,
   type PublicProjectionReceipt,
   type PublicTrashTrailItem
@@ -15,7 +15,6 @@ export interface PublicProjectionInput {
   chainId: number;
   asOfBlock: bigint;
   asOfBlockHash: Hex;
-  historyCoverage: PublicCoverage;
   launches: readonly LaunchObserved[];
   facts: readonly ProvenanceFact[];
 }
@@ -26,7 +25,6 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
 
   validateInput(input, launches, facts);
 
-  const launchById = new Map(launches.map((launch) => [launch.launchId, launch]));
   const factByLaunchId = new Map(facts.map((fact) => [fact.launchId, fact]));
   const launchesByCreator = new Map<string, LaunchObserved[]>();
 
@@ -64,21 +62,14 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
       evidence.push({
         state: 'NOTED',
         code: 'REPORTED_CREATOR_PRIOR_LAUNCHES',
-        text: `The same ArcPad-reported creator address appears on ${prior.length} earlier indexed launch${prior.length === 1 ? '' : 'es'}.`,
+        text: `The same ArcPad-reported creator address appears on ${prior.length} earlier indexed launch${prior.length === 1 ? '' : 'es'} present in this projection input.`,
         sourceFactIds: [fact.factId, ...prior.map((item) => item.sourceFactId)]
-      });
-    } else if (input.historyCoverage === 'COMPLETE') {
-      evidence.push({
-        state: 'OBSERVED',
-        code: 'NO_PRIOR_INDEXED_LAUNCH',
-        text: 'No earlier launch with the same ArcPad-reported creator address is present in the complete indexed history supplied to this projection.',
-        sourceFactIds: [fact.factId]
       });
     } else {
       evidence.push({
         state: 'UNKNOWN',
         code: 'PRIOR_HISTORY_NOT_ESTABLISHED',
-        text: `No earlier matching launch is present in this projection input, but history coverage is ${input.historyCoverage}.`,
+        text: 'No earlier matching launch is present in this projection input. PUBLIC_PROJECTION_V0 does not claim complete history coverage.',
         sourceFactIds: [fact.factId]
       });
     }
@@ -110,7 +101,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
       },
       trashTrail: {
         priorLaunchCount: prior.length,
-        coverage: input.historyCoverage,
+        coverage: PUBLIC_HISTORY_COVERAGE_V0,
         prior
       },
       evidence
@@ -124,7 +115,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
     chainId: input.chainId,
     asOfBlock: input.asOfBlock,
     asOfBlockHash: input.asOfBlockHash.toLowerCase(),
-    historyCoverage: input.historyCoverage,
+    historyCoverage: PUBLIC_HISTORY_COVERAGE_V0,
     launches: launches.map((launch) => ({
       launchId: launch.launchId,
       eventId: launch.eventId,
@@ -150,7 +141,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
     chainId: input.chainId,
     asOfBlock: input.asOfBlock.toString(),
     asOfBlockHash: input.asOfBlockHash.toLowerCase(),
-    historyCoverage: input.historyCoverage,
+    historyCoverage: PUBLIC_HISTORY_COVERAGE_V0,
     bags
   };
 
@@ -161,7 +152,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
     chainId: input.chainId,
     asOfBlock: input.asOfBlock,
     asOfBlockHash: input.asOfBlockHash.toLowerCase(),
-    historyCoverage: input.historyCoverage,
+    historyCoverage: PUBLIC_HISTORY_COVERAGE_V0,
     inputDigest,
     outputDigest
   };
@@ -170,7 +161,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
     chainId: input.chainId,
     asOfBlock: input.asOfBlock.toString(),
     asOfBlockHash: input.asOfBlockHash.toLowerCase() as Hex,
-    historyCoverage: input.historyCoverage,
+    historyCoverage: PUBLIC_HISTORY_COVERAGE_V0,
     inputDigest,
     outputDigest,
     receiptId: `binrat-public:${await sha256Hex(receiptMaterial)}`
@@ -180,12 +171,16 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
 }
 
 function validateInput(input: PublicProjectionInput, launches: LaunchObserved[], facts: ProvenanceFact[]): void {
+  if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) throw new Error('PUBLIC_CHAIN_ID_INVALID');
   if (input.asOfBlock < 0n) throw new Error('PUBLIC_AS_OF_BLOCK_INVALID');
+  if (!/^0x[0-9a-fA-F]{64}$/.test(input.asOfBlockHash)) throw new Error('PUBLIC_AS_OF_BLOCK_HASH_INVALID');
+
   const factIds = new Set<string>();
   const factLaunchIds = new Set<string>();
 
   for (const launch of launches) {
     if (launch.chainId !== input.chainId) throw new Error(`PUBLIC_CHAIN_MISMATCH:${launch.launchId}`);
+    if (launch.source !== 'ARCPAD') throw new Error(`PUBLIC_SOURCE_UNSUPPORTED:${launch.launchId}`);
     if (launch.blockNumber > input.asOfBlock) throw new Error(`PUBLIC_FUTURE_LAUNCH:${launch.launchId}`);
   }
 
