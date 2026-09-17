@@ -1819,3 +1819,17 @@ img {
     transition: none !important;
   }
 }
+
+/* Operational state and long real onchain labels; no fixture analytics in live mode. */
+body:not([data-mode="LIVE"]):not([data-mode="FIXTURE"]) .status-dot,
+body[data-mode="UNAVAILABLE"] .intake-label::before { background: var(--unknown); animation: none; }
+body[data-mode="UNAVAILABLE"] .network-pill b { color: var(--noted); }
+.token-symbol, .token-name, .intake-bag b, .drawer h2, .trail-row strong { overflow-wrap: anywhere; min-width: 0; }
+.token-heading > div, .drawer-title-row > div { min-width: 0; }
+.metric-row { flex-wrap: wrap; }
+.share-card-footer span { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 520px) {
+  .desk-bar > span:last-child { font-size: 6px; max-width: 55%; text-align: right; }
+  .desk-bar > span:last-child::after { content: none; }
+  .section-meta { max-width: 47%; overflow-wrap: anywhere; }
+}

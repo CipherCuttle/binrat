@@ -16,7 +16,7 @@ const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e991
 const requiredHtml = [
   'BINRAT',
   'HOT GARBAGE',
-  'FIXTURE MODE',
+  'INDEX CONNECTING',
   'THE DUMPSTER',
   'HOW HE DIGS',
   'CLAIM BOUNDARY',
@@ -40,15 +40,16 @@ if (!shareCss.includes('.share-card-rat')) throw new Error('WEB_SHARE_CARD_MASCO
 if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
 if (!fixtures.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_FIELD_MISSING');
 if (/^\s*creator\s*:/m.test(fixtures)) throw new Error('WEB_AMBIGUOUS_CREATOR_FIELD_REINTRODUCED');
-if (!dataSource.includes("WEB_DATA_SOURCE_MODE = 'FIXTURE'")) throw new Error('WEB_DATA_SOURCE_MODE_DRIFT');
-if (!dataSource.includes("from './fixtures.js'")) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
-if (dataSource.includes('fetch(')) throw new Error('WEB_FIXTURE_SOURCE_NETWORK_ACCESS');
-if (!shareCard.includes("SHARE_CARD_MODE = 'FIXTURE'")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
+if (!dataSource.includes("get('fixtures') === '1'")) throw new Error('WEB_EXPLICIT_FIXTURE_MODE_MISSING');
+if (!dataSource.includes("import('./fixtures.js')")) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
+if (!dataSource.includes("fetch('/api/feed'")) throw new Error('WEB_LIVE_SOURCE_MISSING');
+if (!dataSource.includes("schemaVersion !== 'binrat.public-feed/0.1'")) throw new Error('WEB_SCHEMA_VALIDATION_MISSING');
+if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
 if (!app.includes("from './data-source.js'")) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes("from './share-card.js'")) throw new Error('WEB_SHARE_CARD_BOUNDARY_BYPASSED');
-if (!app.includes("feed?.mode !== 'FIXTURE'")) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
+if (!app.includes("!['FIXTURE', 'LIVE'].includes(feed?.mode)")) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
 if (app.includes('bag.creator')) throw new Error('WEB_AMBIGUOUS_CREATOR_RENDERING_REINTRODUCED');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');

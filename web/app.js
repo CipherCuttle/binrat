@@ -1,4 +1,4 @@
-import { loadDumpsterFeed } from './data-source.js';
+import { loadDumpsterFeed, WEB_DATA_SOURCE_MODE } from './data-source.js';
 import { buildShareCardModel, buildSharePostText } from './share-card.js';
 
 const grid = document.querySelector('#garbage-grid');
@@ -10,6 +10,34 @@ const randomBag = document.querySelector('#random-bag');
 let returnFocus = null;
 let bags = [];
 let activeFilter = 'all';
+let activeMode = null;
+let available = false;
+const modeCopy = {
+  FIXTURE: {
+    header: 'FIXTURE MODE', desk: 'PUBLIC PREVIEW / NO LIVE TOKEN DATA', status: 'DETERMINISTIC FIXTURES',
+    detail: 'Real interface. Synthetic bags.', end: 'END OF FIXTURE INDEX', bagLabel: 'FIXTURE BAGS',
+    report: 'FIXTURE REPORT', token: 'TOKEN ADDRESS / FIXTURE', source: 'FIXTURE / PRODUCT-SHELL ONLY',
+    stamp: 'NOT LIVE EVIDENCE', scope: 'this fixture', launch: 'Launch in this fixture',
+    empty: 'NO FIXTURE BAGS INDEXED', unavailable: 'FIXTURE SOURCE NOT AVAILABLE'
+  },
+  LIVE: {
+    header: 'LIVE INDEX', desk: 'LIVE // PUBLIC PROJECTION V0', status: 'PUBLIC PROJECTION / ARC 5042',
+    detail: 'HISTORY COVERAGE: UNVERIFIED', end: 'END OF CURRENT INDEX', bagLabel: 'INDEXED BAGS',
+    report: 'PUBLIC PROJECTION', token: 'TOKEN ADDRESS / OBSERVED ON ARC', source: 'LIVE // PUBLIC PROJECTION V0',
+    stamp: 'PUBLIC EVIDENCE', scope: 'this projection', launch: 'Observed on Arc',
+    empty: 'NO BAGS IN CURRENT INDEX WINDOW', unavailable: 'LIVE INDEX NOT AVAILABLE'
+  }
+};
+function copy() { return modeCopy[activeMode ?? WEB_DATA_SOURCE_MODE]; }
+function applyMode(feed) {
+  for (const element of document.querySelectorAll('[data-mode-copy]')) {
+    element.textContent = copy()[element.dataset.modeCopy];
+  }
+  document.body.dataset.mode = activeMode;
+  document.querySelector('[data-mode-copy="detail"]').textContent = activeMode === 'LIVE'
+    ? `HISTORY: UNVERIFIED / AS OF BLOCK ${feed.asOfBlock}` : copy().detail;
+}
+function ageLabel(item) { return activeMode === 'LIVE' ? item.age : `${item.age} AGO`; }
 const search = document.querySelector('#bag-search');
 const latestBag = document.querySelector('#latest-bag');
 const pageSurfaces = [
@@ -19,14 +47,32 @@ const pageSurfaces = [
 ];
 
 await bootstrap();
+if (WEB_DATA_SOURCE_MODE === 'LIVE') {
+  let checking = false;
+  setInterval(async () => {
+    if (document.hidden || checking) return;
+    checking = true;
+    try {
+      const response = await fetch('/api/health', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+      const health = await response.json();
+      if (!response.ok || !health.ok || !health.indexReady || health.chainId !== 5042) throw new Error('LIVE_INDEX_NOT_AVAILABLE');
+      if (!drawer.classList.contains('open')) await bootstrap();
+    } catch (error) { renderUnavailable(error); }
+    finally { checking = false; }
+  }, 15000);
+}
 
 async function bootstrap() {
   try {
     const feed = await loadDumpsterFeed();
-    if (feed?.mode !== 'FIXTURE')
+    if (!['FIXTURE', 'LIVE'].includes(feed?.mode))
       throw new Error('WEB_DATA_SOURCE_NOT_AUTHORIZED');
     if (!Array.isArray(feed?.bags)) throw new Error('WEB_DATA_SOURCE_INVALID');
     bags = feed.bags;
+    activeMode = feed.mode;
+    available = true;
+    applyMode(feed);
+    randomBag.disabled = bags.length === 0;
     renderIntake();
     renderFeed();
   } catch (error) {
@@ -35,17 +81,18 @@ async function bootstrap() {
 }
 
 function renderUnavailable(error) {
+  available = false;
   bags = [];
+  closeDrawer();
   randomBag.disabled = true;
-  grid.replaceChildren();
-  latestBag.querySelector('.intake-loading').textContent =
-    'Fixture source unavailable';
+  document.body.dataset.mode = 'UNAVAILABLE';
+  for (const element of document.querySelectorAll('[data-mode-copy]')) element.textContent = 'INDEX UNAVAILABLE';
+  document.querySelector('[data-mode-copy="header"]').textContent = copy().unavailable;
+  latestBag.innerHTML = '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
   document.querySelector('#feed-count').textContent = 'INDEX UNAVAILABLE';
-  const panel = document.createElement('div');
-  panel.className = 'data-unavailable';
-  panel.textContent =
-    'DUMPSTER DATA UNAVAILABLE — fixture source failed closed.';
-  grid.append(panel);
+  document.querySelector('#all-count').textContent = '—';
+  document.querySelector('#history-count').textContent = '—';
+  grid.innerHTML = `<div class="data-unavailable">DUMPSTER DATA UNAVAILABLE<br/>${copy().unavailable}</div>`;
   console.error(error);
 }
 
@@ -58,13 +105,12 @@ function renderIntake() {
   ).padStart(2, '0');
   const latest = bags[0];
   if (!latest) {
-    latestBag.querySelector('.intake-loading').textContent =
-      'No fixture bags indexed';
+    latestBag.innerHTML = `<span class="intake-loading">${copy().empty}</span>`;
     randomBag.disabled = true;
     return;
   }
   latestBag.innerHTML = `<span class="intake-label">LAST INTO THE BIN</span>
-    <button class="intake-bag" type="button" aria-label="Open latest fixture bag ${escapeHtml(latest.symbol)}">
+    <button class="intake-bag" type="button" aria-label="Open latest ${copy().report} bag ${escapeHtml(latest.symbol)}">
       <b>${escapeHtml(latest.symbol)}</b><span class="intake-note">${escapeHtml(latest.note)}</span>
       <span class="intake-block">BLOCK / ${escapeHtml(latest.block)}</span><span class="intake-open">INSPECT RECEIPT ↗</span>
     </button>`;
@@ -73,6 +119,7 @@ function renderIntake() {
 }
 
 function renderFeed() {
+  if (!available) return;
   const query = search.value.trim().toLowerCase();
   const visible = bags.filter(
     (bag) =>
@@ -83,9 +130,9 @@ function renderFeed() {
   );
   grid.innerHTML = visible.length
     ? visible.map(renderCard).join('')
-    : '<div class="empty-feed">No bags match this dig.<button type="button" id="clear-search">CLEAR FILTERS ↗</button></div>';
+    : bags.length === 0 ? `<div class="empty-feed">${copy().empty}</div>` : '<div class="empty-feed">No bags match this dig.<button type="button" id="clear-search">CLEAR FILTERS ↗</button></div>';
   document.querySelector('#feed-count').textContent =
-    `${String(visible.length).padStart(2, '0')} / ${String(bags.length).padStart(2, '0')} FIXTURE BAGS`;
+    `${String(visible.length).padStart(2, '0')} / ${String(bags.length).padStart(2, '0')} ${copy().bagLabel}`;
   grid.querySelector('#clear-search')?.addEventListener('click', () => {
     search.value = '';
     setFilter('all');
@@ -106,12 +153,12 @@ function renderCard(bag) {
       : 0;
   const serial = String(bags.indexOf(bag) + 1).padStart(3, '0');
   return `
-    <article class="bag-card" tabindex="0" role="button" aria-haspopup="dialog" data-bag-id="${escapeHtml(bag.id)}" data-noted="${noted}" aria-label="Open ${escapeHtml(bag.symbol)} fixture report">
-      <div class="card-top"><span class="card-serial">BAG / ${serial}</span><span class="age">${escapeHtml(bag.age)} AGO ↙</span></div>
+    <article class="bag-card" tabindex="0" role="button" aria-haspopup="dialog" data-bag-id="${escapeHtml(bag.id)}" data-noted="${noted}" aria-label="Open ${escapeHtml(bag.symbol)} ${copy().report}">
+      <div class="card-top"><span class="card-serial">BAG / ${serial}</span><span class="age">${escapeHtml(ageLabel(bag))} ↙</span></div>
       <div class="token-heading"><div><h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3><div class="token-name">${escapeHtml(bag.name)}</div></div><span class="inspect-arrow" aria-hidden="true">↗</span></div>
       <div class="creator-line"><span>ARCPAD-REPORTED CREATOR ADDRESS</span><code>${escapeHtml(shortAddress(bag.reportedCreatorAddress))}</code></div>
       <div class="card-intelligence"><div class="prior-metric"><strong>${escapeHtml(bag.priorLaunches)}</strong><span>PRIOR INDEXED<br/>BAGS</span></div><div class="coverage-metric"><span>RECORD COVERAGE</span><span class="coverage ${coverage}">${coverage}</span></div></div>
-      <div class="metric-table">${metric('24H MATURE', `${bag.mature24h}/${bag.priorLaunches || 0}`)}${metric('TOP 5', bag.concentration)}</div>
+      <div class="metric-table">${metric('24H MATURE', activeMode === 'LIVE' ? 'NOT PROJECTED' : `${bag.mature24h}/${bag.priorLaunches || 0}`)}${metric('TOP 5', bag.concentration)}</div>
       <div class="condition-strip"><span class="condition-count">${noted === 0 ? '0 NOTED CONDITIONS' : `${noted} NOTED CONDITION${noted === 1 ? '' : 'S'}`}</span><span class="observation-count">${bag.evidence.length} RECORDS</span></div>
       <div class="rat-note"><span>RAT NOTE /</span> “${escapeHtml(bag.note)}”</div>
       <div class="card-footer"><span>BLK ${escapeHtml(bag.block)}</span><span>OPEN RECEIPT ↗</span></div>
@@ -167,22 +214,23 @@ function openBag(id, origin = document.activeElement) {
           (item) => `
         <div class="trail-row">
           <strong>${escapeHtml(item.symbol)}</strong>
-          <span class="trail-age">${escapeHtml(item.age)} AGO</span>
+          <span class="trail-age">${escapeHtml(ageLabel(item))}</span>
           <span class="trail-outcome">${escapeHtml(item.outcome)}</span>
           <span class="coverage ${normalizeCoverage(item.coverage)}">${normalizeCoverage(item.coverage)}</span>
         </div>
       `,
         )
         .join('')
-    : '<div class="empty-trail">No earlier ArcPad fixture launch is attached to this reported creator address. This is absence of fixture history, not positive evidence.</div>';
+    : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
 
   const share = buildShareCardModel(bag);
 
   drawerContent.innerHTML = `
-    <p class="drawer-kicker">TRASH TRAIL // FIXTURE REPORT</p>
-    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(bag.age)} ago</p></div><div class="case-number">FILE<br/><b>${String(bags.indexOf(bag) + 1).padStart(3, '0')}</b></div></div>
+    <p class="drawer-kicker">TRASH TRAIL // ${copy().report}</p>
+    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${String(bags.indexOf(bag) + 1).padStart(3, '0')}</b></div></div>
     <div class="address creator-address"><span>ArcPad-reported creator address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
-    <div class="address"><span>TOKEN ADDRESS / FIXTURE</span><code>${escapeHtml(bag.token)}</code></div>
+    <div class="address"><span>${copy().token}</span><code>${escapeHtml(bag.token)}</code></div>
+    ${activeMode === 'LIVE' ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ''}
     <div class="drawer-note"><span>RAT NOTE / PRESENTATION, NOT A VERDICT</span>“${escapeHtml(bag.note)}”</div>
     <div class="file-section-heading"><h3>01 / OBSERVATIONS</h3><span>${bag.evidence.length} RECORDS</span></div>
     <div class="evidence-list">
@@ -191,8 +239,8 @@ function openBag(id, origin = document.activeElement) {
 
     <div class="trail">
       <div class="file-section-heading"><h3>02 / TRASH TRAIL</h3><span>${escapeHtml(bag.priorLaunches)} PRIOR INDEXED BAGS</span></div>
-      <p class="trail-summary">Same reported address. Not a claim of human identity. ${bag.trail.length} earlier bag${bag.trail.length === 1 ? '' : 's'} shown in this fixture.</p>
-      <div class="trail-rows"><div class="trail-row current"><strong>${escapeHtml(bag.symbol)} / CURRENT BAG</strong><span class="trail-age">${escapeHtml(bag.age)} AGO</span><span class="trail-outcome">Launch in this fixture</span><span class="coverage ${normalizeCoverage(bag.coverage)}">${normalizeCoverage(bag.coverage)}</span></div>${trail}</div>
+      <p class="trail-summary">Same reported address. Not a claim of human identity. ${bag.trail.length} earlier bag${bag.trail.length === 1 ? '' : 's'} shown in ${copy().scope}.</p>
+      <div class="trail-rows"><div class="trail-row current"><strong>${escapeHtml(bag.symbol)} / CURRENT BAG</strong><span class="trail-age">${escapeHtml(ageLabel(bag))}</span><span class="trail-outcome">${copy().launch}</span><span class="coverage ${normalizeCoverage(bag.coverage)}">${normalizeCoverage(bag.coverage)}</span></div>${trail}</div>
     </div>
 
     <div class="receipt-box">
@@ -200,13 +248,14 @@ function openBag(id, origin = document.activeElement) {
       <dl class="receipt-grid">
         <dt>receipt</dt><dd>${escapeHtml(bag.receipt)}</dd>
         <dt>coverage</dt><dd>${escapeHtml(normalizeCoverage(bag.coverage))}</dd>
-        <dt>source class</dt><dd>FIXTURE / PRODUCT-SHELL ONLY</dd>
-        <dt>block</dt><dd>${escapeHtml(bag.block)}</dd>
+        <dt>source class</dt><dd>${copy().source}</dd>
+        <dt>launch block</dt><dd>${escapeHtml(bag.block)}</dd>
+        ${activeMode === 'LIVE' ? `<dt>as-of block</dt><dd>${escapeHtml(bag.asOfBlock)}</dd><dt>as-of hash</dt><dd>${escapeHtml(bag.asOfBlockHash)}</dd>` : ''}
       </dl>
-      <span class="fixture-stamp">NOT LIVE EVIDENCE</span><span class="receipt-bars" aria-hidden="true"></span>
+      <span class="fixture-stamp">${copy().stamp}</span><span class="receipt-bars" aria-hidden="true"></span>
     </div>
 
-    <section class="share-tools" aria-label="Share card fixture preview">
+    <section class="share-tools" aria-label="Share card ${copy().report}">
       <h3>04 / TAKE THE RECEIPT WITH YOU</h3>
       ${renderShareCard(share)}
       <div class="share-actions">
@@ -265,10 +314,10 @@ async function copySharePost(bag, statusNode) {
     if (!navigator.clipboard?.writeText)
       throw new Error('CLIPBOARD_UNAVAILABLE');
     await navigator.clipboard.writeText(text);
-    statusNode.textContent = 'COPIED // fixture stamp included';
+    statusNode.textContent = `COPIED // ${copy().report} stamp included`;
   } catch {
     statusNode.textContent =
-      'COPY UNAVAILABLE // select the fixture card manually';
+      'COPY UNAVAILABLE // select the card manually';
   }
 }
 

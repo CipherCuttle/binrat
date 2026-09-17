@@ -12,6 +12,7 @@ export interface LaunchStore {
   putLaunch(launch: LaunchObserved): Promise<'INSERTED' | 'DUPLICATE'>;
   getLaunch(launchId: string): Promise<LaunchObserved | null>;
   getLaunchByToken(token: Hex): Promise<LaunchObserved | null>;
+  listLaunches(): Promise<LaunchObserved[]>;
   listLaunchesMissingProvenance(): Promise<LaunchObserved[]>;
   putProvenanceFact(fact: ProvenanceFact): Promise<'INSERTED' | 'DUPLICATE'>;
   listProvenanceFacts(): Promise<ProvenanceFact[]>;

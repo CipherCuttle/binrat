@@ -7,12 +7,12 @@
     <meta name="robots" content="noindex,nofollow,noarchive" />
     <meta
       name="description"
-      content="BINRAT digs through new Arc launches, follows reported creator addresses, and keeps the receipts. Explore the fixture terminal."
+      content="BINRAT digs through new Arc launches, follows reported creator addresses, and keeps the receipts. Explore public launch evidence."
     />
     <meta property="og:title" content="BINRAT — HOT GARBAGE" />
     <meta
       property="og:description"
-      content="He gets the scraps. You get the receipts. Fixture preview. $BINRAT is not live."
+      content="He gets the scraps. You get the receipts. Public launch evidence. $BINRAT is not live."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./assets/binrat-hero.webp" />
@@ -24,7 +24,7 @@
     <meta name="twitter:title" content="BINRAT — HOT GARBAGE" />
     <meta
       name="twitter:description"
-      content="A dumpster rat for Arc. Fixture preview. $BINRAT is not live."
+      content="A dumpster rat for Arc. Public launch evidence. $BINRAT is not live."
     />
     <meta name="twitter:image" content="./assets/binrat-hero.webp" />
     <title>BINRAT — The Dumpster</title>
@@ -56,16 +56,14 @@
         ><a href="#token-status">03 / $BINRAT</a>
       </nav>
       <div class="network-pill">
-        <span class="status-dot"></span><b>FIXTURE MODE</b
+        <span class="status-dot"></span><b data-mode-copy="header">INDEX CONNECTING</b
         ><span class="network-id">ARC / 5042</span>
       </div>
     </header>
     <main id="top">
       <div class="desk-bar shell">
         <span>BINRAT TERMINAL <b>/ 001</b></span
-        ><span
-          >PUBLIC PREVIEW <span class="bar-divider">/</span> NO LIVE TOKEN
-          DATA</span
+        ><span data-mode-copy="desk">WAITING FOR PUBLIC INDEX</span
         >
       </div>
       <section class="hero shell" aria-labelledby="hero-title">
@@ -113,10 +111,10 @@
       <div
         class="shell intake-strip"
         id="latest-bag"
-        aria-label="Latest fixture bag"
+        aria-label="Latest indexed bag"
       >
         <span class="intake-label">LAST INTO THE BIN</span
-        ><span class="intake-loading">Loading fixture receipt…</span>
+        ><span class="intake-loading">Loading index receipt…</span>
       </div>
       <section
         id="garbage"
@@ -131,9 +129,7 @@
             </h2>
           </div>
           <p class="section-meta">
-            <span class="status-dot"></span> DETERMINISTIC FIXTURES<br /><span
-              >Real interface. Synthetic bags.</span
-            >
+            <span data-mode-copy="status">INDEX CONNECTING</span><br /><span data-mode-copy="detail">Waiting for a committed checkpoint.</span>
           </p>
         </div>
         <div class="feed-toolbar">
@@ -168,7 +164,7 @@
         <div id="garbage-grid" class="garbage-grid" aria-live="polite"></div>
         <div class="feed-bottom">
           <span id="feed-count">Loading bags…</span
-          ><span>END OF FIXTURE INDEX <span class="tiny-cross">+</span></span>
+          ><span><span data-mode-copy="end">WAITING FOR INDEX</span> <span class="tiny-cross">+</span></span>
         </div>
         <p class="feed-boundary">
           Coverage describes the record, never the token. Open a bag to inspect
