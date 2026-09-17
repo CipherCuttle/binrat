@@ -8,7 +8,12 @@ import type { Hex } from '../core/types.js';
 import type { LaunchSource } from '../core/ports.js';
 import { syncLaunches } from '../indexer/syncLaunches.js';
 import { SqliteStore } from '../store/sqliteStore.js';
-import { computeHotGarbageMetrics, decideHotGarbage, reconcileTokenSets } from './hotGarbageMetrics.js';
+import {
+  computeHistoricalCreatorOpportunity,
+  computeHotGarbageMetrics,
+  decideHotGarbage,
+  reconcileTokenSets
+} from './hotGarbageMetrics.js';
 
 const START_RECEIPT_PATH = resolve(
   process.env.BINRAT_EXPERIMENT_START_RECEIPT ?? 'docs/experiments/hot-garbage-v0-start.json'
@@ -18,6 +23,8 @@ const ARCPAD_API = process.env.BINRAT_ARCPAD_API ?? 'https://arcpad.meme';
 const BATCH_BLOCKS = BigInt(process.env.BINRAT_EXPERIMENT_BATCH_BLOCKS ?? '2000');
 const CONFIRMATIONS = 2n;
 const ALLOW_EARLY = process.env.BINRAT_EXPERIMENT_ALLOW_EARLY === '1';
+const ARCPAD_CATCHUP_TIMEOUT_MS = Number(process.env.BINRAT_ARCPAD_CATCHUP_TIMEOUT_MS ?? '300000');
+const ARCPAD_CATCHUP_POLL_MS = Number(process.env.BINRAT_ARCPAD_CATCHUP_POLL_MS ?? '5000');
 
 interface StartReceipt {
   schemaVersion: string;
@@ -29,17 +36,31 @@ interface StartReceipt {
   startBlockHash: Hex;
 }
 
+interface RawArcPadCreation {
+  token?: unknown;
+  creator?: unknown;
+  blockNumber?: unknown;
+}
+
 interface ArcPadCreation {
-  token?: string;
-  creator?: string;
-  blockNumber?: string | number;
+  token: Hex;
+  creator: Hex;
+  blockNumber: bigint;
 }
 
 interface ArcPadTokensPage {
-  creations?: ArcPadCreation[];
+  creations?: RawArcPadCreation[];
   nextAfter?: string | number | null;
   state?: string;
   servedAt?: number;
+}
+
+interface ArcPadStatus {
+  ok?: boolean;
+  chainId?: number;
+  launchesTo?: string | number;
+  indexerGaps?: number;
+  currentBlock?: string | number;
 }
 
 class RetryingLaunchSource implements LaunchSource {
@@ -60,6 +81,7 @@ class CappedLaunchSource implements LaunchSource {
 
 const start = JSON.parse(readFileSync(START_RECEIPT_PATH, 'utf8')) as StartReceipt;
 validateStart(start);
+validateRuntimeOptions();
 
 const startedAtMs = Date.parse(start.startedAt);
 const endAtMs = startedAtMs + start.windowHours * 60 * 60 * 1000;
@@ -114,13 +136,26 @@ try {
     throw new Error('EXPERIMENT_WINDOW_LEAK');
   }
 
-  const apiSnapshot = await fetchArcPadWindow(startBlock, endBlock);
+  const arcPadCoverage = await waitForArcPadCoverage(endBlock);
+  const apiSnapshot = await fetchArcPadHistory();
+  const apiWindow = apiSnapshot.creations.filter(
+    (creation) => creation.blockNumber > startBlock && creation.blockNumber <= endBlock
+  );
+  const priorApiCreatorAddresses = apiSnapshot.creations
+    .filter((creation) => creation.blockNumber <= startBlock)
+    .map((creation) => creation.creator);
+
   const metrics = computeHotGarbageMetrics(launches);
+  const historicalCreatorOpportunity = computeHistoricalCreatorOpportunity(launches, priorApiCreatorAddresses);
   const reconciliation = reconcileTokenSets(
     launches.map((launch) => launch.token),
-    apiSnapshot.tokens
+    apiWindow.map((creation) => creation.token)
   );
-  const decision = decideHotGarbage(metrics.launchCount);
+  const volumeDecisionCandidate = decideHotGarbage(metrics.launchCount);
+  const captureGatePass =
+    reconciliation.onchainCapturePercentAgainstApi >= 99 &&
+    reconciliation.apiCapturePercentAgainstOnchain >= 99;
+  const verdict = captureGatePass ? volumeDecisionCandidate : 'EVIDENCE_GATE_FAILED';
 
   const report = {
     schemaVersion: 'binrat.hot-garbage-72h.result.v0',
@@ -137,7 +172,8 @@ try {
       blockHash: canonicalEnd.hash.toLowerCase(),
       blockTimestamp: new Date(Number(canonicalEnd.timestamp) * 1000).toISOString(),
       observedHeadBlock: head.number.toString(),
-      observedHeadHash: head.hash.toLowerCase()
+      observedHeadHash: head.hash.toLowerCase(),
+      timestampResolutionNote: 'Arc block timestamps are second-resolution; the block boundary is the last timestamp <= the preregistered end instant.'
     },
     reconstruction: {
       batchBlocks: BATCH_BLOCKS.toString(),
@@ -145,18 +181,23 @@ try {
       indexedLaunches: launches.length
     },
     metrics,
+    historicalCreatorOpportunity: {
+      evidenceClass: 'LAUNCHPAD_INDEXER',
+      ...historicalCreatorOpportunity
+    },
     reconciliation: {
       ...reconciliation,
+      arcPadCoverage,
       arcPadApiState: apiSnapshot.state,
       arcPadApiServedAt: apiSnapshot.servedAt,
       pagesRead: apiSnapshot.pagesRead
     },
     gates: {
       captureGatePercent: 99,
-      captureGatePass: reconciliation.onchainCapturePercentAgainstApi >= 99 && reconciliation.apiCapturePercentAgainstOnchain >= 99,
-      volumeDecision: decision
+      captureGatePass,
+      volumeDecisionCandidate
     },
-    decision,
+    verdict,
     claimBoundary: 'Creator repetition means repeated ArcPad TokenCreated events reporting the same creator address. It is not proof of human identity, EOA ownership, coordinated control, or ultimate deploying actor.'
   };
 
@@ -183,13 +224,51 @@ async function findLastBlockAtOrBefore(
   return low;
 }
 
-async function fetchArcPadWindow(startBlock: bigint, endBlock: bigint): Promise<{
-  tokens: Hex[];
+async function waitForArcPadCoverage(endBlock: bigint): Promise<{
+  launchesTo: string;
+  currentBlock: string | null;
+  indexerGaps: number;
+}> {
+  const deadline = Date.now() + ARCPAD_CATCHUP_TIMEOUT_MS;
+  let lastStatus: ArcPadStatus | null = null;
+
+  for (;;) {
+    lastStatus = await retryTransient(() => fetchJson<ArcPadStatus>(new URL('/api/status', ARCPAD_API)));
+    const launchesTo = parseBlockNumber(lastStatus.launchesTo);
+    const currentBlock = parseBlockNumber(lastStatus.currentBlock);
+    const gaps = typeof lastStatus.indexerGaps === 'number' && Number.isInteger(lastStatus.indexerGaps)
+      ? lastStatus.indexerGaps
+      : null;
+
+    if (
+      lastStatus.ok === true &&
+      lastStatus.chainId === ARC_CHAIN_ID &&
+      launchesTo !== null &&
+      launchesTo >= endBlock &&
+      gaps === 0
+    ) {
+      return {
+        launchesTo: launchesTo.toString(),
+        currentBlock: currentBlock?.toString() ?? null,
+        indexerGaps: gaps
+      };
+    }
+
+    if (Date.now() >= deadline) {
+      throw new Error(`ARCPAD_INDEXER_NOT_CAUGHT_UP:endBlock=${endBlock}:status=${JSON.stringify(lastStatus)}`);
+    }
+    await sleep(ARCPAD_CATCHUP_POLL_MS);
+  }
+}
+
+async function fetchArcPadHistory(): Promise<{
+  creations: ArcPadCreation[];
   state: string | null;
   servedAt: number | null;
   pagesRead: number;
 }> {
-  const tokens: Hex[] = [];
+  const creations: ArcPadCreation[] = [];
+  const seenCursors = new Set<string>();
   let after: string | number | null = null;
   let state: string | null = null;
   let servedAt: number | null = null;
@@ -202,22 +281,36 @@ async function fetchArcPadWindow(startBlock: bigint, endBlock: bigint): Promise<
     const page = await retryTransient(() => fetchJson<ArcPadTokensPage>(url));
     pagesRead += 1;
     if (pagesRead > 100) throw new Error('ARCPAD_API_PAGINATION_LIMIT_EXCEEDED');
+    if (typeof page.state === 'string' && page.state !== 'fresh') throw new Error(`ARCPAD_API_NOT_FRESH:${page.state}`);
     state = typeof page.state === 'string' ? page.state : state;
     servedAt = typeof page.servedAt === 'number' ? page.servedAt : servedAt;
 
-    for (const creation of page.creations ?? []) {
-      if (typeof creation.token !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(creation.token)) continue;
-      const blockNumber = parseBlockNumber(creation.blockNumber);
-      if (blockNumber !== null && blockNumber > startBlock && blockNumber <= endBlock) {
-        tokens.push(creation.token.toLowerCase() as Hex);
-      }
-    }
+    for (const raw of page.creations ?? []) creations.push(parseArcPadCreation(raw));
 
     if (page.nextAfter === null || page.nextAfter === undefined || page.nextAfter === '') break;
+    const cursorKey = String(page.nextAfter);
+    if (seenCursors.has(cursorKey)) throw new Error(`ARCPAD_API_CURSOR_CYCLE:${cursorKey}`);
+    seenCursors.add(cursorKey);
     after = page.nextAfter;
   }
 
-  return { tokens, state, servedAt, pagesRead };
+  return { creations, state, servedAt, pagesRead };
+}
+
+function parseArcPadCreation(raw: RawArcPadCreation): ArcPadCreation {
+  if (typeof raw.token !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(raw.token)) {
+    throw new Error('ARCPAD_API_MALFORMED_TOKEN');
+  }
+  if (typeof raw.creator !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(raw.creator)) {
+    throw new Error(`ARCPAD_API_MALFORMED_CREATOR:${raw.token}`);
+  }
+  const blockNumber = parseBlockNumber(raw.blockNumber);
+  if (blockNumber === null) throw new Error(`ARCPAD_API_MALFORMED_BLOCK:${raw.token}`);
+  return {
+    token: raw.token.toLowerCase() as Hex,
+    creator: raw.creator.toLowerCase() as Hex,
+    blockNumber
+  };
 }
 
 async function fetchJson<T>(url: URL): Promise<T> {
@@ -259,7 +352,17 @@ function validateStart(value: StartReceipt): void {
   if (!Number.isFinite(Date.parse(value.startedAt))) throw new Error('START_TIME_INVALID');
 }
 
-function parseBlockNumber(value: string | number | undefined): bigint | null {
+function validateRuntimeOptions(): void {
+  if (BATCH_BLOCKS < 1n) throw new Error('BINRAT_EXPERIMENT_BATCH_BLOCKS must be >= 1');
+  if (!Number.isFinite(ARCPAD_CATCHUP_TIMEOUT_MS) || ARCPAD_CATCHUP_TIMEOUT_MS < 1) {
+    throw new Error('BINRAT_ARCPAD_CATCHUP_TIMEOUT_MS must be >= 1');
+  }
+  if (!Number.isFinite(ARCPAD_CATCHUP_POLL_MS) || ARCPAD_CATCHUP_POLL_MS < 100) {
+    throw new Error('BINRAT_ARCPAD_CATCHUP_POLL_MS must be >= 100');
+  }
+}
+
+function parseBlockNumber(value: unknown): bigint | null {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0) return BigInt(value);
   if (typeof value === 'string' && /^\d+$/.test(value)) return BigInt(value);
   return null;
