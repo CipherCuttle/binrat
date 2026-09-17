@@ -54,7 +54,6 @@ test('public projection is deterministic and makes reported-creator semantics ex
     chainId: CHAIN_ID,
     asOfBlock: 103n,
     asOfBlockHash: AS_OF_HASH,
-    historyCoverage: 'COMPLETE' as const,
     launches,
     facts
   };
@@ -63,43 +62,38 @@ test('public projection is deterministic and makes reported-creator semantics ex
   const reversed = await projectPublicFeed({ ...input, launches: [...launches].reverse(), facts: [...facts].reverse() });
 
   assert.deepEqual(forward, reversed);
+  assert.equal(forward.historyCoverage, 'UNVERIFIED');
+  assert.equal(forward.receipt.historyCoverage, 'UNVERIFIED');
   assert.equal(forward.bags[0]?.id, 'a3');
   assert.equal(forward.bags[0]?.reportedCreatorAddress, CREATOR_A);
   assert.equal(forward.bags[0]?.trashTrail.priorLaunchCount, 2);
+  assert.equal(forward.bags[0]?.trashTrail.coverage, 'UNVERIFIED');
   assert.deepEqual(forward.bags[0]?.trashTrail.prior.map((item) => item.launchId), ['a1', 'a2']);
   assert.equal(forward.bags[0]?.evidence.find((item) => item.code === 'REPORTED_CREATOR_PRIOR_LAUNCHES')?.state, 'NOTED');
   assert.match(forward.receipt.receiptId, /^binrat-public:[0-9a-f]{64}$/);
 
   const serialized = JSON.stringify(forward).toLowerCase();
   assert.equal(serialized.includes('deployer'), false);
-  assert.equal(serialized.includes('wallet'), false);
+  assert.equal(serialized.includes('walletowner'), false);
   assert.equal(serialized.includes('buy_eligible'), false);
   assert.equal(serialized.includes('safe score'), false);
 });
 
-test('absence of prior history stays unknown unless history coverage is complete', async () => {
+test('absence of prior history is always unknown in PUBLIC_PROJECTION_V0', async () => {
   const only = launch({ id: 'only', block: 100n, logIndex: 0, token: '0x3000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'ONLY' });
   const fact = await buildProvenanceFact(only);
 
-  const partial = await projectPublicFeed({
+  const feed = await projectPublicFeed({
     chainId: CHAIN_ID,
     asOfBlock: 100n,
     asOfBlockHash: AS_OF_HASH,
-    historyCoverage: 'PARTIAL',
     launches: [only],
     facts: [fact]
   });
-  assert.equal(partial.bags[0]?.evidence.find((item) => item.code === 'PRIOR_HISTORY_NOT_ESTABLISHED')?.state, 'UNKNOWN');
 
-  const complete = await projectPublicFeed({
-    chainId: CHAIN_ID,
-    asOfBlock: 100n,
-    asOfBlockHash: AS_OF_HASH,
-    historyCoverage: 'COMPLETE',
-    launches: [only],
-    facts: [fact]
-  });
-  assert.equal(complete.bags[0]?.evidence.find((item) => item.code === 'NO_PRIOR_INDEXED_LAUNCH')?.state, 'OBSERVED');
+  assert.equal(feed.historyCoverage, 'UNVERIFIED');
+  assert.equal(feed.bags[0]?.evidence.find((item) => item.code === 'PRIOR_HISTORY_NOT_ESTABLISHED')?.state, 'UNKNOWN');
+  assert.equal(feed.bags[0]?.evidence.some((item) => item.code === 'NO_PRIOR_INDEXED_LAUNCH'), false);
 });
 
 test('public projection fails closed on future or mismatched provenance input', async () => {
@@ -111,7 +105,6 @@ test('public projection fails closed on future or mismatched provenance input', 
       chainId: CHAIN_ID,
       asOfBlock: 100n,
       asOfBlockHash: AS_OF_HASH,
-      historyCoverage: 'UNVERIFIED',
       launches: [item],
       facts: [fact]
     }),
@@ -124,10 +117,22 @@ test('public projection fails closed on future or mismatched provenance input', 
       chainId: CHAIN_ID,
       asOfBlock: 101n,
       asOfBlockHash: AS_OF_HASH,
-      historyCoverage: 'UNVERIFIED',
       launches: [item],
       facts: [tampered]
     }),
     /PUBLIC_FACT_AUTHORITY_MISMATCH/
+  );
+});
+
+test('public projection rejects malformed as-of authority', async () => {
+  await assert.rejects(
+    projectPublicFeed({
+      chainId: CHAIN_ID,
+      asOfBlock: 0n,
+      asOfBlockHash: '0x1234' as Hex,
+      launches: [],
+      facts: []
+    }),
+    /PUBLIC_AS_OF_BLOCK_HASH_INVALID/
   );
 });
