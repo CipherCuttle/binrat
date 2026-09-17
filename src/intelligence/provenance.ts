@@ -3,8 +3,8 @@ import { sha256Hex } from '../evidence/canonical.js';
 
 export const PROVENANCE_DERIVATION_VERSION = 'BINRAT_PROVENANCE_V0' as const;
 
-export type ProvenanceFactKind = 'LAUNCH_DEPLOYED_BY_CREATOR';
-export type ProvenanceEdgeKind = 'DEPLOYED_BY' | 'PREVIOUS_LAUNCH';
+export type ProvenanceFactKind = 'ARCPAD_REPORTED_CREATOR';
+export type ProvenanceEdgeKind = 'REPORTED_CREATOR' | 'PREVIOUS_LAUNCH';
 export type EvidenceClass = 'DIRECT_ONCHAIN' | 'DERIVED_ONCHAIN';
 
 export interface ProvenanceFact {
@@ -40,7 +40,7 @@ export async function buildProvenanceFact(launch: LaunchObserved): Promise<Prove
   const factId = `binrat-fact:${launch.chainId}:${launch.launchId}`;
   const payload = {
     factId,
-    kind: 'LAUNCH_DEPLOYED_BY_CREATOR' as const,
+    kind: 'ARCPAD_REPORTED_CREATOR' as const,
     chainId: launch.chainId,
     launchId: launch.launchId,
     creator,
@@ -59,10 +59,10 @@ export async function projectProvenanceEdges(facts: readonly ProvenanceFact[]): 
 
   for (const fact of ordered) {
     const launchNode = launchNodeId(fact);
-    const creatorNode = walletNodeId(fact.chainId, fact.creator);
+    const creatorNode = creatorAddressNodeId(fact.chainId, fact.creator);
     edges.push(await buildEdge({
-      edgeId: `deployed-by:${fact.factId}`,
-      kind: 'DEPLOYED_BY',
+      edgeId: `reported-creator:${fact.factId}`,
+      kind: 'REPORTED_CREATOR',
       chainId: fact.chainId,
       from: launchNode,
       to: creatorNode,
@@ -97,8 +97,8 @@ function launchNodeId(fact: Pick<ProvenanceFact, 'chainId' | 'launchId'>): strin
   return `launch:${fact.chainId}:${fact.launchId}`;
 }
 
-function walletNodeId(chainId: number, creator: Hex): string {
-  return `wallet:${chainId}:${creator.toLowerCase()}`;
+function creatorAddressNodeId(chainId: number, creator: Hex): string {
+  return `address:${chainId}:${creator.toLowerCase()}`;
 }
 
 async function buildEdge(input: Omit<ProvenanceEdge, 'derivationVersion' | 'evidenceDigest'>): Promise<ProvenanceEdge> {
