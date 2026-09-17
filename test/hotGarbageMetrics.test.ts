@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
-import { computeHotGarbageMetrics, decideHotGarbage, reconcileTokenSets } from '../src/experiment/hotGarbageMetrics.js';
+import {
+  computeHistoricalCreatorOpportunity,
+  computeHotGarbageMetrics,
+  decideHotGarbage,
+  reconcileTokenSets
+} from '../src/experiment/hotGarbageMetrics.js';
 
 function launch(index: number, creator: Hex, metadata: Partial<Pick<LaunchObserved, 'website' | 'twitter' | 'telegram'>> = {}): LaunchObserved {
   const nibble = index.toString(16).padStart(40, '0');
@@ -50,6 +55,20 @@ test('metrics count repeated reported creator addresses without inferring identi
       withTelegram: 1,
       withAnySocialOrWebsite: 3
     }
+  });
+});
+
+test('historical opportunity detects pre-window Trash Trail even when the window has no repeat', () => {
+  const a = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as Hex;
+  const b = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' as Hex;
+  const c = '0xcccccccccccccccccccccccccccccccccccccccc' as Hex;
+  const window = [launch(1, a), launch(2, b), launch(3, c)];
+  const result = computeHistoricalCreatorOpportunity(window, [a, a, b]);
+  assert.deepEqual(result, {
+    windowCreatorAddressesWithPriorArcPadLaunch: 2,
+    windowLaunchesWithPriorArcPadLaunch: 2,
+    totalPriorArcPadLaunchesForWindowCreators: 3,
+    maxPriorArcPadLaunchesForOneWindowCreator: 2
   });
 });
 
