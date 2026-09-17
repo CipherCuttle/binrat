@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0a080a" />
+  <meta name="description" content="BINRAT digs through new Arc launches and keeps the receipts." />
+  <title>BINRAT — HOT GARBAGE</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="BINRAT home">
+      <span class="brand-mark">BR</span>
+      <span>BINRAT</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href="#garbage">HOT GARBAGE</a>
+      <a href="#how">HOW HE DIGS</a>
+      <a href="#boundary">CLAIM BOUNDARY</a>
+    </nav>
+    <div class="network-pill"><span class="live-dot"></span> ARC 5042 <b>FIXTURE MODE</b></div>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow">A MEMECOIN ATTACHED TO A USEFUL RAT</p>
+        <h1>HOT<br/><span>GARBAGE.</span></h1>
+        <p class="lede">He gets the scraps. <strong>You get the receipts.</strong></p>
+        <p class="sublede">New launches hit the dumpster. BINRAT follows the address on the bag, remembers the old bags, and shows exactly what he found.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#garbage">ENTER THE DUMPSTER</a>
+          <button class="button ghost" id="random-bag" type="button">PULL A RANDOM BAG</button>
+        </div>
+        <div class="hero-footnote">No risk score. No buy call. No paid placement. Just evidence + a rat.</div>
+      </div>
+
+      <div class="mascot-stage" aria-label="BINRAT mascot stage">
+        <div class="scanline"></div>
+        <div class="stage-status"><span>CAM_01</span><span class="red">DIGGING</span></div>
+        <img src="./binrat-mark.svg" alt="BINRAT peeking from a dumpster" />
+        <div class="stage-caption">
+          <span>$BINRAT</span>
+          <b>NOT LIVE</b>
+        </div>
+      </div>
+    </section>
+
+    <section class="ticker" aria-label="Fixture warning">
+      <span>⚠ PRODUCT SHELL / DETERMINISTIC FIXTURES / NO LIVE TOKEN DATA</span>
+      <span>⚠ PRODUCT SHELL / DETERMINISTIC FIXTURES / NO LIVE TOKEN DATA</span>
+    </section>
+
+    <section id="garbage" class="shell garbage-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">THE DUMPSTER</p>
+          <h2>HOT GARBAGE</h2>
+        </div>
+        <div class="section-meta">Newest bags first // click anything to dig deeper</div>
+      </div>
+
+      <div id="garbage-grid" class="garbage-grid" aria-live="polite"></div>
+    </section>
+
+    <section id="how" class="shell how-section">
+      <div class="section-heading compact">
+        <div>
+          <p class="eyebrow">HOW HE DIGS</p>
+          <h2>THE RAT DOES NOT GUESS.</h2>
+        </div>
+      </div>
+      <div class="process-grid">
+        <article><span>01</span><h3>BAG HITS BIN</h3><p>Capture the exact launch event, block, transaction, token and ArcPad-reported creator address.</p></article>
+        <article><span>02</span><h3>FOLLOW THE SMELL</h3><p>Link that reported creator address to earlier ArcPad launches without pretending it proves a human identity.</p></article>
+        <article><span>03</span><h3>DIG FOR SCRAPS</h3><p>Collect factual observations: prior outcomes, distribution, metadata and anything still unresolved.</p></article>
+        <article><span>04</span><h3>KEEP THE RECEIPT</h3><p>Bind the result to evidence and coverage so the joke can never outrank the record underneath it.</p></article>
+      </div>
+    </section>
+
+    <section id="boundary" class="shell boundary-section">
+      <div class="warning-label">DO NOT EAT THE DASHBOARD</div>
+      <h2>BINRAT REPORTS WHAT HE FOUND.</h2>
+      <p>It does not prove a token is safe, a creator is honest, two addresses belong to the same human, or a price will go up. <strong>Missing evidence stays missing.</strong></p>
+    </section>
+  </main>
+
+  <aside id="drawer" class="drawer" aria-hidden="true" aria-label="Trash Trail detail">
+    <button id="drawer-close" class="drawer-close" type="button" aria-label="Close detail">×</button>
+    <div id="drawer-content"></div>
+  </aside>
+  <div id="backdrop" class="backdrop" hidden></div>
+
+  <footer class="site-footer shell">
+    <span>BINRAT // THE DUMPSTER</span>
+    <span>HE GETS THE SCRAPS. YOU GET THE RECEIPTS.</span>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
