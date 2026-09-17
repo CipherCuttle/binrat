@@ -124,6 +124,33 @@ test('public projection fails closed on future or mismatched provenance input', 
   );
 });
 
+test('public projection recomputes provenance fact identity and digest', async () => {
+  const item = launch({ id: 'integrity', block: 110n, logIndex: 0, token: '0x5000000000000000000000000000000000000001', creator: CREATOR_A, symbol: 'HASH' });
+  const fact = await buildProvenanceFact(item);
+
+  await assert.rejects(
+    projectPublicFeed({
+      chainId: CHAIN_ID,
+      asOfBlock: 110n,
+      asOfBlockHash: AS_OF_HASH,
+      launches: [item],
+      facts: [{ ...fact, factId: `${fact.factId}:tampered` }]
+    }),
+    /PUBLIC_FACT_INTEGRITY_MISMATCH/
+  );
+
+  await assert.rejects(
+    projectPublicFeed({
+      chainId: CHAIN_ID,
+      asOfBlock: 110n,
+      asOfBlockHash: AS_OF_HASH,
+      launches: [item],
+      facts: [{ ...fact, evidenceDigest: '0'.repeat(64) }]
+    }),
+    /PUBLIC_FACT_INTEGRITY_MISMATCH/
+  );
+});
+
 test('public projection rejects malformed as-of authority', async () => {
   await assert.rejects(
     projectPublicFeed({
