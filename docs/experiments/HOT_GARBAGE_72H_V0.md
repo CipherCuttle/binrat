@@ -2,7 +2,7 @@
 
 ## Objective
 
-Test whether ArcPad alone produces enough new-launch activity, and enough repeated ArcPad-reported creator addresses, to justify BINRAT's first HOT GARBAGE feed before building the landing page or launching `$BINRAT`.
+Test whether ArcPad alone produces enough new-launch activity, and enough creator-address history to make BINRAT's TRASH TRAIL useful, before building the landing page or launching `$BINRAT`.
 
 This is an observation experiment only. It authorizes no token launch, trading, signing, private keys, transaction submission, or capital deployment.
 
@@ -27,14 +27,16 @@ The finalizer does not depend on a continuously running daemon.
 At or after maturity it:
 
 1. verifies the preregistered start block hash is still canonical;
-2. finds the last Arc block whose timestamp is at or before the exact 72-hour end instant;
+2. finds the last Arc block whose second-resolution timestamp is at or before the exact 72-hour end instant;
 3. replays ArcPad `TokenCreated` events from `startBlock + 1` through that end block into a temporary SQLite/WAL database;
 4. derives creator-address provenance using the same evidence spine merged in PR #2;
-5. fetches every ArcPad `/api/tokens` page and filters it to the same block window;
-6. reconciles token-address sets;
-7. emits one JSON result with deterministic metrics and the preregistered volume decision.
+5. waits, bounded, until ArcPad reports `launchesTo >= endBlock`, chain `5042`, `ok=true`, and `indexerGaps=0`;
+6. fetches every ArcPad `/api/tokens` page;
+7. reconciles the exact window token-address set against onchain truth;
+8. uses pre-window ArcPad API history only as `LAUNCHPAD_INDEXER` evidence to measure whether new launches already have a TRASH TRAIL;
+9. emits one JSON result.
 
-Transient RPC/network failures are retried with bounded exponential backoff. Chain-id drift, launcher drift, malformed source events, identity conflicts, deep reorgs, and window leakage fail closed.
+Transient RPC/network failures are retried with bounded exponential backoff. Chain-id drift, launcher drift, malformed source/API records, identity conflicts, cursor cycles, deep reorgs, indexer non-catchup, and window leakage fail closed.
 
 Run after maturity:
 
@@ -46,20 +48,21 @@ ARC_RPC_URL=https://rpc.arc-scan.org pnpm experiment:finalize > hot-garbage-v0-r
 
 ## Metrics
 
-Primary:
+Onchain window metrics:
 
 - ArcPad launches in the exact 72-hour window;
 - unique ArcPad-reported creator addresses;
-- creator addresses appearing in more than one launch;
-- launches associated with those repeated creator addresses;
-- maximum launches from one reported creator address.
+- creator addresses appearing more than once inside the window;
+- launches associated with those repeated addresses;
+- maximum launches from one reported creator address;
+- website/X/Telegram metadata presence.
 
-Secondary:
+TRASH TRAIL opportunity (`LAUNCHPAD_INDEXER` evidence):
 
-- website presence;
-- X/Twitter presence;
-- Telegram presence;
-- any website/social metadata.
+- window creator addresses with at least one prior pre-window ArcPad launch;
+- window launches whose creator address already had prior ArcPad history;
+- total prior launches associated with those window creator addresses;
+- maximum prior launches for one window creator address.
 
 Reconciliation reports both directions:
 
@@ -70,11 +73,15 @@ Reconciliation reports both directions:
 
 ## Frozen decision rule
 
+The candidate volume decision remains preregistered:
+
 - `>=25` launches: `CONTINUE_ARCPAD_ONLY`
 - `10-24` launches: `ADD_SECOND_SOURCE`
 - `<10` launches: `ARCPAD_ONLY_TOO_SPARSE`
 
-Engineering reconciliation gate: both directional capture rates must be at least `99%` before the volume result is treated as trustworthy.
+Engineering reconciliation gate: both directional capture rates must be at least `99%`.
+
+If that gate fails, the overall verdict is **`EVIDENCE_GATE_FAILED`** regardless of launch count. The volume decision is retained only as a diagnostic candidate and must not be treated as the experiment verdict.
 
 ## Claim boundary
 
