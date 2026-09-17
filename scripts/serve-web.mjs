@@ -17,13 +17,21 @@ const types = {
 };
 
 createServer((request, response) => {
-  const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
-  const requested = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname).replace(/^[/\\]+/, '');
+  let pathname;
+  try {
+    const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
+    pathname = decodeURIComponent(url.pathname);
+  } catch {
+    response.writeHead(400, { 'content-type': 'text/plain; charset=utf-8' }).end('bad request');
+    return;
+  }
+
+  const requested = pathname === '/' ? 'index.html' : pathname.replace(/^[/\\]+/, '');
   const safe = normalize(requested);
   const file = join(root, safe);
 
   if (file !== root && !file.startsWith(rootPrefix)) {
-    response.writeHead(403).end('forbidden');
+    response.writeHead(403, { 'content-type': 'text/plain; charset=utf-8' }).end('forbidden');
     return;
   }
 
