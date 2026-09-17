@@ -19,11 +19,12 @@ function renderFeed() {
 
 function renderCard(bag) {
   const coverage = normalizeCoverage(bag.coverage);
+  const noted = Number.isInteger(bag.notedConditions) && bag.notedConditions >= 0 ? bag.notedConditions : 0;
   return `
-    <article class="bag-card" tabindex="0" role="button" data-bag-id="${escapeHtml(bag.id)}" data-flags="${Number.isInteger(bag.flags) ? bag.flags : 0}" aria-label="Open ${escapeHtml(bag.symbol)} fixture report">
+    <article class="bag-card" tabindex="0" role="button" data-bag-id="${escapeHtml(bag.id)}" data-noted="${noted}" aria-label="Open ${escapeHtml(bag.symbol)} fixture report">
       <div class="card-top">
         <span class="age">THROWN OUT ${escapeHtml(bag.age)} AGO</span>
-        <span class="flag-count">${bag.flags === 0 ? 'NO FIXTURE FLAGS' : `${bag.flags} FLAG${bag.flags === 1 ? '' : 'S'}`}</span>
+        <span class="condition-count">${noted === 0 ? '0 NOTED CONDITIONS' : `${noted} NOTED CONDITION${noted === 1 ? '' : 'S'}`}</span>
       </div>
       <h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3>
       <div class="token-name">${escapeHtml(bag.name)}</div>
@@ -56,7 +57,7 @@ function openBag(id, origin = document.activeElement) {
           <span>${escapeHtml(item.outcome)}</span>
         </div>
       `).join('')
-    : '<div class="empty-trail">No earlier ArcPad fixture launch is attached to this reported creator address.</div>';
+    : '<div class="empty-trail">No earlier ArcPad fixture launch is attached to this reported creator address. This is absence of fixture history, not positive evidence.</div>';
 
   drawerContent.innerHTML = `
     <p class="drawer-kicker">TRASH TRAIL // FIXTURE REPORT</p>
@@ -67,7 +68,7 @@ function openBag(id, origin = document.activeElement) {
     <div class="drawer-note">“${escapeHtml(bag.note)}”</div>
 
     <div class="evidence-list">
-      ${bag.evidence.map((item) => `<div class="evidence-item ${normalizeTone(item.tone)}">${escapeHtml(item.text)}</div>`).join('')}
+      ${bag.evidence.map((item) => `<div class="evidence-item ${normalizeTone(item.tone)}"><span class="evidence-label">${normalizeTone(item.tone).toUpperCase()}</span>${escapeHtml(item.text)}</div>`).join('')}
     </div>
 
     <div class="trail">
@@ -122,7 +123,7 @@ function normalizeCoverage(value) {
 }
 
 function normalizeTone(value) {
-  return ['good', 'warn', 'unknown'].includes(value) ? value : 'unknown';
+  return ['observed', 'noted', 'unknown'].includes(value) ? value : 'unknown';
 }
 
 function escapeHtml(value) {
