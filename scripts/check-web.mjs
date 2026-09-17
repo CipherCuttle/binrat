@@ -5,6 +5,7 @@ const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8')
 const css = readFileSync(new URL('../web/styles.css', import.meta.url), 'utf8');
 const semanticCss = readFileSync(new URL('../web/evidence-semantics.css', import.meta.url), 'utf8');
 const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'utf8');
+const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
 const mascotUrl = new URL('../web/binrat-mascot-128.webp', import.meta.url);
@@ -31,6 +32,11 @@ if (!css.includes('--dumpster: #263b35')) throw new Error('WEB_DUMPSTER_GREEN_DR
 if (!css.includes('image-rendering: pixelated')) throw new Error('WEB_PIXEL_MASCOT_RENDERING_MISSING');
 if (!semanticCss.includes('.evidence-item.observed')) throw new Error('WEB_OBSERVATIONAL_SEMANTICS_MISSING');
 if (!fixtures.includes('0x1111111111111111111111111111111111111111')) throw new Error('WEB_FIXTURE_BOUNDARY_MISSING');
+if (!dataSource.includes("WEB_DATA_SOURCE_MODE = 'FIXTURE'")) throw new Error('WEB_DATA_SOURCE_MODE_DRIFT');
+if (!dataSource.includes("from './fixtures.js'")) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
+if (dataSource.includes('fetch(')) throw new Error('WEB_FIXTURE_SOURCE_NETWORK_ACCESS');
+if (!app.includes("from './data-source.js'")) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
+if (!app.includes("feed?.mode !== 'FIXTURE'")) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('0 NOTED CONDITIONS')) throw new Error('WEB_ZERO_CONDITION_COPY_MISSING');
 
@@ -51,7 +57,7 @@ const prohibitedClaims = [
   'GUARANTEED SAFE',
   'NO FIXTURE FLAGS'
 ];
-const corpus = `${html}\n${fixtures}\n${app}`.toUpperCase();
+const corpus = `${html}\n${fixtures}\n${dataSource}\n${app}`.toUpperCase();
 for (const claim of prohibitedClaims) {
   if (corpus.includes(claim)) throw new Error(`WEB_CLAIM_BOUNDARY_VIOLATION:${claim}`);
 }
