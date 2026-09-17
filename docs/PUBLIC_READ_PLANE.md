@@ -38,9 +38,9 @@ The V0 projection exposes only:
 - token/pool addresses;
 - ArcPad-reported creator address;
 - supplied launch metadata;
-- earlier indexed launches with the same reported creator address;
+- earlier launches with the same reported creator address that are actually present in the supplied projection input;
 - explicit evidence states;
-- explicit history coverage;
+- a frozen `UNVERIFIED` history-coverage state;
 - a deterministic projection receipt.
 
 It does **not** expose or infer:
@@ -61,15 +61,21 @@ The public field is named:
 
 Never `deployer`, `owner`, `person`, or `walletOwner`.
 
-The only claim V0 makes is that ArcPad reported the address on the launch event and, where evidence exists, that the same reported address appears on earlier indexed launches.
+The only claim V0 makes is that ArcPad reported the address on the launch event and, where evidence exists, that the same reported address appears on earlier launches present in the projection input.
 
 ## Coverage law
 
-`COMPLETE`, `PARTIAL`, and `UNVERIFIED` describe the supplied indexed-history coverage only.
+`PUBLIC_PROJECTION_V0` **cannot claim complete history coverage**.
 
-No prior matching launch may be presented as affirmative/positive evidence unless history coverage is explicitly `COMPLETE`.
+Its history coverage is frozen to:
 
-With `PARTIAL` or `UNVERIFIED` history, absence of a prior match must remain `UNKNOWN`.
+`UNVERIFIED`
+
+Presence is still useful: if prior matching launches are actually present, BINRAT may note them.
+
+Absence is never promoted to affirmative evidence in V0. If no prior match is present, the public state remains `UNKNOWN`.
+
+A later projection version may introduce `PARTIAL` or `COMPLETE` only after a separate, evidence-backed coverage authority exists. A caller-provided string or digest is not enough to establish completeness.
 
 ## Receipt law
 
@@ -78,11 +84,11 @@ Every public projection binds:
 - projection version;
 - chain ID;
 - as-of block and block hash;
-- history coverage;
+- frozen `UNVERIFIED` history coverage;
 - canonical input digest;
 - canonical output digest.
 
-The receipt is projection identity, not a claim that the underlying token is safe or truthful.
+The receipt is projection identity, not a claim that the underlying token is safe or truthful, and not proof that the supplied history is exhaustive.
 
 ## Browser boundary during the 72-hour experiment
 
@@ -96,9 +102,11 @@ No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARB
 
 - deterministic output independent of input ordering;
 - future-dated launch/fact input fails closed;
+- malformed as-of chain authority fails closed;
 - mismatched provenance fails closed;
 - public field is `reportedCreatorAddress`;
-- incomplete history cannot silently become positive evidence;
+- V0 history coverage is always `UNVERIFIED`;
+- absent history is always `UNKNOWN` in V0;
 - output has a digest-bound projection receipt;
 - web consumes data through `web/data-source.js` only;
 - browser remains fixture-only and noindex;
