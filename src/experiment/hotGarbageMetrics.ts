@@ -5,7 +5,7 @@ export type HotGarbageDecision =
   | 'ADD_SECOND_SOURCE'
   | 'ARCPAD_ONLY_TOO_SPARSE';
 
-export type HotGarbageVerdict = HotGarbageDecision | 'EVIDENCE_GATE_FAILED';
+export type HotGarbageVerdict = HotGarbageDecision | 'EVIDENCE_GATE_FAILED' | 'EARLY_SMOKE_ONLY';
 
 export interface HotGarbageMetrics {
   launchCount: number;
@@ -127,7 +127,12 @@ export function decideHotGarbage(launchCount: number): HotGarbageDecision {
   return 'ARCPAD_ONLY_TOO_SPARSE';
 }
 
-export function gateHotGarbageDecision(decision: HotGarbageDecision, captureGatePass: boolean): HotGarbageVerdict {
+export function gateHotGarbageDecision(
+  decision: HotGarbageDecision,
+  captureGatePass: boolean,
+  maturedWindow = true
+): HotGarbageVerdict {
+  if (!maturedWindow) return 'EARLY_SMOKE_ONLY';
   return captureGatePass ? decision : 'EVIDENCE_GATE_FAILED';
 }
 
