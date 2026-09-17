@@ -25,7 +25,9 @@ export interface Reconciliation {
   inBoth: number;
   missingFromApi: Hex[];
   missingFromOnchain: Hex[];
-  capturePercentAgainstUnion: number;
+  onchainCapturePercentAgainstApi: number;
+  apiCapturePercentAgainstOnchain: number;
+  agreementPercentAgainstUnion: number;
 }
 
 export function computeHotGarbageMetrics(launches: readonly LaunchObserved[]): HotGarbageMetrics {
@@ -80,7 +82,9 @@ export function reconcileTokenSets(onchainTokens: readonly Hex[], apiTokens: rea
     inBoth,
     missingFromApi,
     missingFromOnchain,
-    capturePercentAgainstUnion: union.size === 0 ? 100 : round4((inBoth / union.size) * 100)
+    onchainCapturePercentAgainstApi: api.size === 0 ? (onchain.size === 0 ? 100 : 0) : round4((inBoth / api.size) * 100),
+    apiCapturePercentAgainstOnchain: onchain.size === 0 ? (api.size === 0 ? 100 : 0) : round4((inBoth / onchain.size) * 100),
+    agreementPercentAgainstUnion: union.size === 0 ? 100 : round4((inBoth / union.size) * 100)
   };
 }
 
