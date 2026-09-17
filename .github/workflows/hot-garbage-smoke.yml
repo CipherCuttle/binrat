@@ -1,0 +1,38 @@
+name: hot-garbage-smoke
+
+on:
+  push:
+    branches: [experiment/72h-hot-garbage-v0]
+    paths:
+      - src/experiment/finalizeHotGarbage.ts
+      - src/experiment/hotGarbageMetrics.ts
+      - .github/workflows/hot-garbage-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: pnpm install --frozen-lockfile=false
+      - name: Exercise live reconstruction path before window maturity
+        run: pnpm experiment:finalize | tee hot-garbage-v0-smoke.json
+        env:
+          ARC_RPC_URL: https://rpc.arc-scan.org
+          BINRAT_EXPERIMENT_ALLOW_EARLY: '1'
+          BINRAT_ARCPAD_CATCHUP_TIMEOUT_MS: '60000'
+          BINRAT_EXPERIMENT_BATCH_BLOCKS: '2000'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hot-garbage-v0-smoke
+          path: hot-garbage-v0-smoke.json
+          if-no-files-found: error
