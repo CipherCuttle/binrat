@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
+const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url), 'utf8');
+const shareCard = readFileSync(new URL('../web/share-card.js', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('../docs/PUBLIC_IDENTITY_ACQUISITION.md', import.meta.url), 'utf8');
 
 for (const marker of [
@@ -11,11 +14,12 @@ for (const marker of [
   if (!policy.includes(marker)) throw new Error(`PUBLIC_IDENTITY_POLICY_DRIFT:${marker}`);
 }
 
-// Until ownership is verified, the public HTML is intentionally self-contained.
-// This fails closed on accidental social/domain publication through any absolute anchor,
-// not only x.com specifically.
-if (/href=["']https?:\/\//i.test(html)) {
-  throw new Error('PUBLIC_IDENTITY_ABSOLUTE_OUTBOUND_LINK_PUBLISHED_BEFORE_OWNERSHIP');
+// Until ownership is verified, browser-facing code is intentionally self-contained.
+// This fails closed on links, redirects, or embedded remote identity URLs introduced
+// through either HTML or JavaScript.
+const browserCorpus = `${html}\n${app}\n${dataSource}\n${shareCard}`;
+if (/https?:\/\//i.test(browserCorpus)) {
+  throw new Error('PUBLIC_IDENTITY_ABSOLUTE_BROWSER_URL_PUBLISHED_BEFORE_OWNERSHIP');
 }
 
 if (/<link[^>]+rel=["']canonical["'][^>]*>/i.test(html)) {
