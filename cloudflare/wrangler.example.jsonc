@@ -4,6 +4,9 @@
   "main": "src/cloudflare/worker.ts",
   "compatibility_date": "2026-09-18",
   "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./web"
+  },
   "d1_databases": [
     {
       "binding": "DB",
