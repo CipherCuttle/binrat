@@ -152,6 +152,7 @@ export function understandRatMessage(
 
   if (
     hasAny(doc, ['token', 'coin', 'rat credit']) ||
+    /\brat credits?\b/i.test(lower) ||
     /\$binrat\b/i.test(normalized) ||
     /\bwen token\b/i.test(lower)
   ) {
