@@ -1,12 +1,12 @@
 # RAT PERSONALITY V0.5
 
-Status: implementation contract
+Status: pre-beta implementation contract
 
 ## Thesis
 
 The Rat is not an LLM wearing a mascot.
 
-BINRAT decides what is true. The Rat decides how to say it.
+**BINRAT decides what is true. The Rat decides how to say it.**
 
 Pipeline:
 
@@ -24,13 +24,13 @@ No personality layer may create evidence.
 
 ## NLP
 
-V0.5 uses `compromise@14.16.0` locally in the Telegram service.
+V0.5 uses exact-pinned `compromise@14.16.0` locally in the Telegram service.
 
-It is used only for bounded English intent matching. No model API, embedding service, vector database, or external NLP call is required.
+It is used only for bounded English intent matching. There is no model API, embedding service, vector database, or external NLP call.
 
 Explicit slash commands remain highest authority.
 
-Natural-language replies require an explicit reference to BINRAT/the Rat in group-style chat. Private bot conversations may omit the repeated Rat name. Ordinary unaddressed group chat is ignored.
+Group-style natural language requires an explicit BINRAT/Rat reference, except that a direct Telegram reply to the bot also counts as addressed context. Private bot conversations may omit the Rat name. Ordinary unaddressed group chat is ignored.
 
 Initial intents:
 
@@ -41,6 +41,7 @@ Initial intents:
 - TOKEN
 - PROOF
 - CREATOR_HISTORY
+- ADDRESS_LOOKUP
 - BAG
 - RECEIPT
 - REPLAY
@@ -48,18 +49,59 @@ Initial intents:
 - SAFETY_BOUNDARY
 - CLARIFY
 
-Entity extraction remains strict:
+Routing strength is categorical, not probabilistic:
 
-- EVM creator addresses: `0x` + 40 hex characters;
-- launch ids: exactly 64 hex characters.
+- `EXPLICIT`
+- `STRONG_RULE`
+- `AMBIGUOUS`
 
-Low-confidence text produces CLARIFY. It never guesses an intent that would create a factual claim.
+These labels are routing provenance. They are not calibrated probabilities.
+
+## Entity handling
+
+Launch ids are exactly 64 hex characters.
+
+A bare EVM address is **not assumed to be a creator**. It first becomes `ADDRESS_LOOKUP` and is resolved against the current public feed as:
+
+- `TOKEN`
+- `POOL`
+- `REPORTED_CREATOR`
+- `AMBIGUOUS`
+- `UNKNOWN`
+
+A uniquely resolved creator address uses Creator File. A unique token/pool launch uses the bag projection. Multiple roles require clarification. Unknown stays unknown.
+
+Explicit `/creator 0x...` remains an explicit creator request.
+
+## Public API contract
+
+The Telegram consumer fails closed on incompatible projection schemas.
+
+Current consumed contracts:
+
+- Creator File: `binrat.creator-file/0.1`
+- bag/public feed: `binrat.public-feed/0.1`
+- Replay Lab: `binrat.replay-bundle/0.1`
+
+Replay Lab is integrated into the same Telegram candidate history; `/replay` is not allowed to depend on an untracked sibling-only route.
+
+Capability and launch authorization are read from the live BINRAT public endpoint:
+
+`GET /api/capabilities`
+
+The Telegram process uses remote fail-closed mode. If that status cannot be verified, marketing and launch authorization become false in Rat replies rather than preserving a previously privileged state.
 
 ## Voice
 
 Renderer version:
 
-`binrat.rat-voice/0.1`
+`binrat.rat-voice/0.2`
+
+Answer-plan version:
+
+`binrat.rat-answer-plan/0.2`
+
+The answer plan is a discriminated TypeScript contract per intent rather than a generic fact bag.
 
 Tone:
 
@@ -83,75 +125,76 @@ Operational moods are presentation states, not evidence classifications:
 
 `SMELLS_FAMILIAR` never means scam/rug.
 
-## Determinism
+## Determinism and answer receipts
 
-Voice variants are selected from a SHA-256 digest of:
+The exact typed answer plan is canonicalized and SHA-256 hashed as `planDigest`.
+
+RatVoice deterministically selects a voice variant from:
 
 - renderer version;
-- intent;
-- mood;
-- sorted factual fields;
-- receipt ids;
-- source references.
+- plan digest.
 
 No `Math.random()`.
 
-The same factual plan under the same renderer version produces the same reply.
+The same answer plan under the same renderer version produces the same reply.
 
-Each delivered reply logs:
+After a successful Telegram send, the Telegram service persists a reply receipt containing:
 
 - Telegram update id;
+- chat id;
 - intent;
 - renderer version;
 - voice variant;
+- plan digest;
 - reply digest;
+- exact non-user-text answer plan;
 - evidence receipt ids;
-- Telegram message id.
+- Telegram message id;
+- recorded timestamp.
 
-Raw user text is not required in that delivery log.
+Raw user message text is not stored in that reply ledger.
+
+The ledger is SQLite-backed and suppresses an already-recorded update across process restarts **when the configured database path is on persistent storage**.
+
+This is not an exactly-once delivery claim. A process/network failure after Telegram accepted a send but before the local receipt commit can still create an ambiguous retry window. The contract is replay-safe duplicate suppression for recorded deliveries, not mathematically exactly-once messaging.
 
 ## Hard boundaries
 
-The renderer has explicit invariant checks against:
+The renderer fails closed against phrasing that tells a user to buy/sell/ape, declares a token safe, declares a person/address a scammer/rugger, guarantees returns, or deterministically predicts a pump.
 
-- telling a user to buy/sell/ape;
-- declaring a token safe;
-- declaring a person/address a scammer/rugger;
-- guaranteed-return language;
-- deterministic price-pump claims.
-
-Questions like “is this safe?”, “should I buy?”, or “is this dev a rugger?” are first-class intents. They receive useful boundary replies instead of generic refusal text.
+Questions such as “is this safe?” and “should I buy?” are first-class boundary intents rather than prompts for a trading recommendation.
 
 Creator history always preserves:
 
-same source-reported address != same human identity.
+**same source-reported address != same human identity.**
 
-## Examples
+## Frozen parser evidence
 
-User:
+Pre-beta routing is tested against:
 
-`rat should i buy this?`
+- `test/fixtures/rat-intent-corpus-v0.json` — 131 labeled cases;
+- `test/fixtures/rat-intent-holdout-v0.json` — 36 labeled cases.
 
-Rat:
+They cover:
 
-```
-🐀 receipts, not prophecies.
+- explicit commands;
+- degen slang;
+- normal private-chat wording;
+- group addressing/OOS chatter;
+- buy/sell and safety questions;
+- creator-risk wording;
+- address ambiguity;
+- bag/receipt/replay intents;
+- clarification behavior.
 
-i archive garbage. i do not predict candles.
-
-no buy call. no sell call. no entry. give me a launch or creator and i will show you the receipts.
-```
-
-User:
-
-`rat did this dev rug before 0x...`
-
-Rat routes to Creator File, reports indexed launches/history coverage/receipt, then states that wallet history is evidence about an address, not a criminal record about a person.
+The holdout is frozen. Parser changes must report their result against it rather than silently rewriting labels to obtain a passing score.
 
 ## Later V1
 
 A model may be added only behind this deterministic layer.
 
-A future model gets retrieved canonical evidence and must return a structured answer candidate. Code validates the candidate before RatVoice renders it.
+A future model receives retrieved canonical evidence and returns a structured candidate. Code validates that candidate before RatVoice renders it.
 
-The model never becomes evidence authority.
+Retrieved websites/social text must be treated as untrusted data, not instructions.
+
+The model never becomes evidence authority and receives no trading/signing authority.
