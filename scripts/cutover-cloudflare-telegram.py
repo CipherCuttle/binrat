@@ -89,6 +89,38 @@ def try_request_json(url: str) -> dict[str, Any] | None:
         return None
 
 
+def try_webhook_post(
+    url: str,
+    *,
+    body: dict[str, Any],
+    webhook_secret: str,
+) -> tuple[int | None, dict[str, Any] | None]:
+    data = json.dumps(body).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "accept": "application/json",
+            "content-type": "application/json",
+            "user-agent": "Mozilla/5.0 BINRAT-Cutover/0.1",
+            "X-Telegram-Bot-Api-Secret-Token": webhook_secret,
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            parsed = json.loads(response.read().decode("utf-8"))
+            return response.status, parsed if isinstance(parsed, dict) else None
+    except urllib.error.HTTPError as exc:
+        try:
+            parsed = json.loads(exc.read().decode("utf-8"))
+        except Exception:
+            parsed = None
+        return exc.code, parsed if isinstance(parsed, dict) else None
+    except Exception:
+        return None, None
+
+
 def telegram(token: str, method: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
     result = request_json(
         f"https://api.telegram.org/bot{token}/{method}",
@@ -236,21 +268,55 @@ def main() -> None:
     print("CAPABILITY_MANIFEST_OK")
 
     synthetic_id = 8_000_000_000_000_000 + (int(time.time()) % 1_000_000_000)
-    synthetic = request_json(
-        WEBHOOK_URL,
-        method="POST",
-        body={
-            "update_id": synthetic_id,
-            "message": {
-                "message_id": 1,
-                "chat": {"id": -1, "type": "private"},
-                "text": "/status",
-            },
+    synthetic_body = {
+        "update_id": synthetic_id,
+        "message": {
+            "message_id": 1,
+            "chat": {"id": -1, "type": "private"},
+            "text": "/status",
         },
-        headers={"X-Telegram-Bot-Api-Secret-Token": webhook_secret},
-    )
-    if synthetic.get("ok") is not True or synthetic.get("ignored") is not True:
-        fail("synthetic Cloudflare webhook was not safely ignored")
+    }
+
+    synthetic = None
+    last_status = None
+    for attempt in range(30):
+        status, candidate = try_webhook_post(
+            WEBHOOK_URL,
+            body=synthetic_body,
+            webhook_secret=webhook_secret,
+        )
+        last_status = status
+        if (
+            status == 200
+            and candidate is not None
+            and candidate.get("ok") is True
+            and (
+                candidate.get("ignored") is True
+                or candidate.get("duplicate") is True
+            )
+        ):
+            synthetic = candidate
+            break
+        if status not in (None, 401, 503):
+            fail(f"synthetic webhook returned unexpected HTTP {status}")
+        if attempt == 0:
+            print("Waiting for fresh Cloudflare secret version to reach webhook edge...")
+        time.sleep(2)
+
+    if synthetic is None:
+        fail(f"fresh webhook secret never became active (last HTTP {last_status})")
+
+    # Prove the same secret is stable across multiple edge requests before
+    # handing it to Telegram.
+    for _ in range(2):
+        status, candidate = try_webhook_post(
+            WEBHOOK_URL,
+            body=synthetic_body,
+            webhook_secret=webhook_secret,
+        )
+        if status != 200 or candidate is None or candidate.get("ok") is not True:
+            fail("fresh webhook secret was not stable across repeated probes")
+
     receipt = find_receipt(
         d1_query(
             "SELECT update_id,state,created_at_ms,updated_at_ms "
