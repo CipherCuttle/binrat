@@ -130,6 +130,22 @@ Identical event id + identical payload is replay-safe.
 
 Changed payload under the same immutable event id fails closed.
 
+## Rat NLP / personality V0.5
+
+The deterministic implementation contract is in `docs/RAT_PERSONALITY_V0_5.md`.
+
+V0.5 adds:
+
+- local `compromise` intent matching;
+- strict address / launch-id extraction;
+- typed factual answer plans;
+- deterministic Rat voice variants;
+- operational moods that never alter evidence semantics;
+- explicit BUY / SAFETY / identity-risk boundary intents;
+- replayable reply metadata without logging raw user text.
+
+The personality layer is downstream of evidence lookup. It may change phrasing, never facts.
+
 ## Question answering
 
 ### V0

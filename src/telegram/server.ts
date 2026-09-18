@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { resolve } from 'node:path';
-import { renderRatReply, validateCapabilityManifest, type RatConfig } from './rat.js';
+import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from './rat.js';
 import { PerChatRateGate, UpdateDeliveryFence } from './deliveryGuard.js';
 
 interface TelegramChat {
@@ -23,6 +23,7 @@ interface TelegramUpdate {
 interface TelegramApiResponse {
   ok?: boolean;
   description?: string;
+  result?: { message_id?: number };
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -60,7 +61,7 @@ function json(response: ServerResponse, status: number, value: unknown): void {
   response.end(JSON.stringify(value));
 }
 
-async function sendMessage(token: string, chatId: number, text: string): Promise<void> {
+async function sendMessage(token: string, chatId: number, text: string): Promise<number | null> {
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -74,6 +75,7 @@ async function sendMessage(token: string, chatId: number, text: string): Promise
   let parsed: TelegramApiResponse = {};
   try { parsed = await response.json() as TelegramApiResponse; } catch {}
   if (!response.ok || parsed.ok !== true) throw new Error('TELEGRAM_SEND_FAILED');
+  return Number.isSafeInteger(parsed.result?.message_id) ? parsed.result!.message_id! : null;
 }
 
 const token = requiredEnv('TELEGRAM_BOT_TOKEN');
@@ -138,15 +140,25 @@ const server = createServer(async (request, response) => {
         return;
       }
 
-      const reply = await renderRatReply(message.text, config);
+      const reply = await renderRatReplyDetailed(message.text, config);
       if (!reply) {
         updateFence.commit(update.update_id);
         json(response, 200, { ok: true, ignored: true });
         return;
       }
 
-      await sendMessage(token, message.chat.id, reply);
+      const telegramMessageId = await sendMessage(token, message.chat.id, reply.text);
       updateFence.commit(update.update_id);
+      console.log(JSON.stringify({
+        event: 'TELEGRAM_RAT_REPLY',
+        updateId: update.update_id,
+        intent: reply.intent,
+        rendererVersion: reply.rendererVersion,
+        voiceVariant: reply.voiceVariant,
+        replyDigest: reply.replyDigest,
+        receiptIds: reply.receiptIds,
+        telegramMessageId
+      }));
       json(response, 200, { ok: true });
     } catch (error) {
       updateFence.release(update.update_id);
