@@ -57,6 +57,9 @@ if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP
 if (!app.includes('notedConditions')) throw new Error('WEB_NOTED_CONDITIONS_MAPPING_MISSING');
 if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`')) throw new Error('WEB_BAG_INTELLIGENCE_SOURCE_MISSING');
 if (!dataSource.includes('fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}`')) throw new Error('WEB_CREATOR_FILE_SOURCE_MISSING');
+if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/replay`')) throw new Error('WEB_REPLAY_BUNDLE_SOURCE_MISSING');
+if (!app.includes('REPLAY LAB')) throw new Error('WEB_REPLAY_LAB_MISSING');
+if (!app.includes('nothing is simulated')) throw new Error('WEB_REPLAY_BOUNDARY_MISSING');
 if (!app.includes('Raw pool liquidity is not USD liquidity')) throw new Error('WEB_RAW_LIQUIDITY_BOUNDARY_MISSING');
 if (!app.includes('Same ArcPad-reported address only')) throw new Error('WEB_CREATOR_IDENTITY_BOUNDARY_MISSING');
 if (!reactBitsIsland.includes('React Bits')) throw new Error('WEB_REACT_BITS_DONOR_MARKER_MISSING');

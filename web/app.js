@@ -1,4 +1,4 @@
-import { loadDumpsterFeed, loadBagIntelligence, loadCreatorFile, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
 const grid = document.querySelector("#garbage-grid");
@@ -381,8 +381,13 @@ function openBag(id, origin = document.activeElement) {
       <p class="intel-loading">Opening the reported-address file…</p>
     </section>
 
+    <section class="replay-lab-panel rb-card" data-replay-panel>
+      <div class="file-section-heading"><h3>05 / REPLAY LAB</h3><span>REAL INDEXED ARC EVIDENCE</span></div>
+      <p class="intel-loading">Composing launch → 5m → 1h → 24h evidence chain…</p>
+    </section>
+
     <div class="receipt-box">
-      <div class="receipt-head"><h3>05 / RECEIPT</h3><span>BINRAT / ARC 5042</span></div>
+      <div class="receipt-head"><h3>06 / RECEIPT</h3><span>BINRAT / ARC 5042</span></div>
       <dl class="receipt-grid">
         <dt>receipt</dt><dd>${escapeHtml(bag.receipt)}</dd>
         <dt>coverage</dt><dd>${escapeHtml(normalizeCoverage(bag.coverage))}</dd>
@@ -394,7 +399,7 @@ function openBag(id, origin = document.activeElement) {
     </div>
 
     <section class="share-tools" aria-label="Share card ${copy().report}">
-      <h3>06 / TAKE THE RECEIPT WITH YOU</h3>
+      <h3>07 / TAKE THE RECEIPT WITH YOU</h3>
       ${renderShareCard(share)}
       <div class="share-actions">
         <button class="button ghost" type="button" data-copy-post>COPY POST</button>
@@ -409,6 +414,7 @@ function openBag(id, origin = document.activeElement) {
   if (activeMode === "LIVE") {
     void hydrateBagIntelligence(bag);
     void hydrateCreatorFile(bag);
+    void hydrateReplayLab(bag);
   }
 
   drawer.inert = false;
@@ -497,6 +503,50 @@ async function hydrateCreatorFile(bag) {
   } catch {
     if (activeDrawerBagId !== bag.id) return;
     panel.innerHTML = '<div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Creator history projection is not available.</div>';
+  }
+}
+
+
+async function hydrateReplayLab(bag) {
+  const panel = drawerContent.querySelector("[data-replay-panel]");
+  if (!panel) return;
+  try {
+    const replay = await loadReplayBundle(bag.id);
+    if (!replay || !drawer.classList.contains("open") || activeDrawerBagId !== bag.id) return;
+    const stages = replay.stages.map((stage) => `
+      <div class="intel-snapshot">
+        <span class="intel-horizon">${escapeHtml(stage.label)}</span>
+        <strong>${escapeHtml(stage.status)}</strong>
+        <span>BLOCK ${escapeHtml(stage.blockNumber)}</span>
+        <code title="${escapeHtml(stage.blockHash)}">${escapeHtml(shortAddress(stage.blockHash))}</code>
+      </div>`).join("");
+    panel.innerHTML = `
+      <div class="file-section-heading"><h3>05 / REPLAY LAB</h3><span>${escapeHtml(replay.stages.length)} EVIDENCE STAGES</span></div>
+      <p class="intel-boundary">Deterministic replay of real indexed Arc evidence. Missing 5m / 1h / 24h stages remain missing; nothing is simulated.</p>
+      <div class="intel-snapshots">${stages}</div>
+      <div class="creator-file-stats">
+        <div><span>CREATOR FILE</span><b>${escapeHtml(replay.creatorFile.indexedLaunchCount)} LAUNCHES</b></div>
+        <div><span>OBSERVATION COVERAGE</span><b>${escapeHtml(replay.intelligence.observationCoverage)}</b></div>
+        <div><span>AS OF BLOCK</span><b>${escapeHtml(replay.asOfBlock)}</b></div>
+        <div><span>HISTORY</span><b>${escapeHtml(replay.historyCoverage)}</b></div>
+      </div>
+      <div class="share-actions"><button class="button ghost" type="button" data-copy-replay>COPY EVIDENCE BUNDLE</button></div>
+      <div class="share-copy-status" data-replay-copy-status aria-live="polite"></div>
+      <div class="intel-receipt">REPLAY RECEIPT / ${escapeHtml(replay.receipt.receiptId)}</div>
+    `;
+    panel.querySelector("[data-copy-replay]")?.addEventListener("click", async () => {
+      const status = panel.querySelector("[data-replay-copy-status]");
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(replay, null, 2));
+        if (status) status.textContent = "EVIDENCE BUNDLE COPIED";
+      } catch {
+        if (status) status.textContent = "COPY UNAVAILABLE";
+      }
+    });
+    window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "replay" } }));
+  } catch {
+    if (activeDrawerBagId !== bag.id) return;
+    panel.innerHTML = '<div class="file-section-heading"><h3>05 / REPLAY LAB</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Replay bundle is unavailable. No evidence was synthesized.</div>';
   }
 }
 

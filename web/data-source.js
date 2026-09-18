@@ -192,3 +192,27 @@ export async function loadCreatorFile(reportedCreatorAddress) {
   ) throw new Error("CREATOR_FILE_INVALID");
   return value;
 }
+
+
+export async function loadReplayBundle(bagId) {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}/replay`, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("REPLAY_BUNDLE_NOT_AVAILABLE");
+  const value = await response.json();
+  if (
+    value?.schemaVersion !== "binrat.replay-bundle/0.1" ||
+    value.projectionVersion !== "BINRAT_REPLAY_BUNDLE_V0" ||
+    value.chainId !== 5042 ||
+    value.launch?.id !== bagId ||
+    value.historyCoverage !== "UNVERIFIED" ||
+    !Array.isArray(value.stages) ||
+    value.stages.some((stage) => !["LAUNCH", "5m", "1h", "24h"].includes(stage?.label)) ||
+    typeof value.receipt?.receiptId !== "string" ||
+    !value.receipt.receiptId.startsWith("binrat-replay:")
+  ) throw new Error("REPLAY_BUNDLE_INVALID");
+  return value;
+}
