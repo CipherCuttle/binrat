@@ -10,6 +10,7 @@ import sys
 import tempfile
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -189,21 +190,30 @@ def main() -> None:
             except FileNotFoundError:
                 pass
 
-    health = request_json(f"{WORKER_URL}/health")
-    if health.get("repliesEnabled") is not False:
-        fail("Cloudflare replies are not disabled")
-    if health.get("launchAuthorization") != "BLOCKED":
-        fail("Cloudflare launch authorization is not BLOCKED")
-    print("CLOUDFLARE_CONTROL_PLANE_OK: replies=false / launch=BLOCKED")
+    health = None
+    capabilities = None
+    for _ in range(15):
+        try:
+            candidate_health = request_json(f"{WORKER_URL}/health")
+            candidate_capabilities = request_json(f"{WORKER_URL}/api/capabilities")
+            candidate_launch = candidate_capabilities.get("launchAuthorization", {})
+            if (
+                candidate_health.get("repliesEnabled") is False
+                and candidate_health.get("launchAuthorization") == "BLOCKED"
+                and candidate_launch.get("status") == "BLOCKED"
+                and candidate_launch.get("marketingAuthorized") is False
+                and candidate_launch.get("launchAuthorized") is False
+            ):
+                health = candidate_health
+                capabilities = candidate_capabilities
+                break
+        except SystemExit:
+            pass
+        time.sleep(2)
 
-    capabilities = request_json(f"{WORKER_URL}/api/capabilities")
-    capability_launch = capabilities.get("launchAuthorization", {})
-    if not (
-        capability_launch.get("status") == "BLOCKED"
-        and capability_launch.get("marketingAuthorized") is False
-        and capability_launch.get("launchAuthorized") is False
-    ):
-        fail("remote capability manifest is not fail-closed")
+    if health is None or capabilities is None:
+        fail("Cloudflare secret version did not become healthy and fail-closed")
+    print("CLOUDFLARE_CONTROL_PLANE_OK: replies=false / launch=BLOCKED")
     print("CAPABILITY_MANIFEST_OK")
 
     synthetic_id = 8_000_000_000_000_000 + (int(time.time()) % 1_000_000_000)
