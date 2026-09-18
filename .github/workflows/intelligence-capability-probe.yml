@@ -1,0 +1,76 @@
+name: intelligence-capability-probe
+
+on:
+  push:
+    branches: [feat/binrat-intelligence-v1]
+
+permissions:
+  contents: read
+
+jobs:
+  historical-reads:
+    if: contains(github.event.head_commit.message, '[probe]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ARC_RPC_URL: https://rpc.mainnet.arc.io
+      BINRAT_DB_PATH: ${{ runner.temp }}/binrat-probe.sqlite
+      BINRAT_LIVE_LOOKBACK_BLOCKS: "50000"
+      BINRAT_MAX_BATCH_BLOCKS: "1000"
+      BINRAT_CONFIRMATIONS: "2"
+      BINRAT_POLL_MS: "1000"
+      PORT: "4174"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: pnpm install --frozen-lockfile=false
+      - name: Start bounded live index
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm serve:live >"${RUNNER_TEMP}/binrat-live.log" 2>&1 &
+          echo $! >"${RUNNER_TEMP}/binrat-live.pid"
+      - name: Wait for indexed launch
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 180); do
+            if curl -fsS http://127.0.0.1:4174/api/health >"${RUNNER_TEMP}/health.json"; then
+              if node -e "const x=require(process.env.RUNNER_TEMP+'/health.json'); process.exit(x.indexReady && x.launchCount > 0 ? 0 : 1)"; then
+                cat "${RUNNER_TEMP}/health.json"
+                exit 0
+              fi
+            fi
+            sleep 1
+          done
+          cat "${RUNNER_TEMP}/binrat-live.log" || true
+          exit 1
+      - name: Probe historical pool and token reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          pnpm probe:observations | tee "${RUNNER_TEMP}/observation-probe.json"
+          status=${PIPESTATUS[0]}
+          set -e
+          test -s "${RUNNER_TEMP}/observation-probe.json"
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/observation-probe.json', 'utf8'));
+          console.log('BINRAT_HISTORICAL_RECONSTRUCTION_SUPPORTED=' + report.historicalReconstructionSupported);
+          console.log(JSON.stringify(report, null, 2));
+          NODE
+          echo "probe_process_exit=${status}"
+      - name: Stop probe server
+        if: always()
+        shell: bash
+        run: |
+          if test -f "${RUNNER_TEMP}/binrat-live.pid"; then
+            kill "$(cat "${RUNNER_TEMP}/binrat-live.pid")" 2>/dev/null || true
+          fi
