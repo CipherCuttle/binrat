@@ -1,6 +1,6 @@
 {
   "schemaVersion": "binrat.capability-manifest/0.1",
-  "updatedAt": "2026-09-18",
+  "updatedAt": "2026-09-19",
   "doctrine": {
     "roadmap": "docs/ROADMAP_V0.md",
     "philosophy": "docs/PHILOSOPHY.md",
@@ -22,9 +22,18 @@
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "telegramRatV0": {
-      "engineeringStatus": "BUILDING",
+      "engineeringStatus": "ENGINEERING_PASS",
       "candidatePr": 15,
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "candidateHead": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PUBLIC_LIVE_BETA",
+      "cloudflareWorkerVersion": "da3b86c6-7478-4ddb-8748-1f169ce8fdcc",
+      "liveAcceptance": {
+        "ingress": "PASS",
+        "replies": "PASS",
+        "ledgerState": "REPLIED",
+        "rendererVersion": "binrat.rat-voice/0.2"
+      }
     },
     "dumpsterLedger": {
       "engineeringStatus": "PLANNED",
