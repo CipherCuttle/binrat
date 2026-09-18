@@ -95,7 +95,14 @@ test('observation status cannot claim COMPLETE when evidence is missing', async 
       observedBlockHash: `0x${'20'.padStart(64, '0')}` as Hex,
       observedTimestampMs: 3_600_001,
       status: 'COMPLETE',
-      facts: {},
+      facts: {
+        poolCodePresent: true,
+        poolSqrtPriceX96: 456n,
+        poolTick: 12,
+        creatorTokenBalance: 789n,
+        tokenTotalSupply: 1_000n,
+        tokenDecimals: 18
+      },
       missing: ['POOL_LIQUIDITY']
     }),
     /OBSERVATION_STATUS_MISMATCH/
