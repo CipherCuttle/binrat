@@ -67,9 +67,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if ! pnpm dlx wrangler@4.135.0 d1 info binrat-v0             --json --config /tmp/wrangler-provision.jsonc >/tmp/d1-info.json 2>/tmp/d1-info.err; then
-            pnpm dlx wrangler@4.135.0 d1 create binrat-v0               --location weur --config /tmp/wrangler-provision.jsonc
-            pnpm dlx wrangler@4.135.0 d1 info binrat-v0               --json --config /tmp/wrangler-provision.jsonc >/tmp/d1-info.json
+          if ! pnpm dlx wrangler@4.135.0 d1 info binrat-v0 --json --config /tmp/wrangler-provision.jsonc >/tmp/d1-info.json 2>/tmp/d1-info.err; then
+            pnpm dlx wrangler@4.135.0 d1 create binrat-v0 --location weur --config /tmp/wrangler-provision.jsonc
+            pnpm dlx wrangler@4.135.0 d1 info binrat-v0 --json --config /tmp/wrangler-provision.jsonc >/tmp/d1-info.json
           fi
 
       - name: Resolve D1 database ID
@@ -105,8 +105,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if ! pnpm dlx wrangler@4.135.0 queues info binrat-sync-v0             --config /tmp/wrangler-provision.jsonc >/dev/null 2>&1; then
-            pnpm dlx wrangler@4.135.0 queues create binrat-sync-v0               --config /tmp/wrangler-provision.jsonc
+          if ! pnpm dlx wrangler@4.135.0 queues info binrat-sync-v0 --config /tmp/wrangler-provision.jsonc >/dev/null 2>&1; then
+            pnpm dlx wrangler@4.135.0 queues create binrat-sync-v0 --config /tmp/wrangler-provision.jsonc
           fi
 
       - name: Prepare deployment config
@@ -161,17 +161,17 @@ jobs:
         shell: bash
         run: |
           {
-            echo "## BINRAT Cloudflare candidate"
+            echo '## BINRAT Cloudflare candidate'
             echo
-            echo "- branch: `ops/cloudflare-deploy-v0`"
-            echo "- commit: `${GITHUB_SHA}`"
-            echo "- worker: `binrat-edge-v0`"
-            echo "- D1: `binrat-v0`"
-            echo "- Queue: `binrat-sync-v0`"
-            echo "- Telegram replies: `false`"
+            printf '%s\n' '- branch: `ops/cloudflare-deploy-v0`'
+            printf '%s\n' "- commit: `${GITHUB_SHA}`"
+            printf '%s\n' '- worker: `binrat-edge-v0`'
+            printf '%s\n' '- D1: `binrat-v0`'
+            printf '%s\n' '- Queue: `binrat-sync-v0`'
+            printf '%s\n' '- Telegram replies: `false`'
             if [ -n "${WORKER_URL:-}" ]; then
               echo "- URL: $WORKER_URL"
             fi
             echo
-            echo "Render fallback was not modified."
+            echo 'Render fallback was not modified.'
           } >> "$GITHUB_STEP_SUMMARY"
