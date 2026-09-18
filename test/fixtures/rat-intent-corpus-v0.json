@@ -581,7 +581,7 @@
     {
       "text": "what is binrat",
       "allowUnaddressed": false,
-      "expectedIntent": null
+      "expectedIntent": "WHY"
     },
     {
       "text": "what have you built?",
