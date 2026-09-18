@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { renderRatReply, type RatConfig } from './rat.js';
+import { resolve } from 'node:path';
+import { renderRatReply, validateCapabilityManifest, type RatConfig } from './rat.js';
 
 interface TelegramChat {
   id: number;
@@ -89,9 +91,12 @@ async function sendMessage(token: string, chatId: number, text: string): Promise
 
 const token = requiredEnv('TELEGRAM_BOT_TOKEN');
 const webhookSecret = requiredEnv('TELEGRAM_WEBHOOK_SECRET');
+const manifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
+const manifest = validateCapabilityManifest(JSON.parse(readFileSync(manifestPath, 'utf8')));
 const config: RatConfig = {
   apiBaseUrl: requiredEnv('BINRAT_PUBLIC_BASE_URL'),
-  siteUrl: process.env.BINRAT_PUBLIC_SITE_URL?.trim() || requiredEnv('BINRAT_PUBLIC_BASE_URL')
+  siteUrl: process.env.BINRAT_PUBLIC_SITE_URL?.trim() || requiredEnv('BINRAT_PUBLIC_BASE_URL'),
+  manifest
 };
 
 const server = createServer(async (request, response) => {
@@ -99,7 +104,12 @@ const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://localhost');
 
     if (request.method === 'GET' && url.pathname === '/health') {
-      json(response, 200, { ok: true, service: 'binrat-telegram-rat' });
+      json(response, 200, {
+        ok: true,
+        service: 'binrat-telegram-rat',
+        capabilityStatus: config.manifest.capabilities.telegramRatV0?.engineeringStatus ?? 'UNKNOWN',
+        launchAuthorization: config.manifest.launchAuthorization.status
+      });
       return;
     }
 

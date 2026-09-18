@@ -10,7 +10,6 @@
   "scripts": {
     "start": "node dist/src/server.js",
     "serve:live": "tsx src/server.ts",
-    "telegram:serve": "tsx src/telegram/server.ts",
     "build": "tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts",
     "web:serve": "node scripts/serve-web.mjs",
@@ -20,7 +19,8 @@
     "watch": "tsx src/cli.ts watch",
     "inspect": "tsx src/cli.ts inspect",
     "probe:observations": "tsx src/observationProbeCli.ts",
-    "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts"
+    "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts",
+    "telegram:serve": "tsx src/telegram/server.ts"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",

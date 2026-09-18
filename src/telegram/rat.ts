@@ -1,8 +1,28 @@
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
+export interface CapabilityState {
+  engineeringStatus?: string;
+  deploymentStatus?: string;
+  publicStatus?: string;
+  phase?: string;
+}
+
+export interface CapabilityManifest {
+  schemaVersion: string;
+  capabilities: Record<string, CapabilityState>;
+  launchAuthorization: {
+    status: string;
+    marketingAuthorized: boolean;
+    launchAuthorized: boolean;
+    tokenState?: string;
+  };
+  invariant: string;
+}
+
 export interface RatConfig {
   apiBaseUrl: string;
   siteUrl: string;
+  manifest: CapabilityManifest;
 }
 
 type FetchLike = typeof fetch;
@@ -21,6 +41,29 @@ function stringValue(value: unknown, fallback = 'UNKNOWN'): string {
 
 function numberValue(value: unknown, fallback = 0): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+export function validateCapabilityManifest(value: unknown): CapabilityManifest {
+  const root = record(value);
+  const launch = record(root.launchAuthorization);
+  const capabilities = record(root.capabilities);
+  if (
+    root.schemaVersion !== 'binrat.capability-manifest/0.1' ||
+    typeof root.invariant !== 'string' ||
+    typeof launch.status !== 'string' ||
+    typeof launch.marketingAuthorized !== 'boolean' ||
+    typeof launch.launchAuthorized !== 'boolean'
+  ) {
+    throw new Error('CAPABILITY_MANIFEST_INVALID');
+  }
+  for (const state of Object.values(capabilities)) {
+    if (!state || typeof state !== 'object') throw new Error('CAPABILITY_MANIFEST_INVALID');
+    const engineeringStatus = (state as Record<string, unknown>).engineeringStatus;
+    if (engineeringStatus !== undefined && typeof engineeringStatus !== 'string') {
+      throw new Error('CAPABILITY_MANIFEST_INVALID');
+    }
+  }
+  return value as CapabilityManifest;
 }
 
 async function getJson(path: string, config: RatConfig, fetchImpl: FetchLike): Promise<{ ok: boolean; status: number; value: Record<string, unknown> }> {
@@ -54,6 +97,13 @@ function commandFromText(text: string): { command: string; argument: string } | 
   return null;
 }
 
+function capabilityLine(label: string, key: string, config: RatConfig): string {
+  const state = config.manifest.capabilities[key];
+  if (!state) return `${label}: UNKNOWN`;
+  const parts = [state.engineeringStatus, state.deploymentStatus, state.publicStatus].filter(Boolean);
+  return `${label}: ${parts.join(' / ')}`;
+}
+
 function staticReply(command: string, config: RatConfig): string | null {
   const site = trimSlash(config.siteUrl);
   if (command === 'why') {
@@ -68,26 +118,37 @@ function staticReply(command: string, config: RatConfig): string | null {
   }
   if (command === 'roadmap') {
     return [
-      '🐀 ROADMAP',
+      '🐀 ROADMAP / CANONICAL STATUS',
       '',
-      'SHIPPED: Intelligence V1 — Creator Files, Trash Trails, deterministic 5m / 1h / 24h observations, WHAT CHANGED.',
-      'NEXT: Trash DNA → Rat Watch → Dead Drops.',
-      'EXPERIMENT: Rat Credits → Trash Bounties → Proof of First → Rat Reputation.',
-      'LATER: Case Files → Rat Machine → Rat Lab → API/agents → independent evidence providers.',
+      capabilityLine('Intelligence V1', 'intelligenceV1', config),
+      capabilityLine('Replay Lab', 'replayLab', config),
+      capabilityLine('Telegram Rat V0', 'telegramRatV0', config),
+      capabilityLine('Dumpster Ledger', 'dumpsterLedger', config),
+      capabilityLine('Rat Den V0', 'ratDenV0', config),
+      capabilityLine('Rat Watch V0', 'ratWatchV0', config),
+      capabilityLine('Dumpster Raids V0', 'dumpsterRaidsV0', config),
       '',
-      '$BINRAT: early fair launch planned, subject to the launch/compliance gate. Utility expands as shipped roadmap capabilities arrive.'
+      'Sequence: Replay Lab → Telegram Rat → frozen launch mechanics → Dumpster Ledger → Rat Den → minimal Rat Watch → authorization gates.',
+      `launch authorization: ${config.manifest.launchAuthorization.status}`
     ].join('\n');
   }
   if (command === 'token') {
+    const launch = config.manifest.launchAuthorization;
+    const tokenState = launch.tokenState ?? 'UNKNOWN';
     return [
       '🐀 TOKEN STATUS',
       '',
-      'No $BINRAT token is launched yet.',
-      'An early fair launch is planned to create the native BINRAT culture/coordination asset and help bankroll continued development through disclosed project/creator fee revenue.',
-      'No private presale or discounted insider round is intended. Shipped utility and planned utility will be labeled separately.',
-      'Rat Credits remain off-chain, non-transferable coordination units and are not equity or yield.',
+      `token state: ${tokenState}`,
+      `launch authorization: ${launch.status}`,
+      `marketing authorized: ${launch.marketingAuthorized ? 'YES' : 'NO'}`,
+      `launch authorized: ${launch.launchAuthorized ? 'YES' : 'NO'}`,
       '',
-      'Rule: degen decides attention. Receipts decide truth.'
+      tokenState === 'NOT_LAUNCHED'
+        ? 'No $BINRAT token is launched yet.'
+        : 'The Rat only reports the canonical manifest state.',
+      'Rat Credits are separate, off-chain, non-transferable contribution/coordination units; they are not equity, revenue share, or yield.',
+      '',
+      `Rule: ${config.manifest.invariant}`
     ].join('\n');
   }
   if (command === 'proof') {
@@ -98,16 +159,18 @@ function staticReply(command: string, config: RatConfig): string | null {
       'Missing evidence != good evidence.',
       'Future data cannot leak into past views.',
       'Token ownership cannot buy factual authority.',
-      'Core BINRAT evidence must stay truthful regardless of $BINRAT market price.'
+      'Core BINRAT evidence must stay truthful regardless of $BINRAT market price.',
+      '',
+      config.manifest.invariant
     ].join('\n');
   }
   if (command === 'faq' || command === 'help' || command === 'start') {
     return [
       '🐀 ask the rat:',
       '/status — live index state',
-      '/roadmap — shipped / next / experiment',
+      '/roadmap — canonical capability state',
       '/why — what BINRAT is',
-      '/token — token + Rat Credits status',
+      '/token — token + launch-authorization state',
       '/creator 0x... — Creator File summary',
       '/bag <launch-id> — launch summary',
       '/receipt <launch-id> — public receipt id',
@@ -133,6 +196,7 @@ async function statusReply(config: RatConfig, fetchImpl: FetchLike): Promise<str
       `checkpoint block: ${stringValue(h.checkpointBlock, 'NONE')}`,
       `historical backfill: ${history ? 'COMPLETE' : 'IN PROGRESS / UNVERIFIED'}`,
       `observations: ${obs ? 'READY' : 'PARTIAL / DEGRADED'}`,
+      `Telegram Rat capability: ${stringValue(config.manifest.capabilities.telegramRatV0?.engineeringStatus)}`,
       h.lastSyncError ? `index error: ${stringValue(h.lastSyncError)}` : '',
       h.lastObservationError ? `observation error: ${stringValue(h.lastObservationError)}` : ''
     ].filter(Boolean).join('\n');

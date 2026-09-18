@@ -1,22 +1,49 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { renderRatReply } from '../src/telegram/rat.js';
+import { renderRatReply, validateCapabilityManifest, type CapabilityManifest } from '../src/telegram/rat.js';
+
+const manifest: CapabilityManifest = {
+  schemaVersion: 'binrat.capability-manifest/0.1',
+  capabilities: {
+    intelligenceV1: { engineeringStatus: 'ENGINEERING_PASS', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
+    replayLab: { engineeringStatus: 'BUILDING', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
+    telegramRatV0: { engineeringStatus: 'BUILDING', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
+    dumpsterLedger: { engineeringStatus: 'PLANNED', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
+    ratDenV0: { engineeringStatus: 'PLANNED', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
+    ratWatchV0: { engineeringStatus: 'PLANNED', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
+    dumpsterRaidsV0: { engineeringStatus: 'EXPERIMENTAL', phase: 'POST_LAUNCH' }
+  },
+  launchAuthorization: {
+    status: 'BLOCKED',
+    marketingAuthorized: false,
+    launchAuthorized: false,
+    tokenState: 'NOT_LAUNCHED'
+  },
+  invariant: 'Degen can decide attention and priority. It cannot decide what is true.'
+};
 
 const config = {
   apiBaseUrl: 'https://api.example.test',
-  siteUrl: 'https://binrat.example.test'
+  siteUrl: 'https://binrat.example.test',
+  manifest
 };
 
-test('token answer is explicit that no token is launched', async () => {
+test('token answer is sourced from fail-closed launch authorization', async () => {
   const reply = await renderRatReply('/token', config);
-  assert.match(reply ?? '', /No \$BINRAT token is launched/);
-  assert.match(reply ?? '', /not equity, revenue share, yield/i);
+  assert.match(reply ?? '', /token state: NOT_LAUNCHED/);
+  assert.match(reply ?? '', /launch authorization: BLOCKED/);
+  assert.match(reply ?? '', /marketing authorized: NO/);
+  assert.match(reply ?? '', /launch authorized: NO/);
+  assert.match(reply ?? '', /not equity, revenue share, or yield/i);
 });
 
-test('natural-language roadmap question resolves without model inference', async () => {
+test('roadmap answer reports canonical capability states instead of hard-coded shipped claims', async () => {
   const reply = await renderRatReply('binrat what is next on the roadmap?', config);
-  assert.match(reply ?? '', /Trash DNA/);
-  assert.match(reply ?? '', /Rat Credits/);
+  assert.match(reply ?? '', /Intelligence V1: ENGINEERING_PASS/);
+  assert.match(reply ?? '', /Replay Lab: BUILDING/);
+  assert.match(reply ?? '', /Telegram Rat V0: BUILDING/);
+  assert.match(reply ?? '', /Dumpster Raids V0: EXPERIMENTAL/);
+  assert.match(reply ?? '', /launch authorization: BLOCKED/);
 });
 
 test('status is grounded in public health API', async () => {
@@ -34,6 +61,7 @@ test('status is grounded in public health API', async () => {
   assert.match(reply ?? '', /index: READY/);
   assert.match(reply ?? '', /launches indexed: 12/);
   assert.match(reply ?? '', /IN PROGRESS \/ UNVERIFIED/);
+  assert.match(reply ?? '', /Telegram Rat capability: BUILDING/);
 });
 
 test('invalid creator address fails before network lookup', async () => {
@@ -65,4 +93,14 @@ test('creator answer preserves identity boundary and receipt', async () => {
 
 test('irrelevant ordinary chat is ignored', async () => {
   assert.equal(await renderRatReply('wen moon?', config), null);
+});
+
+test('manifest validator fails closed on malformed launch authorization', () => {
+  assert.throws(
+    () => validateCapabilityManifest({
+      ...manifest,
+      launchAuthorization: { status: 'BLOCKED', marketingAuthorized: 'no', launchAuthorized: false }
+    }),
+    /CAPABILITY_MANIFEST_INVALID/
+  );
 });

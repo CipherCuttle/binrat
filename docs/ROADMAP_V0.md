@@ -3,7 +3,16 @@
 Status: planning document  
 Rule: roadmap items are not promises, launch dates, or claims of future token value.
 
-## SHIPPED / ENGINEERING-PASS
+## ENGINEERING-PASS / PUBLIC-LIVE NOT YET AUTHORIZED
+
+Status semantics are canonicalized in `docs/CAPABILITY_MANIFEST_V0.json`.
+
+- `ENGINEERING_PASS` means the reviewed implementation passed its engineering gate.
+- `DEPLOYED` means the referenced implementation is deployed.
+- `PUBLIC_LIVE` means the deployed capability is authorized as a public-live product surface.
+- `BUILDING`, `PLANNED`, and `EXPERIMENTAL` describe roadmap state, not shipping claims.
+
+A capability may be `ENGINEERING_PASS` without being `DEPLOYED` or `PUBLIC_LIVE`.
 
 ### Intelligence V1
 
@@ -28,7 +37,114 @@ Current boundary remains:
 - no inferred human identity;
 - no trading/signing/capital authority.
 
-## NEXT — MEMORY BECOMES OPERATIONAL
+## LAUNCH V0 — THE RAT ESCAPES
+
+Launch V0 is the next integrated product stage. It is intentionally smaller than the full roadmap.
+
+Required launch stack:
+
+- Intelligence V1 public evidence surfaces;
+- Replay Lab pre-launch technical proof;
+- Telegram Rat deterministic V0;
+- `$BINRAT` fair-launch mechanics frozen and publicly documented;
+- Dumpster Ledger / treasury transparency surface;
+- Rat Den V0;
+- minimal Rat Watch V0.
+
+Legal/compliance is a **parallel authorization lane from the start**, not the last feature in the sequence. Token-facing marketing and launch authority remain fail-closed until the applicable legal/compliance, contract, treasury, and disclosure gates are complete and explicitly authorized in the canonical capability manifest.
+
+### Replay Lab — pre-launch technical proof
+
+Replay Lab demonstrates BINRAT's evidence moat without waiting for fresh launch density:
+
+- real indexed Arc launch evidence;
+- Creator File / Trash Trail context;
+- deterministic launch -> 5m -> 1h -> 24h stages;
+- no future leakage;
+- copyable receipt/evidence bundle;
+- missing stages remain missing rather than simulated.
+
+The current implementation candidate lives in draft PR #13. It is a pre-launch proof surface, not a claim that the later Rat Machine roadmap is complete.
+
+### Dumpster Ledger
+
+The public funding surface should expose, where operationally safe:
+
+- creator/project fee recipient wallet(s);
+- treasury wallet(s);
+- cumulative token-related inflows;
+- categorized project outflows;
+- relevant on-chain transaction links;
+- current status of shipped / building / planned utility.
+
+The point is not to pretend the project has no funding motive. The point is to make the funding mechanics legible.
+
+### Rat Den V0
+
+Optional holder-facing community/product surfaces.
+
+Candidate launch features:
+
+- advanced Telegram Rat commands;
+- additional Rat Watch slots;
+- experimental feature access;
+- research/community channels;
+- Trash Hunt eligibility when hunts ship.
+
+Core receipts and factual evidence remain publicly inspectable.
+
+### Rat Watch V0
+
+Launch with the smallest useful alert loop:
+
+- recurring reported creator address;
+- watched Creator File update;
+- matured 5m / 1h / 24h observation;
+- Telegram delivery.
+
+Advanced Trash DNA matching arrives after launch.
+
+### Dumpster Raids V0 — post-launch experiment
+
+Dumpster Raids are **not a Launch V0 blocker**. Token locking introduces additional contract, accounting, abuse, and compliance surface and therefore gets its own bounded post-launch gate.
+
+Holders can lock `$BINRAT` behind bounded evidence gaps or investigations they want prioritized.
+
+Rules:
+
+- locking changes research priority, not factual outcome;
+- lock accounting is public;
+- raid terms have a defined start/end;
+- tokens unlock under the published raid rules;
+- no token-weighted adjudication of evidence.
+
+### Feed the Rat
+
+A deliberately memetic optional action.
+
+A user can send `$BINRAT` to a disclosed destination such as a research/bounty pool or provably dead address, depending on the finalized mechanic.
+
+The destination and effect must be explicit before the action is confirmed.
+
+This is culture, not evidence authority and not a promise of token appreciation.
+
+### Launch V0 acceptance gates
+
+Launch V0 is ready only when:
+
+1. launch contract/mechanics and fee routes are independently verified and captured in a dated verification receipt;
+2. required legal/compliance artifacts are complete and launch authorization is explicitly unblocked;
+3. public token/treasury addresses are frozen and disclosed;
+4. Telegram Rat reports the canonical doctrine/status accurately from the capability manifest;
+5. Dumpster Ledger is live or has a deterministic launch-day bootstrap path;
+6. Rat Den cannot hide or alter core public receipts;
+7. Rat Watch produces at least one real end-to-end Telegram alert;
+8. Replay Lab demonstrates at least one real historical launch -> matured-observation evidence chain without synthesizing missing evidence;
+9. product/docs/Telegram status agrees with the canonical capability manifest;
+10. no private presale, hidden insider allocation, or undisclosed privileged inventory exists under the chosen launch design.
+
+## POST-LAUNCH PHASE 1 — THE RAT REMEMBERS
+
 
 ### 1. TRASH DNA
 
@@ -81,6 +197,10 @@ Preserve public launch artifacts that can disappear:
 
 The first implementation should preserve provenance and hashes before attempting broad archival infrastructure.
 
+## POST-LAUNCH PHASE 2 — THE RATS ORGANIZE
+
+This phase begins only after the launch/product loop is operating and Dead Drops provide useful evidence gaps.
+
 ## EXPERIMENT — CONTRIBUTOR ECONOMY
 
 ### 4. RAT CREDITS
@@ -97,7 +217,15 @@ Use cases:
 
 Rat Credits do not represent equity, revenue share, or a promise of future token conversion.
 
-### 5. TRASH BOUNTIES
+### 5. TRASH HUNTS + TRASH BOUNTIES
+
+**Trash Hunts** are seasonal, bounded research quests. They are the degen/community wrapper around useful evidence work.
+
+Hunters can earn Rat Credits, Rat Reputation, roles, badges, or explicitly disclosed rewards. Hunts must not be games of chance and must not let popularity substitute for evidence quality.
+
+**Trash Bounties** are narrower evidence tasks with explicit acceptance criteria.
+
+
 
 A user or project funds a bounded evidence question.
 
@@ -142,6 +270,8 @@ No unstructured accusation feed.
 Allow cryptographic control proofs and creator-signed context without rewriting historical evidence.
 
 ### 10. RAT MACHINE
+
+Replay Lab is the bounded pre-launch precursor. Rat Machine is the later interactive expansion.
 
 Interactive point-in-time replay:
 
@@ -193,9 +323,15 @@ The API should become useful to bots and agents without granting them trading au
 
 ### 14. TELEGRAM RAT
 
-Autonomous communication layer for updates, status, launch intelligence, FAQs, receipts, and watch alerts.
+Autonomous communication layer for updates, status, launch intelligence, FAQs, receipts, watch alerts, Dumpster Raid status, Trash Hunts, and later Case File/bounty events.
 
 The bot is explicitly automated and never impersonates the founder.
+
+### 15. DUMPSTER LEDGER
+
+Public proof-of-funding and execution surface linking token-related project inflows, treasury policy, roadmap state, and on-chain receipts.
+
+The ledger is part of the product trust model: the project can openly use token-related revenue to bankroll development without hiding the mechanism.
 
 ## EARLY FAIR LAUNCH — FUND THE BUILD, SHIP THE UTILITY
 
@@ -228,10 +364,11 @@ Subject to implementation and legal review, early `$BINRAT` utility can include:
 
 - **Rat Den** — optional token-gated community/product surfaces;
 - **Rat Watch capacity** — additional watch slots or advanced alert configuration;
-- **Dumpster Raids** — token-lock signaling for which evidence gaps/cases the community wants investigated next;
+- **Dumpster Raids** — post-launch experimental token-lock signaling for which evidence gaps/cases the community wants investigated next;
 - **Trash Hunts** — seasonal research quests that earn Rat Credits and reputation rather than purchasing truth;
 - **Bounty Boosts** — use `$BINRAT` to increase the posted reward/priority of a bounded evidence task;
-- **Case sponsorship** — visibly sponsor research without gaining adjudication authority.
+- **Case sponsorship** — visibly sponsor research without gaining adjudication authority;
+- **Feed the Rat** — optional memetic contribution to a disclosed research/bounty/dead destination, with the effect shown before confirmation.
 
 ### Utility expansion
 
@@ -261,7 +398,7 @@ The evidence cannot be.
 
 The product flywheel is:
 
-`HOT GARBAGE -> RECEIPTS -> CREATOR FILE -> TRASH DNA -> EVIDENCE GAPS -> BOUNTIES -> CONTRIBUTORS -> VERIFIED EVIDENCE -> STRONGER MEMORY -> RAT WATCH -> MORE USERS -> MORE EVIDENCE`
+`FAIR LAUNCH -> TELEGRAM RAT / RAT DEN -> HOT GARBAGE -> RECEIPTS -> CREATOR FILE -> TRASH DNA -> RAT WATCH -> EVIDENCE GAPS -> DEAD DROPS -> TRASH HUNTS / BOUNTIES -> CONTRIBUTORS -> VERIFIED EVIDENCE -> STRONGER MEMORY -> MORE USERS -> MORE EVIDENCE`
 
 The moat is accumulated, replayable history.
 
