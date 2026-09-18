@@ -49,3 +49,70 @@ Repository: `CipherCuttle/rekt-terminal`
 Pinned H5 commit: `b2c67646a65307d05b6aa0fa7392092fd21eb483`
 
 Not copied in V0. Reserved future donor for idempotent outbox workers, renewable leases, stale-worker fencing, bounded retry, and failure observability once BINRAT needs concurrent workers.
+
+
+## BINRAT Intelligence V1 donor freeze
+
+Intelligence V1 ports bounded primitives once and then owns them locally. There are no runtime imports, submodules, shared databases, or compatibility promises to donor repositories.
+
+### Sentry Forensic Gate — primary donor
+
+Repository: `CipherCuttle/sentry-forensic-gate`  
+Pinned commit: `7f48f1ea59ae59c4cb36b4bfb93cb53406e39948`
+
+Allowed ports:
+
+- `src/outcome/horizons.ts` -> `src/observations/horizons.ts`
+- forward-outcome identity/replay/reorg semantics -> `src/observations/*` and `src/store/*`
+- creator-history point-in-time join semantics -> future `src/intelligence/creatorFile.ts`
+- atomic launch/provenance snapshot pattern -> future read projections
+
+Explicitly not ported:
+
+- baseline trading positions;
+- BUY / PASS / REJECT decisions;
+- adverse-selection scoring;
+- canary execution;
+- approvals, signing, broadcast, capital, or wallet authority;
+- Sentry-specific Tsunami market assumptions.
+
+### SerrataOS — later funding-trail donor
+
+Repository: `CipherCuttle/SerrataOS`  
+Pinned commit: `34f981a7ea6d8148443046211562d23fe6c365a1`
+
+Reserved, not in the first Intelligence V1 changeset:
+
+- bounded funding-origin traversal;
+- infrastructure/router filtering;
+- chronological event projection.
+
+Do not port suspect labels, Python runtime coupling, or case-specific heuristics.
+
+### Rektrace — provider-resilience donor
+
+Repository: `CipherCuttle/Rektrace`  
+Pinned commit: `9db947aa3a5b9036a9ef91f283b475c62b357334`
+
+Reserved only if third-party providers become necessary:
+
+- timeout/retry/concurrency patterns;
+- circuit-breaker patterns.
+
+Do not port risk scores, approved/rejected semantics, or provider dependencies pre-emptively.
+
+
+## React Bits — presentation-only donor
+
+Repository: `DavidHDev/react-bits`  
+Pinned commit: `c49d6978d2496660f0f0c5a3b3ca77a059566a93`
+
+Intelligence V1 adapts the interaction behavior of:
+
+- `src/content/Animations/AnimatedContent/AnimatedContent.jsx`;
+- `src/content/Components/SpotlightCard/SpotlightCard.jsx`;
+- `src/content/Components/SpotlightCard/SpotlightCard.css`.
+
+The behaviors are ported into `web/react-bits-island.js` using native IntersectionObserver, Web Animations and pointer CSS variables. This intentionally avoids a React/GSAP runtime migration and keeps all evidence/data authority in the existing application.
+
+The animation island is presentation-only. Deleting it must not alter feed, Creator File, observation, receipt or API semantics.

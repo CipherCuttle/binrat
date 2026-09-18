@@ -4,9 +4,14 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { ArcPadLaunchSource } from './arc/arcpadSource.js';
+import { ArcObservationSource } from './arc/observationSource.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from './arc/chain.js';
-import { runLaunchWatcher, type SyncOptions } from './indexer/syncLaunches.js';
+import { syncLaunches, type SyncOptions } from './indexer/syncLaunches.js';
+import { syncHistoricalLaunches } from './indexer/syncHistoricalLaunches.js';
+import { syncObservations } from './observations/syncObservations.js';
 import { projectPublicFeed } from './public/project.js';
+import { projectCreatorFile } from './public/creatorFile.js';
+import { projectBagIntelligence } from './public/bagIntelligence.js';
 import { SqliteStore } from './store/sqliteStore.js';
 
 // Source and compiled entrypoints both resolve the same repo-owned web directory.
@@ -17,6 +22,11 @@ mkdirSync(dirname(dbPath), { recursive: true });
 const store = new SqliteStore(dbPath, ARC_CHAIN_ID);
 const controller = new AbortController();
 let lastSyncError: string | null = null;
+let lastObservationError: string | null = null;
+let observationSyncSucceeded = false;
+let lastHistoryError: string | null = null;
+let historyBackfillComplete = false;
+let historyBackfillTargetBlock: bigint | null = null;
 let sourceVerified = false;
 
 function integerEnv(name: string, fallback: number, minimum: number): number {
@@ -36,7 +46,7 @@ const baseOptions = {
 // Never expose viem error messages: they may contain RPC URLs, headers or credentials.
 function syncErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
-  const code = message.match(/^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+)(?=:|$)/)?.[1];
+  const code = message.match(/^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+)(?=:|$)/)?.[1];
   return code ?? 'SYNC_FAILED';
 }
 
@@ -49,17 +59,64 @@ async function watch(): Promise<void> {
         const checkpoint = await store.getCheckpoint();
         const head = await source.getHeadBlockNumber();
         const recentStart = head > lookback ? head - lookback : 0n;
-        options = { ...baseOptions, startBlock: checkpoint ? ARCPAD_START_BLOCK : (recentStart > ARCPAD_START_BLOCK ? recentStart : ARCPAD_START_BLOCK) };
-        console.log(JSON.stringify({ event: 'INDEX_START', chainId: ARC_CHAIN_ID, startBlock: options.startBlock.toString(), resumed: Boolean(checkpoint), historyCoverage: 'UNVERIFIED' }));
+        const liveWindowStart = recentStart > ARCPAD_START_BLOCK ? recentStart : ARCPAD_START_BLOCK;
+        historyBackfillTargetBlock = liveWindowStart > ARCPAD_START_BLOCK ? liveWindowStart - 1n : null;
+        options = { ...baseOptions, startBlock: checkpoint ? ARCPAD_START_BLOCK : liveWindowStart };
+        console.log(JSON.stringify({
+          event: 'INDEX_START',
+          chainId: ARC_CHAIN_ID,
+          startBlock: options.startBlock.toString(),
+          resumed: Boolean(checkpoint),
+          historyBackfillTargetBlock: historyBackfillTargetBlock?.toString() ?? null,
+          historyCoverage: 'UNVERIFIED'
+        }));
       }
       await source.assertAuthority(await source.getHeadBlockNumber());
       // Existing databases must pass checkpoint validation before being advertised ready.
       if (!(await store.getCheckpoint())) sourceVerified = true;
-      await runLaunchWatcher(source, store, options, controller.signal, (report) => {
-        sourceVerified = true;
-        lastSyncError = null;
-        console.log(JSON.stringify({ event: 'INDEX_SYNC', ...report }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
-      });
+
+      const launchReport = await syncLaunches(source, store, options);
+      sourceVerified = true;
+      lastSyncError = null;
+      console.log(JSON.stringify({ event: 'INDEX_SYNC', ...launchReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+
+      if (historyBackfillTargetBlock === null) {
+        historyBackfillComplete = true;
+        lastHistoryError = null;
+      } else {
+        try {
+          const historyReport = await syncHistoricalLaunches(source, store, {
+            startBlock: ARCPAD_START_BLOCK,
+            endBlock: historyBackfillTargetBlock,
+            maxBatchBlocks: baseOptions.maxBatchBlocks
+          });
+          historyBackfillComplete = historyReport.complete;
+          lastHistoryError = null;
+          console.log(JSON.stringify({ event: 'HISTORY_SYNC', ...historyReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+        } catch (error) {
+          historyBackfillComplete = false;
+          const code = syncErrorCode(error);
+          lastHistoryError = code === 'SYNC_FAILED' ? 'HISTORY_SYNC_FAILED' : code;
+          console.error(JSON.stringify({ event: 'HISTORY_ERROR', code: lastHistoryError }));
+        }
+      }
+
+      try {
+        const observationSource = new ArcObservationSource();
+        const observationReport = await syncObservations(observationSource, store, {
+          confirmations: baseOptions.confirmations,
+          maxObservationsPerSync: integerEnv('BINRAT_MAX_OBSERVATIONS_PER_SYNC', 12, 1)
+        });
+        observationSyncSucceeded = true;
+        lastObservationError = null;
+        console.log(JSON.stringify({ event: 'OBSERVATION_SYNC', ...observationReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+      } catch (error) {
+        observationSyncSucceeded = false;
+        const code = syncErrorCode(error);
+        lastObservationError = code === 'SYNC_FAILED' ? 'OBSERVATION_SYNC_FAILED' : code;
+        console.error(JSON.stringify({ event: 'OBSERVATION_ERROR', code: lastObservationError }));
+      }
+      await delay(pollIntervalMs, undefined, { signal: controller.signal }).catch(() => {});
     } catch (error) {
       sourceVerified = false;
       lastSyncError = syncErrorCode(error);
@@ -70,10 +127,9 @@ async function watch(): Promise<void> {
 }
 
 async function snapshot() {
-  const checkpoint = await store.getCheckpoint();
-  if (!checkpoint || !sourceVerified || lastSyncError) return null;
-  const launches = (await store.listLaunches()).filter((launch) => launch.blockNumber <= checkpoint.blockNumber);
-  const facts = (await store.listProvenanceFacts()).filter((fact) => fact.observedBlock <= checkpoint.blockNumber);
+  const state = await store.readPublicProjectionState();
+  if (!state || !sourceVerified || lastSyncError) return null;
+  const { checkpoint, launches, facts } = state;
   const feed = await projectPublicFeed({
     chainId: ARC_CHAIN_ID,
     asOfBlock: checkpoint.blockNumber,
@@ -105,13 +161,42 @@ const server = createServer(async (request, response) => {
     if (pathname === '/api/health') {
       const checkpoint = await store.getCheckpoint();
       const launches = await store.listLaunches();
+      const historyBackfillNextBlock = await store.getHistoricalBackfillNextBlock();
       json(response, 200, {
         ok: !lastSyncError, chainId: ARC_CHAIN_ID,
         indexReady: Boolean(checkpoint && sourceVerified && !lastSyncError),
         checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
         launchCount: checkpoint ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length : 0,
+        historyBackfillComplete,
+        historyBackfillTargetBlock: historyBackfillTargetBlock?.toString() ?? null,
+        historyBackfillNextBlock: historyBackfillNextBlock?.toString() ?? null,
+        lastHistoryError,
+        observationReady: observationSyncSucceeded && !lastObservationError,
+        lastObservationError,
         lastSyncError
       });
+      return;
+    }
+    if (pathname.startsWith('/api/bag/') && pathname.endsWith('/intelligence')) {
+      const bagId = pathname.slice('/api/bag/'.length, -'/intelligence'.length);
+      if (!bagId) { json(response, 400, { error: 'BAG_ID_INVALID' }); return; }
+      const feed = await snapshot();
+      if (!feed) { json(response, 503, { ready: false, reason: lastSyncError ? 'LIVE_INDEX_NOT_AVAILABLE' : 'INDEX_NOT_READY' }); return; }
+      const bag = feed.bags.find((item) => item.id === bagId);
+      if (!bag) { json(response, 404, { error: 'BAG_NOT_FOUND' }); return; }
+      const observations = (await store.listObservationsForLaunch(bag.id))
+        .filter((receipt) => receipt.observedBlock <= BigInt(feed.asOfBlock));
+      json(response, 200, await projectBagIntelligence(feed, bag, observations));
+      return;
+    }
+    if (pathname.startsWith('/api/creator/')) {
+      const creator = pathname.slice('/api/creator/'.length).toLowerCase();
+      if (!/^0x[0-9a-f]{40}$/.test(creator)) { json(response, 400, { error: 'CREATOR_ADDRESS_INVALID' }); return; }
+      const feed = await snapshot();
+      if (!feed) { json(response, 503, { ready: false, reason: lastSyncError ? 'LIVE_INDEX_NOT_AVAILABLE' : 'INDEX_NOT_READY' }); return; }
+      const creatorFile = await projectCreatorFile(feed, creator);
+      if (!creatorFile) { json(response, 404, { error: 'CREATOR_NOT_INDEXED' }); return; }
+      json(response, 200, creatorFile);
       return;
     }
     if (pathname === '/api/feed' || pathname.startsWith('/api/bag/')) {

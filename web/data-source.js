@@ -148,3 +148,47 @@ function hash(value) {
 function block(value) {
   return typeof value === "string" && /^\d+$/.test(value);
 }
+
+
+export async function loadBagIntelligence(bagId) {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("BAG_INTELLIGENCE_NOT_AVAILABLE");
+  const value = await response.json();
+  if (
+    value?.schemaVersion !== "binrat.bag-intelligence/0.1" ||
+    value.projectionVersion !== "BINRAT_BAG_INTELLIGENCE_V0" ||
+    value.chainId !== 5042 ||
+    value.bagId !== bagId ||
+    !["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value.observationCoverage) ||
+    !Array.isArray(value.snapshots) ||
+    !Array.isArray(value.changes) ||
+    typeof value.receipt?.receiptId !== "string"
+  ) throw new Error("BAG_INTELLIGENCE_INVALID");
+  return value;
+}
+
+export async function loadCreatorFile(reportedCreatorAddress) {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  const response = await fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}`, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("CREATOR_FILE_NOT_AVAILABLE");
+  const value = await response.json();
+  if (
+    value?.schemaVersion !== "binrat.creator-file/0.1" ||
+    value.chainId !== 5042 ||
+    String(value.reportedCreatorAddress).toLowerCase() !== String(reportedCreatorAddress).toLowerCase() ||
+    value.historyCoverage !== "UNVERIFIED" ||
+    !Number.isSafeInteger(value.indexedLaunchCount) ||
+    !Array.isArray(value.launches) ||
+    typeof value.receipt?.receiptId !== "string"
+  ) throw new Error("CREATOR_FILE_INVALID");
+  return value;
+}

@@ -2559,3 +2559,254 @@ body {
     height: 42px;
   }
 }
+
+
+/* BINRAT Intelligence V1: evidence-first longitudinal panels. */
+.intelligence-panel,
+.creator-file-panel {
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  background: #131613;
+  padding: 18px;
+}
+.intel-loading,
+.intel-empty,
+.intel-boundary {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.intel-boundary {
+  max-width: 66ch;
+}
+.intel-snapshots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.intel-snapshot {
+  border: 1px solid var(--line);
+  background: #0f120f;
+  padding: 12px;
+}
+.intel-snapshot-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.intel-snapshot-head strong {
+  color: var(--good);
+  font-size: 13px;
+}
+.intel-snapshot dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 7px 12px;
+  margin: 0;
+  font-size: 11px;
+}
+.intel-snapshot dt {
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.intel-snapshot dd {
+  margin: 0;
+  text-align: right;
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+}
+.intel-snapshot small {
+  color: var(--muted);
+  font-size: 9px;
+}
+.intel-changes {
+  margin-top: 14px;
+}
+.intel-subhead {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+.intel-change {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+}
+.intel-change > span {
+  color: var(--muted);
+}
+.intel-change b {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+.intel-change small {
+  color: var(--muted);
+}
+.intel-receipt {
+  margin-top: 12px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+.creator-file-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.creator-file-stats > div {
+  border: 1px solid var(--line);
+  padding: 10px;
+  min-width: 0;
+}
+.creator-file-stats span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+.creator-file-stats code,
+.creator-file-stats b {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.creator-launches {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.creator-launch-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.6fr) .7fr .8fr auto auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 54px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+}
+.creator-launch-row span,
+.creator-launch-row code {
+  color: var(--muted);
+}
+.creator-launch-token {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+}
+.creator-launch-token > div {
+  min-width: 0;
+}
+.creator-launch-token strong,
+.creator-launch-token small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.creator-launch-token small {
+  margin-top: 2px;
+  color: var(--muted);
+}
+.creator-token-thumb {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+}
+.creator-launch-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.creator-launch-socials {
+  display: inline-flex;
+  gap: 5px;
+}
+.creator-launch-socials a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+.creator-launch-socials.muted {
+  font-size: 9px;
+}
+.creator-launch-open {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  padding: 6px 8px;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.creator-launch-open:hover,
+.creator-launch-open:focus-visible {
+  border-color: var(--ink);
+}
+
+/* React Bits-derived SpotlightCard behavior, ported to the existing vanilla shell. */
+.rb-spotlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --rb-x: 50%;
+  --rb-y: 50%;
+}
+.rb-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle 220px at var(--rb-x) var(--rb-y), rgba(139, 32, 125, .13), transparent 75%);
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+.rb-spotlight:hover::after,
+.rb-spotlight:focus-within::after {
+  opacity: 1;
+}
+.rb-spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 760px) {
+  .intel-snapshots,
+  .creator-file-stats {
+    grid-template-columns: 1fr;
+  }
+  .intel-change {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .creator-launch-row {
+    grid-template-columns: 1fr auto;
+  }
+  .creator-launch-token,
+  .creator-launch-row code {
+    grid-column: 1 / -1;
+  }
+  .creator-launch-meta {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rb-spotlight::after {
+    display: none;
+  }
+}
