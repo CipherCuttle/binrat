@@ -69,6 +69,29 @@ test('rewind discards pending Rat Watch alerts for removed launches', async () =
   }
 });
 
+test('unsubscribe cancels already-pending recurrence alerts', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const launches = new D1Store(db, CHAIN_ID);
+  const watches = new D1RatWatchStore(db);
+  const creator = address(5);
+
+  try {
+    await launches.putLaunch(await makeLaunch(100n, 1, creator));
+    await watches.subscribe(77, creator, 100n, 1_000);
+    await launches.putLaunch(await makeLaunch(200n, 2, creator));
+    assert.equal(await watches.enqueueRecurrenceAlerts(CHAIN_ID, 2_000), 1);
+    assert.equal((await watches.listPending()).length, 1);
+
+    assert.equal(await watches.unsubscribe(77, creator), true);
+    assert.equal((await watches.listPending()).length, 0);
+    assert.equal((await watches.list(77)).length, 0);
+  } finally {
+    launches.close();
+    db.close();
+  }
+});
+
 test('Rat Watch queue sends one durable recurrence alert and does not resend it', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
