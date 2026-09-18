@@ -6,6 +6,24 @@ interface TelegramWebhookResponse {
   result?: boolean;
 }
 
+interface TelegramWebhookInfoResponse {
+  ok?: boolean;
+  description?: string;
+  result?: {
+    url?: string;
+    pending_update_count?: number;
+    last_error_date?: number;
+    last_error_message?: string;
+  };
+}
+
+export interface TelegramWebhookVerification {
+  url: string;
+  pendingUpdateCount: number;
+  lastErrorDate: number | null;
+  lastErrorMessage: string | null;
+}
+
 export function validateTelegramWebhookUrl(value: string): string {
   let url: URL;
   try {
@@ -40,4 +58,30 @@ export async function registerTelegramWebhook(
   if (!response.ok || parsed.ok !== true || parsed.result !== true) {
     throw new Error('TELEGRAM_WEBHOOK_REGISTRATION_FAILED');
   }
+}
+
+
+export async function verifyTelegramWebhook(
+  token: string,
+  expectedWebhookUrl: string,
+  fetchImpl: FetchLike = fetch
+): Promise<TelegramWebhookVerification> {
+  const expected = validateTelegramWebhookUrl(expectedWebhookUrl);
+  const response = await fetchImpl(`https://api.telegram.org/bot${token}/getWebhookInfo`);
+  let parsed: TelegramWebhookInfoResponse = {};
+  try { parsed = await response.json() as TelegramWebhookInfoResponse; } catch {}
+  const info = parsed.result;
+  if (!response.ok || parsed.ok !== true || !info) {
+    throw new Error('TELEGRAM_WEBHOOK_INFO_FAILED');
+  }
+  const actual = typeof info.url === 'string' ? info.url : '';
+  if (actual !== expected) throw new Error('TELEGRAM_WEBHOOK_URL_MISMATCH');
+
+  const pending = Number.isSafeInteger(info.pending_update_count) ? info.pending_update_count! : 0;
+  return {
+    url: actual,
+    pendingUpdateCount: pending,
+    lastErrorDate: Number.isSafeInteger(info.last_error_date) ? info.last_error_date! : null,
+    lastErrorMessage: typeof info.last_error_message === 'string' ? info.last_error_message : null
+  };
 }

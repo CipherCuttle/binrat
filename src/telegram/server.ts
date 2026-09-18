@@ -5,7 +5,7 @@ import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } fr
 import { PerChatRateGate, UpdateDeliveryFence, webhookStatusForDuplicateBegin } from './deliveryGuard.js';
 import { TelegramReplyLedger } from './replyLedger.js';
 import { parseRepliesEnabled } from './control.js';
-import { registerTelegramWebhook } from './webhook.js';
+import { registerTelegramWebhook, verifyTelegramWebhook } from './webhook.js';
 
 interface TelegramChat {
   id: number;
@@ -120,6 +120,15 @@ if (webhookUrl) {
     event: 'TELEGRAM_WEBHOOK_REGISTERED',
     botUsername: botIdentity.username ?? null,
     webhookUrl
+  }));
+  const webhookInfo = await verifyTelegramWebhook(token, webhookUrl);
+  console.log(JSON.stringify({
+    event: 'TELEGRAM_WEBHOOK_VERIFIED',
+    botUsername: botIdentity.username ?? null,
+    webhookUrl: webhookInfo.url,
+    pendingUpdateCount: webhookInfo.pendingUpdateCount,
+    lastErrorDate: webhookInfo.lastErrorDate,
+    lastErrorMessage: webhookInfo.lastErrorMessage
   }));
 }
 const updateFence = new UpdateDeliveryFence();

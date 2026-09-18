@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { registerTelegramWebhook, validateTelegramWebhookUrl } from '../src/telegram/webhook.js';
+import { registerTelegramWebhook, validateTelegramWebhookUrl, verifyTelegramWebhook } from '../src/telegram/webhook.js';
 
 test('webhook URL must be HTTPS', () => {
   assert.throws(() => validateTelegramWebhookUrl('http://example.test/hook'), /TELEGRAM_WEBHOOK_URL_INVALID/);
@@ -50,5 +50,53 @@ test('webhook registration fails closed on Telegram rejection', async () => {
       fakeFetch
     ),
     /TELEGRAM_WEBHOOK_REGISTRATION_FAILED/
+  );
+});
+
+
+test('webhook verification returns only sanitized delivery state', async () => {
+  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
+    ok: true,
+    result: {
+      url: 'https://binrat.example.test/telegram/webhook',
+      pending_update_count: 0
+    }
+  }), {
+    status: 200,
+    headers: { 'content-type': 'application/json' }
+  });
+
+  const result = await verifyTelegramWebhook(
+    '123:secret',
+    'https://binrat.example.test/telegram/webhook',
+    fakeFetch
+  );
+  assert.deepEqual(result, {
+    url: 'https://binrat.example.test/telegram/webhook',
+    pendingUpdateCount: 0,
+    lastErrorDate: null,
+    lastErrorMessage: null
+  });
+});
+
+test('webhook verification fails closed on URL mismatch', async () => {
+  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
+    ok: true,
+    result: {
+      url: 'https://wrong.example.test/telegram/webhook',
+      pending_update_count: 0
+    }
+  }), {
+    status: 200,
+    headers: { 'content-type': 'application/json' }
+  });
+
+  await assert.rejects(
+    () => verifyTelegramWebhook(
+      '123:secret',
+      'https://binrat.example.test/telegram/webhook',
+      fakeFetch
+    ),
+    /TELEGRAM_WEBHOOK_URL_MISMATCH/
   );
 });
