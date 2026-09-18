@@ -108,7 +108,11 @@ export async function handleSyncQueueBatch(
       }
 
       message.ack();
-      if (result.status === 'SUCCESS' && result.liveCaughtUp) {
+      if (
+        result.status === 'SUCCESS' &&
+        result.liveCaughtUp &&
+        shouldEnqueueObservation(message.body.enqueuedAtMs)
+      ) {
         await enqueueObservationCycle(env, deps.now()).catch((error) => {
           console.error(JSON.stringify({
             event: 'OBSERVATION_ENQUEUE_FAILED',
@@ -375,6 +379,10 @@ function httpStatus(error: unknown): number | null {
   return Number.isInteger(status) && Number(status) >= 100 && Number(status) <= 599
     ? Number(status)
     : null;
+}
+
+function shouldEnqueueObservation(enqueuedAtMs: number): boolean {
+  return Math.floor(enqueuedAtMs / 60_000) % 2 === 0;
 }
 
 function integerSetting(
