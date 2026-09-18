@@ -168,6 +168,8 @@ export function understandRatMessage(
   if (
     hasAny(doc, ['why', 'purpose', 'point']) ||
     /\bwhat (?:is|does) binrat\b/i.test(lower) ||
+    /\bwhat are you for\b/i.test(lower) ||
+    /\bwhat does this do\b/i.test(lower) ||
     /\bwhy should (?:i|anyone) care\b/i.test(lower)
   ) {
     return result('WHY', '', 'STRONG_RULE', false, identityRiskLanguage);
