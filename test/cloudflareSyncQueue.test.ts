@@ -12,6 +12,8 @@ import type {
   D1ResultLike
 } from '../src/cloudflare/d1Types.js';
 import {
+  handleSyncQueueBatch,
+  runCloudflareObservationCycle,
   runCloudflareSyncCycle,
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
@@ -69,6 +71,10 @@ function message(id: string, at = 1_000): BinratSyncMessage {
   return { kind: 'SYNC_CYCLE', cycleId: id, enqueuedAtMs: at };
 }
 
+function observationMessage(id: string, at = 1_000): BinratSyncMessage {
+  return { kind: 'OBSERVATION_CYCLE', cycleId: id, enqueuedAtMs: at };
+}
+
 test('Cloudflare sync cycle catches live window first and advances history in bounded batches', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
@@ -96,7 +102,25 @@ test('Cloudflare sync cycle catches live window first and advances history in bo
     assert.equal(state?.targetBlock, source.head - 2n);
     assert.equal(state?.historyBackfillTargetBlock, ARCPAD_START_BLOCK + 3_999n);
     assert.equal(state?.lastSyncError, null);
-    assert.equal(state?.observationReady, true);
+    assert.equal(state?.observationReady, false);
+    const liveUpdatedAtMs = state!.updatedAtMs;
+
+    const observation = await runCloudflareObservationCycle(
+      {
+        DB: db,
+        BINRAT_CONFIRMATIONS: '2',
+        BINRAT_MAX_OBSERVATIONS_PER_SYNC: '1'
+      },
+      observationMessage('observation-1'),
+      {
+        now: () => 99_000,
+        observationSource: observations
+      }
+    );
+    assert.deepEqual(observation, { status: 'SUCCESS', observationReady: true });
+    const afterObservation = await runtime.get();
+    assert.equal(afterObservation?.observationReady, true);
+    assert.equal(afterObservation?.updatedAtMs, liveUpdatedAtMs);
 
     const cursorAfterFirst = await db.prepare(
       'SELECT next_block FROM launch_history_backfill_state WHERE chain_id = ?'
@@ -138,22 +162,29 @@ test('observation failures preserve a sanitized error class without blocking liv
   }
 
   try {
-    const result = await runCloudflareSyncCycle(
+    await runCloudflareSyncCycle(
       {
         DB: db,
         BINRAT_LIVE_LOOKBACK_BLOCKS: '1000',
         BINRAT_MAX_BATCH_BLOCKS: '1000',
         BINRAT_CONFIRMATIONS: '2'
       },
-      message('cycle-observation-fail'),
+      message('cycle-before-observation-fail'),
+      {
+        now: () => 14_000,
+        launchSource: source
+      }
+    );
+    const result = await runCloudflareObservationCycle(
+      { DB: db, BINRAT_CONFIRMATIONS: '2' },
+      observationMessage('cycle-observation-fail'),
       {
         now: () => 15_000,
-        launchSource: source,
         observationSource: new FailingObservationSource(source.head)
       }
     );
 
-    assert.deepEqual(result, { status: 'SUCCESS', liveCaughtUp: true });
+    assert.deepEqual(result, { status: 'SUCCESS', observationReady: false });
     const state = await new D1RuntimeStateStore(db, 5042).get();
     assert.equal(state?.sourceVerified, true);
     assert.equal(state?.liveCaughtUp, true);
@@ -180,21 +211,72 @@ test('observation HTTP failures expose only sanitized status diagnostics', async
   }
 
   try {
-    const result = await runCloudflareSyncCycle(
+    await runCloudflareSyncCycle(
       { DB: db },
-      message('cycle-observation-429'),
+      message('cycle-before-observation-429'),
+      {
+        now: () => 15_500,
+        launchSource: source
+      }
+    );
+    const result = await runCloudflareObservationCycle(
+      { DB: db },
+      observationMessage('cycle-observation-429'),
       {
         now: () => 16_000,
-        launchSource: source,
         observationSource: new RateLimitedObservationSource(source.head)
       }
     );
 
-    assert.deepEqual(result, { status: 'SUCCESS', liveCaughtUp: true });
+    assert.deepEqual(result, { status: 'SUCCESS', observationReady: false });
     const state = await new D1RuntimeStateStore(db, 5042).get();
     assert.equal(state?.observationReady, false);
     assert.equal(state?.lastObservationError, 'OBSERVATION_HTTP_429');
     assert.equal(state?.lastSyncError, null);
+  } finally {
+    db.close();
+  }
+});
+
+test('successful live queue work schedules one separate observation job', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakeLaunchSource();
+  const sent: BinratSyncMessage[] = [];
+  let acked = 0;
+  let retried = 0;
+  let now = 17_000;
+
+  try {
+    await handleSyncQueueBatch(
+      {
+        messages: [{
+          body: message('cycle-dispatch'),
+          ack() { acked += 1; },
+          retry() { retried += 1; }
+        }]
+      },
+      {
+        DB: db,
+        SYNC_QUEUE: {
+          async send(body) {
+            sent.push(body);
+          }
+        },
+        BINRAT_LIVE_LOOKBACK_BLOCKS: '1000',
+        BINRAT_MAX_BATCH_BLOCKS: '1000',
+        BINRAT_CONFIRMATIONS: '2'
+      },
+      {
+        now: () => now++,
+        launchSource: source
+      }
+    );
+
+    assert.equal(acked, 1);
+    assert.equal(retried, 0);
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0]?.kind, 'OBSERVATION_CYCLE');
   } finally {
     db.close();
   }
