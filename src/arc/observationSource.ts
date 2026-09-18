@@ -46,6 +46,11 @@ export class ArcObservationSource {
     this.client = options.client ?? createPublicClient({ chain: arcMainnet(rpcUrl!), transport: http(rpcUrl) });
   }
 
+  async getHeadBlockNumber(): Promise<bigint> {
+    await this.assertChain();
+    return this.client.getBlockNumber();
+  }
+
   async getBlockPoint(blockNumber: bigint): Promise<ObservationBlockPoint> {
     await this.assertChain();
     const block = await this.client.getBlock({ blockNumber });
@@ -54,6 +59,60 @@ export class ArcObservationSource {
       blockNumber,
       blockHash: block.hash as Hex,
       timestampMs: Number(block.timestamp) * 1000
+    };
+  }
+
+  async readObservationFacts(launch: LaunchObserved, blockNumber: bigint) {
+    if (launch.chainId !== ARC_CHAIN_ID) throw new Error(`OBSERVATION_LAUNCH_CHAIN_MISMATCH:${launch.launchId}`);
+    await this.assertChain();
+    const pool = launch.pool as Address;
+    const token = launch.token as Address;
+    const creator = launch.creator as Address;
+    const code = await this.client.getBytecode({ address: pool, blockNumber });
+    if (!code || code === '0x') throw new Error(`OBSERVATION_POOL_CODE_MISSING:${launch.pool}:block=${blockNumber}`);
+
+    const [slot0, activeLiquidity, creatorTokenBalance, tokenTotalSupply, tokenDecimals] = await Promise.all([
+      this.client.readContract({
+        address: pool,
+        abi: poolObservationAbi,
+        functionName: 'slot0',
+        blockNumber
+      }),
+      this.client.readContract({
+        address: pool,
+        abi: poolObservationAbi,
+        functionName: 'liquidity',
+        blockNumber
+      }),
+      this.client.readContract({
+        address: token,
+        abi: tokenObservationAbi,
+        functionName: 'balanceOf',
+        args: [creator],
+        blockNumber
+      }),
+      this.client.readContract({
+        address: token,
+        abi: tokenObservationAbi,
+        functionName: 'totalSupply',
+        blockNumber
+      }),
+      this.client.readContract({
+        address: token,
+        abi: tokenObservationAbi,
+        functionName: 'decimals',
+        blockNumber
+      })
+    ]);
+
+    return {
+      poolCodePresent: true,
+      poolActiveLiquidity: activeLiquidity,
+      poolSqrtPriceX96: slot0[0],
+      poolTick: slot0[1],
+      creatorTokenBalance,
+      tokenTotalSupply,
+      tokenDecimals
     };
   }
 

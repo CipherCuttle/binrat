@@ -100,10 +100,27 @@ Gate:
 - if they do not, continue forward-only observation collection and ship Creator Files anyway;
 - do not add a paid provider merely to satisfy this gate.
 
+## Historical capability result
+
+Gate executed on 2026-09-18 against Arc mainnet chain 5042 using the public RPC and a real indexed ArcPad launch.
+
+Observed at launch block `21368989`:
+
+- historical block/hash/timestamp read: PASS;
+- pool bytecode: present;
+- pool `slot0()`: PASS;
+- pool `liquidity()`: PASS;
+- creator token `balanceOf()`: PASS;
+- token `totalSupply()` + `decimals()`: PASS.
+
+Result: `historicalReconstructionSupported=true`.
+
+The diagnostic workflow used to establish this result is intentionally removed after the gate so it does not become permanent CI/network debt.
+
 ## Planned implementation commits
 
 1. contract + donor freeze + capability probe + observation ledger skeleton;
-2. deeper ArcPad backfill + 5m/1h/24h observation sync;
+2. 5m/1h/24h historical/forward observation sync;
 3. Creator File + WHAT CHANGED projections + additive API;
 4. UI integration + small animation island + visible roadmap;
 5. integrated verification and one hostile review.

@@ -4,8 +4,10 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { ArcPadLaunchSource } from './arc/arcpadSource.js';
+import { ArcObservationSource } from './arc/observationSource.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from './arc/chain.js';
-import { runLaunchWatcher, type SyncOptions } from './indexer/syncLaunches.js';
+import { syncLaunches, type SyncOptions } from './indexer/syncLaunches.js';
+import { syncObservations } from './observations/syncObservations.js';
 import { projectPublicFeed } from './public/project.js';
 import { projectCreatorFile } from './public/creatorFile.js';
 import { SqliteStore } from './store/sqliteStore.js';
@@ -56,11 +58,19 @@ async function watch(): Promise<void> {
       await source.assertAuthority(await source.getHeadBlockNumber());
       // Existing databases must pass checkpoint validation before being advertised ready.
       if (!(await store.getCheckpoint())) sourceVerified = true;
-      await runLaunchWatcher(source, store, options, controller.signal, (report) => {
-        sourceVerified = true;
-        lastSyncError = null;
-        console.log(JSON.stringify({ event: 'INDEX_SYNC', ...report }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+
+      const launchReport = await syncLaunches(source, store, options);
+      sourceVerified = true;
+      lastSyncError = null;
+      console.log(JSON.stringify({ event: 'INDEX_SYNC', ...launchReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+
+      const observationSource = new ArcObservationSource();
+      const observationReport = await syncObservations(observationSource, store, {
+        confirmations: baseOptions.confirmations,
+        maxObservationsPerSync: integerEnv('BINRAT_MAX_OBSERVATIONS_PER_SYNC', 12, 1)
       });
+      console.log(JSON.stringify({ event: 'OBSERVATION_SYNC', ...observationReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+      await delay(pollIntervalMs, undefined, { signal: controller.signal }).catch(() => {});
     } catch (error) {
       sourceVerified = false;
       lastSyncError = syncErrorCode(error);

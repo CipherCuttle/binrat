@@ -18,7 +18,8 @@
     "backfill": "tsx src/cli.ts backfill",
     "watch": "tsx src/cli.ts watch",
     "inspect": "tsx src/cli.ts inspect",
-    "probe:observations": "tsx src/observationProbeCli.ts"
+    "probe:observations": "tsx src/observationProbeCli.ts",
+    "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
