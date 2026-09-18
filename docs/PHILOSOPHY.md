@@ -1,6 +1,6 @@
 # BINRAT PHILOSOPHY V0
 
-Status: product doctrine / non-token commitment  
+Status: product doctrine / early fair-launch commitment  
 Base product: Intelligence V1 at `69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3`
 
 ## The rat remembers
@@ -59,28 +59,44 @@ Economic stake may provide Sybil resistance and punish spam. Evidence decides ev
 
 ### 6. The product must survive the token going to zero
 
-Core indexing, receipts, Creator Files, Trash Trails, historical replay, and public evidence must not require a token to remain truthful.
+Core indexing, receipts, Creator Files, Trash Trails, historical replay, and public evidence must remain truthful regardless of the market price of `$BINRAT`.
 
-If a token is introduced, it exists to solve a real multi-party coordination problem, not to manufacture demand for the interface.
+The token can fund, coordinate, gate optional features, and create a degen/community layer. It does not own evidence authority.
 
-### 7. Earn the token
+### 7. Launch early, build utility in public
 
-BINRAT starts with off-chain **Rat Credits**.
+BINRAT intends to fair-launch `$BINRAT` early in the project rather than wait until every roadmap utility exists.
 
-Rat Credits are a product experiment for:
+The reason is explicit: the launch is intended to help bankroll continued development while giving the community a native coordination/culture asset from the beginning.
+
+Fair-launch doctrine:
+
+- no private presale or discounted insider round;
+- no hidden team allocation;
+- no promise of returns or future token value;
+- launch mechanics, creator/project fees, any founder purchase, and treasury wallets are disclosed;
+- project funding from token-related fees is tracked publicly;
+- roadmap utility is labeled SHIPPED, BUILDING, PLANNED, or EXPERIMENTAL.
+
+The token should become more useful as BINRAT ships, but roadmap utility is a product commitment, not a price claim.
+
+### 8. Rat Credits are earned reputation-adjacent coordination units
+
+Rat Credits remain off-chain and non-transferable.
+
+They are earned or spent through product activity such as:
 
 - evidence contribution;
+- Trash Hunts;
 - bounties;
 - challenges;
 - proof-of-first;
-- contributor reputation;
-- anti-spam bonds.
+- anti-spam bonds;
+- useful community work.
 
-A transferable `$BINRAT` token is justified only if experiments show that unrelated participants genuinely need transferable collateral to coordinate permissionlessly.
+Rat Credits are not equity, yield, or an automatic claim on `$BINRAT`.
 
-If a normal database balance solves the problem equally well, no token is required.
-
-### 8. Reputation is earned, not bought
+### 9. Reputation is earned, not bought
 
 Contributor reputation is non-transferable and evidence-derived.
 
@@ -96,7 +112,7 @@ Useful dimensions may include:
 
 A wealthy account with bad evidence should be less trusted than a small account with a strong record.
 
-### 9. Creators retain a right of reply, not a right to rewrite history
+### 10. Creators retain a right of reply, not a right to rewrite history
 
 A creator may prove control of an address and attach signed context.
 
@@ -104,7 +120,7 @@ That context is clearly labeled as a creator-signed claim.
 
 It never deletes or rewrites prior receipts.
 
-### 10. Automation must remain attributable
+### 11. Automation must remain attributable
 
 Bots, researchers, indexers, models, and humans may contribute evidence in the future.
 
