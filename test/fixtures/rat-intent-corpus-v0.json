@@ -1,0 +1,662 @@
+{
+  "schemaVersion": "binrat.rat-intent-corpus/0.1",
+  "frozenAt": "2026-09-18",
+  "purpose": "Pre-beta routing torture corpus. Once committed, changes require an explicit corpus-version bump.",
+  "cases": [
+    {
+      "text": "rat status",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "binrat status pls",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat what have you built?",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat what have you shipped?",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat are you live",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat progress report",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat health",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat is the index working",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat roadmap",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat whats next",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat what is next",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "binrat what is coming",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat planned stuff",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat show the plan",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat next on roadmap",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat what are you building next",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat why binrat",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat what is binrat",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat what does binrat do",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat whats the point",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat purpose?",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "why should anyone care about binrat",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat why should i care",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "binrat what are you for",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat wen token",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat token status",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat is the coin live",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat $binrat",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat what about rat credits",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat coin",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "binrat token",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat token launched?",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat proof",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat show the rules",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat doctrine",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat evidence rules",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat truth rules",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "binrat proof",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat what counts as evidence",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat receipts doctrine",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat check creator 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat dev history 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat wallet history 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat did this dev rug before 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat previous launches 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "binrat creator 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat what did this dev sell 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat same guy? 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "binrat 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat check 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat inspect 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat sniff 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat address 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat whats this 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat lookup 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat replay aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat timeline aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat what happened aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat what happened after launch aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat show 5m 1h 24h aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "binrat replay bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat after the launch bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat timeline for bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat receipt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "rat proof aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "binrat receipt bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "rat receipt for bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "rat give me the receipt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "rat proof for bag bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "rat bag aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "rat launch aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "rat token aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "binrat bag bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "rat inspect bag bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "rat launch id aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "rat should i buy this?",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat should i sell it?",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat should i ape this?",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat buy this now",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat sell it now",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat wen moon",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat snipe this",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat entry here?",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat is this safe?",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat is this legit?",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat scam?",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat rug?",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat honest dev?",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat is this dangerous",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat safety check",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "binrat is this good?",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat glorbledorf",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat ???",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat potato",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat explain the purple spoon",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "binrat blargh",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat what about the thing",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat hmm",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat ??? wen ???",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "wen moon?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "is this safe?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "what have you built?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "roadmap?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "token live?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "check this wallet",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "what happened after launch",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "show me proof",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "hello everyone",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "nice chart",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "gm",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "lol",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "this dev rugged",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "should i buy this?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "status?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "what is binrat",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "what have you built?",
+      "allowUnaddressed": true,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "status",
+      "allowUnaddressed": true,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "is the index working?",
+      "allowUnaddressed": true,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "wen token?",
+      "allowUnaddressed": true,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "is the coin live?",
+      "allowUnaddressed": true,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "what is binrat?",
+      "allowUnaddressed": true,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "why should i care?",
+      "allowUnaddressed": true,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "should i ape this?",
+      "allowUnaddressed": true,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "wen moon",
+      "allowUnaddressed": true,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "is this safe?",
+      "allowUnaddressed": true,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "is this legit?",
+      "allowUnaddressed": true,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "dev history 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": true,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "did this dev rug before 0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": true,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "0x1111111111111111111111111111111111111111",
+      "allowUnaddressed": true,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "what happened aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowUnaddressed": true,
+      "expectedIntent": "REPLAY"
+    }
+  ]
+}

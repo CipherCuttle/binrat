@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { renderRatReply, validateCapabilityManifest, type CapabilityManifest } from '../src/telegram/rat.js';
+import {
+  renderRatReply,
+  renderRatReplyDetailed,
+  validateCapabilityManifest,
+  type CapabilityManifest
+} from '../src/telegram/rat.js';
 
 const manifest: CapabilityManifest = {
   schemaVersion: 'binrat.capability-manifest/0.1',
@@ -35,6 +40,27 @@ test('token answer is sourced from fail-closed launch authorization', async () =
   assert.match(reply ?? '', /marketing authorized: NO/);
   assert.match(reply ?? '', /launch authorized: NO/);
   assert.match(reply ?? '', /not equity, revenue share, or yield/i);
+});
+
+test('remote manifest failure revokes launch and marketing authority in replies', async () => {
+  const authorizedLocal: CapabilityManifest = {
+    ...manifest,
+    launchAuthorization: {
+      ...manifest.launchAuthorization,
+      status: 'AUTHORIZED',
+      marketingAuthorized: true,
+      launchAuthorized: true,
+      tokenState: 'LAUNCHED'
+    }
+  };
+  const remoteConfig = { ...config, manifest: authorizedLocal, manifestMode: 'REMOTE_FAIL_CLOSED' as const };
+  const fakeFetch: typeof fetch = async () => new Response('{}', { status: 503 });
+
+  const reply = await renderRatReply('/token', remoteConfig, fakeFetch);
+  assert.match(reply ?? '', /launch authorization: UNVERIFIED_REMOTE_STATUS/);
+  assert.match(reply ?? '', /marketing authorized: NO/);
+  assert.match(reply ?? '', /launch authorized: NO/);
+  assert.match(reply ?? '', /token state: UNVERIFIED/);
 });
 
 test('roadmap answer reports canonical capability states instead of hard-coded shipped claims', async () => {
@@ -77,6 +103,7 @@ test('invalid creator address fails before network lookup', async () => {
 
 test('creator answer preserves identity boundary and receipt', async () => {
   const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
+    schemaVersion: 'binrat.creator-file/0.1',
     reportedCreatorAddress: '0x1111111111111111111111111111111111111111',
     indexedLaunchCount: 3,
     firstIndexedBlock: '100',
@@ -89,6 +116,78 @@ test('creator answer preserves identity boundary and receipt', async () => {
   assert.match(reply ?? '', /indexed launches: 3/);
   assert.match(reply ?? '', /binrat-creator:abc/);
   assert.match(reply ?? '', /not proof of common human identity/i);
+});
+
+test('bare token address resolves to its bag instead of pretending to be a creator', async () => {
+  const launchId='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  const fakeFetch: typeof fetch = async (input) => {
+    const url=String(input);
+    if (url.endsWith('/api/feed')) return new Response(JSON.stringify({
+      schemaVersion: 'binrat.public-feed/0.1',
+      bags: [{
+        id: launchId,
+        token: '0x1111111111111111111111111111111111111111',
+        pool: '0x2222222222222222222222222222222222222222',
+        reportedCreatorAddress: '0x3333333333333333333333333333333333333333'
+      }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+    if (url.endsWith('/api/bag/'+launchId)) return new Response(JSON.stringify({
+      schemaVersion: 'binrat.public-feed/0.1',
+      asOfBlock: '500',
+      historyCoverage: 'UNVERIFIED',
+      bag: {
+        id: launchId,
+        symbol: 'RAT',
+        name: 'Rat Bag',
+        reportedCreatorAddress: '0x3333333333333333333333333333333333333333',
+        trashTrail: { priorLaunchCount: 2, coverage: 'UNVERIFIED' }
+      },
+      receipt: { receiptId: 'binrat-public:'+'a'.repeat(64) }
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+    return new Response('{}', { status: 404 });
+  };
+
+  const reply = await renderRatReply('rat 0x1111111111111111111111111111111111111111', config, fakeFetch);
+  assert.match(reply ?? '', /RAT — Rat Bag/);
+  assert.match(reply ?? '', /prior launches from same reported address: 2/);
+  assert.doesNotMatch(reply ?? '', /Creator File/);
+});
+
+test('address with multiple indexed roles asks for disambiguation', async () => {
+  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
+    schemaVersion: 'binrat.public-feed/0.1',
+    bags: [{
+      id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      token: '0x1111111111111111111111111111111111111111',
+      pool: '0x2222222222222222222222222222222222222222',
+      reportedCreatorAddress: '0x1111111111111111111111111111111111111111'
+    }]
+  }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+  const reply = await renderRatReply('rat 0x1111111111111111111111111111111111111111', config, fakeFetch);
+  assert.match(reply ?? '', /multiple meanings/i);
+  assert.match(reply ?? '', /REPORTED_CREATOR, TOKEN/);
+});
+
+test('Replay consumer rejects schema drift instead of synthesizing a timeline', async () => {
+  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
+    schemaVersion: 'binrat.replay-bundle/99.0',
+    stages: [{ label: '5m', status: 'COMPLETE' }]
+  }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+  const reply = await renderRatReply('/replay aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', config, fakeFetch);
+  assert.match(reply ?? '', /no replayable indexed launch/i);
+  assert.match(reply ?? '', /violated the public API contract/i);
+  assert.doesNotMatch(reply ?? '', /5m COMPLETE/);
+});
+
+test('reply metadata binds exact non-user-text answer plan to the rendered text', async () => {
+  const detailed = await renderRatReplyDetailed('/token', config);
+  assert.ok(detailed);
+  assert.match(detailed!.planDigest, /^[0-9a-f]{64}$/);
+  assert.equal(detailed!.answerPlan.intent, 'TOKEN');
+  assert.equal(detailed!.answerPlan.schemaVersion, 'binrat.rat-answer-plan/0.2');
+  assert.equal(JSON.stringify(detailed!.answerPlan).includes('/token'), false);
 });
 
 test('irrelevant ordinary chat is ignored', async () => {
