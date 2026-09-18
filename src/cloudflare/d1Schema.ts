@@ -93,12 +93,22 @@ CREATE TABLE IF NOT EXISTS chain_checkpoints (
 CREATE TABLE IF NOT EXISTS binrat_runtime_state (
   chain_id INTEGER PRIMARY KEY,
   source_verified INTEGER NOT NULL,
+  live_caught_up INTEGER NOT NULL,
+  head_block TEXT,
+  target_block TEXT,
   observation_ready INTEGER NOT NULL,
   history_backfill_complete INTEGER NOT NULL,
   history_backfill_target_block TEXT,
   last_sync_error TEXT,
   last_history_error TEXT,
   last_observation_error TEXT,
+  updated_at_ms INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS binrat_sync_leases (
+  lease_name TEXT PRIMARY KEY,
+  owner_token TEXT NOT NULL,
+  lease_until_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
 );
 

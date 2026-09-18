@@ -3,6 +3,9 @@ import type { D1DatabaseLike } from './d1Types.js';
 export interface D1RuntimeState {
   chainId: number;
   sourceVerified: boolean;
+  liveCaughtUp: boolean;
+  headBlock: bigint | null;
+  targetBlock: bigint | null;
   observationReady: boolean;
   historyBackfillComplete: boolean;
   historyBackfillTargetBlock: bigint | null;
@@ -26,6 +29,9 @@ export class D1RuntimeStateStore {
     return {
       chainId: row.chain_id,
       sourceVerified: row.source_verified === 1,
+      liveCaughtUp: row.live_caught_up === 1,
+      headBlock: row.head_block === null ? null : BigInt(row.head_block),
+      targetBlock: row.target_block === null ? null : BigInt(row.target_block),
       observationReady: row.observation_ready === 1,
       historyBackfillComplete: row.history_backfill_complete === 1,
       historyBackfillTargetBlock: row.history_backfill_target_block === null
@@ -44,12 +50,15 @@ export class D1RuntimeStateStore {
     }
     const result = await this.db.prepare(`
       INSERT INTO binrat_runtime_state (
-        chain_id,source_verified,observation_ready,history_backfill_complete,
-        history_backfill_target_block,last_sync_error,last_history_error,
-        last_observation_error,updated_at_ms
-      ) VALUES (?,?,?,?,?,?,?,?,?)
+        chain_id,source_verified,live_caught_up,head_block,target_block,
+        observation_ready,history_backfill_complete,history_backfill_target_block,
+        last_sync_error,last_history_error,last_observation_error,updated_at_ms
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
       ON CONFLICT(chain_id) DO UPDATE SET
         source_verified=excluded.source_verified,
+        live_caught_up=excluded.live_caught_up,
+        head_block=excluded.head_block,
+        target_block=excluded.target_block,
         observation_ready=excluded.observation_ready,
         history_backfill_complete=excluded.history_backfill_complete,
         history_backfill_target_block=excluded.history_backfill_target_block,
@@ -60,6 +69,9 @@ export class D1RuntimeStateStore {
     `).bind(
       this.chainId,
       state.sourceVerified ? 1 : 0,
+      state.liveCaughtUp ? 1 : 0,
+      state.headBlock?.toString() ?? null,
+      state.targetBlock?.toString() ?? null,
       state.observationReady ? 1 : 0,
       state.historyBackfillComplete ? 1 : 0,
       state.historyBackfillTargetBlock?.toString() ?? null,
@@ -75,6 +87,9 @@ export class D1RuntimeStateStore {
 interface RuntimeRow {
   chain_id: number;
   source_verified: number;
+  live_caught_up: number;
+  head_block: string | null;
+  target_block: string | null;
   observation_ready: number;
   history_backfill_complete: number;
   history_backfill_target_block: string | null;

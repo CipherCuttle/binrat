@@ -10,9 +10,17 @@ import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
 import { D1Store } from './d1Store.js';
 import { D1TelegramLedger } from './telegramLedger.js';
 import type { D1DatabaseLike } from './d1Types.js';
+import {
+  enqueueSyncCycle,
+  handleSyncQueueBatch,
+  type CloudflareSyncEnv,
+  type SyncQueueBatchLike,
+  type SyncQueueProducerLike
+} from './syncQueue.js';
 
-export interface BinratWorkerEnv {
+export interface BinratWorkerEnv extends CloudflareSyncEnv {
   DB: D1DatabaseLike;
+  SYNC_QUEUE?: SyncQueueProducerLike;
   CAPABILITY_MANIFEST_JSON?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
@@ -73,6 +81,12 @@ const botIdentityCache = new Map<string, Promise<TelegramUser>>();
 export default {
   fetch(request: Request, env: BinratWorkerEnv): Promise<Response> {
     return handleWorkerRequest(request, env);
+  },
+  scheduled(_controller: unknown, env: BinratWorkerEnv): Promise<void> {
+    return enqueueSyncCycle(env);
+  },
+  queue(batch: SyncQueueBatchLike, env: BinratWorkerEnv): Promise<void> {
+    return handleSyncQueueBatch(batch, env);
   }
 };
 
@@ -386,7 +400,13 @@ async function health(env: BinratWorkerEnv): Promise<Response> {
   ]);
 
   const fresh = runtime ? runtimeFresh(runtime, maxStatusAgeMs(env)) : false;
-  const indexReady = Boolean(checkpoint && runtime?.sourceVerified && !runtime.lastSyncError && fresh);
+  const indexReady = Boolean(
+    checkpoint &&
+    runtime?.sourceVerified &&
+    runtime.liveCaughtUp &&
+    !runtime.lastSyncError &&
+    fresh
+  );
   const observationReady = Boolean(runtime?.observationReady && !runtime.lastObservationError && fresh);
 
   return json(200, {
@@ -394,6 +414,9 @@ async function health(env: BinratWorkerEnv): Promise<Response> {
     chainId: ARC_CHAIN_ID,
     indexReady,
     checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
+    headBlock: runtime?.headBlock?.toString() ?? null,
+    targetBlock: runtime?.targetBlock?.toString() ?? null,
+    liveCaughtUp: runtime?.liveCaughtUp ?? false,
     launchCount: checkpoint
       ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length
       : 0,
@@ -432,6 +455,7 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
   if (
     !runtime ||
     !runtime.sourceVerified ||
+    !runtime.liveCaughtUp ||
     runtime.lastSyncError ||
     !runtimeFresh(runtime, maxStatusAgeMs(env))
   ) return null;
@@ -458,6 +482,7 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
     !afterRuntime ||
     afterRuntime.updatedAtMs !== runtime.updatedAtMs ||
     !afterRuntime.sourceVerified ||
+    !afterRuntime.liveCaughtUp ||
     afterRuntime.lastSyncError ||
     !runtimeFresh(afterRuntime, maxStatusAgeMs(env))
   ) return null;
@@ -466,7 +491,7 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
 }
 
 function maxStatusAgeMs(env: BinratWorkerEnv): number {
-  return integerSetting(env.BINRAT_MAX_STATUS_AGE_MS, 60_000, 1_000, 3_600_000);
+  return integerSetting(env.BINRAT_MAX_STATUS_AGE_MS, 180_000, 1_000, 3_600_000);
 }
 
 function runtimeFresh(runtime: D1RuntimeState, maxAgeMs: number): boolean {
