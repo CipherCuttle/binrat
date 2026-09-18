@@ -101,3 +101,43 @@ test('observation status cannot claim COMPLETE when evidence is missing', async 
     /OBSERVATION_STATUS_MISMATCH/
   );
 });
+
+
+test('observation receipt cannot claim COMPLETE by omitting facts from missing coverage', async () => {
+  await assert.rejects(
+    buildObservationReceipt({
+      chainId,
+      launchId: launch.launchId,
+      horizonMs: 300_000,
+      targetTimestampMs: 300_000,
+      observedBlock: 15n,
+      observedBlockHash: `0x${'15'.padStart(64, '0')}` as Hex,
+      observedTimestampMs: 300_001,
+      status: 'COMPLETE',
+      facts: { poolCodePresent: true },
+      missing: []
+    }),
+    /OBSERVATION_FACT_COVERAGE_MISMATCH/
+  );
+});
+
+test('partial observation coverage must account for every absent fact surface exactly once', async () => {
+  const receipt = await buildObservationReceipt({
+    chainId,
+    launchId: launch.launchId,
+    horizonMs: 300_000,
+    targetTimestampMs: 300_000,
+    observedBlock: 15n,
+    observedBlockHash: `0x${'15'.padStart(64, '0')}` as Hex,
+    observedTimestampMs: 300_001,
+    status: 'PARTIAL',
+    facts: {
+      poolCodePresent: true,
+      creatorTokenBalance: 25n,
+      tokenTotalSupply: 100n
+    },
+    missing: ['POOL_SLOT0', 'POOL_LIQUIDITY', 'TOKEN_DECIMALS']
+  });
+  assert.equal(receipt.status, 'PARTIAL');
+  assert.deepEqual(receipt.missing, ['POOL_SLOT0', 'POOL_LIQUIDITY', 'TOKEN_DECIMALS']);
+});

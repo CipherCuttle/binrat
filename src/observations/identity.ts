@@ -49,8 +49,52 @@ function validateInput(input: LaunchObservationInput): void {
   if (!Array.isArray(input.missing) || input.missing.some((item) => typeof item !== 'string' || item.length === 0)) {
     throw new Error('OBSERVATION_MISSING_INVALID');
   }
+  validateFactCoverage(input.facts, input.missing);
   const expectedStatus = input.missing.length === 0 ? 'COMPLETE' : Object.keys(input.facts).length > 0 ? 'PARTIAL' : 'UNVERIFIED';
   if (input.status !== expectedStatus) throw new Error(`OBSERVATION_STATUS_MISMATCH:expected=${expectedStatus}:actual=${input.status}`);
+}
+
+const OBSERVATION_MISSING_CODES = new Set([
+  'POOL_CODE',
+  'POOL_SLOT0',
+  'POOL_LIQUIDITY',
+  'CREATOR_BALANCE',
+  'TOKEN_TOTAL_SUPPLY',
+  'TOKEN_DECIMALS'
+]);
+
+function validateFactCoverage(
+  facts: LaunchObservationInput['facts'],
+  missingItems: readonly string[]
+): void {
+  const missing = new Set(missingItems);
+  if (missing.size !== missingItems.length) throw new Error('OBSERVATION_MISSING_DUPLICATE');
+  for (const code of missing) {
+    if (!OBSERVATION_MISSING_CODES.has(code)) throw new Error(`OBSERVATION_MISSING_CODE_UNSUPPORTED:${code}`);
+  }
+
+  requireCoverage('POOL_CODE', facts.poolCodePresent !== undefined, missing);
+  const hasSqrt = facts.poolSqrtPriceX96 !== undefined;
+  const hasTick = facts.poolTick !== undefined;
+  if (hasSqrt !== hasTick) throw new Error('OBSERVATION_SLOT0_FACT_INCOMPLETE');
+  requireCoverage('POOL_SLOT0', hasSqrt && hasTick, missing);
+  requireCoverage('POOL_LIQUIDITY', facts.poolActiveLiquidity !== undefined, missing);
+  requireCoverage('CREATOR_BALANCE', facts.creatorTokenBalance !== undefined, missing);
+  requireCoverage('TOKEN_TOTAL_SUPPLY', facts.tokenTotalSupply !== undefined, missing);
+  requireCoverage('TOKEN_DECIMALS', facts.tokenDecimals !== undefined, missing);
+
+  if (
+    facts.poolCodePresent === false &&
+    (facts.poolActiveLiquidity !== undefined || facts.poolSqrtPriceX96 !== undefined || facts.poolTick !== undefined)
+  ) {
+    throw new Error('OBSERVATION_POOL_FACTS_WITHOUT_CODE');
+  }
+}
+
+function requireCoverage(code: string, present: boolean, missing: ReadonlySet<string>): void {
+  if (present === missing.has(code)) {
+    throw new Error(`OBSERVATION_FACT_COVERAGE_MISMATCH:${code}`);
+  }
 }
 
 function validateHorizon(horizonMs: number): void {

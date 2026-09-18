@@ -193,7 +193,15 @@ test('fully observed launches do not trigger per-launch historical RPC scans', a
         observedBlockHash: hash(BigInt(20 + i)),
         observedTimestampMs: targetTimestampMs + 1,
         status: 'COMPLETE',
-        facts: { poolCodePresent: true },
+        facts: {
+          poolCodePresent: true,
+          poolActiveLiquidity: 100n,
+          poolSqrtPriceX96: 1000n,
+          poolTick: 1,
+          creatorTokenBalance: 10n,
+          tokenTotalSupply: 100n,
+          tokenDecimals: 18
+        },
         missing: []
       });
       await store.putObservation(receipt);
