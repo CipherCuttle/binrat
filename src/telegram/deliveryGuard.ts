@@ -60,3 +60,8 @@ export class PerChatRateGate {
     return true;
   }
 }
+
+
+export function webhookStatusForDuplicateBegin(result: 'SEEN' | 'IN_FLIGHT'): 200 | 503 {
+  return result === 'IN_FLIGHT' ? 503 : 200;
+}

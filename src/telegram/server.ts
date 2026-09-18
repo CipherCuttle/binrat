@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { resolve } from 'node:path';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from './rat.js';
-import { PerChatRateGate, UpdateDeliveryFence } from './deliveryGuard.js';
+import { PerChatRateGate, UpdateDeliveryFence, webhookStatusForDuplicateBegin } from './deliveryGuard.js';
 import { TelegramReplyLedger } from './replyLedger.js';
 import { parseRepliesEnabled } from './control.js';
 
@@ -159,7 +159,12 @@ const server = createServer(async (request, response) => {
       return;
     }
     if (begin === 'SEEN' || begin === 'IN_FLIGHT') {
-      json(response, 200, { ok: true, duplicate: true });
+      const status = webhookStatusForDuplicateBegin(begin);
+      if (status === 503) {
+        json(response, 503, { ok: false, retryable: true, reason: 'UPDATE_IN_FLIGHT' });
+      } else {
+        json(response, 200, { ok: true, duplicate: true });
+      }
       return;
     }
     if (replyLedger.has(update.update_id)) {

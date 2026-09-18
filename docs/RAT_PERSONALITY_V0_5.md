@@ -158,6 +158,8 @@ Raw user message text is not stored in that reply ledger.
 
 The ledger is SQLite-backed and suppresses an already-recorded update across process restarts **when the configured database path is on persistent storage**.
 
+An in-flight duplicate webhook is deliberately answered with a retryable non-2xx response until the original attempt either becomes durable or releases its fence. A merely in-flight attempt is never acknowledged as delivered.
+
 This is not an exactly-once delivery claim. A process/network failure after Telegram accepted a send but before the local receipt commit can still create an ambiguous retry window. The contract is replay-safe duplicate suppression for recorded deliveries, not mathematically exactly-once messaging.
 
 ## Hard boundaries
