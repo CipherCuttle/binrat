@@ -56,3 +56,25 @@ function validateInput(input: LaunchObservationInput): void {
 function validateHorizon(horizonMs: number): void {
   if (!Number.isInteger(horizonMs) || horizonMs <= 0) throw new Error('OBSERVATION_HORIZON_INVALID');
 }
+
+
+export async function verifyObservationReceipt(receipt: LaunchObservationReceipt): Promise<void> {
+  if (receipt.observationVersion !== OBSERVATION_VERSION) {
+    throw new Error(`OBSERVATION_VERSION_MISMATCH:${receipt.observationVersion}`);
+  }
+  const rebuilt = await buildObservationReceipt({
+    chainId: receipt.chainId,
+    launchId: receipt.launchId,
+    horizonMs: receipt.horizonMs,
+    targetTimestampMs: receipt.targetTimestampMs,
+    observedBlock: receipt.observedBlock,
+    observedBlockHash: receipt.observedBlockHash,
+    observedTimestampMs: receipt.observedTimestampMs,
+    status: receipt.status,
+    facts: receipt.facts,
+    missing: receipt.missing
+  });
+  if (rebuilt.observationId !== receipt.observationId || rebuilt.evidenceDigest !== receipt.evidenceDigest) {
+    throw new Error(`OBSERVATION_INTEGRITY_MISMATCH:${receipt.observationId}`);
+  }
+}

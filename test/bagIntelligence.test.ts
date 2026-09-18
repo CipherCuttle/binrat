@@ -91,3 +91,12 @@ test('future observations are excluded and incomplete horizon coverage stays par
   assert.equal(projected.snapshots.length, 1);
   assert.equal(projected.observationCoverage, 'PARTIAL');
 });
+
+
+test('bag intelligence fails closed on tampered observation evidence', async () => {
+  const five = await receipt(300_000, 110, 10n, 100n);
+  await assert.rejects(
+    projectBagIntelligence(feed, bag, [{ ...five, evidenceDigest: '0'.repeat(64) }]),
+    /OBSERVATION_INTEGRITY_MISMATCH/
+  );
+});

@@ -1,4 +1,5 @@
 import { OBSERVATION_HORIZONS } from '../observations/horizons.js';
+import { verifyObservationReceipt } from '../observations/identity.js';
 import type { LaunchObservationReceipt } from '../observations/types.js';
 import { sha256Hex } from '../evidence/canonical.js';
 import type { PublicBag, PublicCoverage, PublicFeed } from './types.js';
@@ -61,9 +62,13 @@ export async function projectBagIntelligence(
   observations: LaunchObservationReceipt[]
 ): Promise<PublicBagIntelligence> {
   const asOf = BigInt(feed.asOfBlock);
-  const valid = observations
-    .filter((receipt) => receipt.launchId === bag.id && receipt.chainId === feed.chainId && receipt.observedBlock <= asOf)
-    .sort((a, b) => a.horizonMs - b.horizonMs || a.observationId.localeCompare(b.observationId));
+  const valid: LaunchObservationReceipt[] = [];
+  for (const receipt of observations) {
+    if (receipt.launchId !== bag.id || receipt.chainId !== feed.chainId) continue;
+    await verifyObservationReceipt(receipt);
+    if (receipt.observedBlock <= asOf) valid.push(receipt);
+  }
+  valid.sort((a, b) => a.horizonMs - b.horizonMs || a.observationId.localeCompare(b.observationId));
 
   const seen = new Set<number>();
   for (const receipt of valid) {
