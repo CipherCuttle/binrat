@@ -39,6 +39,7 @@ export interface HistoricalCapabilityProbe {
 
 export class ArcObservationSource {
   private readonly client: PublicClient;
+  private chainAssertion: Promise<void> | null = null;
 
   constructor(options: { rpcUrl?: string; client?: PublicClient } = {}) {
     const rpcUrl = options.rpcUrl ?? process.env.ARC_RPC_URL;
@@ -218,9 +219,15 @@ export class ArcObservationSource {
     };
   }
 
-  private async assertChain(): Promise<void> {
-    const actual = await this.client.getChainId();
-    if (actual !== ARC_CHAIN_ID) throw new Error(`ARC_CHAIN_ID_DRIFT:expected=${ARC_CHAIN_ID}:actual=${actual}`);
+  private assertChain(): Promise<void> {
+    if (!this.chainAssertion) {
+      this.chainAssertion = this.client.getChainId().then((actual) => {
+        if (actual !== ARC_CHAIN_ID) {
+          throw new Error(`ARC_CHAIN_ID_DRIFT:expected=${ARC_CHAIN_ID}:actual=${actual}`);
+        }
+      });
+    }
+    return this.chainAssertion;
   }
 }
 
