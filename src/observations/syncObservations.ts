@@ -46,7 +46,7 @@ export async function syncObservations(
   }
   const confirmedHeadBlock = headBlock - options.confirmations;
   const confirmedHeadPoint = await source.getBlockPoint(confirmedHeadBlock);
-  const launches = await store.listLaunches();
+  const launches = [...(await store.listLaunches())].reverse();
   const horizons = [...(options.horizons ?? OBSERVATION_HORIZONS)].sort((a, b) => a.ms - b.ms);
   let remaining = options.maxObservationsPerSync;
   let inserted = 0;

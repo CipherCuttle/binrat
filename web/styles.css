@@ -2714,7 +2714,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   background: radial-gradient(circle 220px at var(--rb-x) var(--rb-y), rgba(139, 32, 125, .13), transparent 75%);
   opacity: 0;
@@ -2723,6 +2723,10 @@ body {
 .rb-spotlight:hover::after,
 .rb-spotlight:focus-within::after {
   opacity: 1;
+}
+.rb-spotlight > * {
+  position: relative;
+  z-index: 1;
 }
 @media (max-width: 760px) {
   .intel-snapshots,

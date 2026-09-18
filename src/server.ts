@@ -21,6 +21,8 @@ mkdirSync(dirname(dbPath), { recursive: true });
 const store = new SqliteStore(dbPath, ARC_CHAIN_ID);
 const controller = new AbortController();
 let lastSyncError: string | null = null;
+let lastObservationError: string | null = null;
+let observationSyncSucceeded = false;
 let sourceVerified = false;
 
 function integerEnv(name: string, fallback: number, minimum: number): number {
@@ -40,7 +42,7 @@ const baseOptions = {
 // Never expose viem error messages: they may contain RPC URLs, headers or credentials.
 function syncErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
-  const code = message.match(/^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+)(?=:|$)/)?.[1];
+  const code = message.match(/^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+)(?=:|$)/)?.[1];
   return code ?? 'SYNC_FAILED';
 }
 
@@ -65,12 +67,21 @@ async function watch(): Promise<void> {
       lastSyncError = null;
       console.log(JSON.stringify({ event: 'INDEX_SYNC', ...launchReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
 
-      const observationSource = new ArcObservationSource();
-      const observationReport = await syncObservations(observationSource, store, {
-        confirmations: baseOptions.confirmations,
-        maxObservationsPerSync: integerEnv('BINRAT_MAX_OBSERVATIONS_PER_SYNC', 12, 1)
-      });
-      console.log(JSON.stringify({ event: 'OBSERVATION_SYNC', ...observationReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+      try {
+        const observationSource = new ArcObservationSource();
+        const observationReport = await syncObservations(observationSource, store, {
+          confirmations: baseOptions.confirmations,
+          maxObservationsPerSync: integerEnv('BINRAT_MAX_OBSERVATIONS_PER_SYNC', 12, 1)
+        });
+        observationSyncSucceeded = true;
+        lastObservationError = null;
+        console.log(JSON.stringify({ event: 'OBSERVATION_SYNC', ...observationReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+      } catch (error) {
+        observationSyncSucceeded = false;
+        const code = syncErrorCode(error);
+        lastObservationError = code === 'SYNC_FAILED' ? 'OBSERVATION_SYNC_FAILED' : code;
+        console.error(JSON.stringify({ event: 'OBSERVATION_ERROR', code: lastObservationError }));
+      }
       await delay(pollIntervalMs, undefined, { signal: controller.signal }).catch(() => {});
     } catch (error) {
       sourceVerified = false;
@@ -122,6 +133,8 @@ const server = createServer(async (request, response) => {
         indexReady: Boolean(checkpoint && sourceVerified && !lastSyncError),
         checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
         launchCount: checkpoint ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length : 0,
+        observationReady: observationSyncSucceeded && !lastObservationError,
+        lastObservationError,
         lastSyncError
       });
       return;

@@ -8,6 +8,7 @@ const drawerClose = document.querySelector("#drawer-close");
 const backdrop = document.querySelector("#backdrop");
 const randomBag = document.querySelector("#random-bag");
 let returnFocus = null;
+let activeDrawerBagId = null;
 let bags = [];
 let activeFilter = "all";
 let activeMode = null;
@@ -333,6 +334,7 @@ if (
 function openBag(id, origin = document.activeElement) {
   const bag = bags.find((item) => item.id === id);
   if (!bag) return;
+  activeDrawerBagId = bag.id;
   returnFocus = origin instanceof HTMLElement ? origin : null;
 
   const trail = bag.trail.length
@@ -430,7 +432,7 @@ async function hydrateBagIntelligence(bag) {
   if (!panel) return;
   try {
     const intel = await loadBagIntelligence(bag.id);
-    if (!intel || !drawer.classList.contains("open")) return;
+    if (!intel || !drawer.classList.contains("open") || activeDrawerBagId !== bag.id) return;
     const snapshots = intel.snapshots.length
       ? intel.snapshots.map(renderObservationSnapshot).join("")
       : '<div class="intel-empty">No matured 5m / 1h / 24h observation receipt yet.</div>';
@@ -446,6 +448,7 @@ async function hydrateBagIntelligence(bag) {
     `;
     window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "intelligence" } }));
   } catch {
+    if (activeDrawerBagId !== bag.id) return;
     panel.innerHTML = '<div class="file-section-heading"><h3>03 / WHAT CHANGED?</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Observation projection is not available. Missing evidence stays missing.</div>';
   }
 }
@@ -455,7 +458,7 @@ async function hydrateCreatorFile(bag) {
   if (!panel) return;
   try {
     const file = await loadCreatorFile(bag.reportedCreatorAddress);
-    if (!file || !drawer.classList.contains("open")) return;
+    if (!file || !drawer.classList.contains("open") || activeDrawerBagId !== bag.id) return;
     const rows = file.launches.slice(0, 8).map((item) => `
       <div class="creator-launch-row">
         <strong>${escapeHtml(item.symbol)}</strong>
@@ -477,6 +480,7 @@ async function hydrateCreatorFile(bag) {
     `;
     window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "creator" } }));
   } catch {
+    if (activeDrawerBagId !== bag.id) return;
     panel.innerHTML = '<div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Creator history projection is not available.</div>';
   }
 }
@@ -578,6 +582,7 @@ function closeDrawer() {
   drawer.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   if (wasOpen && returnFocus?.isConnected) returnFocus.focus();
+  activeDrawerBagId = null;
   returnFocus = null;
 }
 
