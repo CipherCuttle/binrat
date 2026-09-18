@@ -50,6 +50,8 @@ Subject to legal/compliance review immediately before launch, ArcPad is the curr
 
 BINRAT should re-verify the deployed contracts and current ArcPad terms immediately before launch. Product docs are not contract verification.
 
+That verification must produce a dated launch-mechanics receipt binding the contract addresses, relevant code/immutability properties, fee routes, liquidity-lock mechanics, source documents, and verification timestamp used for the launch authorization decision.
+
 ## Treasury doctrine
 
 The project should publish a treasury/funding surface before or at launch.
@@ -90,12 +92,16 @@ The cleanest claim is the claim that can be verified on-chain.
 
 ## Utility ladder
 
-Every utility is labeled one of:
+Capability and utility status comes from `docs/CAPABILITY_MANIFEST_V0.json`.
 
-- **LIVE**
-- **BUILDING**
-- **PLANNED**
-- **EXPERIMENTAL**
+The status model distinguishes:
+
+- **ENGINEERING_PASS** — reviewed implementation passed engineering;
+- **DEPLOYED** — referenced implementation is deployed;
+- **PUBLIC_LIVE** — deployed capability is authorized for public use;
+- **BUILDING**;
+- **PLANNED**;
+- **EXPERIMENTAL**.
 
 ### Launch / early utility
 
@@ -109,10 +115,12 @@ Core receipts and factual evidence must not become inaccessible merely because a
 #### Rat Watch capacity
 Token holding/locking can unlock additional watch slots, richer alert configuration, or community alert channels.
 
-#### Dumpster Raids
-Holders lock tokens to signal which evidence gap, creator cluster, or Case File the community most wants investigated.
+#### Dumpster Raids — post-launch experiment
+Dumpster Raids are not required for Launch V0.
 
-This changes **priority**, not truth.
+If later authorized, holders can lock tokens to signal which evidence gap, creator cluster, or Case File the community most wants investigated.
+
+This changes **priority**, not truth. The locking/unlocking contract, accounting, abuse controls, and applicable compliance treatment require their own bounded gate.
 
 #### Trash Hunts
 Seasonal evidence/research quests.
@@ -203,18 +211,26 @@ Avoid framing such as:
 - manufactured partnership claims;
 - implying roadmap delivery guarantees token value.
 
-## Compliance gate
+## Compliance / launch-authorization lane
 
-Before public launch:
+Compliance begins in parallel with Launch V0 engineering. It is not a final checklist after token-facing product work is complete.
+
+BINRAT adopts a stricter internal fail-closed rule: public token-launch marketing and launch execution remain unauthorized until counsel has determined the applicable obligations and the corresponding disclosure/notification/marketing gates have been satisfied.
+
+Before authorization:
 
 1. determine the legal offeror/issuer structure;
 2. obtain EU/Swedish crypto counsel on classification and launch obligations;
 3. determine the applicable MiCA white-paper/notification/marketing requirements;
-4. produce the required statutory disclosure artifact separately from this product doctrine;
-5. review launch website, Telegram, X, and other marketing for consistency;
-6. freeze and publish the final launch mechanics and treasury addresses;
-7. independently verify the deployed token/launch contracts and fee routes;
-8. only then authorize launch.
+4. produce any required statutory disclosure artifact separately from the product/network paper;
+5. review launch website, Telegram, X, and other token-facing marketing for consistency;
+6. freeze and publish the final launch mechanics and treasury addresses where required/appropriate;
+7. independently verify the deployed token/launch contracts and fee routes and bind them into a dated launch-mechanics receipt;
+8. update the canonical capability manifest with evidence references;
+9. require explicit owner launch authority;
+10. only then authorize launch.
+
+The capability manifest starts with both `marketingAuthorized` and `launchAuthorized` false. Documentation or implementation progress alone must never flip those values.
 
 ## Product invariant
 

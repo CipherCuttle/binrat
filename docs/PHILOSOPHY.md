@@ -76,9 +76,11 @@ Fair-launch doctrine:
 - no promise of returns or future token value;
 - launch mechanics, creator/project fees, any founder purchase, and treasury wallets are disclosed;
 - project funding from token-related fees is tracked publicly;
-- roadmap utility is labeled SHIPPED, BUILDING, PLANNED, or EXPERIMENTAL.
+- roadmap utility/status is sourced from `docs/CAPABILITY_MANIFEST_V0.json` and distinguishes `ENGINEERING_PASS`, `DEPLOYED`, `PUBLIC_LIVE`, `BUILDING`, `PLANNED`, and `EXPERIMENTAL`.
 
 The token should become more useful as BINRAT ships, but roadmap utility is a product commitment, not a price claim.
+
+An engineering-pass capability is not automatically deployed or public-live. Public product copy, Telegram, and roadmap status must not upgrade capability state beyond the canonical manifest.
 
 ### 8. Rat Credits are earned reputation-adjacent coordination units
 

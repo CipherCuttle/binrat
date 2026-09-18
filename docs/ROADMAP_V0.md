@@ -3,7 +3,16 @@
 Status: planning document  
 Rule: roadmap items are not promises, launch dates, or claims of future token value.
 
-## SHIPPED / ENGINEERING-PASS
+## ENGINEERING-PASS / PUBLIC-LIVE NOT YET AUTHORIZED
+
+Status semantics are canonicalized in `docs/CAPABILITY_MANIFEST_V0.json`.
+
+- `ENGINEERING_PASS` means the reviewed implementation passed its engineering gate.
+- `DEPLOYED` means the referenced implementation is deployed.
+- `PUBLIC_LIVE` means the deployed capability is authorized as a public-live product surface.
+- `BUILDING`, `PLANNED`, and `EXPERIMENTAL` describe roadmap state, not shipping claims.
+
+A capability may be `ENGINEERING_PASS` without being `DEPLOYED` or `PUBLIC_LIVE`.
 
 ### Intelligence V1
 
@@ -35,13 +44,27 @@ Launch V0 is the next integrated product stage. It is intentionally smaller than
 Required launch stack:
 
 - Intelligence V1 public evidence surfaces;
-- Telegram Rat;
+- Replay Lab pre-launch technical proof;
+- Telegram Rat deterministic V0;
 - `$BINRAT` fair-launch mechanics frozen and publicly documented;
 - Dumpster Ledger / treasury transparency surface;
 - Rat Den V0;
-- minimal Rat Watch V0;
-- Dumpster Raids V0;
-- legal/compliance launch gate completed.
+- minimal Rat Watch V0.
+
+Legal/compliance is a **parallel authorization lane from the start**, not the last feature in the sequence. Token-facing marketing and launch authority remain fail-closed until the applicable legal/compliance, contract, treasury, and disclosure gates are complete and explicitly authorized in the canonical capability manifest.
+
+### Replay Lab — pre-launch technical proof
+
+Replay Lab demonstrates BINRAT's evidence moat without waiting for fresh launch density:
+
+- real indexed Arc launch evidence;
+- Creator File / Trash Trail context;
+- deterministic launch -> 5m -> 1h -> 24h stages;
+- no future leakage;
+- copyable receipt/evidence bundle;
+- missing stages remain missing rather than simulated.
+
+The current implementation candidate lives in draft PR #13. It is a pre-launch proof surface, not a claim that the later Rat Machine roadmap is complete.
 
 ### Dumpster Ledger
 
@@ -81,7 +104,9 @@ Launch with the smallest useful alert loop:
 
 Advanced Trash DNA matching arrives after launch.
 
-### Dumpster Raids V0
+### Dumpster Raids V0 — post-launch experiment
+
+Dumpster Raids are **not a Launch V0 blocker**. Token locking introduces additional contract, accounting, abuse, and compliance surface and therefore gets its own bounded post-launch gate.
 
 Holders can lock `$BINRAT` behind bounded evidence gaps or investigations they want prioritized.
 
@@ -107,15 +132,15 @@ This is culture, not evidence authority and not a promise of token appreciation.
 
 Launch V0 is ready only when:
 
-1. launch contract/mechanics and fee routes are independently verified;
-2. required legal/compliance artifacts are complete;
+1. launch contract/mechanics and fee routes are independently verified and captured in a dated verification receipt;
+2. required legal/compliance artifacts are complete and launch authorization is explicitly unblocked;
 3. public token/treasury addresses are frozen and disclosed;
-4. Telegram Rat reports the launch doctrine accurately;
+4. Telegram Rat reports the canonical doctrine/status accurately from the capability manifest;
 5. Dumpster Ledger is live or has a deterministic launch-day bootstrap path;
 6. Rat Den cannot hide or alter core public receipts;
 7. Rat Watch produces at least one real end-to-end Telegram alert;
-8. Dumpster Raids cannot modify evidence truth;
-9. shipped vs planned utility is visible in product/docs;
+8. Replay Lab demonstrates at least one real historical launch -> matured-observation evidence chain without synthesizing missing evidence;
+9. product/docs/Telegram status agrees with the canonical capability manifest;
 10. no private presale, hidden insider allocation, or undisclosed privileged inventory exists under the chosen launch design.
 
 ## POST-LAUNCH PHASE 1 — THE RAT REMEMBERS
@@ -246,6 +271,8 @@ Allow cryptographic control proofs and creator-signed context without rewriting 
 
 ### 10. RAT MACHINE
 
+Replay Lab is the bounded pre-launch precursor. Rat Machine is the later interactive expansion.
+
 Interactive point-in-time replay:
 
 - launch;
@@ -337,7 +364,7 @@ Subject to implementation and legal review, early `$BINRAT` utility can include:
 
 - **Rat Den** — optional token-gated community/product surfaces;
 - **Rat Watch capacity** — additional watch slots or advanced alert configuration;
-- **Dumpster Raids** — token-lock signaling for which evidence gaps/cases the community wants investigated next;
+- **Dumpster Raids** — post-launch experimental token-lock signaling for which evidence gaps/cases the community wants investigated next;
 - **Trash Hunts** — seasonal research quests that earn Rat Credits and reputation rather than purchasing truth;
 - **Bounty Boosts** — use `$BINRAT` to increase the posted reward/priority of a bounded evidence task;
 - **Case sponsorship** — visibly sponsor research without gaining adjudication authority;

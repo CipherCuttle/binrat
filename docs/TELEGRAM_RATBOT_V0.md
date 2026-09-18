@@ -136,10 +136,13 @@ Changed payload under the same immutable event id fails closed.
 
 Answer deterministic commands from:
 
+- `docs/CAPABILITY_MANIFEST_V0.json` for capability/launch status;
 - canonical docs;
 - public status;
 - public API;
 - receipt links.
+
+If canonical status sources disagree, the Rat fails closed to the least-privileged state and reports the inconsistency rather than choosing the more promotional interpretation.
 
 ### V1 conversational Rat
 
@@ -224,7 +227,7 @@ The application should never depend on the avatar image being retrievable from T
 V0 passes when:
 
 1. `/status` reports canonical status correctly;
-2. `/roadmap` distinguishes shipped vs planned;
+2. `/roadmap` distinguishes engineering-pass, deployed/public-live, building, planned, and experimental state from the canonical manifest;
 3. `/creator` returns a public Creator File or a bounded not-found response;
 4. one explicit release event posts exactly once to the announcement channel;
 5. duplicate delivery is idempotent;
@@ -232,7 +235,8 @@ V0 passes when:
 7. Telegram outage does not affect BINRAT indexing;
 8. no bot token appears in repository/history/log fixtures;
 9. bot identifies itself as automated;
-10. no BUY/SELL, token-price, return promise, or unsupported identity claim is emitted.
+10. no BUY/SELL, token-price, return promise, or unsupported identity claim is emitted;
+11. token-facing launch messaging remains disabled while the canonical launch authorization state is blocked.
 
 ## First deployment sequence
 
