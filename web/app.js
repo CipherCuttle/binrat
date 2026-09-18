@@ -191,9 +191,8 @@ function renderFeed() {
   for (const image of grid.querySelectorAll("[data-token-image]")) {
     image.addEventListener("error", () => image.remove(), { once: true });
   }
-}
   window.dispatchEvent(new CustomEvent("binrat:feed-rendered"));
-
+}
 
 function renderCard(bag) {
   const coverage = normalizeCoverage(bag.coverage);
