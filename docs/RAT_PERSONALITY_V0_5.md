@@ -30,7 +30,7 @@ It is used only for bounded English intent matching. No model API, embedding ser
 
 Explicit slash commands remain highest authority.
 
-Natural-language replies require an explicit reference to BINRAT/the Rat. Ordinary group chat is ignored.
+Natural-language replies require an explicit reference to BINRAT/the Rat in group-style chat. Private bot conversations may omit the repeated Rat name. Ordinary unaddressed group chat is ignored.
 
 Initial intents:
 

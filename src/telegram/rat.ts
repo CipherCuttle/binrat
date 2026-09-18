@@ -1,4 +1,4 @@
-import type { RatIntent, RatUnderstanding } from './nlp.js';
+import type { RatConversationContext, RatIntent, RatUnderstanding } from './nlp.js';
 import { understandRatMessage } from './nlp.js';
 import { renderRatVoice, type RatAnswerPlan, type RatMood, type RenderedRatReply } from './voice.js';
 
@@ -297,14 +297,20 @@ async function resolvePlan(
 export async function renderRatReplyDetailed(
   text: string,
   config: RatConfig,
-  fetchImpl: FetchLike = fetch
+  fetchImpl: FetchLike = fetch,
+  context: RatConversationContext = {}
 ): Promise<RenderedRatReply | null> {
-  const understanding = understandRatMessage(text);
+  const understanding = understandRatMessage(text, context);
   if (!understanding) return null;
   const answerPlan = await resolvePlan(understanding, config, fetchImpl);
   return renderRatVoice(answerPlan);
 }
 
-export async function renderRatReply(text: string, config: RatConfig, fetchImpl: FetchLike = fetch): Promise<string | null> {
-  return (await renderRatReplyDetailed(text, config, fetchImpl))?.text ?? null;
+export async function renderRatReply(
+  text: string,
+  config: RatConfig,
+  fetchImpl: FetchLike = fetch,
+  context: RatConversationContext = {}
+): Promise<string | null> {
+  return (await renderRatReplyDetailed(text, config, fetchImpl, context))?.text ?? null;
 }

@@ -19,6 +19,10 @@ export type RatIntent =
   | 'SAFETY_BOUNDARY'
   | 'CLARIFY';
 
+export interface RatConversationContext {
+  allowUnaddressed?: boolean;
+}
+
 export interface RatUnderstanding {
   intent: RatIntent;
   argument: string;
@@ -50,7 +54,7 @@ function hasAny(doc: ReturnType<typeof nlp>, patterns: readonly string[]): boole
   return patterns.some((pattern) => doc.has(pattern));
 }
 
-export function understandRatMessage(text: string): RatUnderstanding | null {
+export function understandRatMessage(text: string, context: RatConversationContext = {}): RatUnderstanding | null {
   const normalized = text.trim().slice(0, MAX_NLP_CHARS);
   if (!normalized) return null;
 
@@ -70,17 +74,19 @@ export function understandRatMessage(text: string): RatUnderstanding | null {
 
   const address = normalized.match(ADDRESS_RE)?.[0] ?? '';
   const bagId = normalized.match(BAG_ID_RE)?.[0] ?? '';
-  if (!containsRatReference(normalized)) return null;
+  if (!containsRatReference(normalized) && context.allowUnaddressed !== true) return null;
 
   const doc = nlp(normalized);
   const lower = normalized.toLowerCase();
   const identityRiskLanguage = /\b(scamm?er|rug(?:ger|ged)?|fraud|criminal|same (?:guy|person|human))\b/i.test(lower);
 
-  if (
-    hasAny(doc, ['{buy}', '{sell}', 'ape', 'snipe', 'entry']) ||
-    /\bshould i (?:buy|sell|ape)\b/i.test(lower) ||
-    /\bwen moon\b/i.test(lower)
-  ) {
+  const tradingAdviceLanguage =
+    /\bshould i\b[^?!.]{0,80}\b(?:buy|sell|ape)\b/i.test(lower) ||
+    /\b(?:buy|sell|ape)\s+(?:this|it|now)\b/i.test(lower) ||
+    /\bwen moon\b/i.test(lower) ||
+    hasAny(doc, ['snipe', 'entry']);
+
+  if (tradingAdviceLanguage) {
     return { intent: 'BUY_BOUNDARY', argument: '', confidence: 0.98, explicitCommand: false, identityRiskLanguage };
   }
 

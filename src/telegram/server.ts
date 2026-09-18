@@ -140,7 +140,12 @@ const server = createServer(async (request, response) => {
         return;
       }
 
-      const reply = await renderRatReplyDetailed(message.text, config);
+      const reply = await renderRatReplyDetailed(
+        message.text,
+        config,
+        fetch,
+        { allowUnaddressed: message.chat.type === 'private' }
+      );
       if (!reply) {
         updateFence.commit(update.update_id);
         json(response, 200, { ok: true, ignored: true });

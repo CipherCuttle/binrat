@@ -48,3 +48,24 @@ test('unknown rat-directed chat fails to clarify instead of guessing', () => {
   assert.equal(parsed?.intent, 'CLARIFY');
   assert.ok((parsed?.confidence ?? 1) < 0.5);
 });
+
+
+test('private bot conversation accepts natural language without repeating rat name', () => {
+  assert.equal(
+    understandRatMessage('what have you built?', { allowUnaddressed: true })?.intent,
+    'STATUS'
+  );
+  assert.equal(
+    understandRatMessage('wen token?', { allowUnaddressed: true })?.intent,
+    'TOKEN'
+  );
+});
+
+test('group-style parsing still ignores unaddressed natural language', () => {
+  assert.equal(understandRatMessage('what have you built?'), null);
+});
+
+test('evidence questions containing sell do not become trading advice', () => {
+  const parsed = understandRatMessage('rat what did this dev sell 0x1111111111111111111111111111111111111111');
+  assert.equal(parsed?.intent, 'CREATOR_HISTORY');
+});
