@@ -458,12 +458,19 @@ async function hydrateCreatorFile(bag) {
   try {
     const file = await loadCreatorFile(bag.reportedCreatorAddress);
     if (!file || !drawer.classList.contains("open") || activeDrawerBagId !== bag.id) return;
-    const rows = file.launches.slice(0, 8).map((item) => `
+    const rows = file.launches.map((item) => `
       <div class="creator-launch-row">
-        <strong>${escapeHtml(item.symbol)}</strong>
+        <div class="creator-launch-token">
+          ${renderCreatorTokenThumb(item)}
+          <div><strong>${escapeHtml(item.symbol)}</strong><small>${escapeHtml(item.name)}</small></div>
+        </div>
         <span>BLK ${escapeHtml(item.blockNumber)}</span>
-        <code>${escapeHtml(shortAddress(item.token))}</code>
-        <span>${escapeHtml(item.priorLaunchCount)} PRIOR</span>
+        <code title="${escapeHtml(item.token)}">${escapeHtml(shortAddress(item.token))}</code>
+        <div class="creator-launch-meta">
+          <span>${escapeHtml(item.priorLaunchCount)} PRIOR</span>
+          ${renderCreatorLaunchSocials(item)}
+        </div>
+        <button class="creator-launch-open" type="button" data-open-creator-launch="${escapeHtml(item.id)}">OPEN CHANGES ↗</button>
       </div>`).join("");
     panel.innerHTML = `
       <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
@@ -473,15 +480,44 @@ async function hydrateCreatorFile(bag) {
         <div><span>LAST INDEXED BLOCK</span><b>${escapeHtml(file.lastIndexedBlock)}</b></div>
         <div><span>HISTORY</span><b>${escapeHtml(file.historyCoverage)}</b></div>
       </div>
-      <p class="intel-boundary">Same ArcPad-reported address only. This does not establish common human ownership.</p>
+      <p class="intel-boundary">Same ArcPad-reported address only. This does not establish common human ownership. Full indexed trail shown; open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
       <div class="creator-launches">${rows}</div>
       <div class="intel-receipt">CREATOR FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
     `;
+    for (const image of panel.querySelectorAll("[data-token-image]")) {
+      image.addEventListener("error", () => image.remove(), { once: true });
+    }
+    for (const button of panel.querySelectorAll("[data-open-creator-launch]")) {
+      button.addEventListener("click", () => {
+        const launchId = button.dataset.openCreatorLaunch;
+        if (launchId && bags.some((item) => item.id === launchId)) openBag(launchId, button);
+      });
+    }
     window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "creator" } }));
   } catch {
     if (activeDrawerBagId !== bag.id) return;
     panel.innerHTML = '<div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Creator history projection is not available.</div>';
   }
+}
+
+function renderCreatorTokenThumb(item) {
+  const src = safeExternalUrl(item?.metadata?.imageUri);
+  const mark = String(item?.symbol || "?").trim().slice(0, 2).toUpperCase() || "?";
+  return `<span class="token-thumb creator-token-thumb" aria-hidden="true"><span>${escapeHtml(mark)}</span>${src ? `<img src="${escapeHtml(src)}" alt="" width="36" height="36" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-token-image />` : ""}</span>`;
+}
+
+function renderCreatorLaunchSocials(item) {
+  const sources = {
+    website: item?.metadata?.website,
+    twitter: item?.metadata?.twitter,
+    telegram: item?.metadata?.telegram,
+  };
+  const labels = { website: "WEB", twitter: "X", telegram: "TG" };
+  const links = Object.entries(sources).flatMap(([kind, value]) => {
+    const href = safeExternalUrl(value);
+    return href ? [`<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${labels[kind]}</a>`] : [];
+  });
+  return links.length ? `<span class="creator-launch-socials">${links.join("")}</span>` : '<span class="creator-launch-socials muted">NO SOCIALS</span>';
 }
 
 function renderObservationSnapshot(snapshot) {

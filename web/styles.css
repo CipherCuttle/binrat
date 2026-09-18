@@ -2690,16 +2690,73 @@ body {
 }
 .creator-launch-row {
   display: grid;
-  grid-template-columns: 70px 1fr 1fr auto;
+  grid-template-columns: minmax(150px, 1.6fr) .7fr .8fr auto auto;
   gap: 10px;
   align-items: center;
-  min-height: 38px;
+  min-height: 54px;
+  padding: 7px 0;
   border-bottom: 1px solid var(--line);
   font-size: 11px;
 }
 .creator-launch-row span,
 .creator-launch-row code {
   color: var(--muted);
+}
+.creator-launch-token {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+}
+.creator-launch-token > div {
+  min-width: 0;
+}
+.creator-launch-token strong,
+.creator-launch-token small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.creator-launch-token small {
+  margin-top: 2px;
+  color: var(--muted);
+}
+.creator-token-thumb {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+}
+.creator-launch-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.creator-launch-socials {
+  display: inline-flex;
+  gap: 5px;
+}
+.creator-launch-socials a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+.creator-launch-socials.muted {
+  font-size: 9px;
+}
+.creator-launch-open {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  padding: 6px 8px;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.creator-launch-open:hover,
+.creator-launch-open:focus-visible {
+  border-color: var(--ink);
 }
 
 /* React Bits-derived SpotlightCard behavior, ported to the existing vanilla shell. */
@@ -2738,10 +2795,14 @@ body {
     gap: 4px;
   }
   .creator-launch-row {
-    grid-template-columns: 56px 1fr;
+    grid-template-columns: 1fr auto;
   }
+  .creator-launch-token,
   .creator-launch-row code {
     grid-column: 1 / -1;
+  }
+  .creator-launch-meta {
+    flex-wrap: wrap;
   }
 }
 @media (prefers-reduced-motion: reduce) {
