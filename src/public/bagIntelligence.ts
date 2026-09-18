@@ -173,6 +173,7 @@ function pushBigIntChange(
   if (left === null || right === null) return;
   const a = BigInt(left);
   const b = BigInt(right);
+  if (a === b) return;
   target.push({
     field,
     fromHorizonMs: before.horizonMs,
@@ -191,13 +192,13 @@ function pushNumberChange(
   left: number | null,
   right: number | null
 ): void {
-  if (left === null || right === null) return;
+  if (left === null || right === null || left === right) return;
   target.push({
     field,
     fromHorizonMs: before.horizonMs,
     toHorizonMs: after.horizonMs,
     before: String(left),
     after: String(right),
-    direction: right > left ? 'UP' : right < left ? 'DOWN' : 'SAME'
+    direction: right > left ? 'UP' : 'DOWN'
   });
 }

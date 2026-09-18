@@ -163,6 +163,7 @@ export async function loadBagIntelligence(bagId) {
     value?.schemaVersion !== "binrat.bag-intelligence/0.1" ||
     value.projectionVersion !== "BINRAT_BAG_INTELLIGENCE_V0" ||
     value.chainId !== 5042 ||
+    value.bagId !== bagId ||
     !["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value.observationCoverage) ||
     !Array.isArray(value.snapshots) ||
     !Array.isArray(value.changes) ||
@@ -183,6 +184,7 @@ export async function loadCreatorFile(reportedCreatorAddress) {
   if (
     value?.schemaVersion !== "binrat.creator-file/0.1" ||
     value.chainId !== 5042 ||
+    String(value.reportedCreatorAddress).toLowerCase() !== String(reportedCreatorAddress).toLowerCase() ||
     value.historyCoverage !== "UNVERIFIED" ||
     !Number.isSafeInteger(value.indexedLaunchCount) ||
     !Array.isArray(value.launches) ||

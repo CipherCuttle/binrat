@@ -9,6 +9,7 @@ const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'u
 const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url), 'utf8');
 const shareCard = readFileSync(new URL('../web/share-card.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+const reactBitsIsland = readFileSync(new URL('../web/react-bits-island.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
 const mascotUrl = new URL('../web/assets/binrat-hero.webp', import.meta.url);
 const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e9917cb7f2138bd163';
@@ -54,6 +55,12 @@ if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREAT
 if (app.includes('bag.creator')) throw new Error('WEB_AMBIGUOUS_CREATOR_RENDERING_REINTRODUCED');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('notedConditions')) throw new Error('WEB_NOTED_CONDITIONS_MAPPING_MISSING');
+if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`')) throw new Error('WEB_BAG_INTELLIGENCE_SOURCE_MISSING');
+if (!dataSource.includes('fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}`')) throw new Error('WEB_CREATOR_FILE_SOURCE_MISSING');
+if (!app.includes('Raw pool liquidity is not USD liquidity')) throw new Error('WEB_RAW_LIQUIDITY_BOUNDARY_MISSING');
+if (!app.includes('Same ArcPad-reported address only')) throw new Error('WEB_CREATOR_IDENTITY_BOUNDARY_MISSING');
+if (!reactBitsIsland.includes('React Bits')) throw new Error('WEB_REACT_BITS_DONOR_MARKER_MISSING');
+if (!reactBitsIsland.includes('prefers-reduced-motion')) throw new Error('WEB_REDUCED_MOTION_GUARD_MISSING');
 
 if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
 if (statSync(mascotUrl).size !== 256890) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
