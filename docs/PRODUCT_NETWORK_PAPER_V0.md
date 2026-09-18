@@ -232,9 +232,11 @@ The intended fair-launch principles are:
 - treasury inflows and project spending made legible through a public funding ledger;
 - shipped utility clearly distinguished from planned utility.
 
-Early utility may include token-gated optional community surfaces, Rat Watch capacity, Dumpster Raid case-priority signaling, Trash Hunts, bounty boosting, and case sponsorship.
+Launch-day utility may include token-gated optional community surfaces and Rat Watch capacity.
 
-Later utility may include bonded evidence submissions, bonded challenges, anti-spam collateral, and independent Rat Node collateral.
+Post-launch experimental utility may include Dumpster Raid case-priority signaling, Trash Hunts, bounty boosting, and case sponsorship after their own bounded product/security/compliance gates.
+
+Later network utility may include bonded evidence submissions, bonded challenges, anti-spam collateral, and independent Rat Node collateral.
 
 The permanent boundary is:
 
