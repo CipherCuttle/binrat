@@ -102,8 +102,6 @@ export class SqliteStore implements LaunchStore {
   async replaceProvenanceEdges(edges: ProvenanceEdge[]): Promise<void> {
     const tx = this.db.transaction(() => {
       this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
-      this.db.prepare('DELETE FROM launch_observations WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)')
-        .run(this.chainId, blockNumber.toString());
       const insert = this.db.prepare(`
         INSERT INTO provenance_edges (
           edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
@@ -203,6 +201,8 @@ export class SqliteStore implements LaunchStore {
   async rewindFromBlock(blockNumber: bigint): Promise<void> {
     const tx = this.db.transaction(() => {
       this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
+      this.db.prepare('DELETE FROM launch_observations WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)')
+        .run(this.chainId, blockNumber.toString());
       this.db.prepare('DELETE FROM launches WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)')
         .run(this.chainId, blockNumber.toString());
       const checkpoint = this.db.prepare('SELECT block_number FROM chain_checkpoints WHERE chain_id = ?').get(this.chainId) as { block_number: string } | undefined;
@@ -256,15 +256,17 @@ function reviveObservation(payload: string): LaunchObservationReceipt {
       tokenDecimals?: number;
     };
   };
+  const facts: LaunchObservationReceipt['facts'] = {};
+  if (raw.facts.poolCodePresent !== undefined) facts.poolCodePresent = raw.facts.poolCodePresent;
+  if (raw.facts.poolActiveLiquidity !== undefined) facts.poolActiveLiquidity = BigInt(raw.facts.poolActiveLiquidity);
+  if (raw.facts.poolSqrtPriceX96 !== undefined) facts.poolSqrtPriceX96 = BigInt(raw.facts.poolSqrtPriceX96);
+  if (raw.facts.poolTick !== undefined) facts.poolTick = raw.facts.poolTick;
+  if (raw.facts.creatorTokenBalance !== undefined) facts.creatorTokenBalance = BigInt(raw.facts.creatorTokenBalance);
+  if (raw.facts.tokenTotalSupply !== undefined) facts.tokenTotalSupply = BigInt(raw.facts.tokenTotalSupply);
+  if (raw.facts.tokenDecimals !== undefined) facts.tokenDecimals = raw.facts.tokenDecimals;
   return {
     ...raw,
     observedBlock: BigInt(raw.observedBlock),
-    facts: {
-      ...raw.facts,
-      ...(raw.facts.poolActiveLiquidity !== undefined ? { poolActiveLiquidity: BigInt(raw.facts.poolActiveLiquidity) } : {}),
-      ...(raw.facts.poolSqrtPriceX96 !== undefined ? { poolSqrtPriceX96: BigInt(raw.facts.poolSqrtPriceX96) } : {}),
-      ...(raw.facts.creatorTokenBalance !== undefined ? { creatorTokenBalance: BigInt(raw.facts.creatorTokenBalance) } : {}),
-      ...(raw.facts.tokenTotalSupply !== undefined ? { tokenTotalSupply: BigInt(raw.facts.tokenTotalSupply) } : {})
-    }
+    facts
   };
 }
