@@ -103,9 +103,10 @@ export async function runCloudflareSyncCycle(
 
   const store = new D1Store(env.DB, ARC_CHAIN_ID);
   const runtimeStore = new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID);
-  const previous = await runtimeStore.get();
+  let previous: D1RuntimeState | null = null;
 
   try {
+    previous = await runtimeStore.get();
     const rpcUrl = deps.launchSource ? undefined : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
     const source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
     const observationSource = deps.observationSource ?? new ArcObservationSource({
@@ -129,11 +130,12 @@ export async function runCloudflareSyncCycle(
     const liveWindowStart = recentStart > ARCPAD_START_BLOCK ? recentStart : ARCPAD_START_BLOCK;
     const beforeCheckpoint = await store.getCheckpoint();
     const startBlock = beforeCheckpoint ? ARCPAD_START_BLOCK : liveWindowStart;
-    const historyTarget = previous
-      ? previous.historyBackfillTargetBlock
-      : liveWindowStart > ARCPAD_START_BLOCK
-        ? liveWindowStart - 1n
-        : null;
+    const historyTarget =
+      previous && previous.headBlock !== null && previous.targetBlock !== null
+        ? previous.historyBackfillTargetBlock
+        : liveWindowStart > ARCPAD_START_BLOCK
+          ? liveWindowStart - 1n
+          : null;
 
     let liveReport;
     try {

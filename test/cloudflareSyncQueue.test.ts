@@ -6,6 +6,11 @@ import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { D1SyncLeaseStore } from '../src/cloudflare/syncLease.js';
+import type {
+  D1DatabaseLike,
+  D1PreparedStatementLike,
+  D1ResultLike
+} from '../src/cloudflare/d1Types.js';
 import {
   runCloudflareSyncCycle,
   type BinratSyncMessage
@@ -162,3 +167,137 @@ test('live authority failure is persisted fail-closed and requests retry', async
     db.close();
   }
 });
+
+
+test('failed first cycle does not freeze an uninitialized null history target', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+
+  class FirstFailureSource extends FakeLaunchSource {
+    override async assertAuthority(_blockNumber: bigint) {
+      throw new Error('ARCPAD_AUTHORITY_TEST');
+    }
+  }
+
+  const failing = new FirstFailureSource();
+  let now = 20_000;
+  try {
+    const first = await runCloudflareSyncCycle(
+      { DB: db },
+      message('cycle-first-fail'),
+      {
+        now: () => now++,
+        launchSource: failing,
+        observationSource: new FakeObservationSource(failing.head)
+      }
+    );
+    assert.deepEqual(first, { status: 'RETRY', code: 'ARCPAD_AUTHORITY_TEST' });
+
+    const failedState = await new D1RuntimeStateStore(db, 5042).get();
+    assert.equal(failedState?.headBlock, null);
+    assert.equal(failedState?.targetBlock, null);
+    assert.equal(failedState?.historyBackfillTargetBlock, null);
+
+    const recovered = new FakeLaunchSource();
+    const second = await runCloudflareSyncCycle(
+      {
+        DB: db,
+        BINRAT_LIVE_LOOKBACK_BLOCKS: '1000',
+        BINRAT_MAX_BATCH_BLOCKS: '1000',
+        BINRAT_CONFIRMATIONS: '2'
+      },
+      message('cycle-recovered'),
+      {
+        now: () => now++,
+        launchSource: recovered,
+        observationSource: new FakeObservationSource(recovered.head)
+      }
+    );
+
+    assert.deepEqual(second, { status: 'SUCCESS', liveCaughtUp: true });
+    const recoveredState = await new D1RuntimeStateStore(db, 5042).get();
+    assert.equal(
+      recoveredState?.historyBackfillTargetBlock,
+      ARCPAD_START_BLOCK + 3_999n
+    );
+    assert.equal(recoveredState?.historyBackfillComplete, false);
+
+    const cursor = await db.prepare(
+      'SELECT next_block FROM launch_history_backfill_state WHERE chain_id = ?'
+    ).bind(5042).first<{ next_block: string }>();
+    assert.equal(BigInt(cursor!.next_block), ARCPAD_START_BLOCK + 1_000n);
+  } finally {
+    db.close();
+  }
+});
+
+test('runtime read failure after claim cannot strand the durable sync lease', async () => {
+  const inner = new D1CompatDatabase();
+  await inner.exec(D1_SCHEMA_SQL);
+  const db = new FailFirstRuntimeReadDatabase(inner);
+  try {
+    await assert.rejects(
+      () => runCloudflareSyncCycle(
+        { DB: db },
+        message('cycle-runtime-read-fail'),
+        {
+          now: () => 30_000,
+          launchSource: new FakeLaunchSource(),
+          observationSource: new FakeObservationSource(ARCPAD_START_BLOCK + 5_000n)
+        }
+      ),
+      /INJECTED_RUNTIME_READ_FAILURE/
+    );
+
+    const leases = new D1SyncLeaseStore(inner);
+    assert.equal(
+      await leases.claim('binrat:arc-sync', 'replacement-owner', 30_001, 1_000),
+      true
+    );
+  } finally {
+    inner.close();
+  }
+});
+
+class FailFirstRuntimeReadDatabase implements D1DatabaseLike {
+  private failed = false;
+
+  constructor(private readonly inner: D1DatabaseLike) {}
+
+  prepare(sql: string): D1PreparedStatementLike {
+    const statement = this.inner.prepare(sql);
+    if (!this.failed && sql.includes('SELECT * FROM binrat_runtime_state')) {
+      this.failed = true;
+      return new FailFirstStatement(statement);
+    }
+    return statement;
+  }
+
+  batch(statements: D1PreparedStatementLike[]): Promise<D1ResultLike[]> {
+    return this.inner.batch(statements);
+  }
+
+  exec(sql: string): Promise<unknown> {
+    return this.inner.exec(sql);
+  }
+}
+
+class FailFirstStatement implements D1PreparedStatementLike {
+  constructor(private readonly inner: D1PreparedStatementLike) {}
+
+  bind(...values: unknown[]): D1PreparedStatementLike {
+    return new FailFirstStatement(this.inner.bind(...values));
+  }
+
+  run<T = Record<string, unknown>>(): Promise<D1ResultLike<T>> {
+    return this.inner.run<T>();
+  }
+
+  first<T = Record<string, unknown>>(): Promise<T | null> {
+    return Promise.reject(new Error('INJECTED_RUNTIME_READ_FAILURE'));
+  }
+
+  all<T = Record<string, unknown>>(): Promise<D1ResultLike<T>> {
+    return this.inner.all<T>();
+  }
+}
