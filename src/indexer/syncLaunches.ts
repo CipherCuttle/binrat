@@ -8,6 +8,7 @@ export interface SyncOptions {
   maxBatchBlocks: bigint;
   reorgLookbackBlocks: bigint;
   pollIntervalMs: number;
+  maxBatchesPerRun?: number;
 }
 
 export interface SyncReport {
@@ -101,6 +102,7 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     finalBlock = toBlock;
     batches += 1;
     fromBlock = toBlock + 1n;
+    if (options.maxBatchesPerRun !== undefined && batches >= options.maxBatchesPerRun) break;
   }
 
   return { headBlock, targetBlock, startBlock: initialFrom, endBlock: finalBlock, inserted, duplicates, batches, reorgRewindFrom };
@@ -145,6 +147,10 @@ function validateOptions(options: SyncOptions): void {
   if (options.maxBatchBlocks < 1n) throw new Error('maxBatchBlocks must be >= 1');
   if (options.reorgLookbackBlocks < 1n) throw new Error('reorgLookbackBlocks must be >= 1');
   if (!Number.isFinite(options.pollIntervalMs) || options.pollIntervalMs < 100) throw new Error('pollIntervalMs must be >= 100');
+  if (
+    options.maxBatchesPerRun !== undefined &&
+    (!Number.isSafeInteger(options.maxBatchesPerRun) || options.maxBatchesPerRun < 1)
+  ) throw new Error('maxBatchesPerRun must be a positive safe integer');
 }
 
 function emptyReport(headBlock: bigint): SyncReport {

@@ -64,3 +64,37 @@ test('sync is idempotent and repairs shallow reorg from guard', async () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+
+test('sync can be hard-bounded to one batch for queue execution', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-bounded-sync-'));
+  const db = join(dir, 'test.sqlite');
+  try {
+    const source = new FakeSource();
+    source.head = 15n;
+    const store = new SqliteStore(db, chainId);
+    const options = {
+      startBlock: 8n,
+      confirmations: 1n,
+      maxBatchBlocks: 2n,
+      reorgLookbackBlocks: 4n,
+      pollIntervalMs: 100,
+      maxBatchesPerRun: 1
+    };
+
+    const first = await syncLaunches(source, store, options);
+    assert.equal(first.batches, 1);
+    assert.equal(first.startBlock, 8n);
+    assert.equal(first.endBlock, 9n);
+    assert.equal((await store.getCheckpoint())?.blockNumber, 9n);
+
+    const second = await syncLaunches(source, store, options);
+    assert.equal(second.batches, 1);
+    assert.equal(second.startBlock, 10n);
+    assert.equal(second.endBlock, 11n);
+    assert.equal((await store.getCheckpoint())?.blockNumber, 11n);
+    store.close();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
