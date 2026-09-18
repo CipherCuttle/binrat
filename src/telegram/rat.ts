@@ -1,6 +1,11 @@
 import type { RatConversationContext, RatIntent, RatUnderstanding } from './nlp.js';
 import { understandRatMessage } from './nlp.js';
-import { renderRatVoice, type RatAnswerPlan, type RatMood, type RenderedRatReply } from './voice.js';
+import {
+  makeRatAnswerPlan,
+  renderRatVoice,
+  type RatAnswerPlan,
+  type RenderedRatReply
+} from './voice.js';
 
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 const BAG_ID_RE = /^[0-9a-fA-F]{64}$/;
@@ -28,6 +33,7 @@ export interface RatConfig {
   apiBaseUrl: string;
   siteUrl: string;
   manifest: CapabilityManifest;
+  manifestMode?: 'LOCAL_ONLY' | 'REMOTE_FAIL_CLOSED';
 }
 
 type FetchLike = typeof fetch;
@@ -37,7 +43,9 @@ function trimSlash(value: string): string {
 }
 
 function record(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? value as Record<string, unknown> : {};
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
 }
 
 function stringValue(value: unknown, fallback = 'UNKNOWN'): string {
@@ -52,29 +60,27 @@ function boolLabel(value: boolean): string {
   return value ? 'YES' : 'NO';
 }
 
-function capabilityStatus(key: string, config: RatConfig): string {
-  const state = config.manifest.capabilities[key];
+function expectSchema(value: Record<string, unknown>, expected: string): void {
+  if (value.schemaVersion !== expected) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+}
+
+function capabilityStatus(key: string, manifest: CapabilityManifest): string {
+  const state = manifest.capabilities[key];
   if (!state) return 'UNKNOWN';
   const parts = [state.engineeringStatus, state.deploymentStatus, state.publicStatus].filter(Boolean);
   return parts.join(' / ') || 'UNKNOWN';
 }
 
-function plan(
-  intent: RatIntent,
-  mood: RatMood,
-  facts: RatAnswerPlan['facts'] = {},
-  receiptIds: string[] = [],
-  caveats: string[] = [],
-  sourceRefs: string[] = []
-): RatAnswerPlan {
+function failClosedManifest(local: CapabilityManifest): CapabilityManifest {
   return {
-    schemaVersion: 'binrat.rat-answer-plan/0.1',
-    intent,
-    mood,
-    facts,
-    receiptIds,
-    caveats,
-    sourceRefs
+    ...local,
+    launchAuthorization: {
+      ...local.launchAuthorization,
+      status: 'UNVERIFIED_REMOTE_STATUS',
+      marketingAuthorized: false,
+      launchAuthorized: false,
+      tokenState: local.launchAuthorization.tokenState === 'NOT_LAUNCHED' ? 'NOT_LAUNCHED' : 'UNVERIFIED'
+    }
   };
 }
 
@@ -101,7 +107,11 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
   return value as CapabilityManifest;
 }
 
-async function getJson(path: string, config: RatConfig, fetchImpl: FetchLike): Promise<{ ok: boolean; status: number; value: Record<string, unknown> }> {
+async function getJson(
+  path: string,
+  config: RatConfig,
+  fetchImpl: FetchLike
+): Promise<{ ok: boolean; status: number; value: Record<string, unknown> }> {
   const response = await fetchImpl(`${trimSlash(config.apiBaseUrl)}${path}`, {
     headers: { accept: 'application/json' }
   });
@@ -110,25 +120,40 @@ async function getJson(path: string, config: RatConfig, fetchImpl: FetchLike): P
   return { ok: response.ok, status: response.status, value: record(parsed) };
 }
 
-function staticPlan(understanding: RatUnderstanding, config: RatConfig): RatAnswerPlan | null {
+async function currentManifest(config: RatConfig, fetchImpl: FetchLike): Promise<CapabilityManifest> {
+  if (config.manifestMode !== 'REMOTE_FAIL_CLOSED') return config.manifest;
+  try {
+    const result = await getJson('/api/capabilities', config, fetchImpl);
+    if (!result.ok) return failClosedManifest(config.manifest);
+    return validateCapabilityManifest(result.value);
+  } catch {
+    return failClosedManifest(config.manifest);
+  }
+}
+
+function staticPlan(
+  understanding: RatUnderstanding,
+  config: RatConfig,
+  manifest: CapabilityManifest
+): RatAnswerPlan | null {
   switch (understanding.intent) {
     case 'WHY':
-      return plan('WHY', 'RUMMAGING', { site: trimSlash(config.siteUrl) }, [], [], ['STATIC_PRODUCT_THESIS']);
+      return makeRatAnswerPlan('WHY', 'RUMMAGING', { site: trimSlash(config.siteUrl) }, [], [], ['STATIC_PRODUCT_THESIS']);
     case 'ROADMAP':
-      return plan('ROADMAP', 'NEUTRAL', {
-        intelligenceV1: capabilityStatus('intelligenceV1', config),
-        replayLab: capabilityStatus('replayLab', config),
-        telegramRatV0: capabilityStatus('telegramRatV0', config),
-        dumpsterLedger: capabilityStatus('dumpsterLedger', config),
-        ratDenV0: capabilityStatus('ratDenV0', config),
-        ratWatchV0: capabilityStatus('ratWatchV0', config),
-        dumpsterRaidsV0: capabilityStatus('dumpsterRaidsV0', config),
-        launchAuthorization: config.manifest.launchAuthorization.status
+      return makeRatAnswerPlan('ROADMAP', 'NEUTRAL', {
+        intelligenceV1: capabilityStatus('intelligenceV1', manifest),
+        replayLab: capabilityStatus('replayLab', manifest),
+        telegramRatV0: capabilityStatus('telegramRatV0', manifest),
+        dumpsterLedger: capabilityStatus('dumpsterLedger', manifest),
+        ratDenV0: capabilityStatus('ratDenV0', manifest),
+        ratWatchV0: capabilityStatus('ratWatchV0', manifest),
+        dumpsterRaidsV0: capabilityStatus('dumpsterRaidsV0', manifest),
+        launchAuthorization: manifest.launchAuthorization.status
       }, [], [], ['CAPABILITY_MANIFEST']);
     case 'TOKEN': {
-      const launch = config.manifest.launchAuthorization;
+      const launch = manifest.launchAuthorization;
       const tokenState = launch.tokenState ?? 'UNKNOWN';
-      return plan('TOKEN', 'NEUTRAL', {
+      return makeRatAnswerPlan('TOKEN', 'NEUTRAL', {
         tokenState,
         launchAuthorization: launch.status,
         marketingAuthorized: boolLabel(launch.marketingAuthorized),
@@ -136,75 +161,101 @@ function staticPlan(understanding: RatUnderstanding, config: RatConfig): RatAnsw
         tokenMessage: tokenState === 'NOT_LAUNCHED'
           ? 'no official $BINRAT token is launched yet.'
           : 'reporting the canonical manifest state only.',
-        invariant: config.manifest.invariant
+        invariant: manifest.invariant
       }, [], [], ['CAPABILITY_MANIFEST']);
     }
     case 'PROOF':
-      return plan('PROOF', 'NEUTRAL', { invariant: config.manifest.invariant }, [], [], ['BINRAT_DOCTRINE']);
+      return makeRatAnswerPlan('PROOF', 'NEUTRAL', { invariant: manifest.invariant }, [], [], ['BINRAT_DOCTRINE']);
     case 'HELP':
-      return plan('HELP', 'RUMMAGING', {}, [], [], ['TELEGRAM_RAT_V0']);
+      return makeRatAnswerPlan('HELP', 'RUMMAGING', {}, [], [], ['TELEGRAM_RAT_V0']);
     case 'BUY_BOUNDARY':
-      return plan('BUY_BOUNDARY', 'BOUNDARY', {}, [], [], ['CLAIM_BOUNDARY']);
+      return makeRatAnswerPlan('BUY_BOUNDARY', 'BOUNDARY', {}, [], [], ['CLAIM_BOUNDARY']);
     case 'SAFETY_BOUNDARY':
-      return plan('SAFETY_BOUNDARY', 'BOUNDARY', {}, [], [], ['CLAIM_BOUNDARY']);
+      return makeRatAnswerPlan('SAFETY_BOUNDARY', 'BOUNDARY', {}, [], [], ['CLAIM_BOUNDARY']);
     case 'CLARIFY':
-      return plan('CLARIFY', 'EMPTY_PAWS', {}, [], [], ['RAT_NLP_V0_5']);
+      return makeRatAnswerPlan('CLARIFY', 'EMPTY_PAWS', {}, [], [], ['RAT_NLP_V0_5']);
     default:
       return null;
   }
 }
 
-async function statusPlan(config: RatConfig, fetchImpl: FetchLike): Promise<RatAnswerPlan> {
+async function statusPlan(config: RatConfig, fetchImpl: FetchLike, manifest: CapabilityManifest): Promise<RatAnswerPlan> {
   try {
     const result = await getJson('/api/health', config, fetchImpl);
-    if (!result.ok) {
-      return plan('STATUS', 'STUCK_IN_A_PIPE', {
+    const h = result.value;
+    if (
+      !result.ok ||
+      typeof h.indexReady !== 'boolean' ||
+      typeof h.observationReady !== 'boolean' ||
+      typeof h.historyBackfillComplete !== 'boolean'
+    ) {
+      return makeRatAnswerPlan('STATUS', 'STUCK_IN_A_PIPE', {
         index: `UNAVAILABLE / HTTP ${result.status}`,
         launchCount: 0,
         checkpointBlock: 'NONE',
         history: 'UNKNOWN',
         observations: 'UNKNOWN',
-        telegramStatus: capabilityStatus('telegramRatV0', config)
+        telegramStatus: capabilityStatus('telegramRatV0', manifest)
       }, [], ['the rat will not invent a healthy status.'], ['/api/health']);
     }
-    const h = result.value;
     const ready = h.indexReady === true;
     const obs = h.observationReady === true;
     const history = h.historyBackfillComplete === true;
-    return plan('STATUS', ready && obs ? (history ? 'RUMMAGING' : 'DIGGING') : 'STUCK_IN_A_PIPE', {
+    return makeRatAnswerPlan('STATUS', ready && obs ? (history ? 'RUMMAGING' : 'DIGGING') : 'STUCK_IN_A_PIPE', {
       index: ready ? 'READY' : 'DEGRADED',
       launchCount: numberValue(h.launchCount),
       checkpointBlock: stringValue(h.checkpointBlock, 'NONE'),
       history: history ? 'COMPLETE' : 'IN PROGRESS / UNVERIFIED',
       observations: obs ? 'READY' : 'PARTIAL / DEGRADED',
-      telegramStatus: capabilityStatus('telegramRatV0', config),
+      telegramStatus: capabilityStatus('telegramRatV0', manifest),
       ...(h.lastSyncError ? { indexError: stringValue(h.lastSyncError) } : {}),
       ...(h.lastObservationError ? { observationError: stringValue(h.lastObservationError) } : {})
     }, [], [], ['/api/health']);
   } catch {
-    return plan('STATUS', 'STUCK_IN_A_PIPE', {
+    return makeRatAnswerPlan('STATUS', 'STUCK_IN_A_PIPE', {
       index: 'UNREACHABLE',
       launchCount: 0,
       checkpointBlock: 'NONE',
       history: 'UNKNOWN',
       observations: 'UNKNOWN',
-      telegramStatus: capabilityStatus('telegramRatV0', config)
+      telegramStatus: capabilityStatus('telegramRatV0', manifest)
     }, [], ['public read plane unreachable. the rat will not guess.'], ['/api/health']);
   }
 }
 
-async function creatorPlan(understanding: RatUnderstanding, config: RatConfig, fetchImpl: FetchLike): Promise<RatAnswerPlan> {
+async function creatorPlan(
+  understanding: RatUnderstanding,
+  config: RatConfig,
+  fetchImpl: FetchLike
+): Promise<RatAnswerPlan> {
   const address = understanding.argument;
-  if (!ADDRESS_RE.test(address)) return plan('CREATOR_HISTORY', 'EMPTY_PAWS', { invalidInput: true });
+  if (!ADDRESS_RE.test(address)) {
+    return makeRatAnswerPlan('CREATOR_HISTORY', 'EMPTY_PAWS', { invalidInput: true });
+  }
   try {
     const result = await getJson(`/api/creator/${address.toLowerCase()}`, config, fetchImpl);
-    if (result.status === 404) return plan('CREATOR_HISTORY', 'EMPTY_PAWS', { notFound: true });
-    if (!result.ok) return plan('CREATOR_HISTORY', 'STUCK_IN_A_PIPE', { notFound: true }, [], [`Creator File unavailable / HTTP ${result.status}.`]);
+    if (result.status === 404) return makeRatAnswerPlan('CREATOR_HISTORY', 'EMPTY_PAWS', { notFound: true });
+    if (!result.ok) {
+      return makeRatAnswerPlan(
+        'CREATOR_HISTORY',
+        'STUCK_IN_A_PIPE',
+        { notFound: true },
+        [],
+        [`Creator File unavailable / HTTP ${result.status}.`]
+      );
+    }
+    expectSchema(result.value, 'binrat.creator-file/0.1');
     const c = result.value;
     const receipt = record(c.receipt);
     const receiptId = stringValue(receipt.receiptId, '');
+    if (
+      !ADDRESS_RE.test(stringValue(c.reportedCreatorAddress, '')) ||
+      typeof c.indexedLaunchCount !== 'number' ||
+      typeof c.historyCoverage !== 'string'
+    ) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+
     const indexedLaunchCount = numberValue(c.indexedLaunchCount);
-    return plan('CREATOR_HISTORY', indexedLaunchCount > 1 ? 'SMELLS_FAMILIAR' : 'RUMMAGING', {
+    return makeRatAnswerPlan('CREATOR_HISTORY', indexedLaunchCount > 1 ? 'SMELLS_FAMILIAR' : 'RUMMAGING', {
       creator: stringValue(c.reportedCreatorAddress),
       indexedLaunchCount,
       firstIndexedBlock: stringValue(c.firstIndexedBlock),
@@ -214,30 +265,53 @@ async function creatorPlan(understanding: RatUnderstanding, config: RatConfig, f
       identityRiskLanguage: understanding.identityRiskLanguage
     }, receiptId ? [receiptId] : [], [], [`/api/creator/${address.toLowerCase()}`]);
   } catch {
-    return plan('CREATOR_HISTORY', 'STUCK_IN_A_PIPE', { notFound: true }, [], ['Creator File lookup failed. no invented scraps.']);
+    return makeRatAnswerPlan(
+      'CREATOR_HISTORY',
+      'STUCK_IN_A_PIPE',
+      { notFound: true },
+      [],
+      ['Creator File lookup failed or violated the public API contract. no invented scraps.']
+    );
   }
 }
 
-async function bagPlan(id: string, receiptOnly: boolean, config: RatConfig, fetchImpl: FetchLike): Promise<RatAnswerPlan> {
-  const intent: RatIntent = receiptOnly ? 'RECEIPT' : 'BAG';
-  if (!BAG_ID_RE.test(id)) return plan(intent, 'EMPTY_PAWS', { invalidInput: true });
+async function bagPlan(
+  id: string,
+  receiptOnly: boolean,
+  config: RatConfig,
+  fetchImpl: FetchLike
+): Promise<RatAnswerPlan> {
+  if (!BAG_ID_RE.test(id)) {
+    return receiptOnly
+      ? makeRatAnswerPlan('RECEIPT', 'EMPTY_PAWS', { invalidInput: true })
+      : makeRatAnswerPlan('BAG', 'EMPTY_PAWS', { invalidInput: true });
+  }
   try {
     const result = await getJson(`/api/bag/${encodeURIComponent(id)}`, config, fetchImpl);
-    if (result.status === 404) return plan(intent, 'EMPTY_PAWS', { notFound: true });
-    if (!result.ok) return plan(intent, 'STUCK_IN_A_PIPE', { notFound: true }, [], [`launch lookup unavailable / HTTP ${result.status}.`]);
+    if (result.status === 404) {
+      return receiptOnly
+        ? makeRatAnswerPlan('RECEIPT', 'EMPTY_PAWS', { notFound: true })
+        : makeRatAnswerPlan('BAG', 'EMPTY_PAWS', { notFound: true });
+    }
+    if (!result.ok) throw new Error('PUBLIC_API_UNAVAILABLE');
+    expectSchema(result.value, 'binrat.public-feed/0.1');
+
     const bag = record(result.value.bag);
     const receipt = record(result.value.receipt);
     const receiptId = stringValue(receipt.receiptId, '');
+    if (!BAG_ID_RE.test(stringValue(bag.id, ''))) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+
     if (receiptOnly) {
-      return plan('RECEIPT', 'RUMMAGING', {
+      return makeRatAnswerPlan('RECEIPT', 'RUMMAGING', {
         launchId: stringValue(bag.id, id),
         receipt: receiptId || 'UNKNOWN',
         asOfBlock: stringValue(result.value.asOfBlock),
         historyCoverage: stringValue(result.value.historyCoverage)
       }, receiptId ? [receiptId] : [], [], [`/api/bag/${id}`]);
     }
+
     const trail = record(bag.trashTrail);
-    return plan('BAG', 'RUMMAGING', {
+    return makeRatAnswerPlan('BAG', 'RUMMAGING', {
       symbol: stringValue(bag.symbol, '?'),
       name: stringValue(bag.name, 'unnamed'),
       launchId: stringValue(bag.id, id),
@@ -247,35 +321,125 @@ async function bagPlan(id: string, receiptOnly: boolean, config: RatConfig, fetc
       receipt: receiptId || 'UNKNOWN'
     }, receiptId ? [receiptId] : [], [], [`/api/bag/${id}`]);
   } catch {
-    return plan(intent, 'STUCK_IN_A_PIPE', { notFound: true }, [], ['launch lookup failed. no invented scraps.']);
+    return receiptOnly
+      ? makeRatAnswerPlan('RECEIPT', 'STUCK_IN_A_PIPE', { notFound: true }, [], ['receipt lookup failed or violated the public API contract.'])
+      : makeRatAnswerPlan('BAG', 'STUCK_IN_A_PIPE', { notFound: true }, [], ['launch lookup failed or violated the public API contract. no invented scraps.']);
   }
 }
 
 async function replayPlan(id: string, config: RatConfig, fetchImpl: FetchLike): Promise<RatAnswerPlan> {
-  if (!BAG_ID_RE.test(id)) return plan('REPLAY', 'EMPTY_PAWS', { invalidInput: true });
+  if (!BAG_ID_RE.test(id)) return makeRatAnswerPlan('REPLAY', 'EMPTY_PAWS', { invalidInput: true });
   try {
     const result = await getJson(`/api/bag/${encodeURIComponent(id)}/replay`, config, fetchImpl);
-    if (result.status === 404) return plan('REPLAY', 'EMPTY_PAWS', { notFound: true });
-    if (!result.ok) return plan('REPLAY', 'STUCK_IN_A_PIPE', { notFound: true }, [], [`replay unavailable / HTTP ${result.status}.`]);
+    if (result.status === 404) return makeRatAnswerPlan('REPLAY', 'EMPTY_PAWS', { notFound: true });
+    if (!result.ok) throw new Error('PUBLIC_API_UNAVAILABLE');
+    expectSchema(result.value, 'binrat.replay-bundle/0.1');
+
     const launch = record(result.value.launch);
     const intelligence = record(result.value.intelligence);
     const receipt = record(result.value.receipt);
     const receiptId = stringValue(receipt.receiptId, '');
-    const stagesRaw = Array.isArray(result.value.stages) ? result.value.stages : [];
+    const stagesRaw = Array.isArray(result.value.stages) ? result.value.stages : null;
+    if (
+      !stagesRaw ||
+      typeof intelligence.observationCoverage !== 'string' ||
+      !receiptId.startsWith('binrat-replay:')
+    ) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+
     const stages = stagesRaw
       .map((value) => record(value))
       .map((stage) => `${stringValue(stage.label)} ${stringValue(stage.status)}`)
       .join(' → ');
-    return plan('REPLAY', 'RUMMAGING', {
+
+    return makeRatAnswerPlan('REPLAY', 'RUMMAGING', {
       symbol: stringValue(launch.symbol, '?'),
       name: stringValue(launch.name, 'unnamed'),
       stages: stages || 'UNKNOWN',
       observationCoverage: stringValue(intelligence.observationCoverage),
       historyCoverage: stringValue(result.value.historyCoverage),
-      receipt: receiptId || 'UNKNOWN'
-    }, receiptId ? [receiptId] : [], [], [`/api/bag/${id}/replay`]);
+      receipt: receiptId
+    }, [receiptId], [], [`/api/bag/${id}/replay`]);
   } catch {
-    return plan('REPLAY', 'STUCK_IN_A_PIPE', { notFound: true }, [], ['replay lookup failed. no invented timeline.']);
+    return makeRatAnswerPlan(
+      'REPLAY',
+      'STUCK_IN_A_PIPE',
+      { notFound: true },
+      [],
+      ['replay lookup failed or violated the public API contract. no invented timeline.']
+    );
+  }
+}
+
+async function addressLookupPlan(
+  understanding: RatUnderstanding,
+  config: RatConfig,
+  fetchImpl: FetchLike
+): Promise<RatAnswerPlan> {
+  const address = understanding.argument.toLowerCase();
+  if (!ADDRESS_RE.test(address)) {
+    return makeRatAnswerPlan('ADDRESS_LOOKUP', 'EMPTY_PAWS', {
+      address: understanding.argument || 'UNKNOWN',
+      role: 'UNKNOWN',
+      roles: 'NONE'
+    });
+  }
+
+  try {
+    const result = await getJson('/api/feed', config, fetchImpl);
+    if (!result.ok) throw new Error('PUBLIC_API_UNAVAILABLE');
+    expectSchema(result.value, 'binrat.public-feed/0.1');
+    if (!Array.isArray(result.value.bags)) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+
+    const roles = new Set<'TOKEN' | 'POOL' | 'REPORTED_CREATOR'>();
+    const bagIds = new Set<string>();
+
+    for (const value of result.value.bags) {
+      const bag = record(value);
+      const bagId = stringValue(bag.id, '');
+      if (stringValue(bag.token, '').toLowerCase() === address) {
+        roles.add('TOKEN');
+        if (BAG_ID_RE.test(bagId)) bagIds.add(bagId);
+      }
+      if (stringValue(bag.pool, '').toLowerCase() === address) {
+        roles.add('POOL');
+        if (BAG_ID_RE.test(bagId)) bagIds.add(bagId);
+      }
+      if (stringValue(bag.reportedCreatorAddress, '').toLowerCase() === address) {
+        roles.add('REPORTED_CREATOR');
+      }
+    }
+
+    if (roles.size === 0) {
+      return makeRatAnswerPlan('ADDRESS_LOOKUP', 'EMPTY_PAWS', {
+        address,
+        role: 'UNKNOWN',
+        roles: 'NONE'
+      }, [], [], ['/api/feed']);
+    }
+
+    if (roles.size === 1 && roles.has('REPORTED_CREATOR')) {
+      return creatorPlan(
+        { ...understanding, intent: 'CREATOR_HISTORY', argument: address },
+        config,
+        fetchImpl
+      );
+    }
+
+    if (roles.size === 1 && bagIds.size === 1 && (roles.has('TOKEN') || roles.has('POOL'))) {
+      return bagPlan([...bagIds][0]!, false, config, fetchImpl);
+    }
+
+    return makeRatAnswerPlan('ADDRESS_LOOKUP', 'NEUTRAL', {
+      address,
+      role: 'AMBIGUOUS',
+      roles: [...roles].sort().join(', ')
+    }, [], [], ['/api/feed']);
+  } catch {
+    return makeRatAnswerPlan('ADDRESS_LOOKUP', 'STUCK_IN_A_PIPE', {
+      address,
+      role: 'UNKNOWN',
+      roles: 'UNAVAILABLE'
+    }, [], ['address-role lookup failed or violated the public API contract.'], ['/api/feed']);
   }
 }
 
@@ -284,14 +448,16 @@ async function resolvePlan(
   config: RatConfig,
   fetchImpl: FetchLike
 ): Promise<RatAnswerPlan> {
-  const fixed = staticPlan(understanding, config);
+  const manifest = await currentManifest(config, fetchImpl);
+  const fixed = staticPlan(understanding, config, manifest);
   if (fixed) return fixed;
-  if (understanding.intent === 'STATUS') return statusPlan(config, fetchImpl);
+  if (understanding.intent === 'STATUS') return statusPlan(config, fetchImpl, manifest);
   if (understanding.intent === 'CREATOR_HISTORY') return creatorPlan(understanding, config, fetchImpl);
+  if (understanding.intent === 'ADDRESS_LOOKUP') return addressLookupPlan(understanding, config, fetchImpl);
   if (understanding.intent === 'BAG') return bagPlan(understanding.argument, false, config, fetchImpl);
   if (understanding.intent === 'RECEIPT') return bagPlan(understanding.argument, true, config, fetchImpl);
   if (understanding.intent === 'REPLAY') return replayPlan(understanding.argument, config, fetchImpl);
-  return plan('CLARIFY', 'EMPTY_PAWS');
+  return makeRatAnswerPlan('CLARIFY', 'EMPTY_PAWS', {});
 }
 
 export async function renderRatReplyDetailed(
