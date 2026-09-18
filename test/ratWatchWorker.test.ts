@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import worker from '../src/cloudflare/worker.js';
+import { handleWorkerRequest } from '../src/cloudflare/worker.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { D1Store } from '../src/cloudflare/d1Store.js';
@@ -77,7 +77,7 @@ test('Telegram /watch persists exact reported creator subscription and operation
         text: `/watch ${creator}`
       }
     };
-    const response = await worker.fetch(
+    const response = await handleWorkerRequest(
       new Request('https://binrat.example/telegram/webhook', {
         method: 'POST',
         headers: {
