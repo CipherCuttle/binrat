@@ -7,6 +7,7 @@ import { ArcPadLaunchSource } from './arc/arcpadSource.js';
 import { ArcObservationSource } from './arc/observationSource.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from './arc/chain.js';
 import { syncLaunches, type SyncOptions } from './indexer/syncLaunches.js';
+import { syncHistoricalLaunches } from './indexer/syncHistoricalLaunches.js';
 import { syncObservations } from './observations/syncObservations.js';
 import { projectPublicFeed } from './public/project.js';
 import { projectCreatorFile } from './public/creatorFile.js';
@@ -23,6 +24,9 @@ const controller = new AbortController();
 let lastSyncError: string | null = null;
 let lastObservationError: string | null = null;
 let observationSyncSucceeded = false;
+let lastHistoryError: string | null = null;
+let historyBackfillComplete = false;
+let historyBackfillTargetBlock: bigint | null = null;
 let sourceVerified = false;
 
 function integerEnv(name: string, fallback: number, minimum: number): number {
@@ -42,7 +46,7 @@ const baseOptions = {
 // Never expose viem error messages: they may contain RPC URLs, headers or credentials.
 function syncErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
-  const code = message.match(/^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+)(?=:|$)/)?.[1];
+  const code = message.match(/^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+)(?=:|$)/)?.[1];
   return code ?? 'SYNC_FAILED';
 }
 
@@ -55,8 +59,17 @@ async function watch(): Promise<void> {
         const checkpoint = await store.getCheckpoint();
         const head = await source.getHeadBlockNumber();
         const recentStart = head > lookback ? head - lookback : 0n;
-        options = { ...baseOptions, startBlock: checkpoint ? ARCPAD_START_BLOCK : (recentStart > ARCPAD_START_BLOCK ? recentStart : ARCPAD_START_BLOCK) };
-        console.log(JSON.stringify({ event: 'INDEX_START', chainId: ARC_CHAIN_ID, startBlock: options.startBlock.toString(), resumed: Boolean(checkpoint), historyCoverage: 'UNVERIFIED' }));
+        const liveWindowStart = recentStart > ARCPAD_START_BLOCK ? recentStart : ARCPAD_START_BLOCK;
+        historyBackfillTargetBlock = liveWindowStart > ARCPAD_START_BLOCK ? liveWindowStart - 1n : null;
+        options = { ...baseOptions, startBlock: checkpoint ? ARCPAD_START_BLOCK : liveWindowStart };
+        console.log(JSON.stringify({
+          event: 'INDEX_START',
+          chainId: ARC_CHAIN_ID,
+          startBlock: options.startBlock.toString(),
+          resumed: Boolean(checkpoint),
+          historyBackfillTargetBlock: historyBackfillTargetBlock?.toString() ?? null,
+          historyCoverage: 'UNVERIFIED'
+        }));
       }
       await source.assertAuthority(await source.getHeadBlockNumber());
       // Existing databases must pass checkpoint validation before being advertised ready.
@@ -66,6 +79,27 @@ async function watch(): Promise<void> {
       sourceVerified = true;
       lastSyncError = null;
       console.log(JSON.stringify({ event: 'INDEX_SYNC', ...launchReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+
+      if (historyBackfillTargetBlock === null) {
+        historyBackfillComplete = true;
+        lastHistoryError = null;
+      } else {
+        try {
+          const historyReport = await syncHistoricalLaunches(source, store, {
+            startBlock: ARCPAD_START_BLOCK,
+            endBlock: historyBackfillTargetBlock,
+            maxBatchBlocks: baseOptions.maxBatchBlocks
+          });
+          historyBackfillComplete = historyReport.complete;
+          lastHistoryError = null;
+          console.log(JSON.stringify({ event: 'HISTORY_SYNC', ...historyReport }, (_key, value) => typeof value === 'bigint' ? value.toString() : value));
+        } catch (error) {
+          historyBackfillComplete = false;
+          const code = syncErrorCode(error);
+          lastHistoryError = code === 'SYNC_FAILED' ? 'HISTORY_SYNC_FAILED' : code;
+          console.error(JSON.stringify({ event: 'HISTORY_ERROR', code: lastHistoryError }));
+        }
+      }
 
       try {
         const observationSource = new ArcObservationSource();
@@ -128,11 +162,16 @@ const server = createServer(async (request, response) => {
     if (pathname === '/api/health') {
       const checkpoint = await store.getCheckpoint();
       const launches = await store.listLaunches();
+      const historyBackfillNextBlock = await store.getHistoricalBackfillNextBlock();
       json(response, 200, {
         ok: !lastSyncError, chainId: ARC_CHAIN_ID,
         indexReady: Boolean(checkpoint && sourceVerified && !lastSyncError),
         checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
         launchCount: checkpoint ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length : 0,
+        historyBackfillComplete,
+        historyBackfillTargetBlock: historyBackfillTargetBlock?.toString() ?? null,
+        historyBackfillNextBlock: historyBackfillNextBlock?.toString() ?? null,
+        lastHistoryError,
         observationReady: observationSyncSucceeded && !lastObservationError,
         lastObservationError,
         lastSyncError

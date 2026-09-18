@@ -76,6 +76,11 @@ CREATE INDEX IF NOT EXISTS idx_launch_observations_launch_horizon
 CREATE INDEX IF NOT EXISTS idx_launch_observations_observed_block
   ON launch_observations(chain_id, observed_block);
 
+CREATE TABLE IF NOT EXISTS launch_history_backfill_state (
+  chain_id INTEGER PRIMARY KEY,
+  next_block TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS chain_checkpoints (
   chain_id INTEGER PRIMARY KEY,
   block_number TEXT NOT NULL,

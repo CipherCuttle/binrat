@@ -117,6 +117,21 @@ Result: `historicalReconstructionSupported=true`.
 
 The diagnostic workflow used to establish this result is intentionally removed after the gate so it does not become permanent CI/network debt.
 
+## Deeper ArcPad history lane
+
+The live checkpoint remains a forward-only availability cursor. Intelligence V1 uses a separate resumable historical cursor to scan from `ARCPAD_START_BLOCK` toward the live-window boundary in bounded batches.
+
+Rules:
+
+- historical backfill never moves the live checkpoint backward;
+- exact overlap with already-indexed live launches is idempotent;
+- each batch verifies launcher authority plus canonical batch/launch hashes before writes;
+- the cursor advances only after launch/provenance persistence succeeds;
+- a failed batch is replayed rather than skipped;
+- public history coverage remains `UNVERIFIED` while the stronger completeness claim is not yet justified.
+
+This closes the architectural gap where a resumed live checkpoint could advance forever without ever indexing older ArcPad launches.
+
 ## Planned implementation commits
 
 1. contract + donor freeze + capability probe + observation ledger skeleton;

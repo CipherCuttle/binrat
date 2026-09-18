@@ -171,6 +171,21 @@ export class SqliteStore implements LaunchStore {
     return rows.map((row) => reviveObservation(row.payload_json));
   }
 
+  async getHistoricalBackfillNextBlock(): Promise<bigint | null> {
+    const row = this.db.prepare('SELECT next_block FROM launch_history_backfill_state WHERE chain_id = ?')
+      .get(this.chainId) as { next_block: string } | undefined;
+    return row ? BigInt(row.next_block) : null;
+  }
+
+  async setHistoricalBackfillNextBlock(nextBlock: bigint): Promise<void> {
+    if (nextBlock < 0n) throw new Error('HISTORY_CURSOR_INVALID');
+    this.db.prepare(`
+      INSERT INTO launch_history_backfill_state (chain_id,next_block)
+      VALUES (?,?)
+      ON CONFLICT(chain_id) DO UPDATE SET next_block=excluded.next_block
+    `).run(this.chainId, nextBlock.toString());
+  }
+
   async getCheckpoint(): Promise<ChainCheckpoint | null> {
     const row = this.db.prepare('SELECT * FROM chain_checkpoints WHERE chain_id = ?').get(this.chainId) as CheckpointRow | undefined;
     if (!row) return null;
