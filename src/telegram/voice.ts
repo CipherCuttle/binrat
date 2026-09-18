@@ -130,7 +130,7 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         line('launch authorized', fact(plan, 'launchAuthorized')),
         '',
         fact(plan, 'tokenMessage'),
-        'Rat Credits are separate, off-chain, non-transferable contribution/coordination units.',
+        'Rat Credits are separate, off-chain, non-transferable contribution/coordination units; they are not equity, revenue share, or yield.',
         '',
         line('rule', fact(plan, 'invariant'))
       ];
@@ -164,13 +164,13 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         line('checkpoint block', fact(plan, 'checkpointBlock')),
         line('historical backfill', fact(plan, 'history')),
         line('observations', fact(plan, 'observations')),
-        line('Telegram Rat', fact(plan, 'telegramStatus')),
+        line('Telegram Rat capability', fact(plan, 'telegramStatus')),
         ...(plan.facts.indexError ? [line('index error', fact(plan, 'indexError'))] : []),
         ...(plan.facts.observationError ? [line('observation error', fact(plan, 'observationError'))] : [])
       ];
     case 'CREATOR_HISTORY':
       if (plan.facts.notFound) return ['no indexed Creator File for that address. unknown is not clean.'];
-      if (plan.facts.invalidInput) return ['give me an EVM address: 0x + 40 hex characters.'];
+      if (plan.facts.invalidInput) return ['invalid creator address. expected 0x + 40 hex characters.'];
       return [
         line('reported creator', fact(plan, 'creator')),
         line('indexed launches', fact(plan, 'indexedLaunchCount')),
