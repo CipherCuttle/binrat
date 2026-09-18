@@ -7,6 +7,7 @@ import { ArcPadLaunchSource } from './arc/arcpadSource.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from './arc/chain.js';
 import { runLaunchWatcher, type SyncOptions } from './indexer/syncLaunches.js';
 import { projectPublicFeed } from './public/project.js';
+import { projectCreatorFile } from './public/creatorFile.js';
 import { SqliteStore } from './store/sqliteStore.js';
 
 // Source and compiled entrypoints both resolve the same repo-owned web directory.
@@ -112,6 +113,16 @@ const server = createServer(async (request, response) => {
         launchCount: checkpoint ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length : 0,
         lastSyncError
       });
+      return;
+    }
+    if (pathname.startsWith('/api/creator/')) {
+      const creator = pathname.slice('/api/creator/'.length).toLowerCase();
+      if (!/^0x[0-9a-f]{40}$/.test(creator)) { json(response, 400, { error: 'CREATOR_ADDRESS_INVALID' }); return; }
+      const feed = await snapshot();
+      if (!feed) { json(response, 503, { ready: false, reason: lastSyncError ? 'LIVE_INDEX_NOT_AVAILABLE' : 'INDEX_NOT_READY' }); return; }
+      const creatorFile = await projectCreatorFile(feed, creator);
+      if (!creatorFile) { json(response, 404, { error: 'CREATOR_NOT_INDEXED' }); return; }
+      json(response, 200, creatorFile);
       return;
     }
     if (pathname === '/api/feed' || pathname.startsWith('/api/bag/')) {
