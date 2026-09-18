@@ -68,52 +68,79 @@ export class ArcObservationSource {
     const pool = launch.pool as Address;
     const token = launch.token as Address;
     const creator = launch.creator as Address;
-    const code = await this.client.getBytecode({ address: pool, blockNumber });
-    if (!code || code === '0x') throw new Error(`OBSERVATION_POOL_CODE_MISSING:${launch.pool}:block=${blockNumber}`);
+    const facts: {
+      poolCodePresent?: boolean;
+      poolActiveLiquidity?: bigint;
+      poolSqrtPriceX96?: bigint;
+      poolTick?: number;
+      creatorTokenBalance?: bigint;
+      tokenTotalSupply?: bigint;
+      tokenDecimals?: number;
+    } = {};
+    const missing: string[] = [];
 
-    const [slot0, activeLiquidity, creatorTokenBalance, tokenTotalSupply, tokenDecimals] = await Promise.all([
-      this.client.readContract({
+    const poolCode = await check(async () => this.client.getBytecode({ address: pool, blockNumber }));
+    if (poolCode.ok) {
+      facts.poolCodePresent = Boolean(poolCode.value && poolCode.value !== '0x');
+    } else {
+      missing.push('POOL_CODE');
+    }
+
+    if (facts.poolCodePresent === true) {
+      const slot0 = await check(async () => this.client.readContract({
         address: pool,
         abi: poolObservationAbi,
         functionName: 'slot0',
         blockNumber
-      }),
-      this.client.readContract({
+      }));
+      if (slot0.ok) {
+        facts.poolSqrtPriceX96 = slot0.value[0];
+        facts.poolTick = slot0.value[1];
+      } else {
+        missing.push('POOL_SLOT0');
+      }
+
+      const activeLiquidity = await check(async () => this.client.readContract({
         address: pool,
         abi: poolObservationAbi,
         functionName: 'liquidity',
         blockNumber
-      }),
-      this.client.readContract({
-        address: token,
-        abi: tokenObservationAbi,
-        functionName: 'balanceOf',
-        args: [creator],
-        blockNumber
-      }),
-      this.client.readContract({
-        address: token,
-        abi: tokenObservationAbi,
-        functionName: 'totalSupply',
-        blockNumber
-      }),
-      this.client.readContract({
-        address: token,
-        abi: tokenObservationAbi,
-        functionName: 'decimals',
-        blockNumber
-      })
-    ]);
+      }));
+      if (activeLiquidity.ok) facts.poolActiveLiquidity = activeLiquidity.value;
+      else missing.push('POOL_LIQUIDITY');
+    } else {
+      missing.push('POOL_SLOT0', 'POOL_LIQUIDITY');
+    }
 
-    return {
-      poolCodePresent: true,
-      poolActiveLiquidity: activeLiquidity,
-      poolSqrtPriceX96: slot0[0],
-      poolTick: slot0[1],
-      creatorTokenBalance,
-      tokenTotalSupply,
-      tokenDecimals
-    };
+    const creatorBalance = await check(async () => this.client.readContract({
+      address: token,
+      abi: tokenObservationAbi,
+      functionName: 'balanceOf',
+      args: [creator],
+      blockNumber
+    }));
+    if (creatorBalance.ok) facts.creatorTokenBalance = creatorBalance.value;
+    else missing.push('CREATOR_BALANCE');
+
+    const totalSupply = await check(async () => this.client.readContract({
+      address: token,
+      abi: tokenObservationAbi,
+      functionName: 'totalSupply',
+      blockNumber
+    }));
+    if (totalSupply.ok) facts.tokenTotalSupply = totalSupply.value;
+    else missing.push('TOKEN_TOTAL_SUPPLY');
+
+    const decimals = await check(async () => this.client.readContract({
+      address: token,
+      abi: tokenObservationAbi,
+      functionName: 'decimals',
+      blockNumber
+    }));
+    if (decimals.ok) facts.tokenDecimals = decimals.value;
+    else missing.push('TOKEN_DECIMALS');
+
+    return { facts, missing };
   }
 
   async probeHistoricalCapabilities(launch: LaunchObserved): Promise<HistoricalCapabilityProbe> {

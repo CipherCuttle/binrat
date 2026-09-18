@@ -42,15 +42,18 @@ class FakeObservationSource implements ObservationSource {
   async getBlockPoint(blockNumber: bigint): Promise<ObservationBlockPoint> {
     return { blockNumber, blockHash: hash(blockNumber), timestampMs: Number(blockNumber) * 60_000 };
   }
-  async readObservationFacts(_launch: LaunchObserved, blockNumber: bigint): Promise<LaunchObservationFacts> {
+  async readObservationFacts(_launch: LaunchObserved, blockNumber: bigint): Promise<{ facts: LaunchObservationFacts; missing: string[] }> {
     return {
-      poolCodePresent: true,
-      poolActiveLiquidity: blockNumber * 10n,
-      poolSqrtPriceX96: blockNumber * 100n,
-      poolTick: Number(blockNumber),
-      creatorTokenBalance: 1_000n - blockNumber,
-      tokenTotalSupply: 1_000n,
-      tokenDecimals: 18
+      facts: {
+        poolCodePresent: true,
+        poolActiveLiquidity: blockNumber * 10n,
+        poolSqrtPriceX96: blockNumber * 100n,
+        poolTick: Number(blockNumber),
+        creatorTokenBalance: 1_000n - blockNumber,
+        tokenTotalSupply: 1_000n,
+        tokenDecimals: 18
+      },
+      missing: []
     };
   }
 }
@@ -119,6 +122,44 @@ test('sync fails closed when launch block hash no longer matches canonical chain
       }),
       /OBSERVATION_LAUNCH_REORG/
     );
+  } finally {
+    store.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+
+test('sync persists partial receipts instead of treating unsupported evidence as success or aborting the horizon', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-observation-partial-'));
+  const store = new SqliteStore(join(dir, 'test.sqlite'), chainId);
+  try {
+    const item = launch(10n);
+    await store.putLaunch(item);
+    class PartialSource extends FakeObservationSource {
+      override async readObservationFacts(_launch: LaunchObserved, blockNumber: bigint) {
+        return {
+          facts: {
+            poolCodePresent: true,
+            creatorTokenBalance: 1_000n - blockNumber,
+            tokenTotalSupply: 1_000n
+          },
+          missing: ['POOL_SLOT0', 'POOL_LIQUIDITY', 'TOKEN_DECIMALS']
+        };
+      }
+    }
+
+    const report = await syncObservations(new PartialSource(), store, {
+      confirmations: 1n,
+      maxObservationsPerSync: 1,
+      horizons: [{ label: '5m', ms: 300_000 }]
+    });
+    assert.equal(report.inserted, 1);
+
+    const [receipt] = await store.listObservationsForLaunch(item.launchId);
+    assert.equal(receipt?.status, 'PARTIAL');
+    assert.deepEqual(receipt?.missing, ['POOL_SLOT0', 'POOL_LIQUIDITY', 'TOKEN_DECIMALS']);
+    assert.equal(receipt?.facts.poolCodePresent, true);
+    assert.equal(receipt?.facts.poolActiveLiquidity, undefined);
   } finally {
     store.close();
     rmSync(dir, { recursive: true, force: true });

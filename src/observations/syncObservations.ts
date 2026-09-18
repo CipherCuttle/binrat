@@ -3,7 +3,7 @@ import type { LaunchStore } from '../core/ports.js';
 import { buildObservationReceipt } from './identity.js';
 import { OBSERVATION_HORIZONS } from './horizons.js';
 import type { ObservationStore } from './store.js';
-import type { LaunchObservationFacts } from './types.js';
+import type { LaunchObservationFacts, ObservationStatus } from './types.js';
 
 export interface ObservationBlockPoint {
   blockNumber: bigint;
@@ -14,7 +14,10 @@ export interface ObservationBlockPoint {
 export interface ObservationSource {
   getHeadBlockNumber(): Promise<bigint>;
   getBlockPoint(blockNumber: bigint): Promise<ObservationBlockPoint>;
-  readObservationFacts(launch: LaunchObserved, blockNumber: bigint): Promise<LaunchObservationFacts>;
+  readObservationFacts(
+    launch: LaunchObserved,
+    blockNumber: bigint
+  ): Promise<{ facts: LaunchObservationFacts; missing: string[] }>;
 }
 
 export interface ObservationSyncOptions {
@@ -91,7 +94,7 @@ export async function syncObservations(
         throw new Error(`OBSERVATION_HORIZON_NONMINIMAL:block=${observed.blockNumber}:predecessor=${predecessor.blockNumber}`);
       }
 
-      const facts = await source.readObservationFacts(launch, observed.blockNumber);
+      const observedFacts = await source.readObservationFacts(launch, observed.blockNumber);
       await assertEvidenceStable(source, launch, observed, predecessor, targetTimestampMs);
       const receipt = await buildObservationReceipt({
         chainId: launch.chainId,
@@ -101,9 +104,9 @@ export async function syncObservations(
         observedBlock: observed.blockNumber,
         observedBlockHash: observed.blockHash,
         observedTimestampMs: observed.timestampMs,
-        status: 'COMPLETE',
-        facts,
-        missing: []
+        status: observationStatus(observedFacts.facts, observedFacts.missing),
+        facts: observedFacts.facts,
+        missing: observedFacts.missing
       });
       const result = await store.putObservation(receipt);
       if (result === 'INSERTED') inserted += 1;
@@ -165,6 +168,11 @@ async function assertEvidenceStable(
   if (observedAgain.timestampMs < targetTimestampMs) {
     throw new Error(`OBSERVATION_HORIZON_BEFORE_TARGET:block=${observed.blockNumber}`);
   }
+}
+
+function observationStatus(facts: LaunchObservationFacts, missing: readonly string[]): ObservationStatus {
+  if (missing.length === 0) return 'COMPLETE';
+  return Object.keys(facts).length > 0 ? 'PARTIAL' : 'UNVERIFIED';
 }
 
 function assertHash(label: string, blockNumber: bigint, expected: Hex, actual: Hex): void {
