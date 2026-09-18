@@ -410,7 +410,7 @@ async function sendRatWatchMessage(
   chatId: number,
   text: string,
   fetchImpl: typeof fetch
-): Promise<number | null> {
+): Promise<number> {
   const response = await fetchImpl(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -423,7 +423,10 @@ async function sendRatWatchMessage(
   let parsed: { ok?: boolean; result?: { message_id?: number } } = {};
   try { parsed = await response.json() as { ok?: boolean; result?: { message_id?: number } }; } catch {}
   if (!response.ok || parsed.ok !== true) throw new Error('RAT_WATCH_TELEGRAM_SEND_FAILED');
-  return Number.isSafeInteger(parsed.result?.message_id) ? parsed.result!.message_id! : null;
+  if (!Number.isSafeInteger(parsed.result?.message_id)) {
+    throw new Error('RAT_WATCH_TELEGRAM_MESSAGE_ID_MISSING');
+  }
+  return parsed.result!.message_id!;
 }
 
 async function persistLiveFailure(
