@@ -165,6 +165,41 @@ test('observation failures preserve a sanitized error class without blocking liv
   }
 });
 
+test('observation HTTP failures expose only sanitized status diagnostics', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakeLaunchSource();
+
+  class RateLimitedObservationSource extends FakeObservationSource {
+    override async getHeadBlockNumber(): Promise<bigint> {
+      const error = new Error('provider details intentionally omitted') as Error & { status?: number };
+      error.name = 'HttpRequestError';
+      error.status = 429;
+      throw error;
+    }
+  }
+
+  try {
+    const result = await runCloudflareSyncCycle(
+      { DB: db },
+      message('cycle-observation-429'),
+      {
+        now: () => 16_000,
+        launchSource: source,
+        observationSource: new RateLimitedObservationSource(source.head)
+      }
+    );
+
+    assert.deepEqual(result, { status: 'SUCCESS', liveCaughtUp: true });
+    const state = await new D1RuntimeStateStore(db, 5042).get();
+    assert.equal(state?.observationReady, false);
+    assert.equal(state?.lastObservationError, 'OBSERVATION_HTTP_429');
+    assert.equal(state?.lastSyncError, null);
+  } finally {
+    db.close();
+  }
+});
+
 test('Cloudflare sync lease is fenced so an old owner cannot release a replacement lease', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
