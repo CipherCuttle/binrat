@@ -48,6 +48,9 @@ test('Cloudflare read API projects the same durable BINRAT evidence from D1', as
     await store.setHistoricalBackfillNextBlock(launch.blockNumber + 1n);
     await runtime.put({
       sourceVerified: true,
+      liveCaughtUp: true,
+      headBlock: launch.blockNumber + 2n,
+      targetBlock: launch.blockNumber,
       observationReady: true,
       historyBackfillComplete: false,
       historyBackfillTargetBlock: launch.blockNumber - 1n,
@@ -127,6 +130,9 @@ test('Cloudflare read API refuses stale runtime authority even when old evidence
     });
     await runtime.put({
       sourceVerified: true,
+      liveCaughtUp: true,
+      headBlock: launch.blockNumber + 2n,
+      targetBlock: launch.blockNumber,
       observationReady: true,
       historyBackfillComplete: false,
       historyBackfillTargetBlock: null,

@@ -97,3 +97,36 @@ Secrets are not stored in Wrangler config. Deployment must bind:
 - `CAPABILITY_MANIFEST_JSON`
 
 Replies remain disabled by default in the example configuration.
+
+
+## CF4 bounded writer
+
+A one-minute Cron enqueue triggers a single `SYNC_CYCLE` Queue message.
+
+The Queue consumer is hard-bounded:
+
+1. acquire a fenced D1 sync lease;
+2. execute at most one live launch batch;
+3. if live is caught up, execute at most one historical backfill batch;
+4. if live is caught up, reconstruct at most the configured observation count;
+5. persist one runtime/freshness record;
+6. release only the lease owned by this cycle.
+
+The first live bootstrap defaults to the last 1,000 blocks so the edge can become current in one successful 1,000-block batch. Older evidence is recovered independently through the durable historical cursor.
+
+Public reads require:
+- source authority verified;
+- no active live-sync error;
+- `liveCaughtUp = true`;
+- fresh runtime state.
+
+A recently updated but partially caught-up bootstrap is therefore **not** advertised READY.
+
+Queue concurrency is additionally capped to one in the example Wrangler config, but the D1 owner-token lease remains the correctness boundary for retries or overlap.
+
+Production bindings still required:
+- D1 database
+- Queue
+- `ARC_RPC_URL` secret
+- Telegram secrets
+- capability manifest

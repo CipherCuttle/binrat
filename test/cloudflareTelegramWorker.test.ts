@@ -75,6 +75,9 @@ test('Cloudflare Telegram Rat resolves /status locally and persists reply receip
     });
     await runtime.put({
       sourceVerified: true,
+      liveCaughtUp: true,
+      headBlock: launch.blockNumber + 2n,
+      targetBlock: launch.blockNumber,
       observationReady: true,
       historyBackfillComplete: false,
       historyBackfillTargetBlock: launch.blockNumber - 1n,
