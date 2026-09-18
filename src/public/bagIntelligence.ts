@@ -72,7 +72,7 @@ export async function projectBagIntelligence(
   }
 
   const snapshots = valid.map(projectSnapshot);
-  const expected = new Set(OBSERVATION_HORIZONS.map((horizon) => horizon.ms));
+  const expected = new Set<number>(OBSERVATION_HORIZONS.map((horizon) => horizon.ms));
   const observationCoverage: PublicCoverage =
     snapshots.length === 0
       ? 'UNVERIFIED'
