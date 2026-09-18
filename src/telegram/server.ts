@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from './rat.js';
 import { PerChatRateGate, UpdateDeliveryFence } from './deliveryGuard.js';
 import { TelegramReplyLedger } from './replyLedger.js';
+import { parseRepliesEnabled } from './control.js';
 
 interface TelegramChat {
   id: number;
@@ -109,6 +110,7 @@ async function sendMessage(token: string, chatId: number, text: string): Promise
 
 const token = requiredEnv('TELEGRAM_BOT_TOKEN');
 const webhookSecret = requiredEnv('TELEGRAM_WEBHOOK_SECRET');
+const repliesEnabled = parseRepliesEnabled(process.env.TELEGRAM_REPLIES_ENABLED);
 const botIdentity = await getBotIdentity(token);
 const updateFence = new UpdateDeliveryFence();
 const rateGate = new PerChatRateGate(integerEnv('TELEGRAM_MAX_MESSAGES_PER_MINUTE', 12, 1));
@@ -133,7 +135,8 @@ const server = createServer(async (request, response) => {
         ok: true,
         service: 'binrat-telegram-rat',
         capabilityStatus: config.manifest.capabilities.telegramRatV0?.engineeringStatus ?? 'UNKNOWN',
-        launchAuthorization: config.manifest.launchAuthorization.status
+        launchAuthorization: config.manifest.launchAuthorization.status,
+        repliesEnabled
       });
       return;
     }
@@ -162,6 +165,12 @@ const server = createServer(async (request, response) => {
     if (replyLedger.has(update.update_id)) {
       updateFence.release(update.update_id);
       json(response, 200, { ok: true, duplicate: true, persisted: true });
+      return;
+    }
+
+    if (!repliesEnabled) {
+      updateFence.commit(update.update_id);
+      json(response, 200, { ok: true, ignored: true, repliesEnabled: false });
       return;
     }
 
