@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 10
     env:
       ARC_RPC_URL: https://rpc.mainnet.arc.io
-      BINRAT_DB_PATH: ${{ runner.temp }}/binrat-probe.sqlite
+      BINRAT_DB_PATH: /tmp/binrat-probe.sqlite
       BINRAT_LIVE_LOOKBACK_BLOCKS: "50000"
       BINRAT_MAX_BATCH_BLOCKS: "1000"
       BINRAT_CONFIRMATIONS: "2"
