@@ -75,18 +75,19 @@ function staticReply(command: string, config: RatConfig): string | null {
       'EXPERIMENT: Rat Credits → Trash Bounties → Proof of First → Rat Reputation.',
       'LATER: Case Files → Rat Machine → Rat Lab → API/agents → independent evidence providers.',
       '',
-      'A transferable token is considered only if the coordination experiment proves it is actually needed.'
+      '$BINRAT: early fair launch planned, subject to the launch/compliance gate. Utility expands as shipped roadmap capabilities arrive.'
     ].join('\n');
   }
   if (command === 'token') {
     return [
       '🐀 TOKEN STATUS',
       '',
-      'No $BINRAT token is launched.',
-      'Rat Credits are planned as an off-chain product experiment for evidence bonds, challenges, bounties and contributor reputation.',
-      'They are not equity, revenue share, yield, or a promise of future token conversion.',
+      'No $BINRAT token is launched yet.',
+      'An early fair launch is planned to create the native BINRAT culture/coordination asset and help bankroll continued development through disclosed project/creator fee revenue.',
+      'No private presale or discounted insider round is intended. Shipped utility and planned utility will be labeled separately.',
+      'Rat Credits remain off-chain, non-transferable coordination units and are not equity or yield.',
       '',
-      'Rule: wealth never decides truth. Evidence does.'
+      'Rule: degen decides attention. Receipts decide truth.'
     ].join('\n');
   }
   if (command === 'proof') {
@@ -97,7 +98,7 @@ function staticReply(command: string, config: RatConfig): string | null {
       'Missing evidence != good evidence.',
       'Future data cannot leak into past views.',
       'Token ownership cannot buy factual authority.',
-      'Core BINRAT must still work if a future token goes to zero.'
+      'Core BINRAT evidence must stay truthful regardless of $BINRAT market price.'
     ].join('\n');
   }
   if (command === 'faq' || command === 'help' || command === 'start') {
