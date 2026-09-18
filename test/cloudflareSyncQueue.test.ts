@@ -282,6 +282,37 @@ test('successful live queue work schedules one separate observation job', async 
   }
 });
 
+test('live queue skips observation scheduling on the alternate minute', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakeLaunchSource();
+  const sent: BinratSyncMessage[] = [];
+
+  try {
+    await handleSyncQueueBatch(
+      {
+        messages: [{
+          body: message('cycle-no-observation', 61_000),
+          ack() {},
+          retry() { throw new Error('unexpected retry'); }
+        }]
+      },
+      {
+        DB: db,
+        SYNC_QUEUE: { async send(body) { sent.push(body); } }
+      },
+      {
+        now: () => 61_500,
+        launchSource: source
+      }
+    );
+
+    assert.equal(sent.length, 0);
+  } finally {
+    db.close();
+  }
+});
+
 test('Cloudflare sync lease is fenced so an old owner cannot release a replacement lease', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
