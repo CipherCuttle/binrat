@@ -171,6 +171,94 @@ export class SqliteStore implements LaunchStore {
     return rows.map((row) => reviveObservation(row.payload_json));
   }
 
+  async commitHistoricalBackfillBatch(
+    launches: readonly LaunchObserved[],
+    facts: readonly ProvenanceFact[],
+    edges: readonly ProvenanceEdge[],
+    nextBlock: bigint
+  ): Promise<{ inserted: number; duplicates: number }> {
+    if (nextBlock < 0n) throw new Error('HISTORY_CURSOR_INVALID');
+    if (facts.length !== launches.length) throw new Error('HISTORY_BATCH_FACT_COUNT_MISMATCH');
+
+    const tx = this.db.transaction(() => {
+      let inserted = 0;
+      let duplicates = 0;
+
+      for (const value of launches) {
+        if (value.chainId !== this.chainId) throw new Error(`LAUNCH_CHAIN_MISMATCH:${value.launchId}`);
+        const launch = normalizeLaunchHex(value);
+        const result = this.db.prepare(`
+          INSERT OR IGNORE INTO launches (
+            launch_id,event_id,chain_id,block_number,block_hash,source,launcher,tx_hash,log_index,
+            token,creator,pool,name,symbol,image_uri,website,twitter,telegram,observed_at_ms
+          ) VALUES (
+            @launchId,@eventId,@chainId,@blockNumber,@blockHash,@source,@launcher,@txHash,@logIndex,
+            @token,@creator,@pool,@name,@symbol,@imageUri,@website,@twitter,@telegram,@observedAtMs
+          )
+        `).run({ ...launch, blockNumber: launch.blockNumber.toString() });
+        if (result.changes === 1) {
+          inserted += 1;
+        } else {
+          const row = this.db.prepare(`
+            SELECT * FROM launches
+            WHERE launch_id = ? OR (chain_id = ? AND tx_hash = ? AND token = ?) OR (chain_id = ? AND token = ?)
+            LIMIT 1
+          `).get(launch.launchId, launch.chainId, launch.txHash, launch.token, launch.chainId, launch.token) as LaunchRow | undefined;
+          if (!row || !sameLaunchAuthority(fromLaunchRow(row), launch)) {
+            throw new Error(`LAUNCH_IDENTITY_CONFLICT:${launch.launchId}`);
+          }
+          duplicates += 1;
+        }
+      }
+
+      for (const fact of facts) {
+        if (fact.chainId !== this.chainId) throw new Error(`PROVENANCE_CHAIN_MISMATCH:${fact.factId}`);
+        const payload = canonicalJson(fact);
+        const result = this.db.prepare(`
+          INSERT OR IGNORE INTO provenance_facts (
+            fact_id,chain_id,launch_id,creator,observed_block,observed_block_hash,log_index,source_event_id,evidence_digest,payload_json
+          ) VALUES (?,?,?,?,?,?,?,?,?,?)
+        `).run(
+          fact.factId, fact.chainId, fact.launchId, fact.creator.toLowerCase(), fact.observedBlock.toString(),
+          fact.observedBlockHash.toLowerCase(), fact.logIndex, fact.sourceEventId, fact.evidenceDigest, payload
+        );
+        if (result.changes === 0) {
+          const existing = this.db.prepare('SELECT fact_id,evidence_digest,payload_json FROM provenance_facts WHERE fact_id = ? OR launch_id = ? LIMIT 1')
+            .get(fact.factId, fact.launchId) as { fact_id: string; evidence_digest: string; payload_json: string } | undefined;
+          if (!existing || existing.fact_id !== fact.factId || existing.evidence_digest !== fact.evidenceDigest || existing.payload_json !== payload) {
+            throw new Error(`PROVENANCE_FACT_IDENTITY_CONFLICT:${fact.factId}`);
+          }
+        }
+      }
+
+      this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
+      const insertEdge = this.db.prepare(`
+        INSERT INTO provenance_edges (
+          edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
+          source_fact_ids_json,derivation_version,evidence_digest,payload_json
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+      `);
+      for (const edge of edges) {
+        if (edge.chainId !== this.chainId) throw new Error(`PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
+        insertEdge.run(
+          edge.edgeId, edge.chainId, edge.kind, edge.from, edge.to, edge.evidenceClass,
+          edge.observedBlock.toString(), edge.observedBlockHash.toLowerCase(), canonicalJson(edge.sourceFactIds),
+          edge.derivationVersion, edge.evidenceDigest, canonicalJson(edge)
+        );
+      }
+
+      this.db.prepare(`
+        INSERT INTO launch_history_backfill_state (chain_id,next_block)
+        VALUES (?,?)
+        ON CONFLICT(chain_id) DO UPDATE SET next_block=excluded.next_block
+      `).run(this.chainId, nextBlock.toString());
+
+      return { inserted, duplicates };
+    });
+
+    return tx();
+  }
+
   async getHistoricalBackfillNextBlock(): Promise<bigint | null> {
     const row = this.db.prepare('SELECT next_block FROM launch_history_backfill_state WHERE chain_id = ?')
       .get(this.chainId) as { next_block: string } | undefined;

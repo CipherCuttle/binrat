@@ -6,6 +6,7 @@ import test from 'node:test';
 import type { LaunchSource } from '../src/core/ports.js';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { syncHistoricalLaunches } from '../src/indexer/syncHistoricalLaunches.js';
+import { buildProvenanceFact } from '../src/intelligence/provenance.js';
 import { SqliteStore } from '../src/store/sqliteStore.js';
 
 const chainId = 5042;
@@ -134,6 +135,35 @@ test('historical cursor does not advance when the batch boundary changes during 
     );
     assert.equal(await store.getHistoricalBackfillNextBlock(), null);
     assert.equal((await store.listLaunches()).length, 0);
+  } finally {
+    store.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+
+test('historical batch commit is atomic across launches, provenance, edges, and cursor', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-history-atomic-'));
+  const store = new SqliteStore(join(dir, 'test.sqlite'), chainId);
+  try {
+    const first = launchAt(2n);
+    const conflict: LaunchObserved = {
+      ...launchAt(3n),
+      launchId: 'history-launch-conflict',
+      eventId: 'history-event-conflict',
+      txHash: hash(201n)
+    };
+    const facts = await Promise.all([buildProvenanceFact(first), buildProvenanceFact(conflict)]);
+
+    await assert.rejects(
+      store.commitHistoricalBackfillBatch([first, conflict], facts, [], 4n),
+      /LAUNCH_IDENTITY_CONFLICT/
+    );
+
+    assert.equal((await store.listLaunches()).length, 0);
+    assert.equal((await store.listProvenanceFacts()).length, 0);
+    assert.equal((await store.listProvenanceEdges()).length, 0);
+    assert.equal(await store.getHistoricalBackfillNextBlock(), null);
   } finally {
     store.close();
     rmSync(dir, { recursive: true, force: true });

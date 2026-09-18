@@ -1,10 +1,15 @@
 import type { Hex, LaunchObserved } from '../core/types.js';
 import type { LaunchSource, LaunchStore } from '../core/ports.js';
-import { buildProvenanceFact, projectProvenanceEdges } from '../intelligence/provenance.js';
+import { buildProvenanceFact, projectProvenanceEdges, type ProvenanceEdge, type ProvenanceFact } from '../intelligence/provenance.js';
 
 export interface HistoricalBackfillStore extends LaunchStore {
   getHistoricalBackfillNextBlock(): Promise<bigint | null>;
-  setHistoricalBackfillNextBlock(nextBlock: bigint): Promise<void>;
+  commitHistoricalBackfillBatch(
+    launches: readonly LaunchObserved[],
+    facts: readonly ProvenanceFact[],
+    edges: readonly ProvenanceEdge[],
+    nextBlock: bigint
+  ): Promise<{ inserted: number; duplicates: number }>;
 }
 
 export interface HistoricalBackfillOptions {
@@ -66,21 +71,13 @@ export async function syncHistoricalLaunches(
     throw new Error(`HISTORY_REORG_BEFORE_WRITE:block=${toBlock}`);
   }
 
-  let inserted = 0;
-  let duplicates = 0;
-  for (let i = 0; i < launches.length; i += 1) {
-    const launch = launches[i]!;
-    const result = await store.putLaunch(launch);
-    if (result === 'INSERTED') inserted += 1;
-    else duplicates += 1;
-    await store.putProvenanceFact(facts[i]!);
-  }
-
-  const allFacts = await store.listProvenanceFacts();
-  await store.replaceProvenanceEdges(await projectProvenanceEdges(allFacts));
+  const existingFacts = await store.listProvenanceFacts();
+  const mergedFacts = new Map(existingFacts.map((fact) => [fact.factId, fact] as const));
+  for (const fact of facts) mergedFacts.set(fact.factId, fact);
+  const edges = await projectProvenanceEdges([...mergedFacts.values()]);
 
   const followingBlock = toBlock + 1n;
-  await store.setHistoricalBackfillNextBlock(followingBlock);
+  const committed = await store.commitHistoricalBackfillBatch(launches, facts, edges, followingBlock);
 
   return {
     requestedStartBlock: options.startBlock,
@@ -88,8 +85,8 @@ export async function syncHistoricalLaunches(
     scannedStartBlock: nextBlock,
     scannedEndBlock: toBlock,
     nextBlock: followingBlock,
-    inserted,
-    duplicates,
+    inserted: committed.inserted,
+    duplicates: committed.duplicates,
     complete: followingBlock > options.endBlock
   };
 }
