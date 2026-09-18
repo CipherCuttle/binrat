@@ -90,6 +90,18 @@ CREATE TABLE IF NOT EXISTS chain_checkpoints (
 
 -- A failing CHECK inside D1 batch() aborts and rolls back the whole batch.
 -- The store uses this only as an invariant tripwire; successful operations insert no rows.
+CREATE TABLE IF NOT EXISTS binrat_runtime_state (
+  chain_id INTEGER PRIMARY KEY,
+  source_verified INTEGER NOT NULL,
+  observation_ready INTEGER NOT NULL,
+  history_backfill_complete INTEGER NOT NULL,
+  history_backfill_target_block TEXT,
+  last_sync_error TEXT,
+  last_history_error TEXT,
+  last_observation_error TEXT,
+  updated_at_ms INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS binrat_invariant_guard (
   must_be_zero INTEGER NOT NULL CHECK (must_be_zero = 0)
 );

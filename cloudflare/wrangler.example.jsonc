@@ -1,0 +1,16 @@
+{
+  // Copy to wrangler.jsonc after creating the D1 database.
+  "name": "binrat-edge-v0",
+  "main": "src/cloudflare/worker.ts",
+  "compatibility_date": "2026-09-18",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "binrat-v0",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+  "vars": {
+    "BINRAT_MAX_STATUS_AGE_MS": "60000"
+  }
+}

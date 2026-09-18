@@ -49,3 +49,24 @@ Next gates:
 6. explicit owner deployment authorization.
 
 No trading, signing, capital, launch, or marketing authority is added.
+
+
+## CF2 read plane
+
+`src/cloudflare/worker.ts` exposes the existing BINRAT read contracts from D1:
+
+- `GET /api/health`
+- `GET /api/capabilities`
+- `GET /api/feed`
+- `GET /api/creator/:address`
+- `GET /api/bag/:id`
+- `GET /api/bag/:id/intelligence`
+- `GET /api/bag/:id/replay`
+
+The Worker is independent of indexer process uptime.
+
+Freshness authority is stored in `binrat_runtime_state`. Durable old evidence may remain queryable inside D1, but public projection routes return 503 if the indexer's verified runtime state is stale or has an active sync error.
+
+`/api/health` itself remains fast and returns a structured degraded state rather than relying on a sleeping application server.
+
+`cloudflare/wrangler.example.jsonc` is intentionally non-deployable until a real D1 database id is bound.
