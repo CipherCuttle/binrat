@@ -60,12 +60,18 @@ export class D1RatWatchStore {
   async unsubscribe(chatId: number, creator: string): Promise<boolean> {
     validateChatId(chatId);
     const normalized = normalizeCreator(creator);
-    const result = await this.db.prepare(`
-      DELETE FROM rat_watch_subscriptions
-      WHERE chat_id = ? AND creator = ?
-    `).bind(chatId, normalized).run();
-    if (!result.success) throw new Error('RAT_WATCH_UNSUBSCRIBE_FAILED');
-    return changes(result) === 1;
+    const results = await this.db.batch([
+      this.db.prepare(`
+        DELETE FROM rat_watch_subscriptions
+        WHERE chat_id = ? AND creator = ?
+      `).bind(chatId, normalized),
+      this.db.prepare(`
+        DELETE FROM rat_watch_alerts
+        WHERE chat_id = ? AND creator = ? AND state = 'PENDING'
+      `).bind(chatId, normalized)
+    ]);
+    if (results.some((result) => !result.success)) throw new Error('RAT_WATCH_UNSUBSCRIBE_FAILED');
+    return changes(results[0]!) === 1;
   }
 
   async list(chatId: number): Promise<RatWatchSubscription[]> {
@@ -137,6 +143,9 @@ export class D1RatWatchStore {
         l.name
       FROM rat_watch_alerts a
       JOIN launches l ON l.launch_id = a.launch_id
+      JOIN rat_watch_subscriptions s
+        ON s.chat_id = a.chat_id
+       AND s.creator = a.creator
       WHERE a.state = 'PENDING'
       ORDER BY a.created_at_ms, a.alert_id
       LIMIT ?
