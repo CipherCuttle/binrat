@@ -1,7 +1,7 @@
 # BINRAT WHITEPAPER V0.1
 
-Status: product / network design draft  
-Not a token offering document. Not a promise of launch, token value, returns, or roadmap timing.
+Status: product / network + early fair-launch design draft  
+Not a statutory token-offering white paper. Not a promise of token value, returns, or roadmap timing.
 
 ## Abstract
 
@@ -15,7 +15,7 @@ BINRAT observes launch events, preserves point-in-time evidence, reconstructs cr
 
 The long-term design extends that evidence system with collaborative research, bounties, challenges, contributor reputation, historical replay, alerts, and potentially permissionless evidence providers.
 
-A transferable token is not assumed to be necessary. BINRAT first tests the coordination model using off-chain Rat Credits.
+BINRAT intends to fair-launch `$BINRAT` early. The purpose is explicit: create a native culture/coordination asset and use transparently disclosed project/creator fee revenue to help bankroll continued development. Utility is intended to expand as roadmap capabilities ship. This is a product and funding design statement, not a statement about future token value.
 
 ## 1. Problem
 
@@ -153,7 +153,7 @@ A commit/reveal mechanism can preserve attribution for novel discoveries while r
 
 Reputation is non-transferable and derived from evidence history.
 
-Token balance, if a token later exists, never substitutes for reputation.
+`$BINRAT` balance never substitutes for reputation.
 
 ## 8. Case Files
 
@@ -213,26 +213,34 @@ It should not:
 
 ## 12. Token doctrine
 
-BINRAT does not begin with the assumption that it needs a token.
+BINRAT intends to launch `$BINRAT` early rather than wait for the complete network roadmap.
 
-The token thesis must survive this test:
+The project is explicit about why:
 
-> What important coordination problem fails if we replace the token with a database permission, reputation score, stablecoin deposit, or subscription?
+- a fair launch creates a native community/culture asset;
+- disclosed creator/project fee revenue can bankroll development;
+- holders can participate in progressively shipped product utility;
+- the degen layer can help distribute BINRAT while the evidence layer earns trust.
 
-If nothing important fails, the token is decorative.
+The intended fair-launch principles are:
 
-A future transferable `$BINRAT` is only justified if permissionless participation creates a real need for transferable economic collateral.
+- no private presale;
+- no discounted insider round;
+- no hidden team allocation;
+- launch mechanics and fee routes disclosed before launch;
+- any founder/project market purchase disclosed;
+- treasury inflows and project spending made legible through a public funding ledger;
+- shipped utility clearly distinguished from planned utility.
 
-Candidate functions include:
+Early utility may include token-gated optional community surfaces, Rat Watch capacity, Dumpster Raid case-priority signaling, Trash Hunts, bounty boosting, and case sponsorship.
 
-- bonded evidence submission;
-- bonded challenges;
-- evidence-provider collateral;
-- independent observer/node collateral.
+Later utility may include bonded evidence submissions, bonded challenges, anti-spam collateral, and independent Rat Node collateral.
 
-Economic stake can make spam expensive.
+The permanent boundary is:
 
-It cannot make a claim true.
+> Economic stake may decide who spends resources, what gets prioritized, and how costly spam becomes. It does not decide what is true.
+
+BINRAT will not market roadmap utility as a prediction of token value.
 
 ## 13. Why stable-value bounties may coexist with collateral
 
@@ -244,12 +252,13 @@ A protocol asset, if eventually justified, can supply network-specific collatera
 
 The design should not force every useful payment through a volatile asset merely to create token demand.
 
-## 14. Business model
+## 14. Business model and project funding
 
-BINRAT may support sustainable revenue without requiring token appreciation.
+BINRAT intends to combine ordinary product revenue with transparently disclosed token-launch economics.
 
-Potential revenue surfaces include:
+Potential funding/revenue surfaces include:
 
+- creator/project fee revenue from the selected fair-launch rail;
 - advanced user features;
 - alerts;
 - API access;
@@ -257,7 +266,9 @@ Potential revenue surfaces include:
 - team/researcher tools;
 - enterprise data access.
 
-The evidence product should have a business model independent of speculative token demand.
+Token-related project revenue should flow to disclosed treasury addresses and be summarized through a public funding ledger.
+
+The project must remain capable of building useful evidence products without relying on token-price appreciation.
 
 ## 15. Risks
 
@@ -285,14 +296,14 @@ Major progression:
 
 1. deterministic launch memory;
 2. longitudinal observations;
-3. Trash DNA + Rat Watch;
-4. Dead Drops;
-5. Rat Credits + bounties;
-6. Proof of First + reputation;
-7. Case Files + replay + Rat Lab;
-8. API/agent distribution;
-9. independent evidence providers;
-10. token consideration only if the coordination experiment proves the need.
+3. legal/compliance + launch-mechanics gate for the early fair launch;
+4. Telegram Rat + public funding/Dumpster Ledger;
+5. Trash DNA + Rat Watch;
+6. Dead Drops;
+7. Rat Credits + bounties;
+8. Proof of First + reputation;
+9. Case Files + replay + Rat Lab;
+10. API/agent distribution + independent evidence providers.
 
 ## 17. North star
 
