@@ -4,6 +4,7 @@ import { normalizeLaunchHex, sameLaunchAuthority } from '../core/identity.js';
 import type { ChainCheckpoint, Hex, LaunchObserved } from '../core/types.js';
 import type { LaunchStore } from '../core/ports.js';
 import type { ProvenanceEdge, ProvenanceFact } from '../intelligence/provenance.js';
+import type { LaunchObservationReceipt } from '../observations/types.js';
 import { SCHEMA_SQL } from './schema.js';
 
 export class SqliteStore implements LaunchStore {
@@ -101,6 +102,8 @@ export class SqliteStore implements LaunchStore {
   async replaceProvenanceEdges(edges: ProvenanceEdge[]): Promise<void> {
     const tx = this.db.transaction(() => {
       this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
+      this.db.prepare('DELETE FROM launch_observations WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)')
+        .run(this.chainId, blockNumber.toString());
       const insert = this.db.prepare(`
         INSERT INTO provenance_edges (
           edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
@@ -123,6 +126,51 @@ export class SqliteStore implements LaunchStore {
     const rows = this.db.prepare(`SELECT payload_json FROM provenance_edges WHERE chain_id = ? ORDER BY CAST(observed_block AS INTEGER),edge_id`)
       .all(this.chainId) as Array<{ payload_json: string }>;
     return rows.map((row) => reviveEdge(row.payload_json));
+  }
+
+  async putObservation(receipt: LaunchObservationReceipt): Promise<'INSERTED' | 'DUPLICATE'> {
+    if (receipt.chainId !== this.chainId) throw new Error(`OBSERVATION_CHAIN_MISMATCH:${receipt.observationId}`);
+    const payload = canonicalJson(receipt);
+    const result = this.db.prepare(`
+      INSERT OR IGNORE INTO launch_observations (
+        observation_id,observation_version,chain_id,launch_id,horizon_ms,observed_block,
+        observed_block_hash,observed_timestamp_ms,evidence_digest,payload_json
+      ) VALUES (?,?,?,?,?,?,?,?,?,?)
+    `).run(
+      receipt.observationId, receipt.observationVersion, receipt.chainId, receipt.launchId,
+      receipt.horizonMs, receipt.observedBlock.toString(), receipt.observedBlockHash.toLowerCase(),
+      receipt.observedTimestampMs, receipt.evidenceDigest, payload
+    );
+    if (result.changes === 1) return 'INSERTED';
+
+    const existing = this.db.prepare(`
+      SELECT observation_id,evidence_digest,payload_json
+      FROM launch_observations
+      WHERE observation_id = ?
+         OR (launch_id = ? AND horizon_ms = ? AND observation_version = ?)
+      LIMIT 1
+    `).get(
+      receipt.observationId, receipt.launchId, receipt.horizonMs, receipt.observationVersion
+    ) as { observation_id: string; evidence_digest: string; payload_json: string } | undefined;
+    if (
+      !existing ||
+      existing.observation_id !== receipt.observationId ||
+      existing.evidence_digest !== receipt.evidenceDigest ||
+      existing.payload_json !== payload
+    ) {
+      throw new Error(`OBSERVATION_IDENTITY_CONFLICT:${receipt.observationId}`);
+    }
+    return 'DUPLICATE';
+  }
+
+  async listObservationsForLaunch(launchId: string): Promise<LaunchObservationReceipt[]> {
+    const rows = this.db.prepare(`
+      SELECT payload_json
+      FROM launch_observations
+      WHERE chain_id = ? AND launch_id = ?
+      ORDER BY horizon_ms, observation_version, observation_id
+    `).all(this.chainId, launchId) as Array<{ payload_json: string }>;
+    return rows.map((row) => reviveObservation(row.payload_json));
   }
 
   async getCheckpoint(): Promise<ChainCheckpoint | null> {
@@ -192,4 +240,31 @@ function reviveFact(payload: string): ProvenanceFact {
 function reviveEdge(payload: string): ProvenanceEdge {
   const raw = JSON.parse(payload) as Omit<ProvenanceEdge, 'observedBlock'> & { observedBlock: string };
   return { ...raw, observedBlock: BigInt(raw.observedBlock) };
+}
+
+
+function reviveObservation(payload: string): LaunchObservationReceipt {
+  const raw = JSON.parse(payload) as Omit<LaunchObservationReceipt, 'observedBlock' | 'facts'> & {
+    observedBlock: string;
+    facts: {
+      poolCodePresent?: boolean;
+      poolActiveLiquidity?: string;
+      poolSqrtPriceX96?: string;
+      poolTick?: number;
+      creatorTokenBalance?: string;
+      tokenTotalSupply?: string;
+      tokenDecimals?: number;
+    };
+  };
+  return {
+    ...raw,
+    observedBlock: BigInt(raw.observedBlock),
+    facts: {
+      ...raw.facts,
+      ...(raw.facts.poolActiveLiquidity !== undefined ? { poolActiveLiquidity: BigInt(raw.facts.poolActiveLiquidity) } : {}),
+      ...(raw.facts.poolSqrtPriceX96 !== undefined ? { poolSqrtPriceX96: BigInt(raw.facts.poolSqrtPriceX96) } : {}),
+      ...(raw.facts.creatorTokenBalance !== undefined ? { creatorTokenBalance: BigInt(raw.facts.creatorTokenBalance) } : {}),
+      ...(raw.facts.tokenTotalSupply !== undefined ? { tokenTotalSupply: BigInt(raw.facts.tokenTotalSupply) } : {})
+    }
+  };
 }

@@ -58,6 +58,24 @@ CREATE TABLE IF NOT EXISTS provenance_edges (
 );
 CREATE INDEX IF NOT EXISTS idx_provenance_edges_order ON provenance_edges(chain_id, observed_block, edge_id);
 
+CREATE TABLE IF NOT EXISTS launch_observations (
+  observation_id TEXT PRIMARY KEY,
+  observation_version TEXT NOT NULL,
+  chain_id INTEGER NOT NULL,
+  launch_id TEXT NOT NULL REFERENCES launches(launch_id) ON DELETE CASCADE,
+  horizon_ms INTEGER NOT NULL,
+  observed_block TEXT NOT NULL,
+  observed_block_hash TEXT NOT NULL,
+  observed_timestamp_ms INTEGER NOT NULL,
+  evidence_digest TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  UNIQUE(launch_id, horizon_ms, observation_version)
+);
+CREATE INDEX IF NOT EXISTS idx_launch_observations_launch_horizon
+  ON launch_observations(chain_id, launch_id, horizon_ms);
+CREATE INDEX IF NOT EXISTS idx_launch_observations_observed_block
+  ON launch_observations(chain_id, observed_block);
+
 CREATE TABLE IF NOT EXISTS chain_checkpoints (
   chain_id INTEGER PRIMARY KEY,
   block_number TEXT NOT NULL,
