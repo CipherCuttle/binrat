@@ -124,6 +124,47 @@ test('Cloudflare sync cycle catches live window first and advances history in bo
   }
 });
 
+test('observation failures preserve a sanitized error class without blocking live readiness', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakeLaunchSource();
+
+  class FailingObservationSource extends FakeObservationSource {
+    override async getHeadBlockNumber() {
+      const error = new Error('sensitive transport details intentionally omitted');
+      error.name = 'BlockNotFoundError';
+      throw error;
+    }
+  }
+
+  try {
+    const result = await runCloudflareSyncCycle(
+      {
+        DB: db,
+        BINRAT_LIVE_LOOKBACK_BLOCKS: '1000',
+        BINRAT_MAX_BATCH_BLOCKS: '1000',
+        BINRAT_CONFIRMATIONS: '2'
+      },
+      message('cycle-observation-fail'),
+      {
+        now: () => 15_000,
+        launchSource: source,
+        observationSource: new FailingObservationSource(source.head)
+      }
+    );
+
+    assert.deepEqual(result, { status: 'SUCCESS', liveCaughtUp: true });
+    const state = await new D1RuntimeStateStore(db, 5042).get();
+    assert.equal(state?.sourceVerified, true);
+    assert.equal(state?.liveCaughtUp, true);
+    assert.equal(state?.observationReady, false);
+    assert.equal(state?.lastObservationError, 'OBSERVATION_BLOCK_NOT_FOUND_ERROR');
+    assert.equal(state?.lastSyncError, null);
+  } finally {
+    db.close();
+  }
+});
+
 test('Cloudflare sync lease is fenced so an old owner cannot release a replacement lease', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
