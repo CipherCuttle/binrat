@@ -17,6 +17,14 @@ export interface D1TelegramReplyInput {
   telegramMessageId: number | null;
 }
 
+export interface D1TelegramOperationalReplyInput {
+  updateId: number;
+  chatId: number;
+  intent: string;
+  replyDigest: string;
+  telegramMessageId: number | null;
+}
+
 export interface D1TelegramUpdateRow {
   updateId: number;
   state: 'CLAIMED' | TelegramTerminalState;
@@ -130,6 +138,51 @@ export class D1TelegramLedger {
     if (
       existing?.state === 'REPLIED' &&
       existing.planDigest === input.planDigest &&
+      existing.replyDigest === input.replyDigest
+    ) return 'DUPLICATE';
+    throw new Error('TELEGRAM_REPLY_LEDGER_CONFLICT');
+  }
+
+  async completeOperationalReply(
+    input: D1TelegramOperationalReplyInput,
+    nowMs: number
+  ): Promise<'INSERTED' | 'DUPLICATE'> {
+    validateUpdateId(input.updateId);
+    validateNow(nowMs);
+    if (!Number.isSafeInteger(input.chatId)) throw new Error('TELEGRAM_REPLY_CHAT_ID_INVALID');
+    if (!/^[0-9a-f]{64}$/.test(input.replyDigest)) throw new Error('TELEGRAM_REPLY_DIGEST_INVALID');
+
+    const result = await this.db.prepare(`
+      UPDATE telegram_update_receipts
+      SET state = 'REPLIED',
+          claim_expires_at_ms = NULL,
+          chat_id = ?,
+          intent = ?,
+          renderer_version = 'binrat.operational/0.1',
+          voice_variant = 0,
+          plan_digest = NULL,
+          reply_digest = ?,
+          answer_plan_json = NULL,
+          receipt_ids_json = '[]',
+          telegram_message_id = ?,
+          updated_at_ms = ?
+      WHERE update_id = ? AND state = 'CLAIMED'
+    `).bind(
+      input.chatId,
+      input.intent,
+      input.replyDigest,
+      input.telegramMessageId,
+      nowMs,
+      input.updateId
+    ).run();
+
+    if (!result.success) throw new Error('TELEGRAM_REPLY_LEDGER_WRITE_FAILED');
+    if (changes(result) === 1) return 'INSERTED';
+
+    const existing = await this.get(input.updateId);
+    if (
+      existing?.state === 'REPLIED' &&
+      existing.planDigest === null &&
       existing.replyDigest === input.replyDigest
     ) return 'DUPLICATE';
     throw new Error('TELEGRAM_REPLY_LEDGER_CONFLICT');
