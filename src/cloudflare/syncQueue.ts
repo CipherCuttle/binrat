@@ -199,8 +199,9 @@ export async function runCloudflareSyncCycle(
         lastObservationError = null;
       } catch (error) {
         observationReady = false;
-        const code = syncErrorCode(error);
-        lastObservationError = code === 'SYNC_FAILED' ? 'OBSERVATION_SYNC_FAILED' : code;
+        const code = observationSyncErrorCode(error);
+        lastObservationError = code;
+        console.error(JSON.stringify({ event: 'OBSERVATION_SYNC_FAILED', code }));
       }
     }
 
@@ -252,6 +253,23 @@ function syncErrorCode(error: unknown): string {
     /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+)(?=:|$)/
   )?.[1];
   return code ?? 'SYNC_FAILED';
+}
+
+function observationSyncErrorCode(error: unknown): string {
+  const code = syncErrorCode(error);
+  if (code !== 'SYNC_FAILED') return code;
+
+  const rawName = error instanceof Error ? error.name : '';
+  const normalizedName = rawName
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80);
+
+  return normalizedName && normalizedName !== 'ERROR'
+    ? `OBSERVATION_${normalizedName}`
+    : 'OBSERVATION_SYNC_FAILED';
 }
 
 function integerSetting(
