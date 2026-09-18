@@ -3,6 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { resolve } from 'node:path';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from './rat.js';
 import { PerChatRateGate, UpdateDeliveryFence } from './deliveryGuard.js';
+import { TelegramReplyLedger } from './replyLedger.js';
 
 interface TelegramChat {
   id: number;
@@ -111,6 +112,9 @@ const webhookSecret = requiredEnv('TELEGRAM_WEBHOOK_SECRET');
 const botIdentity = await getBotIdentity(token);
 const updateFence = new UpdateDeliveryFence();
 const rateGate = new PerChatRateGate(integerEnv('TELEGRAM_MAX_MESSAGES_PER_MINUTE', 12, 1));
+const replyLedger = new TelegramReplyLedger(
+  process.env.TELEGRAM_REPLY_DB_PATH?.trim() || './data/telegram-rat.sqlite'
+);
 const manifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
 const manifest = validateCapabilityManifest(JSON.parse(readFileSync(manifestPath, 'utf8')));
 const config: RatConfig = {
@@ -155,6 +159,11 @@ const server = createServer(async (request, response) => {
       json(response, 200, { ok: true, duplicate: true });
       return;
     }
+    if (replyLedger.has(update.update_id)) {
+      updateFence.release(update.update_id);
+      json(response, 200, { ok: true, duplicate: true, persisted: true });
+      return;
+    }
 
     try {
       const message = update.message;
@@ -187,6 +196,18 @@ const server = createServer(async (request, response) => {
       }
 
       const telegramMessageId = await sendMessage(token, message.chat.id, reply.text);
+      replyLedger.record({
+        updateId: update.update_id,
+        chatId: message.chat.id,
+        intent: reply.intent,
+        rendererVersion: reply.rendererVersion,
+        voiceVariant: reply.voiceVariant,
+        planDigest: reply.planDigest,
+        replyDigest: reply.replyDigest,
+        answerPlan: reply.answerPlan,
+        receiptIds: reply.receiptIds,
+        telegramMessageId
+      });
       updateFence.commit(update.update_id);
       console.log(JSON.stringify({
         event: 'TELEGRAM_RAT_REPLY',
@@ -215,5 +236,5 @@ const port = integerEnv('TELEGRAM_PORT', 4175, 1);
 server.listen(port, '0.0.0.0', () => console.log(JSON.stringify({ event: 'TELEGRAM_RAT_READY', port })));
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
-  process.once(signal, () => server.close());
+  process.once(signal, () => server.close(() => replyLedger.close()));
 }
