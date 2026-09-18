@@ -38,7 +38,7 @@ export interface CloudflareSyncEnv {
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE';
+  kind: 'SYNC_CYCLE' | 'OBSERVATION_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -55,6 +55,7 @@ export type SyncCycleResult =
   | { status: 'RETRY'; code: string };
 
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
+const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -69,9 +70,23 @@ export async function enqueueSyncCycle(
   });
 }
 
+export async function enqueueObservationCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({
+    kind: 'OBSERVATION_CYCLE',
+    cycleId,
+    enqueuedAtMs: nowMs
+  });
+}
+
 export async function handleSyncQueueBatch(
   batch: SyncQueueBatchLike,
-  env: CloudflareSyncEnv
+  env: CloudflareSyncEnv,
+  deps: CloudflareSyncDeps = { now: Date.now }
 ): Promise<void> {
   for (const message of batch.messages) {
     if (!isSyncMessage(message.body)) {
@@ -79,9 +94,32 @@ export async function handleSyncQueueBatch(
       continue;
     }
     try {
-      const result = await runCloudflareSyncCycle(env, message.body);
-      if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
-      else message.ack();
+      if (message.body.kind === 'OBSERVATION_CYCLE') {
+        const result = await runCloudflareObservationCycle(env, message.body, deps);
+        if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
+        else message.ack();
+        continue;
+      }
+
+      const result = await runCloudflareSyncCycle(env, message.body, deps);
+      if (result.status === 'RETRY') {
+        message.retry({ delaySeconds: 30 });
+        continue;
+      }
+
+      message.ack();
+      if (
+        result.status === 'SUCCESS' &&
+        result.liveCaughtUp &&
+        shouldEnqueueObservation(message.body.enqueuedAtMs)
+      ) {
+        await enqueueObservationCycle(env, deps.now()).catch((error) => {
+          console.error(JSON.stringify({
+            event: 'OBSERVATION_ENQUEUE_FAILED',
+            code: syncErrorCode(error)
+          }));
+        });
+      }
     } catch {
       message.retry({ delaySeconds: 30 });
     }
@@ -109,9 +147,6 @@ export async function runCloudflareSyncCycle(
     previous = await runtimeStore.get();
     const rpcUrl = deps.launchSource ? undefined : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
     const source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
-    const observationSource = deps.observationSource ?? new ArcObservationSource({
-      rpcUrl: deps.observationSource ? undefined : required(env.ARC_RPC_URL, 'ARC_RPC_URL')
-    });
 
     let bootstrapHead: bigint;
     try {
@@ -185,23 +220,6 @@ export async function runCloudflareSyncCycle(
         }
       }
 
-      try {
-        await syncObservations(observationSource, store, {
-          confirmations,
-          maxObservationsPerSync: integerSetting(
-            env.BINRAT_MAX_OBSERVATIONS_PER_SYNC,
-            12,
-            1,
-            10_000
-          )
-        });
-        observationReady = true;
-        lastObservationError = null;
-      } catch (error) {
-        observationReady = false;
-        const code = syncErrorCode(error);
-        lastObservationError = code === 'SYNC_FAILED' ? 'OBSERVATION_SYNC_FAILED' : code;
-      }
     }
 
     await runtimeStore.put({
@@ -222,6 +240,85 @@ export async function runCloudflareSyncCycle(
   } finally {
     store.close();
     await lease.release(SYNC_LEASE_NAME, message.cycleId);
+  }
+}
+
+export async function runCloudflareObservationCycle(
+  env: CloudflareSyncEnv,
+  message: BinratSyncMessage,
+  deps: CloudflareSyncDeps = { now: Date.now }
+): Promise<
+  | { status: 'SUCCESS'; observationReady: boolean }
+  | { status: 'BUSY' }
+  | { status: 'RETRY'; code: string }
+> {
+  if (!isSyncMessage(message) || message.kind !== 'OBSERVATION_CYCLE') {
+    return { status: 'RETRY', code: 'SYNC_MESSAGE_INVALID' };
+  }
+
+  const lease = new D1SyncLeaseStore(env.DB);
+  if (!(await lease.claim(OBSERVATION_LEASE_NAME, message.cycleId, deps.now()))) {
+    return { status: 'BUSY' };
+  }
+
+  const store = new D1Store(env.DB, ARC_CHAIN_ID);
+  const runtimeStore = new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID);
+
+  try {
+    const previous = await runtimeStore.get();
+    if (
+      !previous ||
+      !previous.sourceVerified ||
+      !previous.liveCaughtUp ||
+      previous.lastSyncError
+    ) {
+      return { status: 'SUCCESS', observationReady: previous?.observationReady ?? false };
+    }
+
+    const rpcUrl = deps.observationSource
+      ? undefined
+      : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
+    const source = deps.observationSource ?? new ArcObservationSource({ rpcUrl });
+    const confirmations = BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000));
+
+    let observationReady = false;
+    let lastObservationError: string | null = null;
+    try {
+      await syncObservations(source, store, {
+        confirmations,
+        maxObservationsPerSync: integerSetting(
+          env.BINRAT_MAX_OBSERVATIONS_PER_SYNC,
+          1,
+          1,
+          10_000
+        )
+      });
+      observationReady = true;
+    } catch (error) {
+      const code = observationSyncErrorCode(error);
+      lastObservationError = code;
+      console.error(JSON.stringify({ event: 'OBSERVATION_SYNC_FAILED', code }));
+    }
+
+    await runtimeStore.put({
+      sourceVerified: previous.sourceVerified,
+      liveCaughtUp: previous.liveCaughtUp,
+      headBlock: previous.headBlock,
+      targetBlock: previous.targetBlock,
+      observationReady,
+      historyBackfillComplete: previous.historyBackfillComplete,
+      historyBackfillTargetBlock: previous.historyBackfillTargetBlock,
+      lastSyncError: previous.lastSyncError,
+      lastHistoryError: previous.lastHistoryError,
+      lastObservationError,
+      // Observation enrichment must never refresh live-read authority.
+      updatedAtMs: previous.updatedAtMs
+    });
+
+    return { status: 'SUCCESS', observationReady };
+  } finally {
+    store.close();
+    await lease.release(OBSERVATION_LEASE_NAME, message.cycleId);
   }
 }
 
@@ -254,6 +351,40 @@ function syncErrorCode(error: unknown): string {
   return code ?? 'SYNC_FAILED';
 }
 
+function observationSyncErrorCode(error: unknown): string {
+  const code = syncErrorCode(error);
+  if (code !== 'SYNC_FAILED') return code;
+
+  const rawName = error instanceof Error ? error.name : '';
+  const normalizedName = rawName
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80);
+
+  const status = httpStatus(error);
+  if (normalizedName === 'HTTP_REQUEST_ERROR' && status !== null) {
+    return `OBSERVATION_HTTP_${status}`;
+  }
+
+  return normalizedName && normalizedName !== 'ERROR'
+    ? `OBSERVATION_${normalizedName}`
+    : 'OBSERVATION_SYNC_FAILED';
+}
+
+function httpStatus(error: unknown): number | null {
+  if (!error || typeof error !== 'object') return null;
+  const status = (error as { status?: unknown }).status;
+  return Number.isInteger(status) && Number(status) >= 100 && Number(status) <= 599
+    ? Number(status)
+    : null;
+}
+
+function shouldEnqueueObservation(enqueuedAtMs: number): boolean {
+  return Math.floor(enqueuedAtMs / 60_000) % 2 === 0;
+}
+
 function integerSetting(
   value: string | undefined,
   fallback: number,
@@ -275,7 +406,7 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const item = value as Record<string, unknown>;
   return (
-    item.kind === 'SYNC_CYCLE' &&
+    (item.kind === 'SYNC_CYCLE' || item.kind === 'OBSERVATION_CYCLE') &&
     typeof item.cycleId === 'string' &&
     /^[A-Za-z0-9:_-]{1,200}$/.test(item.cycleId) &&
     Number.isSafeInteger(item.enqueuedAtMs) &&

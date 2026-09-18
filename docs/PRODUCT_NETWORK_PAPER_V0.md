@@ -60,6 +60,8 @@ The implemented system includes:
 
 The product intentionally does not claim human identity from an address and does not output a SAFE/RUG score or trading recommendation.
 
+As of 2026-09-19, the verified public-beta deployment serves the web frontend and public API from Cloudflare, persists runtime/evidence state in D1, runs live/history/observation work through bounded Queue execution, and serves the Telegram Rat from the same Cloudflare edge runtime. Existing Render services remain rollback-only. This deployment status does not change the separate fail-closed token-launch authorization lane.
+
 ## 3. Evidence hierarchy
 
 BINRAT distinguishes between evidence and interpretation.
