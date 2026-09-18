@@ -50,7 +50,10 @@ def request_json(
     headers: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     data = None if body is None else json.dumps(body).encode("utf-8")
-    merged = {"accept": "application/json"}
+    merged = {
+        "accept": "application/json",
+        "user-agent": "Mozilla/5.0 BINRAT-Cutover/0.1",
+    }
     if body is not None:
         merged["content-type"] = "application/json"
     if headers:
@@ -67,6 +70,23 @@ def request_json(
         fail(f"HTTP {exc.code} from {urllib.parse.urlsplit(url).netloc}")
     except Exception:
         fail(f"request failed for {urllib.parse.urlsplit(url).netloc}")
+
+
+def try_request_json(url: str) -> dict[str, Any] | None:
+    request = urllib.request.Request(
+        url,
+        headers={
+            "accept": "application/json",
+            "user-agent": "Mozilla/5.0 BINRAT-Cutover/0.1",
+        },
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            parsed = json.loads(response.read().decode("utf-8"))
+            return parsed if isinstance(parsed, dict) else None
+    except Exception:
+        return None
 
 
 def telegram(token: str, method: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -193,22 +213,21 @@ def main() -> None:
     health = None
     capabilities = None
     for _ in range(15):
-        try:
-            candidate_health = request_json(f"{WORKER_URL}/health")
-            candidate_capabilities = request_json(f"{WORKER_URL}/api/capabilities")
-            candidate_launch = candidate_capabilities.get("launchAuthorization", {})
-            if (
-                candidate_health.get("repliesEnabled") is False
-                and candidate_health.get("launchAuthorization") == "BLOCKED"
-                and candidate_launch.get("status") == "BLOCKED"
-                and candidate_launch.get("marketingAuthorized") is False
-                and candidate_launch.get("launchAuthorized") is False
-            ):
-                health = candidate_health
-                capabilities = candidate_capabilities
-                break
-        except SystemExit:
-            pass
+        candidate_health = try_request_json(f"{WORKER_URL}/health")
+        candidate_capabilities = try_request_json(f"{WORKER_URL}/api/capabilities")
+        candidate_launch = (candidate_capabilities or {}).get("launchAuthorization", {})
+        if (
+            candidate_health is not None
+            and candidate_capabilities is not None
+            and candidate_health.get("repliesEnabled") is False
+            and candidate_health.get("launchAuthorization") == "BLOCKED"
+            and candidate_launch.get("status") == "BLOCKED"
+            and candidate_launch.get("marketingAuthorized") is False
+            and candidate_launch.get("launchAuthorized") is False
+        ):
+            health = candidate_health
+            capabilities = candidate_capabilities
+            break
         time.sleep(2)
 
     if health is None or capabilities is None:
