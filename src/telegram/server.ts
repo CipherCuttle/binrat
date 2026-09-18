@@ -9,10 +9,21 @@ interface TelegramChat {
   type?: string;
 }
 
+interface TelegramUser {
+  id: number;
+  is_bot?: boolean;
+  username?: string;
+}
+
 interface TelegramMessage {
   message_id: number;
   chat: TelegramChat;
+  from?: TelegramUser;
   text?: string;
+  reply_to_message?: {
+    message_id: number;
+    from?: TelegramUser;
+  };
 }
 
 interface TelegramUpdate {
@@ -20,10 +31,11 @@ interface TelegramUpdate {
   message?: TelegramMessage;
 }
 
-interface TelegramApiResponse {
+interface TelegramApiResponse<T> {
   ok?: boolean;
   description?: string;
-  result?: { message_id?: number };
+  result?: T;
+  parameters?: { retry_after?: number };
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -61,6 +73,16 @@ function json(response: ServerResponse, status: number, value: unknown): void {
   response.end(JSON.stringify(value));
 }
 
+async function getBotIdentity(token: string): Promise<TelegramUser> {
+  const response = await fetch(`https://api.telegram.org/bot${token}/getMe`);
+  let parsed: TelegramApiResponse<TelegramUser> = {};
+  try { parsed = await response.json() as TelegramApiResponse<TelegramUser>; } catch {}
+  if (!response.ok || parsed.ok !== true || !parsed.result || !Number.isSafeInteger(parsed.result.id)) {
+    throw new Error('TELEGRAM_GET_ME_FAILED');
+  }
+  return parsed.result;
+}
+
 async function sendMessage(token: string, chatId: number, text: string): Promise<number | null> {
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
@@ -72,14 +94,21 @@ async function sendMessage(token: string, chatId: number, text: string): Promise
     })
   });
 
-  let parsed: TelegramApiResponse = {};
-  try { parsed = await response.json() as TelegramApiResponse; } catch {}
-  if (!response.ok || parsed.ok !== true) throw new Error('TELEGRAM_SEND_FAILED');
+  let parsed: TelegramApiResponse<{ message_id?: number }> = {};
+  try { parsed = await response.json() as TelegramApiResponse<{ message_id?: number }>; } catch {}
+  if (!response.ok || parsed.ok !== true) {
+    const retryAfter = parsed.parameters?.retry_after;
+    if (Number.isSafeInteger(retryAfter) && retryAfter! > 0) {
+      console.error(JSON.stringify({ event: 'TELEGRAM_RATE_LIMITED', retryAfterSeconds: retryAfter }));
+    }
+    throw new Error('TELEGRAM_SEND_FAILED');
+  }
   return Number.isSafeInteger(parsed.result?.message_id) ? parsed.result!.message_id! : null;
 }
 
 const token = requiredEnv('TELEGRAM_BOT_TOKEN');
 const webhookSecret = requiredEnv('TELEGRAM_WEBHOOK_SECRET');
+const botIdentity = await getBotIdentity(token);
 const updateFence = new UpdateDeliveryFence();
 const rateGate = new PerChatRateGate(integerEnv('TELEGRAM_MAX_MESSAGES_PER_MINUTE', 12, 1));
 const manifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
@@ -87,7 +116,8 @@ const manifest = validateCapabilityManifest(JSON.parse(readFileSync(manifestPath
 const config: RatConfig = {
   apiBaseUrl: requiredEnv('BINRAT_PUBLIC_BASE_URL'),
   siteUrl: process.env.BINRAT_PUBLIC_SITE_URL?.trim() || requiredEnv('BINRAT_PUBLIC_BASE_URL'),
-  manifest
+  manifest,
+  manifestMode: 'REMOTE_FAIL_CLOSED'
 };
 
 const server = createServer(async (request, response) => {
@@ -144,7 +174,11 @@ const server = createServer(async (request, response) => {
         message.text,
         config,
         fetch,
-        { allowUnaddressed: message.chat.type === 'private' }
+        {
+          allowUnaddressed:
+            message.chat.type === 'private' ||
+            message.reply_to_message?.from?.id === botIdentity.id
+        }
       );
       if (!reply) {
         updateFence.commit(update.update_id);
@@ -161,6 +195,8 @@ const server = createServer(async (request, response) => {
         rendererVersion: reply.rendererVersion,
         voiceVariant: reply.voiceVariant,
         replyDigest: reply.replyDigest,
+        planDigest: reply.planDigest,
+        answerPlan: reply.answerPlan,
         receiptIds: reply.receiptIds,
         telegramMessageId
       }));

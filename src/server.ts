@@ -1,4 +1,4 @@
-import { createReadStream, mkdirSync, realpathSync, statSync } from 'node:fs';
+import { createReadStream, mkdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { createServer, type ServerResponse } from 'node:http';
 import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +19,7 @@ import { SqliteStore } from './store/sqliteStore.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = realpathSync(resolve(here, here.endsWith(`${sep}dist${sep}src`) ? '../../web' : '../web'));
 const dbPath = resolve(process.env.BINRAT_DB_PATH ?? './data/binrat.sqlite');
+const capabilityManifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
 mkdirSync(dirname(dbPath), { recursive: true });
 const store = new SqliteStore(dbPath, ARC_CHAIN_ID);
 const controller = new AbortController();
@@ -159,6 +160,11 @@ const server = createServer(async (request, response) => {
     let pathname: string;
     try { pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname); }
     catch { json(response, 400, { error: 'INVALID_PATH' }); return; }
+    if (pathname === '/api/capabilities') {
+      const manifest = JSON.parse(readFileSync(capabilityManifestPath, 'utf8')) as unknown;
+      json(response, 200, manifest);
+      return;
+    }
     if (pathname === '/api/health') {
       const checkpoint = await store.getCheckpoint();
       const launches = await store.listLaunches();
