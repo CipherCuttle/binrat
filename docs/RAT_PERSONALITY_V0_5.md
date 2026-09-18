@@ -32,6 +32,8 @@ Explicit slash commands remain highest authority.
 
 Group-style natural language requires an explicit BINRAT/Rat reference, except that a direct Telegram reply to the bot also counts as addressed context. Private bot conversations may omit the Rat name. Ordinary unaddressed group chat is ignored.
 
+When `TELEGRAM_WEBHOOK_URL` is configured, the service registers its own HTTPS webhook at startup using the Render-held bot token and webhook secret. Registration fails closed before the service begins listening if Telegram rejects the webhook.
+
 Conversational replies are gated by `TELEGRAM_REPLIES_ENABLED`. The gate defaults to `false`; only the literal value `true` enables replies. Invalid values fail configuration validation. Authenticated updates received while disabled are acknowledged and intentionally dropped rather than queued for later replay.
 
 Initial intents:
