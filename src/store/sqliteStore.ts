@@ -259,6 +259,41 @@ export class SqliteStore implements LaunchStore {
     return tx();
   }
 
+  async readPublicProjectionState(): Promise<{
+    checkpoint: ChainCheckpoint;
+    launches: LaunchObserved[];
+    facts: ProvenanceFact[];
+  } | null> {
+    const read = this.db.transaction(() => {
+      const row = this.db.prepare('SELECT * FROM chain_checkpoints WHERE chain_id = ?')
+        .get(this.chainId) as CheckpointRow | undefined;
+      if (!row) return null;
+      const checkpoint: ChainCheckpoint = {
+        chainId: row.chain_id,
+        blockNumber: BigInt(row.block_number),
+        blockHash: row.block_hash,
+        guardBlockNumber: row.guard_block_number === null ? null : BigInt(row.guard_block_number),
+        guardBlockHash: row.guard_block_hash
+      };
+      const launchRows = this.db.prepare(`
+        SELECT * FROM launches
+        WHERE chain_id = ? AND CAST(block_number AS INTEGER) <= CAST(? AS INTEGER)
+        ORDER BY CAST(block_number AS INTEGER), log_index, launch_id
+      `).all(this.chainId, checkpoint.blockNumber.toString()) as LaunchRow[];
+      const factRows = this.db.prepare(`
+        SELECT payload_json FROM provenance_facts
+        WHERE chain_id = ? AND CAST(observed_block AS INTEGER) <= CAST(? AS INTEGER)
+        ORDER BY CAST(observed_block AS INTEGER), log_index, fact_id
+      `).all(this.chainId, checkpoint.blockNumber.toString()) as Array<{ payload_json: string }>;
+      return {
+        checkpoint,
+        launches: launchRows.map(fromLaunchRow),
+        facts: factRows.map((item) => reviveFact(item.payload_json))
+      };
+    });
+    return read();
+  }
+
   async getHistoricalBackfillNextBlock(): Promise<bigint | null> {
     const row = this.db.prepare('SELECT next_block FROM launch_history_backfill_state WHERE chain_id = ?')
       .get(this.chainId) as { next_block: string } | undefined;
@@ -308,6 +343,13 @@ export class SqliteStore implements LaunchStore {
         .run(this.chainId, blockNumber.toString());
       this.db.prepare('DELETE FROM launches WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)')
         .run(this.chainId, blockNumber.toString());
+      const history = this.db.prepare('SELECT next_block FROM launch_history_backfill_state WHERE chain_id = ?')
+        .get(this.chainId) as { next_block: string } | undefined;
+      if (history && BigInt(history.next_block) > blockNumber) {
+        // A rewind that crosses already-scanned history must not leave the cursor ahead
+        // of deleted evidence. Restarting the bounded backfill is expensive but fail-safe.
+        this.db.prepare('DELETE FROM launch_history_backfill_state WHERE chain_id = ?').run(this.chainId);
+      }
       const checkpoint = this.db.prepare('SELECT block_number FROM chain_checkpoints WHERE chain_id = ?').get(this.chainId) as { block_number: string } | undefined;
       if (checkpoint && BigInt(checkpoint.block_number) >= blockNumber) {
         this.db.prepare('DELETE FROM chain_checkpoints WHERE chain_id = ?').run(this.chainId);

@@ -72,6 +72,11 @@ test('historical backfill resumes independently without moving the live checkpoi
     assert.equal(first.complete, false);
     assert.equal(await store.getHistoricalBackfillNextBlock(), 3n);
     assert.equal((await store.getCheckpoint())?.blockNumber, 20n);
+    const publicState = await store.readPublicProjectionState();
+    assert.equal(publicState?.checkpoint.blockNumber, 20n);
+    assert.equal(publicState?.launches.length, 1);
+    assert.equal(publicState?.facts.length, 1);
+    assert.equal(publicState?.facts[0]?.launchId, publicState?.launches[0]?.launchId);
 
     const second = await syncHistoricalLaunches(source, store, {
       startBlock: 1n,
@@ -163,6 +168,20 @@ test('historical batch commit is atomic across launches, provenance, edges, and 
     assert.equal((await store.listLaunches()).length, 0);
     assert.equal((await store.listProvenanceFacts()).length, 0);
     assert.equal((await store.listProvenanceEdges()).length, 0);
+    assert.equal(await store.getHistoricalBackfillNextBlock(), null);
+  } finally {
+    store.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+
+test('rewind resets a historical cursor that would otherwise skip deleted evidence', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-history-cursor-rewind-'));
+  const store = new SqliteStore(join(dir, 'test.sqlite'), chainId);
+  try {
+    await store.setHistoricalBackfillNextBlock(10n);
+    await store.rewindFromBlock(9n);
     assert.equal(await store.getHistoricalBackfillNextBlock(), null);
   } finally {
     store.close();

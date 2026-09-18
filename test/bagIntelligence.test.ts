@@ -100,3 +100,12 @@ test('bag intelligence fails closed on tampered observation evidence', async () 
     /OBSERVATION_INTEGRITY_MISMATCH/
   );
 });
+
+
+test('bag intelligence rejects receipts outside the frozen 5m / 1h / 24h contract', async () => {
+  const unsupported = await receipt(900_000, 115, 9n, 75n);
+  await assert.rejects(
+    projectBagIntelligence(feed, bag, [unsupported]),
+    /PUBLIC_OBSERVATION_HORIZON_UNSUPPORTED/
+  );
+});

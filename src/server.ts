@@ -127,10 +127,9 @@ async function watch(): Promise<void> {
 }
 
 async function snapshot() {
-  const checkpoint = await store.getCheckpoint();
-  if (!checkpoint || !sourceVerified || lastSyncError) return null;
-  const launches = (await store.listLaunches()).filter((launch) => launch.blockNumber <= checkpoint.blockNumber);
-  const facts = (await store.listProvenanceFacts()).filter((fact) => fact.observedBlock <= checkpoint.blockNumber);
+  const state = await store.readPublicProjectionState();
+  if (!state || !sourceVerified || lastSyncError) return null;
+  const { checkpoint, launches, facts } = state;
   const feed = await projectPublicFeed({
     chainId: ARC_CHAIN_ID,
     asOfBlock: checkpoint.blockNumber,

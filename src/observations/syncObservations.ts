@@ -1,6 +1,6 @@
 import type { Hex, LaunchObserved } from '../core/types.js';
 import type { LaunchStore } from '../core/ports.js';
-import { buildObservationReceipt } from './identity.js';
+import { buildObservationReceipt, verifyObservationReceipt } from './identity.js';
 import { OBSERVATION_HORIZONS } from './horizons.js';
 import type { ObservationStore } from './store.js';
 import type { LaunchObservationFacts, ObservationStatus } from './types.js';
@@ -59,20 +59,39 @@ export async function syncObservations(
 
   for (const launch of launches) {
     if (remaining <= 0) break;
+    const existingReceipts = await store.listObservationsForLaunch(launch.launchId);
+    for (const receipt of existingReceipts) {
+      if (receipt.launchId !== launch.launchId) {
+        throw new Error(`OBSERVATION_LAUNCH_ID_MISMATCH:expected=${launch.launchId}:actual=${receipt.launchId}`);
+      }
+      await verifyObservationReceipt(receipt);
+    }
+    const existing = new Map(existingReceipts.map((receipt) => [receipt.horizonMs, receipt] as const));
+    const missingHorizons = horizons.filter((horizon) => !existing.has(horizon.ms));
+    alreadyPresent += horizons.length - missingHorizons.length;
+    if (missingHorizons.length === 0) continue;
+
+    const receiptLaunchTimestampMs = deriveLaunchTimestampMs(existingReceipts);
+    if (
+      receiptLaunchTimestampMs !== null &&
+      missingHorizons.every((horizon) => confirmedHeadPoint.timestampMs < receiptLaunchTimestampMs + horizon.ms)
+    ) {
+      pendingMaturity += missingHorizons.length;
+      continue;
+    }
+
     const launchPoint = await source.getBlockPoint(launch.blockNumber);
     assertHash('OBSERVATION_LAUNCH_REORG', launch.blockNumber, launch.blockHash, launchPoint.blockHash);
-    const existing = new Map(
-      (await store.listObservationsForLaunch(launch.launchId))
-        .map((receipt) => [receipt.horizonMs, receipt] as const)
-    );
+    if (receiptLaunchTimestampMs !== null && receiptLaunchTimestampMs !== launchPoint.timestampMs) {
+      throw new Error(
+        `OBSERVATION_LAUNCH_TIMESTAMP_CONFLICT:launch=${launch.launchId}:receipt=${receiptLaunchTimestampMs}:chain=${launchPoint.timestampMs}`
+      );
+    }
+    const launchTimestampMs = launchPoint.timestampMs;
 
-    for (const horizon of horizons) {
+    for (const horizon of missingHorizons) {
       if (remaining <= 0) break;
-      if (existing.has(horizon.ms)) {
-        alreadyPresent += 1;
-        continue;
-      }
-      const targetTimestampMs = launchPoint.timestampMs + horizon.ms;
+      const targetTimestampMs = launchTimestampMs + horizon.ms;
       if (confirmedHeadPoint.timestampMs < targetTimestampMs) {
         pendingMaturity += 1;
         continue;
@@ -168,6 +187,19 @@ async function assertEvidenceStable(
   if (observedAgain.timestampMs < targetTimestampMs) {
     throw new Error(`OBSERVATION_HORIZON_BEFORE_TARGET:block=${observed.blockNumber}`);
   }
+}
+
+function deriveLaunchTimestampMs(receipts: readonly { targetTimestampMs: number; horizonMs: number }[]): number | null {
+  let expected: number | null = null;
+  for (const receipt of receipts) {
+    const candidate = receipt.targetTimestampMs - receipt.horizonMs;
+    if (!Number.isFinite(candidate) || candidate < 0) throw new Error('OBSERVATION_LAUNCH_TIMESTAMP_INVALID');
+    if (expected === null) expected = candidate;
+    else if (expected !== candidate) {
+      throw new Error(`OBSERVATION_LAUNCH_TIMESTAMP_CONFLICT:receipt=${candidate}:expected=${expected}`);
+    }
+  }
+  return expected;
 }
 
 function observationStatus(facts: LaunchObservationFacts, missing: readonly string[]): ObservationStatus {

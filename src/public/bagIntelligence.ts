@@ -62,10 +62,14 @@ export async function projectBagIntelligence(
   observations: LaunchObservationReceipt[]
 ): Promise<PublicBagIntelligence> {
   const asOf = BigInt(feed.asOfBlock);
+  const expected = new Set<number>(OBSERVATION_HORIZONS.map((horizon) => horizon.ms));
   const valid: LaunchObservationReceipt[] = [];
   for (const receipt of observations) {
     if (receipt.launchId !== bag.id || receipt.chainId !== feed.chainId) continue;
     await verifyObservationReceipt(receipt);
+    if (!expected.has(receipt.horizonMs)) {
+      throw new Error(`PUBLIC_OBSERVATION_HORIZON_UNSUPPORTED:${bag.id}:${receipt.horizonMs}`);
+    }
     if (receipt.observedBlock <= asOf) valid.push(receipt);
   }
   valid.sort((a, b) => a.horizonMs - b.horizonMs || a.observationId.localeCompare(b.observationId));
@@ -77,7 +81,6 @@ export async function projectBagIntelligence(
   }
 
   const snapshots = valid.map(projectSnapshot);
-  const expected = new Set<number>(OBSERVATION_HORIZONS.map((horizon) => horizon.ms));
   const observationCoverage: PublicCoverage =
     snapshots.length === 0
       ? 'UNVERIFIED'

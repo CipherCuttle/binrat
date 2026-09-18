@@ -6,6 +6,7 @@ import test from 'node:test';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import type { ObservationBlockPoint, ObservationSource } from '../src/observations/syncObservations.js';
 import { findFirstBlockAtOrAfterTimestamp, syncObservations } from '../src/observations/syncObservations.js';
+import { buildObservationReceipt } from '../src/observations/identity.js';
 import type { LaunchObservationFacts } from '../src/observations/types.js';
 import { SqliteStore } from '../src/store/sqliteStore.js';
 
@@ -38,8 +39,10 @@ function launch(blockNumber: bigint): LaunchObserved {
 
 class FakeObservationSource implements ObservationSource {
   head = 40n;
+  blockPointCalls: bigint[] = [];
   async getHeadBlockNumber() { return this.head; }
   async getBlockPoint(blockNumber: bigint): Promise<ObservationBlockPoint> {
+    this.blockPointCalls.push(blockNumber);
     return { blockNumber, blockHash: hash(blockNumber), timestampMs: Number(blockNumber) * 60_000 };
   }
   async readObservationFacts(_launch: LaunchObserved, blockNumber: bigint): Promise<{ facts: LaunchObservationFacts; missing: string[] }> {
@@ -160,6 +163,52 @@ test('sync persists partial receipts instead of treating unsupported evidence as
     assert.deepEqual(receipt?.missing, ['POOL_SLOT0', 'POOL_LIQUIDITY', 'TOKEN_DECIMALS']);
     assert.equal(receipt?.facts.poolCodePresent, true);
     assert.equal(receipt?.facts.poolActiveLiquidity, undefined);
+  } finally {
+    store.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+
+test('fully observed launches do not trigger per-launch historical RPC scans', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-observation-rpc-bound-'));
+  const store = new SqliteStore(join(dir, 'test.sqlite'), chainId);
+  try {
+    const item = launch(10n);
+    await store.putLaunch(item);
+    const horizons = [
+      { label: '5m', ms: 300_000 },
+      { label: '1h', ms: 3_600_000 },
+      { label: '24h', ms: 86_400_000 }
+    ];
+    for (let i = 0; i < horizons.length; i += 1) {
+      const horizon = horizons[i]!;
+      const targetTimestampMs = 600_000 + horizon.ms;
+      const receipt = await buildObservationReceipt({
+        chainId,
+        launchId: item.launchId,
+        horizonMs: horizon.ms,
+        targetTimestampMs,
+        observedBlock: BigInt(20 + i),
+        observedBlockHash: hash(BigInt(20 + i)),
+        observedTimestampMs: targetTimestampMs + 1,
+        status: 'COMPLETE',
+        facts: { poolCodePresent: true },
+        missing: []
+      });
+      await store.putObservation(receipt);
+    }
+
+    const source = new FakeObservationSource();
+    const report = await syncObservations(source, store, {
+      confirmations: 1n,
+      maxObservationsPerSync: 10,
+      horizons
+    });
+
+    assert.equal(report.inserted, 0);
+    assert.equal(report.alreadyPresent, 3);
+    assert.equal(source.blockPointCalls.includes(item.blockNumber), false);
   } finally {
     store.close();
     rmSync(dir, { recursive: true, force: true });
