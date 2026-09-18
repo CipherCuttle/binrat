@@ -130,7 +130,7 @@ test('observation failures preserve a sanitized error class without blocking liv
   const source = new FakeLaunchSource();
 
   class FailingObservationSource extends FakeObservationSource {
-    override async getHeadBlockNumber() {
+    override async getHeadBlockNumber(): Promise<bigint> {
       const error = new Error('sensitive transport details intentionally omitted');
       error.name = 'BlockNotFoundError';
       throw error;
