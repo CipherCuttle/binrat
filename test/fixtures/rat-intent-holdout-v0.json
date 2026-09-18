@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "binrat.rat-intent-holdout/0.1",
+  "frozenAt": "2026-09-18",
+  "note": "Frozen after pre-beta hardening. Future parser changes must report results without rewriting expected labels in place.",
+  "cases": [
+    {
+      "text": "rat give me system health",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat shipped anything yet",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "binrat working?",
+      "allowUnaddressed": false,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "rat coming next?",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat planned roadmap pls",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "binrat next",
+      "allowUnaddressed": false,
+      "expectedIntent": "ROADMAP"
+    },
+    {
+      "text": "rat coin status",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat wen $binrat",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat rat credit status",
+      "allowUnaddressed": false,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "rat why does this exist",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "binrat what does this do",
+      "allowUnaddressed": false,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "rat evidence",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat truth doctrine",
+      "allowUnaddressed": false,
+      "expectedIntent": "PROOF"
+    },
+    {
+      "text": "rat should i sell this now",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat snipe?",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat entry?",
+      "allowUnaddressed": false,
+      "expectedIntent": "BUY_BOUNDARY"
+    },
+    {
+      "text": "rat safe or not",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat legit or nah",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat scam or no",
+      "allowUnaddressed": false,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    },
+    {
+      "text": "rat developer history 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat fraud? 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "CREATOR_HISTORY"
+    },
+    {
+      "text": "rat 0x2222222222222222222222222222222222222222",
+      "allowUnaddressed": false,
+      "expectedIntent": "ADDRESS_LOOKUP"
+    },
+    {
+      "text": "rat show timeline bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat what happened to bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "REPLAY"
+    },
+    {
+      "text": "rat receipt bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "RECEIPT"
+    },
+    {
+      "text": "rat bag bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "allowUnaddressed": false,
+      "expectedIntent": "BAG"
+    },
+    {
+      "text": "rat banana telemetry",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "rat what",
+      "allowUnaddressed": false,
+      "expectedIntent": "CLARIFY"
+    },
+    {
+      "text": "should i sell now?",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "ratless status",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "this looks safe",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "gm rats",
+      "allowUnaddressed": false,
+      "expectedIntent": null
+    },
+    {
+      "text": "what have you shipped?",
+      "allowUnaddressed": true,
+      "expectedIntent": "STATUS"
+    },
+    {
+      "text": "token status",
+      "allowUnaddressed": true,
+      "expectedIntent": "TOKEN"
+    },
+    {
+      "text": "why does this exist?",
+      "allowUnaddressed": true,
+      "expectedIntent": "WHY"
+    },
+    {
+      "text": "safe or not?",
+      "allowUnaddressed": true,
+      "expectedIntent": "SAFETY_BOUNDARY"
+    }
+  ]
+}

@@ -96,6 +96,7 @@ Suggested environment variables:
 - `TELEGRAM_WEBHOOK_SECRET`
 - `TELEGRAM_CHANNEL_ID`
 - `TELEGRAM_DISCUSSION_CHAT_ID`
+- `TELEGRAM_REPLY_DB_PATH`
 - `BINRAT_PUBLIC_BASE_URL`
 - `BINRAT_PUBLIC_SITE_URL`
 
@@ -129,6 +130,27 @@ Every outbound event gets:
 Identical event id + identical payload is replay-safe.
 
 Changed payload under the same immutable event id fails closed.
+
+Do not promise mathematically exactly-once Telegram delivery. Persisted receipts/outbox state may suppress recorded duplicates, but an ambiguous failure after a remote send and before local commit still requires idempotent recovery semantics.
+
+## Rat NLP / personality V0.5
+
+The deterministic implementation contract is in `docs/RAT_PERSONALITY_V0_5.md`.
+
+V0.5 adds:
+
+- exact-pinned local `compromise` intent matching;
+- categorical routing provenance rather than fake numeric confidence;
+- strict launch-id extraction and role-aware address resolution;
+- discriminated typed factual answer plans;
+- deterministic Rat voice variants;
+- operational moods that never alter evidence semantics;
+- explicit BUY / SAFETY / identity-risk boundary intents;
+- live fail-closed capability/launch authorization from `/api/capabilities`;
+- persisted answer-plan/reply digests without raw user message text;
+- a 131-case frozen routing corpus plus 36-case frozen holdout.
+
+The personality layer is downstream of evidence lookup. It may change phrasing, never facts.
 
 ## Question answering
 
@@ -204,13 +226,14 @@ Required controls:
 - command allowlist;
 - URL/address validation;
 - Telegram update-id dedupe;
+- persisted reply receipt ledger when deployed on persistent storage;
 - outbound event dedupe;
 - bounded retries;
 - no secrets in logs;
 - no arbitrary URL fetch from user input;
 - no arbitrary code execution;
 - no trading/signing authority;
-- moderator kill switch for conversational replies.
+- moderator reply-disable control (`TELEGRAM_REPLIES_ENABLED`, default false).
 
 ## Avatar
 
@@ -229,14 +252,18 @@ V0 passes when:
 1. `/status` reports canonical status correctly;
 2. `/roadmap` distinguishes engineering-pass, deployed/public-live, building, planned, and experimental state from the canonical manifest;
 3. `/creator` returns a public Creator File or a bounded not-found response;
-4. one explicit release event posts exactly once to the announcement channel;
-5. duplicate delivery is idempotent;
+4. one explicit release event is recorded and posted through the persistent outbound event path;
+5. recorded duplicate delivery is replay-safe/idempotent;
 6. invalid webhook secret is rejected;
 7. Telegram outage does not affect BINRAT indexing;
 8. no bot token appears in repository/history/log fixtures;
 9. bot identifies itself as automated;
 10. no BUY/SELL, token-price, return promise, or unsupported identity claim is emitted;
-11. token-facing launch messaging remains disabled while the canonical launch authorization state is blocked.
+11. token-facing launch messaging remains disabled while the canonical launch authorization state is blocked;
+12. remote capability-status failure drops launch/marketing authority to a least-privileged state;
+13. a bare address cannot silently become a creator claim;
+14. the frozen routing corpus and holdout pass without relabeling parser failures;
+15. Replay Lab provider and Telegram consumer contracts are present in the same candidate history.
 
 ## First deployment sequence
 
@@ -248,6 +275,7 @@ V0 passes when:
 6. configure secrets in deployment environment;
 7. set HTTPS webhook + webhook secret;
 8. register commands;
-9. run private smoke test;
-10. enable announcement posting;
-11. enable discussion replies only after deterministic command tests pass.
+9. run private smoke test with `TELEGRAM_REPLIES_ENABLED=false`;
+10. set `TELEGRAM_REPLIES_ENABLED=true` only after deterministic and natural-language tests pass;
+11. enable announcement posting separately;
+12. keep the reply-disable control available for moderation response.

@@ -22,7 +22,8 @@
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "telegramRatV0": {
-      "engineeringStatus": "PLANNED",
+      "engineeringStatus": "BUILDING",
+      "candidatePr": 15,
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "dumpsterLedger": {
@@ -59,7 +60,8 @@
       "replay_lab_real_evidence_smoke",
       "status_consistency_check",
       "allocation_and_privileged_inventory_disclosure"
-    ]
+    ],
+    "tokenState": "NOT_LAUNCHED"
   },
   "invariant": "Degen can decide attention and priority. It cannot decide what is true."
 }
