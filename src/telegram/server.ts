@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { resolve } from 'node:path';
 import { renderRatReply, validateCapabilityManifest, type RatConfig } from './rat.js';
+import { PerChatRateGate, UpdateDeliveryFence } from './deliveryGuard.js';
 
 interface TelegramChat {
   id: number;
@@ -25,8 +26,6 @@ interface TelegramApiResponse {
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
-const seenUpdates = new Set<number>();
-const seenOrder: number[] = [];
 
 function requiredEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -38,18 +37,6 @@ function integerEnv(name: string, fallback: number, minimum: number): number {
   const value = Number(process.env[name] ?? fallback);
   if (!Number.isSafeInteger(value) || value < minimum) throw new Error(`INVALID_CONFIG:${name}`);
   return value;
-}
-
-function remember(updateId: number): boolean {
-  if (!Number.isSafeInteger(updateId) || updateId < 0) return false;
-  if (seenUpdates.has(updateId)) return false;
-  seenUpdates.add(updateId);
-  seenOrder.push(updateId);
-  while (seenOrder.length > 2048) {
-    const old = seenOrder.shift();
-    if (old !== undefined) seenUpdates.delete(old);
-  }
-  return true;
 }
 
 async function readBody(request: IncomingMessage): Promise<string> {
@@ -91,6 +78,8 @@ async function sendMessage(token: string, chatId: number, text: string): Promise
 
 const token = requiredEnv('TELEGRAM_BOT_TOKEN');
 const webhookSecret = requiredEnv('TELEGRAM_WEBHOOK_SECRET');
+const updateFence = new UpdateDeliveryFence();
+const rateGate = new PerChatRateGate(integerEnv('TELEGRAM_MAX_MESSAGES_PER_MINUTE', 12, 1));
 const manifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
 const manifest = validateCapabilityManifest(JSON.parse(readFileSync(manifestPath, 'utf8')));
 const config: RatConfig = {
@@ -125,25 +114,44 @@ const server = createServer(async (request, response) => {
 
     const body = await readBody(request);
     const update = JSON.parse(body) as TelegramUpdate;
-    if (!remember(update.update_id)) {
+    const begin = updateFence.begin(update.update_id);
+    if (begin === 'INVALID') {
+      json(response, 400, { error: 'INVALID_UPDATE_ID' });
+      return;
+    }
+    if (begin === 'SEEN' || begin === 'IN_FLIGHT') {
       json(response, 200, { ok: true, duplicate: true });
       return;
     }
 
-    const message = update.message;
-    if (!message?.text) {
-      json(response, 200, { ok: true, ignored: true });
-      return;
-    }
+    try {
+      const message = update.message;
+      if (!message?.text) {
+        updateFence.commit(update.update_id);
+        json(response, 200, { ok: true, ignored: true });
+        return;
+      }
 
-    const reply = await renderRatReply(message.text, config);
-    if (!reply) {
-      json(response, 200, { ok: true, ignored: true });
-      return;
-    }
+      if (!rateGate.allow(message.chat.id)) {
+        updateFence.commit(update.update_id);
+        json(response, 200, { ok: true, rateLimited: true });
+        return;
+      }
 
-    await sendMessage(token, message.chat.id, reply);
-    json(response, 200, { ok: true });
+      const reply = await renderRatReply(message.text, config);
+      if (!reply) {
+        updateFence.commit(update.update_id);
+        json(response, 200, { ok: true, ignored: true });
+        return;
+      }
+
+      await sendMessage(token, message.chat.id, reply);
+      updateFence.commit(update.update_id);
+      json(response, 200, { ok: true });
+    } catch (error) {
+      updateFence.release(update.update_id);
+      throw error;
+    }
   } catch (error) {
     const code = error instanceof Error && /^[A-Z_]+$/.test(error.message) ? error.message : 'TELEGRAM_RAT_FAILED';
     json(response, code === 'BODY_TOO_LARGE' ? 413 : 503, { error: code });
