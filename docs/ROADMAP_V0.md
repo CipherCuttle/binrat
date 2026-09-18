@@ -197,32 +197,65 @@ Autonomous communication layer for updates, status, launch intelligence, FAQs, r
 
 The bot is explicitly automated and never impersonates the founder.
 
-## TOKEN-GATED — ONLY IF EARNED
+## EARLY FAIR LAUNCH — FUND THE BUILD, SHIP THE UTILITY
 
-A transferable `$BINRAT` may be considered only after Rat Credits prove all of the following:
+BINRAT intends to launch `$BINRAT` early, subject to the legal/compliance launch gate in `TOKEN_LAUNCH_DOCTRINE.md`.
 
-1. there are multiple unrelated contributors;
-2. evidence spam/Sybil behavior is a real problem;
-3. meaningful value is exchanged around evidence tasks;
-4. transferable collateral improves coordination materially;
-5. ordinary account reputation or fiat/stablecoin deposits are insufficient;
-6. legal/compliance review supports the proposed design.
+The launch objective is explicit:
 
-Candidate future functions if those gates pass:
+1. create a fair-access BINRAT culture/coordination asset;
+2. use disclosed creator/project fee revenue to help bankroll continued development;
+3. ship progressively deeper token utility alongside the evidence roadmap;
+4. retain a degen layer without letting token wealth determine factual truth.
 
-- bonded evidence submissions;
+### Launch-day target
+
+The cleanest fair-launch target is:
+
+- no presale;
+- no private discount;
+- no hidden team allocation;
+- fixed supply under the selected launch contract;
+- locked launch liquidity under the selected launch contract;
+- disclosed project/creator fee route;
+- any founder/project market purchase disclosed and executed through the same public market;
+- public treasury wallet and funding ledger;
+- clear separation between shipped utility and planned utility.
+
+### Early utility layer
+
+Subject to implementation and legal review, early `$BINRAT` utility can include:
+
+- **Rat Den** — optional token-gated community/product surfaces;
+- **Rat Watch capacity** — additional watch slots or advanced alert configuration;
+- **Dumpster Raids** — token-lock signaling for which evidence gaps/cases the community wants investigated next;
+- **Trash Hunts** — seasonal research quests that earn Rat Credits and reputation rather than purchasing truth;
+- **Bounty Boosts** — use `$BINRAT` to increase the posted reward/priority of a bounded evidence task;
+- **Case sponsorship** — visibly sponsor research without gaining adjudication authority.
+
+### Utility expansion
+
+As the network matures, `$BINRAT` may additionally be used for:
+
+- bonded external-evidence submissions;
 - bonded challenges;
+- anti-spam collateral;
 - permissionless evidence-provider collateral;
-- eventually independent Rat Node collateral.
+- independent Rat Node collateral.
 
-Explicit non-utilities:
+### Permanent exclusions
 
-- paying for dark mode;
-- artificial APY;
-- token-weighted truth;
-- mandatory token payment for ordinary API access;
-- buybacks marketed as appreciation mechanics;
-- token-gated factual evidence.
+Token balance must never:
+
+- determine whether evidence is true;
+- overwrite receipts;
+- buy Rat Reputation;
+- turn an unsupported identity inference into a fact;
+- create guaranteed yield or a promise of appreciation.
+
+The project can be degen.
+
+The evidence cannot be.
 
 ## END STATE
 
@@ -232,4 +265,4 @@ The product flywheel is:
 
 The moat is accumulated, replayable history.
 
-The token, if one ever exists, is infrastructure for adversarial coordination around that history — not the reason the history exists.
+The token launches early as a fair-access culture/coordination asset and project-funding mechanism; its utility expands with shipped roadmap capabilities. The evidence history remains useful independently of token price.
