@@ -528,10 +528,10 @@ function formatBps(value) {
 function formatRaw(value) {
   if (value === null || value === undefined) return "UNKNOWN";
   const text = String(value);
-  if (!/^-?\\d+$/.test(text)) return escapeHtml(text);
+  if (!/^-?\d+$/.test(text)) return escapeHtml(text);
   const negative = text.startsWith("-");
   const digits = negative ? text.slice(1) : text;
-  const grouped = digits.replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",");
+  const grouped = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return escapeHtml((negative ? "-" : "") + grouped);
 }
 
