@@ -102,6 +102,29 @@ CREATE TABLE IF NOT EXISTS binrat_runtime_state (
   updated_at_ms INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS telegram_update_receipts (
+  update_id INTEGER PRIMARY KEY,
+  state TEXT NOT NULL CHECK (state IN ('CLAIMED','REPLIED','IGNORED','RATE_LIMITED')),
+  claim_expires_at_ms INTEGER,
+  chat_id INTEGER,
+  intent TEXT,
+  renderer_version TEXT,
+  voice_variant INTEGER,
+  plan_digest TEXT,
+  reply_digest TEXT,
+  answer_plan_json TEXT,
+  receipt_ids_json TEXT,
+  telegram_message_id INTEGER,
+  created_at_ms INTEGER NOT NULL,
+  updated_at_ms INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS telegram_rate_windows (
+  chat_id INTEGER PRIMARY KEY,
+  started_at_ms INTEGER NOT NULL,
+  count INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS binrat_invariant_guard (
   must_be_zero INTEGER NOT NULL CHECK (must_be_zero = 0)
 );

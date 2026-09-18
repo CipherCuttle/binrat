@@ -70,3 +70,30 @@ Freshness authority is stored in `binrat_runtime_state`. Durable old evidence ma
 `/api/health` itself remains fast and returns a structured degraded state rather than relying on a sleeping application server.
 
 `cloudflare/wrangler.example.jsonc` is intentionally non-deployable until a real D1 database id is bound.
+
+
+## CF3 Telegram edge
+
+The same Worker now exposes `POST /telegram/webhook`.
+
+Telegram delivery state moves from process-local memory + ephemeral SQLite to D1:
+
+- update claim lease
+- durable terminal state
+- durable reply plan/reply digests
+- durable answer plan
+- Telegram message id
+- shared per-chat rate window
+
+Raw Telegram message text is not persisted.
+
+An active claim returns retryable 503. A terminal update returns 200 duplicate. Expired claims can be reclaimed.
+
+The known remote-send/local-ledger ambiguity remains: a Worker can fail after Telegram accepts `sendMessage` but before D1 records the terminal reply. No exactly-once claim is made.
+
+Secrets are not stored in Wrangler config. Deployment must bind:
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_WEBHOOK_SECRET`
+- `CAPABILITY_MANIFEST_JSON`
+
+Replies remain disabled by default in the example configuration.
