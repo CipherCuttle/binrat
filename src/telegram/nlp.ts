@@ -12,12 +12,15 @@ export type RatIntent =
   | 'TOKEN'
   | 'PROOF'
   | 'CREATOR_HISTORY'
+  | 'ADDRESS_LOOKUP'
   | 'BAG'
   | 'RECEIPT'
   | 'REPLAY'
   | 'BUY_BOUNDARY'
   | 'SAFETY_BOUNDARY'
   | 'CLARIFY';
+
+export type RatRoutingStrength = 'EXPLICIT' | 'STRONG_RULE' | 'AMBIGUOUS';
 
 export interface RatConversationContext {
   allowUnaddressed?: boolean;
@@ -26,7 +29,7 @@ export interface RatConversationContext {
 export interface RatUnderstanding {
   intent: RatIntent;
   argument: string;
-  confidence: number;
+  strength: RatRoutingStrength;
   explicitCommand: boolean;
   identityRiskLanguage: boolean;
 }
@@ -46,6 +49,16 @@ const COMMANDS: Record<string, RatIntent> = {
   replay: 'REPLAY'
 };
 
+function result(
+  intent: RatIntent,
+  argument: string,
+  strength: RatRoutingStrength,
+  explicitCommand: boolean,
+  identityRiskLanguage: boolean
+): RatUnderstanding {
+  return { intent, argument, strength, explicitCommand, identityRiskLanguage };
+}
+
 function containsRatReference(text: string): boolean {
   return /(^|\W)(binrat|rat)(\W|$)/i.test(text) || /\$binrat\b/i.test(text);
 }
@@ -54,7 +67,10 @@ function hasAny(doc: ReturnType<typeof nlp>, patterns: readonly string[]): boole
   return patterns.some((pattern) => doc.has(pattern));
 }
 
-export function understandRatMessage(text: string, context: RatConversationContext = {}): RatUnderstanding | null {
+export function understandRatMessage(
+  text: string,
+  context: RatConversationContext = {}
+): RatUnderstanding | null {
   const normalized = text.trim().slice(0, MAX_NLP_CHARS);
   if (!normalized) return null;
 
@@ -62,20 +78,20 @@ export function understandRatMessage(text: string, context: RatConversationConte
     const [rawCommand, ...rest] = normalized.split(/\s+/);
     const command = rawCommand!.slice(1).split('@')[0]!.toLowerCase();
     const intent = COMMANDS[command];
-    if (!intent) return { intent: 'CLARIFY', argument: '', confidence: 1, explicitCommand: true, identityRiskLanguage: false };
-    return {
+    if (!intent) return result('CLARIFY', '', 'EXPLICIT', true, false);
+    return result(
       intent,
-      argument: rest.join(' ').trim(),
-      confidence: 1,
-      explicitCommand: true,
-      identityRiskLanguage: /\b(scamm?er|rug(?:ger|ged)?|fraud)\b/i.test(normalized)
-    };
+      rest.join(' ').trim(),
+      'EXPLICIT',
+      true,
+      /\b(scamm?er|rug(?:ger|ged)?|fraud)\b/i.test(normalized)
+    );
   }
+
+  if (!containsRatReference(normalized) && context.allowUnaddressed !== true) return null;
 
   const address = normalized.match(ADDRESS_RE)?.[0] ?? '';
   const bagId = normalized.match(BAG_ID_RE)?.[0] ?? '';
-  if (!containsRatReference(normalized) && context.allowUnaddressed !== true) return null;
-
   const doc = nlp(normalized);
   const lower = normalized.toLowerCase();
   const identityRiskLanguage = /\b(scamm?er|rug(?:ger|ged)?|fraud|criminal|same (?:guy|person|human))\b/i.test(lower);
@@ -87,21 +103,23 @@ export function understandRatMessage(text: string, context: RatConversationConte
     hasAny(doc, ['snipe', 'entry']);
 
   if (tradingAdviceLanguage) {
-    return { intent: 'BUY_BOUNDARY', argument: '', confidence: 0.98, explicitCommand: false, identityRiskLanguage };
-  }
-
-  if (address && (
-    identityRiskLanguage ||
-    hasAny(doc, ['creator', 'developer', 'dev', 'wallet', '{launch}', 'history', 'before', 'previous'])
-  )) {
-    return { intent: 'CREATOR_HISTORY', argument: address, confidence: 0.95, explicitCommand: false, identityRiskLanguage };
+    return result('BUY_BOUNDARY', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (
     hasAny(doc, ['safe', 'safety', 'scam', 'rug', 'rugger', 'honest', 'legit']) ||
     /\bis this (?:good|bad|dangerous)\b/i.test(lower)
   ) {
-    return { intent: 'SAFETY_BOUNDARY', argument: address, confidence: 0.94, explicitCommand: false, identityRiskLanguage };
+    if (!address || !identityRiskLanguage) {
+      return result('SAFETY_BOUNDARY', address, 'STRONG_RULE', false, identityRiskLanguage);
+    }
+  }
+
+  if (address && (
+    identityRiskLanguage ||
+    hasAny(doc, ['creator', 'developer', 'dev', 'wallet', '{launch}', 'history', 'before', 'previous'])
+  )) {
+    return result('CREATOR_HISTORY', address, 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (
@@ -110,26 +128,26 @@ export function understandRatMessage(text: string, context: RatConversationConte
     /\bafter (?:the )?launch\b/i.test(lower) ||
     /\b(5m|1h|24h)\b/i.test(lower)
   ) {
-    return { intent: 'REPLAY', argument: bagId, confidence: 0.93, explicitCommand: false, identityRiskLanguage };
+    return result('REPLAY', bagId, 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (hasAny(doc, ['receipt', 'proof']) && bagId) {
-    return { intent: 'RECEIPT', argument: bagId, confidence: 0.92, explicitCommand: false, identityRiskLanguage };
+    return result('RECEIPT', bagId, 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (bagId && hasAny(doc, ['bag', 'launch', 'token'])) {
-    return { intent: 'BAG', argument: bagId, confidence: 0.9, explicitCommand: false, identityRiskLanguage };
+    return result('BAG', bagId, 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (address) {
-    return { intent: 'CREATOR_HISTORY', argument: address, confidence: 0.86, explicitCommand: false, identityRiskLanguage };
+    return result('ADDRESS_LOOKUP', address, 'AMBIGUOUS', false, identityRiskLanguage);
   }
 
   if (
     hasAny(doc, ['roadmap', 'coming', 'next', 'plan', 'planned']) ||
     /\bwhat(?:'s| is) next\b/i.test(lower)
   ) {
-    return { intent: 'ROADMAP', argument: '', confidence: 0.9, explicitCommand: false, identityRiskLanguage };
+    return result('ROADMAP', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (
@@ -137,14 +155,14 @@ export function understandRatMessage(text: string, context: RatConversationConte
     /\$binrat\b/i.test(normalized) ||
     /\bwen token\b/i.test(lower)
   ) {
-    return { intent: 'TOKEN', argument: '', confidence: 0.9, explicitCommand: false, identityRiskLanguage };
+    return result('TOKEN', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (
     hasAny(doc, ['status', 'progress', 'live', 'shipped', 'working', 'health']) ||
     /\bwhat have you (?:built|shipped)\b/i.test(lower)
   ) {
-    return { intent: 'STATUS', argument: '', confidence: 0.88, explicitCommand: false, identityRiskLanguage };
+    return result('STATUS', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (
@@ -152,16 +170,16 @@ export function understandRatMessage(text: string, context: RatConversationConte
     /\bwhat (?:is|does) binrat\b/i.test(lower) ||
     /\bwhy should (?:i|anyone) care\b/i.test(lower)
   ) {
-    return { intent: 'WHY', argument: '', confidence: 0.88, explicitCommand: false, identityRiskLanguage };
+    return result('WHY', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (hasAny(doc, ['proof', 'rules', 'doctrine', 'truth', 'evidence'])) {
-    return { intent: 'PROOF', argument: '', confidence: 0.86, explicitCommand: false, identityRiskLanguage };
+    return result('PROOF', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
   if (hasAny(doc, ['help', 'commands', 'what can you do'])) {
-    return { intent: 'HELP', argument: '', confidence: 0.86, explicitCommand: false, identityRiskLanguage };
+    return result('HELP', '', 'STRONG_RULE', false, identityRiskLanguage);
   }
 
-  return { intent: 'CLARIFY', argument: '', confidence: 0.35, explicitCommand: false, identityRiskLanguage };
+  return result('CLARIFY', '', 'AMBIGUOUS', false, identityRiskLanguage);
 }
