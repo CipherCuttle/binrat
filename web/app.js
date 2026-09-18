@@ -1,4 +1,4 @@
-import { loadDumpsterFeed, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadBagIntelligence, loadCreatorFile, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
 const grid = document.querySelector("#garbage-grid");
@@ -191,6 +191,8 @@ function renderFeed() {
     image.addEventListener("error", () => image.remove(), { once: true });
   }
 }
+  window.dispatchEvent(new CustomEvent("binrat:feed-rendered"));
+
 
 function renderCard(bag) {
   const coverage = normalizeCoverage(bag.coverage);
@@ -368,8 +370,18 @@ function openBag(id, origin = document.activeElement) {
       <div class="trail-rows"><div class="trail-row current"><strong>${escapeHtml(bag.symbol)} / CURRENT BAG</strong><span class="trail-age">${escapeHtml(ageLabel(bag))}</span><span class="trail-outcome">${copy().launch}</span><span class="coverage ${normalizeCoverage(bag.coverage)}">${normalizeCoverage(bag.coverage)}</span></div>${trail}</div>
     </div>
 
+    <section class="intelligence-panel rb-card" data-intelligence-panel>
+      <div class="file-section-heading"><h3>03 / WHAT CHANGED?</h3><span>LOADING OBSERVATIONS…</span></div>
+      <p class="intel-loading">Checking 5m / 1h / 24h evidence receipts.</p>
+    </section>
+
+    <section class="creator-file-panel rb-card" data-creator-panel>
+      <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>INDEXED HISTORY</span></div>
+      <p class="intel-loading">Opening the reported-address file…</p>
+    </section>
+
     <div class="receipt-box">
-      <div class="receipt-head"><h3>03 / RECEIPT</h3><span>BINRAT / ARC 5042</span></div>
+      <div class="receipt-head"><h3>05 / RECEIPT</h3><span>BINRAT / ARC 5042</span></div>
       <dl class="receipt-grid">
         <dt>receipt</dt><dd>${escapeHtml(bag.receipt)}</dd>
         <dt>coverage</dt><dd>${escapeHtml(normalizeCoverage(bag.coverage))}</dd>
@@ -381,7 +393,7 @@ function openBag(id, origin = document.activeElement) {
     </div>
 
     <section class="share-tools" aria-label="Share card ${copy().report}">
-      <h3>04 / TAKE THE RECEIPT WITH YOU</h3>
+      <h3>06 / TAKE THE RECEIPT WITH YOU</h3>
       ${renderShareCard(share)}
       <div class="share-actions">
         <button class="button ghost" type="button" data-copy-post>COPY POST</button>
@@ -393,6 +405,10 @@ function openBag(id, origin = document.activeElement) {
   const copyButton = drawerContent.querySelector("[data-copy-post]");
   const copyStatus = drawerContent.querySelector(".share-copy-status");
   copyButton?.addEventListener("click", () => copySharePost(bag, copyStatus));
+  if (activeMode === "LIVE") {
+    void hydrateBagIntelligence(bag);
+    void hydrateCreatorFile(bag);
+  }
 
   drawer.inert = false;
   pageSurfaces.forEach((surface) => {
@@ -407,6 +423,112 @@ function openBag(id, origin = document.activeElement) {
     if (drawer.classList.contains("open"))
       drawerClose.focus({ preventScroll: true });
   });
+}
+
+async function hydrateBagIntelligence(bag) {
+  const panel = drawerContent.querySelector("[data-intelligence-panel]");
+  if (!panel) return;
+  try {
+    const intel = await loadBagIntelligence(bag.id);
+    if (!intel || !drawer.classList.contains("open")) return;
+    const snapshots = intel.snapshots.length
+      ? intel.snapshots.map(renderObservationSnapshot).join("")
+      : '<div class="intel-empty">No matured 5m / 1h / 24h observation receipt yet.</div>';
+    const changes = intel.changes.length
+      ? intel.changes.map(renderObservedChange).join("")
+      : '<div class="intel-empty">No between-horizon change can be projected yet.</div>';
+    panel.innerHTML = `
+      <div class="file-section-heading"><h3>03 / WHAT CHANGED?</h3><span>${escapeHtml(intel.observationCoverage)} OBSERVATION COVERAGE</span></div>
+      <p class="intel-boundary">On-chain snapshots only. Raw pool liquidity is not USD liquidity. The reported creator address is not a claim of human identity.</p>
+      <div class="intel-snapshots">${snapshots}</div>
+      <div class="intel-changes"><span class="intel-subhead">BETWEEN RECEIPTS</span>${changes}</div>
+      <div class="intel-receipt">INTELLIGENCE RECEIPT / ${escapeHtml(intel.receipt.receiptId)}</div>
+    `;
+    window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "intelligence" } }));
+  } catch {
+    panel.innerHTML = '<div class="file-section-heading"><h3>03 / WHAT CHANGED?</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Observation projection is not available. Missing evidence stays missing.</div>';
+  }
+}
+
+async function hydrateCreatorFile(bag) {
+  const panel = drawerContent.querySelector("[data-creator-panel]");
+  if (!panel) return;
+  try {
+    const file = await loadCreatorFile(bag.reportedCreatorAddress);
+    if (!file || !drawer.classList.contains("open")) return;
+    const rows = file.launches.slice(0, 8).map((item) => `
+      <div class="creator-launch-row">
+        <strong>${escapeHtml(item.symbol)}</strong>
+        <span>BLK ${escapeHtml(item.blockNumber)}</span>
+        <code>${escapeHtml(shortAddress(item.token))}</code>
+        <span>${escapeHtml(item.priorLaunchCount)} PRIOR</span>
+      </div>`).join("");
+    panel.innerHTML = `
+      <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
+      <div class="creator-file-stats">
+        <div><span>REPORTED ADDRESS</span><code>${escapeHtml(shortAddress(file.reportedCreatorAddress))}</code></div>
+        <div><span>FIRST INDEXED BLOCK</span><b>${escapeHtml(file.firstIndexedBlock)}</b></div>
+        <div><span>LAST INDEXED BLOCK</span><b>${escapeHtml(file.lastIndexedBlock)}</b></div>
+        <div><span>HISTORY</span><b>${escapeHtml(file.historyCoverage)}</b></div>
+      </div>
+      <p class="intel-boundary">Same ArcPad-reported address only. This does not establish common human ownership.</p>
+      <div class="creator-launches">${rows}</div>
+      <div class="intel-receipt">CREATOR FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
+    `;
+    window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "creator" } }));
+  } catch {
+    panel.innerHTML = '<div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Creator history projection is not available.</div>';
+  }
+}
+
+function renderObservationSnapshot(snapshot) {
+  return `
+    <article class="intel-snapshot" data-rb-animated>
+      <div class="intel-snapshot-head"><strong>+${escapeHtml(snapshot.horizonLabel.toUpperCase())}</strong><span>BLK ${escapeHtml(snapshot.observedBlock)}</span></div>
+      <dl>
+        <dt>creator share</dt><dd>${formatBps(snapshot.reportedCreatorShareBps)}</dd>
+        <dt>creator balance</dt><dd>${formatRaw(snapshot.reportedCreatorBalanceRaw)}</dd>
+        <dt>active liquidity</dt><dd>${formatRaw(snapshot.poolActiveLiquidityRaw)} <small>RAW</small></dd>
+        <dt>pool tick</dt><dd>${snapshot.poolTick === null ? "UNKNOWN" : escapeHtml(snapshot.poolTick)}</dd>
+      </dl>
+    </article>`;
+}
+
+function renderObservedChange(change) {
+  const label = {
+    POOL_ACTIVE_LIQUIDITY_RAW: "ACTIVE LIQUIDITY / RAW",
+    POOL_TICK: "POOL TICK",
+    REPORTED_CREATOR_BALANCE_RAW: "REPORTED CREATOR BALANCE",
+    REPORTED_CREATOR_SHARE_BPS: "REPORTED CREATOR SHARE",
+  }[change.field] ?? change.field;
+  const before = change.field === "REPORTED_CREATOR_SHARE_BPS" ? formatBps(change.before) : formatRaw(change.before);
+  const after = change.field === "REPORTED_CREATOR_SHARE_BPS" ? formatBps(change.after) : formatRaw(change.after);
+  return `<div class="intel-change"><span>${escapeHtml(label)}</span><b>${before} → ${after}</b><small>${escapeHtml(horizonLabel(change.fromHorizonMs))} → ${escapeHtml(horizonLabel(change.toHorizonMs))}</small></div>`;
+}
+
+function horizonLabel(ms) {
+  if (ms === 300000) return "+5M";
+  if (ms === 3600000) return "+1H";
+  if (ms === 86400000) return "+24H";
+  return `+${ms}MS`;
+}
+
+function formatBps(value) {
+  if (value === null || value === undefined) return "UNKNOWN";
+  const bps = BigInt(value);
+  const whole = bps / 100n;
+  const fraction = (bps % 100n).toString().padStart(2, "0");
+  return `${whole}.${fraction}%`;
+}
+
+function formatRaw(value) {
+  if (value === null || value === undefined) return "UNKNOWN";
+  const text = String(value);
+  if (!/^-?\\d+$/.test(text)) return escapeHtml(text);
+  const negative = text.startsWith("-");
+  const digits = negative ? text.slice(1) : text;
+  const grouped = digits.replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",");
+  return escapeHtml((negative ? "-" : "") + grouped);
 }
 
 function renderShareCard(card) {

@@ -10,6 +10,7 @@ import { syncLaunches, type SyncOptions } from './indexer/syncLaunches.js';
 import { syncObservations } from './observations/syncObservations.js';
 import { projectPublicFeed } from './public/project.js';
 import { projectCreatorFile } from './public/creatorFile.js';
+import { projectBagIntelligence } from './public/bagIntelligence.js';
 import { SqliteStore } from './store/sqliteStore.js';
 
 // Source and compiled entrypoints both resolve the same repo-owned web directory.
@@ -123,6 +124,18 @@ const server = createServer(async (request, response) => {
         launchCount: checkpoint ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length : 0,
         lastSyncError
       });
+      return;
+    }
+    if (pathname.startsWith('/api/bag/') && pathname.endsWith('/intelligence')) {
+      const bagId = pathname.slice('/api/bag/'.length, -'/intelligence'.length);
+      if (!bagId) { json(response, 400, { error: 'BAG_ID_INVALID' }); return; }
+      const feed = await snapshot();
+      if (!feed) { json(response, 503, { ready: false, reason: lastSyncError ? 'LIVE_INDEX_NOT_AVAILABLE' : 'INDEX_NOT_READY' }); return; }
+      const bag = feed.bags.find((item) => item.id === bagId);
+      if (!bag) { json(response, 404, { error: 'BAG_NOT_FOUND' }); return; }
+      const observations = (await store.listObservationsForLaunch(bag.id))
+        .filter((receipt) => receipt.observedBlock <= BigInt(feed.asOfBlock));
+      json(response, 200, await projectBagIntelligence(feed, bag, observations));
       return;
     }
     if (pathname.startsWith('/api/creator/')) {

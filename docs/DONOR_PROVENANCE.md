@@ -100,3 +100,19 @@ Reserved only if third-party providers become necessary:
 - circuit-breaker patterns.
 
 Do not port risk scores, approved/rejected semantics, or provider dependencies pre-emptively.
+
+
+## React Bits — presentation-only donor
+
+Repository: `DavidHDev/react-bits`  
+Pinned commit: `c49d6978d2496660f0f0c5a3b3ca77a059566a93`
+
+Intelligence V1 adapts the interaction behavior of:
+
+- `src/content/Animations/AnimatedContent/AnimatedContent.jsx`;
+- `src/content/Components/SpotlightCard/SpotlightCard.jsx`;
+- `src/content/Components/SpotlightCard/SpotlightCard.css`.
+
+The behaviors are ported into `web/react-bits-island.js` using native IntersectionObserver, Web Animations and pointer CSS variables. This intentionally avoids a React/GSAP runtime migration and keeps all evidence/data authority in the existing application.
+
+The animation island is presentation-only. Deleting it must not alter feed, Creator File, observation, receipt or API semantics.
