@@ -233,7 +233,7 @@ Required controls:
 - no arbitrary URL fetch from user input;
 - no arbitrary code execution;
 - no trading/signing authority;
-- moderator kill switch for conversational replies.
+- moderator reply-disable control (`TELEGRAM_REPLIES_ENABLED`, default false).
 
 ## Avatar
 
@@ -275,6 +275,7 @@ V0 passes when:
 6. configure secrets in deployment environment;
 7. set HTTPS webhook + webhook secret;
 8. register commands;
-9. run private smoke test;
-10. enable announcement posting;
-11. enable discussion replies only after deterministic command tests pass.
+9. run private smoke test with `TELEGRAM_REPLIES_ENABLED=false`;
+10. set `TELEGRAM_REPLIES_ENABLED=true` only after deterministic and natural-language tests pass;
+11. enable announcement posting separately;
+12. keep the reply-disable control available for moderation response.
