@@ -190,7 +190,7 @@ export async function runCloudflareSyncCycle(
           confirmations,
           maxObservationsPerSync: integerSetting(
             env.BINRAT_MAX_OBSERVATIONS_PER_SYNC,
-            12,
+            1,
             1,
             10_000
           )
@@ -267,9 +267,22 @@ function observationSyncErrorCode(error: unknown): string {
     .replace(/^_+|_+$/g, '')
     .slice(0, 80);
 
+  const status = httpStatus(error);
+  if (normalizedName === 'HTTP_REQUEST_ERROR' && status !== null) {
+    return `OBSERVATION_HTTP_${status}`;
+  }
+
   return normalizedName && normalizedName !== 'ERROR'
     ? `OBSERVATION_${normalizedName}`
     : 'OBSERVATION_SYNC_FAILED';
+}
+
+function httpStatus(error: unknown): number | null {
+  if (!error || typeof error !== 'object') return null;
+  const status = (error as { status?: unknown }).status;
+  return Number.isInteger(status) && Number(status) >= 100 && Number(status) <= 599
+    ? Number(status)
+    : null;
 }
 
 function integerSetting(
