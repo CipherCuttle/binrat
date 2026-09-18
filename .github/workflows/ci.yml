@@ -17,5 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: pnpm install --frozen-lockfile=false
+      - run: python3 -m py_compile scripts/cutover-cloudflare-telegram.py scripts/publish-cloudflare-capability-manifest.py scripts/deploy-cloudflare-web-assets.py
+      - run: pnpm install --frozen-lockfile
       - run: pnpm check

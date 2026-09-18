@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "binrat.capability-manifest/0.1",
+  "updatedAt": "2026-09-19",
+  "doctrine": {
+    "roadmap": "docs/ROADMAP_V0.md",
+    "philosophy": "docs/PHILOSOPHY.md",
+    "tokenLaunch": "docs/TOKEN_LAUNCH_DOCTRINE.md",
+    "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md"
+  },
+  "capabilities": {
+    "intelligenceV1": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "reviewedHead": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+      "deploymentStatus": "NOT_VERIFIED",
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+    },
+    "replayLab": {
+      "engineeringStatus": "BUILDING",
+      "candidatePr": 13,
+      "candidateHead": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
+      "deploymentStatus": "NOT_VERIFIED",
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+    },
+    "telegramRatV0": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "candidatePr": 15,
+      "candidateHead": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PUBLIC_LIVE_BETA",
+      "cloudflareWorkerVersion": "da3b86c6-7478-4ddb-8748-1f169ce8fdcc",
+      "liveAcceptance": {
+        "ingress": "PASS",
+        "replies": "PASS",
+        "ledgerState": "REPLIED",
+        "rendererVersion": "binrat.rat-voice/0.2"
+      }
+    },
+    "dumpsterLedger": {
+      "engineeringStatus": "PLANNED",
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+    },
+    "ratDenV0": {
+      "engineeringStatus": "PLANNED",
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+    },
+    "ratWatchV0": {
+      "engineeringStatus": "PLANNED",
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+    },
+    "dumpsterRaidsV0": {
+      "engineeringStatus": "EXPERIMENTAL",
+      "phase": "POST_LAUNCH",
+      "launchBlocker": false
+    }
+  },
+  "launchAuthorization": {
+    "status": "BLOCKED",
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerAuthorityRequired": true,
+    "requiredEvidence": [
+      "legal_compliance_artifacts",
+      "launch_mechanics_verification_receipt",
+      "token_and_treasury_addresses",
+      "telegram_doctrine_smoke",
+      "dumpster_ledger_bootstrap",
+      "rat_den_public_receipt_boundary",
+      "rat_watch_end_to_end_alert",
+      "replay_lab_real_evidence_smoke",
+      "status_consistency_check",
+      "allocation_and_privileged_inventory_disclosure"
+    ],
+    "tokenState": "NOT_LAUNCHED"
+  },
+  "invariant": "Degen can decide attention and priority. It cannot decide what is true."
+}

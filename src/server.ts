@@ -1,4 +1,4 @@
-import { createReadStream, mkdirSync, realpathSync, statSync } from 'node:fs';
+import { createReadStream, mkdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { createServer, type ServerResponse } from 'node:http';
 import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,12 +12,14 @@ import { syncObservations } from './observations/syncObservations.js';
 import { projectPublicFeed } from './public/project.js';
 import { projectCreatorFile } from './public/creatorFile.js';
 import { projectBagIntelligence } from './public/bagIntelligence.js';
+import { projectReplayBundle } from './public/replayBundle.js';
 import { SqliteStore } from './store/sqliteStore.js';
 
 // Source and compiled entrypoints both resolve the same repo-owned web directory.
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = realpathSync(resolve(here, here.endsWith(`${sep}dist${sep}src`) ? '../../web' : '../web'));
 const dbPath = resolve(process.env.BINRAT_DB_PATH ?? './data/binrat.sqlite');
+const capabilityManifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
 mkdirSync(dirname(dbPath), { recursive: true });
 const store = new SqliteStore(dbPath, ARC_CHAIN_ID);
 const controller = new AbortController();
@@ -158,6 +160,11 @@ const server = createServer(async (request, response) => {
     let pathname: string;
     try { pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname); }
     catch { json(response, 400, { error: 'INVALID_PATH' }); return; }
+    if (pathname === '/api/capabilities') {
+      const manifest = JSON.parse(readFileSync(capabilityManifestPath, 'utf8')) as unknown;
+      json(response, 200, manifest);
+      return;
+    }
     if (pathname === '/api/health') {
       const checkpoint = await store.getCheckpoint();
       const launches = await store.listLaunches();
@@ -187,6 +194,18 @@ const server = createServer(async (request, response) => {
       const observations = (await store.listObservationsForLaunch(bag.id))
         .filter((receipt) => receipt.observedBlock <= BigInt(feed.asOfBlock));
       json(response, 200, await projectBagIntelligence(feed, bag, observations));
+      return;
+    }
+    if (pathname.startsWith('/api/bag/') && pathname.endsWith('/replay')) {
+      const bagId = pathname.slice('/api/bag/'.length, -'/replay'.length);
+      if (!bagId) { json(response, 400, { error: 'BAG_ID_INVALID' }); return; }
+      const feed = await snapshot();
+      if (!feed) { json(response, 503, { ready: false, reason: lastSyncError ? 'LIVE_INDEX_NOT_AVAILABLE' : 'INDEX_NOT_READY' }); return; }
+      const bag = feed.bags.find((item) => item.id === bagId);
+      if (!bag) { json(response, 404, { error: 'BAG_NOT_FOUND' }); return; }
+      const observations = (await store.listObservationsForLaunch(bag.id))
+        .filter((receipt) => receipt.observedBlock <= BigInt(feed.asOfBlock));
+      json(response, 200, await projectReplayBundle(feed, bag, observations));
       return;
     }
     if (pathname.startsWith('/api/creator/')) {

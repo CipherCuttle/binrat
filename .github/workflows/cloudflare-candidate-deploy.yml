@@ -1,0 +1,177 @@
+name: cloudflare-candidate-deploy
+
+on:
+  push:
+    branches:
+      - ops/cloudflare-deploy-v0
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-candidate:
+    if: ${{ contains(github.event.head_commit.message, '[deploy-cf-candidate]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ARC_RPC_URL: ${{ secrets.ARC_RPC_URL }}
+      BINRAT_PUBLIC_SITE_URL: ${{ vars.BINRAT_PUBLIC_SITE_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Require deployment credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -n "${CLOUDFLARE_API_TOKEN:-}" ] || {
+            echo "::error::Missing GitHub Actions secret CLOUDFLARE_API_TOKEN"
+            exit 1
+          }
+          [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ] || {
+            echo "::error::Missing GitHub Actions secret CLOUDFLARE_ACCOUNT_ID"
+            exit 1
+          }
+          [ -n "${ARC_RPC_URL:-}" ] || {
+            echo "::error::Missing GitHub Actions secret ARC_RPC_URL"
+            exit 1
+          }
+
+      - name: Prepare provisioning config
+        shell: bash
+        run: |
+          cat > /tmp/wrangler-provision.jsonc <<'JSON'
+          {
+            "name": "binrat-edge-v0",
+            "main": "src/cloudflare/worker.ts",
+            "compatibility_date": "2026-09-18",
+            "compatibility_flags": ["nodejs_compat"]
+          }
+          JSON
+
+      - name: Ensure D1 database exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! pnpm dlx wrangler@4.135.0 d1 info binrat-v0 --json --config /tmp/wrangler-provision.jsonc >/tmp/d1-info.json 2>/tmp/d1-info.err; then
+            pnpm dlx wrangler@4.135.0 d1 create binrat-v0 --location weur --config /tmp/wrangler-provision.jsonc
+            pnpm dlx wrangler@4.135.0 d1 info binrat-v0 --json --config /tmp/wrangler-provision.jsonc >/tmp/d1-info.json
+          fi
+
+      - name: Resolve D1 database ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          DB_ID="$(node <<'NODE'
+          const fs = require('fs');
+          const raw = fs.readFileSync('/tmp/d1-info.json', 'utf8');
+          const begin = raw.indexOf('{');
+          const end = raw.lastIndexOf('}');
+          if (begin < 0 || end < begin) process.exit(2);
+          const value = JSON.parse(raw.slice(begin, end + 1));
+          const seen = new Set();
+          function findUuid(v) {
+            if (typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)) return v;
+            if (!v || typeof v !== 'object' || seen.has(v)) return null;
+            seen.add(v);
+            for (const item of Array.isArray(v) ? v : Object.values(v)) {
+              const hit = findUuid(item);
+              if (hit) return hit;
+            }
+            return null;
+          }
+          const id = findUuid(value);
+          if (!id) process.exit(3);
+          process.stdout.write(id);
+          NODE
+          )"
+          echo "D1_DATABASE_ID=$DB_ID" >> "$GITHUB_ENV"
+
+      - name: Ensure sync queue exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! pnpm dlx wrangler@4.135.0 queues info binrat-sync-v0 --config /tmp/wrangler-provision.jsonc >/dev/null 2>&1; then
+            pnpm dlx wrangler@4.135.0 queues create binrat-sync-v0 --config /tmp/wrangler-provision.jsonc
+          fi
+
+      - name: Prepare deployment config
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp cloudflare/wrangler.example.jsonc wrangler.jsonc
+          node <<'NODE'
+          const fs = require('fs');
+          let cfg = fs.readFileSync('wrangler.jsonc', 'utf8');
+          cfg = cfg.replace('REPLACE_WITH_D1_DATABASE_ID', process.env.D1_DATABASE_ID);
+          cfg = cfg.replace('https://REPLACE_WITH_PUBLIC_SITE', process.env.BINRAT_PUBLIC_SITE_URL || 'https://example.invalid');
+          fs.writeFileSync('wrangler.jsonc', cfg);
+          NODE
+
+      - name: Apply idempotent D1 schema
+        run: pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --file cloudflare/schema.sql --config wrangler.jsonc
+
+      - name: Deploy candidate with Telegram replies disabled
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm dlx wrangler@4.135.0 deploy --config wrangler.jsonc 2>&1 | tee /tmp/deploy.log
+          WORKER_URL="$(grep -Eo 'https://[A-Za-z0-9.-]+\.workers\.dev' /tmp/deploy.log | tail -1 || true)"
+          echo "WORKER_URL=$WORKER_URL" >> "$GITHUB_ENV"
+
+      - name: Install runtime secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE' >/tmp/cloudflare-secrets.json
+          process.stdout.write(JSON.stringify({ ARC_RPC_URL: process.env.ARC_RPC_URL }));
+          NODE
+          pnpm dlx wrangler@4.135.0 secret bulk --config wrangler.jsonc < /tmp/cloudflare-secrets.json
+          rm -f /tmp/cloudflare-secrets.json
+
+      - name: Smoke candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${WORKER_URL:-}" ]; then
+            echo "Worker deployed, but Wrangler did not emit a workers.dev URL; skipping HTTP smoke."
+            exit 0
+          fi
+          curl --fail --silent --show-error "$WORKER_URL/health" | tee /tmp/health.json
+          echo
+          sleep 65
+          curl --silent --show-error --write-out "\nHTTP_STATUS=%{http_code}\n" "$WORKER_URL/api/health" | tee /tmp/api-health.txt
+
+      - name: Record deployment summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## BINRAT Cloudflare candidate'
+            echo
+            printf '%s\n' '- branch: `ops/cloudflare-deploy-v0`'
+            printf '%s\n' "- commit: `${GITHUB_SHA}`"
+            printf '%s\n' '- worker: `binrat-edge-v0`'
+            printf '%s\n' '- D1: `binrat-v0`'
+            printf '%s\n' '- Queue: `binrat-sync-v0`'
+            printf '%s\n' '- Telegram replies: `false`'
+            if [ -n "${WORKER_URL:-}" ]; then
+              echo "- URL: $WORKER_URL"
+            fi
+            echo
+            echo 'Render fallback was not modified.'
+          } >> "$GITHUB_STEP_SUMMARY"

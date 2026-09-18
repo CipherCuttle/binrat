@@ -1,0 +1,48 @@
+{
+  // Copy to wrangler.jsonc after creating the D1 database.
+  "name": "binrat-edge-v0",
+  "main": "src/cloudflare/worker.ts",
+  "compatibility_date": "2026-09-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./web"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "binrat-v0",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
+  "queues": {
+    "producers": [
+      {
+        "binding": "SYNC_QUEUE",
+        "queue": "binrat-sync-v0"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "binrat-sync-v0",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 5,
+        "max_concurrency": 1,
+        "retry_delay": 30
+      }
+    ]
+  },
+  "vars": {
+    "BINRAT_MAX_STATUS_AGE_MS": "180000",
+    "BINRAT_LIVE_LOOKBACK_BLOCKS": "1000",
+    "BINRAT_CONFIRMATIONS": "2",
+    "BINRAT_MAX_BATCH_BLOCKS": "1000",
+    "BINRAT_MAX_OBSERVATIONS_PER_SYNC": "1",
+    "TELEGRAM_REPLIES_ENABLED": "false",
+    "TELEGRAM_MAX_MESSAGES_PER_MINUTE": "12",
+    "BINRAT_PUBLIC_SITE_URL": "https://REPLACE_WITH_PUBLIC_SITE"
+  }
+}

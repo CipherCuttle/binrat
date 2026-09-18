@@ -19,11 +19,13 @@
     "watch": "tsx src/cli.ts watch",
     "inspect": "tsx src/cli.ts inspect",
     "probe:observations": "tsx src/observationProbeCli.ts",
-    "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts"
+    "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts",
+    "telegram:serve": "tsx src/telegram/server.ts"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
-    "viem": "2.56.3"
+    "viem": "2.56.3",
+    "compromise": "14.16.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "9.6.0",
