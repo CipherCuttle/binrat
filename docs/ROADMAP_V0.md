@@ -3,9 +3,20 @@
 Status: planning document  
 Rule: roadmap items are not promises, launch dates, or claims of future token value.
 
-## ENGINEERING-PASS / PUBLIC-LIVE NOT YET AUTHORIZED
+## CURRENT PRODUCT STATE — PUBLIC LIVE BETA / TOKEN LAUNCH BLOCKED
 
 Status semantics are canonicalized in `docs/CAPABILITY_MANIFEST_V0.json`.
+
+Verified public-beta runtime as of 2026-09-19:
+
+- BINRAT web frontend served as Cloudflare Worker static assets;
+- public read API served by the same Cloudflare Worker;
+- Arc launch indexing and historical backfill persisted in D1;
+- deterministic observation reconstruction active in a separately bounded Queue lane;
+- Telegram Rat webhook, durable D1 reply ledger, and deterministic replies live on Cloudflare;
+- existing Render services retained only as rollback infrastructure.
+
+This public product state does **not** authorize token launch or token marketing. Canonical launch authority remains fail-closed: `BLOCKED`, `marketingAuthorized=false`, `launchAuthorized=false`, `tokenState=NOT_LAUNCHED`.
 
 - `ENGINEERING_PASS` means the reviewed implementation passed its engineering gate.
 - `DEPLOYED` means the referenced implementation is deployed.
@@ -29,6 +40,13 @@ Implemented and mechanically verified:
 - reorg-aware, fail-closed evidence semantics;
 - public read plane;
 - presentation layer that does not own evidence authority.
+
+Current public deployment:
+
+- Cloudflare Worker + D1 + Queue runtime;
+- same-origin Cloudflare web + API;
+- public beta live with fail-closed health authority;
+- deeper historical coverage may still be backfilling and remains explicitly represented as incomplete/unverified where applicable.
 
 Current boundary remains:
 
