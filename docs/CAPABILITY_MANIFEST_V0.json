@@ -44,7 +44,8 @@
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "ratWatchV0": {
-      "engineeringStatus": "PLANNED",
+      "engineeringStatus": "BUILDING",
+      "candidatePr": 18,
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "dumpsterRaidsV0": {
