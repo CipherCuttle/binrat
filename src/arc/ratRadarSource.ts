@@ -2,6 +2,7 @@ import {
   createPublicClient,
   http,
   parseAbi,
+  parseAbiItem,
   type Address,
   type PublicClient
 } from 'viem';
@@ -11,9 +12,11 @@ import { ARC_CHAIN_ID, arcMainnet } from './chain.js';
 
 const poolAbi = parseAbi([
   'function token0() view returns (address)',
-  'function token1() view returns (address)',
-  'event Swap(address indexed sender,address indexed recipient,int256 amount0,int256 amount1,uint160 sqrtPriceX96,uint128 liquidity,int24 tick)'
+  'function token1() view returns (address)'
 ]);
+const swapEvent = parseAbiItem(
+  'event Swap(address indexed sender,address indexed recipient,int256 amount0,int256 amount1,uint160 sqrtPriceX96,uint128 liquidity,int24 tick)'
+);
 
 export interface RatRadarSource {
   assertAuthority(blockNumber: bigint, expectedBlockHash: Hex): Promise<void>;
@@ -83,7 +86,7 @@ export class ArcRatRadarSource implements RatRadarSource {
 
     const logs = await this.client.getLogs({
       address: pool,
-      event: poolAbi[2],
+      event: swapEvent,
       fromBlock,
       toBlock,
       strict: true
