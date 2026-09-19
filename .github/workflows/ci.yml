@@ -20,3 +20,45 @@ jobs:
       - run: python3 -m py_compile scripts/cutover-cloudflare-telegram.py scripts/publish-cloudflare-capability-manifest.py scripts/deploy-cloudflare-web-assets.py scripts/deploy-rat-watch-candidate.py scripts/deploy-rat-radar-candidate.py
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+
+
+  rat-radar-candidate-deploy:
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
+    needs: check
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Fail closed unless Cloudflare credentials exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${CLOUDFLARE_API_TOKEN:?missing CLOUDFLARE_API_TOKEN}"
+          : "${CLOUDFLARE_ACCOUNT_ID:?missing CLOUDFLARE_ACCOUNT_ID}"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Prepare live candidate config
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp cloudflare/wrangler.example.jsonc wrangler.jsonc
+          sed -i 's/REPLACE_WITH_D1_DATABASE_ID/46814564-1a41-449a-88e5-c1349eed3a27/g' wrangler.jsonc
+          sed -i 's#https://REPLACE_WITH_PUBLIC_SITE#https://binrat-edge-v0.pettevik.workers.dev#g' wrangler.jsonc
+          sed -i 's/"TELEGRAM_REPLIES_ENABLED": "false"/"TELEGRAM_REPLIES_ENABLED": "true"/g' wrangler.jsonc
+
+      - name: Deploy guarded Rat Radar candidate
+        run: python3 scripts/deploy-rat-radar-candidate.py
