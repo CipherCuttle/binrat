@@ -39,35 +39,61 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Cloudflare device authorization
+      - name: Start Cloudflare device authorization
         shell: bash
         run: |
           set -euo pipefail
-          log="$(mktemp)"
-          pnpm dlx wrangler@4.135.0 login --device --browser=false --no-use-keyring >"$log" 2>&1 &
+          log="$RUNNER_TEMP/cf-device.log"
+          pidfile="$RUNNER_TEMP/cf-device.pid"
+          codefile="$RUNNER_TEMP/cf-device.txt"
+          rm -f "$log" "$pidfile" "$codefile"
+          env -u RUNNER_TRACKING_ID nohup pnpm dlx wrangler@4.135.0 login --device --browser=false --no-use-keyring >"$log" 2>&1 </dev/null &
           pid=$!
-          posted=0
+          echo "$pid" > "$pidfile"
           for _ in $(seq 1 90); do
             if grep -q "https://dash.cloudflare.com/oauth2/device" "$log"; then
               url="$(grep -Eo 'https://dash\.cloudflare\.com/oauth2/device[^[:space:]]*' "$log" | tail -1)"
               code="$(awk '/enter the code:/{getline; getline; gsub(/[[:space:]]/,""); print; exit}' "$log")"
               if [ -n "$url" ] && [ -n "$code" ]; then
-                echo "::notice title=Cloudflare device authorization::Open $url and enter code $code"
-                posted=1
-                break
+                printf 'URL=%s\nCODE=%s\n' "$url" "$code" > "$codefile"
+                exit 0
               fi
             fi
             if ! kill -0 "$pid" 2>/dev/null; then
-              break
+              cat "$log"
+              exit 1
             fi
             sleep 1
           done
-          if [ "$posted" -ne 1 ]; then
-            cat "$log"
-            wait "$pid"
-            exit 1
-          fi
-          wait "$pid"
+          cat "$log"
+          exit 1
+
+      - name: Upload Cloudflare device code
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-device-auth
+          path: ${{ runner.temp }}/cf-device.txt
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Wait for Cloudflare approval
+        shell: bash
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/cf-device.log"
+          pid="$(cat "$RUNNER_TEMP/cf-device.pid")"
+          for _ in $(seq 1 300); do
+            if grep -q "Successfully logged in" "$log"; then
+              exit 0
+            fi
+            if ! kill -0 "$pid" 2>/dev/null; then
+              cat "$log"
+              exit 1
+            fi
+            sleep 1
+          done
+          cat "$log"
+          exit 1
 
       - run: pnpm install --frozen-lockfile
 
