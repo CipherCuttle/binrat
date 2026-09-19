@@ -11,13 +11,14 @@ export interface RatRadarSwapInput {
   launchId: string;
   pool: Hex;
   token: Hex;
+  token0: Hex;
+  token1: Hex;
   blockNumber: bigint;
   blockHash: Hex;
   txHash: Hex;
   logIndex: number;
   sender: Hex;
   recipient: Hex;
-  tokenSide: RatRadarTokenSide;
   amount0: bigint;
   amount1: bigint;
   sqrtPriceX96: bigint;
@@ -47,12 +48,21 @@ export async function deriveRatRadarSwapReceipt(
     ...input,
     pool: normalizeHex(input.pool),
     token: normalizeHex(input.token),
+    token0: normalizeHex(input.token0),
+    token1: normalizeHex(input.token1),
     blockHash: normalizeHex(input.blockHash),
     txHash: normalizeHex(input.txHash),
     sender: normalizeHex(input.sender),
     recipient: normalizeHex(input.recipient)
   };
-  const launchedTokenDelta = normalized.tokenSide === 'TOKEN0' ? normalized.amount0 : normalized.amount1;
+  if (normalized.token0 === normalized.token1) throw new Error('RAT_RADAR_POOL_TOKENS_INVALID');
+  const tokenSide: RatRadarTokenSide =
+    normalized.token === normalized.token0
+      ? 'TOKEN0'
+      : normalized.token === normalized.token1
+        ? 'TOKEN1'
+        : (() => { throw new Error('RAT_RADAR_TOKEN_NOT_IN_POOL'); })();
+  const launchedTokenDelta = tokenSide === 'TOKEN0' ? normalized.amount0 : normalized.amount1;
   const launchedTokenFlow: RatRadarLaunchedTokenFlow =
     launchedTokenDelta < 0n
       ? 'POOL_TO_RECIPIENT'
@@ -72,6 +82,7 @@ export async function deriveRatRadarSwapReceipt(
     version: RAT_RADAR_SWAP_VERSION,
     activityId,
     ...normalized,
+    tokenSide,
     launchedTokenDelta,
     launchedTokenFlow
   };
