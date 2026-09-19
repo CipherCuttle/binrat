@@ -21,7 +21,7 @@ test('Rat Radar free watchlist ranks recurrence before one-off early timing and 
 
   assert.equal(watchlist.schemaVersion, 'binrat.rat-radar-watchlist/0.1');
   assert.equal(watchlist.rankingVersion, 'binrat.rat-radar-ranking/0.1');
-  assert.equal(watchlist.method.evidencedRole, 'UNISWAP_V3_SWAP_RECIPIENT');
+  assert.equal(watchlist.method.evidencedRole, 'V3_SWAP_RECIPIENT');
   assert.match(watchlist.method.identityBoundary, /not automatically a human trader/i);
   assert.match(watchlist.method.recommendationBoundary, /not a BUY\/SELL recommendation/i);
 
