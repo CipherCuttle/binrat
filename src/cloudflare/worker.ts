@@ -176,6 +176,26 @@ export async function handleBinratApiRequest(
       return json(200, projectPublicRatRadarSwapReceipt(receipt));
     }
 
+    if (pathname.startsWith('/api/rat-radar/address/') && pathname.endsWith('/activity')) {
+      const recipient = pathname
+        .slice('/api/rat-radar/address/'.length, -'/activity'.length)
+        .toLowerCase();
+      if (!/^0x[0-9a-f]{40}$/.test(recipient)) {
+        return json(400, { error: 'RAT_RADAR_RECIPIENT_INVALID' });
+      }
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipts = await radar.listForRecipientThroughBlock(recipient, BigInt(feed.asOfBlock));
+      return json(200, {
+        schemaVersion: 'binrat.rat-radar-address-activity/0.1',
+        chainId: ARC_CHAIN_ID,
+        asOfBlock: feed.asOfBlock,
+        observedRecipientAddress: recipient,
+        activityCount: receipts.length,
+        activities: receipts.map(projectPublicRatRadarSwapReceipt),
+        identityBoundary: 'An observed recipient address is not automatically a human trader identity.'
+      });
+    }
+
     if (pathname.startsWith('/api/creator/')) {
       const creator = pathname.slice('/api/creator/'.length).toLowerCase();
       if (!/^0x[0-9a-f]{40}$/.test(creator)) return json(400, { error: 'CREATOR_ADDRESS_INVALID' });
