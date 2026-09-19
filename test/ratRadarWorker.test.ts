@@ -81,7 +81,7 @@ test('Cloudflare exposes a free Rat Radar watchlist and public evidence receipts
     assert.equal(body.coverage.swapReceiptCount, 2);
     assert.equal(body.coverage.acquisitionReceiptCount, 2);
     assert.equal(body.coverage.distinctRecipientAddressCount, 1);
-    assert.equal(body.method.evidencedRole, 'UNISWAP_V3_SWAP_RECIPIENT');
+    assert.equal(body.method.evidencedRole, 'V3_SWAP_RECIPIENT');
     assert.match(body.method.identityBoundary, /not automatically a human trader/i);
     assert.match(body.method.recommendationBoundary, /not a BUY\/SELL recommendation/i);
     assert.equal(body.candidates[0]?.observedRecipientAddress, recurrent);
