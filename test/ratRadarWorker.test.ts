@@ -73,7 +73,7 @@ test('Cloudflare exposes a free Rat Radar watchlist and public evidence receipts
       method: { evidencedRole: string; identityBoundary: string; recommendationBoundary: string };
       candidates: Array<{
         observedRecipientAddress: string;
-        independentLaunchCount: number;
+        distinctLaunchCount: number;
         evidenceActivityIds: string[];
       }>;
     };
@@ -85,11 +85,30 @@ test('Cloudflare exposes a free Rat Radar watchlist and public evidence receipts
     assert.match(body.method.identityBoundary, /not automatically a human trader/i);
     assert.match(body.method.recommendationBoundary, /not a BUY\/SELL recommendation/i);
     assert.equal(body.candidates[0]?.observedRecipientAddress, recurrent);
-    assert.equal(body.candidates[0]?.independentLaunchCount, 2);
+    assert.equal(body.candidates[0]?.distinctLaunchCount, 2);
     assert.deepEqual(
       body.candidates[0]?.evidenceActivityIds,
       [firstReceipt.activityId, secondReceipt.activityId]
     );
+
+    const addressActivity = await worker.fetch(
+      new Request(`https://binrat.example/api/rat-radar/address/${recurrent}/activity`),
+      env
+    );
+    assert.equal(addressActivity.status, 200);
+    const addressActivityBody = await addressActivity.json() as {
+      activityCount: number;
+      observedRecipientAddress: string;
+      activities: Array<{ activityId: string }>;
+      identityBoundary: string;
+    };
+    assert.equal(addressActivityBody.observedRecipientAddress, recurrent);
+    assert.equal(addressActivityBody.activityCount, 2);
+    assert.deepEqual(
+      addressActivityBody.activities.map((item) => item.activityId),
+      [firstReceipt.activityId, secondReceipt.activityId]
+    );
+    assert.match(addressActivityBody.identityBoundary, /not automatically a human trader/i);
 
     const activity = await worker.fetch(
       new Request(`https://binrat.example/api/rat-radar/activity/${firstReceipt.activityId}`),
