@@ -269,6 +269,9 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         '/bag <launch-id> — launch summary',
         '/replay <launch-id> — launch → 5m → 1h → 24h',
         '/receipt <launch-id> — public receipt',
+        '/watch 0x... — alert on a future launch from this indexed reported creator address',
+        '/unwatch 0x... — stop watching that reported address',
+        '/watches — list this chat\'s watched reported addresses',
         '/proof — rules of the bin'
       ];
     case 'STATUS':

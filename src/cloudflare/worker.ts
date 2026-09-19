@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { projectBagIntelligence } from '../public/bagIntelligence.js';
 import { projectCreatorFile } from '../public/creatorFile.js';
@@ -7,6 +8,7 @@ import type { PublicFeed } from '../public/types.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
 import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
+import { D1RatWatchStore } from './ratWatch.js';
 import { D1Store } from './d1Store.js';
 import { D1TelegramLedger } from './telegramLedger.js';
 import type { D1DatabaseLike } from './d1Types.js';
@@ -266,6 +268,30 @@ async function telegramWebhook(
       return json(200, { ok: true, rateLimited: true });
     }
 
+    const watchCommand = parseRatWatchCommand(message.text);
+    if (watchCommand) {
+      const operational = await handleRatWatchCommand(
+        watchCommand,
+        message.chat.id,
+        env,
+        deps.now()
+      );
+      const telegramMessageId = await sendMessage(
+        token,
+        message.chat.id,
+        operational.text,
+        deps.externalFetch
+      );
+      await ledger.completeOperationalReply({
+        updateId: update.update_id,
+        chatId: message.chat.id,
+        intent: operational.intent,
+        replyDigest: createHash('sha256').update(operational.text).digest('hex'),
+        telegramMessageId
+      }, deps.now());
+      return json(200, { ok: true });
+    }
+
     let allowUnaddressed = message.chat.type === 'private';
     if (!allowUnaddressed && message.reply_to_message?.from?.id !== undefined) {
       const identity = await getBotIdentity(token, deps.externalFetch);
@@ -341,6 +367,118 @@ async function telegramWebhook(
     await ledger.release(update.update_id).catch(() => {});
     return json(503, { error: safeErrorCode(error) });
   }
+}
+
+type RatWatchCommand =
+  | { action: 'WATCH'; creator: string | null }
+  | { action: 'UNWATCH'; creator: string | null }
+  | { action: 'LIST'; creator: null };
+
+function parseRatWatchCommand(text: string): RatWatchCommand | null {
+  const match = text.trim().match(/^\/(watch|unwatch|watches)(?:@[A-Za-z0-9_]+)?(?:\s+(.+))?$/i);
+  if (!match) return null;
+  const action = match[1]!.toLowerCase();
+  const raw = match[2]?.trim() ?? '';
+  if (action === 'watches') return { action: 'LIST', creator: null };
+  const creator = /^0x[0-9a-fA-F]{40}$/.test(raw) ? raw.toLowerCase() : null;
+  return action === 'watch'
+    ? { action: 'WATCH', creator }
+    : { action: 'UNWATCH', creator };
+}
+
+async function handleRatWatchCommand(
+  command: RatWatchCommand,
+  chatId: number,
+  env: BinratWorkerEnv,
+  nowMs: number
+): Promise<{ intent: string; text: string }> {
+  const watches = new D1RatWatchStore(env.DB);
+
+  if (command.action === 'LIST') {
+    const rows = await watches.list(chatId);
+    return {
+      intent: 'WATCH_LIST',
+      text: rows.length === 0
+        ? '🐀 no watched creator addresses yet.\n\n/watch 0x... — watch an indexed ArcPad-reported creator address'
+        : [
+            '🐀 watch list.',
+            '',
+            ...rows.map((row) => row.creator),
+            '',
+            'exact reported addresses only. address != human identity.'
+          ].join('\n')
+    };
+  }
+
+  if (!command.creator) {
+    return {
+      intent: command.action,
+      text: command.action === 'WATCH'
+        ? '🐀 usage: /watch 0x...'
+        : '🐀 usage: /unwatch 0x...'
+    };
+  }
+
+  if (command.action === 'UNWATCH') {
+    const removed = await watches.unsubscribe(chatId, command.creator);
+    return {
+      intent: 'UNWATCH',
+      text: removed
+        ? `🐀 stopped watching ${command.creator}.`
+        : `🐀 ${command.creator} was not on this chat's watch list.`
+    };
+  }
+
+  const ready = await readyContext(env);
+  if (!ready) {
+    return {
+      intent: 'WATCH',
+      text: '🐀 live index is not authoritative right now. watch was not added.'
+    };
+  }
+
+  const knownCreator = ready.feed.bags.some(
+    (bag) => bag.reportedCreatorAddress.toLowerCase() === command.creator
+  );
+  if (!knownCreator) {
+    return {
+      intent: 'WATCH',
+      text: [
+        '🐀 that address is not currently indexed as an ArcPad-reported creator.',
+        'watch was not added. unknown is not clean.'
+      ].join('\n')
+    };
+  }
+
+  const result = await watches.subscribe(
+    chatId,
+    command.creator,
+    BigInt(ready.feed.asOfBlock),
+    nowMs
+  );
+  if (result === 'LIMIT_REACHED') {
+    return {
+      intent: 'WATCH',
+      text: '🐀 watch list full. max 25 exact creator addresses per chat.'
+    };
+  }
+  if (result === 'DUPLICATE') {
+    return {
+      intent: 'WATCH',
+      text: `🐀 already watching ${command.creator}.`
+    };
+  }
+  return {
+    intent: 'WATCH',
+    text: [
+      '🐀 watch armed.',
+      command.creator,
+      '',
+      `starting after block ${ready.feed.asOfBlock}.`,
+      'i will alert on a future launch from the same ArcPad-reported address.',
+      'same address != same human identity.'
+    ].join('\n')
+  };
 }
 
 async function getBotIdentity(token: string, fetchImpl: typeof fetch): Promise<TelegramUser> {

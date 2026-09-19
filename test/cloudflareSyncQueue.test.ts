@@ -238,7 +238,7 @@ test('observation HTTP failures expose only sanitized status diagnostics', async
   }
 });
 
-test('successful live queue work schedules one separate observation job', async () => {
+test('successful live queue work schedules separate observation and Rat Watch jobs on minute zero', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
   const source = new FakeLaunchSource();
@@ -275,8 +275,11 @@ test('successful live queue work schedules one separate observation job', async 
 
     assert.equal(acked, 1);
     assert.equal(retried, 0);
-    assert.equal(sent.length, 1);
-    assert.equal(sent[0]?.kind, 'OBSERVATION_CYCLE');
+    assert.equal(sent.length, 2);
+    assert.deepEqual(
+      sent.map((item) => item.kind).sort(),
+      ['OBSERVATION_CYCLE', 'RAT_WATCH_CYCLE']
+    );
   } finally {
     db.close();
   }

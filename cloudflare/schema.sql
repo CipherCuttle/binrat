@@ -134,6 +134,30 @@ CREATE TABLE IF NOT EXISTS telegram_rate_windows (
   count INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS rat_watch_subscriptions (
+  chat_id INTEGER NOT NULL,
+  creator TEXT NOT NULL,
+  start_block TEXT NOT NULL,
+  created_at_ms INTEGER NOT NULL,
+  PRIMARY KEY (chat_id, creator)
+);
+CREATE INDEX IF NOT EXISTS idx_rat_watch_subscriptions_creator
+  ON rat_watch_subscriptions(creator, chat_id);
+
+CREATE TABLE IF NOT EXISTS rat_watch_alerts (
+  alert_id TEXT PRIMARY KEY,
+  chat_id INTEGER NOT NULL,
+  creator TEXT NOT NULL,
+  launch_id TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('PENDING','SENT')),
+  telegram_message_id INTEGER,
+  created_at_ms INTEGER NOT NULL,
+  updated_at_ms INTEGER NOT NULL,
+  UNIQUE(chat_id, launch_id)
+);
+CREATE INDEX IF NOT EXISTS idx_rat_watch_alerts_pending
+  ON rat_watch_alerts(state, created_at_ms, alert_id);
+
 CREATE TABLE IF NOT EXISTS binrat_invariant_guard (
   must_be_zero INTEGER NOT NULL CHECK (must_be_zero = 0)
 );

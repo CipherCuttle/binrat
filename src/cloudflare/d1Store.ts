@@ -263,6 +263,14 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
     const statements = [
       this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').bind(this.chainId),
       this.db.prepare(`
+        DELETE FROM rat_watch_alerts
+        WHERE state = 'PENDING'
+          AND launch_id IN (
+            SELECT launch_id FROM launches
+            WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
+          )
+      `).bind(this.chainId, blockNumber.toString()),
+      this.db.prepare(`
         DELETE FROM launch_observations
         WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
       `).bind(this.chainId, blockNumber.toString()),

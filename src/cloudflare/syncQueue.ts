@@ -9,6 +9,7 @@ import {
   type ObservationSource
 } from '../observations/syncObservations.js';
 import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
+import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
 import { D1Store } from './d1Store.js';
 import { D1SyncLeaseStore } from './syncLease.js';
 import type { D1DatabaseLike } from './d1Types.js';
@@ -35,10 +36,11 @@ export interface CloudflareSyncEnv {
   BINRAT_CONFIRMATIONS?: string;
   BINRAT_MAX_BATCH_BLOCKS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
+  TELEGRAM_BOT_TOKEN?: string;
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'OBSERVATION_CYCLE';
+  kind: 'SYNC_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -47,6 +49,7 @@ export interface CloudflareSyncDeps {
   now: () => number;
   launchSource?: LaunchSource;
   observationSource?: ObservationSource;
+  externalFetch?: typeof fetch;
 }
 
 export type SyncCycleResult =
@@ -56,6 +59,7 @@ export type SyncCycleResult =
 
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
+const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -83,6 +87,19 @@ export async function enqueueObservationCycle(
   });
 }
 
+export async function enqueueRatWatchCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({
+    kind: 'RAT_WATCH_CYCLE',
+    cycleId,
+    enqueuedAtMs: nowMs
+  });
+}
+
 export async function handleSyncQueueBatch(
   batch: SyncQueueBatchLike,
   env: CloudflareSyncEnv,
@@ -96,6 +113,13 @@ export async function handleSyncQueueBatch(
     try {
       if (message.body.kind === 'OBSERVATION_CYCLE') {
         const result = await runCloudflareObservationCycle(env, message.body, deps);
+        if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
+        else message.ack();
+        continue;
+      }
+
+      if (message.body.kind === 'RAT_WATCH_CYCLE') {
+        const result = await runCloudflareRatWatchCycle(env, message.body, deps);
         if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
         else message.ack();
         continue;
@@ -116,6 +140,18 @@ export async function handleSyncQueueBatch(
         await enqueueObservationCycle(env, deps.now()).catch((error) => {
           console.error(JSON.stringify({
             event: 'OBSERVATION_ENQUEUE_FAILED',
+            code: syncErrorCode(error)
+          }));
+        });
+      }
+      if (
+        result.status === 'SUCCESS' &&
+        result.liveCaughtUp &&
+        shouldEnqueueRatWatch(message.body.enqueuedAtMs)
+      ) {
+        await enqueueRatWatchCycle(env, deps.now()).catch((error) => {
+          console.error(JSON.stringify({
+            event: 'RAT_WATCH_ENQUEUE_FAILED',
             code: syncErrorCode(error)
           }));
         });
@@ -322,6 +358,77 @@ export async function runCloudflareObservationCycle(
   }
 }
 
+export async function runCloudflareRatWatchCycle(
+  env: CloudflareSyncEnv,
+  message: BinratSyncMessage,
+  deps: CloudflareSyncDeps = { now: Date.now }
+): Promise<
+  | { status: 'SUCCESS'; enqueued: number; sent: number }
+  | { status: 'BUSY' }
+  | { status: 'RETRY'; code: string }
+> {
+  if (!isSyncMessage(message) || message.kind !== 'RAT_WATCH_CYCLE') {
+    return { status: 'RETRY', code: 'SYNC_MESSAGE_INVALID' };
+  }
+
+  const lease = new D1SyncLeaseStore(env.DB);
+  if (!(await lease.claim(RAT_WATCH_LEASE_NAME, message.cycleId, deps.now()))) {
+    return { status: 'BUSY' };
+  }
+
+  try {
+    const watches = new D1RatWatchStore(env.DB);
+    const enqueued = await watches.enqueueRecurrenceAlerts(ARC_CHAIN_ID, deps.now());
+    const pending = await watches.listPending(5);
+    if (pending.length === 0) return { status: 'SUCCESS', enqueued, sent: 0 };
+
+    const token = required(env.TELEGRAM_BOT_TOKEN, 'TELEGRAM_BOT_TOKEN');
+    const fetchImpl = deps.externalFetch ?? fetch;
+    let sent = 0;
+    for (const alert of pending) {
+      try {
+        const telegramMessageId = await sendRatWatchMessage(
+          token,
+          alert.chatId,
+          ratWatchAlertText(alert),
+          fetchImpl
+        );
+        await watches.completeSent(alert.alertId, telegramMessageId, deps.now());
+        sent += 1;
+      } catch {
+        return { status: 'RETRY', code: 'RAT_WATCH_TELEGRAM_SEND_FAILED' };
+      }
+    }
+    return { status: 'SUCCESS', enqueued, sent };
+  } finally {
+    await lease.release(RAT_WATCH_LEASE_NAME, message.cycleId);
+  }
+}
+
+async function sendRatWatchMessage(
+  token: string,
+  chatId: number,
+  text: string,
+  fetchImpl: typeof fetch
+): Promise<number> {
+  const response = await fetchImpl(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: text.slice(0, 4096),
+      disable_web_page_preview: true
+    })
+  });
+  let parsed: { ok?: boolean; result?: { message_id?: number } } = {};
+  try { parsed = await response.json() as { ok?: boolean; result?: { message_id?: number } }; } catch {}
+  if (!response.ok || parsed.ok !== true) throw new Error('RAT_WATCH_TELEGRAM_SEND_FAILED');
+  if (!Number.isSafeInteger(parsed.result?.message_id)) {
+    throw new Error('RAT_WATCH_TELEGRAM_MESSAGE_ID_MISSING');
+  }
+  return parsed.result!.message_id!;
+}
+
 async function persistLiveFailure(
   runtimeStore: D1RuntimeStateStore,
   previous: D1RuntimeState | null,
@@ -385,6 +492,10 @@ function shouldEnqueueObservation(enqueuedAtMs: number): boolean {
   return Math.floor(enqueuedAtMs / 60_000) % 2 === 0;
 }
 
+function shouldEnqueueRatWatch(enqueuedAtMs: number): boolean {
+  return Math.floor(enqueuedAtMs / 60_000) % 5 === 0;
+}
+
 function integerSetting(
   value: string | undefined,
   fallback: number,
@@ -406,7 +517,11 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const item = value as Record<string, unknown>;
   return (
-    (item.kind === 'SYNC_CYCLE' || item.kind === 'OBSERVATION_CYCLE') &&
+    (
+      item.kind === 'SYNC_CYCLE' ||
+      item.kind === 'OBSERVATION_CYCLE' ||
+      item.kind === 'RAT_WATCH_CYCLE'
+    ) &&
     typeof item.cycleId === 'string' &&
     /^[A-Za-z0-9:_-]{1,200}$/.test(item.cycleId) &&
     Number.isSafeInteger(item.enqueuedAtMs) &&
