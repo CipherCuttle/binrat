@@ -26,7 +26,7 @@ test('Rat Radar free watchlist ranks recurrence before one-off early timing and 
   assert.match(watchlist.method.recommendationBoundary, /not a BUY\/SELL recommendation/i);
 
   assert.equal(watchlist.candidates[0]?.observedRecipientAddress, recurrent);
-  assert.equal(watchlist.candidates[0]?.independentLaunchCount, 2);
+  assert.equal(watchlist.candidates[0]?.distinctLaunchCount, 2);
   assert.equal(watchlist.candidates[0]?.acquisitionReceiptCount, 2);
   assert.equal(watchlist.candidates[0]?.medianFirstEntryBlockDelta, 4.5);
   assert.equal(watchlist.candidates[0]?.earliestFirstEntryBlockDelta, 2);
@@ -34,7 +34,7 @@ test('Rat Radar free watchlist ranks recurrence before one-off early timing and 
   assert.equal(watchlist.candidates[0]?.evidenceActivityIds.length, 2);
 
   assert.equal(watchlist.candidates[1]?.observedRecipientAddress, oneOff);
-  assert.equal(watchlist.candidates[1]?.independentLaunchCount, 1);
+  assert.equal(watchlist.candidates[1]?.distinctLaunchCount, 1);
   assert.equal(watchlist.coverage.acquisitionReceiptCount, 4);
   assert.equal(watchlist.coverage.distinctRecipientAddressCount, 2);
   assert.equal(watchlist.coverage.status, 'PARTIAL');
