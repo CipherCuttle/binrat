@@ -34,7 +34,7 @@ export interface RatRadarFreeWatchlist {
     status: 'NO_SWAP_EVIDENCE' | 'PARTIAL';
   };
   method: {
-    evidencedRole: 'UNISWAP_V3_SWAP_RECIPIENT';
+    evidencedRole: 'V3_SWAP_RECIPIENT';
     freeLimit: number;
     ordering: [
       'distinctLaunchCount DESC',
@@ -175,7 +175,7 @@ export async function projectRatRadarFreeWatchlist(
       status: bounded.length === 0 ? 'NO_SWAP_EVIDENCE' as const : 'PARTIAL' as const
     },
     method: {
-      evidencedRole: 'UNISWAP_V3_SWAP_RECIPIENT' as const,
+      evidencedRole: 'V3_SWAP_RECIPIENT' as const,
       freeLimit: limit,
       ordering: [
         'distinctLaunchCount DESC',
