@@ -2,6 +2,7 @@ import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import type { Hex } from '../core/types.js';
 
 export const RAT_RADAR_SWAP_VERSION = 'binrat.rat-radar-swap/0.1' as const;
+export const RAT_RADAR_PUBLIC_ACTIVITY_SCHEMA_VERSION = 'binrat.rat-radar-activity/0.1' as const;
 
 export type RatRadarTokenSide = 'TOKEN0' | 'TOKEN1';
 export type RatRadarLaunchedTokenFlow = 'POOL_TO_RECIPIENT' | 'CALLBACK_SIDE_TO_POOL' | 'ZERO_DELTA';
@@ -90,6 +91,37 @@ export async function deriveRatRadarSwapReceipt(
   const evidenceDigest = await sha256Hex(authority);
 
   return { ...authority, evidenceDigest };
+}
+
+
+export function projectPublicRatRadarSwapReceipt(receipt: RatRadarSwapReceipt) {
+  return {
+    schemaVersion: RAT_RADAR_PUBLIC_ACTIVITY_SCHEMA_VERSION,
+    version: receipt.version,
+    activityId: receipt.activityId,
+    chainId: receipt.chainId,
+    launchId: receipt.launchId,
+    pool: receipt.pool,
+    token: receipt.token,
+    token0: receipt.token0,
+    token1: receipt.token1,
+    blockNumber: receipt.blockNumber.toString(),
+    blockHash: receipt.blockHash,
+    txHash: receipt.txHash,
+    logIndex: receipt.logIndex,
+    sender: receipt.sender,
+    recipient: receipt.recipient,
+    tokenSide: receipt.tokenSide,
+    amount0: receipt.amount0.toString(),
+    amount1: receipt.amount1.toString(),
+    sqrtPriceX96: receipt.sqrtPriceX96.toString(),
+    liquidity: receipt.liquidity.toString(),
+    tick: receipt.tick,
+    launchedTokenDelta: receipt.launchedTokenDelta.toString(),
+    launchedTokenFlow: receipt.launchedTokenFlow,
+    evidenceDigest: receipt.evidenceDigest,
+    identityBoundary: 'sender and recipient are evidenced protocol roles, not inferred human identities'
+  };
 }
 
 export function sameRatRadarSwapReceipt(a: RatRadarSwapReceipt, b: RatRadarSwapReceipt): boolean {
