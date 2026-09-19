@@ -29,6 +29,7 @@ export interface RatRadarSwapInput {
 export interface RatRadarSwapReceipt extends RatRadarSwapInput {
   version: typeof RAT_RADAR_SWAP_VERSION;
   activityId: string;
+  tokenSide: RatRadarTokenSide;
   launchedTokenDelta: bigint;
   launchedTokenFlow: RatRadarLaunchedTokenFlow;
   evidenceDigest: string;
