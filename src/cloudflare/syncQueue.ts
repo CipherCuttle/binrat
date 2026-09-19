@@ -195,7 +195,13 @@ export async function handleSyncQueueBatch(
           }));
         });
       }
-    } catch {
+    } catch (error) {
+      console.error(JSON.stringify({
+        event: 'SYNC_QUEUE_UNCAUGHT',
+        kind: message.body.kind,
+        cycleId: message.body.cycleId,
+        code: syncErrorCode(error)
+      }));
       message.retry({ delaySeconds: 30 });
     }
   }
