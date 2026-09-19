@@ -16,6 +16,8 @@ import type {
 } from '../src/cloudflare/d1Types.js';
 import {
   handleSyncQueueBatch,
+  ARC_PUBLIC_RPC_FALLBACK_URL,
+  resolveArcRpcUrl,
   runCloudflareObservationCycle,
   runCloudflareRatRadarCycle,
   runCloudflareSyncCycle,
@@ -107,6 +109,16 @@ class FakeRatRadarSource implements RatRadarSource {
       .filter((receipt) => receipt.blockNumber >= fromBlock && receipt.blockNumber <= toBlock);
   }
 }
+
+
+test('Arc RPC resolver prefers configured authority and otherwise uses the public mainnet fallback', () => {
+  assert.equal(
+    resolveArcRpcUrl({ ARC_RPC_URL: ' https://configured.example/rpc ' }),
+    'https://configured.example/rpc'
+  );
+  assert.equal(resolveArcRpcUrl({}), ARC_PUBLIC_RPC_FALLBACK_URL);
+  assert.equal(ARC_PUBLIC_RPC_FALLBACK_URL, 'https://rpc.arc-scan.org');
+});
 
 test('Cloudflare sync cycle catches live window first and advances history in bounded batches', async () => {
   const db = new D1CompatDatabase();
