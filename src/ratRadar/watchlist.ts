@@ -9,7 +9,7 @@ export const RAT_RADAR_FREE_LIMIT = 5;
 export interface RatRadarWatchCandidate {
   rank: number;
   observedRecipientAddress: string;
-  independentLaunchCount: number;
+  distinctLaunchCount: number;
   acquisitionReceiptCount: number;
   medianFirstEntryBlockDelta: number;
   earliestFirstEntryBlockDelta: number;
@@ -37,7 +37,7 @@ export interface RatRadarFreeWatchlist {
     evidencedRole: 'UNISWAP_V3_SWAP_RECIPIENT';
     freeLimit: number;
     ordering: [
-      'independentLaunchCount DESC',
+      'distinctLaunchCount DESC',
       'medianFirstEntryBlockDelta ASC',
       'acquisitionReceiptCount DESC',
       'observedRecipientAddress ASC'
@@ -77,7 +77,8 @@ export async function projectRatRadarFreeWatchlist(
 
   const acquisitions = bounded.filter((receipt) => (
     receipt.launchedTokenFlow === 'POOL_TO_RECIPIENT' &&
-    receipt.launchedTokenDelta < 0n
+    receipt.launchedTokenDelta < 0n &&
+    isCandidateRecipient(receipt)
   ));
 
   const byAddress = new Map<string, CandidateAccumulator>();
@@ -114,7 +115,7 @@ export async function projectRatRadarFreeWatchlist(
       return safeNumber(receipt.blockNumber - launchBlock);
     }).sort((a, b) => a - b);
 
-    const independentLaunchCount = firstEntries.length;
+    const distinctLaunchCount = firstEntries.length;
     const acquisitionReceiptCount = candidate.acquisitions.length;
     const medianFirstEntryBlockDelta = median(candidate.firstEntryDeltas);
     const earliestFirstEntryBlockDelta = candidate.firstEntryDeltas[0] ?? 0;
@@ -123,14 +124,14 @@ export async function projectRatRadarFreeWatchlist(
       0n
     );
     const reasonCodes = [
-      independentLaunchCount > 1 ? 'RECURRENT_RECIPIENT_ACROSS_LAUNCHES' : 'OBSERVED_RECIPIENT',
+      distinctLaunchCount > 1 ? 'RECURRENT_RECIPIENT_ACROSS_LAUNCHES' : 'OBSERVED_RECIPIENT',
       'FIRST_ENTRY_TIMING_MEASURED',
-      acquisitionReceiptCount > independentLaunchCount ? 'REPEATED_ACQUISITION_ACTIVITY' : 'ACQUISITION_ACTIVITY'
+      acquisitionReceiptCount > distinctLaunchCount ? 'REPEATED_ACQUISITION_ACTIVITY' : 'ACQUISITION_ACTIVITY'
     ];
     const reasons = [
-      independentLaunchCount === 1
+      distinctLaunchCount === 1
         ? 'Observed as the launched-token recipient in 1 indexed launch.'
-        : `Observed as the launched-token recipient across ${independentLaunchCount} independent indexed launches.`,
+        : `Observed as the launched-token recipient across ${distinctLaunchCount} distinct indexed launches.`,
       `Median first recipient-side acquisition: ${formatNumber(medianFirstEntryBlockDelta)} blocks after indexed launch.`,
       `${acquisitionReceiptCount} launched-token acquisition receipt${acquisitionReceiptCount === 1 ? '' : 's'} observed.`
     ];
@@ -138,7 +139,7 @@ export async function projectRatRadarFreeWatchlist(
     return {
       rank: 0,
       observedRecipientAddress: candidate.address,
-      independentLaunchCount,
+      distinctLaunchCount,
       acquisitionReceiptCount,
       medianFirstEntryBlockDelta,
       earliestFirstEntryBlockDelta,
@@ -152,7 +153,7 @@ export async function projectRatRadarFreeWatchlist(
         .map((receipt) => receipt.activityId)
     } satisfies RatRadarWatchCandidate;
   }).sort((a, b) => (
-    b.independentLaunchCount - a.independentLaunchCount ||
+    b.distinctLaunchCount - a.distinctLaunchCount ||
     a.medianFirstEntryBlockDelta - b.medianFirstEntryBlockDelta ||
     b.acquisitionReceiptCount - a.acquisitionReceiptCount ||
     a.observedRecipientAddress.localeCompare(b.observedRecipientAddress)
@@ -177,7 +178,7 @@ export async function projectRatRadarFreeWatchlist(
       evidencedRole: 'UNISWAP_V3_SWAP_RECIPIENT' as const,
       freeLimit: limit,
       ordering: [
-        'independentLaunchCount DESC',
+        'distinctLaunchCount DESC',
         'medianFirstEntryBlockDelta ASC',
         'acquisitionReceiptCount DESC',
         'observedRecipientAddress ASC'
@@ -220,4 +221,16 @@ function median(values: number[]): number {
 
 function formatNumber(value: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}
+
+
+function isCandidateRecipient(receipt: RatRadarSwapReceipt): boolean {
+  const recipient = receipt.recipient.toLowerCase();
+  return (
+    recipient !== '0x0000000000000000000000000000000000000000' &&
+    recipient !== receipt.pool.toLowerCase() &&
+    recipient !== receipt.token.toLowerCase() &&
+    recipient !== receipt.token0.toLowerCase() &&
+    recipient !== receipt.token1.toLowerCase()
+  );
 }
