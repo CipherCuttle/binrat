@@ -26,6 +26,9 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -40,7 +43,42 @@ jobs:
           cache: pnpm
 
       - name: Cloudflare device authorization
-        run: pnpm dlx wrangler@4.135.0 login --device --browser=false --no-use-keyring
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          log="$(mktemp)"
+          pnpm dlx wrangler@4.135.0 login --device --browser=false --no-use-keyring >"$log" 2>&1 &
+          pid=$!
+          posted=0
+          for _ in $(seq 1 90); do
+            if grep -q "https://dash.cloudflare.com/oauth2/device" "$log"; then
+              url="$(grep -Eo 'https://dash\.cloudflare\.com/oauth2/device[^[:space:]]*' "$log" | tail -1)"
+              code="$(awk '/enter the code:/{getline; getline; gsub(/[[:space:]]/,""); print; exit}' "$log")"
+              if [ -n "$url" ] && [ -n "$code" ]; then
+                gh pr comment 19 --body "CLOUDFLARE_DEVICE_AUTH_REQUIRED
+
+Open: $url
+
+Code: `$code`
+
+Approve this one-time Wrangler session. No API token is being created or exposed."
+                posted=1
+                break
+              fi
+            fi
+            if ! kill -0 "$pid" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          if [ "$posted" -ne 1 ]; then
+            cat "$log"
+            wait "$pid"
+            exit 1
+          fi
+          wait "$pid"
 
       - run: pnpm install --frozen-lockfile
 
