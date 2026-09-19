@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { ARCPAD_START_BLOCK } from '../src/arc/chain.js';
+import type { RatRadarSource } from '../src/arc/ratRadarSource.js';
 import type { LaunchSource } from '../src/core/ports.js';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
+import { D1RatRadarStore } from '../src/cloudflare/ratRadarStore.js';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
+import { D1Store } from '../src/cloudflare/d1Store.js';
 import { D1SyncLeaseStore } from '../src/cloudflare/syncLease.js';
 import type {
   D1DatabaseLike,
@@ -13,7 +16,10 @@ import type {
 } from '../src/cloudflare/d1Types.js';
 import {
   handleSyncQueueBatch,
+  ARC_PUBLIC_RPC_FALLBACK_URL,
+  resolveArcRpcUrl,
   runCloudflareObservationCycle,
+  runCloudflareRatRadarCycle,
   runCloudflareSyncCycle,
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
@@ -22,6 +28,8 @@ import type {
   ObservationSource
 } from '../src/observations/syncObservations.js';
 import type { LaunchObservationFacts } from '../src/observations/types.js';
+import { deriveEventId, deriveLaunchId } from '../src/core/identity.js';
+import { deriveRatRadarSwapReceipt, type RatRadarSwapReceipt } from '../src/ratRadar/activity.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
 
 const hash = (block: bigint) => `0x${block.toString(16).padStart(64, '0')}` as Hex;
@@ -74,6 +82,43 @@ function message(id: string, at = 1_000): BinratSyncMessage {
 function observationMessage(id: string, at = 1_000): BinratSyncMessage {
   return { kind: 'OBSERVATION_CYCLE', cycleId: id, enqueuedAtMs: at };
 }
+
+
+function ratRadarMessage(id: string, at = 1_000): BinratSyncMessage {
+  return { kind: 'RAT_RADAR_CYCLE', cycleId: id, enqueuedAtMs: at };
+}
+
+class FakeRatRadarSource implements RatRadarSource {
+  authorityCalls: Array<[bigint, Hex]> = [];
+  catchUpCalls: Array<[string, bigint, bigint]> = [];
+  failLaunchId: string | null = null;
+  receiptByLaunch = new Map<string, RatRadarSwapReceipt[]>();
+
+  async assertAuthority(blockNumber: bigint, expectedBlockHash: Hex): Promise<void> {
+    this.authorityCalls.push([blockNumber, expectedBlockHash]);
+  }
+
+  async catchUp(
+    launch: LaunchObserved,
+    fromBlock: bigint,
+    toBlock: bigint
+  ): Promise<RatRadarSwapReceipt[]> {
+    this.catchUpCalls.push([launch.launchId, fromBlock, toBlock]);
+    if (launch.launchId === this.failLaunchId) throw new Error('RAT_RADAR_TEST_POOL_FAILURE');
+    return (this.receiptByLaunch.get(launch.launchId) ?? [])
+      .filter((receipt) => receipt.blockNumber >= fromBlock && receipt.blockNumber <= toBlock);
+  }
+}
+
+
+test('Arc RPC resolver prefers configured authority and otherwise uses the public mainnet fallback', () => {
+  assert.equal(
+    resolveArcRpcUrl({ ARC_RPC_URL: ' https://configured.example/rpc ' }),
+    'https://configured.example/rpc'
+  );
+  assert.equal(resolveArcRpcUrl({}), ARC_PUBLIC_RPC_FALLBACK_URL);
+  assert.equal(ARC_PUBLIC_RPC_FALLBACK_URL, 'https://rpc.arc-scan.org');
+});
 
 test('Cloudflare sync cycle catches live window first and advances history in bounded batches', async () => {
   const db = new D1CompatDatabase();
@@ -275,10 +320,10 @@ test('successful live queue work schedules separate observation and Rat Watch jo
 
     assert.equal(acked, 1);
     assert.equal(retried, 0);
-    assert.equal(sent.length, 2);
+    assert.equal(sent.length, 3);
     assert.deepEqual(
       sent.map((item) => item.kind).sort(),
-      ['OBSERVATION_CYCLE', 'RAT_WATCH_CYCLE']
+      ['OBSERVATION_CYCLE', 'RAT_RADAR_CYCLE', 'RAT_WATCH_CYCLE']
     );
   } finally {
     db.close();
@@ -310,7 +355,7 @@ test('live queue skips observation scheduling on the alternate minute', async ()
       }
     );
 
-    assert.equal(sent.length, 0);
+    assert.deepEqual(sent.map((item) => item.kind), ['RAT_RADAR_CYCLE']);
   } finally {
     db.close();
   }
@@ -493,3 +538,231 @@ class FailFirstStatement implements D1PreparedStatementLike {
     return this.inner.all<T>();
   }
 }
+
+test('Rat Radar cycle ingests a bounded confirmed pool range and advances only after durable writes', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store = new D1Store(db, 5042);
+  const runtime = new D1RuntimeStateStore(db, 5042);
+  const radar = new D1RatRadarStore(db, 5042);
+  const source = new FakeRatRadarSource();
+
+  try {
+    const launch = await makeRadarLaunch(100n, 1);
+    await store.putLaunch(launch);
+    await store.commitCheckpoint({
+      blockNumber: 120n,
+      blockHash: hash(120n),
+      guardBlockNumber: 119n,
+      guardBlockHash: hash(119n)
+    });
+    await runtime.put({
+      sourceVerified: true,
+      liveCaughtUp: true,
+      headBlock: 122n,
+      targetBlock: 120n,
+      observationReady: true,
+      historyBackfillComplete: false,
+      historyBackfillTargetBlock: 99n,
+      lastSyncError: null,
+      lastHistoryError: null,
+      lastObservationError: null,
+      updatedAtMs: 10_000
+    });
+
+    source.receiptByLaunch.set(launch.launchId, [
+      await makeRadarReceipt(launch, 105n, 1, address(900))
+    ]);
+
+    const result = await runCloudflareRatRadarCycle(
+      {
+        DB: db,
+        BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS: '10',
+        BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE: '1'
+      },
+      ratRadarMessage('radar-1'),
+      { now: () => 20_000, ratRadarSource: source }
+    );
+
+    assert.deepEqual(result, {
+      status: 'SUCCESS',
+      poolsProcessed: 1,
+      receiptsInserted: 1,
+      receiptsDuplicate: 0,
+      poolsFailed: 0
+    });
+    assert.deepEqual(source.catchUpCalls, [[launch.launchId, 100n, 109n]]);
+    const cursor = await radar.nextPoolCursor(120n, 20_000);
+    assert.equal(cursor?.launchId, launch.launchId);
+    assert.equal(cursor?.nextBlock, 110n);
+    assert.equal((await radar.listForLaunch(launch.launchId)).length, 1);
+    assert.equal(source.authorityCalls.length, 2);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+test('Rat Radar cycle backs off one failed pool without blocking another pool', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store = new D1Store(db, 5042);
+  const runtime = new D1RuntimeStateStore(db, 5042);
+  const radar = new D1RatRadarStore(db, 5042);
+  const source = new FakeRatRadarSource();
+
+  try {
+    const a = await makeRadarLaunch(100n, 11);
+    const b = await makeRadarLaunch(100n, 12);
+    await store.putLaunch(a);
+    await store.putLaunch(b);
+    await store.commitCheckpoint({
+      blockNumber: 105n,
+      blockHash: hash(105n),
+      guardBlockNumber: 104n,
+      guardBlockHash: hash(104n)
+    });
+    await runtime.put({
+      sourceVerified: true,
+      liveCaughtUp: true,
+      headBlock: 107n,
+      targetBlock: 105n,
+      observationReady: true,
+      historyBackfillComplete: false,
+      historyBackfillTargetBlock: 99n,
+      lastSyncError: null,
+      lastHistoryError: null,
+      lastObservationError: null,
+      updatedAtMs: 30_000
+    });
+    await radar.ensurePoolCursors([a, b], 30_000);
+    const first = await radar.nextPoolCursor(105n, 30_000);
+    assert.ok(first);
+    source.failLaunchId = first!.launchId;
+
+    const result = await runCloudflareRatRadarCycle(
+      {
+        DB: db,
+        BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS: '6',
+        BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE: '2'
+      },
+      ratRadarMessage('radar-failure-isolation'),
+      { now: () => 30_000, ratRadarSource: source }
+    );
+
+    assert.deepEqual(result, {
+      status: 'SUCCESS',
+      poolsProcessed: 1,
+      receiptsInserted: 0,
+      receiptsDuplicate: 0,
+      poolsFailed: 1
+    });
+    const failed = await db.prepare(`
+      SELECT next_block,failure_count,last_error,retry_after_ms
+      FROM rat_radar_pool_cursors
+      WHERE launch_id = ?
+    `).bind(first!.launchId).first<{
+      next_block: string;
+      failure_count: number;
+      last_error: string | null;
+      retry_after_ms: number;
+    }>();
+    assert.equal(failed?.next_block, '100');
+    assert.equal(failed?.failure_count, 1);
+    assert.equal(failed?.last_error, 'RAT_RADAR_TEST_POOL_FAILURE');
+    assert.ok((failed?.retry_after_ms ?? 0) > 30_000);
+
+    const otherId = first!.launchId === a.launchId ? b.launchId : a.launchId;
+    const other = await db.prepare(`
+      SELECT next_block FROM rat_radar_pool_cursors WHERE launch_id = ?
+    `).bind(otherId).first<{ next_block: string }>();
+    assert.equal(other?.next_block, '106');
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+test('Rat Radar cursor rewinds with chain evidence after reorg', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store = new D1Store(db, 5042);
+  const radar = new D1RatRadarStore(db, 5042);
+
+  try {
+    const launch = await makeRadarLaunch(100n, 21);
+    await store.putLaunch(launch);
+    await radar.ensurePoolCursors([launch], 1_000);
+    await radar.advancePoolCursor(launch.launchId, 100n, 201n, 1_001);
+    await radar.putSwap(await makeRadarReceipt(launch, 180n, 1, address(901)));
+
+    await store.rewindFromBlock(150n);
+
+    assert.equal((await radar.listForLaunch(launch.launchId)).length, 0);
+    const cursor = await radar.nextPoolCursor(200n, 2_000);
+    assert.equal(cursor?.launchId, launch.launchId);
+    assert.equal(cursor?.nextBlock, 150n);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+async function makeRadarLaunch(blockNumber: bigint, seed: number): Promise<LaunchObserved> {
+  const launcher = address(100 + seed);
+  const txHash = hash(BigInt(200 + seed));
+  const token = address(300 + seed);
+  return {
+    launchId: await deriveLaunchId({ chainId: 5042, launcher, txHash, token }),
+    eventId: await deriveEventId({ chainId: 5042, launcher, txHash, logIndex: seed }),
+    chainId: 5042,
+    blockNumber,
+    blockHash: hash(blockNumber),
+    observedAtMs: Number(blockNumber) * 1_000,
+    source: 'ARCPAD',
+    launcher,
+    txHash,
+    logIndex: seed,
+    token,
+    creator: address(400 + seed),
+    pool: address(500 + seed),
+    name: `Queue Radar ${seed}`,
+    symbol: `QR${seed}`,
+    imageUri: '',
+    website: '',
+    twitter: '',
+    telegram: ''
+  };
+}
+
+async function makeRadarReceipt(
+  launch: LaunchObserved,
+  blockNumber: bigint,
+  logIndex: number,
+  recipient: Hex
+): Promise<RatRadarSwapReceipt> {
+  return deriveRatRadarSwapReceipt({
+    chainId: 5042,
+    launchId: launch.launchId,
+    pool: launch.pool,
+    token: launch.token,
+    token0: launch.token,
+    token1: address(999),
+    blockNumber,
+    blockHash: hash(blockNumber),
+    txHash: hash(blockNumber * 10n + BigInt(logIndex)),
+    logIndex,
+    sender: address(800 + logIndex),
+    recipient,
+    amount0: -100n,
+    amount1: 50n,
+    sqrtPriceX96: 1_000n,
+    liquidity: 2_000n,
+    tick: 5
+  });
+}
+
+function address(seed: number): Hex {
+  return `0x${seed.toString(16).padStart(40, '0').slice(-40)}` as Hex;
+}
+

@@ -181,6 +181,8 @@ Creator context remains labeled as such and cannot overwrite historical receipts
 
 **Rat Watch** turns memory into operational intelligence through user-defined tripwires.
 
+**Rat Radar** ranks statistically unusual observed addresses from reproducible launch/pool evidence. The public layer should expose a bounded useful watchlist and its factual basis; eligible $BINRAT holders may unlock deeper coverage, richer statistics, live activity views, filtering, and higher watch capacity. Core receipts remain public.
+
 **Rat API** exposes the same evidence to external bots and agents.
 
 Examples include alerts when:
@@ -234,7 +236,7 @@ The intended fair-launch principles are:
 - treasury inflows and project spending made legible through a public funding ledger;
 - shipped utility clearly distinguished from planned utility.
 
-Launch-day utility may include token-gated optional community surfaces and Rat Watch capacity.
+Launch-day utility should prioritize holder-gated Rat Radar depth and expanded Rat Watch capacity, while keeping a genuinely useful public evidence/watchlist layer. Optional community surfaces can follow post-launch.
 
 Post-launch experimental utility may include Dumpster Raid case-priority signaling, Trash Hunts, bounty boosting, and case sponsorship after their own bounded product/security/compliance gates.
 
@@ -302,12 +304,13 @@ Major progression:
 2. longitudinal observations;
 3. Replay Lab pre-launch proof;
 4. Telegram Rat + capability manifest + public funding/Dumpster Ledger;
-5. legal/compliance and launch-mechanics authorization running in parallel;
-6. early fair launch only after authorization gates pass;
-7. Trash DNA + advanced Rat Watch;
-8. Dead Drops;
-9. Rat Credits + bounties + Proof of First + reputation;
-10. Case Files + Rat Machine/Rat Lab + API/agent distribution + independent evidence providers.
+5. Rat Radar wallet-activity evidence index -> useful free watchlist -> holder-gated depth;
+6. legal/compliance and launch-mechanics authorization running in parallel;
+7. early fair launch only after authorization gates pass;
+8. Trash DNA + advanced Rat Watch;
+9. Dead Drops;
+10. Rat Credits + bounties + Proof of First + reputation;
+11. Case Files + Rat Machine/Rat Lab + API/agent distribution + independent evidence providers.
 
 ## 17. North star
 

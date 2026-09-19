@@ -158,6 +158,56 @@ CREATE TABLE IF NOT EXISTS rat_watch_alerts (
 CREATE INDEX IF NOT EXISTS idx_rat_watch_alerts_pending
   ON rat_watch_alerts(state, created_at_ms, alert_id);
 
+
+CREATE TABLE IF NOT EXISTS rat_radar_swap_receipts (
+  activity_id TEXT PRIMARY KEY,
+  version TEXT NOT NULL,
+  chain_id INTEGER NOT NULL,
+  launch_id TEXT NOT NULL REFERENCES launches(launch_id) ON DELETE CASCADE,
+  pool TEXT NOT NULL,
+  token TEXT NOT NULL,
+  token0 TEXT NOT NULL,
+  token1 TEXT NOT NULL,
+  block_number TEXT NOT NULL,
+  block_hash TEXT NOT NULL,
+  tx_hash TEXT NOT NULL,
+  log_index INTEGER NOT NULL,
+  sender TEXT NOT NULL,
+  recipient TEXT NOT NULL,
+  token_side TEXT NOT NULL CHECK (token_side IN ('TOKEN0','TOKEN1')),
+  amount0 TEXT NOT NULL,
+  amount1 TEXT NOT NULL,
+  sqrt_price_x96 TEXT NOT NULL,
+  liquidity TEXT NOT NULL,
+  tick INTEGER NOT NULL,
+  launched_token_delta TEXT NOT NULL,
+  launched_token_flow TEXT NOT NULL CHECK (
+    launched_token_flow IN ('POOL_TO_RECIPIENT','CALLBACK_SIDE_TO_POOL','ZERO_DELTA')
+  ),
+  evidence_digest TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  UNIQUE(chain_id, pool, tx_hash, log_index)
+);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_launch_order
+  ON rat_radar_swap_receipts(chain_id, launch_id, block_number, log_index);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_recipient_order
+  ON rat_radar_swap_receipts(chain_id, recipient, block_number, log_index);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_sender_order
+  ON rat_radar_swap_receipts(chain_id, sender, block_number, log_index);
+
+
+CREATE TABLE IF NOT EXISTS rat_radar_pool_cursors (
+  launch_id TEXT PRIMARY KEY REFERENCES launches(launch_id) ON DELETE CASCADE,
+  chain_id INTEGER NOT NULL,
+  next_block TEXT NOT NULL,
+  retry_after_ms INTEGER NOT NULL DEFAULT 0,
+  failure_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT,
+  updated_at_ms INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_pool_cursor_schedule
+  ON rat_radar_pool_cursors(chain_id, retry_after_ms, next_block, launch_id);
+
 CREATE TABLE IF NOT EXISTS binrat_invariant_guard (
   must_be_zero INTEGER NOT NULL CHECK (must_be_zero = 0)
 );

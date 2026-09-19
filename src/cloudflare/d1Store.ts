@@ -271,6 +271,21 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
           )
       `).bind(this.chainId, blockNumber.toString()),
       this.db.prepare(`
+        DELETE FROM rat_radar_swap_receipts
+        WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
+      `).bind(this.chainId, blockNumber.toString()),
+      this.db.prepare(`
+        UPDATE rat_radar_pool_cursors
+        SET next_block = CASE
+              WHEN CAST(next_block AS INTEGER) > CAST(? AS INTEGER) THEN ?
+              ELSE next_block
+            END,
+            retry_after_ms = 0,
+            failure_count = 0,
+            last_error = NULL
+        WHERE chain_id = ?
+      `).bind(blockNumber.toString(), blockNumber.toString(), this.chainId),
+      this.db.prepare(`
         DELETE FROM launch_observations
         WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
       `).bind(this.chainId, blockNumber.toString()),

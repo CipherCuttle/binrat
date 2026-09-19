@@ -1,6 +1,7 @@
 import { ArcPadLaunchSource } from '../arc/arcpadSource.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from '../arc/chain.js';
 import { ArcObservationSource } from '../arc/observationSource.js';
+import { ArcRatRadarSource, type RatRadarSource } from '../arc/ratRadarSource.js';
 import type { LaunchSource } from '../core/ports.js';
 import { syncHistoricalLaunches } from '../indexer/syncHistoricalLaunches.js';
 import { syncLaunches } from '../indexer/syncLaunches.js';
@@ -10,6 +11,7 @@ import {
 } from '../observations/syncObservations.js';
 import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
+import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
 import { D1SyncLeaseStore } from './syncLease.js';
 import type { D1DatabaseLike } from './d1Types.js';
@@ -36,11 +38,13 @@ export interface CloudflareSyncEnv {
   BINRAT_CONFIRMATIONS?: string;
   BINRAT_MAX_BATCH_BLOCKS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
+  BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
+  BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE?: string;
   TELEGRAM_BOT_TOKEN?: string;
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE';
+  kind: 'SYNC_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -49,6 +53,7 @@ export interface CloudflareSyncDeps {
   now: () => number;
   launchSource?: LaunchSource;
   observationSource?: ObservationSource;
+  ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
 }
 
@@ -60,6 +65,8 @@ export type SyncCycleResult =
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
+const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
+export const ARC_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.arc-scan.org';
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -100,6 +107,20 @@ export async function enqueueRatWatchCycle(
   });
 }
 
+
+export async function enqueueRatRadarCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({
+    kind: 'RAT_RADAR_CYCLE',
+    cycleId,
+    enqueuedAtMs: nowMs
+  });
+}
+
 export async function handleSyncQueueBatch(
   batch: SyncQueueBatchLike,
   env: CloudflareSyncEnv,
@@ -120,6 +141,13 @@ export async function handleSyncQueueBatch(
 
       if (message.body.kind === 'RAT_WATCH_CYCLE') {
         const result = await runCloudflareRatWatchCycle(env, message.body, deps);
+        if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
+        else message.ack();
+        continue;
+      }
+
+      if (message.body.kind === 'RAT_RADAR_CYCLE') {
+        const result = await runCloudflareRatRadarCycle(env, message.body, deps);
         if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
         else message.ack();
         continue;
@@ -156,6 +184,17 @@ export async function handleSyncQueueBatch(
           }));
         });
       }
+      if (
+        result.status === 'SUCCESS' &&
+        result.liveCaughtUp
+      ) {
+        await enqueueRatRadarCycle(env, deps.now()).catch((error) => {
+          console.error(JSON.stringify({
+            event: 'RAT_RADAR_ENQUEUE_FAILED',
+            code: ratRadarSyncErrorCode(error)
+          }));
+        });
+      }
     } catch {
       message.retry({ delaySeconds: 30 });
     }
@@ -181,8 +220,16 @@ export async function runCloudflareSyncCycle(
 
   try {
     previous = await runtimeStore.get();
-    const rpcUrl = deps.launchSource ? undefined : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
-    const source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
+
+    let source: LaunchSource;
+    try {
+      const rpcUrl = deps.launchSource ? undefined : resolveArcRpcUrl(env);
+      source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
+    } catch (error) {
+      const code = syncErrorCode(error);
+      await persistLiveFailure(runtimeStore, previous, code, deps.now);
+      return { status: 'RETRY', code };
+    }
 
     let bootstrapHead: bigint;
     try {
@@ -313,7 +360,7 @@ export async function runCloudflareObservationCycle(
 
     const rpcUrl = deps.observationSource
       ? undefined
-      : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
+      : resolveArcRpcUrl(env);
     const source = deps.observationSource ?? new ArcObservationSource({ rpcUrl });
     const confirmations = BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000));
 
@@ -355,6 +402,134 @@ export async function runCloudflareObservationCycle(
   } finally {
     store.close();
     await lease.release(OBSERVATION_LEASE_NAME, message.cycleId);
+  }
+}
+
+export async function runCloudflareRatRadarCycle(
+  env: CloudflareSyncEnv,
+  message: BinratSyncMessage,
+  deps: CloudflareSyncDeps = { now: Date.now }
+): Promise<
+  | { status: 'SUCCESS'; poolsProcessed: number; receiptsInserted: number; receiptsDuplicate: number; poolsFailed: number }
+  | { status: 'BUSY' }
+  | { status: 'RETRY'; code: string }
+> {
+  if (!isSyncMessage(message) || message.kind !== 'RAT_RADAR_CYCLE') {
+    return { status: 'RETRY', code: 'SYNC_MESSAGE_INVALID' };
+  }
+
+  const lease = new D1SyncLeaseStore(env.DB);
+  const nowMs = deps.now();
+  if (!(await lease.claim(RAT_RADAR_LEASE_NAME, message.cycleId, nowMs))) {
+    return { status: 'BUSY' };
+  }
+
+  const store = new D1Store(env.DB, ARC_CHAIN_ID);
+  const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+  try {
+    const runtime = await new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID).get();
+    const checkpoint = await store.getCheckpoint();
+    if (
+      !runtime ||
+      !checkpoint ||
+      !runtime.sourceVerified ||
+      !runtime.liveCaughtUp ||
+      runtime.lastSyncError
+    ) {
+      return {
+        status: 'SUCCESS',
+        poolsProcessed: 0,
+        receiptsInserted: 0,
+        receiptsDuplicate: 0,
+        poolsFailed: 0
+      };
+    }
+
+    const launches = (await store.listLaunches())
+      .filter((launch) => launch.blockNumber <= checkpoint.blockNumber);
+    await radar.ensurePoolCursors(launches, nowMs);
+
+    const rpcUrl = deps.ratRadarSource ? undefined : resolveArcRpcUrl(env);
+    const source = deps.ratRadarSource ?? new ArcRatRadarSource({ rpcUrl });
+    try {
+      await source.assertAuthority(checkpoint.blockNumber, checkpoint.blockHash);
+    } catch (error) {
+      return { status: 'RETRY', code: ratRadarSyncErrorCode(error) };
+    }
+
+    const maxBatchBlocks = BigInt(integerSetting(
+      env.BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS,
+      25_000,
+      1,
+      250_000
+    ));
+    const maxPools = integerSetting(
+      env.BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE,
+      4,
+      1,
+      20
+    );
+    let poolsProcessed = 0;
+    let receiptsInserted = 0;
+    let receiptsDuplicate = 0;
+    let poolsFailed = 0;
+
+    for (let index = 0; index < maxPools; index += 1) {
+      const cursor = await radar.nextPoolCursor(checkpoint.blockNumber, nowMs);
+      if (!cursor) break;
+      const launch = await store.getLaunch(cursor.launchId);
+      if (!launch) return { status: 'RETRY', code: 'RAT_RADAR_CURSOR_LAUNCH_MISSING' };
+
+      const toBlock = cursor.nextBlock + maxBatchBlocks - 1n > checkpoint.blockNumber
+        ? checkpoint.blockNumber
+        : cursor.nextBlock + maxBatchBlocks - 1n;
+
+      try {
+        const receipts = await source.catchUp(launch, cursor.nextBlock, toBlock);
+        await source.assertAuthority(checkpoint.blockNumber, checkpoint.blockHash);
+        for (const receipt of receipts) {
+          const result = await radar.putSwap(receipt);
+          if (result === 'INSERTED') receiptsInserted += 1;
+          else receiptsDuplicate += 1;
+        }
+        await radar.advancePoolCursor(
+          launch.launchId,
+          cursor.nextBlock,
+          toBlock + 1n,
+          deps.now()
+        );
+        poolsProcessed += 1;
+      } catch (error) {
+        const code = ratRadarSyncErrorCode(error);
+        if (
+          code.startsWith('ARC_CHAIN_ID_DRIFT') ||
+          code.startsWith('RAT_RADAR_CHECKPOINT_REORG') ||
+          code.startsWith('RAT_RADAR_BLOCK_HASH_MISSING')
+        ) {
+          return { status: 'RETRY', code };
+        }
+        poolsFailed += 1;
+        const backoffMinutes = Math.min(60, 2 ** Math.min(cursor.failureCount, 5));
+        await radar.recordPoolFailure(
+          launch.launchId,
+          cursor.nextBlock,
+          code,
+          deps.now() + backoffMinutes * 60_000,
+          deps.now()
+        );
+      }
+    }
+
+    return {
+      status: 'SUCCESS',
+      poolsProcessed,
+      receiptsInserted,
+      receiptsDuplicate,
+      poolsFailed
+    };
+  } finally {
+    store.close();
+    await lease.release(RAT_RADAR_LEASE_NAME, message.cycleId);
   }
 }
 
@@ -453,9 +628,26 @@ async function persistLiveFailure(
 function syncErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
   const code = message.match(
-    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+)(?=:|$)/
+    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
   )?.[1];
   return code ?? 'SYNC_FAILED';
+}
+
+function ratRadarSyncErrorCode(error: unknown): string {
+  const message = error instanceof Error ? error.message : '';
+  const explicit = message.match(/^(RAT_RADAR_[A-Z0-9_]+|ARC_[A-Z0-9_]+)(?=:|$)/)?.[1];
+  if (explicit) return explicit;
+
+  const rawName = error instanceof Error ? error.name : '';
+  const normalizedName = rawName
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 100);
+  return normalizedName && normalizedName !== 'ERROR'
+    ? `RAT_RADAR_${normalizedName}`
+    : 'RAT_RADAR_SYNC_FAILED';
 }
 
 function observationSyncErrorCode(error: unknown): string {
@@ -496,6 +688,11 @@ function shouldEnqueueRatWatch(enqueuedAtMs: number): boolean {
   return Math.floor(enqueuedAtMs / 60_000) % 5 === 0;
 }
 
+export function resolveArcRpcUrl(env: Pick<CloudflareSyncEnv, 'ARC_RPC_URL'>): string {
+  const configured = env.ARC_RPC_URL?.trim();
+  return configured || ARC_PUBLIC_RPC_FALLBACK_URL;
+}
+
 function integerSetting(
   value: string | undefined,
   fallback: number,
@@ -520,7 +717,8 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
     (
       item.kind === 'SYNC_CYCLE' ||
       item.kind === 'OBSERVATION_CYCLE' ||
-      item.kind === 'RAT_WATCH_CYCLE'
+      item.kind === 'RAT_WATCH_CYCLE' ||
+      item.kind === 'RAT_RADAR_CYCLE'
     ) &&
     typeof item.cycleId === 'string' &&
     /^[A-Za-z0-9:_-]{1,200}$/.test(item.cycleId) &&

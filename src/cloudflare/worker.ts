@@ -5,10 +5,13 @@ import { projectCreatorFile } from '../public/creatorFile.js';
 import { projectPublicFeed } from '../public/project.js';
 import { projectReplayBundle } from '../public/replayBundle.js';
 import type { PublicFeed } from '../public/types.js';
+import { projectPublicRatRadarSwapReceipt } from '../ratRadar/activity.js';
+import { projectRatRadarFreeWatchlist } from '../ratRadar/watchlist.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
 import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore } from './ratWatch.js';
+import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
 import { D1TelegramLedger } from './telegramLedger.js';
 import type { D1DatabaseLike } from './d1Types.js';
@@ -153,6 +156,45 @@ export async function handleBinratApiRequest(
     const { store, feed } = ready;
 
     if (pathname === '/api/feed') return json(200, feed);
+
+    if (pathname === '/api/rat-radar/watchlist') {
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipts = await radar.listThroughBlock(BigInt(feed.asOfBlock));
+      return json(200, await projectRatRadarFreeWatchlist(feed, receipts));
+    }
+
+    if (pathname.startsWith('/api/rat-radar/activity/')) {
+      const activityId = pathname.slice('/api/rat-radar/activity/'.length).toLowerCase();
+      if (!/^[0-9a-f]{64}$/.test(activityId)) {
+        return json(400, { error: 'RAT_RADAR_ACTIVITY_ID_INVALID' });
+      }
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipt = await radar.getSwap(activityId);
+      if (!receipt || receipt.blockNumber > BigInt(feed.asOfBlock)) {
+        return json(404, { error: 'RAT_RADAR_ACTIVITY_NOT_FOUND' });
+      }
+      return json(200, projectPublicRatRadarSwapReceipt(receipt));
+    }
+
+    if (pathname.startsWith('/api/rat-radar/address/') && pathname.endsWith('/activity')) {
+      const recipient = pathname
+        .slice('/api/rat-radar/address/'.length, -'/activity'.length)
+        .toLowerCase();
+      if (!/^0x[0-9a-f]{40}$/.test(recipient)) {
+        return json(400, { error: 'RAT_RADAR_RECIPIENT_INVALID' });
+      }
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipts = await radar.listForRecipientThroughBlock(recipient, BigInt(feed.asOfBlock));
+      return json(200, {
+        schemaVersion: 'binrat.rat-radar-address-activity/0.1',
+        chainId: ARC_CHAIN_ID,
+        asOfBlock: feed.asOfBlock,
+        observedRecipientAddress: recipient,
+        activityCount: receipts.length,
+        activities: receipts.map(projectPublicRatRadarSwapReceipt),
+        identityBoundary: 'An observed recipient address is not automatically a human trader identity.'
+      });
+    }
 
     if (pathname.startsWith('/api/creator/')) {
       const creator = pathname.slice('/api/creator/'.length).toLowerCase();
