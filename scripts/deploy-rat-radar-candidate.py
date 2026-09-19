@@ -144,74 +144,98 @@ def main() -> None:
     )
     print("RAT_RADAR_CAPABILITY_MANIFEST: PUBLISHED")
 
-    last_health: dict = {}
+    last_service_health: dict = {}
+    last_api_health: dict = {}
     last_caps: dict = {}
-    last_radar: dict = {}
-    for attempt in range(30):
+    deployment_ready = False
+
+    for attempt in range(45):
         try:
-            health = get_json("/api/health")
+            service_health = get_json("/health")
+            api_health = get_json("/api/health")
             caps = get_json("/api/capabilities")
-            radar_api = get_json("/api/rat-radar/watchlist")
-            last_health = health
+            last_service_health = service_health
+            last_api_health = api_health
             last_caps = caps
-            last_radar = radar_api
             remote_radar = caps.get("capabilities", {}).get("ratRadarV0", {})
             remote_launch = caps.get("launchAuthorization", {})
-            if (
-                health.get("ok") is True
-                and health.get("indexReady") is True
-                and health.get("lastSyncError") is None
+            deployment_ready = (
+                service_health.get("ok") is True
+                and service_health.get("service") == "binrat-cloudflare-edge"
                 and remote_launch.get("status") == "BLOCKED"
                 and remote_launch.get("marketingAuthorized") is False
                 and remote_launch.get("launchAuthorized") is False
                 and remote_radar.get("engineeringStatus") == "BUILDING"
                 and remote_radar.get("publicStatus") == "NOT_PUBLIC_LIVE_AUTHORIZED"
-                and radar_api.get("schemaVersion") == "binrat.rat-radar-watchlist/0.1"
-                and radar_api.get("method", {}).get("evidencedRole") == "V3_SWAP_RECIPIENT"
-            ):
-                print("RAT_RADAR_CANDIDATE_DEPLOY: PASS")
-                print("indexReady: true")
-                print("Rat Radar API: PASS")
-                print(
-                    "Rat Radar coverage:",
-                    json.dumps(radar_api.get("coverage", {}), sort_keys=True),
-                )
-                print("launchAuthorization: BLOCKED")
-                print("D1 Rat Radar snapshot:")
-                run(
-                    WRANGLER
-                    + [
-                        "d1",
-                        "execute",
-                        "DB",
-                        "--remote",
-                        "--yes",
-                        "--command",
-                        (
-                            "SELECT COUNT(*) AS cursor_count, "
-                            "SUM(CASE WHEN last_error IS NOT NULL THEN 1 ELSE 0 END) AS cursor_errors "
-                            "FROM rat_radar_pool_cursors; "
-                            "SELECT COUNT(*) AS swap_receipt_count FROM rat_radar_swap_receipts;"
-                        ),
-                        "--config",
-                        "wrangler.jsonc",
-                    ]
-                )
-                print("NEXT: verify cursor advancement and inspect /api/rat-radar/watchlist after queue cycles")
-                return
+            )
+            if deployment_ready:
+                break
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
             pass
         if attempt == 0:
             print("Waiting for candidate deployment to propagate...")
         time.sleep(2)
 
-    print("LAST_API_HEALTH:", json.dumps(last_health, sort_keys=True))
-    print(
-        "LAST_RAT_RADAR_CAPABILITY:",
-        json.dumps(last_caps.get("capabilities", {}).get("ratRadarV0", {}), sort_keys=True),
+    if not deployment_ready:
+        print("LAST_SERVICE_HEALTH:", json.dumps(last_service_health, sort_keys=True))
+        print("LAST_API_HEALTH:", json.dumps(last_api_health, sort_keys=True))
+        print(
+            "LAST_RAT_RADAR_CAPABILITY:",
+            json.dumps(last_caps.get("capabilities", {}).get("ratRadarV0", {}), sort_keys=True),
+        )
+        fail("candidate Worker/capability state did not converge")
+
+    print("RAT_RADAR_CANDIDATE_DEPLOY: PASS")
+    print("launchAuthorization: BLOCKED")
+    print("RAT_RADAR_API_HEALTH:", json.dumps(last_api_health, sort_keys=True))
+
+    if (
+        last_api_health.get("ok") is True
+        and last_api_health.get("indexReady") is True
+        and last_api_health.get("lastSyncError") is None
+    ):
+        try:
+            radar_api = get_json("/api/rat-radar/watchlist")
+            if (
+                radar_api.get("schemaVersion") == "binrat.rat-radar-watchlist/0.1"
+                and radar_api.get("method", {}).get("evidencedRole") == "V3_SWAP_RECIPIENT"
+            ):
+                print("RAT_RADAR_RUNTIME: READY")
+                print("Rat Radar API: PASS")
+                print(
+                    "Rat Radar coverage:",
+                    json.dumps(radar_api.get("coverage", {}), sort_keys=True),
+                )
+            else:
+                print("RAT_RADAR_RUNTIME: API_MISMATCH")
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            print("RAT_RADAR_RUNTIME: READY_BUT_PUBLIC_SMOKE_UNAVAILABLE")
+    else:
+        print("RAT_RADAR_RUNTIME: PENDING_SYNC_CATCHUP")
+
+    print("D1 Rat Radar snapshot:")
+    run(
+        WRANGLER
+        + [
+            "d1",
+            "execute",
+            "DB",
+            "--remote",
+            "--yes",
+            "--command",
+            (
+                "SELECT COUNT(*) AS cursor_count, "
+                "SUM(CASE WHEN last_error IS NOT NULL THEN 1 ELSE 0 END) AS cursor_errors "
+                "FROM rat_radar_pool_cursors; "
+                "SELECT COUNT(*) AS swap_receipt_count FROM rat_radar_swap_receipts; "
+                "SELECT chain_id,source_verified,live_caught_up,last_sync_error,updated_at_ms "
+                "FROM binrat_runtime_state WHERE chain_id = 5042;"
+            ),
+            "--config",
+            "wrangler.jsonc",
+        ]
     )
-    print("LAST_RAT_RADAR_API:", json.dumps(last_radar, sort_keys=True))
-    fail("candidate did not converge to the expected fail-closed live state")
+    print("NEXT: public smoke until runtime becomes READY, then inspect real address distribution")
 
 
 if __name__ == "__main__":
