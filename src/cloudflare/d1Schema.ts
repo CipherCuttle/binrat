@@ -167,6 +167,8 @@ CREATE TABLE IF NOT EXISTS rat_radar_swap_receipts (
   launch_id TEXT NOT NULL REFERENCES launches(launch_id) ON DELETE CASCADE,
   pool TEXT NOT NULL,
   token TEXT NOT NULL,
+  token0 TEXT NOT NULL,
+  token1 TEXT NOT NULL,
   block_number TEXT NOT NULL,
   block_hash TEXT NOT NULL,
   tx_hash TEXT NOT NULL,
