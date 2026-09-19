@@ -66,8 +66,8 @@ Required launch stack:
 - Telegram Rat deterministic V0;
 - `$BINRAT` fair-launch mechanics frozen and publicly documented;
 - Dumpster Ledger / treasury transparency surface;
-- Rat Den V0;
-- minimal Rat Watch V0.
+- minimal Rat Watch V0;
+- Rat Radar V0 free intelligence surface plus a holder-gated depth/speed layer.
 
 Legal/compliance is a **parallel authorization lane from the start**, not the last feature in the sequence. Token-facing marketing and launch authority remain fail-closed until the applicable legal/compliance, contract, treasury, and disclosure gates are complete and explicitly authorized in the canonical capability manifest.
 
@@ -97,19 +97,59 @@ The public funding surface should expose, where operationally safe:
 
 The point is not to pretend the project has no funding motive. The point is to make the funding mechanics legible.
 
-### Rat Den V0
+### Rat Den V0 — optional / post-launch
 
-Optional holder-facing community/product surfaces.
+Rat Den is an optional community/product surface and is **not a Launch V0 blocker**.
 
-Candidate launch features:
+Candidate later features:
 
 - advanced Telegram Rat commands;
-- additional Rat Watch slots;
 - experimental feature access;
 - research/community channels;
 - Trash Hunt eligibility when hunts ship.
 
 Core receipts and factual evidence remain publicly inspectable.
+
+### Rat Radar V0 — launch utility priority
+
+Rat Radar turns BINRAT's accumulated launch evidence into a ranked watchlist of statistically unusual addresses.
+
+The first version must be deterministic and receipt-bound. It must not label an address as a smart human, infer identity, or issue a BUY/SELL recommendation.
+
+Evidence layer required before ranking:
+
+- wallet/address participation around indexed launch pools;
+- entry timing relative to pool/launch creation;
+- observed token acquisition/disposal paths where deterministically recoverable;
+- position size relative to observable pool/liquidity state;
+- recurrence across independent launches;
+- later 5m / 1h / 24h outcomes tied to the original point-in-time evidence;
+- explicit sample size, coverage, and missing-data state.
+
+A router, contract, recipient, or transfer beneficiary must remain labeled as the address actually evidenced. BINRAT must not silently infer the final human trader.
+
+Free product should be useful enough to prove the intelligence layer:
+
+- exact addresses for a small top watchlist;
+- sample size and coverage;
+- basic deterministic reasons for inclusion;
+- a bounded historical profile;
+- public receipts/evidence links;
+- at least one basic watch slot.
+
+Holder-gated depth may unlock:
+
+- the full ranked address universe;
+- richer factor decomposition and longitudinal statistics;
+- current/near-real-time active-wallet views;
+- larger Rat Watch capacity;
+- custom filters/cohorts;
+- faster/richer Telegram alerts;
+- later API/webhook access.
+
+**Truth is not gated.** Public receipts and the evidence needed to verify factual claims remain public. The gate sells depth, speed, scale, filtering, and operational convenience.
+
+Holder eligibility should use a wallet-control proof plus a publicly frozen balance threshold. A percentage-of-fixed-supply target may be converted into an absolute token threshold, but the exact threshold is not frozen until holder-distribution and price sensitivity have been simulated. The gate must not imply ownership of a particular percentage of circulating supply when it only checks balance.
 
 ### Rat Watch V0
 
@@ -155,8 +195,8 @@ Launch V0 is ready only when:
 3. public token/treasury addresses are frozen and disclosed;
 4. Telegram Rat reports the canonical doctrine/status accurately from the capability manifest;
 5. Dumpster Ledger is live or has a deterministic launch-day bootstrap path;
-6. Rat Den cannot hide or alter core public receipts;
-7. Rat Watch produces at least one real end-to-end Telegram alert;
+6. Rat Radar exposes a genuinely useful free watchlist and the holder gate demonstrably unlocks only depth/speed/scale while core factual receipts remain public;
+7. Rat Watch has a live future-only subscription plus a deterministic end-to-end delivery smoke; a naturally occurring future recurrence alert remains required evidence for the mature feature, but is not allowed to hold Launch V0 hostage to event timing;
 8. Replay Lab demonstrates at least one real historical launch -> matured-observation evidence chain without synthesizing missing evidence;
 9. product/docs/Telegram status agrees with the canonical capability manifest;
 10. no private presale, hidden insider allocation, or undisclosed privileged inventory exists under the chosen launch design.
@@ -380,8 +420,9 @@ The cleanest fair-launch target is:
 
 Subject to implementation and legal review, early `$BINRAT` utility can include:
 
-- **Rat Den** — optional token-gated community/product surfaces;
+- **Rat Radar depth** — full ranked wallet/address universe, richer statistics, live activity views, filtering, and later machine access;
 - **Rat Watch capacity** — additional watch slots or advanced alert configuration;
+- **Rat Den** — optional post-launch community/product surfaces;
 - **Dumpster Raids** — post-launch experimental token-lock signaling for which evidence gaps/cases the community wants investigated next;
 - **Trash Hunts** — seasonal research quests that earn Rat Credits and reputation rather than purchasing truth;
 - **Bounty Boosts** — use `$BINRAT` to increase the posted reward/priority of a bounded evidence task;
