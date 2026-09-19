@@ -112,6 +112,20 @@ jobs:
       - name: Deploy guarded Rat Radar candidate
         run: python3 scripts/deploy-rat-radar-candidate.py
 
+      - name: Diagnose scheduler and queue after deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 75
+          echo "=== sync leases after one cron interval ==="
+          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --command "SELECT lease_name, owner_token, lease_until_ms, updated_at_ms FROM binrat_sync_leases ORDER BY lease_name;" --config wrangler.jsonc
+          echo "=== runtime after one cron interval ==="
+          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --command "SELECT chain_id, source_verified, live_caught_up, last_sync_error, updated_at_ms FROM binrat_runtime_state WHERE chain_id = 5042;" --config wrangler.jsonc
+          echo "=== Rat Radar persistence after one cron interval ==="
+          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --command "SELECT COUNT(*) AS cursor_count, SUM(CASE WHEN last_error IS NOT NULL THEN 1 ELSE 0 END) AS cursor_errors FROM rat_radar_pool_cursors; SELECT COUNT(*) AS swap_receipt_count FROM rat_radar_swap_receipts;" --config wrangler.jsonc
+          echo "=== public API health after one cron interval ==="
+          curl --fail --silent --show-error https://binrat-edge-v0.pettevik.workers.dev/api/health
+
 
   rat-radar-public-smoke:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
