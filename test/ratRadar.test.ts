@@ -19,13 +19,14 @@ test('Rat Radar swap receipt preserves V3 sender and recipient without inferring
     launchId: 'launch-1',
     pool: address(1),
     token: address(2),
+    token0: address(3),
+    token1: address(2),
     blockNumber: 110n,
     blockHash: hex64(110),
     txHash: hex64(7),
     logIndex: 3,
     sender: address(10),
     recipient: address(11),
-    tokenSide: 'TOKEN1',
     amount0: 1_000n,
     amount1: -500n,
     sqrtPriceX96: 123n,
@@ -57,13 +58,14 @@ test('Rat Radar D1 swap receipts are immutable and idempotent', async () => {
       launchId: launch.launchId,
       pool: launch.pool,
       token: launch.token,
+      token0: launch.token,
+      token1: address(222),
       blockNumber: 110n,
       blockHash: hex64(110),
       txHash: hex64(70),
       logIndex: 2,
       sender: address(20),
       recipient: address(21),
-      tokenSide: 'TOKEN0' as const,
       amount0: -100n,
       amount1: 50n,
       sqrtPriceX96: 1_000n,
@@ -100,13 +102,14 @@ test('Rat Radar receipts after a reorg boundary are removed even for an older su
       launchId: launch.launchId,
       pool: launch.pool,
       token: launch.token,
+      token0: address(223),
+      token1: launch.token,
       blockNumber: 200n,
       blockHash: hex64(200),
       txHash: hex64(80),
       logIndex: 4,
       sender: address(30),
       recipient: address(31),
-      tokenSide: 'TOKEN1',
       amount0: 80n,
       amount1: -160n,
       sqrtPriceX96: 3_000n,
@@ -120,6 +123,64 @@ test('Rat Radar receipts after a reorg boundary are removed even for an older su
 
     assert.equal((await radar.listForLaunch(launch.launchId)).length, 0);
     assert.ok(await launches.getLaunch(launch.launchId));
+  } finally {
+    launches.close();
+    db.close();
+  }
+});
+
+
+test('Rat Radar derives token side from pool tokens and rejects mismatched pool authority', async () => {
+  await assert.rejects(
+    () => deriveRatRadarSwapReceipt({
+      chainId: CHAIN_ID,
+      launchId: 'launch-x',
+      pool: address(1),
+      token: address(2),
+      token0: address(3),
+      token1: address(4),
+      blockNumber: 10n,
+      blockHash: hex64(10),
+      txHash: hex64(11),
+      logIndex: 0,
+      sender: address(5),
+      recipient: address(6),
+      amount0: 1n,
+      amount1: -1n,
+      sqrtPriceX96: 1n,
+      liquidity: 1n,
+      tick: 0
+    }),
+    /RAT_RADAR_TOKEN_NOT_IN_POOL/
+  );
+
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const launches = new D1Store(db, CHAIN_ID);
+  const radar = new D1RatRadarStore(db, CHAIN_ID);
+  try {
+    const launch = await makeLaunch(100n, 3);
+    await launches.putLaunch(launch);
+    const wrongPool = await deriveRatRadarSwapReceipt({
+      chainId: CHAIN_ID,
+      launchId: launch.launchId,
+      pool: address(250),
+      token: launch.token,
+      token0: launch.token,
+      token1: address(251),
+      blockNumber: 110n,
+      blockHash: hex64(110),
+      txHash: hex64(111),
+      logIndex: 1,
+      sender: address(252),
+      recipient: address(253),
+      amount0: -2n,
+      amount1: 1n,
+      sqrtPriceX96: 2n,
+      liquidity: 3n,
+      tick: 1
+    });
+    await assert.rejects(() => radar.putSwap(wrongPool), /RAT_RADAR_LAUNCH_AUTHORITY_MISMATCH/);
   } finally {
     launches.close();
     db.close();
