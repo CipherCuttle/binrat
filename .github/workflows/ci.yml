@@ -26,9 +26,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
     needs: check
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
 
@@ -42,14 +40,10 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Fail closed unless Cloudflare credentials exist
-        shell: bash
-        run: |
-          set -euo pipefail
-          : "${CLOUDFLARE_API_TOKEN:?missing CLOUDFLARE_API_TOKEN}"
-          : "${CLOUDFLARE_ACCOUNT_ID:?missing CLOUDFLARE_ACCOUNT_ID}"
-
       - run: pnpm install --frozen-lockfile
+
+      - name: Cloudflare device authorization
+        run: pnpm dlx wrangler@4.135.0 login --device --browser=false --no-use-keyring
 
       - name: Prepare live candidate config
         shell: bash
