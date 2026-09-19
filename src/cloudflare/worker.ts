@@ -5,6 +5,7 @@ import { projectCreatorFile } from '../public/creatorFile.js';
 import { projectPublicFeed } from '../public/project.js';
 import { projectReplayBundle } from '../public/replayBundle.js';
 import type { PublicFeed } from '../public/types.js';
+import { projectPublicRatRadarSwapReceipt } from '../ratRadar/activity.js';
 import { projectRatRadarFreeWatchlist } from '../ratRadar/watchlist.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
@@ -172,7 +173,7 @@ export async function handleBinratApiRequest(
       if (!receipt || receipt.blockNumber > BigInt(feed.asOfBlock)) {
         return json(404, { error: 'RAT_RADAR_ACTIVITY_NOT_FOUND' });
       }
-      return json(200, receipt);
+      return json(200, projectPublicRatRadarSwapReceipt(receipt));
     }
 
     if (pathname.startsWith('/api/creator/')) {
