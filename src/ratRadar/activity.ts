@@ -45,6 +45,18 @@ export async function deriveRatRadarSwapReceipt(
   if (!Number.isSafeInteger(input.tick)) throw new Error('RAT_RADAR_TICK_INVALID');
   if (input.blockNumber < 0n) throw new Error('RAT_RADAR_BLOCK_INVALID');
   if (input.sqrtPriceX96 < 0n || input.liquidity < 0n) throw new Error('RAT_RADAR_POOL_STATE_INVALID');
+  for (const [name, value] of [
+    ['pool', input.pool],
+    ['token', input.token],
+    ['token0', input.token0],
+    ['token1', input.token1],
+    ['sender', input.sender],
+    ['recipient', input.recipient]
+  ] as const) {
+    if (!/^0x[0-9a-fA-F]{40}$/.test(value)) throw new Error(`RAT_RADAR_${name.toUpperCase()}_INVALID`);
+  }
+  if (!/^0x[0-9a-fA-F]{64}$/.test(input.blockHash)) throw new Error('RAT_RADAR_BLOCK_HASH_INVALID');
+  if (!/^0x[0-9a-fA-F]{64}$/.test(input.txHash)) throw new Error('RAT_RADAR_TX_HASH_INVALID');
 
   const normalized: RatRadarSwapInput = {
     ...input,
