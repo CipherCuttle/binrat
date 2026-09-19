@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -81,3 +82,26 @@ jobs:
           if (radar.schemaVersion !== 'binrat.rat-radar-watchlist/0.1') process.exit(1);
           if (radar.method?.evidencedRole !== 'V3_SWAP_RECIPIENT') process.exit(1);
           NODE
+
+
+      - name: Report candidate deploy outcome to PR 19
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ job.status }}" = "success" ]; then
+            body="RAT_RADAR_REMOTE_DEPLOY: PASS
+
+Head: ${GITHUB_SHA}
+
+Cloudflare candidate deployment + live smoke completed successfully."
+          else
+            body="RAT_RADAR_REMOTE_DEPLOY: FAIL
+
+Head: ${GITHUB_SHA}
+
+Check the rat-radar-candidate-deploy workflow logs. No launch/token authority was granted."
+          fi
+          gh pr comment 19 --body "$body"
