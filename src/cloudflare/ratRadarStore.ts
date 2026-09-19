@@ -7,6 +7,25 @@ export class D1RatRadarStore {
 
   async putSwap(receipt: RatRadarSwapReceipt): Promise<'INSERTED' | 'DUPLICATE'> {
     if (receipt.chainId !== this.chainId) throw new Error('RAT_RADAR_CHAIN_MISMATCH');
+    const launch = await this.db.prepare(`
+      SELECT chain_id,pool,token,block_number
+      FROM launches
+      WHERE launch_id = ?
+      LIMIT 1
+    `).bind(receipt.launchId).first<{
+      chain_id: number;
+      pool: string;
+      token: string;
+      block_number: string;
+    }>();
+    if (
+      !launch ||
+      launch.chain_id !== receipt.chainId ||
+      launch.pool !== receipt.pool ||
+      launch.token !== receipt.token ||
+      receipt.blockNumber < BigInt(launch.block_number)
+    ) throw new Error('RAT_RADAR_LAUNCH_AUTHORITY_MISMATCH');
+
     const payload = canonicalJson(receipt);
     const result = await this.db.prepare(INSERT_SWAP_SQL).bind(
       receipt.activityId,
@@ -15,6 +34,8 @@ export class D1RatRadarStore {
       receipt.launchId,
       receipt.pool,
       receipt.token,
+      receipt.token0,
+      receipt.token1,
       receipt.blockNumber.toString(),
       receipt.blockHash,
       receipt.txHash,
@@ -71,10 +92,10 @@ export class D1RatRadarStore {
 
 const INSERT_SWAP_SQL = `
   INSERT OR IGNORE INTO rat_radar_swap_receipts (
-    activity_id,version,chain_id,launch_id,pool,token,block_number,block_hash,tx_hash,log_index,
+    activity_id,version,chain_id,launch_id,pool,token,token0,token1,block_number,block_hash,tx_hash,log_index,
     sender,recipient,token_side,amount0,amount1,sqrt_price_x96,liquidity,tick,
     launched_token_delta,launched_token_flow,evidence_digest,payload_json
-  ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 `;
 
 function changes(result: D1ResultLike): number {
