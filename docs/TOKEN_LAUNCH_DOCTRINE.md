@@ -107,13 +107,24 @@ The status model distinguishes:
 
 Candidate early surfaces:
 
-#### Rat Den
-Optional holder-gated community and product surfaces.
+#### Rat Radar depth
+Rat Radar should provide a genuinely useful public watchlist while reserving higher-cost operational depth for eligible holders.
 
-Core receipts and factual evidence must not become inaccessible merely because a user does not hold the token.
+Public users should retain access to exact addresses on a bounded watchlist, sample size/coverage, basic inclusion reasons, and the receipts needed to verify factual claims.
+
+A wallet that proves control and satisfies a publicly frozen $BINRAT balance threshold may unlock deeper ranking coverage, richer factor decomposition, live activity views, custom filters/cohorts, larger watch capacity, and later API/webhook access.
+
+The holder gate sells depth, speed, scale, filtering, and convenience. It must not hide or rewrite factual receipts.
+
+The initial balance threshold may be derived from a percentage of fixed total supply, but the final threshold must be frozen only after distribution and price-sensitivity simulation. The product must describe the actual balance test precisely rather than imply control of a percentage of circulating supply.
 
 #### Rat Watch capacity
 Token holding/locking can unlock additional watch slots, richer alert configuration, or community alert channels.
+
+#### Rat Den
+Optional post-launch holder-gated community and product surfaces.
+
+Core receipts and factual evidence must not become inaccessible merely because a user does not hold the token.
 
 #### Dumpster Raids — post-launch experiment
 Dumpster Raids are not required for Launch V0.
