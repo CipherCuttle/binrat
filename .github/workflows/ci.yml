@@ -23,7 +23,7 @@ jobs:
 
 
   rat-radar-candidate-deploy:
-    if: ${{ false }}
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
