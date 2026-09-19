@@ -78,6 +78,28 @@ export class D1RatRadarStore {
     return 'DUPLICATE';
   }
 
+  async getSwap(activityId: string): Promise<RatRadarSwapReceipt | null> {
+    const row = await this.db.prepare(`
+      SELECT payload_json
+      FROM rat_radar_swap_receipts
+      WHERE chain_id = ? AND activity_id = ?
+      LIMIT 1
+    `).bind(this.chainId, activityId).first<{ payload_json: string }>();
+    return row ? revive(row.payload_json) : null;
+  }
+
+  async listThroughBlock(asOfBlock: bigint): Promise<RatRadarSwapReceipt[]> {
+    if (asOfBlock < 0n) throw new Error('RAT_RADAR_BLOCK_INVALID');
+    const result = await this.db.prepare(`
+      SELECT payload_json
+      FROM rat_radar_swap_receipts
+      WHERE chain_id = ? AND CAST(block_number AS INTEGER) <= CAST(? AS INTEGER)
+      ORDER BY CAST(block_number AS INTEGER), log_index, activity_id
+    `).bind(this.chainId, asOfBlock.toString()).all<{ payload_json: string }>();
+    if (!result.success) throw new Error('RAT_RADAR_QUERY_FAILED');
+    return (result.results ?? []).map((row) => revive(row.payload_json));
+  }
+
   async listForLaunch(launchId: string): Promise<RatRadarSwapReceipt[]> {
     const result = await this.db.prepare(`
       SELECT payload_json
