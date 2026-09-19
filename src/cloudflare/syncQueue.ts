@@ -210,16 +210,21 @@ export async function runCloudflareSyncCycle(
 
   const lease = new D1SyncLeaseStore(env.DB);
   const nowMs = deps.now();
+  console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_CLAIM_START', cycleId: message.cycleId, nowMs }));
   if (!(await lease.claim(SYNC_LEASE_NAME, message.cycleId, nowMs))) {
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_BUSY', cycleId: message.cycleId, nowMs }));
     return { status: 'BUSY' };
   }
 
+  console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_CLAIMED', cycleId: message.cycleId, nowMs }));
   const store = new D1Store(env.DB, ARC_CHAIN_ID);
   const runtimeStore = new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID);
   let previous: D1RuntimeState | null = null;
 
   try {
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_READ_START', cycleId: message.cycleId }));
     previous = await runtimeStore.get();
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_READ_DONE', cycleId: message.cycleId, previousUpdatedAtMs: previous?.updatedAtMs ?? null }));
 
     let source: LaunchSource;
     try {
@@ -233,8 +238,10 @@ export async function runCloudflareSyncCycle(
 
     let bootstrapHead: bigint;
     try {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'SOURCE_BOOTSTRAP_START', cycleId: message.cycleId }));
       bootstrapHead = await source.getHeadBlockNumber();
       await source.assertAuthority(bootstrapHead);
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'SOURCE_BOOTSTRAP_DONE', cycleId: message.cycleId, bootstrapHead: bootstrapHead.toString() }));
     } catch (error) {
       const code = syncErrorCode(error);
       await persistLiveFailure(runtimeStore, previous, code, deps.now);
@@ -257,6 +264,7 @@ export async function runCloudflareSyncCycle(
 
     let liveReport;
     try {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_SYNC_START', cycleId: message.cycleId }));
       liveReport = await syncLaunches(source, store, {
         startBlock,
         confirmations,
@@ -265,6 +273,7 @@ export async function runCloudflareSyncCycle(
         pollIntervalMs: 1000,
         maxBatchesPerRun: 1
       });
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_SYNC_DONE', cycleId: message.cycleId, batches: liveReport.batches, endBlock: liveReport.endBlock?.toString() ?? null }));
     } catch (error) {
       const code = syncErrorCode(error);
       await persistLiveFailure(runtimeStore, previous, code, deps.now);
@@ -305,6 +314,7 @@ export async function runCloudflareSyncCycle(
 
     }
 
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_WRITE_START', cycleId: message.cycleId }));
     await runtimeStore.put({
       sourceVerified: true,
       liveCaughtUp,
@@ -319,10 +329,13 @@ export async function runCloudflareSyncCycle(
       updatedAtMs: deps.now()
     });
 
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_WRITE_DONE', cycleId: message.cycleId }));
     return { status: 'SUCCESS', liveCaughtUp };
   } finally {
     store.close();
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_RELEASE_START', cycleId: message.cycleId }));
     await lease.release(SYNC_LEASE_NAME, message.cycleId);
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_RELEASE_DONE', cycleId: message.cycleId }));
   }
 }
 
