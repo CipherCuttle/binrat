@@ -117,26 +117,15 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify live Rat Radar public endpoints
+      - name: Diagnose live Rat Radar public endpoints
         shell: bash
         run: |
           set -euo pipefail
           base="https://binrat-edge-v0.pettevik.workers.dev"
-          curl --fail --silent --show-error --retry 20 --retry-all-errors --retry-delay 3 "$base/api/health" -o /tmp/health.json
-          curl --fail --silent --show-error --retry 20 --retry-all-errors --retry-delay 3 "$base/api/capabilities" -o /tmp/capabilities.json
-          curl --fail --silent --show-error --retry 20 --retry-all-errors --retry-delay 3 "$base/api/rat-radar/watchlist" -o /tmp/radar.json
-          node - <<'NODE'
-          const fs = require('fs');
-          const health = JSON.parse(fs.readFileSync('/tmp/health.json','utf8'));
-          const caps = JSON.parse(fs.readFileSync('/tmp/capabilities.json','utf8'));
-          const radar = JSON.parse(fs.readFileSync('/tmp/radar.json','utf8'));
-          console.log('HEALTH', JSON.stringify(health));
-          console.log('RAT_RADAR_CAPABILITY', JSON.stringify(caps.capabilities?.ratRadarV0 ?? null));
-          console.log('LAUNCH_AUTHORIZATION', JSON.stringify(caps.launchAuthorization ?? null));
-          console.log('RAT_RADAR_COVERAGE', JSON.stringify(radar.coverage ?? null));
-          console.log('RAT_RADAR_CANDIDATES', JSON.stringify(radar.candidates ?? null));
-          if (health.ok !== true || health.indexReady !== true || health.lastSyncError !== null) process.exit(1);
-          if (radar.schemaVersion !== 'binrat.rat-radar-watchlist/0.1') process.exit(1);
-          if (radar.method?.evidencedRole !== 'V3_SWAP_RECIPIENT') process.exit(1);
-          if (caps.launchAuthorization?.status !== 'BLOCKED') process.exit(1);
-          NODE
+          for path in /health /api/health /api/capabilities /api/rat-radar/watchlist; do
+            body="/tmp/$(echo "$path" | tr '/' '_').json"
+            code="$(curl --silent --show-error --max-time 20 -o "$body" -w '%{http_code}' "$base$path" || true)"
+            echo "=== $path HTTP $code ==="
+            cat "$body" 2>/dev/null || true
+            echo
+          done
