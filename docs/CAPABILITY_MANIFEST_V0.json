@@ -44,9 +44,18 @@
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "ratWatchV0": {
-      "engineeringStatus": "BUILDING",
+      "engineeringStatus": "ENGINEERING_PASS",
       "candidatePr": 18,
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "candidateHead": "cc782f04b08c938412394fd587f7158426acc067",
+      "deploymentStatus": "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED",
+      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING",
+      "liveAcceptance": {
+        "subscription": "PASS",
+        "commandReceipt": "PASS",
+        "recurrenceAlert": "PENDING_REAL_FUTURE_LAUNCH",
+        "watchedCreator": "0x05952cb87116ddfbc4a2f85204e4e267202dd950",
+        "startBlock": "21585477"
+      }
     },
     "dumpsterRaidsV0": {
       "engineeringStatus": "EXPERIMENTAL",
