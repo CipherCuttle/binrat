@@ -41,6 +41,8 @@
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",
+      "phase": "POST_LAUNCH",
+      "launchBlocker": false,
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "ratWatchV0": {
@@ -61,6 +63,13 @@
       "engineeringStatus": "EXPERIMENTAL",
       "phase": "POST_LAUNCH",
       "launchBlocker": false
+    },
+    "ratRadarV0": {
+      "engineeringStatus": "BUILDING",
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED",
+      "launchUtilityPriority": true,
+      "evidenceStatus": "WALLET_ACTIVITY_INDEX_REQUIRED",
+      "accessDoctrine": "PUBLIC_RECEIPTS_HOLDER_GATED_DEPTH_SPEED_SCALE"
     }
   },
   "launchAuthorization": {
@@ -73,9 +82,9 @@
       "launch_mechanics_verification_receipt",
       "token_and_treasury_addresses",
       "telegram_doctrine_smoke",
+      "rat_radar_free_value_and_holder_gate_smoke",
+      "rat_watch_live_subscription_and_delivery_smoke",
       "dumpster_ledger_bootstrap",
-      "rat_den_public_receipt_boundary",
-      "rat_watch_end_to_end_alert",
       "replay_lab_real_evidence_smoke",
       "status_consistency_check",
       "allocation_and_privileged_inventory_disclosure"
