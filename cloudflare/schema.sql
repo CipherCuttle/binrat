@@ -195,6 +195,19 @@ CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_recipient_order
 CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_sender_order
   ON rat_radar_swap_receipts(chain_id, sender, block_number, log_index);
 
+
+CREATE TABLE IF NOT EXISTS rat_radar_pool_cursors (
+  launch_id TEXT PRIMARY KEY REFERENCES launches(launch_id) ON DELETE CASCADE,
+  chain_id INTEGER NOT NULL,
+  next_block TEXT NOT NULL,
+  retry_after_ms INTEGER NOT NULL DEFAULT 0,
+  failure_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT,
+  updated_at_ms INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_pool_cursor_schedule
+  ON rat_radar_pool_cursors(chain_id, retry_after_ms, next_block, launch_id);
+
 CREATE TABLE IF NOT EXISTS binrat_invariant_guard (
   must_be_zero INTEGER NOT NULL CHECK (must_be_zero = 0)
 );
