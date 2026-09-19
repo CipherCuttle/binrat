@@ -52,6 +52,61 @@ test('Arc Rat Radar source decodes V3 Swap roles and derives launched-token flow
   assert.equal(receipts[0]?.blockNumber, 105n);
 });
 
+
+test('Arc Rat Radar source ignores same-block Swap logs at or before the ArcPad launch log index', async () => {
+  const launch = await makeLaunch();
+  const token1 = address(99);
+  const client = {
+    async getChainId() { return CHAIN_ID; },
+    async readContract({ functionName }: { functionName: string }) {
+      if (functionName === 'token0') return launch.token;
+      if (functionName === 'token1') return token1;
+      throw new Error('unexpected read');
+    },
+    async getLogs() {
+      return [
+        {
+          blockNumber: launch.blockNumber,
+          blockHash: launch.blockHash,
+          transactionHash: hex64(800),
+          logIndex: launch.logIndex - 1,
+          args: {
+            sender: address(80),
+            recipient: address(81),
+            amount0: -10n,
+            amount1: 5n,
+            sqrtPriceX96: 100n,
+            liquidity: 200n,
+            tick: 1
+          }
+        },
+        {
+          blockNumber: launch.blockNumber,
+          blockHash: launch.blockHash,
+          transactionHash: hex64(801),
+          logIndex: launch.logIndex + 1,
+          args: {
+            sender: address(82),
+            recipient: address(83),
+            amount0: -20n,
+            amount1: 10n,
+            sqrtPriceX96: 101n,
+            liquidity: 201n,
+            tick: 2
+          }
+        }
+      ];
+    }
+  } as unknown as PublicClient;
+
+  const source = new ArcRatRadarSource({ client });
+  const receipts = await source.catchUp(launch, launch.blockNumber, launch.blockNumber);
+
+  assert.equal(receipts.length, 1);
+  assert.equal(receipts[0]?.recipient, address(83));
+  assert.equal(receipts[0]?.logIndex, launch.logIndex + 1);
+});
+
 test('Arc Rat Radar source rejects a pool whose token pair does not contain the launched token', async () => {
   const launch = await makeLaunch();
   const client = {
