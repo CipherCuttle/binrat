@@ -88,6 +88,25 @@ export class D1RatRadarStore {
     return row ? revive(row.payload_json) : null;
   }
 
+  async listForRecipientThroughBlock(recipient: string, asOfBlock: bigint): Promise<RatRadarSwapReceipt[]> {
+    if (!/^0x[0-9a-fA-F]{40}$/.test(recipient)) throw new Error('RAT_RADAR_RECIPIENT_INVALID');
+    if (asOfBlock < 0n) throw new Error('RAT_RADAR_BLOCK_INVALID');
+    const result = await this.db.prepare(`
+      SELECT payload_json
+      FROM rat_radar_swap_receipts
+      WHERE chain_id = ?
+        AND recipient = ?
+        AND CAST(block_number AS INTEGER) <= CAST(? AS INTEGER)
+      ORDER BY CAST(block_number AS INTEGER), log_index, activity_id
+    `).bind(
+      this.chainId,
+      recipient.toLowerCase(),
+      asOfBlock.toString()
+    ).all<{ payload_json: string }>();
+    if (!result.success) throw new Error('RAT_RADAR_QUERY_FAILED');
+    return (result.results ?? []).map((row) => revive(row.payload_json));
+  }
+
   async listThroughBlock(asOfBlock: bigint): Promise<RatRadarSwapReceipt[]> {
     if (asOfBlock < 0n) throw new Error('RAT_RADAR_BLOCK_INVALID');
     const result = await this.db.prepare(`
