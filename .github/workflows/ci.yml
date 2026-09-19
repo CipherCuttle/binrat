@@ -24,7 +24,6 @@ jobs:
 
   rat-radar-candidate-deploy:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
-    needs: check
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -40,10 +39,13 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-
       - name: Cloudflare device authorization
         run: pnpm dlx wrangler@4.135.0 login --device --browser=false --no-use-keyring
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify candidate before deploy
+        run: pnpm check
 
       - name: Prepare live candidate config
         shell: bash
