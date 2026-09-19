@@ -18,11 +18,17 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def run(args: list[str], *, capture: bool = False) -> str:
+def run(
+    args: list[str],
+    *,
+    capture: bool = False,
+    input_text: str | None = None,
+) -> str:
     result = subprocess.run(
         args,
         cwd=ROOT,
         text=True,
+        input=input_text,
         stdout=subprocess.PIPE if capture else None,
         stderr=subprocess.STDOUT if capture else None,
         check=False,
@@ -120,11 +126,32 @@ def main() -> None:
     print("Deploying Rat Watch candidate...")
     run(WRANGLER + ["deploy", "--config", "wrangler.jsonc"])
 
+    print("Publishing candidate capability manifest...")
+    compact_manifest = json.dumps(parsed, separators=(",", ":")) + "\n"
+    run(
+        WRANGLER
+        + [
+            "secret",
+            "put",
+            "CAPABILITY_MANIFEST_JSON",
+            "--config",
+            "wrangler.jsonc",
+        ],
+        input_text=compact_manifest,
+    )
+    print("RAT_WATCH_CAPABILITY_MANIFEST: PUBLISHED")
+
+    last_health: dict = {}
+    last_control: dict = {}
+    last_caps: dict = {}
     for attempt in range(30):
         try:
             health = get_json("/api/health")
             control = get_json("/health")
             caps = get_json("/api/capabilities")
+            last_health = health
+            last_control = control
+            last_caps = caps
             remote_watch = caps.get("capabilities", {}).get("ratWatchV0", {})
             remote_launch = caps.get("launchAuthorization", {})
             if (
@@ -155,6 +182,12 @@ def main() -> None:
             print("Waiting for candidate deployment to propagate...")
         time.sleep(2)
 
+    print("LAST_API_HEALTH:", json.dumps(last_health, sort_keys=True))
+    print("LAST_CONTROL_HEALTH:", json.dumps(last_control, sort_keys=True))
+    print(
+        "LAST_RAT_WATCH_CAPABILITY:",
+        json.dumps(last_caps.get("capabilities", {}).get("ratWatchV0", {}), sort_keys=True),
+    )
     fail("candidate did not converge to the expected fail-closed live state")
 
 
