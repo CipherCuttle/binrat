@@ -66,6 +66,7 @@ const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
+export const ARC_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.arc-scan.org';
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -219,8 +220,16 @@ export async function runCloudflareSyncCycle(
 
   try {
     previous = await runtimeStore.get();
-    const rpcUrl = deps.launchSource ? undefined : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
-    const source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
+
+    let source: LaunchSource;
+    try {
+      const rpcUrl = deps.launchSource ? undefined : resolveArcRpcUrl(env);
+      source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
+    } catch (error) {
+      const code = syncErrorCode(error);
+      await persistLiveFailure(runtimeStore, previous, code, deps.now);
+      return { status: 'RETRY', code };
+    }
 
     let bootstrapHead: bigint;
     try {
@@ -351,7 +360,7 @@ export async function runCloudflareObservationCycle(
 
     const rpcUrl = deps.observationSource
       ? undefined
-      : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
+      : resolveArcRpcUrl(env);
     const source = deps.observationSource ?? new ArcObservationSource({ rpcUrl });
     const confirmations = BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000));
 
@@ -440,7 +449,7 @@ export async function runCloudflareRatRadarCycle(
       .filter((launch) => launch.blockNumber <= checkpoint.blockNumber);
     await radar.ensurePoolCursors(launches, nowMs);
 
-    const rpcUrl = deps.ratRadarSource ? undefined : required(env.ARC_RPC_URL, 'ARC_RPC_URL');
+    const rpcUrl = deps.ratRadarSource ? undefined : resolveArcRpcUrl(env);
     const source = deps.ratRadarSource ?? new ArcRatRadarSource({ rpcUrl });
     try {
       await source.assertAuthority(checkpoint.blockNumber, checkpoint.blockHash);
@@ -619,7 +628,7 @@ async function persistLiveFailure(
 function syncErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
   const code = message.match(
-    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+)(?=:|$)/
+    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
   )?.[1];
   return code ?? 'SYNC_FAILED';
 }
@@ -677,6 +686,11 @@ function shouldEnqueueObservation(enqueuedAtMs: number): boolean {
 
 function shouldEnqueueRatWatch(enqueuedAtMs: number): boolean {
   return Math.floor(enqueuedAtMs / 60_000) % 5 === 0;
+}
+
+export function resolveArcRpcUrl(env: Pick<CloudflareSyncEnv, 'ARC_RPC_URL'>): string {
+  const configured = env.ARC_RPC_URL?.trim();
+  return configured || ARC_PUBLIC_RPC_FALLBACK_URL;
 }
 
 function integerSetting(
