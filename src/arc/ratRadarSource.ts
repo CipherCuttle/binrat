@@ -100,6 +100,10 @@ export class ArcRatRadarSource implements RatRadarSource {
         log.transactionHash === null ||
         log.logIndex === null
       ) throw new Error('RAT_RADAR_INCOMPLETE_SWAP_LOG');
+      if (
+        log.blockNumber === launch.blockNumber &&
+        log.logIndex <= launch.logIndex
+      ) continue;
 
       const args = log.args as Partial<{
         sender: Address;
