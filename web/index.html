@@ -39,7 +39,7 @@
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./evidence-semantics.css" />
     <link rel="stylesheet" href="./share-card.css" />
-    <link rel="stylesheet" href="./launch-presentation.css" />
+    <link rel="stylesheet" href="./launch-presentation.css" />\n    <link rel="stylesheet" href="./binrat-effects.css" />
   </head>
   <body>
     <a class="skip-link" href="#garbage">Skip to the dumpster</a>
@@ -90,7 +90,7 @@
             evidence + a rat.
           </div>
         </div>
-        <figure class="mascot-stage">
+        <figure class="mascot-stage" id="rat-stage" data-rat-state="idle">
           <img
             src="./assets/binrat-hero.webp"
             alt="BINRAT, a cyber-eyed rat, digging through a dumpster of discarded token scraps"
@@ -98,6 +98,18 @@
             height="1100"
             fetchpriority="high"
           />
+          <div class="rat-state-indicator"><span id="rat-state-text">IDLE / LISTENING</span></div>
+          <div class="rat-state-console" aria-label="Living rat visual prototype controls">
+            <div class="prototype-label"><span>RIVE STATE PROTOTYPE</span><b>VISUAL TEST ONLY</b></div>
+            <div class="rat-state-buttons">
+              <button type="button" data-rat-state-button data-state="idle" aria-pressed="true">IDLE</button>
+              <button type="button" data-rat-state-button data-state="sniffing" aria-pressed="false">SNIFF</button>
+              <button type="button" data-rat-state-button data-state="digging" aria-pressed="false">DIG</button>
+              <button type="button" data-rat-state-button data-state="found" aria-pressed="false">RECEIPT</button>
+              <button type="button" data-rat-state-button data-state="repeat" aria-pressed="false">REPEAT HIT</button>
+              <button type="button" data-rat-state-button data-state="offline" aria-pressed="false">OFFLINE</button>
+            </div>
+          </div>
           <div class="stage-status">
             <span>FIELD NOTES / 001</span><span>THE RESIDENT</span>
           </div>
@@ -358,6 +370,6 @@
       ><a href="#top">BACK TO SURFACE ↑</a>
     </footer>
     <script type="module" src="./app.js"></script>
-    <script type="module" src="./react-bits-island.js"></script>
+    <script type="module" src="./react-bits-island.js"></script>\n    <script type="module" src="./binrat-effects.js"></script>
   </body>
 </html>
