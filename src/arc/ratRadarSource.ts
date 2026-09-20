@@ -65,17 +65,17 @@ export class ArcRatRadarSource implements RatRadarSource {
 
     const pool = launch.pool as Address;
     const [token0Raw, token1Raw] = await Promise.all([
+      // V3 pool token ordering is immutable. Read current identity instead of pinning these
+      // calls to an old historical block; historical evidence remains bound by log block hashes.
       this.client.readContract({
         address: pool,
         abi: poolAbi,
-        functionName: 'token0',
-        blockNumber: toBlock
+        functionName: 'token0'
       }),
       this.client.readContract({
         address: pool,
         abi: poolAbi,
-        functionName: 'token1',
-        blockNumber: toBlock
+        functionName: 'token1'
       })
     ]);
     const token0 = token0Raw.toLowerCase() as Hex;
