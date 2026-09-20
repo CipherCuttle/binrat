@@ -39,7 +39,7 @@
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./evidence-semantics.css" />
     <link rel="stylesheet" href="./share-card.css" />
-    <link rel="stylesheet" href="./launch-presentation.css" />\n    <link rel="stylesheet" href="./binrat-effects.css" />
+    <link rel="stylesheet" href="./launch-presentation.css" />\n    <link rel="stylesheet" href="./binrat-effects.css" />\n    <link rel="stylesheet" href="./rat-machine-demo.css" />
   </head>
   <body>
     <a class="skip-link" href="#garbage">Skip to the dumpster</a>
@@ -120,6 +120,69 @@
           <span class="stage-corner" aria-hidden="true"></span>
         </figure>
       </section>
+      <section id="rat-machine-demo" class="shell rat-machine-section" aria-labelledby="rat-machine-title">
+        <div class="rat-machine-heading">
+          <div>
+            <p class="eyebrow">EXPERIMENT / THE RAT OPERATES THE MACHINE</p>
+            <h2 id="rat-machine-title">RAT<br />MACHINE.</h2>
+          </div>
+          <p>
+            A tactile Rive-direction prototype: sniff indexed evidence, dispatch the rat,
+            and physically print a receipt. The machine visualizes evidence state; it does
+            not create new claims.
+          </p>
+        </div>
+        <div class="rat-machine">
+          <span class="machine-demo-tag">VISUAL PROTOTYPE / FIXTURE SAFE</span>
+          <div class="rat-machine-topline"></div>
+          <div class="rat-machine-grid">
+            <div class="sniffer-bay">
+              <div class="instrument-label">
+                <span>01 / RECURRENCE SNIFFER</span><strong>NO PRICE SIGNAL</strong>
+              </div>
+              <div class="crt-shell">
+                <div class="scope-readout"><span>ADDRESS SPECTRUM</span><span id="scope-target" class="scope-target">TARGET // —</span></div>
+                <canvas id="rat-scope" aria-label="Animated recurrence signal scope"></canvas>
+              </div>
+              <div class="machine-controls">
+                <div id="scope-candidates" class="scope-candidates" aria-label="Fixture evidence targets"></div>
+                <div class="machine-knob-wrap" role="button" tabindex="0" aria-label="Cycle recurrence target">
+                  <div id="machine-knob" class="machine-knob" aria-hidden="true"></div>
+                  <span>SNIFFER<br />GAIN</span>
+                </div>
+                <div class="machine-lever-wrap">
+                  <button id="machine-lever" class="machine-lever" type="button" aria-label="Dispatch rat and print selected evidence receipt"></button>
+                  <span>DISPATCH<br />RAT</span>
+                </div>
+              </div>
+              <p id="machine-message" class="machine-message">MACHINE WARMING // WAITING FOR INDEX</p>
+            </div>
+            <div class="printer-bay">
+              <div class="instrument-label">
+                <span>02 / RECEIPT PRINTER</span><strong>EVIDENCE OUT</strong>
+              </div>
+              <div class="printer-box" id="printer-box">
+                <div class="machine-rat-perch" aria-hidden="true"></div>
+                <div class="printer-head">
+                  <span>BR-THERMAL / 01</span>
+                  <span class="printer-led">READY</span>
+                </div>
+                <div class="printer-slot" aria-hidden="true"></div>
+                <div class="receipt-viewport">
+                  <article id="machine-receipt" class="machine-receipt" aria-live="polite">
+                    <div class="receipt-logo"><span>BINRAT / RECEIPT</span><span>ARC 5042</span></div>
+                    <div class="receipt-title">WAITING.</div>
+                    <div class="receipt-verdict">PULL THE RED LEVER.<br />THE RAT WILL FETCH THE RECORD.</div>
+                    <div class="receipt-foot">VISUAL PROTOTYPE // NO NEW EVIDENCE AUTHORITY</div>
+                  </article>
+                </div>
+                <div class="print-prompt">SELECT AN ADDRESS → PULL LEVER → WATCH THE RAT FETCH THE RECEIPT</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div id="rat-runner" class="rat-runner" aria-hidden="true"><img src="./assets/binrat-hero.webp" alt="" /></div>
       <div
         class="shell intake-strip"
         id="latest-bag"
@@ -370,6 +433,6 @@
       ><a href="#top">BACK TO SURFACE ↑</a>
     </footer>
     <script type="module" src="./app.js"></script>
-    <script type="module" src="./react-bits-island.js"></script>\n    <script type="module" src="./binrat-effects.js"></script>
+    <script type="module" src="./react-bits-island.js"></script>\n    <script type="module" src="./binrat-effects.js"></script>\n    <script type="module" src="./rat-machine-demo.js"></script>
   </body>
 </html>
