@@ -107,6 +107,29 @@ test('Arc Rat Radar source ignores same-block Swap logs at or before the ArcPad 
   assert.equal(receipts[0]?.logIndex, launch.logIndex + 1);
 });
 
+
+test('Arc Rat Radar source reads immutable pool identity from current state, not historical state', async () => {
+  const launch = await makeLaunch();
+  const seen: Array<{ functionName: string; blockNumber?: bigint }> = [];
+  const client = {
+    async getChainId() { return CHAIN_ID; },
+    async readContract(args: { functionName: string; blockNumber?: bigint }) {
+      seen.push(args);
+      if (args.functionName === 'token0') return launch.token;
+      if (args.functionName === 'token1') return address(99);
+      throw new Error('unexpected read');
+    },
+    async getLogs() { return []; }
+  } as unknown as PublicClient;
+
+  const source = new ArcRatRadarSource({ client });
+  await source.catchUp(launch, launch.blockNumber, launch.blockNumber + 25_000n);
+
+  assert.equal(seen.length, 2);
+  assert.deepEqual(seen.map((item) => item.functionName).sort(), ['token0', 'token1']);
+  assert.ok(seen.every((item) => item.blockNumber === undefined));
+});
+
 test('Arc Rat Radar source rejects a pool whose token pair does not contain the launched token', async () => {
   const launch = await makeLaunch();
   const client = {
