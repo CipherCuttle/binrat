@@ -22,6 +22,63 @@ export async function loadDumpsterFeed() {
   return adaptPublicFeed(await response.json());
 }
 
+export async function loadDumpsterLedger() {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  const response = await fetch("/api/dumpster-ledger", {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("DUMPSTER_LEDGER_NOT_AVAILABLE");
+  const value = await response.json();
+  const statuses = [
+    "TREASURY_AUTHORITY_NOT_CONFIGURED",
+    "TREASURY_AUTHORITY_INVALID",
+    "FUNDING_OBSERVATION_SOURCE_NOT_IMPLEMENTED",
+  ];
+  const rawAmount = (candidate) =>
+    typeof candidate === "string" && /^(0|[1-9][0-9]*)$/.test(candidate);
+  const utility = (candidate) =>
+    Array.isArray(candidate) &&
+    candidate.every(
+      (item) =>
+        typeof item?.capability === "string" &&
+        typeof item.engineeringStatus === "string" &&
+        typeof item.deploymentStatus === "string" &&
+        typeof item.publicStatus === "string",
+    );
+  if (
+    value?.schemaVersion !== "binrat.dumpster-ledger/0.1" ||
+    value.projectionVersion !== "BINRAT_DUMPSTER_LEDGER_V0" ||
+    value.chainId !== 5042 ||
+    !["PRE_LAUNCH_NO_FUNDING_AUTHORITY", "FAIL_CLOSED"].includes(
+      value.accountingState,
+    ) ||
+    value.fundingAuthority?.accountingEnabled !== false ||
+    !statuses.includes(value.fundingAuthority.status) ||
+    !Array.isArray(value.fundingAuthority.creatorFeeRecipients) ||
+    !Array.isArray(value.fundingAuthority.treasuryAddresses) ||
+    !Number.isSafeInteger(value.totals?.entryCount) ||
+    !Number.isSafeInteger(value.totals?.inflowEntryCount) ||
+    !Number.isSafeInteger(value.totals?.outflowEntryCount) ||
+    !rawAmount(value.totals?.tokenInflowsRaw) ||
+    !rawAmount(value.totals?.tokenOutflowsRaw) ||
+    !Array.isArray(value.entries) ||
+    value.entries.length !== value.totals.entryCount ||
+    value.utilityStatus?.source !== "CAPABILITY_MANIFEST" ||
+    !utility(value.utilityStatus.shipped) ||
+    !utility(value.utilityStatus.building) ||
+    !utility(value.utilityStatus.planned) ||
+    typeof value.explanation !== "string" ||
+    typeof value.evidenceBoundary !== "string" ||
+    typeof value.receipt?.receiptId !== "string" ||
+    !value.receipt.receiptId.startsWith("binrat-dumpster-ledger:")
+  ) {
+    throw new Error("DUMPSTER_LEDGER_INVALID");
+  }
+  return value;
+}
+
 export function adaptPublicFeed(feed) {
   if (
     feed?.schemaVersion !== "binrat.public-feed/0.1" ||

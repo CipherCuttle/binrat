@@ -101,6 +101,12 @@ The public funding surface should expose, where operationally safe:
 
 The point is not to pretend the project has no funding motive. The point is to make the funding mechanics legible.
 
+Dumpster Ledger V0 is implemented as an immutable, receipt-bound projection over four separate layers: canonical funding configuration, observed transactions, conservative categorization, and public presentation. Production configuration validates chain, token, role-address uniqueness, effective block, and policy versions. A valid configuration still cannot activate accounting until a reviewed observation source exists.
+
+The pre-launch transparency surface is live at `GET /api/dumpster-ledger`. Because `$BINRAT` has not launched and no canonical token, fee recipient, or treasury authority is configured, it truthfully returns `PRE_LAUNCH_NO_FUNDING_AUTHORITY`, zero production entries/inflows/outflows, no configured wallets, and the shipped/building/planned utility state derived from the capability manifest. Test fixtures exercise future inflow/outflow behavior but are explicitly labeled and cannot enter the production projection. No explorer URL convention is manufactured before it is frozen.
+
+Status: `ENGINEERING_PASS / CLOUDFLARE_LIVE_VERIFIED / PRE_LAUNCH_TRANSPARENCY_LIVE`. Production funding authority remains `TREASURY_AUTHORITY_NOT_CONFIGURED`, production accounting remains disabled, and `dumpster_ledger_bootstrap` remains a required launch artifact until canonical funding authority and live transaction observation are accepted.
+
 ### Rat Den V0 — optional / post-launch
 
 Rat Den is an optional community/product surface and is **not a Launch V0 blocker**.

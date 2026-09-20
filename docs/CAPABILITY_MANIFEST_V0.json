@@ -44,8 +44,20 @@
       }
     },
     "dumpsterLedger": {
-      "engineeringStatus": "PLANNED",
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PRE_LAUNCH_TRANSPARENCY_LIVE",
+      "endpoint": "/api/dumpster-ledger",
+      "productionFundingAuthority": "TREASURY_AUTHORITY_NOT_CONFIGURED",
+      "productionAccountingActive": false,
+      "configuredWalletCount": 0,
+      "liveAcceptance": {
+        "status": "PASS",
+        "accountingState": "PRE_LAUNCH_NO_FUNDING_AUTHORITY",
+        "entryCount": 0,
+        "tokenInflowsRaw": "0",
+        "tokenOutflowsRaw": "0"
+      }
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",

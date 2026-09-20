@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
+import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
+import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
 import { projectBagIntelligence } from '../public/bagIntelligence.js';
 import { projectCreatorFile } from '../public/creatorFile.js';
 import { projectPublicFeed } from '../public/project.js';
@@ -41,6 +43,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   DB: D1DatabaseLike;
   SYNC_QUEUE?: SyncQueueProducerLike;
   CAPABILITY_MANIFEST_JSON?: string;
+  BINRAT_FUNDING_CONFIG_JSON?: string;
   BINRAT_HOLDER_WALLET_AUTH_ENABLED?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
@@ -177,6 +180,7 @@ export async function handleBinratApiRequest(
   try {
     if (pathname === '/api/capabilities') return capabilities(env);
     if (pathname === '/api/health') return health(env);
+    if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
 
     const ready = await readyContext(env);
     if (!ready) return json(503, { ready: false, reason: 'INDEX_NOT_READY' });
@@ -751,6 +755,13 @@ function capabilities(env: BinratWorkerEnv): Response {
   return manifest
     ? json(200, manifest)
     : json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
+}
+
+async function dumpsterLedger(env: BinratWorkerEnv): Promise<Response> {
+  const manifest = readManifest(env);
+  if (!manifest) return json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
+  const funding = resolveProductionFundingConfig(env.BINRAT_FUNDING_CONFIG_JSON, ARC_CHAIN_ID);
+  return json(200, await projectDumpsterLedger(manifest, funding, [], 'PRODUCTION'));
 }
 
 function readManifest(env: BinratWorkerEnv) {

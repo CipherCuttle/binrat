@@ -6,6 +6,8 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { ArcPadLaunchSource } from './arc/arcpadSource.js';
 import { ArcObservationSource } from './arc/observationSource.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from './arc/chain.js';
+import { resolveProductionFundingConfig } from './dumpsterLedger/config.js';
+import { projectDumpsterLedger } from './dumpsterLedger/project.js';
 import { syncLaunches, type SyncOptions } from './indexer/syncLaunches.js';
 import { syncHistoricalLaunches } from './indexer/syncHistoricalLaunches.js';
 import { syncObservations } from './observations/syncObservations.js';
@@ -14,6 +16,7 @@ import { projectCreatorFile } from './public/creatorFile.js';
 import { projectBagIntelligence } from './public/bagIntelligence.js';
 import { projectReplayBundle } from './public/replayBundle.js';
 import { SqliteStore } from './store/sqliteStore.js';
+import { validateCapabilityManifest } from './telegram/rat.js';
 
 // Source and compiled entrypoints both resolve the same repo-owned web directory.
 const here = dirname(fileURLToPath(import.meta.url));
@@ -163,6 +166,17 @@ const server = createServer(async (request, response) => {
     if (pathname === '/api/capabilities') {
       const manifest = JSON.parse(readFileSync(capabilityManifestPath, 'utf8')) as unknown;
       json(response, 200, manifest);
+      return;
+    }
+    if (pathname === '/api/dumpster-ledger') {
+      const manifest = validateCapabilityManifest(
+        JSON.parse(readFileSync(capabilityManifestPath, 'utf8')) as unknown
+      );
+      const funding = resolveProductionFundingConfig(
+        process.env.BINRAT_FUNDING_CONFIG_JSON,
+        ARC_CHAIN_ID
+      );
+      json(response, 200, await projectDumpsterLedger(manifest, funding, [], 'PRODUCTION'));
       return;
     }
     if (pathname === '/api/health') {

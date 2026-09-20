@@ -1,4 +1,4 @@
-import { loadDumpsterFeed, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadDumpsterLedger, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
 const grid = document.querySelector("#garbage-grid");
@@ -72,6 +72,7 @@ const pageSurfaces = [
   ),
 ];
 
+void bootstrapLedger();
 await bootstrap();
 if (WEB_DATA_SOURCE_MODE === "LIVE") {
   let checking = false;
@@ -117,6 +118,55 @@ async function bootstrap() {
   } catch (error) {
     renderUnavailable(error);
   }
+}
+
+async function bootstrapLedger() {
+  const section = document.querySelector("#dumpster-ledger");
+  try {
+    const ledger = await loadDumpsterLedger();
+    if (!ledger) {
+      section.dataset.ledgerState = "FIXTURE_MODE";
+      document.querySelector("#ledger-funding-status").textContent =
+        "LIVE FUNDING STATE HIDDEN IN FIXTURE MODE";
+      return;
+    }
+    section.dataset.ledgerState = ledger.accountingState;
+    document.querySelector("#ledger-funding-status").textContent =
+      ledger.fundingAuthority.status;
+    document.querySelector("#ledger-token-state").textContent = ledger.tokenState;
+    document.querySelector("#ledger-wallet-status").textContent =
+      ledger.fundingAuthority.creatorFeeRecipients.length === 0 &&
+      ledger.fundingAuthority.treasuryAddresses.length === 0
+        ? "NOT CONFIGURED"
+        : `${ledger.fundingAuthority.creatorFeeRecipients.length} FEE / ${ledger.fundingAuthority.treasuryAddresses.length} TREASURY`;
+    document.querySelector("#ledger-money-in").textContent =
+      `${ledger.totals.tokenInflowsRaw} RAW / ${ledger.totals.inflowEntryCount} ENTRIES`;
+    document.querySelector("#ledger-money-out").textContent =
+      `${ledger.totals.tokenOutflowsRaw} RAW / ${ledger.totals.outflowEntryCount} ENTRIES`;
+    document.querySelector("#ledger-receipt").textContent =
+      ledger.entries.length === 0
+        ? `${ledger.receipt.receiptId} / NO PRODUCTION ENTRIES`
+        : `${ledger.receipt.receiptId} / ${ledger.entries.length} ENTRIES`;
+    document.querySelector("#ledger-explanation").textContent = ledger.explanation;
+    document.querySelector("#ledger-boundary").textContent =
+      ledger.evidenceBoundary;
+    renderUtility("#ledger-shipped", ledger.utilityStatus.shipped);
+    renderUtility("#ledger-building", ledger.utilityStatus.building);
+    renderUtility("#ledger-planned", ledger.utilityStatus.planned);
+  } catch (error) {
+    section.dataset.ledgerState = "FAIL_CLOSED";
+    document.querySelector("#ledger-funding-status").textContent =
+      "PUBLIC LEDGER UNAVAILABLE / FAIL CLOSED";
+    document.querySelector("#ledger-explanation").textContent =
+      "The funding projection could not be verified. No wallet or balance is being presented as production truth.";
+    console.error(error);
+  }
+}
+
+function renderUtility(selector, items) {
+  document.querySelector(selector).textContent = items.length
+    ? items.map((item) => `${item.capability} / ${item.publicStatus}`).join(" · ")
+    : "NONE DECLARED";
 }
 
 function renderUnavailable(error) {

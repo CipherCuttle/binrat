@@ -20,6 +20,7 @@ const requiredHtml = [
   'INDEX CONNECTING',
   'THE DUMPSTER',
   'HOW HE DIGS',
+  'DUMPSTER LEDGER',
   'CLAIM BOUNDARY',
   'He gets the scraps.',
   'You get the receipts.',
@@ -44,11 +45,15 @@ if (/^\s*creator\s*:/m.test(fixtures)) throw new Error('WEB_AMBIGUOUS_CREATOR_FI
 if (!dataSource.includes('get("fixtures") === "1"')) throw new Error('WEB_EXPLICIT_FIXTURE_MODE_MISSING');
 if (!dataSource.includes('import("./fixtures.js")')) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
 if (!dataSource.includes('fetch("/api/feed"')) throw new Error('WEB_LIVE_SOURCE_MISSING');
+if (!dataSource.includes('fetch("/api/dumpster-ledger"')) throw new Error('WEB_DUMPSTER_LEDGER_SOURCE_MISSING');
+if (!dataSource.includes('TREASURY_AUTHORITY_NOT_CONFIGURED')) throw new Error('WEB_DUMPSTER_LEDGER_FAIL_CLOSED_STATE_MISSING');
 if (!dataSource.includes('schemaVersion !== "binrat.public-feed/0.1"')) throw new Error('WEB_SCHEMA_VALIDATION_MISSING');
 if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
+if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
+if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
 if (!app.includes('from "./share-card.js"')) throw new Error('WEB_SHARE_CARD_BOUNDARY_BYPASSED');
 if (!app.includes('!["FIXTURE", "LIVE"].includes(feed?.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
