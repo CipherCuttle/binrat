@@ -82,7 +82,11 @@ Replay Lab demonstrates BINRAT's evidence moat without waiting for fresh launch 
 - copyable receipt/evidence bundle;
 - missing stages remain missing rather than simulated.
 
-The current implementation candidate lives in draft PR #13. It is a pre-launch proof surface, not a claim that the later Rat Machine roadmap is complete.
+The implementation originated in draft PR #13 and is now reconciled into the current Cloudflare/D1 stack without merging that PR. Live acceptance on 2026-09-21 verified launch `01f1eb8fe5acede475ce7f09bad73962cbb3279deb1e50f7e7c2746bcd28d85f` through genuine COMPLETE 5m, 1h, and 24h observation receipts at `GET /api/bag/:bagId/replay`.
+
+Replay Lab is `ENGINEERING_PASS / CLOUDFLARE_LIVE_VERIFIED / PUBLIC_LIVE_BETA`. The response binds the canonical checkpoint block/hash, launch and Creator File authority, observation identifiers/digests, chronological maturation targets, explicit available/missing horizons, and no-lookahead boundaries. Global history coverage remains `UNVERIFIED` while deep backfill is incomplete; Replay Lab does not upgrade that claim.
+
+This remains a pre-launch proof surface, not a claim that the later Rat Machine roadmap is complete.
 
 ### Dumpster Ledger
 

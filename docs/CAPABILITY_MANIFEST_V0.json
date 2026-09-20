@@ -1,6 +1,6 @@
 {
   "schemaVersion": "binrat.capability-manifest/0.1",
-  "updatedAt": "2026-09-19",
+  "updatedAt": "2026-09-21",
   "doctrine": {
     "roadmap": "docs/ROADMAP_V0.md",
     "philosophy": "docs/PHILOSOPHY.md",
@@ -15,11 +15,19 @@
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "replayLab": {
-      "engineeringStatus": "BUILDING",
+      "engineeringStatus": "ENGINEERING_PASS",
       "candidatePr": 13,
       "candidateHead": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
-      "deploymentStatus": "NOT_VERIFIED",
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PUBLIC_LIVE_BETA",
+      "endpoint": "/api/bag/:bagId/replay",
+      "liveAcceptance": {
+        "status": "PASS",
+        "launchId": "01f1eb8fe5acede475ce7f09bad73962cbb3279deb1e50f7e7c2746bcd28d85f",
+        "availableHorizons": ["5m", "1h", "24h"],
+        "observationCoverage": "COMPLETE",
+        "historyCoverage": "UNVERIFIED"
+      }
     },
     "telegramRatV0": {
       "engineeringStatus": "ENGINEERING_PASS",
