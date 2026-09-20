@@ -24,12 +24,16 @@ jobs:
           node-version: 20
       - run: pnpm install --frozen-lockfile=false
       - name: Finalize matured 72-hour window
-        run: pnpm experiment:finalize | tee hot-garbage-v0-result.json
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm experiment:finalize 2>&1 | tee hot-garbage-v0-result.json
         env:
           ARC_RPC_URL: https://rpc.arc-scan.org
           BINRAT_ARCPAD_CATCHUP_TIMEOUT_MS: '300000'
           BINRAT_EXPERIMENT_BATCH_BLOCKS: '2000'
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: hot-garbage-v0-result
           path: hot-garbage-v0-result.json
