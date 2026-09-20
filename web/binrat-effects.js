@@ -14,7 +14,17 @@ try {
 
 function fallbackAnimate(element, keyframes, options = {}) {
   if (!element?.animate) return null;
-  const frames = Array.isArray(keyframes) ? keyframes : [keyframes];
+  let frames = keyframes;
+  if (!Array.isArray(keyframes)) {
+    const entries = Object.entries(keyframes ?? {});
+    const count = Math.max(1, ...entries.map(([, value]) => Array.isArray(value) ? value.length : 1));
+    frames = Array.from({ length: count }, (_, index) =>
+      Object.fromEntries(entries.map(([property, value]) => [
+        property,
+        Array.isArray(value) ? value[Math.min(index, value.length - 1)] : value,
+      ])),
+    );
+  }
   return element.animate(frames, {
     duration: Math.round((options.duration ?? .35) * 1000),
     easing: typeof options.ease === "string" ? options.ease : "ease-out",
