@@ -166,6 +166,23 @@ test('entry validation rejects wrong chain, authority, direction and ambiguous a
     buildDumpsterLedgerEntry(config, entry({ tokenAddress: VENDOR })),
     /DUMPSTER_LEDGER_ASSET_AUTHORITY_MISMATCH/
   );
+  await assert.rejects(
+    buildDumpsterLedgerEntry(config, entry({ from: TREASURY, to: FEE })),
+    /DUMPSTER_LEDGER_INTERNAL_TRANSFER_UNCLASSIFIED/
+  );
+  await assert.rejects(
+    buildDumpsterLedgerEntry(config, entry({
+      direction: 'OUTFLOW', fundingRole: 'PROJECT_EXPENSE', category: 'PROJECT_EXPENSE',
+      from: TREASURY, to: FEE
+    })),
+    /DUMPSTER_LEDGER_INTERNAL_TRANSFER_UNCLASSIFIED/
+  );
+  await assert.rejects(
+    buildDumpsterLedgerEntry(config, {
+      ...entry({}), assetType: 'UNSUPPORTED' as DumpsterLedgerEntryInput['assetType']
+    }),
+    /DUMPSTER_LEDGER_ENTRY_INVALID/
+  );
   for (const amountRaw of ['-0', '-1', '00', '01', '1.0']) {
     await assert.rejects(
       buildDumpsterLedgerEntry(config, entry({ amountRaw })),

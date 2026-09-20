@@ -140,6 +140,7 @@ function validateEntryInput(config: CanonicalFundingConfig, input: DumpsterLedge
     !/^0x[0-9a-fA-F]{40}$/.test(input.to) ||
     !Number.isSafeInteger(input.logIndex) ||
     input.logIndex < 0 ||
+    !['NATIVE', 'ERC20'].includes(input.assetType) ||
     !/^(0|[1-9][0-9]*)$/.test(input.amountRaw)
   ) throw new Error('DUMPSTER_LEDGER_ENTRY_INVALID');
   if (
@@ -151,6 +152,7 @@ function validateEntryInput(config: CanonicalFundingConfig, input: DumpsterLedge
   const to = input.to.toLowerCase();
   const feeRecipients = new Set(config.creatorFeeRecipients);
   const treasuries = new Set(config.treasuryAddresses);
+  const fundingAuthorities = new Set([...feeRecipients, ...treasuries]);
   const authorityValid =
     (input.direction === 'INFLOW' && input.fundingRole === 'CREATOR_FEE' && feeRecipients.has(to as Hex)) ||
     (input.direction === 'INFLOW' && input.fundingRole === 'TREASURY' && treasuries.has(to as Hex)) ||
@@ -158,6 +160,14 @@ function validateEntryInput(config: CanonicalFundingConfig, input: DumpsterLedge
       (input.fundingRole === 'PROJECT_EXPENSE' || input.fundingRole === 'OTHER_DISCLOSED') &&
       treasuries.has(from as Hex));
   if (!authorityValid) throw new Error('DUMPSTER_LEDGER_FUNDING_AUTHORITY_MISMATCH');
+  if (
+    (input.direction === 'INFLOW' && fundingAuthorities.has(from as Hex)) ||
+    (input.direction === 'OUTFLOW' && fundingAuthorities.has(to as Hex))
+  ) {
+    // Moving value between declared project wallets is neither money in nor money
+    // out. V0 rejects it rather than booking both sides or guessing its purpose.
+    throw new Error('DUMPSTER_LEDGER_INTERNAL_TRANSFER_UNCLASSIFIED');
+  }
 
   const expectedCategory: Record<FundingRole, LedgerCategory> = {
     CREATOR_FEE: 'CREATOR_FEE_RECEIPT',

@@ -33,6 +33,8 @@ Configuration alone never activates production accounting. V0 has no production 
 
 Known role/category combinations are enforced. When business intent is not deterministically known, the category stays `UNCATEGORIZED`. The projection recomputes entry integrity and totals rather than trusting presentation values. No address is inferred to be privileged merely from activity.
 
+Transfers between two declared project funding addresses are rejected from the V0 inflow/outflow book. They are internal routing, not new money in or project money out, and booking them as either would inflate totals. A later schema may add a non-accounting internal-transfer view once canonical routes exist.
+
 Arc explorer link conventions are not frozen in this repository, so link fields remain `null` instead of manufacturing a misleading URL. The raw transaction and address authorities remain copyable whenever real entries eventually exist.
 
 ## Fixture boundary
