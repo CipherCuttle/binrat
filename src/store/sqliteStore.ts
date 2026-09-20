@@ -54,6 +54,15 @@ export class SqliteStore implements LaunchStore {
     return row ? fromLaunchRow(row) : null;
   }
 
+  async listLaunches(): Promise<LaunchObserved[]> {
+    const rows = this.db.prepare(`
+      SELECT * FROM launches
+      WHERE chain_id = ?
+      ORDER BY CAST(block_number AS INTEGER), log_index, launch_id
+    `).all(this.chainId) as LaunchRow[];
+    return rows.map(fromLaunchRow);
+  }
+
   async listLaunchesMissingProvenance(): Promise<LaunchObserved[]> {
     const rows = this.db.prepare(`
       SELECT l.* FROM launches l

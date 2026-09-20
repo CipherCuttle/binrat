@@ -1,0 +1,40 @@
+name: hot-garbage-finalize
+
+on:
+  push:
+    branches: [experiment/72h-hot-garbage-v0]
+    paths:
+      - .github/workflows/hot-garbage-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: pnpm install --frozen-lockfile=false
+      - name: Finalize matured 72-hour window
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm experiment:finalize 2>&1 | tee hot-garbage-v0-result.json
+        env:
+          ARC_RPC_URL: https://rpc.mainnet.arc.io
+          BINRAT_ARCPAD_CATCHUP_TIMEOUT_MS: '300000'
+          BINRAT_EXPERIMENT_BATCH_BLOCKS: '1000'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hot-garbage-v0-result
+          path: hot-garbage-v0-result.json
+          if-no-files-found: error
