@@ -29,7 +29,7 @@ jobs:
           set -o pipefail
           pnpm experiment:finalize 2>&1 | tee hot-garbage-v0-result.json
         env:
-          ARC_RPC_URL: https://rpc.nodeflare.app/arc/public
+          ARC_RPC_URL: https://5042.rpc.thirdweb.com
           BINRAT_ARCPAD_CATCHUP_TIMEOUT_MS: '300000'
           BINRAT_EXPERIMENT_BATCH_BLOCKS: '2000'
       - uses: actions/upload-artifact@v4
