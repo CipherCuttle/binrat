@@ -1,0 +1,570 @@
+/* BINRAT Rat Machine demo
+   Experimental visual branch: hacked scope + receipt printer + travelling rat actor.
+   This layer owns no evidence semantics. */
+
+.rat-state-console { display: none !important; }
+
+.rat-machine-section {
+  margin: 34px auto 58px;
+  padding: 0;
+}
+
+.rat-machine-heading {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 20px;
+  align-items: end;
+  padding: 0 0 14px;
+  border-bottom: 1px solid rgba(232,222,197,.22);
+}
+
+.rat-machine-heading h2 {
+  margin: 3px 0 0;
+  font-size: clamp(30px,5vw,64px);
+  line-height: .88;
+  letter-spacing: -.045em;
+}
+
+.rat-machine-heading p:last-child {
+  max-width: 430px;
+  margin: 0;
+  color: rgba(232,222,197,.62);
+  font: 11px/1.55 "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: .045em;
+}
+
+.rat-machine {
+  position: relative;
+  margin-top: 16px;
+  border: 1px solid rgba(232,222,197,.24);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.025),transparent 14%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 8px),
+    #111510;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.72), 0 18px 70px rgba(0,0,0,.25);
+  overflow: hidden;
+}
+
+.rat-machine::before {
+  content: "BINRAT // FIELD MACHINE 04";
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 3;
+  color: rgba(232,222,197,.52);
+  font: 9px/1 "IBM Plex Mono", monospace;
+  letter-spacing: .12em;
+}
+
+.rat-machine-topline {
+  min-height: 35px;
+  border-bottom: 1px solid rgba(232,222,197,.16);
+  background: linear-gradient(90deg,rgba(183,255,90,.06),transparent 35%,rgba(255,79,49,.035));
+}
+
+.rat-machine-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1.45fr) minmax(310px,.75fr);
+  min-height: 545px;
+}
+
+.sniffer-bay {
+  position: relative;
+  padding: 28px 26px 26px;
+  border-right: 1px solid rgba(232,222,197,.16);
+}
+
+.instrument-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(232,222,197,.58);
+  font: 9px/1 "IBM Plex Mono", monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.instrument-label strong {
+  color: #b7ff5a;
+  font-weight: 500;
+}
+
+.crt-shell {
+  position: relative;
+  margin-top: 13px;
+  height: 286px;
+  padding: 14px;
+  border: 1px solid rgba(166,196,139,.26);
+  border-radius: 9px 9px 7px 7px;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(127,202,88,.055),transparent 63%),
+    linear-gradient(180deg,#080c08,#050705);
+  box-shadow:
+    inset 0 0 30px rgba(80,160,70,.08),
+    inset 0 0 0 5px #171c15,
+    0 6px 0 #070807;
+}
+
+.crt-shell::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 2px;
+  background: repeating-linear-gradient(0deg,transparent 0 3px,rgba(191,255,165,.025) 4px);
+  mix-blend-mode: screen;
+}
+
+.crt-shell::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 2px;
+  box-shadow: inset 0 0 34px 9px rgba(0,0,0,.73);
+}
+
+#rat-scope {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.scope-readout {
+  position: absolute;
+  inset: 22px 24px auto;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  font: 9px/1 "IBM Plex Mono", monospace;
+  color: rgba(190,255,157,.66);
+  text-transform: uppercase;
+}
+
+.scope-target {
+  color: #dfffd0;
+}
+
+.machine-controls {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+.scope-candidates {
+  min-width: 0;
+  border: 1px solid rgba(232,222,197,.18);
+  background: rgba(0,0,0,.2);
+  padding: 8px;
+  max-height: 148px;
+  overflow: auto;
+}
+
+.scope-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px minmax(0,1fr) auto;
+  gap: 9px;
+  align-items: center;
+  padding: 7px 5px;
+  border: 0;
+  border-bottom: 1px solid rgba(232,222,197,.08);
+  background: transparent;
+  color: rgba(232,222,197,.78);
+  text-align: left;
+  cursor: pointer;
+  font: 10px/1.15 "IBM Plex Mono", monospace;
+}
+
+.scope-row:last-child { border-bottom: 0; }
+
+.scope-row span:first-child {
+  color: rgba(183,255,90,.58);
+}
+
+.scope-row code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.scope-row b {
+  font-weight: 500;
+  color: rgba(232,222,197,.5);
+}
+
+.scope-row:hover,
+.scope-row[aria-pressed="true"] {
+  color: #b7ff5a;
+  background: rgba(183,255,90,.045);
+}
+
+.machine-knob-wrap,
+.machine-lever-wrap {
+  width: 94px;
+  border: 1px solid rgba(232,222,197,.18);
+  background: rgba(0,0,0,.17);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 10px 8px;
+}
+
+.machine-knob-wrap > span,
+.machine-lever-wrap > span {
+  color: rgba(232,222,197,.5);
+  font: 8px/1.2 "IBM Plex Mono", monospace;
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.machine-knob {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(232,222,197,.45);
+  border-radius: 50%;
+  background:
+    linear-gradient(120deg,rgba(255,255,255,.11),transparent 40%),
+    #171b16;
+  box-shadow: inset 0 0 0 6px #0d100c, 0 3px 0 #050705;
+  position: relative;
+  transform: rotate(-36deg);
+  transition: transform 480ms cubic-bezier(.2,.9,.18,1);
+}
+
+.machine-knob::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 16px;
+  top: 4px;
+  left: calc(50% - 1px);
+  background: #b7ff5a;
+  box-shadow: 0 0 8px rgba(183,255,90,.3);
+}
+
+.machine-knob.scanning {
+  transform: rotate(68deg);
+}
+
+.machine-lever {
+  appearance: none;
+  width: 44px;
+  height: 62px;
+  border: 1px solid rgba(232,222,197,.34);
+  background: #0d110c;
+  position: relative;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 5px #171b15;
+}
+
+.machine-lever::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 8px;
+  width: 5px;
+  height: 33px;
+  background: #bbb39e;
+  transform-origin: bottom center;
+  transform: rotate(-10deg);
+  transition: transform 180ms ease;
+}
+
+.machine-lever::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 6px;
+  width: 19px;
+  height: 13px;
+  border-radius: 50%;
+  background: #7f1f18;
+  border: 1px solid #c84a3e;
+  transition: transform 180ms ease;
+}
+
+.machine-lever:active::before,
+.machine-lever.pulled::before {
+  transform: rotate(18deg) translateY(6px);
+}
+
+.machine-lever:active::after,
+.machine-lever.pulled::after {
+  transform: translate(8px,8px);
+}
+
+.printer-bay {
+  position: relative;
+  padding: 28px 24px 38px;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.017),transparent),
+    #0d110d;
+  overflow: hidden;
+}
+
+.printer-box {
+  position: relative;
+  min-height: 440px;
+  border: 1px solid rgba(232,222,197,.2);
+  background: linear-gradient(180deg,#181c16,#10130f);
+  box-shadow: inset 0 0 0 6px rgba(0,0,0,.22);
+  padding: 18px;
+}
+
+.printer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(232,222,197,.12);
+  color: rgba(232,222,197,.52);
+  font: 9px/1 "IBM Plex Mono", monospace;
+  letter-spacing: .09em;
+}
+
+.printer-led {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b7ff5a;
+}
+
+.printer-led::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.printer-slot {
+  position: relative;
+  z-index: 2;
+  height: 18px;
+  margin: 22px 4px 0;
+  border: 1px solid #050605;
+  border-radius: 2px;
+  background: #020302;
+  box-shadow: inset 0 4px 9px #000, 0 1px 0 rgba(255,255,255,.06);
+}
+
+.printer-slot::before,
+.printer-slot::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #22271f;
+  border: 1px solid #050605;
+}
+
+.printer-slot::before { left: 8px; }
+.printer-slot::after { right: 8px; }
+
+.receipt-viewport {
+  position: relative;
+  height: 318px;
+  overflow: hidden;
+  margin-top: -1px;
+}
+
+.machine-receipt {
+  position: absolute;
+  z-index: 1;
+  top: -310px;
+  left: 9%;
+  width: 82%;
+  min-height: 290px;
+  padding: 20px 18px 28px;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.02) 0 1px,transparent 1px 4px),
+    #ddd4b7;
+  color: #171a15;
+  box-shadow: 0 16px 35px rgba(0,0,0,.42);
+  transform: rotate(.3deg);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.machine-receipt.printed {
+  animation: print-receipt 1.35s cubic-bezier(.22,.7,.22,1) forwards;
+}
+
+.machine-receipt::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 12px;
+  background:
+    linear-gradient(135deg,transparent 0 5px,#ddd4b7 5px 10px,transparent 10px) 0 0/14px 12px repeat-x;
+}
+
+.receipt-logo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  border-bottom: 1px dashed rgba(23,26,21,.55);
+  padding-bottom: 9px;
+}
+
+.receipt-title {
+  margin: 15px 0 12px;
+  font-size: 23px;
+  letter-spacing: -.04em;
+}
+
+.receipt-line {
+  display: grid;
+  grid-template-columns: 98px minmax(0,1fr);
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.receipt-line span { opacity: .55; }
+.receipt-line b,
+.receipt-line code {
+  overflow-wrap: anywhere;
+  font-size: inherit;
+}
+
+.receipt-verdict {
+  margin-top: 14px;
+  border-top: 1px dashed rgba(23,26,21,.55);
+  border-bottom: 1px dashed rgba(23,26,21,.55);
+  padding: 10px 0;
+  font: 700 10px/1.35 "IBM Plex Mono", monospace;
+}
+
+.receipt-foot {
+  margin-top: 10px;
+  font-size: 8px;
+  line-height: 1.45;
+  opacity: .7;
+}
+
+.print-prompt {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 15px;
+  color: rgba(232,222,197,.47);
+  font: 9px/1.45 "IBM Plex Mono", monospace;
+  text-align: center;
+}
+
+.rat-runner {
+  position: fixed;
+  z-index: 9500;
+  width: 112px;
+  height: 112px;
+  pointer-events: none;
+  border-radius: 48% 48% 44% 44%;
+  overflow: hidden;
+  opacity: 0;
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,.48));
+  transform-origin: 50% 80%;
+}
+
+.rat-runner img {
+  width: 190%;
+  height: 190%;
+  max-width: none;
+  object-fit: cover;
+  transform: translate(-24%,-21%);
+}
+
+.rat-runner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 25px 13px #0b0e0a;
+  border-radius: inherit;
+}
+
+.machine-rat-perch {
+  position: absolute;
+  z-index: 5;
+  right: 23px;
+  top: -13px;
+  width: 68px;
+  height: 20px;
+  border-top: 2px solid rgba(232,222,197,.22);
+}
+
+.machine-message {
+  min-height: 18px;
+  margin: 12px 0 0;
+  color: rgba(183,255,90,.72);
+  font: 9px/1.4 "IBM Plex Mono", monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.machine-demo-tag {
+  position: absolute;
+  right: 13px;
+  top: 9px;
+  z-index: 4;
+  border: 1px solid rgba(255,95,64,.34);
+  color: #ff725c;
+  padding: 4px 6px;
+  font: 8px/1 "IBM Plex Mono", monospace;
+  letter-spacing: .08em;
+}
+
+@keyframes print-receipt {
+  0% { top: -310px; }
+  35% { top: -185px; }
+  46% { top: -175px; }
+  72% { top: -42px; }
+  80% { top: -48px; }
+  100% { top: 4px; }
+}
+
+@media (max-width: 900px) {
+  .rat-machine-grid { grid-template-columns: 1fr; }
+  .sniffer-bay { border-right: 0; border-bottom: 1px solid rgba(232,222,197,.16); }
+  .printer-box { min-height: 390px; }
+  .receipt-viewport { height: 280px; }
+}
+
+@media (max-width: 580px) {
+  .rat-machine-heading { grid-template-columns: 1fr; }
+  .rat-machine-heading p:last-child { max-width: none; }
+  .sniffer-bay, .printer-bay { padding: 24px 13px 20px; }
+  .crt-shell { height: 220px; padding: 10px; }
+  .scope-readout { inset: 17px 17px auto; }
+  .machine-controls {
+    grid-template-columns: 1fr 84px 84px;
+    gap: 7px;
+  }
+  .machine-knob-wrap,
+  .machine-lever-wrap { width: auto; }
+  .scope-candidates { max-height: 165px; }
+  .printer-box { padding: 13px; }
+  .machine-receipt { left: 4%; width: 92%; padding: 17px 14px 24px; }
+  .receipt-line { grid-template-columns: 82px minmax(0,1fr); font-size: 8px; }
+  .rat-runner { width: 82px; height: 82px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .machine-receipt.printed { animation-duration: .01ms; }
+  .machine-knob { transition: none; }
+}
