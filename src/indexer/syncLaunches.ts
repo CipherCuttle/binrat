@@ -84,10 +84,12 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
       else duplicates += 1;
       await store.putProvenanceFact(await buildProvenanceFact(launch));
     }
-    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
-    const provenanceFacts = await store.listProvenanceFacts();
-    await store.replaceProvenanceEdges(await projectProvenanceEdges(provenanceFacts));
-    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), factCount: provenanceFacts.length }));
+    if (launches.length > 0) {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      const provenanceFacts = await store.listProvenanceFacts();
+      await store.replaceProvenanceEdges(await projectProvenanceEdges(provenanceFacts));
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), factCount: provenanceFacts.length }));
+    }
 
     const guardBlockNumber = toBlock > options.reorgLookbackBlocks ? toBlock - options.reorgLookbackBlocks : 0n;
     const guardBlockHash = await source.getBlockHash(guardBlockNumber);

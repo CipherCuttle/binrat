@@ -86,6 +86,7 @@ test('historical backfill resumes independently without moving the live checkpoi
     assert.equal(second.scannedStartBlock, 3n);
     assert.equal(second.scannedEndBlock, 4n);
     assert.equal(second.nextBlock, 5n);
+    assert.equal((await store.listProvenanceEdges()).length, 1);
 
     const third = await syncHistoricalLaunches(source, store, {
       startBlock: 1n,

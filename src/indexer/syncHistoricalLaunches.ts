@@ -7,7 +7,7 @@ export interface HistoricalBackfillStore extends LaunchStore {
   commitHistoricalBackfillBatch(
     launches: readonly LaunchObserved[],
     facts: readonly ProvenanceFact[],
-    edges: readonly ProvenanceEdge[],
+    edges: readonly ProvenanceEdge[] | null,
     nextBlock: bigint
   ): Promise<{ inserted: number; duplicates: number }>;
 }
@@ -74,10 +74,20 @@ export async function syncHistoricalLaunches(
   const existingFacts = await store.listProvenanceFacts();
   const mergedFacts = new Map(existingFacts.map((fact) => [fact.factId, fact] as const));
   for (const fact of facts) mergedFacts.set(fact.factId, fact);
-  const edges = await projectProvenanceEdges([...mergedFacts.values()]);
+  const projectedEdges = await projectProvenanceEdges([...mergedFacts.values()]);
+  const existingEdges = await store.listProvenanceEdges();
+  const existingDigests = new Map(existingEdges.map((edge) => [edge.edgeId, edge.evidenceDigest]));
+  const edgesUnchanged = existingEdges.length === projectedEdges.length && projectedEdges.every(
+    (edge) => existingDigests.get(edge.edgeId) === edge.evidenceDigest
+  );
 
   const followingBlock = toBlock + 1n;
-  const committed = await store.commitHistoricalBackfillBatch(launches, facts, edges, followingBlock);
+  const committed = await store.commitHistoricalBackfillBatch(
+    launches,
+    facts,
+    edgesUnchanged ? null : projectedEdges,
+    followingBlock
+  );
 
   return {
     requestedStartBlock: options.startBlock,
