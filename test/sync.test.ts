@@ -98,3 +98,35 @@ test('sync can be hard-bounded to one batch for queue execution', async () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('caught-up sync does not rewrite an unchanged provenance projection', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-provenance-noop-'));
+  const db = join(dir, 'test.sqlite');
+  try {
+    const source = new FakeSource();
+    source.launches = [launch('c1', '0xcccccccccccccccccccccccccccccccccccccccc', 10n, 1)];
+    const store = new SqliteStore(db, chainId);
+    const options = {
+      startBlock: 8n,
+      confirmations: 1n,
+      maxBatchBlocks: 100n,
+      reorgLookbackBlocks: 4n,
+      pollIntervalMs: 100
+    };
+
+    await syncLaunches(source, store, options);
+    const replace = store.replaceProvenanceEdges.bind(store);
+    let replacements = 0;
+    store.replaceProvenanceEdges = async (edges) => {
+      replacements += 1;
+      await replace(edges);
+    };
+
+    const second = await syncLaunches(source, store, options);
+    assert.equal(second.batches, 0);
+    assert.equal(replacements, 0);
+    store.close();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

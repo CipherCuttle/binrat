@@ -42,7 +42,10 @@ export class ArcRatRadarSource implements RatRadarSource {
 
   async assertAuthority(blockNumber: bigint, expectedBlockHash: Hex): Promise<void> {
     await this.assertChain();
-    const block = await this.client.getBlock({ blockNumber });
+    const block = await ratRadarRpc(
+      'ETH_GET_BLOCK',
+      () => this.client.getBlock({ blockNumber })
+    );
     if (!block.hash) throw new Error(`RAT_RADAR_BLOCK_HASH_MISSING:${blockNumber}`);
     if (block.hash.toLowerCase() !== expectedBlockHash.toLowerCase()) {
       throw new Error(`RAT_RADAR_CHECKPOINT_REORG:${blockNumber}`);
@@ -67,16 +70,16 @@ export class ArcRatRadarSource implements RatRadarSource {
     const [token0Raw, token1Raw] = await Promise.all([
       // V3 pool token ordering is immutable. Read current identity instead of pinning these
       // calls to an old historical block; historical evidence remains bound by log block hashes.
-      this.client.readContract({
+      ratRadarRpc('ETH_CALL_TOKEN0', () => this.client.readContract({
         address: pool,
         abi: poolAbi,
         functionName: 'token0'
-      }),
-      this.client.readContract({
+      })),
+      ratRadarRpc('ETH_CALL_TOKEN1', () => this.client.readContract({
         address: pool,
         abi: poolAbi,
         functionName: 'token1'
-      })
+      }))
     ]);
     const token0 = token0Raw.toLowerCase() as Hex;
     const token1 = token1Raw.toLowerCase() as Hex;
@@ -84,13 +87,13 @@ export class ArcRatRadarSource implements RatRadarSource {
       throw new Error(`RAT_RADAR_TOKEN_NOT_IN_POOL:${launch.launchId}`);
     }
 
-    const logs = await this.client.getLogs({
+    const logs = await ratRadarRpc('ETH_GET_LOGS', () => this.client.getLogs({
       address: pool,
       event: swapEvent,
       fromBlock,
       toBlock,
       strict: true
-    });
+    }));
 
     const receipts: RatRadarSwapReceipt[] = [];
     for (const log of logs) {
@@ -149,7 +152,10 @@ export class ArcRatRadarSource implements RatRadarSource {
 
   private assertChain(): Promise<void> {
     if (!this.chainAssertion) {
-      this.chainAssertion = this.client.getChainId().then((actual) => {
+      this.chainAssertion = ratRadarRpc(
+        'ETH_CHAIN_ID',
+        () => this.client.getChainId()
+      ).then((actual) => {
         if (actual !== ARC_CHAIN_ID) {
           throw new Error(`ARC_CHAIN_ID_DRIFT:expected=${ARC_CHAIN_ID}:actual=${actual}`);
         }
@@ -157,6 +163,57 @@ export class ArcRatRadarSource implements RatRadarSource {
     }
     return this.chainAssertion;
   }
+}
+
+async function ratRadarRpc<T>(operation: string, read: () => Promise<T>): Promise<T> {
+  try {
+    return await read();
+  } catch (error) {
+    const text = errorText(error).toLowerCase();
+    let condition = 'RPC_ERROR';
+    if (text.includes('pruned history unavailable')) condition = 'PRUNED_HISTORY';
+    else if (text.includes('requested range too large') || text.includes('ranges over')) {
+      condition = 'RANGE_TOO_LARGE';
+    } else if (text.includes('rate limit') || deepHttpStatus(error) === 429) {
+      condition = 'RATE_LIMITED';
+    }
+    throw new Error(`RAT_RADAR_${operation}_${condition}`);
+  }
+}
+
+function errorText(error: unknown): string {
+  const parts: string[] = [];
+  const seen = new Set<unknown>();
+  let current: unknown = error;
+  for (let depth = 0; depth < 8 && current && !seen.has(current); depth += 1) {
+    seen.add(current);
+    if (current instanceof Error) parts.push(current.message);
+    else if (typeof current === 'object') {
+      const value = current as { message?: unknown; details?: unknown };
+      if (typeof value.message === 'string') parts.push(value.message);
+      if (typeof value.details === 'string') parts.push(value.details);
+    }
+    current = typeof current === 'object'
+      ? (current as { cause?: unknown }).cause
+      : null;
+  }
+  return parts.join(' ');
+}
+
+function deepHttpStatus(error: unknown): number | null {
+  const seen = new Set<unknown>();
+  let current: unknown = error;
+  for (let depth = 0; depth < 8 && current && !seen.has(current); depth += 1) {
+    seen.add(current);
+    if (typeof current === 'object') {
+      const status = (current as { status?: unknown }).status;
+      if (Number.isInteger(status)) return Number(status);
+      current = (current as { cause?: unknown }).cause;
+    } else {
+      current = null;
+    }
+  }
+  return null;
 }
 
 function compareReceipts(a: RatRadarSwapReceipt, b: RatRadarSwapReceipt): number {

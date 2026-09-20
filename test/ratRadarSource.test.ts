@@ -149,6 +149,28 @@ test('Arc Rat Radar source rejects a pool whose token pair does not contain the 
   );
 });
 
+test('Arc Rat Radar source exposes sanitized RPC operation and provider conditions', async () => {
+  const launch = await makeLaunch();
+  const client = {
+    async getChainId() { return CHAIN_ID; },
+    async readContract({ functionName }: { functionName: string }) {
+      if (functionName === 'token0') return launch.token;
+      if (functionName === 'token1') return address(99);
+      throw new Error('unexpected read');
+    },
+    async getLogs() {
+      const cause = new Error('pruned history unavailable; secret endpoint omitted');
+      throw new Error('RPC request failed', { cause });
+    }
+  } as unknown as PublicClient;
+
+  const source = new ArcRatRadarSource({ client });
+  await assert.rejects(
+    () => source.catchUp(launch, launch.blockNumber, launch.blockNumber + 10n),
+    (error: Error) => error.message === 'RAT_RADAR_ETH_GET_LOGS_PRUNED_HISTORY'
+  );
+});
+
 test('Arc Rat Radar authority fails closed on checkpoint hash drift', async () => {
   const client = {
     async getChainId() { return CHAIN_ID; },

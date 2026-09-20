@@ -117,7 +117,51 @@ test('Arc RPC resolver prefers configured authority and otherwise uses the publi
     'https://configured.example/rpc'
   );
   assert.equal(resolveArcRpcUrl({}), ARC_PUBLIC_RPC_FALLBACK_URL);
-  assert.equal(ARC_PUBLIC_RPC_FALLBACK_URL, 'https://rpc.arc-scan.org');
+  assert.equal(ARC_PUBLIC_RPC_FALLBACK_URL, 'https://rpc.mainnet.arc.io');
+});
+
+test('Cloudflare sync persists live authority before subordinate history reads', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const runtime = new D1RuntimeStateStore(db, 5042);
+  const source = new FakeLaunchSource();
+  let observedLiveState = false;
+
+  source.catchUp = async (fromBlock: bigint, toBlock: bigint) => {
+    source.catchUpCalls.push([fromBlock, toBlock]);
+    if (fromBlock === ARCPAD_START_BLOCK) {
+      const state = await runtime.get();
+      observedLiveState = Boolean(
+        state?.sourceVerified &&
+        state.liveCaughtUp &&
+        state.lastSyncError === null &&
+        state.updatedAtMs === 10_000
+      );
+      throw new Error('HISTORY_ARCHIVE_UNAVAILABLE');
+    }
+    return [];
+  };
+
+  try {
+    const result = await runCloudflareSyncCycle(
+      {
+        DB: db,
+        BINRAT_LIVE_LOOKBACK_BLOCKS: '1000',
+        BINRAT_MAX_BATCH_BLOCKS: '1000',
+        BINRAT_CONFIRMATIONS: '2'
+      },
+      message('cycle-live-before-history'),
+      { now: () => 10_000, launchSource: source }
+    );
+
+    assert.deepEqual(result, { status: 'SUCCESS', liveCaughtUp: true });
+    assert.equal(observedLiveState, true);
+    const final = await runtime.get();
+    assert.equal(final?.lastHistoryError, 'HISTORY_ARCHIVE_UNAVAILABLE');
+    assert.equal(final?.updatedAtMs, 10_000);
+  } finally {
+    db.close();
+  }
 });
 
 test('Cloudflare sync cycle catches live window first and advances history in bounded batches', async () => {
@@ -765,4 +809,3 @@ async function makeRadarReceipt(
 function address(seed: number): Hex {
   return `0x${seed.toString(16).padStart(40, '0').slice(-40)}` as Hex;
 }
-

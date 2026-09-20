@@ -66,7 +66,8 @@ const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
-export const ARC_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.arc-scan.org';
+const LIVE_SYNC_LEASE_MS = 120_000;
+export const ARC_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.mainnet.arc.io';
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -217,7 +218,7 @@ export async function runCloudflareSyncCycle(
   const lease = new D1SyncLeaseStore(env.DB);
   const nowMs = deps.now();
   console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_CLAIM_START', cycleId: message.cycleId, nowMs }));
-  if (!(await lease.claim(SYNC_LEASE_NAME, message.cycleId, nowMs))) {
+  if (!(await lease.claim(SYNC_LEASE_NAME, message.cycleId, nowMs, LIVE_SYNC_LEASE_MS))) {
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_BUSY', cycleId: message.cycleId, nowMs }));
     return { status: 'BUSY' };
   }
@@ -298,28 +299,12 @@ export async function runCloudflareSyncCycle(
     let observationReady = previous?.observationReady ?? false;
     let lastObservationError = previous?.lastObservationError ?? null;
 
-    if (liveCaughtUp) {
-      if (historyTarget === null) {
-        historyBackfillComplete = true;
-        lastHistoryError = null;
-      } else if (!historyBackfillComplete) {
-        try {
-          const history = await syncHistoricalLaunches(source, store, {
-            startBlock: ARCPAD_START_BLOCK,
-            endBlock: historyTarget,
-            maxBatchBlocks
-          });
-          historyBackfillComplete = history.complete;
-          lastHistoryError = null;
-        } catch (error) {
-          historyBackfillComplete = false;
-          const code = syncErrorCode(error);
-          lastHistoryError = code === 'SYNC_FAILED' ? 'HISTORY_SYNC_FAILED' : code;
-        }
-      }
-
+    if (liveCaughtUp && historyTarget === null) {
+      historyBackfillComplete = true;
+      lastHistoryError = null;
     }
 
+    const liveUpdatedAtMs = deps.now();
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_WRITE_START', cycleId: message.cycleId }));
     await runtimeStore.put({
       sourceVerified: true,
@@ -332,10 +317,47 @@ export async function runCloudflareSyncCycle(
       lastSyncError: null,
       lastHistoryError,
       lastObservationError,
-      updatedAtMs: deps.now()
+      updatedAtMs: liveUpdatedAtMs
     });
 
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_WRITE_DONE', cycleId: message.cycleId }));
+
+    // Live authority is durable before subordinate history work begins. A slow or failed
+    // archive read must not prevent this cycle from refreshing the public live heartbeat.
+    if (liveCaughtUp && historyTarget !== null && !historyBackfillComplete) {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'HISTORY_SYNC_START', cycleId: message.cycleId }));
+      try {
+        const history = await syncHistoricalLaunches(source, store, {
+          startBlock: ARCPAD_START_BLOCK,
+          endBlock: historyTarget,
+          maxBatchBlocks
+        });
+        historyBackfillComplete = history.complete;
+        lastHistoryError = null;
+        console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'HISTORY_SYNC_DONE', cycleId: message.cycleId, nextBlock: history.nextBlock.toString(), complete: history.complete }));
+      } catch (error) {
+        historyBackfillComplete = false;
+        const code = syncErrorCode(error);
+        lastHistoryError = code === 'SYNC_FAILED' ? 'HISTORY_SYNC_FAILED' : code;
+        console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'HISTORY_SYNC_FAILED', cycleId: message.cycleId, code: lastHistoryError }));
+      }
+
+      await runtimeStore.put({
+        sourceVerified: true,
+        liveCaughtUp,
+        headBlock: liveReport.headBlock,
+        targetBlock: liveReport.targetBlock,
+        observationReady,
+        historyBackfillComplete,
+        historyBackfillTargetBlock: historyTarget,
+        lastSyncError: null,
+        lastHistoryError,
+        lastObservationError,
+        // History completion/error state must not extend live-read authority.
+        updatedAtMs: liveUpdatedAtMs
+      });
+    }
+
     return { status: 'SUCCESS', liveCaughtUp };
   } finally {
     store.close();
@@ -439,15 +461,20 @@ export async function runCloudflareRatRadarCycle(
 
   const lease = new D1SyncLeaseStore(env.DB);
   const nowMs = deps.now();
+  console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'LEASE_CLAIM_START', cycleId: message.cycleId }));
   if (!(await lease.claim(RAT_RADAR_LEASE_NAME, message.cycleId, nowMs))) {
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'LEASE_BUSY', cycleId: message.cycleId }));
     return { status: 'BUSY' };
   }
+  console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'LEASE_CLAIMED', cycleId: message.cycleId }));
 
   const store = new D1Store(env.DB, ARC_CHAIN_ID);
   const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
   try {
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'RUNTIME_READ_START', cycleId: message.cycleId }));
     const runtime = await new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID).get();
     const checkpoint = await store.getCheckpoint();
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'RUNTIME_READ_DONE', cycleId: message.cycleId, checkpointBlock: checkpoint?.blockNumber.toString() ?? null }));
     if (
       !runtime ||
       !checkpoint ||
@@ -466,7 +493,9 @@ export async function runCloudflareRatRadarCycle(
 
     const launches = (await store.listLaunches())
       .filter((launch) => launch.blockNumber <= checkpoint.blockNumber);
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'CURSOR_INITIALIZATION_START', cycleId: message.cycleId, launchCount: launches.length }));
     await radar.ensurePoolCursors(launches, nowMs);
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'CURSOR_INITIALIZATION_DONE', cycleId: message.cycleId }));
 
     const rpcUrl = deps.ratRadarSource ? undefined : resolveArcRpcUrl(env);
     const source = deps.ratRadarSource ?? new ArcRatRadarSource({ rpcUrl });
@@ -478,7 +507,7 @@ export async function runCloudflareRatRadarCycle(
 
     const maxBatchBlocks = BigInt(integerSetting(
       env.BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS,
-      25_000,
+      10_000,
       1,
       250_000
     ));
@@ -496,6 +525,7 @@ export async function runCloudflareRatRadarCycle(
     for (let index = 0; index < maxPools; index += 1) {
       const cursor = await radar.nextPoolCursor(checkpoint.blockNumber, nowMs);
       if (!cursor) break;
+      console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'CURSOR_SELECTED', cycleId: message.cycleId, nextBlock: cursor.nextBlock.toString() }));
       const launch = await store.getLaunch(cursor.launchId);
       if (!launch) return { status: 'RETRY', code: 'RAT_RADAR_CURSOR_LAUNCH_MISSING' };
 
@@ -504,8 +534,11 @@ export async function runCloudflareRatRadarCycle(
         : cursor.nextBlock + maxBatchBlocks - 1n;
 
       try {
+        console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'POOL_READ_START', cycleId: message.cycleId, fromBlock: cursor.nextBlock.toString(), toBlock: toBlock.toString() }));
         const receipts = await source.catchUp(launch, cursor.nextBlock, toBlock);
+        console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'POOL_READ_DONE', cycleId: message.cycleId, receiptCount: receipts.length }));
         await source.assertAuthority(checkpoint.blockNumber, checkpoint.blockHash);
+        console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'RECEIPT_PERSISTENCE_START', cycleId: message.cycleId, receiptCount: receipts.length }));
         for (const receipt of receipts) {
           const result = await radar.putSwap(receipt);
           if (result === 'INSERTED') receiptsInserted += 1;
@@ -517,9 +550,11 @@ export async function runCloudflareRatRadarCycle(
           toBlock + 1n,
           deps.now()
         );
+        console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'CURSOR_ADVANCED', cycleId: message.cycleId, nextBlock: (toBlock + 1n).toString() }));
         poolsProcessed += 1;
       } catch (error) {
         const code = ratRadarSyncErrorCode(error);
+        console.error(JSON.stringify({ event: 'RAT_RADAR_POOL_FAILED', cycleId: message.cycleId, code }));
         if (
           code.startsWith('ARC_CHAIN_ID_DRIFT') ||
           code.startsWith('RAT_RADAR_CHECKPOINT_REORG') ||
@@ -548,7 +583,9 @@ export async function runCloudflareRatRadarCycle(
     };
   } finally {
     store.close();
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'LEASE_RELEASE_START', cycleId: message.cycleId }));
     await lease.release(RAT_RADAR_LEASE_NAME, message.cycleId);
+    console.error(JSON.stringify({ event: 'RAT_RADAR_PHASE', phase: 'LEASE_RELEASE_DONE', cycleId: message.cycleId }));
   }
 }
 
@@ -647,7 +684,7 @@ async function persistLiveFailure(
 function syncErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
   const code = message.match(
-    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
+    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|D1_[A-Z_]+|SYNC_LEASE_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
   )?.[1];
   return code ?? 'SYNC_FAILED';
 }

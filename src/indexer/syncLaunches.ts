@@ -135,7 +135,13 @@ async function ensureProvenanceProjection(store: LaunchStore): Promise<void> {
   const missing = await store.listLaunchesMissingProvenance();
   for (const launch of missing) await store.putProvenanceFact(await buildProvenanceFact(launch));
   const facts = await store.listProvenanceFacts();
-  await store.replaceProvenanceEdges(await projectProvenanceEdges(facts));
+  const projected = await projectProvenanceEdges(facts);
+  const existing = await store.listProvenanceEdges();
+  const existingDigests = new Map(existing.map((edge) => [edge.edgeId, edge.evidenceDigest]));
+  const unchanged = existing.length === projected.length && projected.every(
+    (edge) => existingDigests.get(edge.edgeId) === edge.evidenceDigest
+  );
+  if (!unchanged) await store.replaceProvenanceEdges(projected);
 }
 
 async function assertLaunchBlocksStillCanonical(source: LaunchSource, launches: LaunchObserved[]): Promise<void> {
