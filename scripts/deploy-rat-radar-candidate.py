@@ -70,13 +70,23 @@ def main() -> None:
 
     parsed = json.loads(manifest_path.read_text())
     radar = parsed.get("capabilities", {}).get("ratRadarV0", {})
+    holder = parsed.get("capabilities", {}).get("holderGateV0", {})
     launch = parsed.get("launchAuthorization", {})
     if not (
-        radar.get("engineeringStatus") == "BUILDING"
-        and radar.get("publicStatus") == "NOT_PUBLIC_LIVE_AUTHORIZED"
+        radar.get("engineeringStatus") == "ENGINEERING_PASS"
+        and radar.get("deploymentStatus") == "CLOUDFLARE_LIVE_VERIFIED"
+        and radar.get("publicStatus") == "PUBLIC_LIVE_BETA"
         and radar.get("launchUtilityPriority") is True
     ):
-        fail("Rat Radar manifest is not in BUILDING / non-public-live candidate state")
+        fail("Rat Radar manifest is not in its live-verified state")
+    if not (
+        holder.get("engineeringStatus") == "ENGINEERING_PASS"
+        and holder.get("deploymentStatus") == "CLOUDFLARE_DEPLOYED_FAIL_CLOSED"
+        and holder.get("publicStatus") == "TOKEN_AUTHORITY_NOT_CONFIGURED"
+        and holder.get("walletAuthStatus") == "DISABLED_BY_DEFAULT"
+        and holder.get("productionHolderEligibilityActive") is False
+    ):
+        fail("Holder Gate manifest is not in its engineering-ready fail-closed state")
     if not (
         launch.get("status") == "BLOCKED"
         and launch.get("marketingAuthorized") is False
@@ -114,7 +124,8 @@ def main() -> None:
             (
                 "SELECT name FROM sqlite_master "
                 "WHERE type='table' AND name IN "
-                "('rat_radar_swap_receipts','rat_radar_pool_cursors') "
+                "('rat_radar_swap_receipts','rat_radar_pool_cursors',"
+                "'holder_auth_challenges','holder_auth_sessions') "
                 "ORDER BY name;"
             ),
             "--config",
@@ -122,9 +133,15 @@ def main() -> None:
         ],
         capture=True,
     )
-    if "rat_radar_swap_receipts" not in table_check or "rat_radar_pool_cursors" not in table_check:
-        fail("Rat Radar D1 tables were not verified")
-    print("RAT_RADAR_D1_SCHEMA: PASS")
+    required_tables = (
+        "rat_radar_swap_receipts",
+        "rat_radar_pool_cursors",
+        "holder_auth_challenges",
+        "holder_auth_sessions",
+    )
+    if any(table not in table_check for table in required_tables):
+        fail("Rat Radar / Holder Gate D1 tables were not verified")
+    print("RAT_RADAR_HOLDER_D1_SCHEMA: PASS")
 
     print("Deploying Rat Radar candidate...")
     run(WRANGLER + ["deploy", "--config", "wrangler.jsonc"])
@@ -158,6 +175,7 @@ def main() -> None:
             last_api_health = api_health
             last_caps = caps
             remote_radar = caps.get("capabilities", {}).get("ratRadarV0", {})
+            remote_holder = caps.get("capabilities", {}).get("holderGateV0", {})
             remote_launch = caps.get("launchAuthorization", {})
             deployment_ready = (
                 service_health.get("ok") is True
@@ -165,8 +183,14 @@ def main() -> None:
                 and remote_launch.get("status") == "BLOCKED"
                 and remote_launch.get("marketingAuthorized") is False
                 and remote_launch.get("launchAuthorized") is False
-                and remote_radar.get("engineeringStatus") == "BUILDING"
-                and remote_radar.get("publicStatus") == "NOT_PUBLIC_LIVE_AUTHORIZED"
+                and remote_radar.get("engineeringStatus") == "ENGINEERING_PASS"
+                and remote_radar.get("deploymentStatus") == "CLOUDFLARE_LIVE_VERIFIED"
+                and remote_radar.get("publicStatus") == "PUBLIC_LIVE_BETA"
+                and remote_holder.get("engineeringStatus") == "ENGINEERING_PASS"
+                and remote_holder.get("deploymentStatus") == "CLOUDFLARE_DEPLOYED_FAIL_CLOSED"
+                and remote_holder.get("publicStatus") == "TOKEN_AUTHORITY_NOT_CONFIGURED"
+                and remote_holder.get("walletAuthStatus") == "DISABLED_BY_DEFAULT"
+                and remote_holder.get("productionHolderEligibilityActive") is False
             )
             if deployment_ready:
                 break
@@ -182,6 +206,10 @@ def main() -> None:
         print(
             "LAST_RAT_RADAR_CAPABILITY:",
             json.dumps(last_caps.get("capabilities", {}).get("ratRadarV0", {}), sort_keys=True),
+        )
+        print(
+            "LAST_HOLDER_GATE_CAPABILITY:",
+            json.dumps(last_caps.get("capabilities", {}).get("holderGateV0", {}), sort_keys=True),
         )
         fail("candidate Worker/capability state did not converge")
 

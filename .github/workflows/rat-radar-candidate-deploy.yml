@@ -74,14 +74,21 @@ jobs:
           set -euo pipefail
           curl --fail --silent --show-error https://binrat-edge-v0.pettevik.workers.dev/api/health | tee /tmp/health.json
           curl --fail --silent --show-error https://binrat-edge-v0.pettevik.workers.dev/api/rat-radar/watchlist | tee /tmp/radar.json
+          holder_status="$(curl --silent --show-error --output /tmp/holder.json --write-out '%{http_code}' \
+            --request POST --header 'content-type: application/json' \
+            --data '{"wallet":"0x0000000000000000000000000000000000000001"}' \
+            https://binrat-edge-v0.pettevik.workers.dev/api/holder/challenge)"
           node - <<'NODE'
           const fs = require('fs');
           const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'));
           const radar = JSON.parse(fs.readFileSync('/tmp/radar.json', 'utf8'));
+          const holder = JSON.parse(fs.readFileSync('/tmp/holder.json', 'utf8'));
           if (health.ok !== true || health.indexReady !== true || health.lastSyncError !== null) process.exit(1);
           if (radar.schemaVersion !== 'binrat.rat-radar-watchlist/0.1') process.exit(1);
           if (radar.method?.evidencedRole !== 'V3_SWAP_RECIPIENT') process.exit(1);
+          if (holder.error !== 'HOLDER_WALLET_AUTH_NOT_ENABLED') process.exit(1);
           NODE
+          test "$holder_status" = "503"
 
 
       - name: Report candidate deploy outcome to PR 19

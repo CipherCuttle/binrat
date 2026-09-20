@@ -3,6 +3,7 @@ import type { PublicFeed } from '../public/types.js';
 import type { RatRadarSwapReceipt } from './activity.js';
 
 export const RAT_RADAR_WATCHLIST_SCHEMA_VERSION = 'binrat.rat-radar-watchlist/0.1' as const;
+export const RAT_RADAR_HOLDER_WATCHLIST_SCHEMA_VERSION = 'binrat.rat-radar-holder-watchlist/0.1' as const;
 export const RAT_RADAR_RANKING_VERSION = 'binrat.rat-radar-ranking/0.1' as const;
 export const RAT_RADAR_FREE_LIMIT = 5;
 
@@ -52,6 +53,31 @@ export interface RatRadarFreeWatchlist {
   };
 }
 
+export interface RatRadarHolderWatchCandidate extends RatRadarWatchCandidate {
+  firstObservedAcquisitionBlock: string;
+  lastObservedAcquisitionBlock: string;
+  totalObservedReceiptCount: number;
+  publicEvidencePaths: string[];
+}
+
+export interface RatRadarHolderWatchlist {
+  schemaVersion: typeof RAT_RADAR_HOLDER_WATCHLIST_SCHEMA_VERSION;
+  rankingVersion: typeof RAT_RADAR_RANKING_VERSION;
+  chainId: number;
+  asOfBlock: string;
+  coverage: RatRadarFreeWatchlist['coverage'];
+  method: RatRadarFreeWatchlist['method'] & {
+    depth: 'FULL_RANKED_UNIVERSE';
+    evidenceBoundary: string;
+  };
+  candidates: RatRadarHolderWatchCandidate[];
+  freeProjectionReceiptId: string;
+  receipt: {
+    receiptId: string;
+    evidenceDigest: string;
+  };
+}
+
 interface CandidateAccumulator {
   address: string;
   acquisitions: RatRadarSwapReceipt[];
@@ -64,7 +90,7 @@ export async function projectRatRadarFreeWatchlist(
   receipts: readonly RatRadarSwapReceipt[],
   limit = RAT_RADAR_FREE_LIMIT
 ): Promise<RatRadarFreeWatchlist> {
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+  if (!Number.isSafeInteger(limit) || limit < 1) {
     throw new Error('RAT_RADAR_FREE_LIMIT_INVALID');
   }
   const asOfBlock = BigInt(feed.asOfBlock);
@@ -193,6 +219,74 @@ export async function projectRatRadarFreeWatchlist(
     ...authority,
     receipt: {
       receiptId: `binrat-rat-radar:${evidenceDigest}`,
+      evidenceDigest
+    }
+  };
+}
+
+export async function projectRatRadarHolderWatchlist(
+  feed: PublicFeed,
+  receipts: readonly RatRadarSwapReceipt[]
+): Promise<RatRadarHolderWatchlist> {
+  const free = await projectRatRadarFreeWatchlist(feed, receipts);
+  const all = await projectRatRadarFreeWatchlist(
+    feed,
+    receipts,
+    Math.max(1, receipts.length)
+  );
+  const asOfBlock = BigInt(feed.asOfBlock);
+  const launchIds = new Set(feed.bags.map((bag) => bag.id));
+  const bounded = receipts.filter((receipt) => (
+    receipt.chainId === feed.chainId &&
+    receipt.blockNumber <= asOfBlock &&
+    launchIds.has(receipt.launchId)
+  ));
+
+  const candidates = all.candidates.map((candidate) => {
+    const address = candidate.observedRecipientAddress;
+    const observed = bounded
+      .filter((receipt) => receipt.recipient.toLowerCase() === address)
+      .sort(compareReceiptOrder);
+    const acquisitions = observed.filter((receipt) => (
+      receipt.launchedTokenFlow === 'POOL_TO_RECIPIENT' &&
+      receipt.launchedTokenDelta < 0n &&
+      isCandidateRecipient(receipt)
+    ));
+    const evidenceActivityIds = acquisitions.map((receipt) => receipt.activityId);
+    return {
+      ...candidate,
+      evidenceActivityIds,
+      firstObservedAcquisitionBlock: acquisitions[0]?.blockNumber.toString() ?? '0',
+      lastObservedAcquisitionBlock: acquisitions.at(-1)?.blockNumber.toString() ?? '0',
+      totalObservedReceiptCount: observed.length,
+      publicEvidencePaths: evidenceActivityIds.map(
+        (activityId) => `/api/rat-radar/activity/${activityId}`
+      )
+    };
+  });
+
+  const authority = {
+    schemaVersion: RAT_RADAR_HOLDER_WATCHLIST_SCHEMA_VERSION,
+    rankingVersion: RAT_RADAR_RANKING_VERSION,
+    chainId: feed.chainId,
+    asOfBlock: feed.asOfBlock,
+    coverage: {
+      ...all.coverage,
+      rankedAddressCount: candidates.length
+    },
+    method: {
+      ...all.method,
+      depth: 'FULL_RANKED_UNIVERSE' as const,
+      evidenceBoundary: 'Holder access changes projection depth only; receipt truth and public evidence access are unchanged.'
+    },
+    candidates,
+    freeProjectionReceiptId: free.receipt.receiptId
+  };
+  const evidenceDigest = await sha256Hex(authority);
+  return {
+    ...authority,
+    receipt: {
+      receiptId: `binrat-rat-radar-holder:${evidenceDigest}`,
       evidenceDigest
     }
   };

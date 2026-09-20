@@ -118,6 +118,8 @@ The holder gate sells depth, speed, scale, filtering, and convenience. It must n
 
 The initial balance threshold may be derived from a percentage of fixed total supply, but the final threshold must be frozen only after distribution and price-sensitivity simulation. The product must describe the actual balance test precisely rather than imply control of a percentage of circulating supply.
 
+Pre-token Holder Gate V0 keeps eligibility behind a provider interface. Deterministic fixtures may exercise the policy in tests, but production resolves to FREE unless canonical token configuration and a separately reviewed balance source both exist. A configured address or threshold alone is not sufficient to activate HOLDER. Wallet control uses message signing only; it never requests a transaction, gas, approval, transfer, or private key.
+
 #### Rat Watch capacity
 Token holding/locking can unlock additional watch slots, richer alert configuration, or community alert channels.
 

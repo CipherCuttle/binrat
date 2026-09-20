@@ -65,11 +65,22 @@
       "launchBlocker": false
     },
     "ratRadarV0": {
-      "engineeringStatus": "BUILDING",
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED",
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PUBLIC_LIVE_BETA",
       "launchUtilityPriority": true,
-      "evidenceStatus": "WALLET_ACTIVITY_INDEX_REQUIRED",
+      "evidenceStatus": "WALLET_ACTIVITY_INDEX_LIVE_VERIFIED",
       "accessDoctrine": "PUBLIC_RECEIPTS_HOLDER_GATED_DEPTH_SPEED_SCALE"
+    },
+    "holderGateV0": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_DEPLOYED_FAIL_CLOSED",
+      "publicStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+      "walletAuthStatus": "DISABLED_BY_DEFAULT",
+      "productionHolderEligibilityActive": false,
+      "walletControl": "EIP_4361_SHORT_LIVED_SESSION",
+      "freeSurface": "PUBLIC_RAT_RADAR_AND_RECEIPTS",
+      "holderPrototype": "FULL_RANKED_UNIVERSE_AND_EXPANDED_FACTORS"
     }
   },
   "launchAuthorization": {

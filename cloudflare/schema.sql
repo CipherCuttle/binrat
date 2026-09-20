@@ -111,6 +111,32 @@ CREATE TABLE IF NOT EXISTS binrat_sync_leases (
   updated_at_ms INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS holder_auth_challenges (
+  nonce TEXT PRIMARY KEY,
+  wallet TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  uri TEXT NOT NULL,
+  message TEXT NOT NULL,
+  issued_at_ms INTEGER NOT NULL,
+  expires_at_ms INTEGER NOT NULL,
+  consumed_at_ms INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_holder_auth_challenges_expiry
+  ON holder_auth_challenges(expires_at_ms, consumed_at_ms);
+
+CREATE TABLE IF NOT EXISTS holder_auth_sessions (
+  session_hash TEXT PRIMARY KEY,
+  wallet TEXT NOT NULL,
+  access_tier TEXT NOT NULL CHECK (access_tier IN ('FREE','HOLDER')),
+  policy_id TEXT NOT NULL,
+  eligibility_status TEXT NOT NULL,
+  issued_at_ms INTEGER NOT NULL,
+  expires_at_ms INTEGER NOT NULL,
+  invalidated_at_ms INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_holder_auth_sessions_wallet_expiry
+  ON holder_auth_sessions(wallet, expires_at_ms);
+
 CREATE TABLE IF NOT EXISTS telegram_update_receipts (
   update_id INTEGER PRIMARY KEY,
   state TEXT NOT NULL CHECK (state IN ('CLAIMED','REPLIED','IGNORED','RATE_LIMITED')),

@@ -151,6 +151,18 @@ Holder-gated depth may unlock:
 
 Holder eligibility should use a wallet-control proof plus a publicly frozen balance threshold. A percentage-of-fixed-supply target may be converted into an absolute token threshold, but the exact threshold is not frozen until holder-distribution and price sensitivity have been simulated. The gate must not imply ownership of a particular percentage of circulating supply when it only checks balance.
 
+Holder Gate V0 engineering status (2026-09-20):
+
+- EIP-4361 wallet-control challenges are domain-, purpose-, address-, chain-, nonce-, issue-time-, and expiry-bound;
+- one-time challenges issue short-lived opaque sessions whose stored authority is a token digest, wallet, tier, policy id, and expiry;
+- the free projection remains unauthenticated and unchanged;
+- a test-only deterministic eligibility source proves FREE versus HOLDER projection behavior;
+- HOLDER depth exposes the full ranked universe plus expanded acquisition/receipt factors from the same evidence inputs;
+- public receipt and address evidence routes remain unauthenticated;
+- deployed wallet challenge/session writes are disabled unless the separate wallet-auth switch is explicitly enabled;
+- production holder eligibility is deliberately fail-closed as `TOKEN_AUTHORITY_NOT_CONFIGURED` because no canonical `$BINRAT` contract or final threshold exists;
+- no production token address, production threshold, private-key custody, transaction signing, or token action is authorized by this engineering pass.
+
 ### Rat Watch V0
 
 Launch with the smallest useful alert loop:
