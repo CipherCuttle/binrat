@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 WORKER_URL = "https://binrat-edge-v0.pettevik.workers.dev"
-WRANGLER = ["pnpm", "dlx", "wrangler@4.135.0"]
+WRANGLER = ["npx", "-y", "wrangler@4.135.0"]
 
 
 def fail(message: str) -> None:
