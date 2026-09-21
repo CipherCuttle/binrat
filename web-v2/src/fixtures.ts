@@ -1,4 +1,4 @@
-import type { PublicFeed, RadarWatchlist } from './types';
+import type { PublicFeed, RadarPublicActivity, RadarWatchlist } from './types';
 
 const creator = '0x92f831C7E80cF1B3A2d96d6B6e03d98a21B57A40';
 
@@ -103,7 +103,50 @@ export const demoRadar: RadarWatchlist = {
       `Median first recipient-side acquisition: ${median} blocks after indexed launch.`,
       `${receipts} launched-token acquisition receipts observed.`
     ],
-    evidenceActivityIds: [`${rank}`.repeat(64), `${(rank as number) + 1}`.repeat(64)]
+    evidenceActivityIds: [
+      `${rank}a`.repeat(32),
+      `${rank}b`.repeat(32)
+    ]
   })),
   receipt: { receiptId: 'binrat-rat-radar:demo-20418842', evidenceDigest: 'demo-evidence-digest' }
 };
+
+export const demoRadarActivities: Record<string, RadarPublicActivity> = Object.fromEntries(
+  demoRadar.candidates.flatMap((candidate) =>
+    candidate.evidenceActivityIds.map((activityId, index) => {
+      const receiptOrdinal = index + 1;
+      const repeated = String(candidate.rank + receiptOrdinal).repeat(64).slice(0, 64);
+      const blockNumber = Number(demoRadar.asOfBlock) - candidate.rank * 17 - receiptOrdinal;
+      return [
+        activityId,
+        {
+          schemaVersion: 'binrat.rat-radar-activity/0.1',
+          version: 'binrat.rat-radar-swap/0.1',
+          activityId,
+          chainId: 5042,
+          launchId: `demo-launch-${String(candidate.rank).padStart(2, '0')}-${receiptOrdinal}`,
+          pool: `0x${String(candidate.rank).repeat(40).slice(0, 40)}`,
+          token: `0x${String(receiptOrdinal).repeat(40).slice(0, 40)}`,
+          token0: `0x${String(candidate.rank + 2).repeat(40).slice(0, 40)}`,
+          token1: `0x${String(candidate.rank + 3).repeat(40).slice(0, 40)}`,
+          blockNumber: String(blockNumber),
+          blockHash: `0x${repeated}`,
+          txHash: `0x${repeated.split('').reverse().join('')}`,
+          logIndex: receiptOrdinal,
+          sender: `0x${String(candidate.rank + 4).repeat(40).slice(0, 40)}`,
+          recipient: candidate.observedRecipientAddress,
+          tokenSide: receiptOrdinal % 2 ? 'TOKEN0' : 'TOKEN1',
+          amount0: String(-receiptOrdinal * 1000),
+          amount1: String(receiptOrdinal * 1000),
+          sqrtPriceX96: '0',
+          liquidity: '0',
+          tick: 0,
+          launchedTokenDelta: String(-receiptOrdinal * 1000),
+          launchedTokenFlow: 'POOL_TO_RECIPIENT',
+          evidenceDigest: `demo-evidence-digest-${String(candidate.rank).padStart(2, '0')}-${receiptOrdinal}`,
+          identityBoundary: 'sender and recipient are evidenced protocol roles, not inferred human identities'
+        } satisfies RadarPublicActivity
+      ];
+    })
+  )
+);

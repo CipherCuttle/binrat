@@ -117,13 +117,15 @@ export function CheckpointRail({
   checkpoint,
   coverage,
   receiptId,
+  tone = "machine",
 }: {
   checkpoint: string;
   coverage: CoverageState;
   receiptId?: string;
+  tone?: "machine" | "paper";
 }) {
   return (
-    <div className="checkpoint-rail">
+    <div className={tone === "paper" ? "checkpoint-rail paper-checkpoint" : "checkpoint-rail"}>
       <span>
         <small>AS OF BLOCK</small>
         {checkpoint}

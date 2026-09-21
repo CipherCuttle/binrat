@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { CoverageStamp, RecurrenceMarks } from "./Primitives";
+import { RadarCaseFile } from "./RadarCaseFile";
 import type { DataMode } from "./data";
 import type { RadarCandidate, RadarWatchlist } from "./types";
 
@@ -44,7 +45,6 @@ export function RadarWorkbench({
   const [selectedAddress, setSelectedAddress] = useState<string | null>(
     radar.candidates[0]?.observedRecipientAddress ?? null,
   );
-  const [copied, setCopied] = useState(false);
 
   const visibleCandidates = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -70,14 +70,6 @@ export function RadarWorkbench({
     const nextAddress = selected?.observedRecipientAddress ?? null;
     if (nextAddress !== selectedAddress) setSelectedAddress(nextAddress);
   }, [selected, selectedAddress]);
-
-  useEffect(() => setCopied(false), [selectedAddress]);
-
-  const copySelectedAddress = async () => {
-    if (!selected) return;
-    await navigator.clipboard.writeText(selected.observedRecipientAddress);
-    setCopied(true);
-  };
 
   return (
     <section className="radar-machine" aria-labelledby="radar-workbench-title">
@@ -196,40 +188,8 @@ export function RadarWorkbench({
           )}
         </section>
 
-        <aside className="radar-reserved" aria-live="polite">
-          <span>RESERVED EVIDENCE ZONE / 40%</span>
-          <strong>CASE FILE ARRIVES IN GATE C</strong>
-          {selected ? (
-            <>
-              <small>SELECTED OBSERVED RECIPIENT</small>
-              <code>{selected.observedRecipientAddress}</code>
-              <button type="button" onClick={copySelectedAddress}>
-                {copied ? "ADDRESS COPIED" : "COPY FULL ADDRESS"}
-              </button>
-              <dl>
-                <div>
-                  <dt>INSPECTION ORDER</dt>
-                  <dd>{String(selected.rank).padStart(2, "0")}</dd>
-                </div>
-                <div>
-                  <dt>LATEST SEEN BLOCK</dt>
-                  <dd>{selected.latestSeenBlock}</dd>
-                </div>
-              </dl>
-            </>
-          ) : (
-            <p>NO VISIBLE RECIPIENT SELECTED.</p>
-          )}
-        </aside>
+        <RadarCaseFile candidate={selected} radar={radar} mode={mode} />
       </div>
-
-      <footer className="radar-boundary">
-        <span>
-          EVIDENCED ROLE <b>{radar.method.evidencedRole}</b>
-        </span>
-        <p>{radar.method.identityBoundary}</p>
-        <p>{radar.method.recommendationBoundary}</p>
-      </footer>
     </section>
   );
 }

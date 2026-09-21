@@ -66,6 +66,34 @@ export interface RadarWatchlist {
   receipt: { receiptId: string; evidenceDigest: string };
 }
 
+export interface RadarPublicActivity {
+  schemaVersion: 'binrat.rat-radar-activity/0.1';
+  version: 'binrat.rat-radar-swap/0.1';
+  activityId: string;
+  chainId: 5042;
+  launchId: string;
+  pool: string;
+  token: string;
+  token0: string;
+  token1: string;
+  blockNumber: string;
+  blockHash: string;
+  txHash: string;
+  logIndex: number;
+  sender: string;
+  recipient: string;
+  tokenSide: 'TOKEN0' | 'TOKEN1';
+  amount0: string;
+  amount1: string;
+  sqrtPriceX96: string;
+  liquidity: string;
+  tick: number;
+  launchedTokenDelta: string;
+  launchedTokenFlow: 'POOL_TO_RECIPIENT' | 'CALLBACK_SIDE_TO_POOL' | 'ZERO_DELTA';
+  evidenceDigest: string;
+  identityBoundary: string;
+}
+
 export type RatState =
   | 'idle'
   | 'indexing'
