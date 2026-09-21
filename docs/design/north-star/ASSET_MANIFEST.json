@@ -1,0 +1,38 @@
+{
+  "binrat-character-master.png": {
+    "sha256": "6f22821dfad44309638dd0d08b0dfba8b08d74f324abf89795188d4dbed275fe",
+    "bytes": 3328127,
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "role": "Canonical BINRAT character identity reference"
+  },
+  "binrat-world-background.png": {
+    "sha256": "51b307c91740a28fbfda370d034727e6d2dfa9b108eb521a81e926348dd9a4d2",
+    "bytes": 2148526,
+    "dimensions": [
+      1920,
+      1080
+    ],
+    "role": "Canonical persistent app background"
+  },
+  "binrat-home-north-star.png": {
+    "sha256": "26d7dfd52ecdbb8c90dcef5695b0bb0ab8f73e21c339f6e1207607eb3695208a",
+    "bytes": 2596979,
+    "dimensions": [
+      1672,
+      941
+    ],
+    "role": "Definitive homepage UI/design north star"
+  },
+  "binrat-radar-north-star.png": {
+    "sha256": "2d1fc26789bf58e772a8d91c31716eb50319f81d4db35712538ec8b526816eda",
+    "bytes": 2721649,
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "role": "Definitive Rat Radar UI/design north star"
+  }
+}
