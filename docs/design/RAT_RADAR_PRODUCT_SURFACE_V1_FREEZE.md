@@ -8,7 +8,7 @@ Rat Radar V1 is now the reference implementation for Product Surface V1 forensic
 
 - **Branch:** `feat/binrat-radar-final-v1`
 - **Base:** `73c0b016cb265e892ea220b820f5ed7f2f45bfff`
-- **Frozen commit:** recorded by the freeze commit below.
+- **Frozen implementation commit:** `0aae6b955d1bfed1b08380bf23145f1a4f20134e`.
 - **Visual authority:** `docs/design/north-star/binrat-radar-north-star.png`, with `binrat-world-background.png`, `binrat-character-master.png`, and `NORTH_STAR_IMPLEMENTATION_SPEC_V1.md` as the authoritative source material. Canonical sources are not runtime-editable design inputs.
 
 ## Material and composition law
