@@ -1,0 +1,240 @@
+{
+  "schemaVersion": "binrat.launch-gate-matrix/0.1",
+  "matrixVersion": "LAUNCH_GATE_MATRIX_V0",
+  "frozenOn": "2026-09-21",
+  "chainId": 5042,
+  "launchConfigDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+  "launchMechanicsReceiptDigest": "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
+  "gates": {
+    "legal_compliance_artifacts": {
+      "status": "BLOCKED_LEGAL",
+      "evidenceArtifacts": [
+        "docs/TOKEN_LAUNCH_DOCTRINE.md",
+        "docs/ROADMAP_V0.md",
+        "docs/BINRAT_LAUNCH_CONFIG_V0.json"
+      ],
+      "evidenceDigests": [],
+      "liveEvidence": {
+        "status": "NOT_SATISFIED",
+        "technicalArtifactsAreNotLegalApproval": true
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Applicable counsel-reviewed legal/compliance artifacts and explicit legal authorization.",
+      "blocksLaunchAuthorization": true
+    },
+    "launch_mechanics_verification_receipt": {
+      "status": "SATISFIED",
+      "evidenceArtifacts": [
+        "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
+        "docs/LAUNCH_MECHANICS_VERIFICATION_V0.md",
+        "docs/LAUNCH_MECHANICS_HOSTILE_REVIEW_V0.md",
+        "docs/BINRAT_LAUNCH_CONFIG_V0.json"
+      ],
+      "evidenceDigests": [
+        "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
+        "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8"
+      ],
+      "liveEvidence": {
+        "chainId": 5042,
+        "rail": "arcpad-arc-mainnet-usdc-standard-v0",
+        "mode": "STANDARD_CREATOR_REWARDS",
+        "boundToLaunchConfig": true
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Refresh the receipt and deployed-rail authority immediately before any future launch authorization decision.",
+      "blocksLaunchAuthorization": false
+    },
+    "actual_token_address_and_launch_execution_receipt": {
+      "status": "BLOCKED_FUTURE_EVENT",
+      "evidenceArtifacts": [
+        "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
+        "docs/BINRAT_LAUNCH_CONFIG_V0.json"
+      ],
+      "evidenceDigests": [
+        "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+        "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6"
+      ],
+      "liveEvidence": {
+        "tokenAddress": null,
+        "launchTransaction": null,
+        "launchBlock": null,
+        "launchBlockHash": null,
+        "executionStatus": "NOT_EXECUTED",
+        "validationStatus": "INCOMPLETE"
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Create BINRAT only after authorization, then bind the real token address, launch transaction, block/hash, supply, pool, liquidity position, locker, allocation verification, and execution timestamp.",
+      "blocksLaunchAuthorization": true
+    },
+    "telegram_doctrine_smoke": {
+      "status": "SATISFIED",
+      "evidenceArtifacts": [
+        "docs/TELEGRAM_RAT_CLOUDFLARE_LIVE_ACCEPTANCE_2026_09_19.md",
+        "docs/CAPABILITY_MANIFEST_V0.json",
+        "src/telegram/rat.ts"
+      ],
+      "evidenceDigests": [
+        "8666eda9dc90586109a66ab7decc4f9531878c58462c992ef82382132ba56c2d"
+      ],
+      "liveEvidence": {
+        "endpoint": "/health",
+        "status": "PASS",
+        "launchAuthorization": "BLOCKED",
+        "marketingAuthorized": false,
+        "tokenState": "NOT_LAUNCHED",
+        "purchasableTokenClaim": false,
+        "treasuryAndProjectRoles": "CONFIGURED_AUTHORITY_DISPLAY"
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Repeat the read-only doctrine/status smoke after any manifest change and before authorization.",
+      "blocksLaunchAuthorization": false
+    },
+    "rat_radar_free_value_and_holder_gate_smoke": {
+      "status": "PARTIAL",
+      "evidenceArtifacts": [
+        "docs/ROADMAP_V0.md",
+        "docs/CAPABILITY_MANIFEST_V0.json",
+        "test/ratRadarWorker.test.ts",
+        "test/holderGate.test.ts"
+      ],
+      "evidenceDigests": [
+        "f2133e7ad3843f7dce009cce079049b2658a5b2bb04d7f04e6f163f9b48e4cfa"
+      ],
+      "liveEvidence": {
+        "freeRatRadar": "PASS",
+        "holderEngineeringBoundary": "PASS",
+        "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+        "productionEligibilityActive": false,
+        "productionHolderActivation": "NOT_ACTIVE"
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "After the actual token exists, bind a reviewed ERC-20 balance source, frozen absolute raw threshold, policy version, effective block/time, and explicit production activation smoke.",
+      "blocksLaunchAuthorization": false
+    },
+    "rat_watch_live_subscription_and_delivery_smoke": {
+      "status": "SATISFIED",
+      "evidenceArtifacts": [
+        "docs/RAT_WATCH_V0_LIVE_SUBSCRIPTION_ACCEPTANCE_2026_09_19.md",
+        "docs/ROADMAP_V0.md",
+        "test/ratWatch.test.ts",
+        "test/ratWatchWorker.test.ts"
+      ],
+      "evidenceDigests": [
+        "196697dda699a9a707f451d1fea4f3f06d44225d105a95378fb24d9fd22c9f20"
+      ],
+      "liveEvidence": {
+        "subscription": "PASS",
+        "commandReceipt": "PASS",
+        "deterministicDeliverySmoke": "PASS",
+        "realRecurrenceStatus": "PENDING_REAL_FUTURE_LAUNCH",
+        "realRecurrenceBlocksLaunchV0": false
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "A naturally occurring future recurrence alert remains maturity evidence; it is not a Launch V0 blocker.",
+      "blocksLaunchAuthorization": false
+    },
+    "dumpster_ledger_bootstrap": {
+      "status": "SATISFIED",
+      "evidenceArtifacts": [
+        "docs/DUMPSTER_LEDGER_V0.md",
+        "docs/CAPABILITY_MANIFEST_V0.json",
+        "src/dumpsterLedger/project.ts",
+        "test/dumpsterLedger.test.ts"
+      ],
+      "evidenceDigests": [
+        "d0de1ff9b36cd747dab803ee59ab100abcdfadc02b0f761a4bff66f90cfbf767"
+      ],
+      "liveEvidence": {
+        "endpoint": "/api/dumpster-ledger",
+        "status": "PASS",
+        "accountingState": "PRE_LAUNCH_AUTHORITIES_CONFIGURED",
+        "accountingEnabled": false,
+        "tokenAddress": null,
+        "observedTokenFlows": "NOT_YET_AVAILABLE",
+        "treasuryAndProjectRoles": "OWNER_SELECTED_PRE_LAUNCH"
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Before production accounting, bind the actual token, effective launch block, selected receipt, reviewed observer source, and explicit accounting activation.",
+      "blocksLaunchAuthorization": false
+    },
+    "replay_lab_real_evidence_smoke": {
+      "status": "SATISFIED",
+      "evidenceArtifacts": [
+        "docs/REPLAY_LAB_V1.md",
+        "docs/ROADMAP_V0.md",
+        "src/public/replayBundle.ts",
+        "test/replayBundle.test.ts"
+      ],
+      "evidenceDigests": [
+        "d30c53275ce64953cb95a43dba176ab297f5457f3e2a5d5dd7bfb5ddd7fd7e15",
+        "fcd34865c5a0073152bea356b0eeb7d77c8feec10a786d9522d4218499b2ac71",
+        "ec9bf3c6ed84b380575dbc1b975080e727d6bb2af8c6a9db00d72a20040e367c",
+        "9474b30ba194f035b3ac6f63f7cb51da90a9bf5458fa5a0d6955618d263e454d"
+      ],
+      "liveEvidence": {
+        "endpoint": "/api/bag/01f1eb8fe5acede475ce7f09bad73962cbb3279deb1e50f7e7c2746bcd28d85f/replay",
+        "launchId": "01f1eb8fe5acede475ce7f09bad73962cbb3279deb1e50f7e7c2746bcd28d85f",
+        "stages": ["LAUNCH", "5m", "1h", "24h"],
+        "observationCoverage": "COMPLETE",
+        "syntheticEvidence": false
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Preserve the distinction between this historical proof and future live-launch evidence; no current Launch V0 evidence gap.",
+      "blocksLaunchAuthorization": false
+    },
+    "status_consistency_check": {
+      "status": "SATISFIED",
+      "evidenceArtifacts": [
+        "docs/CAPABILITY_MANIFEST_V0.json",
+        "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+        "docs/DUMPSTER_LEDGER_V0.md",
+        "docs/TELEGRAM_RAT_CLOUDFLARE_LIVE_ACCEPTANCE_2026_09_19.md",
+        "src/launchConfig/config.ts",
+        "test/launchConfig.test.ts"
+      ],
+      "evidenceDigests": [
+        "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8"
+      ],
+      "liveEvidence": {
+        "manifest": "NOT_LAUNCHED / BLOCKED / marketingAuthorized=false",
+        "launchConfig": "NOT_LAUNCHED / BLOCKED / marketingAuthorized=false",
+        "dumpsterLedger": "NOT_LAUNCHED / BLOCKED / accounting disabled",
+        "holderGate": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+        "telegram": "NOT_LAUNCHED / BLOCKED",
+        "website": "PRE_LAUNCH_STATUS"
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "Re-run the consistency check after any status-bearing artifact changes; no current contradiction.",
+      "blocksLaunchAuthorization": false
+    },
+    "allocation_and_privileged_inventory_disclosure": {
+      "status": "PARTIAL",
+      "evidenceArtifacts": [
+        "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+        "docs/BINRAT_LAUNCH_CONFIG_V0.md",
+        "docs/LAUNCH_MECHANICS_VERIFICATION_V0.md",
+        "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
+        "test/launchConfig.test.ts"
+      ],
+      "evidenceDigests": [
+        "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+        "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6"
+      ],
+      "liveEvidence": {
+        "evidenceClass": "OWNER_POLICY",
+        "privatePresale": "NO",
+        "discountedInsiderRound": "NO",
+        "hiddenTeamAllocation": "NO",
+        "privilegedCreatorFirstBuy": "NO",
+        "treasuryTokenInventory": "ZERO_NOT_YET_CREATED",
+        "postLaunchOnChainVerification": "REQUIRED_NOT_YET_AVAILABLE"
+      },
+      "verificationDate": "2026-09-21",
+      "exactRemainingRequirement": "After any launch, bind post-launch on-chain allocation/inventory verification to the real execution transaction; owner policy is not transaction proof.",
+      "blocksLaunchAuthorization": false
+    }
+  },
+  "explicitOwnerLaunchAuthorityState": "NOT_GRANTED",
+  "launchAuthorization": "BLOCKED",
+  "matrixDigest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b"
+}

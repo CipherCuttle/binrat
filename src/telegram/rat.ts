@@ -5,6 +5,7 @@ import {
   BINRAT_TREASURY_ADDRESS,
   LAUNCH_CONFIG_DIGEST
 } from '../launchConfig/config.js';
+import { REQUIRED_LAUNCH_GATE_IDS } from '../launchConfig/gateMatrix.js';
 import {
   makeRatAnswerPlan,
   renderRatVoice,
@@ -39,6 +40,12 @@ export interface CapabilityManifest {
     accountingActive: boolean;
     holderGateStatus: string;
     configDigest?: string;
+  };
+  launchGateStatus?: {
+    matrix: string;
+    matrixDigest: string;
+    statuses: Record<string, string>;
+    blockingGateCount: number;
   };
   invariant: string;
 }
@@ -128,6 +135,25 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
       config.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED'
     ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_CONFIG_INVALID');
   }
+  if (root.launchGateStatus !== undefined) {
+    const gateStatus = record(root.launchGateStatus);
+    const statuses = record(gateStatus.statuses);
+    if (
+      gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_V0.json' ||
+      typeof gateStatus.matrixDigest !== 'string' ||
+      !/^[0-9a-f]{64}$/.test(gateStatus.matrixDigest) ||
+      gateStatus.blockingGateCount !== 2
+    ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID');
+    const ids = Object.keys(statuses).sort();
+    if (JSON.stringify(ids) !== JSON.stringify([...REQUIRED_LAUNCH_GATE_IDS].sort())) {
+      throw new Error('CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID');
+    }
+    for (const id of REQUIRED_LAUNCH_GATE_IDS) {
+      if (!VALID_GATE_STATUSES.has(statuses[id] as string)) {
+        throw new Error(`CAPABILITY_MANIFEST_LAUNCH_GATE_STATUS_INVALID:${id}`);
+      }
+    }
+  }
   for (const state of Object.values(capabilities)) {
     if (!state || typeof state !== 'object') throw new Error('CAPABILITY_MANIFEST_INVALID');
     const engineeringStatus = (state as Record<string, unknown>).engineeringStatus;
@@ -137,6 +163,14 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
   }
   return value as CapabilityManifest;
 }
+
+const VALID_GATE_STATUSES = new Set([
+  'SATISFIED',
+  'PARTIAL',
+  'BLOCKED_FUTURE_EVENT',
+  'BLOCKED_OWNER_INPUT',
+  'BLOCKED_LEGAL'
+]);
 
 async function getJson(
   path: string,

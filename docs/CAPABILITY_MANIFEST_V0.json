@@ -8,6 +8,7 @@
     "launchMechanicsReceipt": "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
     "launchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
     "launchExecutionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
+    "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
     "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md"
   },
   "capabilities": {
@@ -19,16 +20,12 @@
     },
     "replayLab": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "candidatePr": 13,
-      "candidateHead": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
       "endpoint": "/api/bag/:bagId/replay"
     },
     "telegramRatV0": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "candidatePr": 15,
-      "candidateHead": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
       "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5"
@@ -41,14 +38,7 @@
       "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
       "productionFundingAuthority": "PRELAUNCH_AUTHORITIES_CONFIGURED",
       "productionAccountingActive": false,
-      "configuredWalletCount": 2,
-      "liveAcceptance": {
-        "status": "PASS",
-        "accountingState": "PRE_LAUNCH_AUTHORITIES_CONFIGURED",
-        "entryCount": 0,
-        "tokenInflowsRaw": "0",
-        "tokenOutflowsRaw": "0"
-      }
+      "configuredWalletCount": 2
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",
@@ -58,8 +48,6 @@
     },
     "ratWatchV0": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "candidatePr": 18,
-      "candidateHead": "cc782f04b08c938412394fd587f7158426acc067",
       "deploymentStatus": "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED",
       "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING"
     },
@@ -72,9 +60,7 @@
       "engineeringStatus": "ENGINEERING_PASS",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "launchUtilityPriority": true,
-      "evidenceStatus": "WALLET_ACTIVITY_INDEX_LIVE_VERIFIED",
-      "accessDoctrine": "PUBLIC_RECEIPTS_HOLDER_GATED_DEPTH_SPEED_SCALE"
+      "evidenceStatus": "WALLET_ACTIVITY_INDEX_LIVE_VERIFIED"
     },
     "holderGateV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -82,10 +68,7 @@
       "publicStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
       "walletAuthStatus": "DISABLED_BY_DEFAULT",
       "productionHolderEligibilityActive": false,
-      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY",
-      "walletControl": "EIP_4361_SHORT_LIVED_SESSION",
-      "freeSurface": "PUBLIC_RAT_RADAR_AND_RECEIPTS",
-      "holderPrototype": "FULL_RANKED_UNIVERSE_AND_EXPANDED_FACTORS"
+      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY"
     },
     "launchMechanicsV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -138,6 +121,23 @@
       "allocation_and_privileged_inventory_disclosure"
     ],
     "tokenState": "NOT_LAUNCHED"
+  },
+  "launchGateStatus": {
+    "matrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
+    "matrixDigest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b",
+    "statuses": {
+      "legal_compliance_artifacts": "BLOCKED_LEGAL",
+      "launch_mechanics_verification_receipt": "SATISFIED",
+      "actual_token_address_and_launch_execution_receipt": "BLOCKED_FUTURE_EVENT",
+      "telegram_doctrine_smoke": "SATISFIED",
+      "rat_radar_free_value_and_holder_gate_smoke": "PARTIAL",
+      "rat_watch_live_subscription_and_delivery_smoke": "SATISFIED",
+      "dumpster_ledger_bootstrap": "SATISFIED",
+      "replay_lab_real_evidence_smoke": "SATISFIED",
+      "status_consistency_check": "SATISFIED",
+      "allocation_and_privileged_inventory_disclosure": "PARTIAL"
+    },
+    "blockingGateCount": 2
   },
   "invariant": "Degen can decide attention and priority. It cannot decide what is true."
 }
