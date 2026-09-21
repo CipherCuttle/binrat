@@ -124,6 +124,9 @@ export function CheckpointRail({
   receiptId?: string;
   tone?: "machine" | "paper";
 }) {
+  const displayedReceiptId = receiptId && receiptId.length > 24
+    ? `${receiptId.slice(0, 10)}…${receiptId.slice(-8)}`
+    : receiptId;
   return (
     <div className={tone === "paper" ? "checkpoint-rail paper-checkpoint" : "checkpoint-rail"}>
       <span>
@@ -133,7 +136,7 @@ export function CheckpointRail({
       {receiptId && (
         <span className="checkpoint-receipt">
           <small>AUTHORITY RECEIPT</small>
-          <code>{receiptId}</code>
+          <code title={receiptId}>{displayedReceiptId}</code>
         </span>
       )}
       <CoverageStamp state={coverage} />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckpointRail, CoverageStamp } from "./Primitives";
 import { loadRadarActivities, type DataMode } from "./data";
 import type { RadarCandidate, RadarPublicActivity, RadarWatchlist } from "./types";
@@ -7,6 +7,8 @@ type ReceiptState =
   | { kind: "loading" }
   | { kind: "ready"; activities: RadarPublicActivity[] }
   | { kind: "unavailable" };
+
+type CopyState = { target: string; message: string } | null;
 
 function shortHash(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
@@ -27,7 +29,8 @@ export function RadarCaseFile({
 }) {
   const [receiptState, setReceiptState] = useState<ReceiptState>({ kind: "loading" });
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  const [copyMessage, setCopyMessage] = useState("");
+  const [copyState, setCopyState] = useState<CopyState>(null);
+  const copyReset = useRef<number | null>(null);
   const activityKey = candidate?.evidenceActivityIds.join(",") ?? "";
 
   useEffect(() => {
@@ -38,7 +41,7 @@ export function RadarCaseFile({
     }
     const controller = new AbortController();
     setReceiptState({ kind: "loading" });
-    setCopyMessage("");
+    setCopyState(null);
     loadRadarActivities(
       candidate.evidenceActivityIds,
       candidate.observedRecipientAddress,
@@ -60,13 +63,22 @@ export function RadarCaseFile({
     return () => controller.abort();
   }, [activityKey, candidate?.observedRecipientAddress, mode]);
 
-  const copy = async (value: string, label: string) => {
+  useEffect(
+    () => () => {
+      if (copyReset.current !== null) window.clearTimeout(copyReset.current);
+    },
+    [],
+  );
+
+  const copy = async (value: string, label: string, target: string) => {
+    if (copyReset.current !== null) window.clearTimeout(copyReset.current);
     try {
       await navigator.clipboard.writeText(value);
-      setCopyMessage(`${label} COPIED`);
+      setCopyState({ target, message: `${label} COPIED` });
     } catch {
-      setCopyMessage("COPY UNAVAILABLE");
+      setCopyState({ target, message: "COPY UNAVAILABLE" });
     }
+    copyReset.current = window.setTimeout(() => setCopyState(null), 1800);
   };
 
   if (!candidate) {
@@ -87,14 +99,14 @@ export function RadarCaseFile({
       : undefined;
 
   return (
-    <aside className="radar-case-file" aria-labelledby="case-file-title" aria-live="polite">
+    <aside className="radar-case-file" aria-labelledby="case-file-title">
       <section className="case-paper-head">
         <header>
           <span>CASE FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}</span>
           <b>OBSERVED. NOT AN IDENTITY.</b>
         </header>
         <h3 id="case-file-title">{shortHash(candidate.observedRecipientAddress)}</h3>
-        <code>{candidate.observedRecipientAddress}</code>
+        <code title={candidate.observedRecipientAddress}>{shortHash(candidate.observedRecipientAddress)}</code>
         <div className="case-tags">
           <b>{radar.method.evidencedRole}</b>
           <CoverageStamp state={radar.coverage.historyCoverage} />
@@ -102,11 +114,16 @@ export function RadarCaseFile({
         <button
           type="button"
           className="case-copy"
-          onClick={() => copy(candidate.observedRecipientAddress, "ADDRESS")}
+          onClick={() => copy(candidate.observedRecipientAddress, "ADDRESS", "address")}
         >
-          {copyMessage === "ADDRESS COPIED" ? copyMessage : "COPY ADDRESS"}
+          {copyState?.target === "address" ? copyState.message : "COPY ADDRESS"}
         </button>
-        <span className="sr-only" aria-live="polite">{copyMessage}</span>
+        <output className="case-copy-status" aria-live="polite">
+          {copyState?.message}
+        </output>
+        <span className="sr-only" aria-live="polite" aria-atomic="true">
+          SELECTED RECIPIENT / INSPECTION ORDER {candidate.rank}
+        </span>
       </section>
 
       <section className="case-facts" aria-label="Selected recipient facts">
@@ -154,7 +171,7 @@ export function RadarCaseFile({
           RECIPIENT WATCH / FUTURE CAPABILITY
         </button>
         <p id="tripwire-boundary">
-          Existing Rat Watch tracks reported creator addresses. This Radar file is an observed swap-recipient address.
+          Radar observes swap-recipient addresses. Current Rat Watch tracks reported creator addresses.
         </p>
       </section>
 
@@ -163,9 +180,9 @@ export function RadarCaseFile({
           <h4 id="case-receipts-title">PUBLIC EVIDENCE RECEIPTS</h4>
           <span>{mode === "DEMO" ? "DETERMINISTIC DEMO" : "LIVE PUBLIC READ"}</span>
         </header>
-        {receiptState.kind === "loading" && <p className="case-receipt-state">LOADING RECEIPT DETAIL…</p>}
+        {receiptState.kind === "loading" && <p className="case-receipt-state" role="status">LOADING RECEIPT DETAIL…</p>}
         {receiptState.kind === "unavailable" && (
-          <p className="case-receipt-state unavailable">RECEIPT DETAIL UNAVAILABLE</p>
+          <p className="case-receipt-state unavailable" role="status">RECEIPT DETAIL UNAVAILABLE</p>
         )}
         {receiptState.kind === "ready" && receiptState.activities.length === 0 && (
           <p className="case-receipt-state">NO BOUNDED RECEIPT DETAIL WAS RETURNED.</p>
@@ -178,24 +195,32 @@ export function RadarCaseFile({
                 <button
                   type="button"
                   className="case-receipt-select"
-                  onClick={() => setSelectedActivityId(activity.activityId)}
+                  onClick={() => {
+                    if (copyReset.current !== null) window.clearTimeout(copyReset.current);
+                    setCopyState(null);
+                    setSelectedActivityId(activity.activityId);
+                  }}
                   aria-pressed={active}
                 >
-                  <span>OBSERVED RECEIPT / {shortHash(activity.activityId)}</span>
+                  <span title={activity.activityId}>OBSERVED RECEIPT / {shortHash(activity.activityId)}</span>
                   <b>BLK {activity.blockNumber}</b>
                   <small>{receiptFlow(activity.launchedTokenFlow)}</small>
                 </button>
                 {active && (
                   <div className="case-receipt-detail">
                     <dl>
-                      <div><dt>LAUNCH</dt><dd>{activity.launchId}</dd></div>
+                      <div><dt>LAUNCH</dt><dd title={activity.launchId}>{activity.launchId}</dd></div>
                       <div><dt>TX</dt><dd title={activity.txHash}>{shortHash(activity.txHash)}</dd></div>
                       <div><dt>LOG INDEX</dt><dd>{activity.logIndex}</dd></div>
                       <div><dt>PROOF DIGEST</dt><dd title={activity.evidenceDigest}>{shortHash(activity.evidenceDigest)}</dd></div>
                     </dl>
                     <div className="case-receipt-actions">
-                      <button type="button" onClick={() => copy(activity.activityId, "ACTIVITY ID")}>COPY ACTIVITY ID</button>
-                      <button type="button" onClick={() => copy(activity.txHash, "TX HASH")}>COPY TX HASH</button>
+                      <button type="button" onClick={() => copy(activity.activityId, "ACTIVITY ID", `activity:${activity.activityId}`)}>
+                        {copyState?.target === `activity:${activity.activityId}` ? copyState.message : "COPY ACTIVITY ID"}
+                      </button>
+                      <button type="button" onClick={() => copy(activity.txHash, "TX HASH", `tx:${activity.txHash}`)}>
+                        {copyState?.target === `tx:${activity.txHash}` ? copyState.message : "COPY TX HASH"}
+                      </button>
                     </div>
                   </div>
                 )}
@@ -218,7 +243,9 @@ export function RadarCaseFile({
           receiptId={radar.receipt.receiptId}
           tone="paper"
         />
-        <code className="case-projection-digest">PROJECTION DIGEST / {radar.receipt.evidenceDigest}</code>
+        <code className="case-projection-digest" title={radar.receipt.evidenceDigest}>
+          PROJECTION DIGEST / {shortHash(radar.receipt.evidenceDigest)}
+        </code>
       </section>
 
       <footer className="case-boundary">

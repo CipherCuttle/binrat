@@ -1,6 +1,6 @@
 # BINRAT North-Star Implementation Spec V1
 
-Status: FROZEN FOR PRODUCT SURFACE V1 CALIBRATION
+Status: FROZEN VISUAL AUTHORITY FOR PRODUCT SURFACE V1
 
 ## Authority
 
@@ -32,4 +32,4 @@ North-star screenshots define atmosphere, composition, hierarchy, material langu
 
 ## Runtime assets
 
-Runtime assets are exact or optimized derivatives of canonical sources, stored under `web-v2/src/assets/north-star/`; canonical files remain untouched. Gate 0 uses exact PNG copies because no safe optimizer is currently available. Produce visually lossless, measured derivatives before production migration.
+Runtime assets are exact or optimized derivatives of canonical sources, stored under `web-v2/src/assets/north-star/`; canonical files remain untouched. Product surfaces may use visually lossless, measured WebP derivatives where dimensions and browser rendering have been checked.

@@ -1,14 +1,14 @@
 import type { CSSProperties } from "react";
 import { AppLink } from "./Primitives";
 import { RadarWorkbench } from "./RadarWorkbench";
-import characterUrl from "./assets/north-star/binrat-character-master.png";
-import worldBackgroundUrl from "./assets/north-star/binrat-world-background.png";
+import characterUrl from "./assets/north-star/binrat-character-master.webp";
+import worldBackgroundUrl from "./assets/north-star/binrat-world-background.webp";
 import type { DataMode } from "./data";
 import type { RadarWatchlist } from "./types";
 
 type Navigate = (path: string) => void;
 
-const calibrationNav = [
+const productNav = [
   ["DUMPSTER", "/dumpster"],
   ["RADAR", "/radar"],
   ["REPLAY", "/replay"],
@@ -42,7 +42,7 @@ export function AppHeader({ navigate }: { navigate: Navigate }) {
         </span>
       </AppLink>
       <nav aria-label="Primary navigation">
-        {calibrationNav.map(([label, path]) => (
+        {productNav.map(([label, path]) => (
           <AppLink
             key={path}
             href={path}
@@ -66,21 +66,13 @@ export function RadarMasthead() {
         <p className="cal-support">
           Observed recipient recurrence across indexed launches.
         </p>
-        <p className="cal-secondary">
-          Same addresses. Different evidence histories.
-        </p>
-        <div className="cal-type" aria-label="Typography calibration">
-          <span>DISPLAY / PLEX CONDENSED</span>
-          <span>LABEL / PLEX MONO</span>
-          <strong>Aa 0123 / SELECTABLE TYPE</strong>
-        </div>
+        <p className="cal-secondary">Evidence stays bounded to indexed receipts.</p>
       </div>
       <figure className="cal-character">
         <img
           src={characterUrl}
           alt="BINRAT, the canonical cybernetic rat, watching from a dumpster"
         />
-        <figcaption>CANONICAL FIELD UNIT / CHARACTER MASTER</figcaption>
       </figure>
     </section>
   );
@@ -106,7 +98,7 @@ function RadarError({ mode }: { mode: DataMode }) {
   );
 }
 
-export function RadarCalibration({
+export function RadarSurface({
   navigate,
   radar,
   mode,
@@ -121,7 +113,7 @@ export function RadarCalibration({
   return (
     <div className="cal-app" style={style}>
       <a className="skip-link" href="#content">
-        Skip to calibration content
+        Skip to Radar evidence
       </a>
       <AppWorldBackground />
       <div className="cal-shell">

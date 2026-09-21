@@ -17,7 +17,7 @@ import {
   RecurrenceMarks,
   WatchControl,
 } from "./Primitives";
-import { RadarCalibration } from "./Calibration";
+import { RadarSurface } from "./Calibration";
 
 type Route =
   | { page: "home" }
@@ -54,7 +54,7 @@ export default function App() {
   const [radar, setRadar] = useState<RadarWatchlist | null>(null);
   const [mode, setMode] = useState<DataMode>("DEMO");
   const [error, setError] = useState("");
-  const isCalibration = route.page === "radar";
+  const isRadar = route.page === "radar";
   useEffect(() => {
     setError("");
     const requestedMode = new URLSearchParams(window.location.search).get("source") === "live"
@@ -93,9 +93,9 @@ export default function App() {
         : "smooth",
     });
   };
-  if (isCalibration)
+  if (isRadar)
     return (
-      <RadarCalibration
+      <RadarSurface
         navigate={navigate}
         radar={radar}
         mode={mode}
