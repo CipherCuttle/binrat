@@ -18,6 +18,7 @@ import {
   RecurrenceMarks,
   WatchControl,
 } from "./Primitives";
+import { RadarCalibration } from "./Calibration";
 
 type Route =
   | { page: "home" }
@@ -54,7 +55,9 @@ export default function App() {
   const [radar, setRadar] = useState<RadarWatchlist | null>(null);
   const [mode, setMode] = useState<DataMode>("DEMO");
   const [error, setError] = useState("");
+  const isCalibration = route.page === "radar";
   useEffect(() => {
+    if (isCalibration) return;
     loadProductData()
       .then((data) => {
         setFeed(data.feed);
@@ -64,7 +67,7 @@ export default function App() {
       .catch((reason: unknown) =>
         setError(reason instanceof Error ? reason.message : "DATA_UNAVAILABLE"),
       );
-  }, []);
+  }, [isCalibration]);
   useEffect(() => {
     const onPopState = () => setRoute(readRoute());
     window.addEventListener("popstate", onPopState);
@@ -87,6 +90,7 @@ export default function App() {
         : "smooth",
     });
   };
+  if (isCalibration) return <RadarCalibration navigate={navigate} />;
   const content = error ? (
     <EmptyState
       title="THE TRAIL WENT COLD."
@@ -98,8 +102,6 @@ export default function App() {
     <Home feed={feed} radar={radar} navigate={navigate} />
   ) : route.page === "dumpster" ? (
     <Dumpster feed={feed} navigate={navigate} />
-  ) : route.page === "radar" ? (
-    <Radar radar={radar} />
   ) : route.page === "bag" ? (
     <BagDossier
       bag={feed.bags.find((bag) => bag.id === route.id) ?? feed.bags[0]}
