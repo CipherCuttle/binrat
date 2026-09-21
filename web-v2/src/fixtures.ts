@@ -85,9 +85,9 @@ export const demoRadar: RadarWatchlist = {
     recommendationBoundary: 'Ranking describes observed recurrence and timing; it is not a BUY/SELL recommendation.'
   },
   candidates: [
-    ['0x7cA80c219A384F9C4b285F10A7537B0f2629C0E1', 8, 18, 2, 1],
+    ['0x7cA80c219A384F9C4b285F10A7537B0f2629C0E1', 13, 18, 2, 1],
     ['0x31E6cb158D883Bf98f0D44649e5C3A9220459e7A', 6, 9, 4, 2],
-    ['0xA93b2242C01e3184f8137E3a03feEc27aB6Ba779', 5, 12, 7, 3],
+    ['0xA93b2242C01e3184f8137E3a03feEc27aB6Ba779', 9, 12, 7, 3],
     ['0x2d8C1cc6Fb6830F9E12e74b0cb3cC09F45F2e861', 4, 6, 3, 4],
     ['0x18f0d98dD5a50E4a1739f23bB132b5682101E1aa', 3, 7, 11, 5]
   ].map(([address, launches, receipts, median, rank]) => ({

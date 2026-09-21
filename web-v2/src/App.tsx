@@ -4,7 +4,6 @@ import type {
   Bag,
   EvidenceState,
   PublicFeed,
-  RadarCandidate,
   RadarWatchlist,
   RatState,
 } from "./types";
@@ -57,7 +56,11 @@ export default function App() {
   const [error, setError] = useState("");
   const isCalibration = route.page === "radar";
   useEffect(() => {
-    if (isCalibration) return;
+    setError("");
+    const requestedMode = new URLSearchParams(window.location.search).get("source") === "live"
+      ? "LIVE"
+      : "DEMO";
+    setMode(requestedMode);
     loadProductData()
       .then((data) => {
         setFeed(data.feed);
@@ -67,7 +70,7 @@ export default function App() {
       .catch((reason: unknown) =>
         setError(reason instanceof Error ? reason.message : "DATA_UNAVAILABLE"),
       );
-  }, [isCalibration]);
+  }, []);
   useEffect(() => {
     const onPopState = () => setRoute(readRoute());
     window.addEventListener("popstate", onPopState);
@@ -90,7 +93,15 @@ export default function App() {
         : "smooth",
     });
   };
-  if (isCalibration) return <RadarCalibration navigate={navigate} />;
+  if (isCalibration)
+    return (
+      <RadarCalibration
+        navigate={navigate}
+        radar={radar}
+        mode={mode}
+        error={error}
+      />
+    );
   const content = error ? (
     <EmptyState
       title="THE TRAIL WENT COLD."
@@ -411,143 +422,6 @@ function Dumpster({
         />
       )}
     </div>
-  );
-}
-
-function Radar({ radar }: { radar: RadarWatchlist }) {
-  const [selected, setSelected] = useState<RadarCandidate>(radar.candidates[0]);
-  return (
-    <div className="page-pad radar-page">
-      <PageHeading
-        index="02"
-        eyebrow="OBSERVED RECURRENCE / TIMING"
-        title="RAT RADAR"
-        detail="Recurring observed recipient addresses worth inspecting because their evidence is unusual—not because BINRAT recommends buying anything."
-      />
-      <div className="radar-method">
-        <div>
-          <span>INDEXED LAUNCHES</span>
-          <b>{radar.coverage.indexedLaunchCount}</b>
-        </div>
-        <div>
-          <span>ACQUISITION RECEIPTS</span>
-          <b>{radar.coverage.acquisitionReceiptCount}</b>
-        </div>
-        <div>
-          <span>OBSERVED ADDRESSES</span>
-          <b>{radar.coverage.distinctRecipientAddressCount}</b>
-        </div>
-        <div>
-          <span>COVERAGE</span>
-          <CoverageStamp state={radar.coverage.historyCoverage} />
-        </div>
-      </div>
-      <div className="radar-workbench">
-        <section className="radar-list" aria-label="Ranked observed addresses">
-          <div className="radar-head">
-            <span>ORDER / ADDRESS</span>
-            <span>LAUNCH SCARS</span>
-            <span>FIRST ENTRY</span>
-            <span>RECEIPTS</span>
-          </div>
-          {radar.candidates.map((candidate) => (
-            <button
-              className={
-                selected.rank === candidate.rank
-                  ? "radar-row selected"
-                  : "radar-row"
-              }
-              key={candidate.observedRecipientAddress}
-              onClick={() => setSelected(candidate)}
-              aria-pressed={selected.rank === candidate.rank}
-            >
-              <span className="rank-address">
-                <b>{String(candidate.rank).padStart(2, "0")}</b>
-                <code>{short(candidate.observedRecipientAddress)}</code>
-              </span>
-              <span className="recurrence">
-                <b>{candidate.distinctLaunchCount}</b>
-                <RecurrenceMarks
-                  count={candidate.distinctLaunchCount}
-                  compact
-                />
-              </span>
-              <span>
-                <b>+{candidate.medianFirstEntryBlockDelta}</b>
-                <small>MEDIAN BLOCKS</small>
-              </span>
-              <span>
-                <b>{candidate.acquisitionReceiptCount}</b>
-                <small>OBSERVED</small>
-              </span>
-            </button>
-          ))}
-        </section>
-        <EvidenceDossier
-          candidate={selected}
-          coverage={radar.coverage.historyCoverage}
-          checkpoint={radar.asOfBlock}
-        />
-      </div>
-      <ProofBoundary>
-        {radar.method.identityBoundary} {radar.method.recommendationBoundary}
-      </ProofBoundary>
-    </div>
-  );
-}
-
-function EvidenceDossier({
-  candidate,
-  coverage,
-  checkpoint,
-}: {
-  candidate: RadarCandidate;
-  coverage: RadarWatchlist["coverage"]["historyCoverage"];
-  checkpoint: string;
-}) {
-  const [watching, setWatching] = useState(false);
-  return (
-    <aside className="evidence-dossier" aria-live="polite">
-      <CaseTab tone="orange">
-        OPEN FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}
-      </CaseTab>
-      <h2>{short(candidate.observedRecipientAddress)}</h2>
-      <code className="full-address">{candidate.observedRecipientAddress}</code>
-      <div className="dossier-recurrence">
-        <span>DISTINCT LAUNCH RECURRENCE</span>
-        <b>{candidate.distinctLaunchCount}</b>
-        <RecurrenceMarks count={candidate.distinctLaunchCount} />
-      </div>
-      <div className="dossier-stamp">
-        <span>OBSERVED ROLE — NOT CREATOR IDENTITY</span>
-        <b>V3_SWAP_RECIPIENT</b>
-      </div>
-      <WatchControl
-        armed={watching}
-        onClick={() => setWatching((value) => !value)}
-        subject="ADDRESS"
-      />
-      <div className="reason-list">
-        {candidate.reasons.map((reason, index) => (
-          <p key={reason}>
-            <span>0{index + 1}</span>
-            {reason}
-          </p>
-        ))}
-      </div>
-      <Receipt
-        title="ACQUISITION RECEIPTS"
-        count={candidate.acquisitionReceiptCount}
-      >
-        {candidate.evidenceActivityIds.map((id) => (
-          <code key={id}>{id.slice(0, 18)}…</code>
-        ))}
-      </Receipt>
-      <CheckpointRail checkpoint={checkpoint} coverage={coverage} />
-      <small className="identity-note">
-        Address role only. Human identity is not inferred.
-      </small>
-    </aside>
   );
 }
 

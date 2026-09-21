@@ -1,7 +1,10 @@
 import type { CSSProperties } from "react";
 import { AppLink } from "./Primitives";
+import { RadarWorkbench } from "./RadarWorkbench";
 import characterUrl from "./assets/north-star/binrat-character-master.png";
 import worldBackgroundUrl from "./assets/north-star/binrat-world-background.png";
+import type { DataMode } from "./data";
+import type { RadarWatchlist } from "./types";
 
 type Navigate = (path: string) => void;
 
@@ -83,49 +86,37 @@ export function RadarMasthead() {
   );
 }
 
-function MachineSample() {
+function RadarLoading({ mode }: { mode: DataMode }) {
   return (
-    <article className="cal-machine" aria-labelledby="machine-sample-title">
-      <header>
-        <span>01 / MATERIAL CALIBRATION</span>
-        <b>MACHINE</b>
-      </header>
-      <div className="cal-machine-readout">
-        <p id="machine-sample-title">INSTRUMENT SURFACE</p>
-        <strong>COBALT / TEAL</strong>
-        <span>HARD RULE · RESTRAINED WEAR · PHYSICAL CONTROL</span>
-      </div>
-      <div className="cal-controls" aria-label="Non-functional material controls">
-        <span>CALIBRATION ONLY</span>
-        <i aria-hidden="true" />
-        <i aria-hidden="true" />
-        <i aria-hidden="true" />
-      </div>
-    </article>
+    <section className="radar-state" aria-live="polite">
+      <span aria-hidden="true" />
+      <strong>TRACING OBSERVED RECIPIENTS…</strong>
+      <small>{mode === "DEMO" ? "DETERMINISTIC DEMO DATA" : "PUBLIC LIVE DATA"}</small>
+    </section>
   );
 }
 
-function EvidenceSample() {
+function RadarError({ mode }: { mode: DataMode }) {
   return (
-    <article className="cal-evidence" aria-labelledby="evidence-sample-title">
-      <header>
-        <span>02 / MATERIAL CALIBRATION</span>
-        <b>EVIDENCE</b>
-      </header>
-      <div className="cal-paper-rule">
-        <p id="evidence-sample-title">PHYSICAL PAPER SURFACE</p>
-        <strong>DIRTY CREAM / HIGH LEGIBILITY</strong>
-        <span>RECEIPT VOCABULARY · HARD RULE · NO CLAIM</span>
-      </div>
-      <div className="cal-paper-footer">
-        <span>SPECIMEN — NOT EVIDENCE</span>
-        <b>UNVERIFIED</b>
-      </div>
-    </article>
+    <section className="radar-state error" role="alert">
+      <strong>THE TRAIL WENT COLD.</strong>
+      <p>No validated Radar evidence was returned.</p>
+      <small>{mode === "LIVE" ? "LIVE READ FAILED / NO DEMO FALLBACK" : "DATA UNAVAILABLE"}</small>
+    </section>
   );
 }
 
-export function RadarCalibration({ navigate }: { navigate: Navigate }) {
+export function RadarCalibration({
+  navigate,
+  radar,
+  mode,
+  error,
+}: {
+  navigate: Navigate;
+  radar: RadarWatchlist | null;
+  mode: DataMode;
+  error: string;
+}) {
   const style = { "--cal-app-width": "1480px" } as CSSProperties;
   return (
     <div className="cal-app" style={style}>
@@ -137,10 +128,13 @@ export function RadarCalibration({ navigate }: { navigate: Navigate }) {
         <AppHeader navigate={navigate} />
         <main id="content" tabIndex={-1}>
           <RadarMasthead />
-          <section className="cal-materials" aria-label="Material calibration">
-            <MachineSample />
-            <EvidenceSample />
-          </section>
+          {error ? (
+            <RadarError mode={mode} />
+          ) : radar ? (
+            <RadarWorkbench radar={radar} mode={mode} />
+          ) : (
+            <RadarLoading mode={mode} />
+          )}
         </main>
       </div>
     </div>

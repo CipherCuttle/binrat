@@ -74,17 +74,20 @@ export function RecurrenceMarks({
   total?: number;
   compact?: boolean;
 }) {
-  const slots = Math.max(total, count);
+  const visualCap = Math.min(Math.max(total, 1), 10);
+  const visibleCount = Math.min(Math.max(count, 0), visualCap);
+  const overflow = Math.max(count - visibleCount, 0);
   return (
     <span
       className={compact ? "recurrence-marks compact" : "recurrence-marks"}
       aria-label={`${count} distinct indexed launch recurrences`}
     >
-      {Array.from({ length: slots }, (_, index) => (
-        <i key={index} className={index < count ? "hit" : ""}>
+      {Array.from({ length: visibleCount }, (_, index) => (
+        <i key={index} className={`scar scar-${(index + count) % 4}`}>
           <span>{index + 1}</span>
         </i>
       ))}
+      {overflow > 0 && <b className="scar-overflow">+{overflow}</b>}
     </span>
   );
 }
