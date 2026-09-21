@@ -1,4 +1,8 @@
 import { sha256Hex } from '../evidence/canonical.js';
+import {
+  CONFIGURED_PRODUCTION_AUTHORITIES,
+  LAUNCH_MECHANICS_RECEIPT_DIGEST
+} from '../launchConfig/config.js';
 import type { CapabilityManifest, CapabilityState } from '../telegram/rat.js';
 import type { FundingConfigResolution } from './config.js';
 import {
@@ -13,11 +17,14 @@ export const DUMPSTER_LEDGER_PROJECTION_VERSION = 'BINRAT_DUMPSTER_LEDGER_V0' as
 export interface PublicDumpsterLedger {
   schemaVersion: typeof DUMPSTER_LEDGER_SCHEMA_VERSION;
   projectionVersion: typeof DUMPSTER_LEDGER_PROJECTION_VERSION;
-  accountingState: 'PRE_LAUNCH_NO_FUNDING_AUTHORITY' | 'FAIL_CLOSED' | 'TEST_FIXTURE';
+  accountingState: 'PRE_LAUNCH_AUTHORITIES_CONFIGURED' | 'FAIL_CLOSED' | 'TEST_FIXTURE';
   chainId: number;
   tokenState: string;
   launchAuthorization: string;
   marketingAuthorized: boolean;
+  configuredAuthorities: typeof CONFIGURED_PRODUCTION_AUTHORITIES & {
+    launchMechanicsReceiptDigest: typeof LAUNCH_MECHANICS_RECEIPT_DIGEST;
+  };
   fundingAuthority: {
     status: FundingConfigResolution['status'];
     accountingEnabled: false;
@@ -46,9 +53,16 @@ export interface PublicDumpsterLedger {
     links: { transaction: null; from: null; to: null };
   }>;
   coverage: {
-    status: 'NO_CANONICAL_FUNDING_AUTHORITY' | 'FAIL_CLOSED' | 'TEST_FIXTURE_ONLY';
+    status: 'NO_TOKEN_OBSERVATIONS_AVAILABLE' | 'FAIL_CLOSED' | 'TEST_FIXTURE_ONLY';
     fromBlock: string | null;
     throughBlock: string | null;
+  };
+  observedDataAvailability: {
+    tokenAddress: 'NOT_YET_AVAILABLE';
+    launchBlock: 'NOT_YET_AVAILABLE';
+    launchTransaction: 'NOT_YET_AVAILABLE';
+    tokenRelatedInflows: 'NOT_YET_AVAILABLE';
+    tokenRelatedOutflows: 'NOT_YET_AVAILABLE';
   };
   utilityStatus: {
     source: 'CAPABILITY_MANIFEST';
@@ -82,6 +96,12 @@ export async function projectDumpsterLedger(
   source: 'PRODUCTION' | 'TEST_FIXTURE' = 'PRODUCTION'
 ): Promise<PublicDumpsterLedger> {
   const config = funding.config;
+  if (
+    manifest.launchAuthorization.status !== 'BLOCKED' ||
+    manifest.launchAuthorization.marketingAuthorized !== false ||
+    manifest.launchAuthorization.launchAuthorized !== false ||
+    manifest.launchAuthorization.tokenState !== 'NOT_LAUNCHED'
+  ) throw new Error('DUMPSTER_LEDGER_STATUS_CONTRADICTION');
   if (source === 'PRODUCTION' && values.length > 0) {
     throw new Error('DUMPSTER_LEDGER_FIXTURE_LEAK_BLOCKED');
   }
@@ -97,13 +117,13 @@ export async function projectDumpsterLedger(
   const tokenTotals = tokenKey ? byAsset.find((item) => assetKey(item) === tokenKey) : undefined;
   const accountingState = source === 'TEST_FIXTURE'
     ? 'TEST_FIXTURE' as const
-    : funding.status === 'TREASURY_AUTHORITY_NOT_CONFIGURED'
-      ? 'PRE_LAUNCH_NO_FUNDING_AUTHORITY' as const
+    : funding.status === 'PRELAUNCH_AUTHORITIES_CONFIGURED'
+      ? 'PRE_LAUNCH_AUTHORITIES_CONFIGURED' as const
       : 'FAIL_CLOSED' as const;
   const coverageStatus = source === 'TEST_FIXTURE'
     ? 'TEST_FIXTURE_ONLY' as const
-    : funding.status === 'TREASURY_AUTHORITY_NOT_CONFIGURED'
-      ? 'NO_CANONICAL_FUNDING_AUTHORITY' as const
+    : funding.status === 'PRELAUNCH_AUTHORITIES_CONFIGURED'
+      ? 'NO_TOKEN_OBSERVATIONS_AVAILABLE' as const
       : 'FAIL_CLOSED' as const;
   const manifestDigest = await sha256Hex(manifest);
   const output = {
@@ -114,6 +134,10 @@ export async function projectDumpsterLedger(
     tokenState: manifest.launchAuthorization.tokenState ?? 'UNVERIFIED',
     launchAuthorization: manifest.launchAuthorization.status,
     marketingAuthorized: manifest.launchAuthorization.marketingAuthorized,
+    configuredAuthorities: {
+      ...CONFIGURED_PRODUCTION_AUTHORITIES,
+      launchMechanicsReceiptDigest: LAUNCH_MECHANICS_RECEIPT_DIGEST
+    },
     fundingAuthority: {
       status: funding.status,
       accountingEnabled: false as const,
@@ -143,6 +167,13 @@ export async function projectDumpsterLedger(
       fromBlock: entries[0]?.blockNumber ?? null,
       throughBlock: entries.at(-1)?.blockNumber ?? null
     },
+    observedDataAvailability: {
+      tokenAddress: 'NOT_YET_AVAILABLE' as const,
+      launchBlock: 'NOT_YET_AVAILABLE' as const,
+      launchTransaction: 'NOT_YET_AVAILABLE' as const,
+      tokenRelatedInflows: 'NOT_YET_AVAILABLE' as const,
+      tokenRelatedOutflows: 'NOT_YET_AVAILABLE' as const
+    },
     utilityStatus: {
       source: 'CAPABILITY_MANIFEST' as const,
       manifestSchemaVersion: manifest.schemaVersion,
@@ -152,10 +183,9 @@ export async function projectDumpsterLedger(
       'REVIEWED_ON_CHAIN_FUNDING_OBSERVATION_SOURCE'
     ] : [
       'TOKEN_CONTRACT_ADDRESS',
-      'CREATOR_OR_PROJECT_FEE_RECIPIENTS',
-      'TREASURY_ADDRESSES',
       'EFFECTIVE_FROM_BLOCK',
       'CATEGORY_POLICY_VERSION',
+      'EXPLICIT_ACCOUNTING_OBSERVER_ACTIVATION',
       'REVIEWED_ON_CHAIN_FUNDING_OBSERVATION_SOURCE'
     ],
     explanation: source === 'TEST_FIXTURE'
@@ -164,8 +194,8 @@ export async function projectDumpsterLedger(
         ? 'BINRAT is not launched. Canonical funding configuration is present, but production accounting remains disabled until a reviewed on-chain observation source is implemented; totals remain zero.'
         : funding.status === 'TREASURY_AUTHORITY_INVALID'
           ? 'BINRAT is not launched. The supplied funding authority is invalid, so production accounting fails closed and no wallet or balance is presented as truth.'
-          : 'BINRAT is not launched. No canonical token treasury or fee route is configured, so production token inflows and outflows are zero and no wallets are presented as treasury authority.',
-    evidenceBoundary: 'Ledger entries must be immutable on-chain facts bound to canonical funding authority. Unknown intent remains UNCATEGORIZED; presentation cannot create accounting truth.'
+          : 'BINRAT is not launched. Owner-selected future treasury and project-fee authorities are configured, but no token, launch block, launch transaction, or token-flow observations exist. Production accounting remains disabled.',
+    evidenceBoundary: 'Configured authority is an owner policy declaration, not proof of custody or an observed token role. Zero pre-launch entries mean token observations are not yet available; they do not predict or preclude future flows. Ledger entries must be immutable on-chain facts bound to activated canonical funding authority.'
   };
   const outputDigest = await sha256Hex(output);
   const receiptMaterial = {

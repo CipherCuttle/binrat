@@ -71,6 +71,14 @@ Required launch stack:
 
 Legal/compliance is a **parallel authorization lane from the start**, not the last feature in the sequence. Token-facing marketing and launch authority remain fail-closed until the applicable legal/compliance, contract, treasury, and disclosure gates are complete and explicitly authorized in the canonical capability manifest.
 
+### Launch Mechanics Verification V0
+
+The dated Arc-mainnet receipt at `docs/LAUNCH_MECHANICS_VERIFICATION_V0.json` verifies the current ArcPad USDC standard creator-rewards rail through deployed bytecode, state, historical calls, logs, fee collections, and three real launch reconstructions. It binds the live launcher, token factory, fee/liquidity locker, Uniswap V3 authorities, token mechanics, bounded liquidity position, fee paths, 1,200-block wallet cap, and optional same-transaction creator first buy.
+
+Status: `ENGINEERING_PASS / VERIFIED_BOUND_TO_LAUNCH_CONFIG_V0`. ArcPad contract source could not be matched independently to the deployed bytecode, and the verified rail contains material external authority: the current launcher owner can redirect future creator quote-fee accrual. The lock finding means no withdrawal path exists in the observed locker runtime; it does not mean the position remains in range or economically active forever.
+
+The separate `BINRAT_LAUNCH_CONFIG_V0.json` now binds the owner-selected fee recipient, treasury, allocation policy, disabled first buy, and not-planned launch-time public purchase to this receipt digest. Holder threshold, token address, metadata, timing, execution, and legal/compliance remain unresolved. Canonical status remains `BLOCKED / marketingAuthorized=false / tokenState=NOT_LAUNCHED`.
+
 ### Replay Lab — pre-launch technical proof
 
 Replay Lab demonstrates BINRAT's evidence moat without waiting for fresh launch density:
@@ -103,9 +111,9 @@ The point is not to pretend the project has no funding motive. The point is to m
 
 Dumpster Ledger V0 is implemented as an immutable, receipt-bound projection over four separate layers: canonical funding configuration, observed transactions, conservative categorization, and public presentation. Production configuration validates chain, token, role-address uniqueness, effective block, and policy versions. A valid configuration still cannot activate accounting until a reviewed observation source exists.
 
-The pre-launch transparency surface is live at `GET /api/dumpster-ledger`. Because `$BINRAT` has not launched and no canonical token, fee recipient, or treasury authority is configured, it truthfully returns `PRE_LAUNCH_NO_FUNDING_AUTHORITY`, zero production entries/inflows/outflows, no configured wallets, and the shipped/building/planned utility state derived from the capability manifest. Test fixtures exercise future inflow/outflow behavior but are explicitly labeled and cannot enter the production projection. No explorer URL convention is manufactured before it is frozen.
+The pre-launch transparency surface is live at `GET /api/dumpster-ledger`. It returns `PRE_LAUNCH_AUTHORITIES_CONFIGURED`, exposes the owner-selected future treasury and project-fee roles, and separately marks the token, launch transaction/block, and token-flow observations unavailable. Accounting remains disabled and production totals have zero entries; that absence of observations is not a claim that future flows cannot exist. Test fixtures remain explicitly labeled and cannot enter the production projection.
 
-Status: `ENGINEERING_PASS / CLOUDFLARE_LIVE_VERIFIED / PRE_LAUNCH_TRANSPARENCY_LIVE`. Production funding authority remains `TREASURY_AUTHORITY_NOT_CONFIGURED`, production accounting remains disabled, and `dumpster_ledger_bootstrap` remains a required launch artifact until canonical funding authority and live transaction observation are accepted.
+Status: `ENGINEERING_PASS / PRE_LAUNCH_TRANSPARENCY_CONFIGURED`. Wallet roles are `PRELAUNCH_AUTHORITIES_CONFIGURED`; production accounting remains disabled, and `dumpster_ledger_bootstrap` remains required until the actual token, effective block, bound receipt, and explicitly activated reviewed observer exist. The earlier live deployment is not claimed to contain these unreleased local changes.
 
 ### Rat Den V0 — optional / post-launch
 
@@ -172,6 +180,8 @@ Holder Gate V0 engineering status (2026-09-20):
 - deployed wallet challenge/session writes are disabled unless the separate wallet-auth switch is explicitly enabled;
 - production holder eligibility is deliberately fail-closed as `TOKEN_AUTHORITY_NOT_CONFIGURED` because no canonical `$BINRAT` contract or final threshold exists;
 - no production token address, production threshold, private-key custody, transaction signing, or token action is authorized by this engineering pass.
+
+The launch-mechanics handoff keeps HOLDER inactive and leaves the token address and threshold unset. Later activation must bind chain ID `5042`, the actual canonical token address, an owner-approved absolute raw balance threshold, policy/version, effective time or block, and a separately reviewed balance source. No subset of those fields activates production eligibility.
 
 ### Rat Watch V0
 

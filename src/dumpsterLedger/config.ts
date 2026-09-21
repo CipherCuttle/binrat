@@ -1,8 +1,14 @@
 import { getAddress, isAddress, type Hex } from 'viem';
+import {
+  BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS,
+  BINRAT_TREASURY_ADDRESS,
+  LAUNCH_MECHANICS_RECEIPT_DIGEST
+} from '../launchConfig/config.js';
 
 export const FUNDING_CONFIG_SCHEMA_VERSION = 'binrat.funding-config/0.1' as const;
 
 export type FundingAuthorityStatus =
+  | 'PRELAUNCH_AUTHORITIES_CONFIGURED'
   | 'TREASURY_AUTHORITY_NOT_CONFIGURED'
   | 'TREASURY_AUTHORITY_INVALID'
   | 'FUNDING_OBSERVATION_SOURCE_NOT_IMPLEMENTED';
@@ -13,6 +19,8 @@ export interface CanonicalFundingConfig {
   categoryPolicyVersion: string;
   chainId: number;
   accountingEnabled: true;
+  accountingObserverActivated: true;
+  launchMechanicsReceiptDigest: typeof LAUNCH_MECHANICS_RECEIPT_DIGEST;
   effectiveFromBlock: string;
   tokenAddress: Hex;
   creatorFeeRecipients: readonly Hex[];
@@ -28,7 +36,7 @@ export function resolveProductionFundingConfig(
   raw: string | undefined,
   expectedChainId: number
 ): FundingConfigResolution {
-  if (!raw?.trim()) return { status: 'TREASURY_AUTHORITY_NOT_CONFIGURED', config: null };
+  if (!raw?.trim()) return { status: 'PRELAUNCH_AUTHORITIES_CONFIGURED', config: null };
   try {
     const config = validateFundingConfig(JSON.parse(raw), expectedChainId, 'PRODUCTION');
     // Deliberately fail closed. Valid addresses are necessary but do not activate accounting;
@@ -53,11 +61,13 @@ export function validateFundingConfig(
   if (
     input.schemaVersion !== FUNDING_CONFIG_SCHEMA_VERSION ||
     input.accountingEnabled !== true ||
+    input.accountingObserverActivated !== true ||
+    input.launchMechanicsReceiptDigest !== LAUNCH_MECHANICS_RECEIPT_DIGEST ||
     input.chainId !== expectedChainId ||
     !Number.isSafeInteger(input.chainId) ||
     !/^[A-Z0-9_.-]{3,80}$/.test(configVersion) ||
     !/^[A-Z0-9_.-]{3,80}$/.test(categoryPolicyVersion) ||
-    !/^(0|[1-9][0-9]*)$/.test(string(input.effectiveFromBlock))
+    !/^[1-9][0-9]*$/.test(string(input.effectiveFromBlock))
   ) throw new Error('FUNDING_CONFIG_INVALID');
   if (mode === 'TEST_FIXTURE') {
     if (!configVersion.startsWith('TEST_') || !categoryPolicyVersion.startsWith('TEST_')) {
@@ -75,6 +85,15 @@ export function validateFundingConfig(
   if (new Set(authorities).size !== authorities.length || authorities.includes(tokenAddress)) {
     throw new Error('FUNDING_AUTHORITY_AMBIGUOUS');
   }
+  if (
+    mode === 'PRODUCTION' &&
+    (
+      creatorFeeRecipients.length !== 1 ||
+      treasuryAddresses.length !== 1 ||
+      creatorFeeRecipients[0] !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS.toLowerCase() ||
+      treasuryAddresses[0] !== BINRAT_TREASURY_ADDRESS.toLowerCase()
+    )
+  ) throw new Error('FUNDING_OWNER_ROLE_BINDING_INVALID');
 
   return Object.freeze({
     schemaVersion: FUNDING_CONFIG_SCHEMA_VERSION,
@@ -82,6 +101,8 @@ export function validateFundingConfig(
     categoryPolicyVersion,
     chainId: expectedChainId,
     accountingEnabled: true as const,
+    accountingObserverActivated: true as const,
+    launchMechanicsReceiptDigest: LAUNCH_MECHANICS_RECEIPT_DIGEST,
     effectiveFromBlock: string(input.effectiveFromBlock),
     tokenAddress,
     creatorFeeRecipients: Object.freeze(creatorFeeRecipients),

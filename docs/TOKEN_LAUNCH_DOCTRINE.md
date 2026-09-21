@@ -38,17 +38,26 @@ Project revenue is not hidden. It is part of the design.
 
 ## Preferred current launch rail: ArcPad standard launch
 
-Subject to legal/compliance review immediately before launch, ArcPad is the current preferred mechanical fit because its documented standard launch currently provides:
+Subject to legal/compliance review immediately before launch, the candidate rail is ArcPad's current Arc-mainnet USDC standard creator-rewards path. The dated `LAUNCH_MECHANICS_VERIFICATION_V0` receipt independently established that this variant currently provides:
 
 - fixed 1,000,000,000 token supply;
 - no presale;
 - no team allocation;
 - launch directly into a Uniswap V3 pool;
-- permanently locked launch liquidity;
-- creator participation through the same pool rather than a hidden allocation;
-- a disclosed creator share of USDC buy-side pool fees.
+- an initial position minted to a non-upgradeable locker whose observed runtime exposes no withdrawal, position-transfer, or decrease-liquidity path;
+- an optional same-transaction creator first buy through the new public pool, with privileged first-position ordering that must be disclosed if selected;
+- a creator claim on 50% of collected quote-side USDC fees and an ArcPad treasury route for the other 50%;
+- launch-token-side pool fees routed to the dead address;
+- a temporary 2% per-recipient cap lasting exactly 1,200 blocks, which is not Sybil resistance;
+- an ArcPad launcher-owner power to redirect future creator quote-fee accrual.
 
-BINRAT should re-verify the deployed contracts and current ArcPad terms immediately before launch. Product docs are not contract verification.
+The position can move out of range and cease being economically active even though its NFT cannot be withdrawn under the observed runtime. The observed initial mint also leaves sub-token raw-unit dust in the launcher, so BINRAT must not describe the allocation as literally 100% of raw units entering liquidity.
+
+The canonical receipt is `docs/LAUNCH_MECHANICS_VERIFICATION_V0.json`, summarized in `docs/LAUNCH_MECHANICS_VERIFICATION_V0.md`. ArcPad contract source was not available in a form that could be matched to deployed bytecode; the ArcPad findings are therefore on-chain verified or retained as platform claims, never source-verified.
+
+`docs/BINRAT_LAUNCH_CONFIG_V0.json` binds that receipt to the owner-selected project roles. Treasury is `0xab063A9b53a2Ab832a941aE5890ea05c1672339D`; project/creator fee recipient is `0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866`. They are separate, non-interchangeable owner declarations, not custody or on-chain execution proof. The privileged first buy, private presale, discounted insider round, hidden team allocation, and privileged founder/project launch allocation are all disabled or none. A founder/project ordinary public-market purchase at launch is not planned.
+
+BINRAT must re-verify the live app routing, deployed bytecode, state, fee authority, and current ArcPad terms immediately before launch. Product docs and this dated receipt are not perpetual contract authority.
 
 That verification must produce a dated launch-mechanics receipt binding the contract addresses, relevant code/immutability properties, fee routes, liquidity-lock mechanics, source documents, and verification timestamp used for the launch authorization decision.
 

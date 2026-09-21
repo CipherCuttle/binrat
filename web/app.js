@@ -135,10 +135,9 @@ async function bootstrapLedger() {
       ledger.fundingAuthority.status;
     document.querySelector("#ledger-token-state").textContent = ledger.tokenState;
     document.querySelector("#ledger-wallet-status").textContent =
-      ledger.fundingAuthority.creatorFeeRecipients.length === 0 &&
-      ledger.fundingAuthority.treasuryAddresses.length === 0
-        ? "NOT CONFIGURED"
-        : `${ledger.fundingAuthority.creatorFeeRecipients.length} FEE / ${ledger.fundingAuthority.treasuryAddresses.length} TREASURY`;
+      ledger.configuredAuthorities.status === "OWNER_SELECTED_PRE_LAUNCH"
+        ? "2 FUTURE ROLES CONFIGURED / ACCOUNTING OFF"
+        : "NOT CONFIGURED";
     document.querySelector("#ledger-money-in").textContent =
       `${ledger.totals.tokenInflowsRaw} RAW / ${ledger.totals.inflowEntryCount} ENTRIES`;
     document.querySelector("#ledger-money-out").textContent =

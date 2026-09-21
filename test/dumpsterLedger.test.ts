@@ -16,6 +16,7 @@ import {
   type DumpsterLedgerEntryInput
 } from '../src/dumpsterLedger/entries.js';
 import { projectDumpsterLedger } from '../src/dumpsterLedger/project.js';
+import { LAUNCH_MECHANICS_RECEIPT_DIGEST } from '../src/launchConfig/config.js';
 import type { CapabilityManifest } from '../src/telegram/rat.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
 
@@ -58,14 +59,18 @@ test('empty production ledger is useful, manifest-derived, and fail-closed pre-l
   const funding = resolveProductionFundingConfig(undefined, ARC_CHAIN_ID);
   const ledger = await projectDumpsterLedger(manifest, funding, []);
 
-  assert.equal(ledger.accountingState, 'PRE_LAUNCH_NO_FUNDING_AUTHORITY');
-  assert.equal(ledger.fundingAuthority.status, 'TREASURY_AUTHORITY_NOT_CONFIGURED');
+  assert.equal(ledger.accountingState, 'PRE_LAUNCH_AUTHORITIES_CONFIGURED');
+  assert.equal(ledger.fundingAuthority.status, 'PRELAUNCH_AUTHORITIES_CONFIGURED');
   assert.equal(ledger.fundingAuthority.accountingEnabled, false);
   assert.equal(ledger.tokenState, 'NOT_LAUNCHED');
   assert.equal(ledger.launchAuthorization, 'BLOCKED');
   assert.equal(ledger.marketingAuthorized, false);
   assert.deepEqual(ledger.fundingAuthority.creatorFeeRecipients, []);
   assert.deepEqual(ledger.fundingAuthority.treasuryAddresses, []);
+  assert.equal(ledger.configuredAuthorities.treasury.role, 'TREASURY');
+  assert.equal(ledger.configuredAuthorities.projectFeeRecipient.role, 'PROJECT_FEE_RECIPIENT');
+  assert.equal(ledger.configuredAuthorities.onChainRoleProof, 'NOT_YET_AVAILABLE');
+  assert.equal(ledger.observedDataAvailability.launchTransaction, 'NOT_YET_AVAILABLE');
   assert.equal(ledger.totals.entryCount, 0);
   assert.equal(ledger.totals.tokenInflowsRaw, '0');
   assert.equal(ledger.totals.tokenOutflowsRaw, '0');
@@ -77,6 +82,26 @@ test('empty production ledger is useful, manifest-derived, and fail-closed pre-l
   assert.deepEqual(ledger.utilityStatus.planned.map((item) => item.capability), ['ratDenV0']);
   assert.deepEqual(ledger.utilityStatus.building.map((item) => item.capability), ['holderGateV0']);
   assert.match(ledger.receipt.receiptId, /^binrat-dumpster-ledger:[0-9a-f]{64}$/);
+});
+
+test('pre-launch projection rejects contradictory launch authorization state', async () => {
+  const contradictory: CapabilityManifest = {
+    ...manifest,
+    launchAuthorization: {
+      status: 'AUTHORIZED',
+      marketingAuthorized: true,
+      launchAuthorized: true,
+      tokenState: 'LAUNCHED'
+    }
+  };
+  await assert.rejects(
+    projectDumpsterLedger(
+      contradictory,
+      resolveProductionFundingConfig(undefined, ARC_CHAIN_ID),
+      []
+    ),
+    /DUMPSTER_LEDGER_STATUS_CONTRADICTION/
+  );
 });
 
 test('fixture inflow and outflow preserve raw values, unknown category, totals and ordering', async () => {
@@ -193,7 +218,7 @@ test('entry validation rejects wrong chain, authority, direction and ambiguous a
 
 test('production funding configuration never defaults open and fixtures cannot leak', async () => {
   const missing = resolveProductionFundingConfig(undefined, ARC_CHAIN_ID);
-  assert.equal(missing.status, 'TREASURY_AUTHORITY_NOT_CONFIGURED');
+  assert.equal(missing.status, 'PRELAUNCH_AUTHORITIES_CONFIGURED');
   assert.equal(missing.config, null);
   assert.equal(
     resolveProductionFundingConfig('{bad json', ARC_CHAIN_ID).status,
@@ -214,10 +239,19 @@ test('production funding configuration never defaults open and fixtures cannot l
   const validButInactive = resolveProductionFundingConfig(JSON.stringify({
     ...fixtureConfigInput(),
     configVersion: 'PRODUCTION_V0',
-    categoryPolicyVersion: 'PRODUCTION_POLICY_V0'
+    categoryPolicyVersion: 'PRODUCTION_POLICY_V0',
+    creatorFeeRecipients: ['0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866'],
+    treasuryAddresses: ['0xab063A9b53a2Ab832a941aE5890ea05c1672339D']
   }), ARC_CHAIN_ID);
   assert.equal(validButInactive.status, 'FUNDING_OBSERVATION_SOURCE_NOT_IMPLEMENTED');
   assert.equal((await projectDumpsterLedger(manifest, validButInactive, [])).accountingState, 'FAIL_CLOSED');
+  assert.equal(resolveProductionFundingConfig(JSON.stringify({
+    ...fixtureConfigInput(),
+    configVersion: 'PRODUCTION_V0',
+    categoryPolicyVersion: 'PRODUCTION_POLICY_V0',
+    creatorFeeRecipients: ['0xab063A9b53a2Ab832a941aE5890ea05c1672339D'],
+    treasuryAddresses: ['0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866']
+  }), ARC_CHAIN_ID).status, 'TREASURY_AUTHORITY_INVALID');
   assert.equal(resolveProductionFundingConfig(JSON.stringify({
     ...fixtureConfigInput(),
     configVersion: 'PRODUCTION_V0',
@@ -254,7 +288,7 @@ test('Cloudflare exposes the empty ledger without changing existing public routi
       totals: { entryCount: number };
     };
     assert.equal(ledger.schemaVersion, 'binrat.dumpster-ledger/0.1');
-    assert.equal(ledger.fundingAuthority.status, 'TREASURY_AUTHORITY_NOT_CONFIGURED');
+    assert.equal(ledger.fundingAuthority.status, 'PRELAUNCH_AUTHORITIES_CONFIGURED');
     assert.equal(ledger.totals.entryCount, 0);
 
     assert.equal((await handleWorkerRequest(
@@ -279,6 +313,8 @@ function fixtureConfigInput() {
     categoryPolicyVersion: 'TEST_CATEGORY_V0',
     chainId: ARC_CHAIN_ID,
     accountingEnabled: true,
+    accountingObserverActivated: true,
+    launchMechanicsReceiptDigest: LAUNCH_MECHANICS_RECEIPT_DIGEST,
     effectiveFromBlock: '100',
     tokenAddress: TOKEN,
     creatorFeeRecipients: [FEE],

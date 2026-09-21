@@ -13,19 +13,27 @@ Dumpster Ledger is a public accounting projection, not an accounting authority. 
 
 - `tokenState: NOT_LAUNCHED`;
 - `launchAuthorization: BLOCKED`;
-- `fundingAuthority.status: TREASURY_AUTHORITY_NOT_CONFIGURED`;
+- `fundingAuthority.status: PRELAUNCH_AUTHORITIES_CONFIGURED`;
 - `fundingAuthority.accountingEnabled: false`;
-- no configured token, fee-recipient, or treasury addresses;
-- zero production entries, inflows, and outflows;
+- configured future `TREASURY` authority `0xab063A9b53a2Ab832a941aE5890ea05c1672339D`;
+- configured future `PROJECT_FEE_RECIPIENT` authority `0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866`;
+- no token address, launch block, launch transaction, or token-flow observations yet available;
+- zero production entries, inflows, and outflows because the token does not yet exist, not as proof about future flows;
 - utility status derived from `CAPABILITY_MANIFEST_V0.json`.
 
 The endpoint returns HTTP 200 for that truthful empty state. An absent authority is not an operational error and is never replaced with a fixture. Invalid configuration or configuration without a reviewed observation source returns a `FAIL_CLOSED` accounting state with accounting still disabled.
 
 ## Funding authority
 
-`binrat.funding-config/0.1` binds the Arc chain ID, token address, fee recipients, treasury addresses, effective block, configuration version, and category-policy version. Duplicate or cross-role addresses, a wrong chain, a missing treasury, zero/malformed addresses, and test-labeled versions in production all fail closed.
+`binrat.funding-config/0.1` binds the Arc chain ID, token address, fee recipients, treasury addresses, effective block, Launch Mechanics receipt digest, explicit observer activation, configuration version, and category-policy version. Duplicate or cross-role addresses, a wrong chain, a missing treasury, zero/malformed addresses, and test-labeled versions in production all fail closed.
 
 Configuration alone never activates production accounting. V0 has no production observation provider, so even a structurally valid configuration resolves to `FUNDING_OBSERVATION_SOURCE_NOT_IMPLEMENTED`.
+
+## Launch-mechanics handoff
+
+`BINRAT_LAUNCH_CONFIG_V0.json` resolves the wallet portion of the earlier Launch Mechanics handoff with explicit owner input. The reviewed production funding authority must consume chain ID `5042`, the canonical token address, creator/project fee-recipient address, treasury address, effective launch block, and selected Launch Mechanics receipt digest.
+
+The wallet roles and receipt digest are now frozen. The token address and block remain unset because no launch exists. Receipt existence, a structurally valid handoff, or owner wallet selection alone does not enable accounting. The actual token, effective block, and explicit activation of a reviewed observation source remain required.
 
 ## Entries and projection
 
@@ -43,4 +51,4 @@ Fixtures require both configuration and category-policy versions prefixed `TEST_
 
 ## Authority boundary
 
-This surface does not create a token, choose wallets, move funds, sign or broadcast transactions, give tax advice, or change launch/marketing authorization. `dumpster_ledger_bootstrap` remains launch-required evidence.
+This surface records owner-selected wallet roles but does not prove custody or deployed-token authority, create a token, move funds, sign or broadcast transactions, give tax advice, or change launch/marketing authorization. `dumpster_ledger_bootstrap` remains launch-required evidence.

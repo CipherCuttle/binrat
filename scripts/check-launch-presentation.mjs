@@ -9,6 +9,9 @@ const requiredHtml = [
   'NO CONTRACT PUBLISHED',
   'NO PRESALE',
   'NO WALLET CONNECTION',
+  '0xab063A9b53a2Ab832a941aE5890ea05c1672339D',
+  '0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866',
+  'ACCOUNTING OFF · HOLDER GATE OFF · LAUNCH BLOCKED',
   'TOKEN STATUS',
   'og:title',
   'og:description',
@@ -30,7 +33,13 @@ if (!launchDoc.includes('NOT LIVE') || !launchDoc.includes('NOT PUBLISHED') || !
 }
 
 const prelaunchCorpus = `${html}\n${launchDoc}`;
-if (/0x[0-9a-fA-F]{40}/.test(prelaunchCorpus)) throw new Error('LAUNCH_CONTRACT_ADDRESS_PUBLISHED_EARLY');
+const allowedAuthorities = new Set([
+  '0xab063A9b53a2Ab832a941aE5890ea05c1672339D',
+  '0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866'
+]);
+for (const address of prelaunchCorpus.match(/0x[0-9a-fA-F]{40}/g) ?? []) {
+  if (!allowedAuthorities.has(address)) throw new Error('LAUNCH_CONTRACT_ADDRESS_PUBLISHED_EARLY');
+}
 
 for (const prohibited of ['BUY NOW', 'PRESALE OPEN', 'GUARANTEED RETURNS', '100X GUARANTEED']) {
   if (html.toUpperCase().includes(prohibited)) throw new Error(`LAUNCH_PRESENTATION_PROHIBITED:${prohibited}`);

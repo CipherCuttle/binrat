@@ -32,6 +32,7 @@ export async function loadDumpsterLedger() {
   if (!response.ok) throw new Error("DUMPSTER_LEDGER_NOT_AVAILABLE");
   const value = await response.json();
   const statuses = [
+    "PRELAUNCH_AUTHORITIES_CONFIGURED",
     "TREASURY_AUTHORITY_NOT_CONFIGURED",
     "TREASURY_AUTHORITY_INVALID",
     "FUNDING_OBSERVATION_SOURCE_NOT_IMPLEMENTED",
@@ -51,13 +52,25 @@ export async function loadDumpsterLedger() {
     value?.schemaVersion !== "binrat.dumpster-ledger/0.1" ||
     value.projectionVersion !== "BINRAT_DUMPSTER_LEDGER_V0" ||
     value.chainId !== 5042 ||
-    !["PRE_LAUNCH_NO_FUNDING_AUTHORITY", "FAIL_CLOSED"].includes(
+    !["PRE_LAUNCH_AUTHORITIES_CONFIGURED", "FAIL_CLOSED"].includes(
       value.accountingState,
     ) ||
     value.fundingAuthority?.accountingEnabled !== false ||
     !statuses.includes(value.fundingAuthority.status) ||
     !Array.isArray(value.fundingAuthority.creatorFeeRecipients) ||
     !Array.isArray(value.fundingAuthority.treasuryAddresses) ||
+    value.configuredAuthorities?.status !== "OWNER_SELECTED_PRE_LAUNCH" ||
+    value.configuredAuthorities?.treasury?.role !== "TREASURY" ||
+    value.configuredAuthorities.treasury.address !==
+      "0xab063A9b53a2Ab832a941aE5890ea05c1672339D" ||
+    value.configuredAuthorities?.projectFeeRecipient?.role !==
+      "PROJECT_FEE_RECIPIENT" ||
+    value.configuredAuthorities.projectFeeRecipient.address !==
+      "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866" ||
+    value.configuredAuthorities.onChainRoleProof !== "NOT_YET_AVAILABLE" ||
+    value.observedDataAvailability?.tokenAddress !== "NOT_YET_AVAILABLE" ||
+    value.observedDataAvailability?.launchBlock !== "NOT_YET_AVAILABLE" ||
+    value.observedDataAvailability?.launchTransaction !== "NOT_YET_AVAILABLE" ||
     !Number.isSafeInteger(value.totals?.entryCount) ||
     !Number.isSafeInteger(value.totals?.inflowEntryCount) ||
     !Number.isSafeInteger(value.totals?.outflowEntryCount) ||
