@@ -113,7 +113,7 @@ Dumpster Ledger V0 is implemented as an immutable, receipt-bound projection over
 
 The pre-launch transparency surface is live at `GET /api/dumpster-ledger`. It returns `PRE_LAUNCH_AUTHORITIES_CONFIGURED`, exposes the owner-selected future treasury and project-fee roles, and separately marks the token, launch transaction/block, and token-flow observations unavailable. Accounting remains disabled and production totals have zero entries; that absence of observations is not a claim that future flows cannot exist. Test fixtures remain explicitly labeled and cannot enter the production projection.
 
-Status: `ENGINEERING_PASS / PRE_LAUNCH_TRANSPARENCY_CONFIGURED`. Wallet roles are `PRELAUNCH_AUTHORITIES_CONFIGURED`; production accounting remains disabled, and `dumpster_ledger_bootstrap` remains required until the actual token, effective block, bound receipt, and explicitly activated reviewed observer exist. The earlier live deployment is not claimed to contain these unreleased local changes.
+Status: `ENGINEERING_PASS / CLOUDFLARE_LIVE_VERIFIED / PRE_LAUNCH_TRANSPARENCY_LIVE` at Worker version `4648a965-9701-4793-b9a0-903f9786e6e5`. Wallet roles are `PRELAUNCH_AUTHORITIES_CONFIGURED`; production accounting remains disabled, and `dumpster_ledger_bootstrap` remains required until the actual token, effective block, bound receipt, and explicitly activated reviewed observer exist.
 
 ### Rat Den V0 — optional / post-launch
 

@@ -23,14 +23,7 @@
       "candidateHead": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "endpoint": "/api/bag/:bagId/replay",
-      "liveAcceptance": {
-        "status": "PASS",
-        "launchId": "01f1eb8fe5acede475ce7f09bad73962cbb3279deb1e50f7e7c2746bcd28d85f",
-        "availableHorizons": ["5m", "1h", "24h"],
-        "observationCoverage": "COMPLETE",
-        "historyCoverage": "UNVERIFIED"
-      }
+      "endpoint": "/api/bag/:bagId/replay"
     },
     "telegramRatV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -38,26 +31,20 @@
       "candidateHead": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "cloudflareWorkerVersion": "da3b86c6-7478-4ddb-8748-1f169ce8fdcc",
-      "liveAcceptance": {
-        "ingress": "PASS",
-        "replies": "PASS",
-        "ledgerState": "REPLIED",
-        "rendererVersion": "binrat.rat-voice/0.2"
-      }
+      "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5"
     },
     "dumpsterLedger": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "deploymentStatus": "CLOUDFLARE_LIVE_PRE_CONFIG_UPDATE",
-      "publicStatus": "PRE_LAUNCH_TRANSPARENCY_UPDATE_PENDING_DEPLOYMENT",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PRE_LAUNCH_TRANSPARENCY_LIVE",
       "endpoint": "/api/dumpster-ledger",
+      "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
       "productionFundingAuthority": "PRELAUNCH_AUTHORITIES_CONFIGURED",
       "productionAccountingActive": false,
       "configuredWalletCount": 2,
-      "candidateAccountingState": "PRE_LAUNCH_AUTHORITIES_CONFIGURED",
       "liveAcceptance": {
         "status": "PASS",
-        "accountingState": "PRE_LAUNCH_NO_FUNDING_AUTHORITY",
+        "accountingState": "PRE_LAUNCH_AUTHORITIES_CONFIGURED",
         "entryCount": 0,
         "tokenInflowsRaw": "0",
         "tokenOutflowsRaw": "0"
@@ -74,14 +61,7 @@
       "candidatePr": 18,
       "candidateHead": "cc782f04b08c938412394fd587f7158426acc067",
       "deploymentStatus": "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED",
-      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING",
-      "liveAcceptance": {
-        "subscription": "PASS",
-        "commandReceipt": "PASS",
-        "recurrenceAlert": "PENDING_REAL_FUTURE_LAUNCH",
-        "watchedCreator": "0x05952cb87116ddfbc4a2f85204e4e267202dd950",
-        "startBlock": "21585477"
-      }
+      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING"
     },
     "dumpsterRaidsV0": {
       "engineeringStatus": "EXPERIMENTAL",
