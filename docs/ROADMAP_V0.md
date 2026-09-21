@@ -25,6 +25,20 @@ This public product state does **not** authorize token launch or token marketing
 
 A capability may be `ENGINEERING_PASS` without being `DEPLOYED` or `PUBLIC_LIVE`.
 
+## PRODUCT SURFACE V1 — MAKE THE RAT LEGIBLE
+
+This is a bounded presentation lane over existing public evidence capabilities. It does not rewrite the backend, authorize token launch/marketing, activate Holder Gate, or block the parallel legal/compliance authorization lane. The current `web/` frontend remains the production surface until a separately accepted migration.
+
+- **P0 — visual/product architecture:** audit existing surfaces, define the deep-linkable information architecture, evidence semantic model, and coherent asset plan.
+- **P1 — app shell:** persistent desktop/mobile navigation, runtime/checkpoint rail, route focus behavior, and clear demo/live state.
+- **P2 — Rat Radar flagship:** recurrence/timing matrix, address evidence dossier, coverage/sample disclosure, public receipts, and an explicit non-recommendation boundary.
+- **P3 — Bag / Creator / Replay flow:** Bag dossier, reported-address Creator File, chronological Trash Trail, frozen `LAUNCH → 5m → 1h → 24h` interaction, and contextual share/watch actions.
+- **P4 — Rat Watch UX:** future-only subscription actions, delivery state, watch receipts, capacity disclosure, and Telegram handoff.
+- **P5 — Ledger / `$BINRAT`:** separate financial transparency from current token state, shipped/planned utility, treasury roles, anti-scam contract disclosure, and launch authorization.
+- **P6 — Rive / distribution / share polish:** owner-approved mascot state assets, product-state Rive adapter, reduced-motion fallbacks, OG/Telegram exports, and stable receipt-card routes.
+
+Product Surface V1 acceptance requires the current production app to remain deployable, V2 to consume existing public schemas through fail-closed adapters, evidence semantics checks to pass, and responsive verification at phone/tablet/desktop widths. Visual completion has no launch-authorization effect.
+
 ### Intelligence V1
 
 Current reviewed head: `69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3`
