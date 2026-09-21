@@ -174,7 +174,7 @@ export class SqliteStore implements LaunchStore {
   async commitHistoricalBackfillBatch(
     launches: readonly LaunchObserved[],
     facts: readonly ProvenanceFact[],
-    edges: readonly ProvenanceEdge[],
+    edges: readonly ProvenanceEdge[] | null,
     nextBlock: bigint
   ): Promise<{ inserted: number; duplicates: number }> {
     if (nextBlock < 0n) throw new Error('HISTORY_CURSOR_INVALID');
@@ -231,20 +231,22 @@ export class SqliteStore implements LaunchStore {
         }
       }
 
-      this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
-      const insertEdge = this.db.prepare(`
-        INSERT INTO provenance_edges (
-          edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
-          source_fact_ids_json,derivation_version,evidence_digest,payload_json
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
-      `);
-      for (const edge of edges) {
-        if (edge.chainId !== this.chainId) throw new Error(`PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
-        insertEdge.run(
-          edge.edgeId, edge.chainId, edge.kind, edge.from, edge.to, edge.evidenceClass,
-          edge.observedBlock.toString(), edge.observedBlockHash.toLowerCase(), canonicalJson(edge.sourceFactIds),
-          edge.derivationVersion, edge.evidenceDigest, canonicalJson(edge)
-        );
+      if (edges !== null) {
+        this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
+        const insertEdge = this.db.prepare(`
+          INSERT INTO provenance_edges (
+            edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
+            source_fact_ids_json,derivation_version,evidence_digest,payload_json
+          ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+        `);
+        for (const edge of edges) {
+          if (edge.chainId !== this.chainId) throw new Error(`PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
+          insertEdge.run(
+            edge.edgeId, edge.chainId, edge.kind, edge.from, edge.to, edge.evidenceClass,
+            edge.observedBlock.toString(), edge.observedBlockHash.toLowerCase(), canonicalJson(edge.sourceFactIds),
+            edge.derivationVersion, edge.evidenceDigest, canonicalJson(edge)
+          );
+        }
       }
 
       this.db.prepare(`

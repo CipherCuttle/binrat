@@ -1,16 +1,35 @@
 import { createHash } from 'node:crypto';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
+import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
+import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
 import { projectBagIntelligence } from '../public/bagIntelligence.js';
 import { projectCreatorFile } from '../public/creatorFile.js';
 import { projectPublicFeed } from '../public/project.js';
 import { projectReplayBundle } from '../public/replayBundle.js';
 import type { PublicFeed } from '../public/types.js';
+import { projectPublicRatRadarSwapReceipt } from '../ratRadar/activity.js';
+import {
+  projectRatRadarFreeWatchlist,
+  projectRatRadarHolderWatchlist
+} from '../ratRadar/watchlist.js';
+import {
+  ProductionHolderEligibilitySource,
+  type HolderEligibilitySource,
+  type HolderPolicyEnv
+} from '../holder/eligibility.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
 import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore } from './ratWatch.js';
+import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
 import { D1TelegramLedger } from './telegramLedger.js';
+import {
+  D1HolderAuthStore,
+  bearerToken,
+  createHolderChallenge,
+  proveHolderWallet
+} from './holderAuth.js';
 import type { D1DatabaseLike } from './d1Types.js';
 import {
   enqueueSyncCycle,
@@ -20,10 +39,12 @@ import {
   type SyncQueueProducerLike
 } from './syncQueue.js';
 
-export interface BinratWorkerEnv extends CloudflareSyncEnv {
+export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   DB: D1DatabaseLike;
   SYNC_QUEUE?: SyncQueueProducerLike;
   CAPABILITY_MANIFEST_JSON?: string;
+  BINRAT_FUNDING_CONFIG_JSON?: string;
+  BINRAT_HOLDER_WALLET_AUTH_ENABLED?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
   TELEGRAM_BOT_TOKEN?: string;
@@ -74,6 +95,7 @@ interface TelegramApiResponse<T> {
 export interface WorkerDeps {
   externalFetch: typeof fetch;
   now: () => number;
+  holderEligibilitySource?: HolderEligibilitySource;
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -111,6 +133,14 @@ export async function handleWorkerRequest(
     return telegramWebhook(request, env, origin, deps);
   }
 
+  if (request.method === 'POST' && pathname === '/api/holder/challenge') {
+    return holderChallenge(request, env, origin, deps);
+  }
+
+  if (request.method === 'POST' && pathname === '/api/holder/session') {
+    return holderSession(request, env, origin, deps);
+  }
+
   if (request.method === 'GET' && pathname === '/health') {
     let repliesEnabled = false;
     try { repliesEnabled = parseRepliesEnabled(env.TELEGRAM_REPLIES_ENABLED); } catch {}
@@ -125,7 +155,7 @@ export async function handleWorkerRequest(
   }
 
   if (request.method === 'GET' && pathname.startsWith('/api/')) {
-    return handleBinratApiRequest(request, env);
+    return handleBinratApiRequest(request, env, deps);
   }
 
   return json(404, { error: 'NOT_FOUND' });
@@ -133,13 +163,16 @@ export async function handleWorkerRequest(
 
 export async function handleBinratApiRequest(
   request: Request,
-  env: BinratWorkerEnv
+  env: BinratWorkerEnv,
+  deps: WorkerDeps = DEFAULT_DEPS
 ): Promise<Response> {
   if (request.method !== 'GET') return json(405, { error: 'METHOD_NOT_ALLOWED' });
 
   let pathname: string;
+  let url: URL;
   try {
-    pathname = new URL(request.url).pathname;
+    url = new URL(request.url);
+    pathname = url.pathname;
   } catch {
     return json(400, { error: 'INVALID_PATH' });
   }
@@ -147,12 +180,82 @@ export async function handleBinratApiRequest(
   try {
     if (pathname === '/api/capabilities') return capabilities(env);
     if (pathname === '/api/health') return health(env);
+    if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
 
     const ready = await readyContext(env);
     if (!ready) return json(503, { ready: false, reason: 'INDEX_NOT_READY' });
     const { store, feed } = ready;
 
     if (pathname === '/api/feed') return json(200, feed);
+
+    if (pathname === '/api/rat-radar/watchlist') {
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipts = await radar.listThroughBlock(BigInt(feed.asOfBlock));
+      const depth = url.searchParams.get('depth');
+      if (depth !== null && depth !== 'free' && depth !== 'full') {
+        return json(400, { error: 'RAT_RADAR_DEPTH_INVALID' });
+      }
+      if (depth === 'full') {
+        if (!holderWalletAuthEnabled(env)) {
+          return json(503, { error: 'HOLDER_WALLET_AUTH_NOT_ENABLED', accessTier: 'FREE' });
+        }
+        const token = bearerToken(request);
+        if (!token) return json(401, { error: 'HOLDER_SESSION_REQUIRED', accessTier: 'FREE' });
+        const session = await new D1HolderAuthStore(env.DB).getSession(token, deps.now());
+        if (!session) return json(401, { error: 'HOLDER_SESSION_INVALID_OR_EXPIRED', accessTier: 'FREE' });
+        if (session.accessTier !== 'HOLDER') {
+          return json(403, {
+            error: 'HOLDER_TIER_REQUIRED',
+            accessTier: 'FREE',
+            eligibilityStatus: session.eligibilityStatus
+          });
+        }
+        const holder = await projectRatRadarHolderWatchlist(feed, receipts);
+        return json(200, {
+          ...holder,
+          access: {
+            accessTier: session.accessTier,
+            wallet: session.wallet,
+            policyId: session.policyId,
+            expiresAtMs: session.expiresAtMs
+          }
+        });
+      }
+      return json(200, await projectRatRadarFreeWatchlist(feed, receipts));
+    }
+
+    if (pathname.startsWith('/api/rat-radar/activity/')) {
+      const activityId = pathname.slice('/api/rat-radar/activity/'.length).toLowerCase();
+      if (!/^[0-9a-f]{64}$/.test(activityId)) {
+        return json(400, { error: 'RAT_RADAR_ACTIVITY_ID_INVALID' });
+      }
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipt = await radar.getSwap(activityId);
+      if (!receipt || receipt.blockNumber > BigInt(feed.asOfBlock)) {
+        return json(404, { error: 'RAT_RADAR_ACTIVITY_NOT_FOUND' });
+      }
+      return json(200, projectPublicRatRadarSwapReceipt(receipt));
+    }
+
+    if (pathname.startsWith('/api/rat-radar/address/') && pathname.endsWith('/activity')) {
+      const recipient = pathname
+        .slice('/api/rat-radar/address/'.length, -'/activity'.length)
+        .toLowerCase();
+      if (!/^0x[0-9a-f]{40}$/.test(recipient)) {
+        return json(400, { error: 'RAT_RADAR_RECIPIENT_INVALID' });
+      }
+      const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
+      const receipts = await radar.listForRecipientThroughBlock(recipient, BigInt(feed.asOfBlock));
+      return json(200, {
+        schemaVersion: 'binrat.rat-radar-address-activity/0.1',
+        chainId: ARC_CHAIN_ID,
+        asOfBlock: feed.asOfBlock,
+        observedRecipientAddress: recipient,
+        activityCount: receipts.length,
+        activities: receipts.map(projectPublicRatRadarSwapReceipt),
+        identityBoundary: 'An observed recipient address is not automatically a human trader identity.'
+      });
+    }
 
     if (pathname.startsWith('/api/creator/')) {
       const creator = pathname.slice('/api/creator/'.length).toLowerCase();
@@ -200,6 +303,83 @@ export async function handleBinratApiRequest(
   } catch {
     return json(503, { ready: false, reason: 'PUBLIC_PROJECTION_UNAVAILABLE' });
   }
+}
+
+async function holderChallenge(
+  request: Request,
+  env: BinratWorkerEnv,
+  origin: string,
+  deps: WorkerDeps
+): Promise<Response> {
+  if (!holderWalletAuthEnabled(env)) {
+    return json(503, { error: 'HOLDER_WALLET_AUTH_NOT_ENABLED' });
+  }
+  try {
+    const body = await readJsonBody(request);
+    const wallet = typeof body.wallet === 'string' ? body.wallet : '';
+    const challenge = await createHolderChallenge(
+      new D1HolderAuthStore(env.DB),
+      { wallet, origin, nowMs: deps.now() }
+    );
+    return json(201, {
+      schemaVersion: 'binrat.holder-challenge/0.1',
+      purpose: 'BINRAT_HOLDER_GATE_V0',
+      chainId: ARC_CHAIN_ID,
+      wallet: challenge.wallet,
+      nonce: challenge.nonce,
+      message: challenge.message,
+      issuedAtMs: challenge.issuedAtMs,
+      expiresAtMs: challenge.expiresAtMs,
+      transactionSigning: false
+    });
+  } catch (error) {
+    return json(holderHttpStatus(error), { error: holderErrorCode(error) });
+  }
+}
+
+async function holderSession(
+  request: Request,
+  env: BinratWorkerEnv,
+  origin: string,
+  deps: WorkerDeps
+): Promise<Response> {
+  if (!holderWalletAuthEnabled(env)) {
+    return json(503, { error: 'HOLDER_WALLET_AUTH_NOT_ENABLED' });
+  }
+  try {
+    const body = await readJsonBody(request);
+    const eligibility = deps.holderEligibilitySource ?? new ProductionHolderEligibilitySource(env);
+    const result = await proveHolderWallet(
+      new D1HolderAuthStore(env.DB),
+      eligibility,
+      {
+        nonce: typeof body.nonce === 'string' ? body.nonce : '',
+        message: typeof body.message === 'string' ? body.message : '',
+        signature: typeof body.signature === 'string' ? body.signature : '',
+        origin,
+        nowMs: deps.now()
+      }
+    );
+    return json(201, {
+      schemaVersion: 'binrat.holder-session/0.1',
+      token: result.token,
+      tokenType: 'Bearer',
+      wallet: result.session.wallet,
+      accessTier: result.session.accessTier,
+      policyId: result.session.policyId,
+      eligibilityStatus: result.session.eligibilityStatus,
+      issuedAtMs: result.session.issuedAtMs,
+      expiresAtMs: result.session.expiresAtMs,
+      productionHolderEligibilityActive: false,
+      transactionSigning: false
+    });
+  } catch (error) {
+    return json(holderHttpStatus(error), { error: holderErrorCode(error) });
+  }
+}
+
+function holderWalletAuthEnabled(env: BinratWorkerEnv): boolean {
+  return env.BINRAT_HOLDER_WALLET_AUTH_ENABLED?.trim() === 'true';
 }
 
 async function telegramWebhook(
@@ -312,7 +492,7 @@ async function telegramWebhook(
       const localRequest = input instanceof Request ? input : new Request(input, init);
       const url = new URL(localRequest.url);
       if (url.origin === origin && url.pathname.startsWith('/api/')) {
-        return handleBinratApiRequest(localRequest, env);
+        return handleBinratApiRequest(localRequest, env, deps);
       }
       return deps.externalFetch(localRequest);
     };
@@ -577,6 +757,13 @@ function capabilities(env: BinratWorkerEnv): Response {
     : json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
 }
 
+async function dumpsterLedger(env: BinratWorkerEnv): Promise<Response> {
+  const manifest = readManifest(env);
+  if (!manifest) return json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
+  const funding = resolveProductionFundingConfig(env.BINRAT_FUNDING_CONFIG_JSON, ARC_CHAIN_ID);
+  return json(200, await projectDumpsterLedger(manifest, funding, [], 'PRODUCTION'));
+}
+
 function readManifest(env: BinratWorkerEnv) {
   if (!env.CAPABILITY_MANIFEST_JSON) return null;
   try {
@@ -657,6 +844,45 @@ function required(value: string | undefined, name: string): string {
 function safeErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
   return /^[A-Z0-9_:.-]+$/.test(message) ? message : 'TELEGRAM_RAT_FAILED';
+}
+
+async function readJsonBody(request: Request): Promise<Record<string, unknown>> {
+  const contentLength = Number(request.headers.get('content-length') ?? '0');
+  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+    throw new Error('HOLDER_BODY_TOO_LARGE');
+  }
+  const text = await request.text();
+  if (new TextEncoder().encode(text).byteLength > MAX_BODY_BYTES) {
+    throw new Error('HOLDER_BODY_TOO_LARGE');
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error('HOLDER_JSON_INVALID');
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('HOLDER_BODY_INVALID');
+  }
+  return parsed as Record<string, unknown>;
+}
+
+function holderErrorCode(error: unknown): string {
+  const message = error instanceof Error ? error.message : '';
+  return /^HOLDER_[A-Z0-9_]+$/.test(message) ? message : 'HOLDER_GATE_FAILED';
+}
+
+function holderHttpStatus(error: unknown): number {
+  const code = holderErrorCode(error);
+  if (code === 'HOLDER_BODY_TOO_LARGE') return 413;
+  if (
+    code === 'HOLDER_SIGNATURE_WALLET_MISMATCH' ||
+    code === 'HOLDER_CHALLENGE_EXPIRED' ||
+    code === 'HOLDER_CHALLENGE_USED_OR_UNKNOWN' ||
+    code === 'HOLDER_CHALLENGE_USED_OR_EXPIRED'
+  ) return 401;
+  if (code === 'HOLDER_GATE_FAILED' || code === 'HOLDER_SESSION_PERSISTENCE_FAILED') return 503;
+  return 400;
 }
 
 function json(status: number, value: unknown): Response {

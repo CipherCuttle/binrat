@@ -1,10 +1,14 @@
 {
   "schemaVersion": "binrat.capability-manifest/0.1",
-  "updatedAt": "2026-09-19",
+  "updatedAt": "2026-09-21",
   "doctrine": {
     "roadmap": "docs/ROADMAP_V0.md",
     "philosophy": "docs/PHILOSOPHY.md",
     "tokenLaunch": "docs/TOKEN_LAUNCH_DOCTRINE.md",
+    "launchMechanicsReceipt": "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
+    "launchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+    "launchExecutionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
+    "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
     "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md"
   },
   "capabilities": {
@@ -15,72 +19,125 @@
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "replayLab": {
-      "engineeringStatus": "BUILDING",
-      "candidatePr": 13,
-      "candidateHead": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
-      "deploymentStatus": "NOT_VERIFIED",
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PUBLIC_LIVE_BETA",
+      "endpoint": "/api/bag/:bagId/replay"
     },
     "telegramRatV0": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "candidatePr": 15,
-      "candidateHead": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "cloudflareWorkerVersion": "da3b86c6-7478-4ddb-8748-1f169ce8fdcc",
-      "liveAcceptance": {
-        "ingress": "PASS",
-        "replies": "PASS",
-        "ledgerState": "REPLIED",
-        "rendererVersion": "binrat.rat-voice/0.2"
-      }
+      "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5"
     },
     "dumpsterLedger": {
-      "engineeringStatus": "PLANNED",
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PRE_LAUNCH_TRANSPARENCY_LIVE",
+      "endpoint": "/api/dumpster-ledger",
+      "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
+      "productionFundingAuthority": "PRELAUNCH_AUTHORITIES_CONFIGURED",
+      "productionAccountingActive": false,
+      "configuredWalletCount": 2
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",
+      "phase": "POST_LAUNCH",
+      "launchBlocker": false,
       "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
     },
     "ratWatchV0": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "candidatePr": 18,
-      "candidateHead": "cc782f04b08c938412394fd587f7158426acc067",
       "deploymentStatus": "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED",
-      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING",
-      "liveAcceptance": {
-        "subscription": "PASS",
-        "commandReceipt": "PASS",
-        "recurrenceAlert": "PENDING_REAL_FUTURE_LAUNCH",
-        "watchedCreator": "0x05952cb87116ddfbc4a2f85204e4e267202dd950",
-        "startBlock": "21585477"
-      }
+      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING"
     },
     "dumpsterRaidsV0": {
       "engineeringStatus": "EXPERIMENTAL",
       "phase": "POST_LAUNCH",
       "launchBlocker": false
+    },
+    "ratRadarV0": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
+      "publicStatus": "PUBLIC_LIVE_BETA",
+      "evidenceStatus": "WALLET_ACTIVITY_INDEX_LIVE_VERIFIED"
+    },
+    "holderGateV0": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "deploymentStatus": "CLOUDFLARE_DEPLOYED_FAIL_CLOSED",
+      "publicStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+      "walletAuthStatus": "DISABLED_BY_DEFAULT",
+      "productionHolderEligibilityActive": false,
+      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY"
+    },
+    "launchMechanicsV0": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "verificationStatus": "VERIFIED_BOUND_TO_LAUNCH_CONFIG_V0",
+      "verifiedAt": "2026-09-21T00:16:16Z",
+      "chainId": 5042,
+      "selectedCandidateRail": "arcpad-arc-mainnet-usdc-standard-v0",
+      "receipt": "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
+      "receiptDigest": "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
+      "sourceMatchStatus": "ARCPAD_DEPLOYED_SOURCE_NOT_VERIFIED",
+      "ownerInputRequired": false,
+      "launchAuthorizationEffect": "NONE"
+    },
+    "launchConfigurationV0": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "publicStatus": "OWNER_POLICY_FROZEN_PRE_LAUNCH",
+      "config": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+      "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+      "executionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
+      "launchAuthorizationEffect": "NONE"
     }
+  },
+  "launchConfiguration": {
+    "configVersion": "BINRAT_LAUNCH_CONFIG_V0",
+    "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+    "treasuryAddress": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D",
+    "projectFeeRecipientAddress": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866",
+    "tokenAddressState": "NOT_YET_CREATED",
+    "accountingActive": false,
+    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED"
   },
   "launchAuthorization": {
     "status": "BLOCKED",
     "marketingAuthorized": false,
     "launchAuthorized": false,
     "explicitOwnerAuthorityRequired": true,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED",
+    "legalComplianceStatus": "NOT_SATISFIED",
+    "receiptExistenceAuthorizesLaunch": false,
     "requiredEvidence": [
       "legal_compliance_artifacts",
       "launch_mechanics_verification_receipt",
-      "token_and_treasury_addresses",
+      "actual_token_address_and_launch_execution_receipt",
       "telegram_doctrine_smoke",
+      "rat_radar_free_value_and_holder_gate_smoke",
+      "rat_watch_live_subscription_and_delivery_smoke",
       "dumpster_ledger_bootstrap",
-      "rat_den_public_receipt_boundary",
-      "rat_watch_end_to_end_alert",
       "replay_lab_real_evidence_smoke",
       "status_consistency_check",
       "allocation_and_privileged_inventory_disclosure"
     ],
     "tokenState": "NOT_LAUNCHED"
+  },
+  "launchGateStatus": {
+    "matrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
+    "matrixDigest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b",
+    "statuses": {
+      "legal_compliance_artifacts": "BLOCKED_LEGAL",
+      "launch_mechanics_verification_receipt": "SATISFIED",
+      "actual_token_address_and_launch_execution_receipt": "BLOCKED_FUTURE_EVENT",
+      "telegram_doctrine_smoke": "SATISFIED",
+      "rat_radar_free_value_and_holder_gate_smoke": "PARTIAL",
+      "rat_watch_live_subscription_and_delivery_smoke": "SATISFIED",
+      "dumpster_ledger_bootstrap": "SATISFIED",
+      "replay_lab_real_evidence_smoke": "SATISFIED",
+      "status_consistency_check": "SATISFIED",
+      "allocation_and_privileged_inventory_disclosure": "PARTIAL"
+    },
+    "blockingGateCount": 2
   },
   "invariant": "Degen can decide attention and priority. It cannot decide what is true."
 }

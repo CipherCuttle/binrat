@@ -68,7 +68,8 @@ test('Cloudflare read API projects the same durable BINRAT evidence from D1', as
         launchAuthorization: {
           status: 'BLOCKED',
           marketingAuthorized: false,
-          launchAuthorized: false
+          launchAuthorized: false,
+          tokenState: 'NOT_LAUNCHED'
         },
         invariant: 'Degen decides attention. Receipts decide truth.'
       })

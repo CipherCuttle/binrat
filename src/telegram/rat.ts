@@ -1,6 +1,12 @@
 import type { RatConversationContext, RatIntent, RatUnderstanding } from './nlp.js';
 import { understandRatMessage } from './nlp.js';
 import {
+  BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS,
+  BINRAT_TREASURY_ADDRESS,
+  LAUNCH_CONFIG_DIGEST
+} from '../launchConfig/config.js';
+import { REQUIRED_LAUNCH_GATE_IDS } from '../launchConfig/gateMatrix.js';
+import {
   makeRatAnswerPlan,
   renderRatVoice,
   type RatAnswerPlan,
@@ -25,6 +31,21 @@ export interface CapabilityManifest {
     marketingAuthorized: boolean;
     launchAuthorized: boolean;
     tokenState?: string;
+    explicitOwnerLaunchAuthorityState?: string;
+  };
+  launchConfiguration?: {
+    treasuryAddress: string;
+    projectFeeRecipientAddress: string;
+    tokenAddressState: string;
+    accountingActive: boolean;
+    holderGateStatus: string;
+    configDigest?: string;
+  };
+  launchGateStatus?: {
+    matrix: string;
+    matrixDigest: string;
+    statuses: Record<string, string>;
+    blockingGateCount: number;
   };
   invariant: string;
 }
@@ -97,6 +118,42 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
   ) {
     throw new Error('CAPABILITY_MANIFEST_INVALID');
   }
+  if (
+    launch.status !== 'BLOCKED' ||
+    launch.marketingAuthorized !== false ||
+    launch.launchAuthorized !== false ||
+    launch.tokenState !== 'NOT_LAUNCHED'
+  ) throw new Error('CAPABILITY_MANIFEST_AUTHORIZATION_ESCALATION');
+  if (root.launchConfiguration !== undefined) {
+    const config = record(root.launchConfiguration);
+    if (
+      config.configDigest !== LAUNCH_CONFIG_DIGEST ||
+      config.treasuryAddress !== BINRAT_TREASURY_ADDRESS ||
+      config.projectFeeRecipientAddress !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS ||
+      config.tokenAddressState !== 'NOT_YET_CREATED' ||
+      config.accountingActive !== false ||
+      config.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED'
+    ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_CONFIG_INVALID');
+  }
+  if (root.launchGateStatus !== undefined) {
+    const gateStatus = record(root.launchGateStatus);
+    const statuses = record(gateStatus.statuses);
+    if (
+      gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_V0.json' ||
+      typeof gateStatus.matrixDigest !== 'string' ||
+      !/^[0-9a-f]{64}$/.test(gateStatus.matrixDigest) ||
+      gateStatus.blockingGateCount !== 2
+    ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID');
+    const ids = Object.keys(statuses).sort();
+    if (JSON.stringify(ids) !== JSON.stringify([...REQUIRED_LAUNCH_GATE_IDS].sort())) {
+      throw new Error('CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID');
+    }
+    for (const id of REQUIRED_LAUNCH_GATE_IDS) {
+      if (!VALID_GATE_STATUSES.has(statuses[id] as string)) {
+        throw new Error(`CAPABILITY_MANIFEST_LAUNCH_GATE_STATUS_INVALID:${id}`);
+      }
+    }
+  }
   for (const state of Object.values(capabilities)) {
     if (!state || typeof state !== 'object') throw new Error('CAPABILITY_MANIFEST_INVALID');
     const engineeringStatus = (state as Record<string, unknown>).engineeringStatus;
@@ -106,6 +163,14 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
   }
   return value as CapabilityManifest;
 }
+
+const VALID_GATE_STATUSES = new Set([
+  'SATISFIED',
+  'PARTIAL',
+  'BLOCKED_FUTURE_EVENT',
+  'BLOCKED_OWNER_INPUT',
+  'BLOCKED_LEGAL'
+]);
 
 async function getJson(
   path: string,
@@ -158,6 +223,10 @@ function staticPlan(
         launchAuthorization: launch.status,
         marketingAuthorized: boolLabel(launch.marketingAuthorized),
         launchAuthorized: boolLabel(launch.launchAuthorized),
+        treasury: manifest.launchConfiguration?.treasuryAddress ?? 'NOT_CONFIGURED',
+        projectFeeRecipient: manifest.launchConfiguration?.projectFeeRecipientAddress ?? 'NOT_CONFIGURED',
+        tokenAddressState: manifest.launchConfiguration?.tokenAddressState ?? 'UNKNOWN',
+        holderGateStatus: manifest.launchConfiguration?.holderGateStatus ?? 'UNKNOWN',
         tokenMessage: tokenState === 'NOT_LAUNCHED'
           ? 'no official $BINRAT token is launched yet.'
           : 'reporting the canonical manifest state only.',

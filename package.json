@@ -15,6 +15,7 @@
     "web:serve": "node scripts/serve-web.mjs",
     "web:check": "node --check web/fixtures.js && node --check web/data-source.js && node --check web/share-card.js && node --check web/app.js && node --check web/react-bits-island.js && node scripts/check-web.mjs && node scripts/check-share-card.mjs && node scripts/check-launch-presentation.mjs",
     "check": "pnpm build && pnpm test && pnpm web:check",
+    "verify:launch-mechanics:rpc": "tsx scripts/verify-launch-mechanics-rpc.ts",
     "backfill": "tsx src/cli.ts backfill",
     "watch": "tsx src/cli.ts watch",
     "inspect": "tsx src/cli.ts inspect",

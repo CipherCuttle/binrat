@@ -163,7 +163,7 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
   async commitHistoricalBackfillBatch(
     launches: readonly LaunchObserved[],
     facts: readonly ProvenanceFact[],
-    edges: readonly ProvenanceEdge[],
+    edges: readonly ProvenanceEdge[] | null,
     nextBlock: bigint
   ): Promise<{ inserted: number; duplicates: number }> {
     if (nextBlock < 0n) throw new Error('HISTORY_CURSOR_INVALID');
@@ -190,10 +190,12 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
       statements.push(this.factGuard(fact, payload));
     }
 
-    statements.push(this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').bind(this.chainId));
-    for (const edge of edges) {
-      this.assertChain(edge.chainId, `PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
-      statements.push(this.edgeInsert(edge));
+    if (edges !== null) {
+      statements.push(this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').bind(this.chainId));
+      for (const edge of edges) {
+        this.assertChain(edge.chainId, `PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
+        statements.push(this.edgeInsert(edge));
+      }
     }
     statements.push(this.db.prepare(`
       INSERT INTO launch_history_backfill_state (chain_id,next_block)
@@ -270,6 +272,21 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
             WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
           )
       `).bind(this.chainId, blockNumber.toString()),
+      this.db.prepare(`
+        DELETE FROM rat_radar_swap_receipts
+        WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
+      `).bind(this.chainId, blockNumber.toString()),
+      this.db.prepare(`
+        UPDATE rat_radar_pool_cursors
+        SET next_block = CASE
+              WHEN CAST(next_block AS INTEGER) > CAST(? AS INTEGER) THEN ?
+              ELSE next_block
+            END,
+            retry_after_ms = 0,
+            failure_count = 0,
+            last_error = NULL
+        WHERE chain_id = ?
+      `).bind(blockNumber.toString(), blockNumber.toString(), this.chainId),
       this.db.prepare(`
         DELETE FROM launch_observations
         WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)

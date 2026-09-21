@@ -111,6 +111,32 @@ CREATE TABLE IF NOT EXISTS binrat_sync_leases (
   updated_at_ms INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS holder_auth_challenges (
+  nonce TEXT PRIMARY KEY,
+  wallet TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  uri TEXT NOT NULL,
+  message TEXT NOT NULL,
+  issued_at_ms INTEGER NOT NULL,
+  expires_at_ms INTEGER NOT NULL,
+  consumed_at_ms INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_holder_auth_challenges_expiry
+  ON holder_auth_challenges(expires_at_ms, consumed_at_ms);
+
+CREATE TABLE IF NOT EXISTS holder_auth_sessions (
+  session_hash TEXT PRIMARY KEY,
+  wallet TEXT NOT NULL,
+  access_tier TEXT NOT NULL CHECK (access_tier IN ('FREE','HOLDER')),
+  policy_id TEXT NOT NULL,
+  eligibility_status TEXT NOT NULL,
+  issued_at_ms INTEGER NOT NULL,
+  expires_at_ms INTEGER NOT NULL,
+  invalidated_at_ms INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_holder_auth_sessions_wallet_expiry
+  ON holder_auth_sessions(wallet, expires_at_ms);
+
 CREATE TABLE IF NOT EXISTS telegram_update_receipts (
   update_id INTEGER PRIMARY KEY,
   state TEXT NOT NULL CHECK (state IN ('CLAIMED','REPLIED','IGNORED','RATE_LIMITED')),
@@ -157,6 +183,56 @@ CREATE TABLE IF NOT EXISTS rat_watch_alerts (
 );
 CREATE INDEX IF NOT EXISTS idx_rat_watch_alerts_pending
   ON rat_watch_alerts(state, created_at_ms, alert_id);
+
+
+CREATE TABLE IF NOT EXISTS rat_radar_swap_receipts (
+  activity_id TEXT PRIMARY KEY,
+  version TEXT NOT NULL,
+  chain_id INTEGER NOT NULL,
+  launch_id TEXT NOT NULL REFERENCES launches(launch_id) ON DELETE CASCADE,
+  pool TEXT NOT NULL,
+  token TEXT NOT NULL,
+  token0 TEXT NOT NULL,
+  token1 TEXT NOT NULL,
+  block_number TEXT NOT NULL,
+  block_hash TEXT NOT NULL,
+  tx_hash TEXT NOT NULL,
+  log_index INTEGER NOT NULL,
+  sender TEXT NOT NULL,
+  recipient TEXT NOT NULL,
+  token_side TEXT NOT NULL CHECK (token_side IN ('TOKEN0','TOKEN1')),
+  amount0 TEXT NOT NULL,
+  amount1 TEXT NOT NULL,
+  sqrt_price_x96 TEXT NOT NULL,
+  liquidity TEXT NOT NULL,
+  tick INTEGER NOT NULL,
+  launched_token_delta TEXT NOT NULL,
+  launched_token_flow TEXT NOT NULL CHECK (
+    launched_token_flow IN ('POOL_TO_RECIPIENT','CALLBACK_SIDE_TO_POOL','ZERO_DELTA')
+  ),
+  evidence_digest TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  UNIQUE(chain_id, pool, tx_hash, log_index)
+);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_launch_order
+  ON rat_radar_swap_receipts(chain_id, launch_id, block_number, log_index);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_recipient_order
+  ON rat_radar_swap_receipts(chain_id, recipient, block_number, log_index);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_swap_sender_order
+  ON rat_radar_swap_receipts(chain_id, sender, block_number, log_index);
+
+
+CREATE TABLE IF NOT EXISTS rat_radar_pool_cursors (
+  launch_id TEXT PRIMARY KEY REFERENCES launches(launch_id) ON DELETE CASCADE,
+  chain_id INTEGER NOT NULL,
+  next_block TEXT NOT NULL,
+  retry_after_ms INTEGER NOT NULL DEFAULT 0,
+  failure_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT,
+  updated_at_ms INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_rat_radar_pool_cursor_schedule
+  ON rat_radar_pool_cursors(chain_id, retry_after_ms, next_block, launch_id);
 
 CREATE TABLE IF NOT EXISTS binrat_invariant_guard (
   must_be_zero INTEGER NOT NULL CHECK (must_be_zero = 0)

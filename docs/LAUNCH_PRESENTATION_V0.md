@@ -14,10 +14,14 @@ This document governs presentation only. It does not create token-launch authori
 - contract: **NOT PUBLISHED**
 - presale: **NONE**
 - wallet connection: **NONE**
+- treasury role: **OWNER-CONFIGURED PRE-LAUNCH** — `0xab063A9b53a2Ab832a941aE5890ea05c1672339D`
+- project fee recipient role: **OWNER-CONFIGURED PRE-LAUNCH** — `0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866`
+- production accounting: **DISABLED**
+- Holder Gate: **TOKEN_AUTHORITY_NOT_CONFIGURED**
 - live evidence feed: **NOT ENABLED**
 - consumer shell: fixture-only until the evidence gate authorizes otherwise
 
-Until the canonical BINRAT site and `CipherCuttle/binrat` repository publish the same contract address together, no circulating contract should be treated as an official BINRAT contract.
+The two configured wallets are future role declarations, not a token address, custody proof, observed token role, launch authorization, or evidence of a transaction. Until the canonical BINRAT site and `CipherCuttle/binrat` repository publish the same contract address together, no circulating contract should be treated as an official BINRAT contract.
 
 ## Primary positioning
 

@@ -51,7 +51,9 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     }
   }
 
+  console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'PROVENANCE_REFRESH_START', fromBlock: fromBlock.toString(), targetBlock: targetBlock.toString() }));
   await ensureProvenanceProjection(store);
+  console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'PROVENANCE_REFRESH_DONE', fromBlock: fromBlock.toString(), targetBlock: targetBlock.toString() }));
   if (fromBlock > targetBlock) {
     return { headBlock, targetBlock, startBlock: null, endBlock: null, inserted: 0, duplicates: 0, batches: 0, reorgRewindFrom };
   }
@@ -64,11 +66,14 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
 
   while (fromBlock <= targetBlock) {
     const toBlock = minBigInt(targetBlock, fromBlock + options.maxBatchBlocks - 1n);
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_BATCH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
     await source.assertAuthority(fromBlock);
     await source.assertAuthority(toBlock);
 
     const boundaryHashBefore = await source.getBlockHash(toBlock);
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
     const launches = await source.catchUp(fromBlock, toBlock);
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), launchCount: launches.length }));
     await assertLaunchBlocksStillCanonical(source, launches);
     const boundaryHashAfterRead = await source.getBlockHash(toBlock);
     if (!sameHex(boundaryHashBefore, boundaryHashAfterRead)) throw new Error(`REORG_DURING_READ:block=${toBlock}`);
@@ -79,8 +84,12 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
       else duplicates += 1;
       await store.putProvenanceFact(await buildProvenanceFact(launch));
     }
-    const provenanceFacts = await store.listProvenanceFacts();
-    await store.replaceProvenanceEdges(await projectProvenanceEdges(provenanceFacts));
+    if (launches.length > 0) {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      const provenanceFacts = await store.listProvenanceFacts();
+      await store.replaceProvenanceEdges(await projectProvenanceEdges(provenanceFacts));
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), factCount: provenanceFacts.length }));
+    }
 
     const guardBlockNumber = toBlock > options.reorgLookbackBlocks ? toBlock - options.reorgLookbackBlocks : 0n;
     const guardBlockHash = await source.getBlockHash(guardBlockNumber);
@@ -93,12 +102,14 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     try { await source.assertAuthority(targetBlock); }
     catch (error) { await store.rewindFromBlock(fromBlock); throw error; }
 
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'CHECKPOINT_COMMIT_START', blockNumber: toBlock.toString() }));
     await store.commitCheckpoint({
       blockNumber: toBlock,
       blockHash: boundaryHashBeforeCommit,
       guardBlockNumber,
       guardBlockHash
     });
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'CHECKPOINT_COMMIT_DONE', blockNumber: toBlock.toString() }));
     finalBlock = toBlock;
     batches += 1;
     fromBlock = toBlock + 1n;
@@ -126,7 +137,13 @@ async function ensureProvenanceProjection(store: LaunchStore): Promise<void> {
   const missing = await store.listLaunchesMissingProvenance();
   for (const launch of missing) await store.putProvenanceFact(await buildProvenanceFact(launch));
   const facts = await store.listProvenanceFacts();
-  await store.replaceProvenanceEdges(await projectProvenanceEdges(facts));
+  const projected = await projectProvenanceEdges(facts);
+  const existing = await store.listProvenanceEdges();
+  const existingDigests = new Map(existing.map((edge) => [edge.edgeId, edge.evidenceDigest]));
+  const unchanged = existing.length === projected.length && projected.every(
+    (edge) => existingDigests.get(edge.edgeId) === edge.evidenceDigest
+  );
+  if (!unchanged) await store.replaceProvenanceEdges(projected);
 }
 
 async function assertLaunchBlocksStillCanonical(source: LaunchSource, launches: LaunchObserved[]): Promise<void> {

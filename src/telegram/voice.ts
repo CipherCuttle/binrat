@@ -43,6 +43,10 @@ export interface RatFactsByIntent {
     launchAuthorization: string;
     marketingAuthorized: string;
     launchAuthorized: string;
+    treasury: string;
+    projectFeeRecipient: string;
+    tokenAddressState: string;
+    holderGateStatus: string;
     tokenMessage: string;
     invariant: string;
   };
@@ -242,6 +246,10 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         line('launch authorization', plan.facts.launchAuthorization),
         line('marketing authorized', plan.facts.marketingAuthorized),
         line('launch authorized', plan.facts.launchAuthorized),
+        line('treasury role', plan.facts.treasury),
+        line('project fee recipient role', plan.facts.projectFeeRecipient),
+        line('token address', plan.facts.tokenAddressState),
+        line('Holder Gate', plan.facts.holderGateStatus),
         '',
         plan.facts.tokenMessage,
         'Rat Credits are separate, off-chain, non-transferable contribution/coordination units; they are not equity, revenue share, or yield.',

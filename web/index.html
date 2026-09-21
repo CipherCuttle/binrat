@@ -53,7 +53,8 @@
       <nav aria-label="Primary">
         <a class="nav-active" href="#garbage">01 / THE DUMPSTER</a
         ><a href="#how">02 / THE METHOD</a
-        ><a href="#token-status">03 / $BINRAT</a>
+        ><a href="#dumpster-ledger">03 / THE LEDGER</a
+        ><a href="#token-status">04 / $BINRAT</a>
       </nav>
       <div class="network-pill">
         <span class="status-dot"></span
@@ -266,12 +267,72 @@
         </div>
       </section>
       <section
+        id="dumpster-ledger"
+        class="shell ledger-section"
+        aria-labelledby="ledger-title"
+      >
+        <div class="ledger-heading">
+          <div>
+            <p class="eyebrow">03 / DUMPSTER LEDGER</p>
+            <h2 id="ledger-title">FOLLOW THE MONEY.<br />DON'T INVENT IT.</h2>
+          </div>
+          <p id="ledger-explanation">
+            Loading the canonical pre-launch funding state. Missing authority
+            stays missing; fixture money never becomes production truth.
+          </p>
+        </div>
+        <div class="ledger-status-grid" aria-live="polite">
+          <article>
+            <span>FUNDING STATUS</span>
+            <b id="ledger-funding-status">CHECKING AUTHORITY</b>
+          </article>
+          <article>
+            <span>TOKEN STATE</span>
+            <b id="ledger-token-state">NOT_LAUNCHED</b>
+          </article>
+          <article>
+            <span>TREASURY / FEE ROUTES</span>
+            <b id="ledger-wallet-status">2 FUTURE ROLES CONFIGURED / ACCOUNTING OFF</b>
+          </article>
+          <article>
+            <span>MONEY IN</span>
+            <b id="ledger-money-in">0 RAW / 0 ENTRIES</b>
+          </article>
+          <article>
+            <span>MONEY OUT</span>
+            <b id="ledger-money-out">0 RAW / 0 ENTRIES</b>
+          </article>
+          <article>
+            <span>RECEIPTS</span>
+            <b id="ledger-receipt">NO PRODUCTION ENTRIES</b>
+          </article>
+        </div>
+        <div class="ledger-utility-grid">
+          <article>
+            <span>SHIPPED</span>
+            <p id="ledger-shipped">Loading capability manifest…</p>
+          </article>
+          <article>
+            <span>BUILDING</span>
+            <p id="ledger-building">Loading capability manifest…</p>
+          </article>
+          <article>
+            <span>PLANNED / NOT AUTHORIZED</span>
+            <p id="ledger-planned">Loading capability manifest…</p>
+          </article>
+        </div>
+        <p class="ledger-boundary" id="ledger-boundary">
+          Accounting authority is separate from presentation. Unknown intent
+          remains uncategorized.
+        </p>
+      </section>
+      <section
         id="token-status"
         class="shell token-status-section"
         aria-labelledby="token-title"
       >
         <div class="token-intro">
-          <p class="eyebrow">03 / TOKEN STATUS</p>
+          <p class="eyebrow">04 / TOKEN STATUS</p>
           <h2 id="token-title">USEFUL RAT.<br />UNRELEASED COIN.</h2>
           <p class="token-status-lede">
             The dumpster comes first. The evidence stays public. A token should
@@ -315,6 +376,14 @@
           NO OFFICIAL BINRAT CONTRACT EXISTS. Any circulating address is not an
           official BINRAT contract.
         </div>
+        <p class="token-status-lede authority-status">
+          OWNER-CONFIGURED FUTURE AUTHORITIES — NOT TOKEN OR CUSTODY PROOF:<br />
+          TREASURY:
+          <code>0xab063A9b53a2Ab832a941aE5890ea05c1672339D</code><br />
+          PROJECT FEE RECIPIENT:
+          <code>0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866</code><br />
+          ACCOUNTING OFF · HOLDER GATE OFF · LAUNCH BLOCKED
+        </p>
       </section>
       <section id="boundary" class="shell boundary-section">
         <div>
