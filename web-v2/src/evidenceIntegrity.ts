@@ -11,6 +11,16 @@ export function findBagAtCheckpoint(
   return feed.bags.find((bag) => bag.id === bagId);
 }
 
+/** Malformed URL encoding is a not-found case, never an application crash. */
+export function bagIdFromPath(path: string): string {
+  if (!path.startsWith("/bag/")) return "";
+  try {
+    return decodeURIComponent(path.slice(5));
+  } catch {
+    return "";
+  }
+}
+
 /** Keep the displayed shortlist, ranked universe and observed universe distinct. */
 export function radarShortlistCounts(
   radar: Pick<RadarWatchlist, "candidates" | "coverage">,
