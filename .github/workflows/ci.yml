@@ -20,6 +20,8 @@ jobs:
       - run: python3 -m py_compile scripts/cutover-cloudflare-telegram.py scripts/publish-cloudflare-capability-manifest.py scripts/deploy-cloudflare-web-assets.py scripts/deploy-rat-watch-candidate.py scripts/deploy-rat-radar-candidate.py
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - name: Check isolated Product Surface V2
+        run: pnpm --dir web-v2 check
 
 
   rat-radar-candidate-deploy:
