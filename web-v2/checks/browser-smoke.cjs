@@ -86,7 +86,14 @@ async function runViewport(browser, viewport) {
       const watch = page.locator(".evidence-dossier .watch-control");
       await watch.click();
       assert.match(await watch.innerText(), /WATCH ARMED/);
-      await page.locator("button.radar-row").nth(1).click();
+      await page.locator(".radar-row").nth(1).click();
+      const selectedAddress = await page.locator(".evidence-dossier .full-address").innerText();
+      assert.match(new URL(page.url()).pathname, /\/radar\/address\//);
+      await page.getByRole("button", { name: "Copy address dossier link" }).click();
+      const copied = await page.evaluate(() => window.__binratCopied);
+      assert.match(copied, /\/radar\/address\//);
+      await ready(page, new URL(copied).pathname);
+      assert.equal(await page.locator(".evidence-dossier .full-address").innerText(), selectedAddress);
       assert.doesNotMatch(await page.locator(".evidence-dossier .watch-control").innerText(), /WATCH ARMED/);
       await assertNoHorizontalOverflow(page, "Radar", viewport.width);
       await page.screenshot({ path: path.join(output, "radar-" + tag + ".png") });
@@ -112,6 +119,55 @@ async function runViewport(browser, viewport) {
       assert.equal(await tabs.nth(0).getAttribute("aria-selected"), "true");
       await assertNoHorizontalOverflow(page, "Bag", viewport.width);
       await page.screenshot({ path: path.join(output, "bag-" + tag + ".png") });
+    });
+
+    await check(tag + "px shareable Radar URL and explicit unknown address", async () => {
+      await ready(page, "/radar");
+      await page.locator(".radar-row").nth(2).click();
+      const chosen = await page.locator(".evidence-dossier .full-address").innerText();
+      assert.equal(new URL(page.url()).pathname.toLowerCase(), ("/radar/address/" + chosen).toLowerCase());
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await page.locator(".evidence-dossier .full-address").waitFor();
+      assert.equal(await page.locator(".evidence-dossier .full-address").innerText(), chosen);
+      await page.goBack({ waitUntil: "domcontentloaded" });
+      await page.locator(".evidence-dossier .full-address").waitFor();
+      assert.notEqual(await page.locator(".evidence-dossier .full-address").innerText(), chosen);
+      await page.goForward({ waitUntil: "domcontentloaded" });
+      await page.locator(".evidence-dossier .full-address").waitFor();
+      assert.equal(await page.locator(".evidence-dossier .full-address").innerText(), chosen);
+      await ready(page, "/radar/address/0x0000000000000000000000000000000000000000");
+      assert.match(await page.locator("main").innerText(), /NO MATCHING RADAR ADDRESS/);
+    });
+
+    await check(tag + "px Creator File deep link respects source-reported identity", async () => {
+      const creator = "0x92f831C7E80cF1B3A2d96d6B6e03d98a21B57A40";
+      await ready(page, "/creator/" + creator);
+      const txt = await page.locator("main").innerText();
+      assert.match(txt, /CREATOR FILE/);
+      assert.match(txt, /BAGS? IN CURRENT FEED/);
+      assert.match(txt, /REFERENCE ONLY/);
+      assert.doesNotMatch(txt, /NO SUCH CREATOR FILE/);
+      await assertNoHorizontalOverflow(page, "Creator File", viewport.width);
+      await page.screenshot({ path: path.join(output, "creator-" + tag + ".png") });
+      await ready(page, "/creator/0x0000000000000000000000000000000000000000");
+      assert.match(await page.locator("main").innerText(), /NO SUCH CREATOR FILE/);
+    });
+
+    await check(tag + "px all five product destinations replace primary-nav placeholders", async () => {
+      const routes = [
+        ["/watch", /RAT WATCH/],
+        ["/replay", /REPLAY FILES/],
+        ["/ledger", /DUMPSTER LEDGER/],
+        ["/binrat", /BINRAT STATUS/],
+        ["/method", /HOW HE DIGS/],
+      ];
+      for (const [route, heading] of routes) {
+        await ready(page, route);
+        const text = await page.locator("main").innerText();
+        assert.match(text, heading);
+        assert.doesNotMatch(text, /ARCHITECTURE PLACEHOLDER/);
+        await assertNoHorizontalOverflow(page, route, viewport.width);
+      }
     });
 
     await check(tag + "px other Bag does not inherit FERAL's staged observations", async () => {

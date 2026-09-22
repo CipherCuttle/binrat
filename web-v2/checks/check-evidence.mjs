@@ -35,6 +35,10 @@ for (const phrase of [
   'bagIdFromPath(path)',
   'NO RADAR FILE IN THIS INDEX.',
   'NO BAGS AT THIS CHECKPOINT.',
+  'addressFromRoute(path, "/radar/address/")',
+  'CreatorFilePage feed={feed}',
+  'href={"/radar/address/" + candidate.observedRecipientAddress}',
+  'PUBLIC ACTIVITY JSON',
 ]) {
   if (!app.includes(phrase)) throw new Error(`V2_EVIDENCE_INTEGRITY_MISSING:${phrase}`);
 }
