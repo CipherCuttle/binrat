@@ -1942,3 +1942,33 @@ input:focus-visible,
     min-height: 40px;
   }
 }
+
+/* PR2: first-class route destinations, preserving industrial evidence language. */
+.route-page > .checkpoint-rail { margin: 16px 0; }
+.route-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 15px; margin: 16px 0; }
+.route-card { min-width: 0; border: 1px solid var(--line-hi); background: var(--panel); padding: 22px; }
+.route-card h2 { font: 23px var(--condensed); margin: 22px 0 8px; color: var(--bone); }
+.route-card h3 { font: 18px var(--condensed); margin: 23px 0 10px; color: var(--bone); }
+.route-card p { color: var(--bone); line-height: 1.7; font-size: 11px; max-width: 72ch; }
+.route-card .full-address { font-size: 11px; }
+.route-stat-line { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 19px 0; }
+.route-stat-line span { font-size: 10px; padding: 13px; border: 1px solid var(--line); }
+.route-stat-line b { display: block; font: 34px var(--condensed); }
+.route-note { font-size: 10px; color: var(--muted) !important; }
+.route-link-list { display: grid; gap: 8px; margin: 18px 0; }
+.route-result-link { display: flex; justify-content: space-between; gap: 20px; align-items: center; border: 1px solid var(--line); background: var(--panel); padding: 13px 16px; font: 16px var(--condensed); overflow-wrap: anywhere; }
+.route-result-link:hover, .route-result-link:focus-visible { border-color: var(--orange); background: var(--panel-hi); }
+.route-result-link small { display: block; color: var(--muted); margin-top: 5px; font: 9px var(--mono); }
+.route-trail { list-style: none; padding: 0; margin: 20px 0; }
+.route-trail li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); font: 15px var(--condensed); }
+.route-trail li small { display: block; font: 9px var(--mono); color: var(--muted); }
+.route-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.source-link { display: inline-flex; font: 9px var(--mono); color: var(--black); border: 1px solid #625c50; padding: 8px 10px; }
+.source-link:hover { text-decoration: underline; }
+@media (max-width: 760px) {
+  .route-grid { grid-template-columns: minmax(0, 1fr); }
+  .route-card { padding: 17px; }
+  .route-stat-line { grid-template-columns: minmax(0, 1fr); }
+  .route-result-link { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .route-trail li { align-items: flex-start; flex-wrap: wrap; }
+}
