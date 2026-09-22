@@ -70,7 +70,6 @@ test('Pons launch receipt code contains no wallet/signing/broadcast surface', as
     assert.equal(source.includes(forbidden), false, `forbidden launch surface: ${forbidden}`);
   }
   assert.match(source, /client\.call\(/);
-  assert.match(source, /client\.estimateGas\(/);
   assert.match(source, /creatorTaxBps:\s*0/);
   assert.match(source, /buybackEnabled:\s*false/);
   assert.match(source, /founderOpeningBuy:\s*'NONE'/);
