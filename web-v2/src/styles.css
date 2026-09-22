@@ -859,6 +859,7 @@ input:focus-visible,
   transform: rotate(90deg);
   color: #ffffff08;
   font: 42px var(--condensed);
+  pointer-events: none; /* Decorative case label must never intercept evidence controls. */
 }
 .evidence-dossier h2 {
   font: 36px var(--condensed);
