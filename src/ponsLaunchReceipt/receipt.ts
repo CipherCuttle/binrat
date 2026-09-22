@@ -15,6 +15,8 @@ export const PONS_V2_FACTORY_RUNTIME_CODE_HASH =
   '0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84' as Hex;
 export const PONS_V2_MEME_HOOK =
   getAddress('0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044');
+export const PONS_V2_MEME_HOOK_RUNTIME_CODE_HASH =
+  '0xc21b1e6c1b45403e81a581f22ed6d9c747997af1cfdac1b1dc9f4b1d346a10db' as Hex;
 export const PONS_V2_LAUNCH_DEPLOYER =
   getAddress('0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42');
 export const PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH =
@@ -237,7 +239,11 @@ export async function buildPonsLaunchReadinessReceipt(
     `expected=${PONS_V2_FACTORY_RUNTIME_CODE_HASH} actual=${actualFactoryRuntimeCodeHash ?? 'MISSING'}`
   ));
 
-  if (chainId !== ROBINHOOD_CHAIN_ID || !factoryCode) {
+  if (
+    chainId !== ROBINHOOD_CHAIN_ID ||
+    !factoryCode ||
+    actualFactoryRuntimeCodeHash !== PONS_V2_FACTORY_RUNTIME_CODE_HASH
+  ) {
     return finalize({
       chainId,
       blockNumber,
@@ -330,11 +336,13 @@ export async function buildPonsLaunchReadinessReceipt(
     maxInternalPriceImpactBps: BigInt(fee.maxInternalPriceImpactBps)
   };
 
+  const memeHookRuntimeCodeHash = memeHookCode ? keccak256(memeHookCode) : null;
   const launchDeployerRuntimeCodeHash = launchDeployerCode ? keccak256(launchDeployerCode) : null;
   checks.push(check(
     'MEME_HOOK',
-    memeHook === PONS_V2_MEME_HOOK && Boolean(memeHookCode && memeHookCode !== '0x'),
-    `expected=${PONS_V2_MEME_HOOK} actual=${memeHook}`
+    memeHook === PONS_V2_MEME_HOOK &&
+      memeHookRuntimeCodeHash === PONS_V2_MEME_HOOK_RUNTIME_CODE_HASH,
+    `expectedAddress=${PONS_V2_MEME_HOOK} actualAddress=${memeHook} expectedHash=${PONS_V2_MEME_HOOK_RUNTIME_CODE_HASH} actualHash=${memeHookRuntimeCodeHash ?? 'MISSING'}`
   ));
   checks.push(check('FEE_POLICY', sameFeePolicy(feePolicy),
     JSON.stringify(stringifyBigints(feePolicy))));
@@ -491,6 +499,7 @@ export async function buildPonsLaunchReadinessReceipt(
     launchConfigCount: String(launchConfigCount),
     launchConfig0: stringifyBigints(config),
     memeHook,
+    memeHookRuntimeCodeHash,
     launchDeployer,
     launchDeployerRuntimeCodeHash,
     currentFeePolicy: stringifyBigints(feePolicy),
