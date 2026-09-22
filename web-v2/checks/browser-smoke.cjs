@@ -188,7 +188,7 @@ async function runMockedLive(browser) {
       assert.match(text, /NO BAGS AT THIS CHECKPOINT/);
       assert.match(text, /NO RADAR SHORTLIST YET/);
       assert.doesNotMatch(text, /FERAL|DEMO \+5m/);
-      assert.ok(await page.getByText("PUBLIC LIVE", { exact: true }).isVisible());
+      assert.equal((await page.locator(".demo-flag").innerText()).trim(), "PUBLIC LIVE");
       await ready(page, "/radar?source=live");
       assert.match(await page.locator("main").innerText(), /NO RADAR FILE IN THIS INDEX/);
       await assertNoHorizontalOverflow(page, "Mocked empty Radar", 390);
