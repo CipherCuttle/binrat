@@ -9,12 +9,14 @@ export function AppLink({
   className,
   children,
   ariaLabel,
+  ariaCurrent,
 }: {
   href: string;
   navigate: Navigate;
   className?: string;
   children: ReactNode;
   ariaLabel?: string;
+  ariaCurrent?: "page";
 }) {
   const base =
     import.meta.env.BASE_URL === "/"
@@ -39,6 +41,7 @@ export function AppLink({
       href={resolvedHref}
       className={className}
       aria-label={ariaLabel}
+      aria-current={ariaCurrent}
       onClick={follow}
     >
       {children}

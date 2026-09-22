@@ -1,6 +1,8 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
 import { loadProductData, type DataMode } from "./data";
+import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
+import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import type {
   Bag,
   EvidenceState,
@@ -24,7 +26,13 @@ import {
 type Route =
   | { page: "home" }
   | { page: "dumpster" }
-  | { page: "radar" }
+  | { page: "radar"; address?: string }
+  | { page: "creator"; address: string }
+  | { page: "method" }
+  | { page: "replay" }
+  | { page: "watch" }
+  | { page: "ledger" }
+  | { page: "binrat" }
   | { page: "bag"; id: string }
   | { page: "placeholder"; name: string };
 const primaryNav = [
@@ -44,7 +52,16 @@ function readRoute(): Route {
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
   if (path === "/") return { page: "home" };
   if (path === "/dumpster") return { page: "dumpster" };
+  const radarAddress = addressFromRoute(path, "/radar/address/");
+  if (radarAddress !== null) return { page: "radar", address: radarAddress };
   if (path === "/radar") return { page: "radar" };
+  const creatorAddress = addressFromRoute(path, "/creator/");
+  if (creatorAddress !== null) return { page: "creator", address: creatorAddress };
+  if (path === "/method") return { page: "method" };
+  if (path === "/replay") return { page: "replay" };
+  if (path === "/watch") return { page: "watch" };
+  if (path === "/ledger") return { page: "ledger" };
+  if (path === "/binrat") return { page: "binrat" };
   if (path.startsWith("/bag/"))
     return { page: "bag", id: bagIdFromPath(path) };
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
@@ -104,7 +121,19 @@ export default function App() {
   ) : route.page === "dumpster" ? (
     <Dumpster feed={feed} navigate={navigate} />
   ) : route.page === "radar" ? (
-    <Radar radar={radar} mode={mode} />
+    <Radar radar={radar} mode={mode} selectedAddress={route.address} navigate={navigate} />
+  ) : route.page === "creator" ? (
+    <CreatorFilePage feed={feed} address={route.address} mode={mode} navigate={navigate} />
+  ) : route.page === "method" ? (
+    <MethodPage navigate={navigate} />
+  ) : route.page === "replay" ? (
+    <ReplayIndexPage feed={feed} mode={mode} navigate={navigate} />
+  ) : route.page === "watch" ? (
+    <WatchPage navigate={navigate} />
+  ) : route.page === "ledger" ? (
+    <LedgerPage />
+  ) : route.page === "binrat" ? (
+    <TokenStatusPage />
   ) : route.page === "bag" ? (
     requestedBag ? (
       <BagDossier key={requestedBag.id} bag={requestedBag} mode={mode} navigate={navigate} />
@@ -146,7 +175,7 @@ function ShellNav({
   route: Route;
   navigate: (path: string) => void;
 }) {
-  const current = route.page === "bag" ? "DUMPSTER" : route.page.toUpperCase();
+  const current = (route.page === "bag" || route.page === "creator") ? "DUMPSTER" : route.page.toUpperCase();
   return (
     <aside className="shell-nav">
       <AppLink
@@ -318,7 +347,7 @@ function Home({
                 share the leading observed recipient address in {mode === "DEMO" ? "this synthetic demo." : "the current public shortlist."}
               </p>
               <RecurrenceMarks count={topRecipient.distinctLaunchCount} />
-              <AppLink className="text-link" href="/radar" navigate={navigate}>
+              <AppLink className="text-link" href={"/radar/address/" + topRecipient.observedRecipientAddress} navigate={navigate}>
                 OPEN THE EVIDENCE FILE →
               </AppLink>
             </div>
@@ -433,8 +462,10 @@ function Dumpster({
   );
 }
 
-function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
-  const [selected, setSelected] = useState<RadarCandidate | null>(radar.candidates[0] ?? null);
+function Radar({ radar, mode, selectedAddress, navigate }: {
+  radar: RadarWatchlist; mode: DataMode; selectedAddress?: string; navigate: (path: string) => void;
+}) {
+  const selected = selectRadarCandidate(radar, selectedAddress);
   const counts = radarShortlistCounts(radar);
   if (!selected) {
     return (
@@ -442,7 +473,7 @@ function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
         <PageHeading index="02" eyebrow="OBSERVED RECURRENCE / TIMING" title="RAT RADAR" detail="Inspectable observed recipient recurrence, subject to indexed coverage." />
         <p className="radar-sample-note">{counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES.</p>
         <CheckpointRail checkpoint={radar.asOfBlock} coverage={radar.coverage.historyCoverage} />
-        <EmptyState title="NO RADAR FILE IN THIS INDEX." detail="No ranked recipient addresses are available at this checkpoint. No dossier or watch state is fabricated." />
+        <EmptyState title={selectedAddress === undefined ? "NO RADAR FILE IN THIS INDEX." : "NO MATCHING RADAR ADDRESS."} detail="No public ranked dossier matches the requested address at this checkpoint. Nothing else was substituted." />
       </div>
     );
   }
@@ -473,6 +504,7 @@ function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
         </div>
       </div>
       <p className="radar-sample-note">PUBLIC SHORTLIST: {counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES. RANK IS INSPECTION ORDER, NOT A RECOMMENDATION.</p>
+      <AppLink href="/method" navigate={navigate} className="text-link">HOW RANKING AND EVIDENCE WORK ↗</AppLink>
       <p className="sr-only" role="status">FILE {selected.rank} OPEN. {selected.distinctLaunchCount} DISTINCT INDEXED LAUNCHES; {selected.acquisitionReceiptCount} ACQUISITION RECEIPTS.</p>
       <div className="radar-workbench">
         <section className="radar-list" aria-label="Ranked observed addresses">
@@ -483,15 +515,13 @@ function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
             <span>RECEIPTS</span>
           </div>
           {radar.candidates.map((candidate) => (
-            <button
-              className={
-                selected.rank === candidate.rank
-                  ? "radar-row selected"
-                  : "radar-row"
-              }
+            <AppLink
+              className={selected.rank === candidate.rank ? "radar-row selected" : "radar-row"}
               key={candidate.observedRecipientAddress}
-              onClick={() => setSelected(candidate)}
-              aria-pressed={selected.rank === candidate.rank}
+              href={"/radar/address/" + candidate.observedRecipientAddress}
+              navigate={navigate}
+              ariaLabel={"Open observed-recipient evidence file for " + candidate.observedRecipientAddress}
+              ariaCurrent={selected.rank === candidate.rank ? "page" : undefined}
             >
               <span className="rank-address">
                 <b>{String(candidate.rank).padStart(2, "0")}</b>
@@ -512,7 +542,7 @@ function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
                 <b>{candidate.acquisitionReceiptCount}</b>
                 <small>OBSERVED</small>
               </span>
-            </button>
+            </AppLink>
           ))}
         </section>
         <EvidenceDossier
@@ -548,7 +578,7 @@ function EvidenceDossier({
         OPEN FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}
       </CaseTab>
       <h2>{short(candidate.observedRecipientAddress)}</h2>
-      <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /></div>
+      <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /><CopyButton label="address dossier link" value={window.location.origin + appBase() + "/radar/address/" + candidate.observedRecipientAddress + window.location.search} /></div>
       <div className="dossier-recurrence">
         <span>DISTINCT LAUNCH RECURRENCE</span>
         <b>{candidate.distinctLaunchCount}</b>
@@ -575,9 +605,14 @@ function EvidenceDossier({
         title="ACQUISITION RECEIPTS"
         count={candidate.acquisitionReceiptCount}
       >
-        <small className="demo-proof-note">{mode === "DEMO" ? "DEMO ACTIVITY IDS — SYNTHETIC; NOT CHAIN RECEIPTS" : "OBSERVED ACTIVITY IDS — PUBLIC LINKS REQUIRE VERIFIED ROUTE"}</small>
+        <small className="demo-proof-note">{mode === "DEMO" ? "DEMO ACTIVITY IDS — SYNTHETIC; NOT CHAIN RECEIPTS" : "OBSERVED ACTIVITY IDS — PUBLIC ACTIVITY JSON IS AVAILABLE FOR VALID IDS"}</small>
         {candidate.evidenceActivityIds.map((id) => (
-          <div className="copyable-value" key={id}><code>{id}</code><CopyButton label="activity identifier" value={id} /></div>
+          <div className="copyable-value" key={id}>
+            <code>{id}</code>
+            <CopyButton label="activity identifier" value={id} />
+            {mode === "LIVE" && /^[0-9a-f]{64}$/i.test(id) &&
+              <a className="source-link" href={"/api/rat-radar/activity/" + id} target="_blank" rel="noopener noreferrer">PUBLIC ACTIVITY JSON ↗</a>}
+          </div>
         ))}
       </Receipt>
       <CheckpointRail checkpoint={checkpoint} coverage={coverage} />
@@ -682,6 +717,7 @@ function BagDossier({
           <CaseTab tone="orange">CREATOR FILE / SOURCE-REPORTED</CaseTab>
           <h2>REPORTED CREATOR ADDRESS</h2>
           <div className="copyable-value"><code className="full-address">{bag.reportedCreatorAddress}</code><CopyButton label="reported creator address" value={bag.reportedCreatorAddress} /></div>
+          <AppLink className="text-link" href={"/creator/" + bag.reportedCreatorAddress} navigate={navigate}>OPEN SHAREABLE CREATOR FILE ↗</AppLink>
           <div className="creator-count">
             <b>{bag.trashTrail.priorLaunchCount + 1}</b>
             <span>
