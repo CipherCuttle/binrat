@@ -1,4 +1,4 @@
-import type { Bag, PublicFeed, RadarWatchlist } from "./types";
+import type { Bag, PublicFeed, RadarWatchlist } from "./types.js";
 
 /**
  * A dossier may only render the bag identified by its URL. Unknown IDs must
