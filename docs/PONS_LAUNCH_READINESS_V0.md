@@ -49,7 +49,7 @@ Pons adapter and refuses a silent factory epoch change.
 5. Launch fee.
 6. Creator-tax ceiling.
 7. Snipe-tax start/window.
-8. Meme-hook address is the reviewed Pons hook and deployed code exists.
+8. Meme-hook address and runtime bytecode hash match the reviewed SENTRY/Pons hook authority.
 9. Current fee policy matches the reviewed candidate terms.
 10. Launch-deployer address and runtime bytecode hash match the reviewed SENTRY/Pons template authority.
 11. Launch-deployer factory binding points back to the pinned factory.
