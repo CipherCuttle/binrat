@@ -3,6 +3,7 @@ import { test } from "node:test";
 import {
   findBagAtCheckpoint,
   radarShortlistCounts,
+  replayStagesForBag,
 } from "../web-v2/src/evidenceIntegrity.js";
 import { demoFeed, demoRadar } from "../web-v2/src/fixtures.js";
 
@@ -27,4 +28,21 @@ test("Radar explicitly distinguishes displayed, ranked and observed addresses", 
     ranked: 5,
     observed: 414,
   });
+});
+
+test("Replay horizons stay bound to the exact demo case and never leak into LIVE", () => {
+  const feral = demoFeed.bags[0];
+  const slag = demoFeed.bags[1];
+  const feralDemo = replayStagesForBag(feral, "DEMO");
+  const slagDemo = replayStagesForBag(slag, "DEMO");
+  const feralLive = replayStagesForBag(feral, "LIVE");
+  assert.equal(feralDemo["5m"].state, "COMPLETE");
+  assert.equal(feralDemo["1h"].state, "PARTIAL");
+  assert.match(feralDemo["5m"].note, /DEMO FIXTURE ONLY/);
+  for (const horizon of ["5m", "1h", "24h"] as const) {
+    assert.equal(slagDemo[horizon].state, "MISSING");
+    assert.equal(feralLive[horizon].state, "MISSING");
+  }
+  assert.equal(slagDemo.LAUNCH.value, "BLOCK " + slag.blockNumber);
+  assert.notEqual(feralDemo.LAUNCH.value, slagDemo.LAUNCH.value);
 });
