@@ -188,14 +188,19 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
     }
   };
   return (
-    <button
-      type="button"
-      className="copy-button"
-      aria-label={`Copy ${label}`}
-      onClick={() => void copy()}
-      title={`Copy ${label}`}
-    >
-      {status === "READY" ? "COPY" : status}
-    </button>
+    <>
+      <button
+        type="button"
+        className="copy-button"
+        aria-label={`Copy ${label}`}
+        onClick={() => void copy()}
+        title={`Copy ${label}`}
+      >
+        {status === "READY" ? "COPY" : status}
+      </button>
+      <span className="sr-only" role="status">
+        {status === "COPIED" ? `${label} copied` : status === "COPY FAILED" ? `${label} could not be copied` : ""}
+      </span>
+    </>
   );
 }
