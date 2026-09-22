@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
+import { findBagAtCheckpoint, radarShortlistCounts } from "./evidenceIntegrity";
 import { loadProductData, type DataMode } from "./data";
 import type {
   Bag,
@@ -12,6 +13,7 @@ import {
   AppLink,
   CaseTab,
   CheckpointRail,
+  CopyButton,
   CoverageStamp,
   ProofBoundary,
   Receipt,
@@ -87,6 +89,9 @@ export default function App() {
         : "smooth",
     });
   };
+  const requestedBag = feed && route.page === "bag"
+    ? findBagAtCheckpoint(feed, route.id)
+    : undefined;
   const content = error ? (
     <EmptyState
       title="THE TRAIL WENT COLD."
@@ -95,16 +100,26 @@ export default function App() {
   ) : !feed || !radar ? (
     <Loading />
   ) : route.page === "home" ? (
-    <Home feed={feed} radar={radar} navigate={navigate} />
+    <Home feed={feed} radar={radar} mode={mode} navigate={navigate} />
   ) : route.page === "dumpster" ? (
     <Dumpster feed={feed} navigate={navigate} />
   ) : route.page === "radar" ? (
-    <Radar radar={radar} />
+    <Radar radar={radar} mode={mode} />
   ) : route.page === "bag" ? (
-    <BagDossier
-      bag={feed.bags.find((bag) => bag.id === route.id) ?? feed.bags[0]}
-      navigate={navigate}
-    />
+    requestedBag ? (
+      <BagDossier bag={requestedBag} mode={mode} navigate={navigate} />
+    ) : (
+      <section className="page-pad">
+        <EmptyState
+          title="NO MATCHING BAG IN THIS INDEX."
+          detail={"No bag matches this exact identifier at checkpoint " + feed.asOfBlock + ". Nothing else was substituted."}
+        />
+        <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
+        <AppLink className="action" href="/dumpster" navigate={navigate}>
+          BACK TO THE DUMPSTER →
+        </AppLink>
+      </section>
+    )
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
@@ -182,7 +197,7 @@ function StatusRail({
     <header className="status-rail">
       <span className="status-cluster">
         <i />
-        {feed ? "INDEX READY" : "INDEXING"}
+        {feed ? (mode === "DEMO" ? "DEMO INDEX READY" : "PUBLIC INDEX READY") : "INDEXING"}
       </span>
       <span>
         ARC <b>5042</b>
@@ -203,10 +218,12 @@ function StatusRail({
 function Home({
   feed,
   radar,
+  mode,
   navigate,
 }: {
   feed: PublicFeed;
   radar: RadarWatchlist;
+  mode: DataMode;
   navigate: (path: string) => void;
 }) {
   const latest = feed.bags[0];
@@ -243,7 +260,7 @@ function Home({
           </p>
           <div
             className="hero-fragments"
-            aria-label="Current demo evidence status"
+            aria-label="Current evidence mode and coverage"
           >
             <span>
               CHECKPOINT
@@ -258,7 +275,7 @@ function Home({
             <span>
               DATA MODE
               <br />
-              <b>DEMO / DETERMINISTIC</b>
+              <b>{mode === "DEMO" ? "DEMO / DETERMINISTIC" : "PUBLIC LIVE"}</b>
             </span>
           </div>
         </div>
@@ -412,8 +429,9 @@ function Dumpster({
   );
 }
 
-function Radar({ radar }: { radar: RadarWatchlist }) {
+function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
   const [selected, setSelected] = useState<RadarCandidate>(radar.candidates[0]);
+  const counts = radarShortlistCounts(radar);
   return (
     <div className="page-pad radar-page">
       <PageHeading
@@ -440,6 +458,8 @@ function Radar({ radar }: { radar: RadarWatchlist }) {
           <CoverageStamp state={radar.coverage.historyCoverage} />
         </div>
       </div>
+      <p className="radar-sample-note">PUBLIC SHORTLIST: {counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES. RANK IS INSPECTION ORDER, NOT A RECOMMENDATION.</p>
+      <p className="sr-only" role="status">FILE {selected.rank} OPEN. {selected.distinctLaunchCount} DISTINCT INDEXED LAUNCHES; {selected.acquisitionReceiptCount} ACQUISITION RECEIPTS.</p>
       <div className="radar-workbench">
         <section className="radar-list" aria-label="Ranked observed addresses">
           <div className="radar-head">
@@ -483,6 +503,7 @@ function Radar({ radar }: { radar: RadarWatchlist }) {
         </section>
         <EvidenceDossier
           candidate={selected}
+          mode={mode}
           coverage={radar.coverage.historyCoverage}
           checkpoint={radar.asOfBlock}
         />
@@ -496,21 +517,23 @@ function Radar({ radar }: { radar: RadarWatchlist }) {
 
 function EvidenceDossier({
   candidate,
+  mode,
   coverage,
   checkpoint,
 }: {
   candidate: RadarCandidate;
+  mode: DataMode;
   coverage: RadarWatchlist["coverage"]["historyCoverage"];
   checkpoint: string;
 }) {
   const [watching, setWatching] = useState(false);
   return (
-    <aside className="evidence-dossier" aria-live="polite">
+    <aside className="evidence-dossier">
       <CaseTab tone="orange">
         OPEN FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}
       </CaseTab>
       <h2>{short(candidate.observedRecipientAddress)}</h2>
-      <code className="full-address">{candidate.observedRecipientAddress}</code>
+      <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /></div>
       <div className="dossier-recurrence">
         <span>DISTINCT LAUNCH RECURRENCE</span>
         <b>{candidate.distinctLaunchCount}</b>
@@ -537,8 +560,9 @@ function EvidenceDossier({
         title="ACQUISITION RECEIPTS"
         count={candidate.acquisitionReceiptCount}
       >
+        <small className="demo-proof-note">{mode === "DEMO" ? "DEMO ACTIVITY IDS — SYNTHETIC; NOT CHAIN RECEIPTS" : "OBSERVED ACTIVITY IDS — PUBLIC LINKS REQUIRE VERIFIED ROUTE"}</small>
         {candidate.evidenceActivityIds.map((id) => (
-          <code key={id}>{id.slice(0, 18)}…</code>
+          <div className="copyable-value" key={id}><code>{id}</code><CopyButton label="activity identifier" value={id} /></div>
         ))}
       </Receipt>
       <CheckpointRail checkpoint={checkpoint} coverage={coverage} />
@@ -552,13 +576,28 @@ function EvidenceDossier({
 type ReplayState = "COMPLETE" | "PARTIAL" | "UNVERIFIED" | "MISSING";
 function BagDossier({
   bag,
+  mode,
   navigate,
 }: {
   bag: Bag;
+  mode: DataMode;
   navigate: (path: string) => void;
 }) {
   const [stage, setStage] = useState("LAUNCH");
   const [watching, setWatching] = useState(false);
+  const onReplayKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const labels = ["LAUNCH", "5m", "1h", "24h"];
+    const current = labels.indexOf(stage);
+    let target = current;
+    if (event.key === "ArrowRight") target = (current + 1) % labels.length;
+    else if (event.key === "ArrowLeft") target = (current - 1 + labels.length) % labels.length;
+    else if (event.key === "Home") target = 0;
+    else if (event.key === "End") target = labels.length - 1;
+    else return;
+    event.preventDefault();
+    setStage(labels[target]);
+    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[target]?.focus();
+  };
   const stageData: Record<
     string,
     { state: ReplayState; note: string; value: string }
@@ -610,11 +649,7 @@ function BagDossier({
           </a>
         </div>
       </div>
-      <CheckpointRail
-        checkpoint={bag.blockNumber}
-        coverage={bag.trashTrail.coverage}
-        receiptId={`binrat-bag:${bag.id}`}
-      />
+      <CheckpointRail checkpoint={bag.blockNumber} coverage={bag.trashTrail.coverage} />
       <div className="case-grid">
         <section className="case-sheet">
           <CaseTab>EXACT LAUNCH RECEIPT</CaseTab>
@@ -622,7 +657,7 @@ function BagDossier({
             <div>
               <dt>TOKEN CONTRACT</dt>
               <dd>
-                <code>{bag.token}</code>
+                <div className="copyable-value"><code>{bag.token}</code><CopyButton label="token contract address" value={bag.token} /></div>
               </dd>
             </div>
             <div>
@@ -632,7 +667,7 @@ function BagDossier({
             <div>
               <dt>TRANSACTION HASH</dt>
               <dd>
-                <code>{bag.txHash}</code>
+                <div className="copyable-value"><code>{bag.txHash}</code><CopyButton label="launch transaction hash" value={bag.txHash} /></div>
               </dd>
             </div>
             <div>
@@ -649,14 +684,14 @@ function BagDossier({
               </div>
             ))}
           </div>
-          <Receipt title="BAG RECEIPT">
-            <code>binrat-bag:{bag.id}</code>
+          <Receipt title={mode === "DEMO" ? "DEMO BAG FILE / NOT CHAIN PROOF" : "BAG FILE ID / NOT AUTHORITY RECEIPT"}>
+            <div className="copyable-value"><code>{bag.id}</code><CopyButton label="bag file ID" value={bag.id} /></div>
           </Receipt>
         </section>
         <aside className="creator-file">
           <CaseTab tone="orange">CREATOR FILE / SOURCE-REPORTED</CaseTab>
           <h2>REPORTED CREATOR ADDRESS</h2>
-          <code className="full-address">{bag.reportedCreatorAddress}</code>
+          <div className="copyable-value"><code className="full-address">{bag.reportedCreatorAddress}</code><CopyButton label="reported creator address" value={bag.reportedCreatorAddress} /></div>
           <div className="creator-count">
             <b>{bag.trashTrail.priorLaunchCount + 1}</b>
             <span>
@@ -713,6 +748,9 @@ function BagDossier({
               role="tab"
               aria-selected={stage === label}
               aria-controls="replay-readout"
+              id={`replay-tab-${index}`}
+              tabIndex={stage === label ? 0 : -1}
+              onKeyDown={onReplayKeyDown}
               onClick={() => setStage(label)}
               key={label}
             >
@@ -727,6 +765,8 @@ function BagDossier({
           className="replay-readout"
           id="replay-readout"
           role="tabpanel"
+          aria-labelledby={`replay-tab-${Object.keys(stageData).indexOf(stage)}`}
+          tabIndex={0}
           aria-live="polite"
         >
           <span>CASE AT {stage}</span>
