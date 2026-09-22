@@ -39,6 +39,102 @@ This is a bounded presentation lane over existing public evidence capabilities. 
 
 Product Surface V1 acceptance requires the current production app to remain deployable, V2 to consume existing public schemas through fail-closed adapters, evidence semantics checks to pass, and responsive verification at phone/tablet/desktop widths. Visual completion has no launch-authorization effect.
 
+## ACTIVE EXECUTION ORDER — FRONTEND FIRST (2026-09-22)
+
+This is the current **work order**, not a change to Launch V0 acceptance criteria or token authority.
+Finish the bounded product/frontend acceptance before resuming launch-operator preparation.
+Legal/compliance, contract risk and disclosure review remain parallel launch-authorization
+gates; a visual release does not authorize token marketing or launch.
+
+### F0 — Inspect and choose the visual direction (CURRENT)
+
+- Show the already-published Product Surface V1 demo:
+  https://ciphercuttle.github.io/binrat/ (Home),
+  https://ciphercuttle.github.io/binrat/radar/ (flagship Rat Radar),
+  https://ciphercuttle.github.io/binrat/bag/bag-feral-arc-20418791/ (Bag + Replay).
+- Compare with the independently deployed live Arc beta:
+  https://binrat-edge-v0.pettevik.workers.dev/. The GitHub Pages demo is
+  deterministic demo data, **not** the production index, subscriptions or ledger.
+- Preserve the approved mascot and forensic-dumpster visual grammar. Owner visual
+  acceptance is pending; the repository's bounded visual review accepted the
+  candidate, not an unconditional production cutover. Incorporate specific owner
+  feedback before asset production, with one bounded review and targeted rereview
+  only for Critical/High corrections.
+
+### F1 — Complete the product journey and real-data boundaries
+
+Use `docs/PRODUCT_SURFACE_V1.md` and `docs/FRONTEND_V2_AUDIT.md` as the
+implementation contracts. Migrate screen-by-screen, retaining the present Worker
+API and deployable `web/` until the replacement is accepted.
+
+1. Home → Dumpster → Bag Dossier with embedded point-in-time Replay →
+   reported Creator File, with native deep links and contextual next actions.
+2. Make Rat Radar the flagship: recurrence scars, selected observed-address
+   dossier, source-role boundary, sample/coverage and linked public receipts.
+3. Replace demo placeholders for Watch, Creator, Ledger, Replay index and token
+   status with truthful surfaces. Watch must bind to accepted future-only
+   subscriptions when available; the demo's local `WATCH ARMED` toggle is **not**
+   production subscription evidence. Holder Gate remains visibly inactive
+   until canonical token authority exists.
+4. Port full typed live validators and evidence semantics from
+   `web/data-source.js`; never silently use fixture data as live. Scope all
+   status, coverage, checkpoint, errors and token claims to the validated API
+   and `docs/CAPABILITY_MANIFEST_V0.json`.
+
+### F2 — Finish the coherent asset and restrained motion system
+
+Produce the scoped P0 assets in `docs/ASSET_PRODUCTION_BRIEF_V1.md`:
+rat-head/wordmark/icon family, physical receipt and ledger objects, recurrence
+scars, Watch tripwire and mascot states derived from the approved art.
+Implement the documented **Rive state contract** for idle, digging, evidence
+found, repeat creator, empty and error, driven only by validated app events.
+No purchased asset pack, replacement mascot or decorative dashboard animations
+are required. Static WebP and reduced-motion equivalents remain mandatory.
+
+### F3 — Candidate release acceptance, then guarded migration
+
+- Check desktop (1440 and 1024) plus mobile (430 and 390), overflow, keyboard
+  links, focus transfer, reduced motion, accessible state labels and readable
+  address/receipt copying.
+- Pin production dependencies and build an isolated V2 candidate against
+  schema-validated live reads. Ensure all deep links resolve on the deployed
+  host and that README/marketing screenshots preserve DEMO/LIVE labels.
+- Run `pnpm check`, frontend evidence checks, candidate-deploy smoke and
+  real endpoint/Telegram/Watch acceptance without changing backend authority.
+  Diagnose the existing Rat Radar candidate-deploy failure independently.
+- Cut over only after explicit owner visual acceptance and verified live
+  read/deep-link/rollback gates; preserve the V0 Cloudflare site as rollback.
+
+**Frontend completion gate:** the flagship Home → Radar → Bag → Replay/Watch
+journey works with evidence-correct live reads, the advertised destinations do
+not lead to misleading placeholders, and the bounded mobile/accessibility/
+release checks pass. Do not expand this into every post-launch feature.
+
+### PARKED — launch-operator tasks (AFTER frontend acceptance)
+
+The owner reports that dedicated addresses have been created; **no public
+addresses have been bound or verified by this repository**. Do not ask for
+private keys, recovery phrases or unrelated trading-wallet access.
+
+- Record and independently verify the dedicated Robinhood/Pons **deployer**
+  and separate **creator-fee recipient** public addresses. Keep the older Arc
+  treasury/fee roles and the SENTRY trading wallet separate until an explicit
+  rail/role decision.
+- Freeze the final BINRAT launch name/symbol, owner-approved logo, description,
+  website and socials; generate a fresh nonzero random `bytes32` launch salt.
+- Refresh the read-only Pons live receipt from draft PR #20, then check the
+  exact deployer access, fee/gas balance, fee-recipient binding and full
+  block-pinned `eth_call` simulation. Capture the hypothetical token/curve
+  addresses and receipt digest; **do not sign or broadcast**.
+- Explicitly decide whether the currently frozen **Arc 5042** launch config
+  is being superseded by **Robinhood 4663 / Pons V2**. Reconcile treasury
+  roles, fee policy, public documentation, capabilities and any affected
+  holder-balance rules only after that owner decision.
+- Contract/audit exposure, legal/compliance, final disclosure, launch
+  authority and marketing authority remain **separate, fail-closed gates**.
+  None are satisfied by a frontend preview, owner-created wallets or a
+  passing read-only simulation.
+
 ### Intelligence V1
 
 Current reviewed head: `69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3`
