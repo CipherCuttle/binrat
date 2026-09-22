@@ -1,5 +1,5 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
+import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
 import { loadProductData, type DataMode } from "./data";
 import type {
   Bag,
@@ -46,7 +46,7 @@ function readRoute(): Route {
   if (path === "/dumpster") return { page: "dumpster" };
   if (path === "/radar") return { page: "radar" };
   if (path.startsWith("/bag/"))
-    return { page: "bag", id: decodeURIComponent(path.slice(5)) };
+    return { page: "bag", id: bagIdFromPath(path) };
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
 }
 
@@ -227,6 +227,7 @@ function Home({
   navigate: (path: string) => void;
 }) {
   const latest = feed.bags[0];
+  const topRecipient = radar.candidates[0];
   return (
     <div className="home-page">
       <section className="home-hero">
@@ -291,47 +292,50 @@ function Home({
           </AppLink>
         </header>
         <div className="snapshot-grid">
-          <AppLink
-            className="latest-file"
-            href={`/bag/${latest.id}`}
-            navigate={navigate}
-          >
-            <CaseTab>LATEST INDEXED BAG</CaseTab>
-            <strong>${latest.symbol}</strong>
-            <small>{latest.name}</small>
-            <div>
-              <span>REPORTED CREATOR</span>
-              <code>{short(latest.reportedCreatorAddress)}</code>
-            </div>
-            <div>
-              <span>PRIOR BAGS</span>
-              <b>
-                {latest.trashTrail.priorLaunchCount.toString().padStart(2, "0")}
-              </b>
-            </div>
-            <span className="open-cue">OPEN DOSSIER ↗</span>
-          </AppLink>
-          <div className="radar-tease">
-            <CaseTab tone="orange">RAT RADAR / RECURRENCE</CaseTab>
-            <p>
-              <b>{radar.candidates[0].distinctLaunchCount}</b> distinct launches
-              share the top observed recipient address in this demo index.
-            </p>
-            <RecurrenceMarks count={radar.candidates[0].distinctLaunchCount} />
-            <AppLink className="text-link" href="/radar" navigate={navigate}>
-              OPEN THE EVIDENCE FILE →
+          {latest ? (
+            <AppLink className="latest-file" href={"/bag/" + latest.id} navigate={navigate}>
+              <CaseTab>LATEST INDEXED BAG</CaseTab>
+              <strong>{"$" + latest.symbol}</strong>
+              <small>{latest.name}</small>
+              <div>
+                <span>REPORTED CREATOR</span>
+                <code>{short(latest.reportedCreatorAddress)}</code>
+              </div>
+              <div>
+                <span>PRIOR BAGS</span>
+                <b>{latest.trashTrail.priorLaunchCount.toString().padStart(2, "0")}</b>
+              </div>
+              <span className="open-cue">OPEN DOSSIER ↗</span>
             </AppLink>
-          </div>
-          <Receipt title={mode === "DEMO" ? "DEMO INDEX RECEIPT / NOT CHAIN PROOF" : "PUBLIC FEED RECEIPT"} count={latest.evidence.length}>
-            <p>
-              Launch receipt fixed to block <b>{latest.blockNumber}</b>.
-            </p>
-            <p>
-              Creator history:{" "}
-              <CoverageStamp state={latest.trashTrail.coverage} />
-            </p>
-            <code>{feed.receipt.receiptId}</code>
-          </Receipt>
+          ) : (
+            <EmptyState title="NO BAGS AT THIS CHECKPOINT." detail="No indexed launches are currently available. No example launch is substituted." />
+          )}
+          {topRecipient ? (
+            <div className="radar-tease">
+              <CaseTab tone="orange">RAT RADAR / RECURRENCE</CaseTab>
+              <p>
+                <b>{topRecipient.distinctLaunchCount}</b> distinct indexed launches
+                share the leading observed recipient address in {mode === "DEMO" ? "this synthetic demo." : "the current public shortlist."}
+              </p>
+              <RecurrenceMarks count={topRecipient.distinctLaunchCount} />
+              <AppLink className="text-link" href="/radar" navigate={navigate}>
+                OPEN THE EVIDENCE FILE →
+              </AppLink>
+            </div>
+          ) : (
+            <EmptyState title="NO RADAR SHORTLIST YET." detail="No ranked recipient address is present at this checkpoint." />
+          )}
+          {latest ? (
+            <Receipt title={mode === "DEMO" ? "DEMO INDEX RECEIPT / NOT CHAIN PROOF" : "PUBLIC FEED RECEIPT"} count={latest.evidence.length}>
+              <p>Launch record at block <b>{latest.blockNumber}</b>.</p>
+              <p>Creator history: <CoverageStamp state={latest.trashTrail.coverage} /></p>
+              <code>{feed.receipt.receiptId}</code>
+            </Receipt>
+          ) : (
+            <Receipt title="NO INDEX RECEIPT AVAILABLE">
+              <p>Nothing has been substituted for missing feed evidence.</p>
+            </Receipt>
+          )}
         </div>
       </section>
     </div>
@@ -430,8 +434,18 @@ function Dumpster({
 }
 
 function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
-  const [selected, setSelected] = useState<RadarCandidate>(radar.candidates[0]);
+  const [selected, setSelected] = useState<RadarCandidate | null>(radar.candidates[0] ?? null);
   const counts = radarShortlistCounts(radar);
+  if (!selected) {
+    return (
+      <div className="page-pad radar-page">
+        <PageHeading index="02" eyebrow="OBSERVED RECURRENCE / TIMING" title="RAT RADAR" detail="Inspectable observed recipient recurrence, subject to indexed coverage." />
+        <p className="radar-sample-note">{counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES.</p>
+        <CheckpointRail checkpoint={radar.asOfBlock} coverage={radar.coverage.historyCoverage} />
+        <EmptyState title="NO RADAR FILE IN THIS INDEX." detail="No ranked recipient addresses are available at this checkpoint. No dossier or watch state is fabricated." />
+      </div>
+    );
+  }
   return (
     <div className="page-pad radar-page">
       <PageHeading
