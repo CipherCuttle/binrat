@@ -64,6 +64,24 @@ Pons adapter and refuses a silent factory epoch change.
 
 All contract reads and the simulation bind to one explicit block where the RPC method supports it.
 
+## 2026-09-22 live read: updated anti-snipe authority
+
+The first public snapshot at Robinhood block `69,767,635` verified all reviewed
+factory, hook, launch-deployer, launch-config-0 and fee-policy values, but found
+`snipeTaxSeconds = 3`, not the 15-second source-code initializer previously
+pinned by this checker. It also observed `launchEnabled = true` at **that block**,
+although Pons's prose still described public launches as closed. Treat the live
+contract as authoritative for its state at a specific block, not as a promise
+that these owner-controlled settings will remain unchanged.
+
+The reviewed read-only candidate now pins the **observed three-second decay**
+and retains fail-closed drift checks; accepting this value for observation does
+**not** establish anti-bot effectiveness, waive Pons's outstanding audit risks,
+or authorize launch. The shorter window increases the importance of our no
+founder opening buy / no additional exemption policy.
+
+Initial live receipt: https://github.com/CipherCuttle/binrat/actions/runs/35748482334
+
 ## Fail-closed behavior
 
 Without deployer, fee-recipient, or salt, the receipt returns `OWNER_INPUT_REQUIRED`.
