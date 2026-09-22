@@ -45,7 +45,8 @@ export const PONS_EXPECTED_FEE_POLICY = Object.freeze({
 
 export const PONS_EXPECTED_MAX_CREATOR_TAX_BPS = 1_000n;
 export const PONS_EXPECTED_SNIPE_TAX_START_BPS = 9_900n;
-export const PONS_EXPECTED_SNIPE_TAX_SECONDS = 15n;
+// Observed on chain at Robinhood block 69,767,635 (2026-09-22); keep fail-closed on future drift.
+export const PONS_EXPECTED_SNIPE_TAX_SECONDS = 3n;
 
 export interface PonsLaunchMetadata {
   name: string;
