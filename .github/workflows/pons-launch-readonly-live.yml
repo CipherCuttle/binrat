@@ -1,0 +1,82 @@
+name: pons-launch-readonly-live
+on:
+  push:
+    branches:
+      - feat/binrat-pons-launch-receipt-v0
+    paths:
+      - .github/workflows/pons-launch-readonly-live.yml
+      - scripts/pons-launch-receipt.ts
+      - src/ponsLaunchReceipt/**
+      - test/ponsLaunchReceipt.test.ts
+      - docs/PONS_LAUNCH_READINESS_V0.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: pnpm install --frozen-lockfile
+      - name: Run read-only Pons snapshot
+        shell: bash
+        run: |
+          set +e
+          timeout 150s pnpm exec tsx scripts/pons-launch-receipt.ts --out "$RUNNER_TEMP/pons-public-snapshot.json" >"$RUNNER_TEMP/pons-public-snapshot.log" 2>&1
+          rc=$?
+          set -e
+          if [ ! -f "$RUNNER_TEMP/pons-public-snapshot.json" ]; then
+            echo "CLI did not produce a receipt (exit $rc)."
+            cat "$RUNNER_TEMP/pons-public-snapshot.log"
+            exit 1
+          fi
+          node - "$RUNNER_TEMP/pons-public-snapshot.json" "$rc" <<'NODE'
+          const fs = require('node:fs');
+          const receipt = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const rc = Number(process.argv[3]);
+          console.log(JSON.stringify({
+            status: receipt.status,
+            chainId: receipt.chainId,
+            snapshotBlock: receipt.snapshotBlock,
+            authority: receipt.authority,
+            observed: receipt.observed,
+            checks: receipt.checks,
+            simulation: receipt.simulation,
+            receiptDigest: receipt.receiptDigest,
+            launchAuthorizationEffect: receipt.launchAuthorizationEffect
+          }, null, 2));
+          if (rc !== 2 || receipt.status !== 'OWNER_INPUT_REQUIRED') {
+            console.error('PUBLIC_SNAPSHOT_NOT_OWNER_INPUT_REQUIRED: inspect BLOCKED checks or runtime errors');
+            process.exit(1);
+          }
+          if (receipt.checks.some(check => check.status === 'BLOCKED')) {
+            console.error('PUBLIC_SNAPSHOT_HAS_BLOCKED_CHECKS');
+            process.exit(1);
+          }
+          for (const id of ['CHAIN_ID','FACTORY_RUNTIME','CONFIG_0','LAUNCH_FEE','MEME_HOOK','LAUNCH_DEPLOYER','FEE_POLICY','ECONOMICS_PIN']) {
+            if (receipt.checks.find(check => check.id === id)?.status !== 'PASS') {
+              console.error('PUBLIC_SNAPSHOT_MISSING_PASS:' + id);
+              process.exit(1);
+            }
+          }
+          NODE
+      - name: Preserve read-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-public-snapshot
+          path: |
+            ${{ runner.temp }}/pons-public-snapshot.json
+            ${{ runner.temp }}/pons-public-snapshot.log
+          retention-days: 7
+          if-no-files-found: warn
