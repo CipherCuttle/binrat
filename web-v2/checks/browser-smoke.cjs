@@ -7,7 +7,7 @@ const path = require("node:path");
 const { chromium } = require("playwright");
 
 const base = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
-const output = path.resolve(__dirname, "../.smoke-artifacts");
+const output = path.resolve(__dirname, "../browser-artifacts");
 fs.mkdirSync(output, { recursive: true });
 const viewports = [
   { width: 390, height: 844 },
@@ -134,9 +134,16 @@ async function runViewport(browser, viewport) {
       await assertNoHorizontalOverflow(page, "Unknown bag", viewport.width);
       await page.screenshot({ path: path.join(output, "unknown-bag-" + tag + ".png") });
     });
-    await check(tag + "px malformed Bag URI fails closed without crashing", async () => {
-      await ready(page, "/bag/%ZZ");
-      assert.match(await page.locator("main").innerText(), /NO MATCHING BAG IN THIS INDEX/);
+    await check(tag + "px malformed client-side Bag URI fails closed without crashing", async () => {
+      // The preview HTTP server may reject malformed percent encoding before
+      // React boots. Test the application's route parser through history.
+      await ready(page, "/");
+      await page.evaluate(() => {
+        history.pushState({}, "", "/bag/%ZZ");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
+      await page.locator("main").getByText("NO MATCHING BAG IN THIS INDEX.").waitFor();
+      assert.match(await page.locator("main").innerText(), /Nothing else was substituted/);
     });
   } catch (error) {
     await page.screenshot({ path: path.join(output, "failure-" + tag + ".png"), fullPage: true }).catch(() => {});
