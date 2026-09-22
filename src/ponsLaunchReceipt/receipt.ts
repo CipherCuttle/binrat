@@ -255,12 +255,12 @@ export async function buildPonsLaunchReadinessReceipt(
     memeHookRaw,
     launchDeployerRaw
   ] = await Promise.all([
-    read(client, 'launchEnabled'),
-    read(client, 'launchFee'),
-    read(client, 'maxCreatorTaxBps'),
-    read(client, 'snipeTaxStartBps'),
-    read(client, 'snipeTaxSeconds'),
-    read(client, 'launchConfigCount'),
+    read(client, blockNumber, 'launchEnabled'),
+    read(client, blockNumber, 'launchFee'),
+    read(client, blockNumber, 'maxCreatorTaxBps'),
+    read(client, blockNumber, 'snipeTaxStartBps'),
+    read(client, blockNumber, 'snipeTaxSeconds'),
+    read(client, blockNumber, 'launchConfigCount'),
     client.readContract({
       address: PONS_V2_FACTORY,
       abi: factoryReadAbi,
@@ -268,8 +268,8 @@ export async function buildPonsLaunchReadinessReceipt(
       args: [PONS_LAUNCH_CONFIG_ID],
       blockNumber
     }),
-    read(client, 'memeHook'),
-    read(client, 'launchDeployer')
+    read(client, blockNumber, 'memeHook'),
+    read(client, blockNumber, 'launchDeployer')
   ]);
 
   const cfg = rawConfig as any;
@@ -406,25 +406,17 @@ export async function buildPonsLaunchReadinessReceipt(
         functionName: 'launchToken',
         data: call.data
       }) as readonly [Address, Address];
-      const gasEstimate = await client.estimateGas({
-        account: deployer,
-        to: PONS_V2_FACTORY,
-        data: calldata,
-        value: BigInt(launchFee as bigint),
-        blockNumber
-      });
       simulation = {
         status: 'PASS',
         token: getAddress(token),
         curve: getAddress(curve),
-        gasEstimate: gasEstimate.toString(),
         calldataKeccak256: keccak256(calldata),
         persistedState: false
       };
       checks.push({
         id: 'LAUNCH_ETH_CALL',
         status: 'PASS',
-        detail: `token=${getAddress(token)} curve=${getAddress(curve)} gas=${gasEstimate}`
+        detail: `token=${getAddress(token)} curve=${getAddress(curve)}`
       });
     } catch (error) {
       simulation = {
@@ -464,17 +456,29 @@ export async function buildPonsLaunchReadinessReceipt(
   });
 }
 
-async function read(client: PublicClient, functionName: 'launchEnabled' | 'launchFee' | 'maxCreatorTaxBps' |
-  'snipeTaxStartBps' | 'snipeTaxSeconds' | 'launchConfigCount' | 'memeHook' | 'launchDeployer') {
+async function read(
+  client: PublicClient,
+  blockNumber: bigint,
+  functionName: 'launchEnabled' | 'launchFee' | 'maxCreatorTaxBps' |
+    'snipeTaxStartBps' | 'snipeTaxSeconds' | 'launchConfigCount' | 'memeHook' | 'launchDeployer'
+) {
   return client.readContract({
     address: PONS_V2_FACTORY,
     abi: factoryReadAbi,
     functionName,
-    blockNumber: await client.getBlockNumber()
+    blockNumber
   } as any);
 }
 
-function sameConfig(actual: typeof PONS_EXPECTED_CONFIG_0): boolean {
+function sameConfig(actual: {
+  supply: bigint;
+  curveFeeBps: bigint;
+  phantomQuote: bigint;
+  graduationThreshold: bigint;
+  poolFee: number;
+  tickSpacing: number;
+  enabled: boolean;
+}): boolean {
   return actual.supply === PONS_EXPECTED_CONFIG_0.supply &&
     actual.curveFeeBps === PONS_EXPECTED_CONFIG_0.curveFeeBps &&
     actual.phantomQuote === PONS_EXPECTED_CONFIG_0.phantomQuote &&
@@ -538,7 +542,7 @@ async function finalize(input: {
   const blocked = input.checks.some((item) => item.status === 'BLOCKED');
   const receipt: Omit<PonsLaunchReadinessReceipt, 'receiptDigest'> = {
     schemaVersion: 'binrat.pons-launch-readiness/0.1',
-    status: ownerInputMissing ? 'OWNER_INPUT_REQUIRED' : blocked ? 'BLOCKED' : 'PASS',
+    status: blocked ? 'BLOCKED' : ownerInputMissing ? 'OWNER_INPUT_REQUIRED' : 'PASS',
     readOnly: true,
     generatedAt: new Date().toISOString(),
     chainId: input.chainId,
