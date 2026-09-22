@@ -1,4 +1,4 @@
-import type { PublicFeed, RadarWatchlist } from './types';
+import type { PublicFeed, RadarWatchlist } from './types.js';
 
 const creator = '0x92f831C7E80cF1B3A2d96d6B6e03d98a21B57A40';
 

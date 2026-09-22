@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
+import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
 import { loadProductData, type DataMode } from "./data";
 import type {
   Bag,
@@ -12,6 +13,7 @@ import {
   AppLink,
   CaseTab,
   CheckpointRail,
+  CopyButton,
   CoverageStamp,
   ProofBoundary,
   Receipt,
@@ -44,7 +46,7 @@ function readRoute(): Route {
   if (path === "/dumpster") return { page: "dumpster" };
   if (path === "/radar") return { page: "radar" };
   if (path.startsWith("/bag/"))
-    return { page: "bag", id: decodeURIComponent(path.slice(5)) };
+    return { page: "bag", id: bagIdFromPath(path) };
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
 }
 
@@ -87,6 +89,9 @@ export default function App() {
         : "smooth",
     });
   };
+  const requestedBag = feed && route.page === "bag"
+    ? findBagAtCheckpoint(feed, route.id)
+    : undefined;
   const content = error ? (
     <EmptyState
       title="THE TRAIL WENT COLD."
@@ -95,16 +100,26 @@ export default function App() {
   ) : !feed || !radar ? (
     <Loading />
   ) : route.page === "home" ? (
-    <Home feed={feed} radar={radar} navigate={navigate} />
+    <Home feed={feed} radar={radar} mode={mode} navigate={navigate} />
   ) : route.page === "dumpster" ? (
     <Dumpster feed={feed} navigate={navigate} />
   ) : route.page === "radar" ? (
-    <Radar radar={radar} />
+    <Radar radar={radar} mode={mode} />
   ) : route.page === "bag" ? (
-    <BagDossier
-      bag={feed.bags.find((bag) => bag.id === route.id) ?? feed.bags[0]}
-      navigate={navigate}
-    />
+    requestedBag ? (
+      <BagDossier key={requestedBag.id} bag={requestedBag} mode={mode} navigate={navigate} />
+    ) : (
+      <section className="page-pad">
+        <EmptyState
+          title="NO MATCHING BAG IN THIS INDEX."
+          detail={"No bag matches this exact identifier at checkpoint " + feed.asOfBlock + ". Nothing else was substituted."}
+        />
+        <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
+        <AppLink className="action" href="/dumpster" navigate={navigate}>
+          BACK TO THE DUMPSTER →
+        </AppLink>
+      </section>
+    )
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
@@ -182,7 +197,7 @@ function StatusRail({
     <header className="status-rail">
       <span className="status-cluster">
         <i />
-        {feed ? "INDEX READY" : "INDEXING"}
+        {feed ? (mode === "DEMO" ? "DEMO INDEX READY" : "PUBLIC INDEX READY") : "INDEXING"}
       </span>
       <span>
         ARC <b>5042</b>
@@ -203,13 +218,16 @@ function StatusRail({
 function Home({
   feed,
   radar,
+  mode,
   navigate,
 }: {
   feed: PublicFeed;
   radar: RadarWatchlist;
+  mode: DataMode;
   navigate: (path: string) => void;
 }) {
   const latest = feed.bags[0];
+  const topRecipient = radar.candidates[0];
   return (
     <div className="home-page">
       <section className="home-hero">
@@ -243,7 +261,7 @@ function Home({
           </p>
           <div
             className="hero-fragments"
-            aria-label="Current demo evidence status"
+            aria-label="Current evidence mode and coverage"
           >
             <span>
               CHECKPOINT
@@ -258,7 +276,7 @@ function Home({
             <span>
               DATA MODE
               <br />
-              <b>DEMO / DETERMINISTIC</b>
+              <b>{mode === "DEMO" ? "DEMO / DETERMINISTIC" : "PUBLIC LIVE"}</b>
             </span>
           </div>
         </div>
@@ -274,47 +292,50 @@ function Home({
           </AppLink>
         </header>
         <div className="snapshot-grid">
-          <AppLink
-            className="latest-file"
-            href={`/bag/${latest.id}`}
-            navigate={navigate}
-          >
-            <CaseTab>LATEST INDEXED BAG</CaseTab>
-            <strong>${latest.symbol}</strong>
-            <small>{latest.name}</small>
-            <div>
-              <span>REPORTED CREATOR</span>
-              <code>{short(latest.reportedCreatorAddress)}</code>
-            </div>
-            <div>
-              <span>PRIOR BAGS</span>
-              <b>
-                {latest.trashTrail.priorLaunchCount.toString().padStart(2, "0")}
-              </b>
-            </div>
-            <span className="open-cue">OPEN DOSSIER ↗</span>
-          </AppLink>
-          <div className="radar-tease">
-            <CaseTab tone="orange">RAT RADAR / RECURRENCE</CaseTab>
-            <p>
-              <b>{radar.candidates[0].distinctLaunchCount}</b> distinct launches
-              share the top observed recipient address in this demo index.
-            </p>
-            <RecurrenceMarks count={radar.candidates[0].distinctLaunchCount} />
-            <AppLink className="text-link" href="/radar" navigate={navigate}>
-              OPEN THE EVIDENCE FILE →
+          {latest ? (
+            <AppLink className="latest-file" href={"/bag/" + latest.id} navigate={navigate}>
+              <CaseTab>LATEST INDEXED BAG</CaseTab>
+              <strong>{"$" + latest.symbol}</strong>
+              <small>{latest.name}</small>
+              <div>
+                <span>REPORTED CREATOR</span>
+                <code>{short(latest.reportedCreatorAddress)}</code>
+              </div>
+              <div>
+                <span>PRIOR BAGS</span>
+                <b>{latest.trashTrail.priorLaunchCount.toString().padStart(2, "0")}</b>
+              </div>
+              <span className="open-cue">OPEN DOSSIER ↗</span>
             </AppLink>
-          </div>
-          <Receipt title="PUBLIC PROOF" count={latest.evidence.length}>
-            <p>
-              Launch receipt fixed to block <b>{latest.blockNumber}</b>.
-            </p>
-            <p>
-              Creator history:{" "}
-              <CoverageStamp state={latest.trashTrail.coverage} />
-            </p>
-            <code>{feed.receipt.receiptId}</code>
-          </Receipt>
+          ) : (
+            <EmptyState title="NO BAGS AT THIS CHECKPOINT." detail="No indexed launches are currently available. No example launch is substituted." />
+          )}
+          {topRecipient ? (
+            <div className="radar-tease">
+              <CaseTab tone="orange">RAT RADAR / RECURRENCE</CaseTab>
+              <p>
+                <b>{topRecipient.distinctLaunchCount}</b> distinct indexed launches
+                share the leading observed recipient address in {mode === "DEMO" ? "this synthetic demo." : "the current public shortlist."}
+              </p>
+              <RecurrenceMarks count={topRecipient.distinctLaunchCount} />
+              <AppLink className="text-link" href="/radar" navigate={navigate}>
+                OPEN THE EVIDENCE FILE →
+              </AppLink>
+            </div>
+          ) : (
+            <EmptyState title="NO RADAR SHORTLIST YET." detail="No ranked recipient address is present at this checkpoint." />
+          )}
+          {latest ? (
+            <Receipt title={mode === "DEMO" ? "DEMO INDEX RECEIPT / NOT CHAIN PROOF" : "PUBLIC FEED RECEIPT"} count={latest.evidence.length}>
+              <p>Launch record at block <b>{latest.blockNumber}</b>.</p>
+              <p>Creator history: <CoverageStamp state={latest.trashTrail.coverage} /></p>
+              <code>{feed.receipt.receiptId}</code>
+            </Receipt>
+          ) : (
+            <Receipt title="NO INDEX RECEIPT AVAILABLE">
+              <p>Nothing has been substituted for missing feed evidence.</p>
+            </Receipt>
+          )}
         </div>
       </section>
     </div>
@@ -412,8 +433,19 @@ function Dumpster({
   );
 }
 
-function Radar({ radar }: { radar: RadarWatchlist }) {
-  const [selected, setSelected] = useState<RadarCandidate>(radar.candidates[0]);
+function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
+  const [selected, setSelected] = useState<RadarCandidate | null>(radar.candidates[0] ?? null);
+  const counts = radarShortlistCounts(radar);
+  if (!selected) {
+    return (
+      <div className="page-pad radar-page">
+        <PageHeading index="02" eyebrow="OBSERVED RECURRENCE / TIMING" title="RAT RADAR" detail="Inspectable observed recipient recurrence, subject to indexed coverage." />
+        <p className="radar-sample-note">{counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES.</p>
+        <CheckpointRail checkpoint={radar.asOfBlock} coverage={radar.coverage.historyCoverage} />
+        <EmptyState title="NO RADAR FILE IN THIS INDEX." detail="No ranked recipient addresses are available at this checkpoint. No dossier or watch state is fabricated." />
+      </div>
+    );
+  }
   return (
     <div className="page-pad radar-page">
       <PageHeading
@@ -440,6 +472,8 @@ function Radar({ radar }: { radar: RadarWatchlist }) {
           <CoverageStamp state={radar.coverage.historyCoverage} />
         </div>
       </div>
+      <p className="radar-sample-note">PUBLIC SHORTLIST: {counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES. RANK IS INSPECTION ORDER, NOT A RECOMMENDATION.</p>
+      <p className="sr-only" role="status">FILE {selected.rank} OPEN. {selected.distinctLaunchCount} DISTINCT INDEXED LAUNCHES; {selected.acquisitionReceiptCount} ACQUISITION RECEIPTS.</p>
       <div className="radar-workbench">
         <section className="radar-list" aria-label="Ranked observed addresses">
           <div className="radar-head">
@@ -482,7 +516,9 @@ function Radar({ radar }: { radar: RadarWatchlist }) {
           ))}
         </section>
         <EvidenceDossier
+          key={selected.observedRecipientAddress}
           candidate={selected}
+          mode={mode}
           coverage={radar.coverage.historyCoverage}
           checkpoint={radar.asOfBlock}
         />
@@ -496,21 +532,23 @@ function Radar({ radar }: { radar: RadarWatchlist }) {
 
 function EvidenceDossier({
   candidate,
+  mode,
   coverage,
   checkpoint,
 }: {
   candidate: RadarCandidate;
+  mode: DataMode;
   coverage: RadarWatchlist["coverage"]["historyCoverage"];
   checkpoint: string;
 }) {
   const [watching, setWatching] = useState(false);
   return (
-    <aside className="evidence-dossier" aria-live="polite">
+    <aside className="evidence-dossier">
       <CaseTab tone="orange">
         OPEN FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}
       </CaseTab>
       <h2>{short(candidate.observedRecipientAddress)}</h2>
-      <code className="full-address">{candidate.observedRecipientAddress}</code>
+      <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /></div>
       <div className="dossier-recurrence">
         <span>DISTINCT LAUNCH RECURRENCE</span>
         <b>{candidate.distinctLaunchCount}</b>
@@ -537,8 +575,9 @@ function EvidenceDossier({
         title="ACQUISITION RECEIPTS"
         count={candidate.acquisitionReceiptCount}
       >
+        <small className="demo-proof-note">{mode === "DEMO" ? "DEMO ACTIVITY IDS — SYNTHETIC; NOT CHAIN RECEIPTS" : "OBSERVED ACTIVITY IDS — PUBLIC LINKS REQUIRE VERIFIED ROUTE"}</small>
         {candidate.evidenceActivityIds.map((id) => (
-          <code key={id}>{id.slice(0, 18)}…</code>
+          <div className="copyable-value" key={id}><code>{id}</code><CopyButton label="activity identifier" value={id} /></div>
         ))}
       </Receipt>
       <CheckpointRail checkpoint={checkpoint} coverage={coverage} />
@@ -549,41 +588,31 @@ function EvidenceDossier({
   );
 }
 
-type ReplayState = "COMPLETE" | "PARTIAL" | "UNVERIFIED" | "MISSING";
 function BagDossier({
   bag,
+  mode,
   navigate,
 }: {
   bag: Bag;
+  mode: DataMode;
   navigate: (path: string) => void;
 }) {
-  const [stage, setStage] = useState("LAUNCH");
+  const [stage, setStage] = useState<ReplayHorizon>("LAUNCH");
   const [watching, setWatching] = useState(false);
-  const stageData: Record<
-    string,
-    { state: ReplayState; note: string; value: string }
-  > = {
-    LAUNCH: {
-      state: "COMPLETE",
-      note: "Launch event, token, pool and reported creator fixed to the source receipt. Later evidence is sealed out.",
-      value: `BLOCK ${bag.blockNumber}`,
-    },
-    "5m": {
-      state: "COMPLETE",
-      note: "Frozen five-minute observation exists. Only launch and +5m evidence is exposed in this file.",
-      value: "OBSERVED +5m",
-    },
-    "1h": {
-      state: "PARTIAL",
-      note: "Pool and creator-balance reads exist; one external field was unavailable at this horizon.",
-      value: "OBSERVED +1h",
-    },
-    "24h": {
-      state: "MISSING",
-      note: "No matured observation exists in this demo bundle. Verification remains UNVERIFIED; no future fact is substituted.",
-      value: "NO RECEIPT",
-    },
+  const onReplayKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const labels = REPLAY_HORIZONS;
+    const current = labels.indexOf(stage);
+    let target = current;
+    if (event.key === "ArrowRight") target = (current + 1) % labels.length;
+    else if (event.key === "ArrowLeft") target = (current - 1 + labels.length) % labels.length;
+    else if (event.key === "Home") target = 0;
+    else if (event.key === "End") target = labels.length - 1;
+    else return;
+    event.preventDefault();
+    setStage(labels[target]);
+    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[target]?.focus();
   };
+  const stageData = replayStagesForBag(bag, mode);
   return (
     <div className="page-pad bag-page">
       <AppLink className="back-link" href="/dumpster" navigate={navigate}>
@@ -610,11 +639,7 @@ function BagDossier({
           </a>
         </div>
       </div>
-      <CheckpointRail
-        checkpoint={bag.blockNumber}
-        coverage={bag.trashTrail.coverage}
-        receiptId={`binrat-bag:${bag.id}`}
-      />
+      <CheckpointRail checkpoint={bag.blockNumber} coverage={bag.trashTrail.coverage} />
       <div className="case-grid">
         <section className="case-sheet">
           <CaseTab>EXACT LAUNCH RECEIPT</CaseTab>
@@ -622,7 +647,7 @@ function BagDossier({
             <div>
               <dt>TOKEN CONTRACT</dt>
               <dd>
-                <code>{bag.token}</code>
+                <div className="copyable-value"><code>{bag.token}</code><CopyButton label="token contract address" value={bag.token} /></div>
               </dd>
             </div>
             <div>
@@ -632,7 +657,7 @@ function BagDossier({
             <div>
               <dt>TRANSACTION HASH</dt>
               <dd>
-                <code>{bag.txHash}</code>
+                <div className="copyable-value"><code>{bag.txHash}</code><CopyButton label="launch transaction hash" value={bag.txHash} /></div>
               </dd>
             </div>
             <div>
@@ -649,14 +674,14 @@ function BagDossier({
               </div>
             ))}
           </div>
-          <Receipt title="BAG RECEIPT">
-            <code>binrat-bag:{bag.id}</code>
+          <Receipt title={mode === "DEMO" ? "DEMO BAG FILE / NOT CHAIN PROOF" : "BAG FILE ID / NOT AUTHORITY RECEIPT"}>
+            <div className="copyable-value"><code>{bag.id}</code><CopyButton label="bag file ID" value={bag.id} /></div>
           </Receipt>
         </section>
         <aside className="creator-file">
           <CaseTab tone="orange">CREATOR FILE / SOURCE-REPORTED</CaseTab>
           <h2>REPORTED CREATOR ADDRESS</h2>
-          <code className="full-address">{bag.reportedCreatorAddress}</code>
+          <div className="copyable-value"><code className="full-address">{bag.reportedCreatorAddress}</code><CopyButton label="reported creator address" value={bag.reportedCreatorAddress} /></div>
           <div className="creator-count">
             <b>{bag.trashTrail.priorLaunchCount + 1}</b>
             <span>
@@ -708,17 +733,20 @@ function BagDossier({
           role="tablist"
           aria-label="Frozen observation horizon"
         >
-          {Object.entries(stageData).map(([label, data], index) => (
+          {REPLAY_HORIZONS.map((label, index) => (
             <button
               role="tab"
               aria-selected={stage === label}
               aria-controls="replay-readout"
+              id={`replay-tab-${index}`}
+              tabIndex={stage === label ? 0 : -1}
+              onKeyDown={onReplayKeyDown}
               onClick={() => setStage(label)}
               key={label}
             >
               <span>0{index + 1}</span>
               <b>{label}</b>
-              <CoverageStamp state={data.state} />
+              <CoverageStamp state={stageData[label].state} />
               <i aria-hidden="true" />
             </button>
           ))}
@@ -727,6 +755,8 @@ function BagDossier({
           className="replay-readout"
           id="replay-readout"
           role="tabpanel"
+          aria-labelledby={`replay-tab-${REPLAY_HORIZONS.indexOf(stage)}`}
+          tabIndex={0}
           aria-live="polite"
         >
           <span>CASE AT {stage}</span>

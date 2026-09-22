@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from "react";
+import { useState, type MouseEvent, type ReactNode } from "react";
 import type { CoverageState } from "./types";
 
 type Navigate = (path: string) => void;
@@ -173,5 +173,34 @@ export function WatchControl({
       </span>
       <b>{armed ? "✓" : "+"}</b>
     </button>
+  );
+}
+
+/** Copy identifiers without presenting synthetic demo data as verified evidence. */
+export function CopyButton({ value, label }: { value: string; label: string }) {
+  const [status, setStatus] = useState<"READY" | "COPIED" | "COPY FAILED">("READY");
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setStatus("COPIED");
+    } catch {
+      setStatus("COPY FAILED");
+    }
+  };
+  return (
+    <>
+      <button
+        type="button"
+        className="copy-button"
+        aria-label={`Copy ${label}`}
+        onClick={() => void copy()}
+        title={`Copy ${label}`}
+      >
+        {status === "READY" ? "COPY" : status}
+      </button>
+      <span className="sr-only" role="status">
+        {status === "COPIED" ? `${label} copied` : status === "COPY FAILED" ? `${label} could not be copied` : ""}
+      </span>
+    </>
   );
 }
