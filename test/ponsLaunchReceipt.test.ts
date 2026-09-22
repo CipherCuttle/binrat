@@ -5,6 +5,8 @@ import {
   PONS_EXPECTED_CONFIG_0,
   PONS_EXPECTED_FEE_POLICY,
   PONS_EXPECTED_LAUNCH_FEE_WEI,
+  PONS_EXPECTED_SNIPE_TAX_START_BPS,
+  PONS_EXPECTED_SNIPE_TAX_SECONDS,
   PONS_NATIVE_PAIR_TOKEN,
   PONS_V2_FACTORY,
   PONS_V2_LAUNCH_DEPLOYER,
@@ -39,6 +41,8 @@ test('Pons BINRAT launch policy pins native ETH config 0 economics', () => {
     enabled: true
   });
   assert.equal(PONS_EXPECTED_LAUNCH_FEE_WEI, 500_000_000_000_000n);
+  assert.equal(PONS_EXPECTED_SNIPE_TAX_START_BPS, 9_900n);
+  assert.equal(PONS_EXPECTED_SNIPE_TAX_SECONDS, 3n); // live block 69,767,635 on 2026-09-22
   assert.deepEqual(PONS_EXPECTED_FEE_POLICY, {
     protocolFeeShareBps: 3_000n,
     buybackBurnBps: 5_000n,
