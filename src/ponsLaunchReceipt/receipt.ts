@@ -13,6 +13,12 @@ export const ROBINHOOD_CHAIN_ID = 4663 as const;
 export const PONS_V2_FACTORY = getAddress('0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e');
 export const PONS_V2_FACTORY_RUNTIME_CODE_HASH =
   '0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84' as Hex;
+export const PONS_V2_MEME_HOOK =
+  getAddress('0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044');
+export const PONS_V2_LAUNCH_DEPLOYER =
+  getAddress('0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42');
+export const PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH =
+  '0xeade22566c766377f6adfb99534f2772251efad9568642c0704a7051418e624c' as Hex;
 export const PONS_NATIVE_PAIR_TOKEN =
   '0x0000000000000000000000000000000000000000' as Address;
 export const PONS_LAUNCH_CONFIG_ID = 0n;
@@ -324,11 +330,20 @@ export async function buildPonsLaunchReadinessReceipt(
     maxInternalPriceImpactBps: BigInt(fee.maxInternalPriceImpactBps)
   };
 
-  checks.push(check('MEME_HOOK', Boolean(memeHookCode && memeHookCode !== '0x'), `address=${memeHook}`));
+  const launchDeployerRuntimeCodeHash = launchDeployerCode ? keccak256(launchDeployerCode) : null;
+  checks.push(check(
+    'MEME_HOOK',
+    memeHook === PONS_V2_MEME_HOOK && Boolean(memeHookCode && memeHookCode !== '0x'),
+    `expected=${PONS_V2_MEME_HOOK} actual=${memeHook}`
+  ));
   checks.push(check('FEE_POLICY', sameFeePolicy(feePolicy),
     JSON.stringify(stringifyBigints(feePolicy))));
-  checks.push(check('LAUNCH_DEPLOYER', Boolean(launchDeployerCode && launchDeployerCode !== '0x'),
-    `address=${launchDeployer}`));
+  checks.push(check(
+    'LAUNCH_DEPLOYER',
+    launchDeployer === PONS_V2_LAUNCH_DEPLOYER &&
+      launchDeployerRuntimeCodeHash === PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH,
+    `expectedAddress=${PONS_V2_LAUNCH_DEPLOYER} actualAddress=${launchDeployer} expectedHash=${PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH} actualHash=${launchDeployerRuntimeCodeHash ?? 'MISSING'}`
+  ));
   checks.push(check('LAUNCH_DEPLOYER_FACTORY',
     getAddress(String(deployerFactoryRaw)) === PONS_V2_FACTORY,
     `factory=${String(deployerFactoryRaw)}`));
@@ -357,8 +372,31 @@ export async function buildPonsLaunchReadinessReceipt(
     deployerBalance !== null && deployerBalance >= BigInt(launchFee as bigint),
     deployerBalance === null ? 'deployer missing' : `balanceWei=${deployerBalance} launchFeeWei=${String(launchFee)}`));
 
-  checks.push({ id: 'CREATOR_TAX_ZERO', status: 'PASS', detail: 'creatorTaxBps=0' });
-  checks.push({ id: 'BUYBACK_OFF', status: 'PASS', detail: 'buybackEnabled=false' });
+  checks.push({
+    id: 'BINRAT_ECONOMIC_POLICY',
+    status: 'PASS',
+    detail: 'creatorTaxBps=0 buybackEnabled=false'
+  });
+  const feeRecipientValid = Boolean(
+    deployer &&
+    creatorFeeRecipient &&
+    creatorFeeRecipient !== PONS_NATIVE_PAIR_TOKEN &&
+    creatorFeeRecipient.toLowerCase() !== deployer.toLowerCase() &&
+    creatorFeeRecipient.toLowerCase() !== feePolicy.protocolFeeRecipient.toLowerCase()
+  );
+  checks.push(
+    !deployer || !creatorFeeRecipient
+      ? {
+          id: 'FEE_RECIPIENT_BINDING',
+          status: 'OWNER_INPUT_REQUIRED',
+          detail: 'dedicated nonzero creator fee recipient required'
+        }
+      : check(
+          'FEE_RECIPIENT_BINDING',
+          feeRecipientValid,
+          `deployer=${deployer} feeRecipient=${creatorFeeRecipient} protocolRecipient=${feePolicy.protocolFeeRecipient}`
+        )
+  );
   checks.push({ id: 'NO_EXTRA_EXEMPTIONS_DIRECT', status: 'PASS',
     detail: 'direct launchToken overload; no extra snipe-tax exemption list; founder opening buy=NONE' });
 
@@ -373,11 +411,26 @@ export async function buildPonsLaunchReadinessReceipt(
     `digest=${economics}`));
 
   let simulation: Record<string, unknown> = { status: 'OWNER_INPUT_REQUIRED' };
+  const saltValid = Boolean(salt && !/^0x0{64}$/i.test(salt));
   if (!deployer || !creatorFeeRecipient || !salt) {
     checks.push({
       id: 'LAUNCH_ETH_CALL',
       status: 'OWNER_INPUT_REQUIRED',
-      detail: 'requires deployer, creatorFeeRecipient and 32-byte salt'
+      detail: 'requires deployer, dedicated creatorFeeRecipient and nonzero 32-byte salt'
+    });
+  } else if (!feeRecipientValid) {
+    simulation = { status: 'BLOCKED', error: 'FEE_RECIPIENT_BINDING_INVALID', persistedState: false };
+    checks.push({
+      id: 'LAUNCH_ETH_CALL',
+      status: 'BLOCKED',
+      detail: 'dedicated creator fee recipient must be nonzero and distinct from deployer/protocol recipient'
+    });
+  } else if (!saltValid) {
+    simulation = { status: 'BLOCKED', error: 'BINRAT_PONS_SALT_ZERO', persistedState: false };
+    checks.push({
+      id: 'LAUNCH_ETH_CALL',
+      status: 'BLOCKED',
+      detail: 'salt must be an owner-supplied nonzero bytes32'
     });
   } else {
     const metadata = normalizeMetadata(options.metadata);
@@ -439,6 +492,7 @@ export async function buildPonsLaunchReadinessReceipt(
     launchConfig0: stringifyBigints(config),
     memeHook,
     launchDeployer,
+    launchDeployerRuntimeCodeHash,
     currentFeePolicy: stringifyBigints(feePolicy),
     previewLaunchEconomics: economics,
     canLaunch,
