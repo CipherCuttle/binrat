@@ -37,7 +37,7 @@ test('receipt fails closed on the wrong chain before launch reads or simulation'
   const fake = {
     getChainId: async () => 1,
     getBlockNumber: async () => 123n,
-    getBlock: async () => ({ hash: `0x${'1'.repeat(64)}` }),
+    getBlock: async () => ({ hash: `0x${'1'.repeat(64)}`, timestamp: 1_700_000_000n }),
     getCode: async () => undefined
   };
   const receipt = await buildPonsLaunchReadinessReceipt(fake as any);
