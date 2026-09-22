@@ -1,5 +1,5 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { findBagAtCheckpoint, radarShortlistCounts } from "./evidenceIntegrity";
+import { findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
 import { loadProductData, type DataMode } from "./data";
 import type {
   Bag,
@@ -107,7 +107,7 @@ export default function App() {
     <Radar radar={radar} mode={mode} />
   ) : route.page === "bag" ? (
     requestedBag ? (
-      <BagDossier bag={requestedBag} mode={mode} navigate={navigate} />
+      <BagDossier key={requestedBag.id} bag={requestedBag} mode={mode} navigate={navigate} />
     ) : (
       <section className="page-pad">
         <EmptyState
@@ -322,7 +322,7 @@ function Home({
               OPEN THE EVIDENCE FILE →
             </AppLink>
           </div>
-          <Receipt title="PUBLIC PROOF" count={latest.evidence.length}>
+          <Receipt title={mode === "DEMO" ? "DEMO INDEX RECEIPT / NOT CHAIN PROOF" : "PUBLIC FEED RECEIPT"} count={latest.evidence.length}>
             <p>
               Launch receipt fixed to block <b>{latest.blockNumber}</b>.
             </p>
@@ -502,6 +502,7 @@ function Radar({ radar, mode }: { radar: RadarWatchlist; mode: DataMode }) {
           ))}
         </section>
         <EvidenceDossier
+          key={selected.observedRecipientAddress}
           candidate={selected}
           mode={mode}
           coverage={radar.coverage.historyCoverage}
@@ -573,7 +574,6 @@ function EvidenceDossier({
   );
 }
 
-type ReplayState = "COMPLETE" | "PARTIAL" | "UNVERIFIED" | "MISSING";
 function BagDossier({
   bag,
   mode,
@@ -583,10 +583,10 @@ function BagDossier({
   mode: DataMode;
   navigate: (path: string) => void;
 }) {
-  const [stage, setStage] = useState("LAUNCH");
+  const [stage, setStage] = useState<ReplayHorizon>("LAUNCH");
   const [watching, setWatching] = useState(false);
   const onReplayKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const labels = ["LAUNCH", "5m", "1h", "24h"];
+    const labels = REPLAY_HORIZONS;
     const current = labels.indexOf(stage);
     let target = current;
     if (event.key === "ArrowRight") target = (current + 1) % labels.length;
@@ -598,31 +598,7 @@ function BagDossier({
     setStage(labels[target]);
     event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[target]?.focus();
   };
-  const stageData: Record<
-    string,
-    { state: ReplayState; note: string; value: string }
-  > = {
-    LAUNCH: {
-      state: "COMPLETE",
-      note: "Launch event, token, pool and reported creator fixed to the source receipt. Later evidence is sealed out.",
-      value: `BLOCK ${bag.blockNumber}`,
-    },
-    "5m": {
-      state: "COMPLETE",
-      note: "Frozen five-minute observation exists. Only launch and +5m evidence is exposed in this file.",
-      value: "OBSERVED +5m",
-    },
-    "1h": {
-      state: "PARTIAL",
-      note: "Pool and creator-balance reads exist; one external field was unavailable at this horizon.",
-      value: "OBSERVED +1h",
-    },
-    "24h": {
-      state: "MISSING",
-      note: "No matured observation exists in this demo bundle. Verification remains UNVERIFIED; no future fact is substituted.",
-      value: "NO RECEIPT",
-    },
-  };
+  const stageData = replayStagesForBag(bag, mode);
   return (
     <div className="page-pad bag-page">
       <AppLink className="back-link" href="/dumpster" navigate={navigate}>
@@ -743,7 +719,7 @@ function BagDossier({
           role="tablist"
           aria-label="Frozen observation horizon"
         >
-          {Object.entries(stageData).map(([label, data], index) => (
+          {REPLAY_HORIZONS.map((label, index) => (
             <button
               role="tab"
               aria-selected={stage === label}
@@ -756,7 +732,7 @@ function BagDossier({
             >
               <span>0{index + 1}</span>
               <b>{label}</b>
-              <CoverageStamp state={data.state} />
+              <CoverageStamp state={stageData[label].state} />
               <i aria-hidden="true" />
             </button>
           ))}
@@ -765,7 +741,7 @@ function BagDossier({
           className="replay-readout"
           id="replay-readout"
           role="tabpanel"
-          aria-labelledby={`replay-tab-${Object.keys(stageData).indexOf(stage)}`}
+          aria-labelledby={`replay-tab-${REPLAY_HORIZONS.indexOf(stage)}`}
           tabIndex={0}
           aria-live="polite"
         >
