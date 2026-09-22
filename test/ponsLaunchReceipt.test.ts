@@ -7,6 +7,9 @@ import {
   PONS_EXPECTED_LAUNCH_FEE_WEI,
   PONS_NATIVE_PAIR_TOKEN,
   PONS_V2_FACTORY,
+  PONS_V2_LAUNCH_DEPLOYER,
+  PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH,
+  PONS_V2_MEME_HOOK,
   ROBINHOOD_CHAIN_ID,
   buildPonsLaunchReadinessReceipt
 } from '../src/ponsLaunchReceipt/receipt.js';
@@ -15,6 +18,12 @@ test('Pons BINRAT launch policy pins native ETH config 0 economics', () => {
   assert.equal(ROBINHOOD_CHAIN_ID, 4663);
   assert.equal(PONS_V2_FACTORY, '0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e');
   assert.equal(PONS_NATIVE_PAIR_TOKEN, '0x0000000000000000000000000000000000000000');
+  assert.equal(PONS_V2_MEME_HOOK, '0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044');
+  assert.equal(PONS_V2_LAUNCH_DEPLOYER, '0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42');
+  assert.equal(
+    PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH,
+    '0xeade22566c766377f6adfb99534f2772251efad9568642c0704a7051418e624c'
+  );
   assert.deepEqual(PONS_EXPECTED_CONFIG_0, {
     supply: 1_000_000_000n * 10n ** 18n,
     curveFeeBps: 100n,
@@ -73,6 +82,9 @@ test('Pons launch receipt code contains no wallet/signing/broadcast surface', as
   assert.match(source, /creatorTaxBps:\s*0/);
   assert.match(source, /buybackEnabled:\s*false/);
   assert.match(source, /founderOpeningBuy:\s*'NONE'/);
+  assert.match(source, /FEE_RECIPIENT_BINDING/);
+  assert.match(source, /PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH/);
+  assert.match(source, /BINRAT_PONS_SALT_ZERO/);
 });
 
 test('CLI requires owner inputs instead of inventing deployer, fee recipient or salt', async () => {
