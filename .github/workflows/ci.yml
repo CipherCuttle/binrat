@@ -145,3 +145,54 @@ jobs:
             cat "$body" 2>/dev/null || true
             echo
           done
+
+  frontend-v2-browser-smoke:
+    name: frontend-v2-browser-smoke
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'fix/binrat-v2-evidence-integrity-pr1' || startsWith(github.head_ref, 'feat/binrat-frontend-')) }}
+    needs: [check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install and build isolated V2 frontend
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm --dir web-v2 build
+      - name: Install isolated Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Browser acceptance across four viewports
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd web-v2
+            pnpm exec vite preview --host 127.0.0.1 --port 4174
+          ) > "$RUNNER_TEMP/binrat-vite.log" 2>&1 &
+          echo "$!" > "$RUNNER_TEMP/binrat-vite.pid"
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4174/ >/dev/null; then break; fi
+            if [ "$attempt" -eq 40 ]; then cat "$RUNNER_TEMP/binrat-vite.log"; exit 1; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
+            node web-v2/checks/browser-smoke.cjs
+      - name: Upload viewport screenshots and failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-v2-viewport-acceptance
+          path: web-v2/.smoke-artifacts/
+          retention-days: 7
+          if-no-files-found: warn
