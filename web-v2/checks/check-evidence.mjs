@@ -29,6 +29,9 @@ for (const phrase of [
   'radarShortlistCounts(radar)',
   'SYNTHETIC; NOT CHAIN RECEIPTS',
   'onKeyDown={onReplayKeyDown}',
+  'replayStagesForBag(bag, mode)',
+  'key={selected.observedRecipientAddress}',
+  'key={requestedBag.id}',
 ]) {
   if (!app.includes(phrase)) throw new Error(`V2_EVIDENCE_INTEGRITY_MISSING:${phrase}`);
 }
