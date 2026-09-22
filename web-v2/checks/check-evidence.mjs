@@ -21,4 +21,15 @@ for (const phrase of ['OBSERVED', 'NOTED', 'UNKNOWN', 'COMPLETE', 'PARTIAL', 'UN
 if (!corpus.includes('AN OBSERVED RECIPIENT ADDRESS IS NOT AUTOMATICALLY A HUMAN TRADER IDENTITY')) throw new Error('V2_IDENTITY_BOUNDARY_MISSING');
 if (!corpus.includes('IT IS NOT A BUY/SELL RECOMMENDATION')) throw new Error('V2_RECOMMENDATION_BOUNDARY_MISSING');
 if (!corpus.includes("'IDLE'") || !corpus.includes("'RECEIPT_VERIFIED'")) throw new Error('V2_RIVE_STATE_CONTRACT_MISSING');
-console.log('BINRAT V2 evidence semantics: PASS');
+const app = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
+if (app.includes('?? feed.bags[0]')) throw new Error('V2_BAG_ID_MUST_NOT_FALL_BACK');
+for (const phrase of [
+  'findBagAtCheckpoint(feed, route.id)',
+  'NO MATCHING BAG IN THIS INDEX.',
+  'radarShortlistCounts(radar)',
+  'SYNTHETIC; NOT CHAIN RECEIPTS',
+  'onKeyDown={onReplayKeyDown}',
+]) {
+  if (!app.includes(phrase)) throw new Error(`V2_EVIDENCE_INTEGRITY_MISSING:${phrase}`);
+}
+console.log('BINRAT V2 evidence semantics and integrity: PASS');
