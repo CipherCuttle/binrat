@@ -32,6 +32,9 @@ for (const phrase of [
   'replayStagesForBag(bag, mode)',
   'key={selected.observedRecipientAddress}',
   'key={requestedBag.id}',
+  'bagIdFromPath(path)',
+  'NO RADAR FILE IN THIS INDEX.',
+  'NO BAGS AT THIS CHECKPOINT.',
 ]) {
   if (!app.includes(phrase)) throw new Error(`V2_EVIDENCE_INTEGRITY_MISSING:${phrase}`);
 }
