@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  bagIdFromPath,
   findBagAtCheckpoint,
   radarShortlistCounts,
   replayStagesForBag,
@@ -45,4 +46,12 @@ test("Replay horizons stay bound to the exact demo case and never leak into LIVE
   }
   assert.equal(slagDemo.LAUNCH.value, "BLOCK " + slag.blockNumber);
   assert.notEqual(feralDemo.LAUNCH.value, slagDemo.LAUNCH.value);
+});
+
+test("Malformed or missing Bag URL encoding resolves to not-found, not a crash", () => {
+  assert.equal(bagIdFromPath("/bag/" + demoFeed.bags[0].id), demoFeed.bags[0].id);
+  assert.equal(bagIdFromPath("/bag/%"), "");
+  assert.equal(bagIdFromPath("/bag/%ZZ"), "");
+  assert.equal(bagIdFromPath("/bag/"), "");
+  assert.equal(findBagAtCheckpoint(demoFeed, bagIdFromPath("/bag/%ZZ")), undefined);
 });
