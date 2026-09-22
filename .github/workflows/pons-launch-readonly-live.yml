@@ -7,6 +7,8 @@ on:
       - .github/workflows/pons-launch-readonly-live.yml
       - scripts/pons-launch-receipt.ts
       - src/ponsLaunchReceipt/**
+      - test/ponsLaunchReceipt.test.ts
+      - docs/PONS_LAUNCH_READINESS_V0.md
   workflow_dispatch:
 
 permissions:
