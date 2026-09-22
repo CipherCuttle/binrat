@@ -49,14 +49,14 @@ Pons adapter and refuses a silent factory epoch change.
 5. Launch fee.
 6. Creator-tax ceiling.
 7. Snipe-tax start/window.
-8. Meme-hook code exists.
+8. Meme-hook address is the reviewed Pons hook and deployed code exists.
 9. Current fee policy matches the reviewed candidate terms.
-10. Launch-deployer code exists.
-11. Launch-deployer factory binding.
+10. Launch-deployer address and runtime bytecode hash match the reviewed SENTRY/Pons template authority.
+11. Launch-deployer factory binding points back to the pinned factory.
 12. Public-or-whitelisted launch access for the supplied deployer.
 13. Supplied deployer can cover the launch fee.
-14. BINRAT creator tax is fixed locally at zero.
-15. BINRAT buyback is fixed locally off.
+14. BINRAT economic policy is fixed locally at creator tax 0 bps and buyback disabled.
+15. Creator-fee recipient is nonzero and distinct from both launcher and Pons protocol fee recipient.
 16. Direct launch path carries no additional exemption list and no founder opening buy.
 17. Current `previewLaunchEconomics(0, address(0))` is captured and pinned into calldata.
 18. Full `launchToken` is simulated with `eth_call`; the returned token and curve addresses are
@@ -67,8 +67,10 @@ All contract reads and the simulation bind to one explicit block where the RPC m
 ## Fail-closed behavior
 
 Without deployer, fee-recipient, or salt, the receipt returns `OWNER_INPUT_REQUIRED`.
-A mismatched chain, bytecode epoch, config, fee policy, access gate, balance, or failed simulation
-returns `BLOCKED`.
+The fee recipient must be a dedicated nonzero address distinct from the launcher and Pons protocol
+fee recipient, and the owner-supplied salt must be nonzero. A mismatched chain, bytecode epoch,
+external launch-deployer template, config, fee policy, access gate, balance, invalid owner input,
+or failed simulation returns `BLOCKED`.
 
 A `PASS` receipt means only:
 
