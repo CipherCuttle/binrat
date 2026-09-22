@@ -10,6 +10,7 @@ import {
   PONS_V2_LAUNCH_DEPLOYER,
   PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH,
   PONS_V2_MEME_HOOK,
+  PONS_V2_MEME_HOOK_RUNTIME_CODE_HASH,
   ROBINHOOD_CHAIN_ID,
   buildPonsLaunchReadinessReceipt
 } from '../src/ponsLaunchReceipt/receipt.js';
@@ -19,6 +20,10 @@ test('Pons BINRAT launch policy pins native ETH config 0 economics', () => {
   assert.equal(PONS_V2_FACTORY, '0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e');
   assert.equal(PONS_NATIVE_PAIR_TOKEN, '0x0000000000000000000000000000000000000000');
   assert.equal(PONS_V2_MEME_HOOK, '0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044');
+  assert.equal(
+    PONS_V2_MEME_HOOK_RUNTIME_CODE_HASH,
+    '0xc21b1e6c1b45403e81a581f22ed6d9c747997af1cfdac1b1dc9f4b1d346a10db'
+  );
   assert.equal(PONS_V2_LAUNCH_DEPLOYER, '0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42');
   assert.equal(
     PONS_V2_LAUNCH_DEPLOYER_RUNTIME_CODE_HASH,
