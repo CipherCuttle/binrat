@@ -236,6 +236,7 @@ export async function buildPonsLaunchReadinessReceipt(
       chainId,
       blockNumber,
       blockHash: block.hash ?? null,
+      blockTimestamp: block.timestamp,
       actualFactoryRuntimeCodeHash,
       options,
       checks,
@@ -448,6 +449,7 @@ export async function buildPonsLaunchReadinessReceipt(
     chainId,
     blockNumber,
     blockHash: block.hash ?? null,
+    blockTimestamp: block.timestamp,
     actualFactoryRuntimeCodeHash,
     options: { ...options, deployer: deployer ?? undefined, creatorFeeRecipient: creatorFeeRecipient ?? undefined },
     checks,
@@ -532,6 +534,7 @@ async function finalize(input: {
   chainId: number;
   blockNumber: bigint;
   blockHash: Hex | null;
+  blockTimestamp: bigint;
   actualFactoryRuntimeCodeHash: Hex | null;
   options: PonsLaunchReceiptOptions;
   checks: PonsLaunchReadinessReceipt['checks'];
@@ -544,7 +547,7 @@ async function finalize(input: {
     schemaVersion: 'binrat.pons-launch-readiness/0.1',
     status: blocked ? 'BLOCKED' : ownerInputMissing ? 'OWNER_INPUT_REQUIRED' : 'PASS',
     readOnly: true,
-    generatedAt: new Date().toISOString(),
+    generatedAt: new Date(Number(input.blockTimestamp) * 1000).toISOString(),
     chainId: input.chainId,
     snapshotBlock: { number: input.blockNumber.toString(), hash: input.blockHash },
     authority: {
