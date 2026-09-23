@@ -6,6 +6,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { chromium, request } = require("playwright");
+const { setTimeout: delay } = require("node:timers/promises");
 
 const preview = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
 const publicApi = "https://binrat-edge-v0.pettevik.workers.dev";
@@ -51,18 +52,44 @@ async function capture(page, label, width) {
   process.stdout.write("LIVE PASS " + width + "px " + label + "\n");
 }
 
+// Production can briefly publish a fail-closed SYNC_FAILED state while the next
+// scheduled cycle catches up. Require two consecutive healthy snapshots within
+// a strictly bounded window; log *every* failed sample rather than masking it.
+async function requireStablePublicHealth(api) {
+  const samples = [];
+  let healthyInRow = 0;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      const response = await api.get(publicApi + "/api/health");
+      const state = response.status() === 200 ? await response.json() : null;
+      const ready = Boolean(response.status() === 200 && state?.ok === true &&
+        state?.chainId === 5042 && state?.runtimeFresh === true &&
+        state?.indexReady === true && state?.liveCaughtUp === true &&
+        state?.lastSyncError === null);
+      samples.push({
+        attempt, http: response.status(), ok: state?.ok ?? false,
+        checkpoint: state?.checkpointBlock ?? null,
+        lastSyncError: state?.lastSyncError ?? null, ready,
+      });
+      healthyInRow = ready ? healthyInRow + 1 : 0;
+      if (healthyInRow === 2) {
+        process.stdout.write("LIVE API HEALTH PASS: " + JSON.stringify(samples) + "\n");
+        return state;
+      }
+    } catch (error) {
+      samples.push({ attempt, error: String(error) });
+      healthyInRow = 0;
+    }
+    if (attempt < 5) await delay(8000);
+  }
+  throw new Error("LIVE_RUNTIME_UNSTABLE: " + JSON.stringify(samples));
+}
+
 (async () => {
   const api = await request.newContext({ timeout: 20000 });
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   try {
-    const health = await api.get(publicApi + "/api/health");
-    assert.equal(health.status(), 200, "public API health must be HTTP 200");
-    const state = await health.json();
-    assert.equal(state.ok, true, "public API health unavailable");
-    assert.equal(state.chainId, 5042, "wrong source chain");
-    assert.equal(state.runtimeFresh, true, "live runtime is stale");
-    assert.equal(state.indexReady, true, "live index not ready");
-    process.stdout.write("LIVE API HEALTH PASS at checkpoint " + state.checkpointBlock + "\n");
+    await requireStablePublicHealth(api);
 
     for (const viewport of sizes) {
       const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
