@@ -345,7 +345,8 @@ export function adaptLiveReplay(value: unknown, requestedBagId: string): LiveRep
   const validHorizons: ReplayHorizon[] = ["5m", "1h", "24h"];
   const available = strings(coverage.availableHorizons, code);
   const missing = strings(coverage.missingHorizons, code);
-  if (new Set([...available, ...missing]).size !== 3 ||
+  if (available.length + missing.length !== 3 ||
+      new Set([...available, ...missing]).size !== 3 ||
       [...available, ...missing].some((h) => !validHorizons.includes(h as ReplayHorizon)) ||
       validHorizons.filter((h) => available.includes(h)).join(",") !== available.join(",") ||
       validHorizons.filter((h) => missing.includes(h)).join(",") !== missing.join(",")) fail(code);
