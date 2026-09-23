@@ -324,12 +324,16 @@ export function adaptLiveReplay(value: unknown, requestedBagId: string): LiveRep
   const creatorLaunches = array(creator.launches, code);
   if (creatorLaunches.length !== creator.indexedLaunchCount ||
       !creatorLaunches.some((item) => object(item, code).id === requestedBagId)) fail(code);
-  const creatorReceipt = receiptId(object(creator.receipt, code).receiptId, "binrat-creator", code);
+  const creatorReceiptData = object(creator.receipt, code);
+  const creatorReceipt = receiptId(creatorReceiptData.receiptId, "binrat-creator", code);
+  if (creatorReceiptData.sourcePublicReceiptId !== sourceReceipt) fail(code);
 
   const intelligence = object(bundle.intelligence, code);
   if (intelligence.schemaVersion !== "binrat.bag-intelligence/0.1" ||
       intelligence.chainId !== 5042 || intelligence.bagId !== requestedBagId ||
-      intelligence.asOfBlock !== checkpoint) fail(code);
+      intelligence.asOfBlock !== checkpoint ||
+      !sameAddress(address(intelligence.reportedCreatorAddress, code), creatorAddress) ||
+      !sameAddress(address(intelligence.token, code), address(launch.token, code))) fail(code);
   const intelligenceReceipt = object(intelligence.receipt, code);
   const intelId = receiptId(intelligenceReceipt.receiptId, "binrat-intelligence", code);
   if (intelligenceReceipt.sourcePublicReceiptId !== sourceReceipt) fail(code);
@@ -375,6 +379,7 @@ export function adaptLiveReplay(value: unknown, requestedBagId: string): LiveRep
     const evidenceDigest = digest(stage.evidenceDigest, code);
     const target = natural(stage.targetTimestampMs, code);
     const observed = natural(stage.observedTimestampMs, code);
+    if (target > 8_640_000_000_000_000 || observed > 8_640_000_000_000_000) fail(code);
     if (stage.kind !== "OBSERVATION" || stage.label !== horizon ||
         !["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(String(stage.status)) ||
         observed < target || target <= priorTarget || observed < priorObserved ||
@@ -396,6 +401,10 @@ export function adaptLiveReplay(value: unknown, requestedBagId: string): LiveRep
     priorObserved = observed;
     priorBlock = BigInt(stageBlock);
   }
+  const expectedCoverage = available.length === 0 ? "UNVERIFIED" :
+    available.length === 3 && available.every((h) => stages[h as ReplayHorizon].state === "COMPLETE")
+      ? "COMPLETE" : "PARTIAL";
+  if (coverage.observationCoverage !== expectedCoverage) fail(code);
   const receipt = object(bundle.receipt, code);
   if (receipt.sourcePublicReceiptId !== sourceReceipt ||
       receipt.creatorFileReceiptId !== creatorReceipt ||
@@ -454,7 +463,9 @@ export function adaptLiveLedger(value: unknown): LiveLedger {
       array(funding.creatorFeeRecipients, code).length !== 0 ||
       array(funding.treasuryAddresses, code).length !== 0 ||
       funding.effectiveFromBlock !== null || funding.configVersion !== null ||
-      funding.categoryPolicyVersion !== null) fail(code);
+      funding.categoryPolicyVersion !== null ||
+      (ledger.accountingState === "PRE_LAUNCH_AUTHORITIES_CONFIGURED") !==
+        (funding.status === "PRELAUNCH_AUTHORITIES_CONFIGURED")) fail(code);
   const totals = object(ledger.totals, code);
   if ([totals.entryCount, totals.inflowEntryCount, totals.outflowEntryCount].some((n) => natural(n, code) !== 0) ||
       totals.tokenInflowsRaw !== "0" || totals.tokenOutflowsRaw !== "0" ||
