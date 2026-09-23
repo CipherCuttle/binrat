@@ -1979,3 +1979,29 @@ input:focus-visible,
   .route-result-link { align-items: flex-start; flex-direction: column; gap: 6px; }
   .route-trail li { align-items: flex-start; flex-wrap: wrap; }
 }
+
+
+/* PR3 hostile mobile regression: actual 64-character Replay receipt IDs and
+ * evidence digests must never establish min-content widths beyond the viewport. */
+.bag-page .replay-proof-meta,
+.bag-page .replay-proof-meta p,
+.bag-page .replay-proof-meta small,
+.bag-page .replay-readout p,
+.bag-page .case-actions .route-actions,
+.bag-page .case-actions .route-actions small {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.bag-page .case-actions {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.bag-page .case-actions .route-actions {
+  margin-top: 0;
+}
+@media (max-width: 720px) {
+  .bag-page .replay-readout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
