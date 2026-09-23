@@ -7,7 +7,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { chromium, request } = require("playwright");
 
-const preview = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace(/\\/$/, "");
+const preview = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
 const publicApi = "https://binrat-edge-v0.pettevik.workers.dev";
 const output = path.resolve(__dirname, "../browser-artifacts/live-candidate");
 const sizes = [
@@ -48,7 +48,7 @@ async function capture(page, label, width) {
     path: path.join(output, "LIVE-" + label + "-" + width + ".png"),
     fullPage: label === "home" && width === 390,
   });
-  process.stdout.write("LIVE PASS " + width + "px " + label + "\\n");
+  process.stdout.write("LIVE PASS " + width + "px " + label + "\n");
 }
 
 (async () => {
@@ -62,7 +62,7 @@ async function capture(page, label, width) {
     assert.equal(state.chainId, 5042, "wrong source chain");
     assert.equal(state.runtimeFresh, true, "live runtime is stale");
     assert.equal(state.indexReady, true, "live index not ready");
-    process.stdout.write("LIVE API HEALTH PASS at checkpoint " + state.checkpointBlock + "\\n");
+    process.stdout.write("LIVE API HEALTH PASS at checkpoint " + state.checkpointBlock + "\n");
 
     for (const viewport of sizes) {
       const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
@@ -91,7 +91,7 @@ async function capture(page, label, width) {
       try {
         await openLive(page, "/");
         const bagPath = await page.locator(".latest-file").getAttribute("href");
-        assert.match(bagPath || "", /^\\/bag\\/[0-9a-f]{64}$/i, "real latest bag missing");
+        assert.match(bagPath || "", /^\/bag\/[0-9a-f]{64}$/i, "real latest bag missing");
         await capture(page, "home", viewport.width);
 
         await openLive(page, "/radar");
@@ -108,7 +108,7 @@ async function capture(page, label, width) {
         assert.equal(await page.locator(".replay-proof-meta .checkpoint-rail").count(), 1,
           "real replay proof not present");
         const creatorPath = await page.locator(".creator-file .text-link").getAttribute("href");
-        assert.match(creatorPath || "", /^\\/creator\\/0x[0-9a-f]{40}$/i);
+        assert.match(creatorPath || "", /^\/creator\/0x[0-9a-f]{40}$/i);
         await capture(page, "bag-replay", viewport.width);
 
         if (viewport.width === 390) {
@@ -132,18 +132,18 @@ async function capture(page, label, width) {
           path: path.join(output, "FAILED-LIVE-" + viewport.width + ".png"), fullPage: true,
         }).catch(() => {});
         process.stderr.write("LIVE candidate " + viewport.width + "px: " +
-          String(error?.stack || error) + "; upstream=" + failures.join("; ") + "\\n");
+          String(error?.stack || error) + "; upstream=" + failures.join("; ") + "\n");
         throw error;
       } finally {
         await context.close();
       }
     }
-    process.stdout.write("READ-ONLY LIVE V2 CANDIDATE: ALL PASS\\n");
+    process.stdout.write("READ-ONLY LIVE V2 CANDIDATE: ALL PASS\n");
   } finally {
     await browser.close();
     await api.dispose();
   }
 })().catch((error) => {
-  process.stderr.write("READ-ONLY LIVE V2 CANDIDATE BLOCKED: " + String(error?.stack || error) + "\\n");
+  process.stderr.write("READ-ONLY LIVE V2 CANDIDATE BLOCKED: " + String(error?.stack || error) + "\n");
   process.exitCode = 1;
 });
