@@ -274,6 +274,8 @@ async function runMockedLive(browser) {
       assert.match(text, /NO RADAR SHORTLIST YET/);
       assert.doesNotMatch(text, /FERAL|DEMO \+5m/);
       assert.equal((await page.locator(".demo-flag").innerText()).trim(), "PUBLIC LIVE");
+      // Native links must preserve LIVE mode on copied/new-tab destinations too.
+      assert.match(await page.locator('nav[aria-label="Primary"] a[href*="/dumpster"]').first().getAttribute("href"), /\?source=live$/);
       await ready(page, "/radar?source=live");
       assert.match(await page.locator("main").innerText(), /NO RADAR FILE IN THIS INDEX/);
       await assertNoHorizontalOverflow(page, "Mocked empty Radar", 390);
