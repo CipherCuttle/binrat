@@ -212,13 +212,28 @@ async function runViewport(browser, viewport) {
 async function runMockedLive(browser) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
+  // The old smoke fixture intentionally skipped receipt/checkpoint fields.
+  // LIVE mode now validates the real API contract; use a structurally honest
+  // empty response so this test still checks missing evidence, not a schema error.
+  const digest = "a".repeat(64);
+  const checkpointHash = "0x" + "b".repeat(64);
   const emptyFeed = {
     schemaVersion: "binrat.public-feed/0.1",
     chainId: 5042,
     asOfBlock: "123",
-    historyCoverage: "PARTIAL",
+    asOfBlockHash: checkpointHash,
+    historyCoverage: "UNVERIFIED",
     bags: [],
-    receipt: { receiptId: "binrat-public:test-empty" },
+    receipt: {
+      projectionVersion: "BINRAT_PUBLIC_PROJECTION_V0",
+      chainId: 5042,
+      asOfBlock: "123",
+      asOfBlockHash: checkpointHash,
+      historyCoverage: "UNVERIFIED",
+      inputDigest: digest,
+      outputDigest: digest,
+      receiptId: "binrat-public:" + digest,
+    },
   };
   const emptyRadar = {
     schemaVersion: "binrat.rat-radar-watchlist/0.1",
@@ -226,7 +241,7 @@ async function runMockedLive(browser) {
     chainId: 5042,
     asOfBlock: "123",
     coverage: {
-      historyCoverage: "PARTIAL",
+      historyCoverage: "UNVERIFIED",
       indexedLaunchCount: 0,
       swapReceiptCount: 0,
       acquisitionReceiptCount: 0,
@@ -236,11 +251,18 @@ async function runMockedLive(browser) {
     },
     method: {
       evidencedRole: "V3_SWAP_RECIPIENT",
+      freeLimit: 5,
+      ordering: [
+        "distinctLaunchCount DESC",
+        "medianFirstEntryBlockDelta ASC",
+        "acquisitionReceiptCount DESC",
+        "observedRecipientAddress ASC",
+      ],
       identityBoundary: "An observed recipient address is not automatically a human trader identity.",
       recommendationBoundary: "Ranking describes observed recurrence and timing; it is not a BUY/SELL recommendation.",
     },
     candidates: [],
-    receipt: { receiptId: "binrat-rat-radar:test-empty", evidenceDigest: "test-only" },
+    receipt: { receiptId: "binrat-rat-radar:" + digest, evidenceDigest: digest },
   };
   await page.route("**/api/feed", (route) => route.fulfill({ json: emptyFeed }));
   await page.route("**/api/rat-radar/watchlist", (route) => route.fulfill({ json: emptyRadar }));
