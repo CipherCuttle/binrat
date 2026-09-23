@@ -68,7 +68,7 @@ async function layout(page, viewport, route) {
     assert.ok(data.brand?.width > 35 && data.status?.height >= 48, "phone header not readable");
     assert.ok(data.nav && data.nav.top > viewport.height - 90 && data.nav.top < viewport.height - 45,
       "thumb navigation not pinned to bottom: " + JSON.stringify(data.nav));
-    assert.ok(data.navLabels.every(x => x.height >= 44 && x.font >= 9),
+    assert.ok(data.navLabels.every(x => x.height >= 44 && x.font >= 11),
       "tiny or untappable navigation: " + JSON.stringify(data.navLabels));
     if (route === "/") {
       assert.ok(data.heroFont >= 13, "mobile hero copy too small: " + data.heroFont);
