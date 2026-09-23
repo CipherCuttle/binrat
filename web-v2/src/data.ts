@@ -5,6 +5,7 @@ import type { PublicFeed, RadarWatchlist } from "./types";
 export type DataMode = "DEMO" | "LIVE";
 
 const wantsLive = new URLSearchParams(window.location.search).get("source") === "live";
+export const selectedDataMode: DataMode = wantsLive ? "LIVE" : "DEMO";
 
 async function readJson(path: string, unavailableCode: string): Promise<unknown> {
   const response = await fetch(path, {
