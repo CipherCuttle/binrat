@@ -22,10 +22,21 @@ async function assertNoHorizontalOverflow(page, label, width) {
     body: document.body.scrollWidth,
     viewport: document.documentElement.clientWidth,
   }));
-  assert.ok(
-    result.doc <= width + 1 && result.body <= width + 1,
-    label + ": horizontal overflow " + JSON.stringify(result),
-  );
+  if (result.doc > width + 1 || result.body > width + 1) {
+    const offenders = await page.evaluate(() => [...document.querySelectorAll("main *")]
+      .filter((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.right > innerWidth + 1;
+      })
+      .slice(0, 12)
+      .map((element) => ({
+        tag: element.tagName, className: String(element.className).slice(0, 80),
+        text: (element.textContent || "").slice(0, 50),
+        right: Math.round(element.getBoundingClientRect().right),
+        scrollWidth: element.scrollWidth, clientWidth: element.clientWidth,
+      })));
+    assert.fail(label + ": horizontal overflow " + JSON.stringify({ ...result, offenders }));
+  }
 }
 
 async function ready(page, url) {
