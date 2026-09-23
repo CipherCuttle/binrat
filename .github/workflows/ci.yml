@@ -205,8 +205,8 @@ jobs:
               sleep 1
             done
           fi
-          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \\
-            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \\
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
             node web-v2/checks/live-candidate-smoke.cjs
 
       - name: Upload viewport screenshots and failure evidence
