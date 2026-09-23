@@ -185,16 +185,30 @@ export function ReplayIndexPage({ feed, mode, navigate }: {
   );
 }
 
-export function WatchPage({ navigate }: { navigate: Navigate }) {
+export function WatchPage({ navigate, mode }: { navigate: Navigate; mode: DataMode }) {
   return (
     <div className="page-pad route-page">
-      <Heading index="05" eyebrow="FUTURE-ONLY EVIDENCE" title="RAT WATCH" detail="Follow recurring evidence, not buy signals. This design demo cannot create or confirm a production subscription." />
+      <Heading
+        index="05"
+        eyebrow="FUTURE-ONLY EVIDENCE"
+        title="RAT WATCH"
+        detail={mode === "DEMO"
+          ? "This design demo illustrates a watch interaction but cannot create a production subscription."
+          : "Real creator recurrence watches are managed through Telegram Rat. This site has no independent subscription authority."}
+      />
       <section className="route-card">
-        <CaseTab tone="orange">DEMO CONTROL / NOT A LIVE SUBSCRIPTION</CaseTab>
-        <p>The Watch buttons in demo dossiers change local interface state only. They do not submit an address, create a receipt, send Telegram alerts or persist across sessions.</p>
-        <p>The existing Telegram Rat belongs to the separate live beta. Subscription management and verified delivery receipts must be connected here before this becomes a production Watch console.</p>
+        <CaseTab tone="orange">{mode === "DEMO" ? "DEMO CONTROL / NOT A LIVE SUBSCRIPTION" : "LIVE / TELEGRAM-MANAGED CREATOR WATCH"}</CaseTab>
+        {mode === "DEMO" ? (
+          <p>The Watch buttons in demo dossiers change local interface state only. They do not submit an address, create a receipt, send Telegram alerts or persist across sessions.</p>
+        ) : (
+          <>
+            <p>Open a LIVE Bag and copy its source-reported creator command. Send that exact <code>/watch 0x...</code> command to Telegram Rat and confirm the bot's response before treating the watch as active.</p>
+            <p>Telegram also supports <code>/watches</code> to inspect accepted watches and <code>/unwatch 0x...</code> to remove one. This web page cannot inspect your Telegram subscriptions or confirm delivery.</p>
+            <p>Radar recipients are different protocol roles and cannot be watched through the current creator-only Telegram command.</p>
+          </>
+        )}
         <div className="route-actions">
-          <AppLink href="/radar" navigate={navigate} className="action primary">FIND AN ADDRESS →</AppLink>
+          <AppLink href="/dumpster" navigate={navigate} className="action primary">FIND A SOURCE-REPORTED CREATOR →</AppLink>
           <a href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer" className="action">OPEN TELEGRAM RAT ↗</a>
         </div>
       </section>
