@@ -210,6 +210,8 @@ const rawReplay = {
     chainId: 5042,
     asOfBlock: "122",
     bagId: id1,
+    token: a,
+    reportedCreatorAddress: b,
     observationCoverage: "PARTIAL",
     snapshots: [{
       horizonLabel: "5m",
@@ -334,6 +336,9 @@ test("LIVE Replay with no stored observations never invents 5m, 1h or 24h stages
 test("LIVE Replay rejects misattributed bag, future blocks, divergent receipts, forged chronology and fabricated horizons", () => {
   for (const mutate of [
     (v: typeof rawReplay) => { v.launch.id = id2; },
+    (v: typeof rawReplay) => { v.intelligence.reportedCreatorAddress = a; },
+    (v: typeof rawReplay) => { v.creatorFile.receipt.sourcePublicReceiptId = "binrat-public:" + "e".repeat(64); },
+    (v: typeof rawReplay) => { v.coverage.observationCoverage = "COMPLETE"; },
     (v: typeof rawReplay) => { v.canonicalAuthority.asOfBlock = "121"; },
     (v: typeof rawReplay) => { v.stages[1]!.blockNumber = "123"; },
     (v: typeof rawReplay) => { v.stages[1]!.evidenceDigest = "e".repeat(64); },
