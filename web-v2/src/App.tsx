@@ -51,7 +51,7 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
-  if (path === "/") return { page: "home" };
+  if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/dumpster") return { page: "dumpster" };
   const radarAddress = addressFromRoute(path, "/radar/address/");
   if (radarAddress !== null) return { page: "radar", address: radarAddress };
