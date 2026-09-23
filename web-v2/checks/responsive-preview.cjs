@@ -52,6 +52,12 @@ async function layout(page, viewport, route) {
       brand: rect(".mobile-brand"),
       status: rect(".status-rail"),
       heading: rect("main h1"),
+      offenders: [...document.querySelectorAll("main *")]
+        .map(e => ({ e, r: e.getBoundingClientRect() }))
+        .filter(({ r }) => r.width > 0 && r.right > innerWidth + 1)
+        .slice(0, 15).map(({ e, r }) => ({ tag: e.tagName, name: String(e.className).slice(0, 70),
+          text: (e.textContent || "").slice(0, 60), right: Math.round(r.right), width: Math.round(r.width),
+          scroll: e.scrollWidth, client: e.clientWidth })),
     };
   });
   assert.ok(data.scroll <= viewport.width + 1 && data.body <= viewport.width + 1,
