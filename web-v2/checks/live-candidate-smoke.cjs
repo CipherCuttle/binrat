@@ -108,7 +108,10 @@ async function requireStablePublicHealth(api) {
             url: publicApi + requestUrl.pathname + requestUrl.search,
             timeout: 20000,
           });
-          if (!response.ok()) failures.push(requestUrl.pathname + ": HTTP " + response.status());
+          if (!response.ok()) {
+            const reason = (await response.text()).slice(0, 300);
+            failures.push(requestUrl.pathname + ": HTTP " + response.status() + " " + reason);
+          }
           await route.fulfill({ response });
         } catch (error) {
           failures.push(requestUrl.pathname + ": " + String(error));
