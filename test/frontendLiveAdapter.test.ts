@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar,
+  adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar, adaptLiveReplay, adaptLiveLedger,
 } from "../web-v2/src/liveAdapter.js";
 
 const a = "0x" + "a".repeat(40);
@@ -180,5 +180,189 @@ test("Canonical Creator File rejects mismatched address, incomplete history and 
     const raw = copy(rawCreator);
     mutate(raw);
     assert.throws(() => adaptLiveCreatorFile(raw, b), /CREATOR_FILE_SCHEMA_INVALID/);
+  }
+});
+
+
+const rawReplay = {
+  schemaVersion: "binrat.replay-bundle/0.1",
+  projectionVersion: "BINRAT_REPLAY_BUNDLE_V0",
+  chainId: 5042,
+  asOfBlock: "122",
+  asOfBlockHash: hash,
+  historyCoverage: "UNVERIFIED",
+  canonicalAuthority: {
+    chainId: 5042,
+    asOfBlock: "122",
+    asOfBlockHash: hash,
+    sourcePublicReceiptId: "binrat-public:" + digest,
+  },
+  coverage: {
+    historyCoverage: "UNVERIFIED",
+    observationCoverage: "PARTIAL",
+    availableHorizons: ["5m"],
+    missingHorizons: ["1h", "24h"],
+  },
+  launch: rawBag,
+  creatorFile: rawCreator,
+  intelligence: {
+    schemaVersion: "binrat.bag-intelligence/0.1",
+    chainId: 5042,
+    asOfBlock: "122",
+    bagId: id1,
+    observationCoverage: "PARTIAL",
+    snapshots: [{
+      horizonLabel: "5m",
+      status: "COMPLETE",
+      observationId: id2,
+      evidenceDigest: digest,
+      observedBlock: "110",
+      observedBlockHash: hash,
+      targetTimestampMs: 1_700_000_300_000,
+      observedTimestampMs: 1_700_000_300_001,
+    }],
+    receipt: {
+      sourcePublicReceiptId: "binrat-public:" + digest,
+      observationEvidenceDigests: [digest],
+      receiptId: "binrat-intelligence:" + digest,
+    },
+  },
+  stages: [{
+    kind: "LAUNCH",
+    label: "LAUNCH",
+    status: "OBSERVED",
+    blockNumber: "100",
+    blockHash: hash,
+    targetTimestampMs: null as number | null,
+    observedTimestampMs: null as number | null,
+    evidenceId: "binrat-public:" + digest,
+    evidenceDigest: null as string | null,
+  }, {
+    kind: "OBSERVATION",
+    label: "5m",
+    status: "COMPLETE",
+    blockNumber: "110",
+    blockHash: hash,
+    targetTimestampMs: 1_700_000_300_000 as number | null,
+    observedTimestampMs: 1_700_000_300_001 as number | null,
+    evidenceId: id2,
+    evidenceDigest: digest as string | null,
+  }],
+  receipt: {
+    projectionVersion: "BINRAT_REPLAY_BUNDLE_V0",
+    sourcePublicReceiptId: "binrat-public:" + digest,
+    creatorFileReceiptId: "binrat-creator:" + digest,
+    intelligenceReceiptId: "binrat-intelligence:" + digest,
+    observationEvidenceDigests: [digest],
+    outputDigest: digest,
+    receiptId: "binrat-replay:" + digest,
+  },
+};
+
+const rawLedger = {
+  schemaVersion: "binrat.dumpster-ledger/0.1",
+  projectionVersion: "BINRAT_DUMPSTER_LEDGER_V0",
+  chainId: 5042,
+  accountingState: "PRE_LAUNCH_AUTHORITIES_CONFIGURED",
+  tokenState: "NOT_LAUNCHED",
+  launchAuthorization: "BLOCKED",
+  marketingAuthorized: false,
+  configuredAuthorities: {
+    status: "OWNER_SELECTED_PRE_LAUNCH",
+    custodyEvidence: "OWNER_DECLARATION_ONLY",
+    onChainRoleProof: "NOT_YET_AVAILABLE",
+    launchMechanicsReceiptDigest: "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
+    treasury: { role: "TREASURY", address: "0xab063A9b53a2Ab832a941aE5890ea05c1672339D" },
+    projectFeeRecipient: { role: "PROJECT_FEE_RECIPIENT", address: "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866" },
+  },
+  fundingAuthority: {
+    status: "PRELAUNCH_AUTHORITIES_CONFIGURED",
+    accountingEnabled: false,
+    tokenAddress: null,
+    creatorFeeRecipients: [] as string[],
+    treasuryAddresses: [] as string[],
+    effectiveFromBlock: null as string | null,
+    configVersion: null as string | null,
+    categoryPolicyVersion: null as string | null,
+  },
+  totals: {
+    entryCount: 0, inflowEntryCount: 0, outflowEntryCount: 0,
+    tokenInflowsRaw: "0", tokenOutflowsRaw: "0", byAsset: [] as object[],
+  },
+  entries: [] as object[],
+  coverage: { status: "NO_TOKEN_OBSERVATIONS_AVAILABLE", fromBlock: null, throughBlock: null },
+  observedDataAvailability: {
+    tokenAddress: "NOT_YET_AVAILABLE", launchBlock: "NOT_YET_AVAILABLE",
+    launchTransaction: "NOT_YET_AVAILABLE", tokenRelatedInflows: "NOT_YET_AVAILABLE",
+    tokenRelatedOutflows: "NOT_YET_AVAILABLE",
+  },
+  utilityStatus: { source: "CAPABILITY_MANIFEST", shipped: [], building: [], planned: [] },
+  awaitingCanonicalAuthority: ["TOKEN_CONTRACT_ADDRESS"],
+  explanation: "No funding observations.",
+  evidenceBoundary: "Zero entries are not a zero balance.",
+  receipt: { manifestDigest: digest, entryEvidenceDigests: [] as string[], outputDigest: digest,
+    receiptId: "binrat-dumpster-ledger:" + digest },
+};
+
+test("LIVE Replay maps separately checkpointed launch and stored observation; missing horizons remain missing", () => {
+  const replay = adaptLiveReplay(copy(rawReplay), id1);
+  assert.equal(replay.stages.LAUNCH.value, "BLOCK 100");
+  assert.equal(replay.stages["5m"].state, "COMPLETE");
+  assert.match(replay.stages["5m"].note, /Evidence digest/);
+  assert.equal(replay.stages["1h"].state, "MISSING");
+  assert.equal(replay.stages["24h"].state, "MISSING");
+  assert.equal(replay.asOfBlock, "122");
+  assert.equal(replay.receipt.receiptId, "binrat-replay:" + digest);
+});
+
+test("LIVE Replay with no stored observations never invents 5m, 1h or 24h stages", () => {
+  const raw = copy(rawReplay);
+  raw.coverage.availableHorizons = [];
+  raw.coverage.missingHorizons = ["5m", "1h", "24h"];
+  raw.coverage.observationCoverage = "UNVERIFIED";
+  raw.intelligence.observationCoverage = "UNVERIFIED";
+  raw.intelligence.snapshots = [];
+  raw.intelligence.receipt.observationEvidenceDigests = [];
+  raw.receipt.observationEvidenceDigests = [];
+  raw.stages = [raw.stages[0]!];
+  const replay = adaptLiveReplay(raw, id1);
+  assert.equal(replay.stages.LAUNCH.state, "COMPLETE");
+  assert.deepEqual(["5m", "1h", "24h"].map((h) => replay.stages[h as "5m" | "1h" | "24h"].state),
+    ["MISSING", "MISSING", "MISSING"]);
+});
+
+test("LIVE Replay rejects misattributed bag, future blocks, divergent receipts, forged chronology and fabricated horizons", () => {
+  for (const mutate of [
+    (v: typeof rawReplay) => { v.launch.id = id2; },
+    (v: typeof rawReplay) => { v.canonicalAuthority.asOfBlock = "121"; },
+    (v: typeof rawReplay) => { v.stages[1]!.blockNumber = "123"; },
+    (v: typeof rawReplay) => { v.stages[1]!.evidenceDigest = "e".repeat(64); },
+    (v: typeof rawReplay) => { v.stages[1]!.observedTimestampMs = 1_700_000_299_999; },
+    (v: typeof rawReplay) => { v.coverage.availableHorizons.push("24h"); },
+    (v: typeof rawReplay) => { v.receipt.intelligenceReceiptId = "binrat-intelligence:" + "e".repeat(64); },
+    (v: typeof rawReplay) => { v.receipt.receiptId = "demo-replay"; },
+  ]) {
+    const raw = copy(rawReplay);
+    mutate(raw);
+    assert.throws(() => adaptLiveReplay(raw, id1), /REPLAY_BUNDLE_SCHEMA_INVALID/);
+  }
+});
+
+test("LIVE Ledger displays only production prelaunch declarations and fails closed on money or role spoofing", () => {
+  const ledger = adaptLiveLedger(copy(rawLedger));
+  assert.equal(ledger.tokenState, "NOT_LAUNCHED");
+  assert.equal(ledger.launchAuthorization, "BLOCKED");
+  assert.equal(ledger.coverage, "NO_TOKEN_OBSERVATIONS_AVAILABLE");
+  for (const mutate of [
+    (v: typeof rawLedger) => { v.tokenState = "LAUNCHED"; },
+    (v: typeof rawLedger) => { v.fundingAuthority.accountingEnabled = true; },
+    (v: typeof rawLedger) => { v.totals.entryCount = 1; },
+    (v: typeof rawLedger) => { v.configuredAuthorities.treasury.address = a; },
+    (v: typeof rawLedger) => { v.configuredAuthorities.custodyEvidence = "PROVEN"; },
+    (v: typeof rawLedger) => { v.receipt.receiptId = "synthetic"; },
+  ]) {
+    const raw = copy(rawLedger);
+    mutate(raw);
+    assert.throws(() => adaptLiveLedger(raw), /DUMPSTER_LEDGER_SCHEMA_INVALID/);
   }
 });
