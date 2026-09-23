@@ -160,7 +160,7 @@ export default function App() {
       </a>
       <ShellNav route={route} navigate={navigate} />
       <div className="workspace">
-        <StatusRail mode={mode} feed={feed} />
+        <StatusRail mode={mode} feed={feed} navigate={navigate} />
         <main id="content" tabIndex={-1}>
           {content}
         </main>
@@ -219,12 +219,15 @@ function ShellNav({
 function StatusRail({
   mode,
   feed,
+  navigate,
 }: {
   mode: DataMode;
   feed: PublicFeed | null;
+  navigate: (path: string) => void;
 }) {
   return (
     <header className="status-rail">
+      <AppLink className="mobile-brand" href="/" navigate={navigate} ariaLabel="BINRAT home">BINRAT <span aria-hidden="true">↗</span></AppLink>
       <span className="status-cluster">
         <i />
         {feed ? (mode === "DEMO" ? "DEMO INDEX READY" : "PUBLIC INDEX READY") : "INDEXING"}
