@@ -334,11 +334,12 @@ async function runMockedLive(browser) {
           asOfBlock: "123", historyCoverage: "UNVERIFIED",
           reportedCreatorAddress: address, indexedLaunchCount: 1,
           launches: [{ ...bag, priorLaunchCount: 0 }],
-          receipt: { receiptId: "binrat-creator:" + digest },
+          receipt: { receiptId: "binrat-creator:" + digest, sourcePublicReceiptId: "binrat-public:" + digest },
         },
         intelligence: {
           schemaVersion: "binrat.bag-intelligence/0.1", chainId: 5042,
-          asOfBlock: "123", bagId: id, observationCoverage: "PARTIAL",
+          asOfBlock: "123", bagId: id, token, reportedCreatorAddress: address,
+          observationCoverage: "PARTIAL",
           snapshots: [{
             horizonLabel: "5m", status: "COMPLETE", observationId: observation.evidenceId,
             evidenceDigest: digest, observedBlock: "122", observedBlockHash: checkpointHash,
