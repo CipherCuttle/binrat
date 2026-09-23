@@ -129,7 +129,7 @@ export default function App() {
   ) : route.page === "replay" ? (
     <ReplayIndexPage feed={feed} mode={mode} navigate={navigate} />
   ) : route.page === "watch" ? (
-    <WatchPage navigate={navigate} />
+    <WatchPage navigate={navigate} mode={mode} />
   ) : route.page === "ledger" ? (
     <LedgerPage />
   ) : route.page === "binrat" ? (
