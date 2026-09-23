@@ -576,6 +576,10 @@ function EvidenceDossier({
   checkpoint: string;
 }) {
   const [watching, setWatching] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(() => !window.matchMedia("(max-width: 720px)").matches);
+  useEffect(() => {
+    setDetailsOpen(!window.matchMedia("(max-width: 720px)").matches);
+  }, [candidate.observedRecipientAddress]);
   return (
     <aside className="evidence-dossier">
       <CaseTab tone="orange">
@@ -605,6 +609,12 @@ function EvidenceDossier({
           separate protocol role; no subscription has been created.
         </p>
       )}
+      {mode === "DEMO" && <small className="dossier-compact-proof">SYNTHETIC; NOT CHAIN RECEIPTS</small>}
+      <button type="button" className="dossier-expand-toggle" aria-controls="radar-evidence-details" aria-expanded={detailsOpen}
+        onClick={() => setDetailsOpen((value) => !value)}>
+        {detailsOpen ? "HIDE FULL RECEIPTS ↑" : "INSPECT FULL RECEIPTS ↓"}
+      </button>
+      <div className="dossier-details-body" id="radar-evidence-details" data-expanded={detailsOpen}>
       <div className="reason-list">
         {candidate.reasons.map((reason, index) => (
           <p key={reason}>
@@ -631,6 +641,7 @@ function EvidenceDossier({
       <small className="identity-note">
         Address role only. Human identity is not inferred.
       </small>
+      </div>
     </aside>
   );
 }

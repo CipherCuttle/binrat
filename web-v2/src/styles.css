@@ -2358,3 +2358,60 @@ input:focus-visible,
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+.dossier-expand-toggle, .dossier-compact-proof { display: none; }
+
+
+/* Visual-review closure: long canonical ledger labels wrap on phones.
+ * Radar defaults to a compact selectable dossier; receipts stay one tap away. */
+@media (max-width: 720px) {
+  .case-tab {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    align-items: flex-start;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+  }
+  .case-tab:before { flex: 0 0 13px; width: 13px; margin: 4px 7px 0 0; }
+  .evidence-dossier > .dossier-compact-proof {
+    display: block;
+    margin: 14px 0 0;
+    color: var(--orange);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .dossier-expand-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 13px;
+    margin-top: 15px;
+    background: var(--dumpster);
+    color: var(--bone);
+    border: 1px solid var(--line-hi);
+    font: 600 12px var(--mono);
+    text-align: left;
+    cursor: pointer;
+  }
+  .dossier-expand-toggle:focus-visible { outline: 2px solid var(--orange); }
+  .dossier-details-body[data-expanded="false"] { display: none; }
+  .dossier-details-body[data-expanded="true"] { display: block; }
+  .dossier-details-body .reason-list,
+  .dossier-details-body > .evidence-receipt { margin: 15px 0; }
+  .dossier-details-body .copyable-value { overflow-wrap: anywhere; }
+}
+@media (min-width: 721px) and (max-width: 1100px) {
+  .evidence-dossier > .dossier-details-body {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+  .dossier-details-body > .reason-list,
+  .dossier-details-body > .evidence-receipt { margin: 0; }
+  .dossier-details-body > .checkpoint-rail,
+  .dossier-details-body > .identity-note { grid-column: 1 / -1; }
+}

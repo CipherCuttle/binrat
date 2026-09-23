@@ -100,9 +100,22 @@ async function layout(page, viewport, route) {
           await visit(page, route);
           assert.ok(await page.getByText("DETERMINISTIC DEMO DATA").isVisible(), "Preview must remain explicit DEMO");
           await layout(page, viewport, route);
+          if (route === "/radar" && viewport.tier === "phone") {
+            const toggle = page.getByRole("button", { name: /INSPECT FULL RECEIPTS/i });
+            assert.ok(await toggle.isVisible(), "Mobile Radar must offer an explicit receipt expander");
+            assert.ok(!(await page.locator(".dossier-details-body").isVisible()), "Mobile Radar should start compact");
+          }
           const label = route === "/" ? "home" : route.includes("/bag/") ? "bag" : route.slice(1);
           if (route === "/" || viewport.width === 320 || viewport.width === 390 || viewport.width === 768) {
             await page.screenshot({ path: path.join(out, label + "-" + viewport.width + ".png"), fullPage: true });
+          }
+          if (route === "/radar" && viewport.tier === "phone") {
+            await page.getByRole("button", { name: /INSPECT FULL RECEIPTS/i }).click();
+            assert.ok(await page.locator(".evidence-dossier .evidence-receipt").isVisible(),
+              "Full receipts should be accessible in one tap");
+            await layout(page, viewport, "/radar-expanded");
+            if (viewport.width === 390) await page.screenshot({ path: path.join(out, "radar-expanded-390.png"), fullPage: true });
+            await page.getByRole("button", { name: /HIDE FULL RECEIPTS/i }).click();
           }
           process.stdout.write("PASS " + viewport.width + "px " + label + " (" + viewport.tier + ")\n");
         }
