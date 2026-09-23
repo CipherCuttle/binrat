@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { matchingCreatorBags } from "./routeIdentity";
-import { loadLiveCreatorFile } from "./data";
-import type { LiveCreatorFile } from "./liveAdapter";
+import { loadLiveCreatorFile, loadLiveLedger } from "./data";
+import type { LiveCreatorFile, LiveLedger } from "./liveAdapter";
 import { replayStagesForBag, REPLAY_HORIZONS } from "./evidenceIntegrity";
 import type { DataMode } from "./data";
 import type { PublicFeed } from "./types";
@@ -167,15 +167,15 @@ export function ReplayIndexPage({ feed, mode, navigate }: {
 }) {
   return (
     <div className="page-pad route-page">
-      <Heading index="04" eyebrow="POINT-IN-TIME EVIDENCE" title="REPLAY FILES" detail="Open a bag's embedded Replay. Demo stages are simulated and bag-specific; live staged observations need their own validated endpoint." />
+      <Heading index="04" eyebrow="POINT-IN-TIME EVIDENCE" title="REPLAY FILES" detail={mode === "LIVE" ? "Open a bag to load its separately checkpointed canonical Replay bundle. Stage availability is not inferred from the feed." : "Open a bag to inspect explicitly authored synthetic demo stages; there is no chain proof here."} />
       <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
       <div className="route-link-list">
         {feed.bags.map((bag) => {
-          const stages = replayStagesForBag(bag, mode);
+          const stages = mode === "DEMO" ? replayStagesForBag(bag, mode) : null;
           return (
             <AppLink href={"/bag/" + bag.id} navigate={navigate} className="route-result-link" key={bag.id}>
               <span>{"$" + bag.symbol} · {bag.name}<small>BLOCK {bag.blockNumber} / {mode === "DEMO" ? "SYNTHETIC DEMO" : "CURRENT FEED"}</small></span>
-              <span>{REPLAY_HORIZONS.slice(1).map((horizon) => horizon + ": " + stages[horizon].state).join(" / ")}<small>OPEN BAG ↗</small></span>
+              <span>{stages ? REPLAY_HORIZONS.slice(1).map((horizon) => horizon + ": " + stages[horizon].state).join(" / ") : "LOAD REAL REPLAY STAGES"}<small>OPEN BAG ↗</small></span>
             </AppLink>
           );
         })}
@@ -216,15 +216,62 @@ export function WatchPage({ navigate, mode }: { navigate: Navigate; mode: DataMo
   );
 }
 
-export function LedgerPage() {
+export function LedgerPage({ mode }: { mode: DataMode }) {
+  const [ledger, setLedger] = useState<LiveLedger | null>(null);
+  const [failure, setFailure] = useState("");
+  useEffect(() => {
+    if (mode !== "LIVE") return;
+    let active = true;
+    loadLiveLedger()
+      .then((result) => { if (active) setLedger(result); })
+      .catch((reason: unknown) => {
+        if (active) setFailure(reason instanceof Error ? reason.message : "DUMPSTER_LEDGER_UNAVAILABLE");
+      });
+    return () => { active = false; };
+  }, [mode]);
   return (
     <div className="page-pad route-page">
-      <Heading index="07" eyebrow="PUBLIC FUNDING EVIDENCE" title="DUMPSTER LEDGER" detail="Financial transparency must come from the current production authority, never from illustrative demo wallet balances." />
-      <section className="route-card">
-        <CaseTab tone="orange">LIVE ACCOUNTING NOT IN THIS DEMO</CaseTab>
-        <p>The current live beta presents pre-launch funding roles and the available ledger status. This V2 candidate has not yet integrated or independently validated its Ledger API, so no balances or transaction totals are shown here.</p>
-        <a href={liveBeta + "#dumpster-ledger"} target="_blank" rel="noopener noreferrer" className="action primary">VIEW EXISTING LIVE LEDGER ↗</a>
-      </section>
+      <Heading index="07" eyebrow="PUBLIC FUNDING EVIDENCE" title="DUMPSTER LEDGER"
+        detail="Owner-declared future funding roles are not on-chain custody proof. Unobserved token flows are not zero balances." />
+      {mode === "DEMO" ? (
+        <section className="route-card">
+          <CaseTab tone="orange">DESIGN DEMO / NO FUNDING EVIDENCE</CaseTab>
+          <p>Funding figures are intentionally absent from the visual demo. The live beta publishes a separate pre-launch Ledger authority.</p>
+          <a href={liveBeta + "#dumpster-ledger"} target="_blank" rel="noopener noreferrer" className="action primary">VIEW EXISTING LIVE LEDGER ↗</a>
+        </section>
+      ) : failure ? (
+        <section className="route-card">
+          <CaseTab tone="red">LEDGER UNAVAILABLE</CaseTab>
+          <p role="alert">{failure}. No synthetic balances, authority addresses or funding entries were substituted.</p>
+        </section>
+      ) : !ledger ? (
+        <section className="route-card"><p role="status">LOADING VALIDATED PUBLIC LEDGER…</p></section>
+      ) : (
+        <>
+          <div className="route-grid">
+            <section className="route-card">
+              <CaseTab tone="orange">{ledger.accountingState} / {ledger.tokenState}</CaseTab>
+              <h2>PRODUCTION ACCOUNTING IS DISABLED</h2>
+              <p>{ledger.explanation}</p>
+              <p>LAUNCH AUTHORIZATION: <b>{ledger.launchAuthorization}</b> · COVERAGE: <b>{ledger.coverage}</b></p>
+              <p>No token-flow entries can be inferred from this pre-launch projection. There is no verified zero balance, total raised or treasury transaction history.</p>
+              <ProofBoundary>{ledger.evidenceBoundary}</ProofBoundary>
+            </section>
+            <aside className="route-card">
+              <CaseTab>OWNER-DECLARED FUTURE ROLES</CaseTab>
+              <h2>TREASURY / POLICY ADDRESS</h2>
+              <div className="copyable-value"><code className="full-address">{ledger.treasury}</code><CopyButton label="declared treasury address" value={ledger.treasury} /></div>
+              <h2>PROJECT FEE RECIPIENT / POLICY ADDRESS</h2>
+              <div className="copyable-value"><code className="full-address">{ledger.projectFeeRecipient}</code><CopyButton label="declared project fee address" value={ledger.projectFeeRecipient} /></div>
+              <p className="route-note">These are configuration declarations, not proof of custody, contract roles, token transfers or marketing authority.</p>
+            </aside>
+          </div>
+          <Receipt title="CANONICAL PRE-LAUNCH LEDGER RECEIPT">
+            <div className="copyable-value"><code>{ledger.receiptId}</code><CopyButton label="canonical Ledger receipt" value={ledger.receiptId} /></div>
+            <small>Receipt format and pre-launch invariants are validated; this interface does not independently rehash the backend projection.</small>
+          </Receipt>
+        </>
+      )}
     </div>
   );
 }
