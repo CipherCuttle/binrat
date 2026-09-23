@@ -2107,7 +2107,7 @@ input:focus-visible,
     min-height: 60px;
     padding: 7px 1px 9px;
     gap: 6px;
-    font-size: clamp(9px, 2.7vw, 11px);
+    font-size: clamp(11px, 2.8vw, 12px);
     font-weight: 700;
     letter-spacing: 0;
     color: var(--paper);
@@ -2339,9 +2339,9 @@ input:focus-visible,
   .hero-copy h1 { font-size: clamp(47px, 14vw, 54px); }
   .action-row { grid-template-columns: minmax(0, 1fr); }
   .page-heading h1 { font-size: clamp(47px, 12vw, 54px); }
-  .shell-nav nav a { font-size: 9px; }
+  .shell-nav nav a { font-size: 11px; }
   .status-rail { padding-inline: 12px; }
-  .status-rail .demo-flag { font-size: 9px; }
+  .status-rail .demo-flag { font-size: 10px; }
   .evidence-dossier, .case-sheet, .creator-file { padding: 14px; }
 }
 
