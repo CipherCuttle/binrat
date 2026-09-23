@@ -22,7 +22,7 @@ export function AppLink({
     import.meta.env.BASE_URL === "/"
       ? ""
       : import.meta.env.BASE_URL.replace(/\/$/, "");
-  const resolvedHref = `${base}${href === "/" ? "/" : href}`;
+  const resolvedHref = `${base}${href === "/" ? "/" : href}${window.location.search}`;
   const follow = (event: MouseEvent<HTMLAnchorElement>) => {
     if (
       event.defaultPrevented ||
