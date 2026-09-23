@@ -38,7 +38,7 @@ const rawBag = {
       sourceFactId: "binrat-fact:5042:" + id2,
     }],
   },
-  evidence: [{ state: "OBSERVED", code: "REPORTED_CREATOR", text: "Source reported it", sourceFactIds: [] }],
+  evidence: [{ state: "OBSERVED", code: "REPORTED_CREATOR", text: "Source reported it", sourceFactIds: [] as string[] }],
 };
 const rawFeed = {
   schemaVersion: "binrat.public-feed/0.1",
