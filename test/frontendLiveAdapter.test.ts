@@ -344,6 +344,7 @@ test("LIVE Replay rejects misattributed bag, future blocks, divergent receipts, 
     (v: typeof rawReplay) => { v.stages[1]!.evidenceDigest = "e".repeat(64); },
     (v: typeof rawReplay) => { v.stages[1]!.observedTimestampMs = 1_700_000_299_999; },
     (v: typeof rawReplay) => { v.coverage.availableHorizons.push("24h"); },
+    (v: typeof rawReplay) => { v.coverage.missingHorizons.push("5m"); },
     (v: typeof rawReplay) => { v.receipt.intelligenceReceiptId = "binrat-intelligence:" + "e".repeat(64); },
     (v: typeof rawReplay) => { v.receipt.receiptId = "demo-replay"; },
   ]) {
