@@ -1,6 +1,6 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
-import { loadProductData, type DataMode } from "./data";
+import { loadProductData, selectedDataMode, type DataMode } from "./data";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import type {
@@ -71,7 +71,7 @@ export default function App() {
   const [route, setRoute] = useState<Route>(readRoute);
   const [feed, setFeed] = useState<PublicFeed | null>(null);
   const [radar, setRadar] = useState<RadarWatchlist | null>(null);
-  const [mode, setMode] = useState<DataMode>("DEMO");
+  const [mode, setMode] = useState<DataMode>(selectedDataMode);
   const [error, setError] = useState("");
   useEffect(() => {
     loadProductData()
@@ -123,7 +123,7 @@ export default function App() {
   ) : route.page === "radar" ? (
     <Radar radar={radar} mode={mode} selectedAddress={route.address} navigate={navigate} />
   ) : route.page === "creator" ? (
-    <CreatorFilePage feed={feed} address={route.address} mode={mode} navigate={navigate} />
+    <CreatorFilePage feed={feed} key={route.address.toLowerCase()} address={route.address} mode={mode} navigate={navigate} />
   ) : route.page === "method" ? (
     <MethodPage navigate={navigate} />
   ) : route.page === "replay" ? (
