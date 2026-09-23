@@ -113,7 +113,8 @@ async function capture(page, label, width) {
 
         if (viewport.width === 390) {
           await openLive(page, creatorPath);
-          await page.locator(".route-page").waitFor();
+          await page.getByRole("heading", { name: "CREATOR FILE", exact: true })
+            .waitFor({ timeout: 20000 });
           assert.equal(await page.locator('[role="alert"]').count(), 0,
             "real Creator File lookup failed");
           await capture(page, "creator", viewport.width);
