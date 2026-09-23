@@ -613,6 +613,13 @@ input:focus-visible,
 .recurrence-marks.compact i:nth-child(even).hit {
   height: 21px;
 }
+.recurrence-total {
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--orange);
+}
 .page-pad {
   padding: 50px clamp(20px, 4vw, 64px) 80px;
 }
