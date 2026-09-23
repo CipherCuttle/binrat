@@ -405,6 +405,9 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 8px;
   letter-spacing: 0.12em;
   color: var(--green);
@@ -412,6 +415,7 @@ input:focus-visible,
 }
 .case-tab:before {
   content: "";
+  flex: 0 0 19px;
   width: 19px;
   height: 7px;
   margin-right: 8px;
