@@ -2345,3 +2345,16 @@ input:focus-visible,
   .status-rail .demo-flag { font-size: 9px; }
   .evidence-dossier, .case-sheet, .creator-file { padding: 14px; }
 }
+
+
+/* Horizon label and coverage badge are both <b>, but only the horizon is large.
+ * The previous broad .replay-strip button > b selector enlarged COMPLETE and
+ * MISSING to 32px, causing a real 354px page at a 320px viewport. */
+.replay-strip button > b.semantic {
+  font: 600 10px/1.4 var(--mono);
+  letter-spacing: .02em;
+  margin: 10px 0 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
