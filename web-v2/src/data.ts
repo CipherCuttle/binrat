@@ -1,5 +1,5 @@
 import { demoFeed, demoRadar } from "./fixtures";
-import { adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar, type LiveCreatorFile } from "./liveAdapter";
+import { adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar, adaptLiveReplay, adaptLiveLedger, type LiveCreatorFile, type LiveReplayBundle, type LiveLedger } from "./liveAdapter";
 import type { PublicFeed, RadarWatchlist } from "./types";
 
 export type DataMode = "DEMO" | "LIVE";
@@ -41,4 +41,19 @@ export async function loadLiveCreatorFile(address: string): Promise<LiveCreatorF
   if (response.status === 404) return null;
   if (!response.ok) throw new Error("CREATOR_FILE_UNAVAILABLE");
   return adaptLiveCreatorFile(await response.json() as unknown, address);
+}
+
+
+/** A replay can have a newer canonical checkpoint than the originally loaded feed. */
+export async function loadLiveReplayBundle(bagId: string): Promise<LiveReplayBundle> {
+  if (!/^[0-9a-f]{64}$/.test(bagId)) throw new Error("REPLAY_BAG_ID_INVALID");
+  return adaptLiveReplay(
+    await readJson("/api/bag/" + encodeURIComponent(bagId) + "/replay", "REPLAY_BUNDLE_UNAVAILABLE"),
+    bagId,
+  );
+}
+
+/** The current production authority exposes only a disabled, pre-launch ledger. */
+export async function loadLiveLedger(): Promise<LiveLedger> {
+  return adaptLiveLedger(await readJson("/api/dumpster-ledger", "DUMPSTER_LEDGER_UNAVAILABLE"));
 }
