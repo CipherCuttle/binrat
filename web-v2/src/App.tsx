@@ -588,11 +588,19 @@ function EvidenceDossier({
         <span>OBSERVED ROLE — NOT CREATOR IDENTITY</span>
         <b>V3_SWAP_RECIPIENT</b>
       </div>
-      <WatchControl
-        armed={watching}
-        onClick={() => setWatching((value) => !value)}
-        subject="ADDRESS"
-      />
+      {mode === "DEMO" ? (
+        <WatchControl
+          armed={watching}
+          onClick={() => setWatching((value) => !value)}
+          subject="ADDRESS"
+        />
+      ) : (
+        <p className="route-note" role="status">
+          LIVE RADAR RECIPIENT WATCH NOT AVAILABLE. Telegram Rat currently accepts
+          source-reported creator addresses only. This observed recipient is a
+          separate protocol role; no subscription has been created.
+        </p>
+      )}
       <div className="reason-list">
         {candidate.reasons.map((reason, index) => (
           <p key={reason}>
@@ -664,11 +672,20 @@ function BagDossier({
           </h1>
         </div>
         <div className="case-actions">
-          <WatchControl
-            armed={watching}
-            onClick={() => setWatching((value) => !value)}
-            subject="CREATOR"
-          />
+          {mode === "DEMO" ? (
+            <WatchControl
+              armed={watching}
+              onClick={() => setWatching((value) => !value)}
+              subject="CREATOR"
+            />
+          ) : (
+            <div className="route-actions">
+              <span>TELEGRAM RAT / SOURCE-REPORTED CREATOR</span>
+              <CopyButton label="Telegram creator watch command" value={"/watch " + bag.reportedCreatorAddress} />
+              <a href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer" className="action">OPEN TELEGRAM RAT ↗</a>
+              <small>Paste the copied command in Telegram and confirm the bot receipt. No subscription was created here.</small>
+            </div>
+          )}
           <a className="action primary" href="#replay">
             OPEN REPLAY ↓
           </a>
