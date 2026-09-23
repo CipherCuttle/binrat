@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/githack-v2-preview.yml'
       - 'web-v2/src/**'
+      - 'web-v2/checks/responsive-preview.cjs'
       - 'web-v2/index.html'
       - 'web-v2/vite.config.ts'
   workflow_dispatch:
@@ -40,6 +41,32 @@ jobs:
           test -f web-v2/dist/binrat-hero.webp
           test -f web-v2/dist/favicon.png
           grep -q '/CipherCuttle/binrat/binrat-v2-githack-pr23/web-v2/dist/assets/' web-v2/dist/index.html
+      - name: Install isolated Playwright Chromium
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify layouts and capture seven viewport widths
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd web-v2 && pnpm exec vite preview --host 127.0.0.1 --port 4174) >"$RUNNER_TEMP/binrat-preview.log" 2>&1 &
+          for attempt in $(seq 1 50); do
+            if curl -fsS http://127.0.0.1:4174/CipherCuttle/binrat/binrat-v2-githack-pr23/web-v2/dist/ >/dev/null; then break; fi
+            if [ "$attempt" -eq 50 ]; then cat "$RUNNER_TEMP/binrat-preview.log"; exit 1; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174/CipherCuttle/binrat/binrat-v2-githack-pr23/web-v2/dist" \
+            node web-v2/checks/responsive-preview.cjs
+      - name: Upload screenshots from seven viewport widths
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-v2-responsive-viewport-gallery
+          path: web-v2/browser-artifacts/responsive/
+          retention-days: 7
+          if-no-files-found: warn
       - name: Commit generated demo only to isolated preview branch
         run: |
           git config user.name 'github-actions[bot]'
