@@ -89,7 +89,7 @@ export function CreatorFilePage({ feed, address, mode, navigate }: {
           <h2>EXACT REPORTED ADDRESS</h2>
           <div className="copyable-value"><code className="full-address">{mode === "LIVE" ? liveFile!.reportedCreatorAddress : address}</code><CopyButton label="reported creator address" value={address} /></div>
           <div className="route-stat-line">
-            <span><b>{matches.length}</b> INDEXED BAG{matches.length === 1 ? "" : "S"} IN {mode === "LIVE" ? "CANONICAL CREATOR FILE" : "CURRENT DEMO FEED"}</span>
+            <span><b>{matches.length}</b> INDEXED BAG{matches.length === 1 ? "" : "S"} IN {mode === "LIVE" ? "CANONICAL CREATOR FILE" : "CURRENT FEED (DEMO)"}</span>
             <span><b>{priorCount}</b> EARLIER INDEXED BAG{priorCount === 1 ? "" : "S"} IN THIS PROJECTION</span>
           </div>
           <p className="route-note">History coverage: <CoverageStamp state={coverage} />. Missing history never implies a clean record. {mode === "LIVE" ? "This Creator File has its own checkpoint and receipt." : "Synthetic demo data is not chain proof."}</p>
