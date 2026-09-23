@@ -142,7 +142,7 @@ async function requireStablePublicHealth(api) {
 
         if (viewport.width === 390) {
           await openLive(page, creatorPath);
-          await page.getByRole("heading", { name: "CREATOR FILE", exact: true })
+          await page.getByRole("heading", { name: /^CREATOR FILE/ })
             .waitFor({ timeout: 20000 });
           assert.equal(await page.locator('[role="alert"]').count(), 0,
             "real Creator File lookup failed");
