@@ -117,7 +117,8 @@ async function requireStablePublicHealth(api) {
       });
       try {
         await openLive(page, "/");
-        const bagPath = await page.locator(".latest-file").getAttribute("href");
+        const bagHref = await page.locator(".latest-file").getAttribute("href");
+        const bagPath = new URL(bagHref || "", preview).pathname;
         assert.match(bagPath || "", /^\/bag\/[0-9a-f]{64}$/i, "real latest bag missing");
         await capture(page, "home", viewport.width);
 
@@ -134,7 +135,8 @@ async function requireStablePublicHealth(api) {
           "canonical LIVE Replay unavailable for selected bag");
         assert.equal(await page.locator(".replay-proof-meta .checkpoint-rail").count(), 1,
           "real replay proof not present");
-        const creatorPath = await page.locator(".creator-file .text-link").getAttribute("href");
+        const creatorHref = await page.locator(".creator-file .text-link").getAttribute("href");
+        const creatorPath = new URL(creatorHref || "", preview).pathname;
         assert.match(creatorPath || "", /^\/creator\/0x[0-9a-f]{40}$/i);
         await capture(page, "bag-replay", viewport.width);
 
