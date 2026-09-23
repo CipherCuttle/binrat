@@ -440,6 +440,21 @@ async function runMockedLive(browser) {
       await assertNoHorizontalOverflow(page, "Live prelaunch Ledger", 390);
       await page.screenshot({ path: path.join(output, "mock-live-ledger-390.png") });
 
+      // Live authority values are longer than DEMO labels: verify the badge
+      // itself stays within its card, as well as the entire narrow viewport.
+      await page.setViewportSize({ width: 320, height: 700 });
+      const badgeBounds = await page.locator(".route-card > .case-tab.orange").first()
+        .evaluate((badge) => {
+          const badgeRect = badge.getBoundingClientRect();
+          const cardRect = badge.closest(".route-card").getBoundingClientRect();
+          return { badgeRight: badgeRect.right, cardRight: cardRect.right };
+        });
+      assert.ok(badgeBounds.badgeRight <= badgeBounds.cardRight + 1,
+        "Live Ledger status badge must wrap within its card: " + JSON.stringify(badgeBounds));
+      await assertNoHorizontalOverflow(page, "Live prelaunch Ledger narrow phone", 320);
+      await page.screenshot({ path: path.join(output, "mock-live-ledger-320.png") });
+      await page.setViewportSize({ width: 390, height: 844 });
+
       await page.unroute("**/api/bag/**/replay");
       await page.route("**/api/bag/**/replay", (route) =>
         route.fulfill({ status: 503, json: { error: "temporarily unavailable" } }));
