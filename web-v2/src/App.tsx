@@ -1,6 +1,7 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
-import { loadProductData, selectedDataMode, type DataMode } from "./data";
+import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
+import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
+import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import type {
@@ -131,7 +132,7 @@ export default function App() {
   ) : route.page === "watch" ? (
     <WatchPage navigate={navigate} mode={mode} />
   ) : route.page === "ledger" ? (
-    <LedgerPage />
+    <LedgerPage mode={mode} />
   ) : route.page === "binrat" ? (
     <TokenStatusPage />
   ) : route.page === "bag" ? (
@@ -642,6 +643,20 @@ function BagDossier({
 }) {
   const [stage, setStage] = useState<ReplayHorizon>("LAUNCH");
   const [watching, setWatching] = useState(false);
+  const [liveReplay, setLiveReplay] = useState<LiveReplayBundle | null>(null);
+  const [replayError, setReplayError] = useState("");
+  useEffect(() => {
+    if (mode !== "LIVE") return;
+    let active = true;
+    setLiveReplay(null);
+    setReplayError("");
+    loadLiveReplayBundle(bag.id)
+      .then((result) => { if (active) setLiveReplay(result); })
+      .catch((reason: unknown) => {
+        if (active) setReplayError(reason instanceof Error ? reason.message : "REPLAY_BUNDLE_UNAVAILABLE");
+      });
+    return () => { active = false; };
+  }, [bag.id, mode]);
   const onReplayKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     const labels = REPLAY_HORIZONS;
     const current = labels.indexOf(stage);
@@ -655,7 +670,16 @@ function BagDossier({
     setStage(labels[target]);
     event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[target]?.focus();
   };
-  const stageData = replayStagesForBag(bag, mode);
+  // DEMO can use authored fixtures. LIVE can only show separately validated
+  // canonical Replay stages; even LAUNCH remains unavailable while loading.
+  const unavailable = (): ReplayStage => ({
+    state: "MISSING",
+    value: "NO VALIDATED REPLAY STAGE",
+    note: "No independently validated Replay bundle is loaded for this exact bag.",
+  });
+  const stageData: Record<ReplayHorizon, ReplayStage> = mode === "DEMO"
+    ? replayStagesForBag(bag, mode)
+    : liveReplay?.stages ?? { LAUNCH: unavailable(), "5m": unavailable(), "1h": unavailable(), "24h": unavailable() };
   return (
     <div className="page-pad bag-page">
       <AppLink className="back-link" href="/dumpster" navigate={navigate}>
@@ -816,6 +840,25 @@ function BagDossier({
           <b>{stageData[stage].value}</b>
           <p>{stageData[stage].note}</p>
         </div>
+        {mode === "LIVE" && (
+          <div className="replay-proof-meta">
+            {replayError ? (
+              <p role="alert">REPLAY UNAVAILABLE / {replayError}. No stages from the feed or demo have been substituted.</p>
+            ) : !liveReplay ? (
+              <p role="status">LOADING SEPARATELY CHECKPOINTED LIVE REPLAY…</p>
+            ) : (
+              <>
+                <CheckpointRail
+                  checkpoint={liveReplay.asOfBlock}
+                  coverage={liveReplay.historyCoverage}
+                  receiptId={liveReplay.receipt.receiptId}
+                />
+                <p>OBSERVATION COVERAGE / <CoverageStamp state={liveReplay.observationCoverage} /> · RECEIPT AUTHORITY / {liveReplay.receipt.sourcePublicReceiptId}</p>
+                <small>Receipt identifiers and chronology are structurally validated in this browser. Cryptographic projection verification remains the backend's responsibility.</small>
+              </>
+            )}
+          </div>
+        )}
         <ProofBoundary>
           Each horizon redraws the file from evidence available at that moment.
           Future observations never fill earlier gaps.
