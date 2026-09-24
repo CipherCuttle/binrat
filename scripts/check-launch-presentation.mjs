@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../web/launch-presentation.css', import.meta.url), 'utf8');
 const launchDoc = readFileSync(new URL('../docs/LAUNCH_PRESENTATION_V0.md', import.meta.url), 'utf8');
-const candidate = JSON.parse(readFileSync(new URL('../docs/PONS_DISCOVERY_METADATA_V1.json', import.meta.url), 'utf8'));
+const candidate = JSON.parse(readFileSync(new URL('../docs/PONS_DISCOVERY_CANDIDATE_V1.json', import.meta.url), 'utf8'));
 const selection = JSON.parse(readFileSync(new URL('../docs/BINRAT_PONS_LAUNCH_SELECTION_V1.json', import.meta.url), 'utf8'));
 const manifest = JSON.parse(readFileSync(new URL('../docs/CAPABILITY_MANIFEST_V0.json', import.meta.url), 'utf8'));
 
@@ -51,39 +51,52 @@ if (!launchDoc.includes('Pons V2 direct factory / Robinhood Chain 4663') ||
   throw new Error('PONS_DISCOVERY_PRESENTATION_DOC_DRIFT');
 }
 
-// The draft metadata is not a Pons launchToken payload. Never infer wallet,
-// listing, website, token address or social authority from a selected rail.
+// Only the strict Pons discovery draft is canonical. Its user-reported bot URL is
+// deliberately not an official social destination; the preview must not link it.
+const proof = candidate.proof?.readOnlyPonsMechanics;
 if (
-  candidate.schemaVersion !== 'binrat.pons-discovery-candidate/1' ||
-  candidate.publicationStatus !== 'INTERNAL_PRELAUNCH_DRAFT_NOT_FOR_LISTING' ||
-  candidate.ownerApproval !== 'NOT_GRANTED' ||
-  candidate.launchAuthorized !== false ||
-  candidate.marketingAuthorized !== false ||
-  candidate.token.status !== 'NOT_LAUNCHED' ||
-  candidate.token.name !== 'BINRAT' ||
-  candidate.token.symbol !== 'BINRAT' ||
-  candidate.token.chainId !== 4663 ||
-  candidate.token.rail !== 'PONS_V2_DIRECT_FACTORY' ||
-  candidate.token.factory !== selection.selectedTokenNetwork.factory ||
-  candidate.token.factory !== manifest.tokenLaunchSuccessor?.ponsFactory ||
-  candidate.token.chainId !== manifest.tokenLaunchSuccessor?.tokenChainId ||
-  candidate.product.researchChainId !== 5042 ||
-  candidate.product.researchChainId !== selection.researchNetwork.chainId ||
-  candidate.product.publicReceiptsRemainFree !== true ||
-  candidate.product.paidHolderAccessActive !== false ||
-  candidate.token.contractAddress !== null ||
-  candidate.token.launchTransaction !== null ||
-  candidate.token.launchBlock !== null ||
-  candidate.ownerRoles.deployer !== null ||
-  candidate.ownerRoles.treasury !== null ||
-  candidate.ownerRoles.creatorFeeRecipient !== null ||
-  candidate.ownerRoles.custodyProof !== 'NOT_SUPPLIED' ||
-  candidate.presentation.logoUrl !== null ||
-  candidate.presentation.verifiedWebsiteUrl !== null ||
-  candidate.presentation.verifiedTelegramUrl !== null ||
-  candidate.presentation.verifiedXUrl !== null ||
-  candidate.presentation.sourceRepositoryUrl !== 'https://github.com/CipherCuttle/binrat' ||
-  Object.values(candidate.verification).some(v => v !== false) ||
+  candidate.schemaVersion !== 'binrat.pons-discovery/1' ||
+  candidate.status !== 'DRAFT_NOT_PUBLISHABLE' ||
+  candidate.identity?.name !== 'BINRAT' ||
+  candidate.identity?.symbol !== 'BINRAT' ||
+  candidate.identity?.logoUrl !== null ||
+  candidate.token?.chainId !== selection.selectedTokenNetwork.chainId ||
+  candidate.token?.chainId !== manifest.tokenLaunchSuccessor?.tokenChainId ||
+  candidate.token?.rail !== 'PONS_V2_DIRECT_FACTORY' ||
+  candidate.token?.factory !== selection.selectedTokenNetwork.factory ||
+  candidate.token?.factory !== manifest.tokenLaunchSuccessor?.ponsFactory ||
+  candidate.token?.tokenAddress !== null ||
+  candidate.token?.launchTransaction !== null ||
+  candidate.token?.ponsListingUrl !== null ||
+  candidate.research?.chainId !== selection.researchNetwork.chainId ||
+  candidate.research?.chainId !== manifest.tokenLaunchSuccessor?.researchChainId ||
+  candidate.research?.coverage !== 'ARC_RESEARCH_ONLY' ||
+  candidate.destinations?.officialWebsite !== null ||
+  candidate.destinations?.officialTelegram !== null ||
+  candidate.destinations?.officialX !== null ||
+  candidate.destinations?.officialDiscord !== null ||
+  candidate.destinations?.officialFarcaster !== null ||
+  candidate.destinations?.verifiedGithub !== 'https://github.com/CipherCuttle/binrat' ||
+  candidate.destinations?.telegramCandidateStatus !== 'USER_REPORTED_OWNERSHIP_NOT_INDEPENDENTLY_VERIFIED' ||
+  candidate.proof?.websiteControl !== 'NOT_VERIFIED' ||
+  candidate.proof?.telegramControl !== 'NOT_VERIFIED' ||
+  candidate.proof?.xControl !== 'NOT_VERIFIED' ||
+  candidate.proof?.logoApproval !== 'NOT_APPROVED' ||
+  candidate.proof?.ponsDeployerCustody !== 'NOT_VERIFIED' ||
+  candidate.proof?.ponsFeeRecipientCustody !== 'NOT_VERIFIED' ||
+  candidate.proof?.ponsTreasuryCustody !== 'NOT_VERIFIED' ||
+  proof?.historicBlock !== selection.observedSnapshotNotFutureGuarantee.observedAtRobinhoodBlock ||
+  proof?.freshReadRequired !== true ||
+  proof?.currentStateVerified !== false ||
+  candidate.authority?.launchAuthorized !== false ||
+  candidate.authority?.marketingAuthorized !== false ||
+  candidate.authority?.metadataPublishAuthorized !== false ||
+  candidate.authority?.contractPublished !== false ||
+  candidate.authority?.holderEntitlementActive !== false ||
+  candidate.authority?.fundingObserverActive !== false ||
+  manifest.tokenLaunchDiscovery?.source !== 'docs/PONS_DISCOVERY_CANDIDATE_V1.json' ||
+  manifest.tokenLaunchDiscovery?.status !== candidate.status ||
+  manifest.tokenLaunchDiscovery?.metadataPublishAuthorized !== false ||
   manifest.tokenLaunchSuccessor?.status !== 'SELECTED_CANDIDATE_BLOCKED' ||
   manifest.tokenLaunchSuccessor?.tokenAddress !== null ||
   manifest.tokenLaunchSuccessor?.holderAccessActive !== false ||
