@@ -165,7 +165,16 @@ test('D1 CHECK refuses chain 5042 rows and HOLDER tier in candidate realm',async
 });
 
 test('additive standalone migration repeats safely; old Arc sessions retain semantics',async()=>{
-  const db=await openDb();
+  const db=new D1CompatDatabase();
+  const marker='-- Additive Robinhood/Pons candidate authentication tables.';
+  const start=D1_SCHEMA_SQL.indexOf(marker);
+  const end=D1_SCHEMA_SQL.indexOf('CREATE TABLE IF NOT EXISTS telegram_update_receipts',start);
+  assert.ok(start>=0 && end>start);
+  const legacySql=D1_SCHEMA_SQL.slice(0,start)+D1_SCHEMA_SQL.slice(end);
+  await db.exec(legacySql);
+  const before=await db.prepare("SELECT name FROM sqlite_master WHERE name='pons_candidate_auth_sessions'")
+    .first<{name:string}>();
+  assert.equal(before,null);
   try {
     const old=new D1HolderAuthStore(db);
     const c=await createHolderChallenge(old,{wallet:OWNER.address,origin:ORIGIN,nowMs:NOW});
@@ -180,6 +189,9 @@ test('additive standalone migration repeats safely; old Arc sessions retain sema
     );
     await db.exec(migration);
     await db.exec(migration);
+    const after=await db.prepare("SELECT name FROM sqlite_master WHERE name='pons_candidate_auth_sessions'")
+      .first<{name:string}>();
+    assert.equal(after?.name,'pons_candidate_auth_sessions');
     assert.equal((await old.getSession(issued.token,NOW+2))?.accessTier,'HOLDER');
     assert.equal(await new D1PonsCandidateAuthStore(db).getSession(issued.token,NOW+2,ORIGIN),null);
   } finally {db.close();}
