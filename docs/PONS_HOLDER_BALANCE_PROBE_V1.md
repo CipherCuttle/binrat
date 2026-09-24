@@ -8,8 +8,8 @@ Existing `src/cloudflare/holderAuth.ts` issues SIWE challenges on **Arc 5042**, 
 This candidate proves a separate **Robinhood 4663** balance-inspection boundary can be exercised without changing the deployed Arc research plane:
 - validate exact token network, nonzero checksummed address, nonzero raw threshold, policy id and effective block;
 - refuse RPC chain 5042 or unknown network;
-- query a **finalized** Robinhood block (never latest/pending fallback);
-- verify canonical block hash both before and after ERC-20 `balanceOf` at that block;
+- query a **finalized** Robinhood block (never latest/pending fallback) and reject blocks over five minutes old or more than 30 seconds in the future relative to the caller's supplied clock;
+- verify canonical block hash both before and after ERC-20 `balanceOf` at that block and recheck the RPC's chain ID after the read;
 - fail closed for incomplete configuration, reorgs, RPC failure, malformed balance and insufficient finality;
 - report a *candidate threshold observation* while **always granting FREE**, even when the threshold is met.
 
