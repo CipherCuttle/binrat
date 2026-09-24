@@ -27,6 +27,7 @@ export interface PonsChallenge {
 export interface PonsSession {
   wallet: Hex;
   domain: string;
+  originUrl: string;
   chainId: typeof PONS_AUTH_CHAIN_ID;
   policyId: typeof PONS_AUTH_POLICY;
   accessTier: 'FREE';
@@ -39,7 +40,7 @@ type ChallengeRow = {
   consumed_at_ms: number | null;
 };
 type SessionRow = {
-  wallet: string; domain: string; chain_id: number; policy_id: string; access_tier: string;
+  wallet: string; domain: string; origin_url: string; chain_id: number; policy_id: string; access_tier: string;
   issued_at_ms: number; expires_at_ms: number;
 };
 
@@ -98,13 +99,15 @@ export class D1PonsCandidateAuthStore {
   async saveSession(token: string, s: PonsSession): Promise<void> {
     if (
       s.chainId !== PONS_AUTH_CHAIN_ID || s.policyId !== PONS_AUTH_POLICY ||
-      s.accessTier !== 'FREE'
+      s.accessTier !== 'FREE' ||
+      s.originUrl !== validateOrigin(s.originUrl).origin ||
+      s.domain !== validateOrigin(s.originUrl).host
     ) throw new Error('PONS_AUTH_SESSION_AUTHORITY_INVALID');
     const row = await this.db.prepare(
       'INSERT INTO pons_candidate_auth_sessions ' +
-      '(session_hash,wallet,domain,chain_id,policy_id,access_tier,issued_at_ms,expires_at_ms,invalidated_at_ms) ' +
-      'VALUES (?,?,?,?,?,?,?,?,NULL)'
-    ).bind(hashToken(token),s.wallet,s.domain,s.chainId,s.policyId,s.accessTier,s.issuedAtMs,s.expiresAtMs).run();
+      '(session_hash,wallet,domain,origin_url,chain_id,policy_id,access_tier,issued_at_ms,expires_at_ms,invalidated_at_ms) ' +
+      'VALUES (?,?,?,?,?,?,?,?,?,NULL)'
+    ).bind(hashToken(token),s.wallet,s.domain,s.originUrl,s.chainId,s.policyId,s.accessTier,s.issuedAtMs,s.expiresAtMs).run();
     if (!written(row)) throw new Error('PONS_AUTH_SESSION_PERSISTENCE_FAILED');
   }
 
@@ -116,14 +119,14 @@ export class D1PonsCandidateAuthStore {
     let origin: URL;
     try { origin = validateOrigin(expectedOrigin); } catch { return null; }
     const row = await this.db.prepare(
-      'SELECT wallet,domain,chain_id,policy_id,access_tier,issued_at_ms,expires_at_ms ' +
-      'FROM pons_candidate_auth_sessions WHERE session_hash=? AND domain=? AND chain_id=4663 ' +
+      'SELECT wallet,domain,origin_url,chain_id,policy_id,access_tier,issued_at_ms,expires_at_ms ' +
+      'FROM pons_candidate_auth_sessions WHERE session_hash=? AND domain=? AND origin_url=? AND chain_id=4663 ' +
       'AND policy_id=? AND access_tier=? AND invalidated_at_ms IS NULL AND expires_at_ms>? LIMIT 1'
-    ).bind(hashToken(token),origin.host,PONS_AUTH_POLICY,'FREE',nowMs).first<SessionRow>();
+    ).bind(hashToken(token),origin.host,origin.origin,PONS_AUTH_POLICY,'FREE',nowMs).first<SessionRow>();
     if (!row || row.chain_id !== PONS_AUTH_CHAIN_ID || row.policy_id !== expectedPolicy ||
-      row.access_tier !== 'FREE' || row.domain !== origin.host) return null;
+      row.access_tier !== 'FREE' || row.domain !== origin.host || row.origin_url !== origin.origin) return null;
     return {
-      wallet:row.wallet as Hex,domain:row.domain,chainId:PONS_AUTH_CHAIN_ID,
+      wallet:row.wallet as Hex,domain:row.domain,originUrl:row.origin_url,chainId:PONS_AUTH_CHAIN_ID,
       policyId:PONS_AUTH_POLICY,accessTier:'FREE',issuedAtMs:row.issued_at_ms,expiresAtMs:row.expires_at_ms
     };
   }
@@ -193,7 +196,7 @@ export async function provePonsWallet(
   if (!(await store.consume(c,input.nowMs))) throw new Error('PONS_AUTH_CHALLENGE_USED_OR_EXPIRED');
   const token=randomBytes(32).toString('hex');
   const session: PonsSession={
-    wallet:c.wallet,domain:c.domain,chainId:PONS_AUTH_CHAIN_ID,policyId:PONS_AUTH_POLICY,
+    wallet:c.wallet,domain:c.domain,originUrl:origin.origin,chainId:PONS_AUTH_CHAIN_ID,policyId:PONS_AUTH_POLICY,
     accessTier:'FREE',issuedAtMs:input.nowMs,expiresAtMs:input.nowMs+PONS_SESSION_TTL_MS
   };
   await store.saveSession(token,session);
