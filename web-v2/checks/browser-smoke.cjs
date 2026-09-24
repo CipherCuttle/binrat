@@ -146,7 +146,7 @@ async function runViewport(browser, viewport) {
       await page.locator(".evidence-dossier .full-address").waitFor();
       assert.equal(await page.locator(".evidence-dossier .full-address").innerText(), chosen);
       await ready(page, "/radar/address/0x0000000000000000000000000000000000000000");
-      assert.match(await page.locator("main").innerText(), /NO MATCHING RADAR ADDRESS/);
+      assert.match(await page.locator("main").innerText(), /ADDRESS OUTSIDE PUBLIC SHORTLIST/);
     });
 
     await check(tag + "px Creator File deep link respects source-reported identity", async () => {
@@ -280,7 +280,7 @@ async function runMockedLive(browser) {
     await check("mocked LIVE empty feed/Radar never substitutes demo fixtures", async () => {
       await ready(page, "/?source=live");
       const text = await page.locator("main").innerText();
-      assert.match(text, /NOTHING IN THIS BAG/);
+      assert.match(text, /NO BAGS AT THIS CHECKPOINT/);
       assert.doesNotMatch(text, /distinct indexed launches share an observed recipient/);
       assert.doesNotMatch(text, /FERAL|DEMO \+5m/);
       assert.ok(await page.getByText("LIVE", { exact: true }).first().isVisible());

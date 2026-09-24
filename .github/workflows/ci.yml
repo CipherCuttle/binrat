@@ -148,7 +148,7 @@ jobs:
 
   frontend-v2-browser-smoke:
     name: frontend-v2-browser-smoke
-    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'fix/binrat-v2-evidence-integrity-pr1' || startsWith(github.head_ref, 'feat/binrat-frontend-')) }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'fix/binrat-v2-evidence-integrity-pr1' || startsWith(github.head_ref, 'feat/binrat-frontend-') || github.head_ref == 'feat/binrat-north-star-slice-g0-g2') }}
     needs: [check]
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -191,6 +191,9 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
             BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
             node web-v2/checks/responsive-preview.cjs
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
+            node web-v2/checks/north-star-live-smoke.cjs
       - name: Read-only LIVE candidate against the existing public API
         if: ${{ github.head_ref == 'feat/binrat-frontend-live-integration-pr3' }}
         shell: bash
