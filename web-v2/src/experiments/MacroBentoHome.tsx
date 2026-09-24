@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppLink } from "../Primitives";
 import { sourceSwitchHref, publicApiUrl } from "../previewRuntime";
 import type { DataMode } from "../data";
@@ -26,6 +26,7 @@ const compactAddress = (address: string) => address.slice(0, 8) + "…" + addres
 
 function useVisibleHealth(mode: DataMode): HealthView {
   const [view, setView] = useState<HealthView>({ value: null, error: null, loading: mode === "LIVE" });
+  const lastHealthyBlock = useRef<string | null>(null);
   useEffect(() => {
     if (mode !== "LIVE") return; // DEMO never contacts the public health endpoint.
     let active = true;
@@ -37,7 +38,14 @@ function useVisibleHealth(mode: DataMode): HealthView {
       request = current;
       try {
         const value = await readPublicHealth(current.signal);
-        if (active && !current.signal.aborted) setView({ value, error: null, loading: false });
+        if (current.signal.aborted || !active) return;
+        if (value.indexReady && value.checkpointBlock !== null) {
+          if (lastHealthyBlock.current !== null &&
+              BigInt(value.checkpointBlock) < BigInt(lastHealthyBlock.current))
+            throw new Error("PUBLIC_HEALTH_CHECKPOINT_REGRESSION");
+          lastHealthyBlock.current = value.checkpointBlock;
+        }
+        setView({ value, error: null, loading: false });
       } catch (error) {
         if (active && !current.signal.aborted)
           setView({ value: null, error: error instanceof Error ? error.message : "PUBLIC_HEALTH_UNAVAILABLE", loading: false });
@@ -82,9 +90,11 @@ function Terminal({ feed, radar, feedError, radarError, mode, loaded, readAtMs }
         </div>
         <div className={s.readout}><small>HEALTH CHECKPOINT</small>
           <strong className={s.block}>{mode === "DEMO" ? "—" : health.value?.checkpointBlock ?? "—"}</strong>
-          <span>{mode === "DEMO" ? "No live checkpoint" : health.value?.runtimeUpdatedAtMs
-            ? "Runtime updated " + new Date(health.value.runtimeUpdatedAtMs).toLocaleTimeString()
-            : health.error ?? "Awaiting health response"}</span>
+          <span>{mode === "DEMO" ? "No live checkpoint" : health.value?.lastSyncError
+            ? "Sync error: " + health.value.lastSyncError
+            : health.value?.runtimeUpdatedAtMs
+              ? "Runtime updated " + new Date(health.value.runtimeUpdatedAtMs).toLocaleTimeString()
+              : health.error ?? "Awaiting health response"}</span>
         </div>
       </div>
       <div className={s.readoutGrid}>
@@ -174,7 +184,7 @@ export default function MacroBentoHome(props: Props) {
             <AppLink className={s.secondary} href="/dumpster" navigate={navigate}>ENTER THE DUMPSTER ↗</AppLink>
           </div>
           <small className={s.disclosure}>{mode === "DEMO" ? "DETERMINISTIC DEMO / ALL FIGURES SYNTHETIC" :
-            "PUBLIC LIVE REQUESTS / STATUS VERIFIED PER SOURCE"} · NO SAFETY SCORE · NO BUY CALL</small>
+            "PUBLIC LIVE REQUESTS / EACH SOURCE CHECKED INDEPENDENTLY"} · NO SAFETY SCORE · NO BUY CALL</small>
         </div>
         <div className={s.terminalArea}>
           <Terminal feed={props.feed} radar={props.radar} feedError={props.feedError} radarError={props.radarError} mode={mode} loaded={props.loaded} readAtMs={props.readAtMs} />

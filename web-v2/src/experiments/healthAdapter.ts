@@ -43,6 +43,7 @@ export function adaptPublicHealth(value: unknown): PublicHealth {
     throw new Error("PUBLIC_HEALTH_TIMESTAMP_INVALID");
   if (raw.runtimeFresh && runtimeUpdatedAtMs === null)
     throw new Error("PUBLIC_HEALTH_CONTRADICTORY");
+  if (raw.ok !== raw.indexReady) throw new Error("PUBLIC_HEALTH_CONTRADICTORY");
   if (raw.ok === true && (!raw.indexReady || !raw.runtimeFresh ||
       checkpointBlock === null || runtimeUpdatedAtMs === null || raw.lastSyncError !== null))
     throw new Error("PUBLIC_HEALTH_CONTRADICTORY");

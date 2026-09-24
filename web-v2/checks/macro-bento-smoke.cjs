@@ -50,8 +50,8 @@ function fixtures(page, state) {
     state.healthRequests++;
     return route.fulfill({ status:state.healthStatus ?? 200, json:state.healthPayload ?? healthy() });
   });
-  page.route("**/api/feed", route => route.fulfill({ status:state.feedStatus ?? 200, json:state.feedPayload ?? feed }));
-  page.route("**/api/rat-radar/watchlist", route => route.fulfill({ status:state.radarStatus ?? 200, json:state.radarPayload ?? radar }));
+  page.route("**/api/feed", route => { state.feedRequests=(state.feedRequests??0)+1; return route.fulfill({ status:state.feedStatus ?? 200, json:state.feedPayload ?? feed }); });
+  page.route("**/api/rat-radar/watchlist", route => { state.radarRequests=(state.radarRequests??0)+1; return route.fulfill({ status:state.radarStatus ?? 200, json:state.radarPayload ?? radar }); });
 }
 async function ready(page) { await page.getByTestId("macro-bento-home").waitFor(); }
 async function noOverflow(page, width) {
@@ -143,7 +143,19 @@ async function contractualChecks(browser) {
     await visit(); await page.getByText(/FEED UNAVAILABLE \/ PUBLIC_FEED_SCHEMA_INVALID/).waitFor();
     await page.getByTestId("macro-health-state").getByText("UNAVAILABLE").waitFor();
     assert.doesNotMatch(await page.getByTestId("macro-bento-home").innerText(),/FERAL|DEMO INDEX RECEIPT/);
-    console.log("PASS not ready/stale; independent 503s; malformed live JSON fails closed");
+    state.feedPayload=feed;
+    state.healthPayload={...healthy(),runtimeUpdatedAtMs:Date.now()-600_000};
+    await visit(); await page.getByTestId("macro-health-state").getByText("STALE").waitFor();
+    assert.equal(await page.getByTestId("macro-launch-count").innerText(),"—",
+      "Aged local health must not display an unverified launch total");
+    state.healthPayload={...healthy(),ok:false,indexReady:true};
+    await visit(); await page.getByTestId("macro-health-state").getByText("UNAVAILABLE").waitFor();
+    assert.equal(await page.getByTestId("macro-launch-count").innerText(),"—",
+      "Contradictory health must fail closed");
+    state.healthPayload={...healthy(),ok:false,indexReady:false,runtimeFresh:false,lastSyncError:"UPSTREAM_STALLED"};
+    await visit(); await page.getByTestId("macro-health-state").getByText("STALE").waitFor();
+    assert.match(await page.getByTestId("macro-bento-home").innerText(),/Sync error: UPSTREAM_STALLED/);
+    console.log("PASS not ready/stale; aged/contradictory health; sync error; independent 503s");
   } finally { await ctx.close(); }
 }
 async function pollingCheck(browser) {
@@ -159,35 +171,66 @@ async function pollingCheck(browser) {
     await page.clock.install();
     await page.goto(url(),{waitUntil:"domcontentloaded"});
     await page.getByTestId("macro-health-state").getByText("READY").waitFor();
-    const before=state.healthRequests;
+    await page.getByText(/Feed as-of block 120/).waitFor();
+    await page.getByText(/Radar as-of block 121/).waitFor();
+    const before={health:state.healthRequests,feed:state.feedRequests,radar:state.radarRequests};
+    const paths=["/api/health","/api/feed","/api/rat-radar/watchlist"];
+    const next=Promise.all(paths.map(p => page.waitForResponse(response => new URL(response.url()).pathname===p)));
     await page.clock.fastForward(61_000);
-    await page.waitForFunction(() => document.querySelector('[data-testid="macro-health-state"]')?.textContent?.includes("READY"));
-    assert.ok(state.healthRequests>before,"60s visible refresh");
+    await next;
+    assert.ok(state.healthRequests>before.health && state.feedRequests>before.feed &&
+      state.radarRequests>before.radar,"60s visible refresh independently updates all three sources");
     await page.evaluate(() => {window.__binratVisible=false; document.dispatchEvent(new Event("visibilitychange"));});
-    const hidden=state.healthRequests;
+    const hidden={health:state.healthRequests,feed:state.feedRequests,radar:state.radarRequests};
     await page.clock.fastForward(61_000);
-    assert.equal(state.healthRequests,hidden,"hidden tab pauses polling");
+    assert.deepEqual({health:state.healthRequests,feed:state.feedRequests,radar:state.radarRequests},
+      hidden,"hidden tab pauses all three read planes");
+    const visible=Promise.all(paths.map(p => page.waitForResponse(response => new URL(response.url()).pathname===p)));
     await page.evaluate(() => {window.__binratVisible=true; document.dispatchEvent(new Event("visibilitychange"));});
-    await page.waitForTimeout(50);
-    assert.equal(state.healthRequests,hidden+1,"visible tab refetches once");
+    await visible;
+    assert.deepEqual({health:state.healthRequests,feed:state.feedRequests,radar:state.radarRequests},
+      {health:hidden.health+1,feed:hidden.feed+1,radar:hidden.radar+1},
+      "visible tab resumes each source exactly once");
     await page.goto(origin+"/radar?experiment=macro-bento&source=live",{waitUntil:"domcontentloaded"});
     const after=state.healthRequests;
     await page.clock.fastForward(61_000);
     assert.equal(state.healthRequests,after,"unmounted home stops health polling");
-    console.log("PASS bounded visible health polling / hidden / unmount");
+    console.log("PASS bounded visible Health/Feed/Radar polling / hidden / unmount");
   } finally { await ctx.close(); }
+}
+async function monotonicHealthCheck(browser) {
+  const ctx=await browser.newContext({viewport:{width:1024,height:768}});
+  const page=await ctx.newPage();
+  const state={healthRequests:0};
+  fixtures(page,state);
+  try {
+    await page.clock.install();
+    await page.goto(url(),{waitUntil:"domcontentloaded"});
+    await page.getByTestId("macro-health-state").getByText("READY").waitFor();
+    state.healthPayload={...healthy(),checkpointBlock:"121"};
+    const response=page.waitForResponse(r=>new URL(r.url()).pathname==="/api/health");
+    await page.clock.fastForward(61_000);
+    await response;
+    await page.getByTestId("macro-health-state").getByText("UNAVAILABLE").waitFor();
+    assert.equal(await page.getByTestId("macro-launch-count").innerText(),"—");
+    assert.match(await page.getByTestId("macro-bento-home").innerText(),/PUBLIC_HEALTH_CHECKPOINT_REGRESSION/);
+    console.log("PASS health checkpoint regression fails closed");
+  } finally {await ctx.close();}
 }
 (async()=>{
   const browser=await chromium.launch({headless:true,args:["--no-sandbox"]});
   try {
     await contractualChecks(browser);
     await pollingCheck(browser);
+    await monotonicHealthCheck(browser);
     for(const [w,h] of sizes) await snapshot(browser,w,h,"demo");
     for(const [w,h] of [[390,844],[430,932],[1024,768],[1440,900],[1672,941]]) await snapshot(browser,w,h,"live");
     fs.writeFileSync(path.join(output,"README.txt"),
       "BROWSER SCREENSHOTS / experimental build. demo-* = deterministic synthetic fixtures. "+
       "live-* = mocked LIVE API contracts (health 122, Feed 120, Radar 121), NOT observed production state. "+
-      "DPR=1; reduced motion. Owner visual approval pending.\n");
+      "DPR=1; reduced motion. Head SHA: "+(process.env.BINRAT_BRANCH_SHA || "LOCAL_UNPINNED")+". "+
+      "Build gate: VITE_BINRAT_BENTO_EXPERIMENT=1; query gate: experiment=macro-bento. "+
+      "Owner visual approval pending.\n");
     console.log("MACRO BENTO: ALL CONTRACT CHECKS AND SCREENSHOTS PASS");
   } finally {await browser.close();}
 })().catch(error=>{console.error("MACRO BENTO FAILED",error);process.exitCode=1;});

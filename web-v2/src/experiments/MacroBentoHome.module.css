@@ -158,17 +158,17 @@
  .terminal { border-width:5px; border-radius:9px; transform:none; box-shadow:0 10px 0 #070908,0 16px 22px #0008; }
  .screen { margin:0 2px; padding:15px 10px 12px; }
  .screenHead { padding-bottom:12px; }
- .screenHead h2 { font-size:25px; } .screenHead .micro { font-size:8px; }
+ .screenHead h2 { font-size:25px; } .screenHead .micro { font-size:9px; }
  .signalReady,.signalCaution { padding:5px 6px; font-size:8px; }
  .hardware,.hardwareFoot { font-size:7px; padding:6px; }
  .readouts { margin:12px 0; } .readout { padding:10px 9px; }
  .readout strong { font-size:32px; } .readout .block { font-size:25px; }
- .readout small,.readout span { font-size:8px; }
+ .readout small,.readout span { font-size:10px; }
  .readoutGrid { grid-template-columns:1fr 1fr; gap:8px; }
- .scopeLabel { font-size:8px; }
+ .scopeLabel { font-size:10px; }
  .scopeValue { margin:7px 0; } .scopeValue b { font-size:28px; }
- .scopeValue span,.scope p,.scope .muted { font-size:8px; }
- .terminalFoot { font-size:7px; padding-top:10px; }
+ .scopeValue span,.scope p,.scope .muted { font-size:10px; }
+ .terminalFoot { font-size:9px; padding-top:10px; }
  .rat { width:99px; right:-10px; bottom:-14px; }
  .ratLabel { display:none; }
  .lower { margin-top:32px; gap:15px; }
