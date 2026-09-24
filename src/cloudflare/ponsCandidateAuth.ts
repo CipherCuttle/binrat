@@ -149,7 +149,7 @@ export async function createPonsChallenge(
       address:getAddress(wallet),chainId:PONS_AUTH_CHAIN_ID,domain:origin.host,
       expirationTime:new Date(input.nowMs+PONS_CHALLENGE_TTL_MS),issuedAt:new Date(input.nowMs),
       nonce,requestId:PONS_AUTH_PURPOSE,
-      resources:[origin.origin+'/api/rat-radar/watchlist?depth=full'],
+      resources:[origin.origin+'/api/pons-candidate/me'],
       scheme:origin.protocol.slice(0,-1),statement:STATEMENT,uri,version:'1'
     });
     const c: PonsChallenge = {
@@ -180,7 +180,7 @@ export async function provePonsWallet(
     parsed.chainId !== PONS_AUTH_CHAIN_ID || parsed.uri !== c.uri ||
     parsed.requestId !== PONS_AUTH_PURPOSE || parsed.statement !== STATEMENT ||
     parsed.resources?.length !== 1 ||
-    parsed.resources[0] !== origin.origin+'/api/rat-radar/watchlist?depth=full' ||
+    parsed.resources[0] !== origin.origin+'/api/pons-candidate/me' ||
     !validateSiweMessage({
       address:c.wallet,domain:c.domain,message:parsed,nonce:c.nonce,
       scheme:origin.protocol.slice(0,-1),time:new Date(input.nowMs)
