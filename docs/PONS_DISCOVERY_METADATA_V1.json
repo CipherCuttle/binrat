@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "binrat.pons-discovery-candidate/1",
+  "publicationStatus": "INTERNAL_PRELAUNCH_DRAFT_NOT_FOR_LISTING",
+  "ownerApproval": "NOT_GRANTED",
+  "launchAuthorized": false,
+  "marketingAuthorized": false,
+  "token": {
+    "name": "BINRAT",
+    "symbol": "BINRAT",
+    "status": "NOT_LAUNCHED",
+    "chainId": 4663,
+    "rail": "PONS_V2_DIRECT_FACTORY",
+    "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "pair": "NATIVE_ETH",
+    "contractAddress": null,
+    "launchTransaction": null,
+    "launchBlock": null
+  },
+  "product": {
+    "researchChainId": 5042,
+    "researchRail": "ArcPad historical reported creator evidence",
+    "publicReceiptsRemainFree": true,
+    "paidHolderAccessActive": false
+  },
+  "ownerRoles": {
+    "deployer": null,
+    "creatorFeeRecipient": null,
+    "treasury": null,
+    "custodyProof": "NOT_SUPPLIED"
+  },
+  "presentation": {
+    "description": "BINRAT researches Arc launch history, tracks ArcPad-reported creator addresses, and preserves public evidence. A separate BINRAT token is planned for Pons V2 on Robinhood Chain 4663 but has not launched.",
+    "logoUrl": null,
+    "verifiedWebsiteUrl": null,
+    "verifiedTelegramUrl": null,
+    "verifiedXUrl": null,
+    "sourceRepositoryUrl": "https://github.com/CipherCuttle/binrat"
+  },
+  "verification": {
+    "freshFactoryAndFeeReceipt": false,
+    "liveDeploymentReceipt": false,
+    "tokenAddressCrossSurfaceMatch": false,
+    "socialAndSiteOwnershipVerified": false,
+    "ownerCustodyVerified": false,
+    "legalAndSecurityReviewSatisfied": false
+  },
+  "disclaimer": "Not a Pons listing or token deployment receipt. Do not convert this document into launchToken metadata or publish links without independent verification and explicit owner launch/marketing authority."
+}
