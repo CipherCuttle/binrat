@@ -184,3 +184,18 @@ test('additive standalone migration repeats safely; old Arc sessions retain sema
     assert.equal(await new D1PonsCandidateAuthStore(db).getSession(issued.token,NOW+2,ORIGIN),null);
   } finally {db.close();}
 });
+
+test('candidate session is restricted to full scheme and host',async()=>{
+  const db=await openDb();
+  try {
+    const store=new D1PonsCandidateAuthStore(db);
+    const origin='http://localhost';
+    const c=await createPonsChallenge(store,{wallet:OWNER.address,origin,nowMs:NOW});
+    const sig=await OWNER.signMessage({message:c.message});
+    const proof=await provePonsWallet(store,{
+      nonce:c.nonce,message:c.message,signature:sig,origin,nowMs:NOW+1
+    });
+    assert.equal((await store.getSession(proof.token,NOW+2,origin))?.accessTier,'FREE');
+    assert.equal(await store.getSession(proof.token,NOW+2,'https://localhost'),null);
+  } finally { db.close(); }
+});
