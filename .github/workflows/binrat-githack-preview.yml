@@ -1,0 +1,148 @@
+name: binrat-githack-journey-preview
+
+on:
+  push:
+    branches:
+      - feat/binrat-north-star-slice-g0-g2
+    paths:
+      - ".github/workflows/binrat-githack-preview.yml"
+      - "web-v2/**"
+      - "scripts/publish-githack-static.mjs"
+      - "src/preview/**"
+      - "cloudflare/wrangler.journey-preview.jsonc"
+  workflow_dispatch:
+
+# Preview publishing is opt-in by commit tag, never silently triggered by normal WIP pushes.
+concurrency:
+  group: binrat-githack-journey-preview
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish-journey-preview:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-githack]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: {}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check repository and existing frontend contract
+        run: |
+          pnpm check
+          pnpm --dir web-v2 check
+      - name: Compile static GitHack frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          VITE_BINRAT_GITHACK_PREVIEW=1 pnpm --dir web-v2 exec vite build --base=./
+          node web-v2/checks/prepare-githack.mjs
+      - name: Install isolated browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify static hash routes and remote API transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd web-v2
+            pnpm exec vite preview --host 127.0.0.1 --port 4175
+          ) > "$RUNNER_TEMP/githack-vite.log" 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:4175/ >/dev/null; then break; fi
+            if [ "$i" -eq 45 ]; then cat "$RUNNER_TEMP/githack-vite.log"; exit 1; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4175" \
+            node web-v2/checks/githack-preview-smoke.cjs
+
+      - name: Ensure separate preview Worker credentials are configured
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo "::error::Missing CLOUDFLARE_API_TOKEN"; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+
+      - name: Deploy ONLY the separate public read-only proxy
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm dlx wrangler@4.135.0 deploy --config cloudflare/wrangler.journey-preview.jsonc
+          # Test CORS and GET-only behaviour; this does not modify the live index.
+          proxy="https://binrat-journey-preview.pettevik.workers.dev"
+          for n in $(seq 1 20); do
+            status="$(curl -sS --max-time 15 -o /tmp/githack-health.json -w '%{http_code}' \
+              -H 'Origin: https://raw.githack.com' "$proxy/api/health" || true)"
+            if [ "$status" = "200" ] || [ "$status" = "503" ]; then break; fi
+            if [ "$n" -eq 20 ]; then echo "::error::Proxy did not become reachable: $status"; exit 1; fi
+            sleep 3
+          done
+          test "$status" = "200" || {
+            echo "::warning::Read-only proxy is reachable, but public index health returned $status"
+          }
+          test "$(curl -sS --max-time 15 -o /tmp/githack-post.json -w '%{http_code}' \
+            -X POST -H 'Origin: https://raw.githack.com' "$proxy/api/feed")" = "405"
+          test "$(curl -sS --max-time 15 -o /tmp/githack-blocked.json -w '%{http_code}' \
+            -H 'Origin: https://raw.githack.com' "$proxy/api/holder/challenge")" = "404"
+          curl -fsS --max-time 15 -D /tmp/githack-cors-headers -o /dev/null \
+            -X OPTIONS -H 'Origin: https://raw.githack.com' \
+            -H 'Access-Control-Request-Method: GET' "$proxy/api/feed"
+          grep -qi 'access-control-allow-origin: https://raw.githack.com' /tmp/githack-cors-headers
+          echo "PREVIEW_PROXY_READ_ONLY: PASS"
+          echo "PUBLIC_UPSTREAM_HTTP_STATUS: $status"
+
+      - name: Publish ONLY the isolated GitHack bundle branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/publish-githack-static.mjs | tee /tmp/githack-publish.log
+          grep -q 'GITHACK_PREVIEW_PUBLISHED' /tmp/githack-publish.log
+
+      - name: Report exact preview and rollback boundaries
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## BINRAT isolated GitHack user-journey preview'
+            echo
+            echo '- Source PR: #31 (still draft, no merge)'
+            echo '- Frontend: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-g2/index.html'
+            echo '- Backend: https://binrat-journey-preview.pettevik.workers.dev/api/health'
+            echo '- Public data upstream: binrat-edge-v0.pettevik.workers.dev (read-only, unchanged)'
+            echo '- No token launch, wallet access, Telegram changes, D1 changes, cron, queue or production deploy'
+            echo "- Build commit: \`${GITHUB_SHA}\`"
+            echo
+            if [ -f /tmp/githack-publish.log ]; then
+              cat /tmp/githack-publish.log
+            else
+              echo '**Preview publishing was blocked before the GitHack branch was updated.**'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve local test screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: githack-journey-preview-failure
+          path: web-v2/browser-artifacts/
+          retention-days: 3
+          if-no-files-found: ignore
