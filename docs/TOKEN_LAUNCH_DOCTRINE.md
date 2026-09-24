@@ -3,6 +3,8 @@
 Status: planning / pre-launch design  
 This document is not a statutory MiCA crypto-asset white paper and is not legal, tax, or investment advice.
 
+> **Successor selection (2026-09-24): Robinhood Chain 4663 / Pons V2 is the owner-selected conditional token-launch direction.** This document still contains the frozen *historical* ArcPad V0 findings below. See [Pons canonical transition](PONS_CANONICAL_TRANSITION_V1.md). They are not Pons guarantees. Launch configuration, runtime authority, public marketing and token launch remain **BLOCKED** pending an independently reviewed migration, current Pons verification, owner inputs and applicable legal gates. Existing Arc intelligence stays on 5042.
+
 ## Intent
 
 BINRAT intends to fair-launch `$BINRAT` early.
@@ -36,9 +38,9 @@ The target launch has:
 
 Project revenue is not hidden. It is part of the design.
 
-## Preferred current launch rail: ArcPad standard launch
+## Historical ArcPad launch candidate (superseded for token planning)
 
-Subject to legal/compliance review immediately before launch, the candidate rail is ArcPad's current Arc-mainnet USDC standard creator-rewards path. The dated `LAUNCH_MECHANICS_VERIFICATION_V0` receipt independently established that this variant currently provides:
+The former candidate rail was ArcPad's Arc-mainnet USDC standard creator-rewards path. The dated `LAUNCH_MECHANICS_VERIFICATION_V0` receipt independently established that this variant currently provides:
 
 - fixed 1,000,000,000 token supply;
 - no presale;
