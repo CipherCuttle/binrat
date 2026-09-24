@@ -135,9 +135,10 @@ async function bootstrapLedger() {
       ledger.fundingAuthority.status;
     document.querySelector("#ledger-token-state").textContent = ledger.tokenState;
     document.querySelector("#ledger-wallet-status").textContent =
-      ledger.configuredAuthorities.status === "OWNER_SELECTED_PRE_LAUNCH"
-        ? "2 FUTURE ROLES CONFIGURED / ACCOUNTING OFF"
-        : "NOT CONFIGURED";
+      ledger.successorToken?.status === "SELECTED_CANDIDATE_BLOCKED" &&
+      ledger.historicalRoleScope === "ARCPAD_V0_HISTORICAL_ONLY_NOT_PONS"
+        ? "PONS ROLES NOT VERIFIED / ARC V0 HISTORICAL"
+        : "PONS AUTHORITY NOT VERIFIED / ACCOUNTING OFF";
     document.querySelector("#ledger-money-in").textContent =
       `${ledger.totals.tokenInflowsRaw} RAW / ${ledger.totals.inflowEntryCount} ENTRIES`;
     document.querySelector("#ledger-money-out").textContent =
