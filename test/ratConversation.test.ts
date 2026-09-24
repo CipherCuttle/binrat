@@ -4,7 +4,7 @@ import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import {
   RAT_AI_GLOBAL_DAILY_LIMIT, RAT_AI_MODEL, RAT_AI_USER_DAILY_LIMIT,
   entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
-  loadRatMemory, reserveRatAiCall, resolveRatFollowup, saveRatMemory, validateRatBanter
+  loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory, validateRatBanter
 } from '../src/cloudflare/ratConversation.js';
 import { understandRatMessage } from '../src/telegram/nlp.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
@@ -54,15 +54,19 @@ test('D1 admission enforces 10/user/day, 120/global/day and UTC rollover', async
     }
     assert.equal(await reserveRatAiCall(db, 1, 100, now), false);
     assert.equal(await reserveRatAiCall(db, 1, 101, now), true);
-    // User-denied requests also consume global slots (fail-safe conservative reservation).
+    // User-denied requests never consume global slots.
     let admitted = 11;
     for (let i = 0; i < 200; i++) {
       const allowed = await reserveRatAiCall(db, 2, i + 1000, now);
       if (allowed) admitted++;
     }
-    assert.equal(admitted, RAT_AI_GLOBAL_DAILY_LIMIT - 1);
+    assert.equal(admitted, RAT_AI_GLOBAL_DAILY_LIMIT);
     assert.equal(await reserveRatAiCall(db, 9, 9999, now), false);
     assert.equal(await reserveRatAiCall(db, 1, 100, now + 86_400_000), true);
+    await pruneRatConversation(db, now + 3 * 86_400_000);
+    const old = await db.prepare('SELECT attempts FROM rat_ai_daily_budget WHERE day_utc=?')
+      .bind(Math.floor(now / 86_400_000)).first();
+    assert.equal(old, null);
   } finally { db.close(); }
 });
 
