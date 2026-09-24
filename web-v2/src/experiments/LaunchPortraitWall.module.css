@@ -14,7 +14,7 @@
 .pixelBackground { position:absolute; inset:0; z-index:-1;
   background:url("/binrat-world-background.png") center 56% / cover no-repeat; opacity:.67;
   image-rendering:auto; }
-.columns { position:absolute; inset:-80px 0 -80px; display:grid; gap:10px; overflow:hidden; padding:4px 12px;
+.columns { position:absolute; inset:0; display:grid; gap:10px; overflow:hidden; padding:4px 12px;
   transform:rotateX(13deg) rotateY(-8deg) scale(1.06); transform-style:preserve-3d; }
 .column { display:flex; flex-direction:column; gap:12px; animation: drift 16s ease-in-out infinite alternate; min-width:0; }
 .column:nth-child(even) { animation-direction:alternate-reverse; }
@@ -46,7 +46,7 @@
  .heading h2 { font-size:28px; } .heading p { font-size:12px; }
  .counter strong {font-size:29px;}
  .wall { height:146px; }
- .columns { inset:-45px 0 -45px; padding:0 7px; gap:7px; transform:rotateX(9deg) rotateY(-5deg) scale(1.04); }
+ .columns { inset:0; padding:8px 7px; gap:7px; transform:rotateX(9deg) rotateY(-5deg) scale(1.04); }
  .column { gap:8px; animation-duration:20s; }
  .tile { height:74px; flex-basis:74px; }
  .tileCaption small { display:none; }

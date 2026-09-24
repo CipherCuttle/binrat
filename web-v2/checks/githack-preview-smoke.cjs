@@ -108,6 +108,12 @@ const emptyRadar = {
           const img=document.querySelector('[data-testid="binrat-bento-home"] img');
           return img && img.complete && img.naturalWidth>0;
         },null,{timeout:10000});
+        const portrait=page.getByTestId("launch-portrait-wall").locator('a[aria-label^="Open indexed launch"]').first();
+        const tileBox=await portrait.boundingBox();
+        const wallBox=await page.getByTestId("portrait-wall-viewport").boundingBox();
+        assert.ok(tileBox&&wallBox&&tileBox.y+tileBox.height/2>=wallBox.y+8&&
+          tileBox.y+tileBox.height/2<=wallBox.y+wallBox.height-8,
+          "DEMO portrait must be visible within the GitHack gallery viewport");
         const toggle=page.locator('a[href*="source=live"]').first();
         const destination=new URL(await toggle.getAttribute("href"),base);
         assert.equal(destination.searchParams.get("experiment"),"bento-v1");

@@ -65,7 +65,7 @@ export default function LaunchPortraitWall({
     (page % Math.max(1, Math.ceil(all.length / PAGE_SIZE)) + 1) * PAGE_SIZE);
   const nCols = Math.min(4, Math.max(1, shown.length));
   const columns = Array.from({ length: nCols }, (_, column) => shown.filter((_, i) => i % nCols === column));
-  return <section className={s.section} aria-labelledby="portrait-wall-title" data-testid="launch-portrait-wall">
+  return <section className={s.section} aria-labelledby="portrait-wall-title" data-testid="launch-portrait-wall" data-visible-tiles={shown.length}>
     <div className={s.heading}>
       <div><span className={s.kicker}>THE DUMPSTER WINDOW / ARC 5042</span>
         <h2 id="portrait-wall-title">THE LATEST IN THE BIN.</h2>
@@ -81,7 +81,7 @@ export default function LaunchPortraitWall({
     <div ref={wallRef} className={s.wall} onPointerEnter={() => setActive(true)}
       onPointerLeave={() => setActive(false)} onFocusCapture={() => setActive(true)}
       onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActive(false); }}
-      data-visible-tiles={shown.length}>
+      data-testid="portrait-wall-viewport">
       {!feed ? <div role={loaded ? "alert" : "status"} className={s.empty}>
         {loaded ? "LAUNCH FEED UNAVAILABLE / " + (error ?? "NO VALIDATED FEED") : "CHECKING THE INDEX…"}
       </div> : !shown.length ? <div className={s.empty}>NO INDEXED LAUNCHES AT THIS CHECKPOINT.</div> :

@@ -80,6 +80,16 @@ async function screenshot(browser,w,h,mode){
     await page.locator("img").first().evaluate(img=>img.decode().catch(()=>{}));
     const bounds=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,width:innerWidth}));
     assert.ok(bounds.doc<=w+1&&bounds.body<=w+1,"horizontal overflow "+JSON.stringify(bounds));
+    const firstTile=page.getByTestId("launch-portrait-wall")
+      .locator('a[aria-label^="Open indexed launch"]').first();
+    if(await firstTile.count()){
+      const tile=await firstTile.boundingBox();
+      const view=await page.getByTestId("portrait-wall-viewport").boundingBox();
+      assert.ok(tile&&view,"portrait gallery geometry exists");
+      const middle=tile.y+tile.height/2;
+      assert.ok(middle>=view.y+8 && middle<=view.y+view.height-8,
+        "visible portrait must actually be inside gallery viewport");
+    }
     const columns=await page.getByTestId("launch-portrait-column").count();
     assert.ok(columns<=4,"gallery must mount bounded columns");
     await page.screenshot({path:path.join(output,mode+"-"+w+"x"+h+"-firstview.png"),fullPage:false});
