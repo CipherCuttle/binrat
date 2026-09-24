@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppLink } from "../Primitives";
 import type { DataMode } from "../data";
 import { BinratIcon, iconLabels, iconNames } from "./icons/binrat";
@@ -13,6 +14,7 @@ const swatches = [
 ] as const;
 const mock: Bookmark = { kind: "bag", id: "visual-art-sample-not-a-real-bag", mode: "DEMO" };
 export function DesignLabPage({ mode, navigate }: { mode: DataMode; navigate: (path: string) => void }) {
+  const [sampleSaved, setSampleSaved] = useState(false);
   if (mode !== "DEMO") return <section className={s.restricted}><h1>DESIGN LAB IS NOT PUBLIC LIVE.</h1>
     <p>These art samples are isolated to deterministic DEMO mode.</p><AppLink href="/" navigate={navigate}>BACK TO BINRAT →</AppLink></section>;
   return <div className={s.lab} data-dumpster-os="art-lab">
@@ -49,7 +51,7 @@ export function DesignLabPage({ mode, navigate }: { mode: DataMode; navigate: (p
           <div className={s.sampleTop}><span>EXHIBIT 004 / INDEXED BAG</span><EvidenceStamp scope="coverage" state="PARTIAL"/></div>
           <div className={s.sampleTitle}><BinratIcon name="bag-dossier" size={47} decorative/><h3>$FERAL</h3><RatOperator size="stamp"/></div>
           <p>Source-reported creator. Three prior indexed demo bags. Exact receipts available inside the dossier.</p>
-          <ScrapBookmark label="sample FERAL bag" item={mock} saved={false} onToggle={()=>{}}/>
+          <ScrapBookmark label="sample FERAL bag" item={mock} saved={sampleSaved} onToggle={()=>setSampleSaved(v=>!v)}/>
         </ScrapCard>
         <ReceiptSheet mode="DEMO" title="EVIDENCE ARTIFACT / DEMONSTRATION" source="STATIC ART SAMPLE">
           <p>Visible proof metadata has an intentionally clean substrate. The serrated edge and rusted bracket surround the content without altering its meaning.</p>
