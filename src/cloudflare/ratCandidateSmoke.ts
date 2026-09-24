@@ -62,7 +62,7 @@ export async function handleRatCandidateSmoke(
   try {
     const once = await env.DB.prepare(
       'INSERT OR IGNORE INTO rat_ai_daily_budget (day_utc,principal,attempts) VALUES (?,?,1)'
-    ).bind(day, 'CANDIDATE:SMOKE', 1).run();
+    ).bind(day, 'CANDIDATE:SMOKE').run();
     if (!once.success) return response(503, { error: 'SMOKE_RESERVATION_FAILED' });
     if (once.meta?.changes !== 1) return response(409, { error: 'ALREADY_TESTED_TODAY' });
     if (!(await reserveRatAiCall(env.DB, 0, 0, nowMs))) {
