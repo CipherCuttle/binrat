@@ -66,3 +66,12 @@ test('lab rejects negative, unknown, excessive bps and duplicate CLI overrides',
   assert.notEqual(duplicated.status, 0);
   assert.deepEqual(evaluate(), evaluate(), 'same assumptions must produce identical outputs');
 });
+
+test('lab fails closed if modeled break-even exceeds safe integer range', () => {
+  const r = spawnSync(process.execPath, [cli,
+    '--volumeUsd=0', '--effectiveFeeBps=1', '--paidSeats=1000000',
+    '--seatVariableCostUsd=1000000', '--fixedCostUsd=1000000000'
+  ], { encoding: 'utf8' });
+  assert.notEqual(r.status, 0);
+  assert.match(r.stderr, /RESEARCH_BREAK_EVEN_OUT_OF_RANGE/);
+});

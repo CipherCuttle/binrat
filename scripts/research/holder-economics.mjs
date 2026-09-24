@@ -50,6 +50,9 @@ export function evaluateScenario(input = {}) {
   const breakEvenVolumeUsd = requiredFeesCents <= 0n ? 0
     : feeBps === 0n ? null
     : Number(ceilDiv(requiredFeesCents * 10000n, feeBps * 100n));
+  if (breakEvenVolumeUsd !== null && !Number.isSafeInteger(breakEvenVolumeUsd)) {
+    throw new Error('RESEARCH_BREAK_EVEN_OUT_OF_RANGE');
+  }
   return {
     status: 'ILLUSTRATIVE_NOT_FORECAST',
     assumptions: x,
