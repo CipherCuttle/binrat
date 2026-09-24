@@ -144,6 +144,7 @@ export function adaptLiveFeed(value: unknown): PublicFeed {
       symbol: bag.symbol as string,
       name: bag.name as string,
       token: bag.token as string,
+      imageUri: (bag.metadata as JsonObject).imageUri as string,
       reportedCreatorAddress: bag.reportedCreatorAddress as string,
       blockNumber: bag.blockNumber as string,
       txHash: bag.txHash as string,

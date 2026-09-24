@@ -1,4 +1,5 @@
 /* LEGACY G2 PRESENTATION: preserved for existing routes and regression safety only.\n * Current owner-approved STRUCTURAL TARGET is docs/design/BENTO_DASHBOARD_V1.md.\n * Do not copy old Home visuals, left/sidebar hero or art direction into the new bento. */\nimport { useEffect, useState, type KeyboardEvent } from "react";
+import BentoHome from "./experiments/BentoHome";
 import { MobileBag, MobileDiscover, MobileMore, MobileRadar, MobileSaved, MobileShell, useMobileBookmarks } from "./mobile/MobileExperience";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
 import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
@@ -97,24 +98,47 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [feedError, setFeedError] = useState<string | null>(null);
   const [radarError, setRadarError] = useState<string | null>(null);
+  const [readAtMs, setReadAtMs] = useState<number | null>(null);
+  const bento = import.meta.env.VITE_BINRAT_BENTO_EXPERIMENT === "1" &&
+    new URLSearchParams(window.location.search).get("experiment") === "bento-v1" &&
+    route.page === "home";
   useEffect(() => {
-    loadProductData()
-      .then((data) => {
+    let active = true;
+    let request: AbortController | null = null;
+    const refresh = async (initial = false) => {
+      if (!initial && document.visibilityState !== "visible") return;
+      request?.abort();
+      const controller = new AbortController();
+      request = controller;
+      try {
+        const data = await loadProductData(controller.signal);
+        if (!active || controller.signal.aborted) return;
         setFeed(data.feed);
         setRadar(data.radar);
         setMode(data.mode);
         setFeedError(data.feedError);
         setRadarError(data.radarError);
+        setReadAtMs(Date.now()); // Locally completed requests, NOT a synchronized source checkpoint.
         setLoaded(true);
-      })
-      .catch((reason: unknown) => {
-        // Unexpected transport/setup failure remains visible in both scopes.
+      } catch (reason: unknown) {
+        if (!active || controller.signal.aborted) return;
         const message = reason instanceof Error ? reason.message : "DATA_UNAVAILABLE";
-        setFeedError(message);
-        setRadarError(message);
-        setLoaded(true);
-      });
-  }, []);
+        setFeed(null); setRadar(null);
+        setFeedError(message); setRadarError(message);
+        setReadAtMs(Date.now()); setLoaded(true);
+      }
+    };
+    void refresh(true);
+    const poll = bento && selectedDataMode === "LIVE";
+    const timer = poll ? window.setInterval(() => { void refresh(); }, 60_000) : null;
+    const onVisible = () => { if (poll && document.visibilityState === "visible") void refresh(); };
+    if (poll) document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      active = false; request?.abort();
+      if (timer !== null) window.clearInterval(timer);
+      if (poll) document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [bento]);
   useEffect(() => {
     const onPopState = () => setRoute(readRoute());
     window.addEventListener("popstate", onPopState);
@@ -152,7 +176,9 @@ export default function App() {
         detail={(code ?? "NO VALIDATED PUBLIC DATA") + ". No LIVE/DEMO substitution was made."} />
     </section>
   );
-  const content = !loaded ? (
+  const content = bento ? (
+    <BentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />
+  ) : !loaded ? (
     <Loading />
   ) : route.page === "home" ? (
     <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
@@ -195,7 +221,9 @@ export default function App() {
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
-  const mobileContent = !loaded ? (
+  const mobileContent = bento ? (
+    <BentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />
+  ) : !loaded ? (
     <div className="loading" role="status"><span /><p>RAT IS CHECKING THE RECEIPTS…</p></div>
   ) : route.page === "home" ? (
     <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
@@ -220,6 +248,11 @@ export default function App() {
       <MobileShell page={route.page} mode={mode} checkpoint={route.page === "radar" ? radar?.asOfBlock ?? null : feed?.asOfBlock ?? null} navigate={navigate}>
         {mobileContent}
       </MobileShell>
+    </div>
+  ) : bento ? (
+    <div className="app-frame binrat-bento-frame">
+      <a className="skip-link" href="#content">Skip to evidence</a>
+      <main id="content" tabIndex={-1}>{content}</main>
     </div>
   ) : (
     <div className="app-frame">

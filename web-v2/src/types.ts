@@ -11,6 +11,8 @@ export interface Bag {
   symbol: string;
   name: string;
   token: string;
+  /** Exact launch source-reported media; treat as untrusted when rendering. */
+  imageUri?: string;
   reportedCreatorAddress: string;
   blockNumber: string;
   txHash: string;
