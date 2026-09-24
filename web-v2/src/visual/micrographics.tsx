@@ -21,9 +21,9 @@ export interface MicrographicProps extends Omit<SVGProps<SVGSVGElement>, "childr
   size?: number;
   tone?: "steel" | "rust" | "bone";
 }
-export function Micrographic({ kind, size = 24, tone = "steel", ...props }: MicrographicProps) {
+export function Micrographic({ kind, size = 24, tone = "steel", className, ...props }: MicrographicProps) {
   return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
     viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4}
-    className={"binrat-motif binrat-motif--" + tone + (props.className ? " " + props.className : "")}
+    className={"binrat-motif binrat-motif--" + tone + (className ? " " + className : "")}
     aria-hidden="true" focusable="false" {...props}>{motifs[kind]}</svg>;
 }
