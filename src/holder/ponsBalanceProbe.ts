@@ -13,6 +13,7 @@ export type PonsProbeStatus =
   | 'TOKEN_AUTHORITY_INVALID'
   | 'PONS_RPC_CHAIN_MISMATCH'
   | 'PONS_FINALIZED_BLOCK_UNAVAILABLE'
+  | 'PONS_FINALIZED_BLOCK_STALE_OR_FUTURE'
   | 'PONS_FINALIZED_BLOCK_BEFORE_EFFECTIVE_BLOCK'
   | 'PONS_REORG_OR_INCONSISTENT_RPC'
   | 'PONS_BALANCE_READ_FAILED'
@@ -33,6 +34,7 @@ export interface PonsCandidateAuthority {
 export interface PonsFinalizedBlock {
   number: bigint;
   hash: string;
+  timestamp: bigint;
 }
 
 export interface PonsBalanceProbePort {
@@ -112,7 +114,8 @@ function configuredAuthority(authority: PonsCandidateAuthority): {
 export async function probePonsHolderCandidate(
   authority: PonsCandidateAuthority,
   wallet: string,
-  port: PonsBalanceProbePort
+  port: PonsBalanceProbePort,
+  nowMs: number
 ): Promise<PonsProbeResult> {
   const cfg = configuredAuthority(authority);
   if (typeof cfg === 'string') return probe(cfg);
@@ -120,6 +123,8 @@ export async function probePonsHolderCandidate(
     return probe('TOKEN_AUTHORITY_INVALID');
   }
   const normalizedWallet = getAddress(wallet);
+  if (!Number.isSafeInteger(nowMs) || nowMs < 0) return probe('TOKEN_AUTHORITY_INVALID');
+  const nowSeconds = BigInt(Math.floor(nowMs / 1000));
 
   try {
     if (await port.getChainId() !== BINRAT_PONS_TOKEN_CHAIN_ID) {
@@ -131,8 +136,15 @@ export async function probePonsHolderCandidate(
       block.number <= 0n ||
       typeof block.hash !== 'string' ||
       !HASH.test(block.hash) ||
-      block.hash.toLowerCase() === `0x${'0'.repeat(64)}`
+      block.hash.toLowerCase() === `0x${'0'.repeat(64)}` ||
+      typeof block.timestamp !== 'bigint' ||
+      block.timestamp <= 0n
     ) return probe('PONS_FINALIZED_BLOCK_UNAVAILABLE');
+    // A finalized block can still be stale when an RPC has stopped advancing.
+    // Clock skew tolerance is 30s; maximum age for this candidate probe is 5m.
+    if (block.timestamp > nowSeconds + 30n || nowSeconds - block.timestamp > 300n) {
+      return probe('PONS_FINALIZED_BLOCK_STALE_OR_FUTURE');
+    }
     if (block.number < cfg.effectiveBlock) {
       return probe('PONS_FINALIZED_BLOCK_BEFORE_EFFECTIVE_BLOCK', block);
     }
@@ -147,6 +159,9 @@ export async function probePonsHolderCandidate(
     if (typeof balance !== 'bigint' || balance < 0n) return probe('PONS_BALANCE_READ_FAILED');
     if ((await port.getBlockHash(block.number)).toLowerCase() !== block.hash.toLowerCase()) {
       return probe('PONS_REORG_OR_INCONSISTENT_RPC');
+    }
+    if (await port.getChainId() !== BINRAT_PONS_TOKEN_CHAIN_ID) {
+      return probe('PONS_RPC_CHAIN_MISMATCH');
     }
     return balance >= cfg.threshold
       ? probe('MEETS_CANDIDATE_THRESHOLD_NO_ACCESS', block, true)
@@ -168,7 +183,7 @@ export function viemPonsBalanceProbePort(
     getChainId: () => client.getChainId(),
     getFinalizedBlock: async () => {
       const block = await client.getBlock({ blockTag: 'finalized' });
-      return { number: block.number, hash: block.hash };
+      return { number: block.number, hash: block.hash, timestamp: block.timestamp };
     },
     getBlockHash: async (blockNumber) => (await client.getBlock({ blockNumber })).hash,
     balanceOf: async ({ token, wallet, blockNumber }) =>
