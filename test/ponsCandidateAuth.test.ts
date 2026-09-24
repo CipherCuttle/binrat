@@ -35,7 +35,7 @@ test('Pons SIWE binds chain, purpose, resource, origin and issues FREE candidate
     assert.equal(msg.chainId,4663);
     assert.equal(msg.requestId,PONS_AUTH_PURPOSE);
     assert.equal(msg.uri,ORIGIN+'/api/pons-candidate/session');
-    assert.deepEqual(msg.resources,[ORIGIN+'/api/rat-radar/watchlist?depth=full']);
+    assert.deepEqual(msg.resources,[ORIGIN+'/api/pons-candidate/me']);
     assert.equal(c.policyId,PONS_AUTH_POLICY);
     const signed=await OWNER.signMessage({message:c.message});
     const issued=await provePonsWallet(store,{
