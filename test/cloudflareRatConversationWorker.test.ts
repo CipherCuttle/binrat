@@ -113,6 +113,34 @@ test('remembered creator works only for the same user; group unaddressed is sile
   } finally { db.close(); }
 });
 
+test('private candidate bot ignores everybody except the explicitly allowed DM sender', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    const sent: string[] = [];
+    const env = {
+      ...base, DB: db, RAT_CONVERSATION_ENABLED: 'true',
+      RAT_CANDIDATE_ALLOWED_USER_ID: '123'
+    };
+    const deps = { now: () => now, externalFetch: sender(sent) };
+    const group = await handleWorkerRequest(
+      request(920, '/help', -300, 123, 'supergroup'), env, deps
+    );
+    assert.equal(group.status, 200);
+    assert.equal((await new D1TelegramLedger(db).get(920))?.state, 'IGNORED');
+    const otherUser = await handleWorkerRequest(
+      request(921, '/help', 321, 456), env, deps
+    );
+    assert.equal(otherUser.status, 200);
+    assert.equal((await new D1TelegramLedger(db).get(921))?.state, 'IGNORED');
+    assert.equal(sent.length, 0);
+
+    const allowed = await handleWorkerRequest(request(922, '/help'), env, deps);
+    assert.equal(allowed.status, 200);
+    assert.equal((await new D1TelegramLedger(db).get(922))?.state, 'REPLIED');
+    assert.equal(sent.length, 1);
+  } finally { db.close(); }
+});
+
 test('AI unavailable or out of budget falls back without disabling the deterministic Rat', async () => {
   const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
   try {
