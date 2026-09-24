@@ -53,6 +53,7 @@ test('D1 admission enforces 10/user/day, 120/global/day and UTC rollover', async
       assert.equal(await reserveRatAiCall(db, 1, 100, now), true);
     }
     assert.equal(await reserveRatAiCall(db, 1, 100, now), false);
+    assert.equal(await reserveRatAiCall(db, 999, 100, now), false, 'user quota applies across chats');
     assert.equal(await reserveRatAiCall(db, 1, 101, now), true);
     // User-denied requests never consume global slots.
     let admitted = 11;
