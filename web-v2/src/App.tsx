@@ -1,4 +1,5 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
+import MacroBentoHome from "./experiments/MacroBentoHome";
 import { MobileBag, MobileDiscover, MobileMore, MobileRadar, MobileSaved, MobileShell, useMobileBookmarks } from "./mobile/MobileExperience";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
 import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
@@ -97,24 +98,52 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [feedError, setFeedError] = useState<string | null>(null);
   const [radarError, setRadarError] = useState<string | null>(null);
+  const [readAtMs, setReadAtMs] = useState<number | null>(null);
+  // The default homepage remains untouched unless both build and query opt in.
+  const macroHome = import.meta.env.VITE_BINRAT_BENTO_EXPERIMENT === "1" &&
+    new URLSearchParams(window.location.search).get("experiment") === "macro-bento" &&
+    route.page === "home";
   useEffect(() => {
-    loadProductData()
-      .then((data) => {
+    let active = true;
+    let request: AbortController | null = null;
+    const refresh = async (initial = false) => {
+      if (!initial && document.visibilityState !== "visible") return;
+      request?.abort();
+      const current = new AbortController();
+      request = current;
+      try {
+        const data = await loadProductData(current.signal);
+        if (!active || current.signal.aborted) return;
         setFeed(data.feed);
         setRadar(data.radar);
         setMode(data.mode);
         setFeedError(data.feedError);
         setRadarError(data.radarError);
+        setReadAtMs(Date.now()); // local response completion, not chain provenance
         setLoaded(true);
-      })
-      .catch((reason: unknown) => {
-        // Unexpected transport/setup failure remains visible in both scopes.
+      } catch (reason: unknown) {
+        if (!active || current.signal.aborted) return;
         const message = reason instanceof Error ? reason.message : "DATA_UNAVAILABLE";
+        setFeed(null);
+        setRadar(null);
         setFeedError(message);
         setRadarError(message);
+        setReadAtMs(Date.now());
         setLoaded(true);
-      });
-  }, []);
+      }
+    };
+    void refresh(true);
+    const poll = macroHome && selectedDataMode === "LIVE";
+    const timer = poll ? window.setInterval(() => { void refresh(); }, 60_000) : null;
+    const visibility = () => { if (poll && document.visibilityState === "visible") void refresh(); };
+    if (poll) document.addEventListener("visibilitychange", visibility);
+    return () => {
+      active = false;
+      request?.abort();
+      if (timer !== null) window.clearInterval(timer);
+      if (poll) document.removeEventListener("visibilitychange", visibility);
+    };
+  }, [macroHome]);
   useEffect(() => {
     const onPopState = () => setRoute(readRoute());
     window.addEventListener("popstate", onPopState);
@@ -152,7 +181,9 @@ export default function App() {
         detail={(code ?? "NO VALIDATED PUBLIC DATA") + ". No LIVE/DEMO substitution was made."} />
     </section>
   );
-  const content = !loaded ? (
+  const content = macroHome ? (
+    <MacroBentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />
+  ) : !loaded ? (
     <Loading />
   ) : route.page === "home" ? (
     <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
@@ -195,7 +226,9 @@ export default function App() {
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
-  const mobileContent = !loaded ? (
+  const mobileContent = macroHome ? (
+    <MacroBentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />
+  ) : !loaded ? (
     <div className="loading" role="status"><span /><p>RAT IS CHECKING THE RECEIPTS…</p></div>
   ) : route.page === "home" ? (
     <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
@@ -220,6 +253,11 @@ export default function App() {
       <MobileShell page={route.page} mode={mode} checkpoint={route.page === "radar" ? radar?.asOfBlock ?? null : feed?.asOfBlock ?? null} navigate={navigate}>
         {mobileContent}
       </MobileShell>
+    </div>
+  ) : macroHome ? (
+    <div className="app-frame macro-bento-app">
+      <a className="skip-link" href="#content">Skip to evidence</a>
+      <main id="content" tabIndex={-1}>{content}</main>
     </div>
   ) : (
     <div className="app-frame">

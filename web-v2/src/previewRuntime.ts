@@ -19,6 +19,8 @@ export function shareableRouteUrl(path: string): string {
   return window.location.origin + routeHref(path);
 }
 export function sourceSwitchHref(live: boolean): string {
-  return window.location.pathname + (live ? "?source=live" : "") +
-    (isGitHackPreview ? window.location.hash : "");
+  const url = new URL(window.location.href);
+  if (live) url.searchParams.set("source", "live");
+  else url.searchParams.delete("source");
+  return url.pathname + url.search + (isGitHackPreview ? url.hash : "");
 }

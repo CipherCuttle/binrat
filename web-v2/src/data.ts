@@ -9,17 +9,17 @@ export type DataMode = "DEMO" | "LIVE";
 const wantsLive = new URLSearchParams(window.location.search).get("source") === "live";
 export const selectedDataMode: DataMode = wantsLive ? "LIVE" : "DEMO";
 
-async function readJson(path: string, unavailableCode: string): Promise<unknown> {
+async function readJson(path: string, unavailableCode: string, signal?: AbortSignal): Promise<unknown> {
   const response = await fetch(publicApiUrl(path), {
     headers: { accept: "application/json" },
     cache: "no-store",
-    signal: AbortSignal.timeout(15000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error(unavailableCode);
   return response.json() as Promise<unknown>;
 }
 
-export async function loadProductData(): Promise<{
+export async function loadProductData(signal?: AbortSignal): Promise<{
   feed: PublicFeed | null; radar: RadarWatchlist | null;
   feedError: string | null; radarError: string | null; mode: DataMode;
 }> {
@@ -29,8 +29,8 @@ export async function loadProductData(): Promise<{
   // Each request AND adapter is independently settled; malformed Radar cannot
   // hide a valid Feed and a Feed outage cannot erase the Radar shortlist.
   const slices = await settleIndependentSlices(
-    () => readJson("/api/feed", "PUBLIC_READ_PLANE_UNAVAILABLE").then(adaptLiveFeed),
-    () => readJson("/api/rat-radar/watchlist", "RAT_RADAR_UNAVAILABLE").then(adaptLiveRadar),
+    () => readJson("/api/feed", "PUBLIC_READ_PLANE_UNAVAILABLE", signal).then(adaptLiveFeed),
+    () => readJson("/api/rat-radar/watchlist", "RAT_RADAR_UNAVAILABLE", signal).then(adaptLiveRadar),
   );
   return { ...slices, mode: "LIVE" };
 }
