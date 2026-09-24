@@ -50,6 +50,11 @@ export interface RatFactsByIntent {
     ponsTreasury?: string;
     ponsCreatorFeeRecipient?: string;
     legacyArcRoleContext?: string;
+    ponsListingStatus?: string;
+    officialWebsiteStatus?: string;
+    officialTelegramStatus?: string;
+    officialXStatus?: string;
+    verifiedRepository?: string;
     tokenAddressState: string;
     holderGateStatus: string;
     tokenMessage: string;
@@ -256,7 +261,14 @@ function bodyFor(plan: RatAnswerPlan): string[] {
           line('research network', plan.facts.researchNetwork ?? 'UNKNOWN'),
           line('Pons treasury', plan.facts.ponsTreasury ?? 'NOT_VERIFIED'),
           line('Pons fee recipient', plan.facts.ponsCreatorFeeRecipient ?? 'NOT_VERIFIED'),
-          line('legacy Arc role context', plan.facts.legacyArcRoleContext ?? 'HISTORICAL_ONLY')
+          line('legacy Arc role context', plan.facts.legacyArcRoleContext ?? 'HISTORICAL_ONLY'),
+          ...(plan.facts.ponsListingStatus ? [
+            line('Pons listing', plan.facts.ponsListingStatus),
+            line('official website', plan.facts.officialWebsiteStatus ?? 'NOT_VERIFIED'),
+            line('official Telegram', plan.facts.officialTelegramStatus ?? 'NOT_VERIFIED'),
+            line('official X', plan.facts.officialXStatus ?? 'NOT_VERIFIED'),
+            line('source repository', plan.facts.verifiedRepository ?? 'NOT_VERIFIED')
+          ] : [])
         ] : []),
         line(plan.facts.selectedTokenRail ? 'legacy Arc treasury (not Pons)' : 'treasury role', plan.facts.treasury),
         line(plan.facts.selectedTokenRail ? 'legacy Arc project fee recipient (not Pons)' : 'project fee recipient role', plan.facts.projectFeeRecipient),
