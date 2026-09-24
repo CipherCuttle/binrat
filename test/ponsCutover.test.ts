@@ -58,7 +58,10 @@ test('missing successor cannot accidentally inherit the historical Arc token aut
   const { selection, manifest } = await artifacts();
   delete manifest.tokenLaunchSuccessor;
   assert.throws(() => evaluatePonsCutoverCandidate(selection, manifest), /PONS_SUCCESSOR_INVALID/);
-  // Older programmatic manifest fixtures remain independently valid but do not imply Pons selection.
+  // An old-style fixture must omit the dependent discovery record as well.
+  // Keeping discovery without its successor remains invalid and must fail closed.
+  assert.throws(() => validateCapabilityManifest(manifest), /PONS_SUCCESSOR_INVALID/);
+  delete manifest.tokenLaunchDiscovery;
   validateCapabilityManifest(manifest);
 });
 
