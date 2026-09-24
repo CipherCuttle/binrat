@@ -45,6 +45,11 @@ export interface RatFactsByIntent {
     launchAuthorized: string;
     treasury: string;
     projectFeeRecipient: string;
+    selectedTokenRail?: string;
+    researchNetwork?: string;
+    ponsTreasury?: string;
+    ponsCreatorFeeRecipient?: string;
+    legacyArcRoleContext?: string;
     tokenAddressState: string;
     holderGateStatus: string;
     tokenMessage: string;
@@ -246,8 +251,15 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         line('launch authorization', plan.facts.launchAuthorization),
         line('marketing authorized', plan.facts.marketingAuthorized),
         line('launch authorized', plan.facts.launchAuthorized),
-        line('treasury role', plan.facts.treasury),
-        line('project fee recipient role', plan.facts.projectFeeRecipient),
+        ...(plan.facts.selectedTokenRail ? [
+          line('selected token rail', plan.facts.selectedTokenRail),
+          line('research network', plan.facts.researchNetwork ?? 'UNKNOWN'),
+          line('Pons treasury', plan.facts.ponsTreasury ?? 'NOT_VERIFIED'),
+          line('Pons fee recipient', plan.facts.ponsCreatorFeeRecipient ?? 'NOT_VERIFIED'),
+          line('legacy Arc role context', plan.facts.legacyArcRoleContext ?? 'HISTORICAL_ONLY')
+        ] : []),
+        line(plan.facts.selectedTokenRail ? 'legacy Arc treasury (not Pons)' : 'treasury role', plan.facts.treasury),
+        line(plan.facts.selectedTokenRail ? 'legacy Arc project fee recipient (not Pons)' : 'project fee recipient role', plan.facts.projectFeeRecipient),
         line('token address', plan.facts.tokenAddressState),
         line('Holder Gate', plan.facts.holderGateStatus),
         '',
