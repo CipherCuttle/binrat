@@ -121,10 +121,7 @@ export default {
     const now = Date.now();
     // Opportunistic daily physical deletion; conversation TTL is enforced on every read.
     const utc = new Date(now);
-    if (
-      (env.RAT_CONVERSATION_ENABLED === 'true' || env.RAT_AI_ENABLED === 'true') &&
-      utc.getUTCHours() === 0 && utc.getUTCMinutes() < 5
-    ) {
+    if (utc.getUTCHours() === 0 && utc.getUTCMinutes() < 5) {
       try { await pruneRatConversation(env.DB, now); }
       catch { /* Maintenance must never block the indexer cron. */ }
     }
@@ -530,14 +527,14 @@ async function telegramWebhook(
     }
 
     if (message.text.trim().toLowerCase() === '/forget') {
-      let forgotten = !memoryEnabled;
-      if (memoryEnabled && authorId !== null) {
+      let forgotten = false;
+      if (authorId !== null) {
         try { await forgetRatMemory(env.DB, message.chat.id, authorId); forgotten = true; }
-        catch { /* Never claim deletion when D1 failed. */ }
+        catch { /* Never claim deletion when D1 failed, even with memory toggled OFF. */ }
       }
       const answer = forgotten
         ? '🐀 conversation context cleared. i keep no raw user-message history.'
-        : '🐀 could not clear memory. try again when the database is back.';
+        : '🐀 cannot confirm deletion. memory is not active if its flag is off; contact an operator if this persists.';
       const telegramMessageId = await sendMessage(token, message.chat.id, answer, deps.externalFetch);
       await ledger.completeOperationalReply({
         updateId: update.update_id, chatId: message.chat.id, intent: 'FORGET',
