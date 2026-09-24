@@ -115,9 +115,21 @@ export async function reserveRatAiCall(
     if (!result.success) throw new Error('RAT_AI_BUDGET_WRITE_FAILED');
     return result.meta?.changes === 1;
   };
-  if (!(await reserve('GLOBAL', RAT_AI_GLOBAL_DAILY_LIMIT))) return false;
-  return reserve('USER:' + chatId + ':' + userId, RAT_AI_USER_DAILY_LIMIT);
+  // Apply user quota first: rejected spam must not consume scarce GLOBAL slots.
+  if (!(await reserve('USER:' + chatId + ':' + userId, RAT_AI_USER_DAILY_LIMIT))) return false;
+  return reserve('GLOBAL', RAT_AI_GLOBAL_DAILY_LIMIT);
 }
+/** Physical cleanup of expired context and old budget counters, called from the daily cron window. */
+export async function pruneRatConversation(db: D1DatabaseLike, nowMs: number): Promise<void> {
+  if (!Number.isSafeInteger(nowMs) || nowMs < 0) return;
+  const oldDay = Math.floor(nowMs / 86_400_000) - 2;
+  const results = await db.batch([
+    db.prepare('DELETE FROM rat_conversation_context WHERE expires_at_ms <= ?').bind(nowMs),
+    db.prepare('DELETE FROM rat_ai_daily_budget WHERE day_utc < ?').bind(oldDay)
+  ]);
+  if (results.some((result) => !result.success)) throw new Error('RAT_CONTEXT_PRUNE_FAILED');
+}
+
 export function isRatBanterEligible(text: string, understanding: RatUnderstanding | null): boolean {
   if (!understanding || understanding.intent !== 'CLARIFY' || understanding.explicitCommand) return false;
   if (text.length === 0 || text.length > MAX_BANTER_CHARS) return false;
