@@ -1,0 +1,36 @@
+name: Dumpster OS / lock pinned Tabler
+on:
+  push:
+    branches: [feat/binrat-dumpster-os-d1]
+    paths:
+      - 'web-v2/package.json'
+      - '.github/workflows/dumpster-os-lockfile.yml'
+permissions:
+  contents: write
+jobs:
+  lock-reviewed-icon-version:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lock exact Tabler 3.46.0, no lifecycle scripts
+        run: pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
+      - name: Persist only the new pnpm lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add pnpm-lock.yaml
+          if git diff --cached --quiet; then echo 'Already locked'; exit 0; fi
+          git commit -m 'build(dumpster-os): lock Tabler React 3.46.0 with pnpm 10.15'
+          git push origin HEAD:feat/binrat-dumpster-os-d1
