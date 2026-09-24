@@ -1,0 +1,54 @@
+name: binrat-d1-runtime-readonly
+
+on:
+  push:
+    branches: [diag/binrat-observability-readonly-20260924]
+    paths: [.github/workflows/binrat-d1-runtime-readonly.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      BINRAT_CLOUDFLARE_ADMIN_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      BINRAT_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Inspect keyed runtime state without modifying D1
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          (async () => {
+            const token = process.env.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN;
+            const account = process.env.BINRAT_CLOUDFLARE_ACCOUNT_ID;
+            if (!token || !/^[0-9a-f]{32}$/i.test(account || '')) throw new Error('Missing token or invalid account ID');
+            const url = `https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/46814564-1a41-449a-88e5-c1349eed3a27/query`;
+            const probes = [
+              ['runtime', 'SELECT source_verified, live_caught_up, head_block, target_block, last_sync_error, last_history_error, updated_at_ms FROM binrat_runtime_state WHERE chain_id = 5042'],
+              ['checkpoint', 'SELECT block_number FROM chain_checkpoints WHERE chain_id = 5042'],
+              ['lease', "SELECT lease_until_ms, updated_at_ms FROM binrat_sync_leases WHERE lease_name = 'binrat:arc-sync'"]
+            ];
+            for (const [label, sql] of probes) {
+              if (!/^SELECT\b/i.test(sql) || /;/.test(sql)) throw new Error('Unsafe query');
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sql }),
+                signal: AbortSignal.timeout(20000)
+              });
+              const body = await response.json();
+              const codes = Array.isArray(body.errors) ? body.errors.map(error => error.code).filter(Number.isInteger) : [];
+              console.log(label, 'HTTP:', response.status, 'success:', body.success === true, 'error codes:', codes);
+              if (!response.ok || body.success !== true || !Array.isArray(body.result) || body.result[0]?.success !== true) process.exit(1);
+              const row = body.result[0].results?.[0] ?? null;
+              // Fixed SELECT lists contain operational state only; no secrets or user data.
+              console.log(label, 'UTC:', new Date().toISOString(), 'state:', JSON.stringify(row));
+            }
+          })().catch(error => {
+            console.error('Read-only D1 inspection failed:', error.name);
+            process.exitCode = 1;
+          });
+          NODE
