@@ -19,6 +19,10 @@ import {
 } from '../holder/eligibility.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { understandRatMessage } from '../telegram/nlp.js';
+import {
+  parseRatFeedback, validateRatFeedbackBody, saveRatFeedback,
+  deleteRatFeedback, pruneRatFeedback
+} from './ratFeedback.js';
 import { handleRatCandidateSmoke } from './ratCandidateSmoke.js';
 import {
   entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
@@ -60,6 +64,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   TELEGRAM_MAX_MESSAGES_PER_MINUTE?: string;
   /** Both flags must be explicitly 'true'; inference is default-off. */
   RAT_CONVERSATION_ENABLED?: string;
+  RAT_FEEDBACK_ENABLED?: string;
   RAT_AI_ENABLED?: string;
   AI?: RatAiBinding;
   RAT_CANDIDATE_SMOKE_ENABLED?: string;
@@ -129,6 +134,8 @@ export default {
     if (utc.getUTCHours() === 0 && utc.getUTCMinutes() < 5) {
       try { await pruneRatConversation(env.DB, now); }
       catch { /* Maintenance must never block the indexer cron. */ }
+      try { await pruneRatFeedback(env.DB, now); }
+      catch { /* Feedback maintenance is best-effort. */ }
     }
     await enqueueSyncCycle(env);
   },
@@ -482,6 +489,61 @@ async function telegramWebhook(
     if (!(await ledger.allowChat(message.chat.id, rateLimit, 60_000, deps.now()))) {
       await ledger.completeIgnored(update.update_id, 'RATE_LIMITED', deps.now());
       return json(200, { ok: true, rateLimited: true });
+    }
+
+    // Feedback is explicit opt-in, DM-only and never sent to the AI model.
+    const feedback = parseRatFeedback(message.text);
+    if (feedback && env.RAT_FEEDBACK_ENABLED === 'true') {
+      let feedbackReply: string;
+      let intent = 'FEEDBACK_HELP';
+      if (message.chat.type !== 'private' || !Number.isSafeInteger(message.from?.id)) {
+        feedbackReply = '🐀 DM me with /feedback <message> so your feedback is not copied into a public group.';
+      } else if (feedback.action === 'HELP') {
+        feedbackReply =
+          '🐀 found the suggestion box.\n\n' +
+          'Send /feedback bug: <what broke> or /feedback idea: <what you want>.\n' +
+          'Only explicit feedback is stored, for up to 90 days. ' +
+          'Your Telegram user ID is retained so you can request deletion with /feedback delete. ' +
+          'Please do not send passwords, private keys, seed phrases or other sensitive information. ' +
+          '3 submissions per day per user.';
+      } else if (feedback.action === 'DELETE') {
+        intent = 'FEEDBACK_DELETE';
+        const count = await deleteRatFeedback(env.DB, message.from!.id);
+        feedbackReply = '🐀 deleted ' + count + ' stored feedback item(s) tied to your Telegram user ID.';
+      } else {
+        intent = 'FEEDBACK_SUBMIT';
+        const valid = validateRatFeedbackBody(feedback.body);
+        if (valid === 'TOO_SHORT') {
+          feedbackReply = '🐀 write at least 5 characters. Usage: /feedback bug: what happened';
+        } else if (valid === 'TOO_LONG') {
+          feedbackReply = '🐀 max 1,200 characters per feedback item. Send a shorter version.';
+        } else if (valid === 'SENSITIVE') {
+          feedbackReply = '🐀 please remove private keys, passwords and seed phrases before sending feedback.';
+        } else {
+          const result = await saveRatFeedback(
+            env.DB, update.update_id, message.chat.id, message.from!.id,
+            feedback.kind, feedback.body, deps.now()
+          );
+          if (result.state === 'USER_LIMIT') {
+            feedbackReply = '🐀 daily feedback limit reached (3). Come back after 00:00 UTC.';
+          } else if (result.state === 'GLOBAL_LIMIT') {
+            feedbackReply = '🐀 suggestion box is full for today. Try again after 00:00 UTC.';
+          } else {
+            feedbackReply = '🐀 receipt #' + result.updateId +
+              ' — feedback saved. Thank you. Your entry is kept for up to 90 days. ' +
+              'Use /feedback delete to remove all your stored submissions.';
+          }
+        }
+      }
+      const telegramMessageId = await sendMessage(
+        token, message.chat.id, feedbackReply, deps.externalFetch
+      );
+      await ledger.completeOperationalReply({
+        updateId: update.update_id, chatId: message.chat.id, intent,
+        replyDigest: createHash('sha256').update(feedbackReply).digest('hex'),
+        telegramMessageId
+      }, deps.now());
+      return json(200, { ok: true, feedback: true });
     }
 
     const watchCommand = parseRatWatchCommand(message.text);
