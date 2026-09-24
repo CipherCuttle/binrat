@@ -8,7 +8,7 @@ Date: 2026-09-24. **Draft only. No public launch or deployment authorization.**
 - **Selected token direction:** separate $BINRAT candidate through Pons V2 direct factory on Robinhood Chain 4663 with native ETH pairing. This is an owner-selected planning candidate, **not a launched token, a live listing, or an invitation to trade**.
 - **Historical roles:** the two wallet declarations in frozen `docs/BINRAT_LAUNCH_CONFIG_V0.json` are **ArcPad V0 records**. Their mere availability does not establish control of any new Robinhood deployer, treasury or fee-recipient role.
 - **New token authority:** Pons contract address, actual deployment receipt, owner/custody proofs, treasury, project fee recipient, verified site, Telegram, X and token-specific art are all **unverified / null**. Do not substitute a Pons factory address for the token's uncreated address.
-- **Listing draft:** `docs/PONS_DISCOVERY_METADATA_V1.json` is an internal planning schema and **MUST NOT** be submitted as Pons launch metadata or to token directories. It contains no executable or implied wallet authority.
+- **Listing draft:** `docs/PONS_DISCOVERY_CANDIDATE_V1.json` is an internal planning schema and **MUST NOT** be submitted as Pons launch metadata or to token directories. It contains no executable or implied wallet authority. This is the only canonical Pons listing-editorial draft; do not create a second metadata file or submit this JSON to Pons directly.
 
 ## Staged surfaces
 
