@@ -155,6 +155,8 @@ export function validateRatBanter(value: unknown): string | null {
   if (!candidate || candidate.length > 450 || /[\r\n]/.test(candidate)) return null;
   if (/https?:\/\/|0x[0-9a-fA-F]{8,}|\$[A-Z]{2,}/i.test(candidate)) return null;
   if (/\b(?:guaranteed|official|launched|verified|safe|scam|rug|buy|sell|ape|price|profit|returns?|contract|partnership|released|deployed|fundraising)\b/i.test(candidate)) return null;
+  // This lane carries zero canonical evidence. Reject even superficially project-factual wording.
+  if (/\b(?:binrat|token|chain|creator|wallet|address|launch|indexer|roadmap|userbase|partner(?:s|ed|ing|ship)?|shipped|indexed|published|releasing|deploying|deployed|working|live|team|revenue|treasury|today|tomorrow)\b/i.test(candidate)) return null;
   if (/\b\d{3,}\b/.test(candidate)) return null;
   return '🐀 ' + candidate;
 }
