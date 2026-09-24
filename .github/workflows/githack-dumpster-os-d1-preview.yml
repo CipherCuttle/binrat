@@ -1,0 +1,78 @@
+name: BINRAT Dumpster OS GitHack visual DEMO
+
+on:
+  push:
+    branches: [binrat-dumpster-os-d1-githack]
+    paths:
+      - '.github/workflows/githack-dumpster-os-d1-preview.yml'
+      - 'web-v2/src/**'
+      - 'web-v2/checks/responsive-preview.cjs'
+      - 'web-v2/index.html'
+      - 'web-v2/vite.config.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-static-demo:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Frozen install and compile visual demo
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm --dir web-v2 check:evidence
+          pnpm --dir web-v2 exec tsc -b
+          pnpm --dir web-v2 exec vite build --base /CipherCuttle/binrat/binrat-dumpster-os-d1-githack/web-v2/dist/
+          test -s web-v2/dist/index.html
+          test -s web-v2/dist/binrat-hero.webp
+          test -s web-v2/dist/favicon.png
+          grep -q '/CipherCuttle/binrat/binrat-dumpster-os-d1-githack/web-v2/dist/assets/' web-v2/dist/index.html
+      - name: Install isolated Playwright Chromium
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify visual lab and seven viewport widths
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd web-v2 && pnpm exec vite preview --host 127.0.0.1 --port 4174 --base /CipherCuttle/binrat/binrat-dumpster-os-d1-githack/web-v2/dist/) >"$RUNNER_TEMP/binrat-os-preview.log" 2>&1 &
+          for attempt in $(seq 1 50); do
+            if curl -fsS http://127.0.0.1:4174/CipherCuttle/binrat/binrat-dumpster-os-d1-githack/web-v2/dist/ >/dev/null; then break; fi
+            if [ "$attempt" -eq 50 ]; then cat "$RUNNER_TEMP/binrat-os-preview.log"; exit 1; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174/CipherCuttle/binrat/binrat-dumpster-os-d1-githack/web-v2/dist" \
+            node web-v2/checks/responsive-preview.cjs
+      - name: Upload design contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-dumpster-os-contact-sheets
+          path: web-v2/browser-artifacts/mobile-m1/
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Commit compiled DEMO to isolated preview branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f web-v2/dist/
+          if git diff --cached --quiet; then echo 'Static preview current'; exit 0; fi
+          git commit -m 'build(preview): compile Dumpster OS D1 static visual DEMO'
+          git push origin HEAD:binrat-dumpster-os-d1-githack
