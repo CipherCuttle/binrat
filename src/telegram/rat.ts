@@ -7,6 +7,10 @@ import {
 } from '../launchConfig/config.js';
 import { REQUIRED_LAUNCH_GATE_IDS } from '../launchConfig/gateMatrix.js';
 import {
+  validatePonsSuccessorCandidate,
+  type PonsSuccessorCandidate
+} from '../launchConfig/ponsCutover.js';
+import {
   makeRatAnswerPlan,
   renderRatVoice,
   type RatAnswerPlan,
@@ -41,6 +45,7 @@ export interface CapabilityManifest {
     holderGateStatus: string;
     configDigest?: string;
   };
+  tokenLaunchSuccessor?: PonsSuccessorCandidate;
   launchGateStatus?: {
     matrix: string;
     matrixDigest: string;
@@ -135,6 +140,16 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
       config.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED'
     ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_CONFIG_INVALID');
   }
+  if (root.tokenLaunchSuccessor !== undefined) {
+    validatePonsSuccessorCandidate(root.tokenLaunchSuccessor);
+    if (launch.explicitOwnerLaunchAuthorityState !== undefined &&
+        launch.explicitOwnerLaunchAuthorityState !== 'NOT_GRANTED') {
+      throw new Error('CAPABILITY_MANIFEST_PONS_AUTHORITY_ESCALATION');
+    }
+    if (root.launchConfiguration === undefined) {
+      throw new Error('CAPABILITY_MANIFEST_PONS_LEGACY_CONTEXT_MISSING');
+    }
+  }
   if (root.launchGateStatus !== undefined) {
     const gateStatus = record(root.launchGateStatus);
     const statuses = record(gateStatus.statuses);
@@ -225,6 +240,14 @@ function staticPlan(
         launchAuthorized: boolLabel(launch.launchAuthorized),
         treasury: manifest.launchConfiguration?.treasuryAddress ?? 'NOT_CONFIGURED',
         projectFeeRecipient: manifest.launchConfiguration?.projectFeeRecipientAddress ?? 'NOT_CONFIGURED',
+        selectedTokenRail: manifest.tokenLaunchSuccessor
+          ? 'Pons V2 on Robinhood 4663 (blocked planning candidate)' : undefined,
+        researchNetwork: manifest.tokenLaunchSuccessor
+          ? 'Arc 5042 (research only)' : undefined,
+        ponsTreasury: manifest.tokenLaunchSuccessor ? 'NOT_VERIFIED' : undefined,
+        ponsCreatorFeeRecipient: manifest.tokenLaunchSuccessor ? 'NOT_VERIFIED' : undefined,
+        legacyArcRoleContext: manifest.tokenLaunchSuccessor
+          ? 'Historical ArcPad V0 declarations only; not proof of Pons custody.' : undefined,
         tokenAddressState: manifest.launchConfiguration?.tokenAddressState ?? 'UNKNOWN',
         holderGateStatus: manifest.launchConfiguration?.holderGateStatus ?? 'UNKNOWN',
         tokenMessage: tokenState === 'NOT_LAUNCHED'
