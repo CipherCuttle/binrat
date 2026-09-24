@@ -76,20 +76,20 @@ without harming legibility or source/evidence authority.
 
 **Bounded delivery status and next art-review gate:**
 
-1. **D0 / reviewable contact sheets:** the DEMO Design Lab now renders for the proposed **24
-   original BINRAT domain icons**, **20 material micrographics**, and approved
-   mascot-fragment crops. Establish 16/24 px mono readability, dark/paper
-   variants and common `24×24` geometry. Full icon/motif/API inventory
-   and usable SVG recipes are in the linked spec; no synthetic or unapproved
-   mascot redesign.
-2. **D1 / candidate implementation:** pinned `@tabler/icons-react` as
-   the **utility-only** family, import a whitelist of 12 action icons, produce
-   the first **13 P0 BINRAT icons** and **M01–M08** micrographics, then
-   implement five first-party reusable components:
-   `ScrapCard`, `EvidenceStamp`, `ReceiptSheet`,
-   `ScrapBookmark`, `SewerDivider`. Apply one shared contract first
-   to Discover on desktop + phone, then Radar and Bag without another
-   layout rewrite. Use CSS Modules and one visual token source.
+1. **D0 / REVIEW CANDIDATE:** the DEMO Design Lab renders the **13 P0
+   implemented icons**, the **eight implemented motifs**, the existing
+   approved rat-art crop, material palette and reusable-component specimens.
+   Automated contact sheets cover 320/390 px phone and 768 px tablet; the
+   production-ready small-size/icon identity and actual phone experience
+   require owner art review. The other **11 icons** and **12 motifs** in the
+   24/20 inventory remain specified but **not implemented**.
+2. **D1 / IMPLEMENTED IN DRAFT:** pinned `@tabler/icons-react@3.46.0` as
+   the utility-only icon family, added a 12-action whitelist, built B01–B13
+   and M01–M08, and integrated `ScrapCard`, `EvidenceStamp`,
+   `ReceiptSheet`, `ScrapBookmark` and `SewerDivider` into the M1
+   mobile surfaces. Applied complementary non-destructive rust/metal
+   treatments to desktop and reused approved mascot art as operator crops.
+   CI and static preview checks pass; no production/owner acceptance yet.
 3. **D2 / NOT STARTED — gated embellishment:** add `ReplaySpool`, `CreatorTag`,
    `RadarSignalCard`, quieter repeated rat fragments, and *only
    state-driven* Motion/Rive after verified art, payload budget and owner
