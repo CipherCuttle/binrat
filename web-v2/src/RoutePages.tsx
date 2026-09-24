@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { matchingCreatorBags } from "./routeIdentity";
+import { loadLiveCreatorFile, loadLiveLedger } from "./data";
+import type { LiveCreatorFile, LiveLedger } from "./liveAdapter";
 import { replayStagesForBag, REPLAY_HORIZONS } from "./evidenceIntegrity";
 import type { DataMode } from "./data";
 import type { PublicFeed } from "./types";
@@ -21,18 +24,62 @@ function Heading({ index, eyebrow, title, detail }: {
 export function CreatorFilePage({ feed, address, mode, navigate }: {
   feed: PublicFeed; address: string; mode: DataMode; navigate: Navigate;
 }) {
-  const matches = matchingCreatorBags(feed, address);
+  // This is a separately checkpointed canonical projection, not a subset of
+  // feed.bags. A failed LIVE request must never fall back to demo/feed history.
+  const [liveFile, setLiveFile] = useState<LiveCreatorFile | null | undefined>(undefined);
+  const [failure, setFailure] = useState("");
+  useEffect(() => {
+    if (mode !== "LIVE") return;
+    let active = true;
+    setLiveFile(undefined);
+    setFailure("");
+    loadLiveCreatorFile(address)
+      .then((result) => { if (active) setLiveFile(result); })
+      .catch((reason: unknown) => {
+        if (active) setFailure(reason instanceof Error ? reason.message : "CREATOR_FILE_UNAVAILABLE");
+      });
+    return () => { active = false; };
+  }, [address, mode]);
+
+  const rail = <CheckpointRail
+    checkpoint={mode === "LIVE" && liveFile ? liveFile.asOfBlock : feed.asOfBlock}
+    coverage={mode === "LIVE" && liveFile ? liveFile.historyCoverage : feed.historyCoverage}
+  />;
+  if (mode === "LIVE" && failure) return (
+    <div className="page-pad route-page">
+      <Heading index="03" eyebrow="REPORTED CREATOR RECORD" title="CREATOR FILE UNAVAILABLE" detail="The canonical public Creator File did not return validated evidence. Current-feed matches have not been substituted." />
+      <p role="alert">{failure}</p>
+      <AppLink href="/dumpster" navigate={navigate} className="action">BACK TO DUMPSTER →</AppLink>
+    </div>
+  );
+  if (mode === "LIVE" && liveFile === undefined) return (
+    <div className="page-pad route-page">
+      <Heading index="03" eyebrow="REPORTED CREATOR RECORD" title="LOADING CREATOR FILE" detail="Waiting for the canonical Creator File and its own evidence receipt." />
+      <p role="status">READING VALIDATED PUBLIC EVIDENCE…</p>
+    </div>
+  );
+
+  const matches = mode === "LIVE"
+    ? (liveFile?.launches ?? [])
+    : matchingCreatorBags(feed, address);
   const newest = matches[0];
-  if (!newest) {
-    return (
-      <div className="page-pad route-page">
-        <Heading index="03" eyebrow="REPORTED CREATOR RECORD" title="NO SUCH CREATOR FILE" detail="No indexed bag in the present feed reports this exact address. An observed Radar recipient is not a creator identity." />
-        <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
-        <AppLink href="/dumpster" navigate={navigate} className="action">BACK TO DUMPSTER →</AppLink>
-      </div>
-    );
-  }
+  if (!newest) return (
+    <div className="page-pad route-page">
+      <Heading index="03" eyebrow="REPORTED CREATOR RECORD" title="NO SUCH CREATOR FILE" detail="This exact address has no indexed canonical Creator File at the current checkpoint. An observed Radar recipient is not a creator identity." />
+      {rail}
+      <AppLink href="/dumpster" navigate={navigate} className="action">BACK TO DUMPSTER →</AppLink>
+    </div>
+  );
+
   const available = new Set(feed.bags.map((bag) => bag.id));
+  const priorCount = mode === "LIVE"
+    ? liveFile!.indexedLaunchCount - 1
+    : matchingCreatorBags(feed, address)[0]!.trashTrail.priorLaunchCount;
+  const prior = mode === "LIVE"
+    ? [...liveFile!.launches.slice(1)].reverse()
+    : [...matchingCreatorBags(feed, address)[0]!.trashTrail.prior].reverse();
+  const fileReceipt = mode === "LIVE" ? liveFile!.receipt.receiptId : feed.receipt.receiptId;
+  const coverage = mode === "LIVE" ? liveFile!.historyCoverage : feed.historyCoverage;
   return (
     <div className="page-pad route-page">
       <Heading index="03" eyebrow="SOURCE-REPORTED ADDRESS / CASE FILE" title="CREATOR FILE" detail="Only launches reporting this exact address. No claim of common human ownership, wallet control, or trading identity." />
@@ -40,43 +87,50 @@ export function CreatorFilePage({ feed, address, mode, navigate }: {
         <section className="route-card">
           <CaseTab tone="orange">SOURCE-REPORTED CREATOR / ARC 5042</CaseTab>
           <h2>EXACT REPORTED ADDRESS</h2>
-          <div className="copyable-value"><code className="full-address">{newest.reportedCreatorAddress}</code><CopyButton label="reported creator address" value={newest.reportedCreatorAddress} /></div>
+          <div className="copyable-value"><code className="full-address">{mode === "LIVE" ? liveFile!.reportedCreatorAddress : address}</code><CopyButton label="reported creator address" value={address} /></div>
           <div className="route-stat-line">
-            <span><b>{matches.length}</b> BAG{matches.length === 1 ? "" : "S"} IN CURRENT FEED</span>
-            <span><b>{newest.trashTrail.priorLaunchCount}</b> PRIOR ENTRIES REFERENCED BY LATEST BAG</span>
+            <span><b>{matches.length}</b> INDEXED BAG{matches.length === 1 ? "" : "S"} IN {mode === "LIVE" ? "CANONICAL CREATOR FILE" : "CURRENT FEED (DEMO)"}</span>
+            <span><b>{priorCount}</b> EARLIER INDEXED BAG{priorCount === 1 ? "" : "S"} IN THIS PROJECTION</span>
           </div>
-          <p className="route-note">These counts describe different evidence scopes and must not be added together. History coverage: <CoverageStamp state={newest.trashTrail.coverage} />.</p>
+          <p className="route-note">History coverage: <CoverageStamp state={coverage} />. Missing history never implies a clean record. {mode === "LIVE" ? "This Creator File has its own checkpoint and receipt." : "Synthetic demo data is not chain proof."}</p>
           <h3>AVAILABLE BAG FILES / NEWEST FIRST</h3>
           <div className="route-link-list">
             {matches.map((bag) => (
-              <AppLink href={"/bag/" + bag.id} navigate={navigate} className="route-result-link" key={bag.id}>
-                <span>{"$" + bag.symbol} · {bag.name}<small>BLOCK {bag.blockNumber}</small></span>
-                <span>OPEN BAG ↗</span>
-              </AppLink>
+              available.has(bag.id) ? (
+                <AppLink href={"/bag/" + bag.id} navigate={navigate} className="route-result-link" key={bag.id}>
+                  <span>{"$" + bag.symbol} · {bag.name}<small>BLOCK {bag.blockNumber}</small></span>
+                  <span>OPEN BAG ↗</span>
+                </AppLink>
+              ) : (
+                <div className="route-result-link" key={bag.id}>
+                  <span>{"$" + bag.symbol} · {bag.name}<small>BLOCK {bag.blockNumber}</small></span>
+                  <small>NOT IN LOADED FEED CHECKPOINT</small>
+                </div>
+              )
             ))}
           </div>
         </section>
         <aside className="route-card">
           <CaseTab>TRASH TRAIL / OLDEST FIRST</CaseTab>
-          <p className="route-note">The most recent bag references these earlier launches. A referenced bag without a complete current-feed dossier is deliberately not linked.</p>
+          <p className="route-note">Only indexed launches are listed. The record is not a proof of exhaustive history.</p>
           <ol className="route-trail">
-            {[...newest.trashTrail.prior].reverse().map((prior) => (
-              <li key={prior.id}>
-                <span>{"$" + prior.symbol}<small>BLOCK {prior.blockNumber}</small></span>
-                {available.has(prior.id)
-                  ? <AppLink href={"/bag/" + prior.id} navigate={navigate} className="text-link">OPEN BAG ↗</AppLink>
-                  : <small>REFERENCE ONLY · FULL FILE UNAVAILABLE HERE</small>}
+            {prior.map((bag) => (
+              <li key={bag.id}>
+                <span>{"$" + bag.symbol}<small>BLOCK {bag.blockNumber}</small></span>
+                {available.has(bag.id)
+                  ? <AppLink href={"/bag/" + bag.id} navigate={navigate} className="text-link">OPEN BAG ↗</AppLink>
+                  : <small>REFERENCE ONLY · FULL BAG NOT IN LOADED FEED</small>}
               </li>
             ))}
-            {!newest.trashTrail.prior.length && <li>NO EARLIER BAG REPORTED IN CURRENT COVERAGE.</li>}
+            {!prior.length && <li>NO EARLIER INDEXED BAG IN THIS COVERAGE.</li>}
           </ol>
-          <ProofBoundary>Matching reported creator addresses are on-chain/source fields, not verified human identities. Missing or partial history is not evidence of no other launches.</ProofBoundary>
+          <ProofBoundary>Matching source-reported addresses are protocol/source facts, not verified human identities. UNVERIFIED coverage cannot prove absence of other launches.</ProofBoundary>
         </aside>
       </div>
-      <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
-      <Receipt title={mode === "DEMO" ? "SYNTHETIC DEMO FEED REFERENCE" : "CURRENT PUBLIC FEED REFERENCE"}>
-        <p>This file is assembled from currently available feed bags. The canonical Creator File API and its receipt require separate validated integration for production.</p>
-        <div className="copyable-value"><code>{feed.receipt.receiptId}</code><CopyButton label="source feed receipt reference" value={feed.receipt.receiptId} /></div>
+      {rail}
+      <Receipt title={mode === "DEMO" ? "SYNTHETIC DEMO FEED REFERENCE" : "CANONICAL CREATOR FILE RECEIPT"}>
+        <p>{mode === "LIVE" ? "Validated public Creator File projection; its source checkpoint may be newer than the loaded feed." : "This file uses the local demo feed; no production subscription or chain proof is implied."}</p>
+        <div className="copyable-value"><code>{fileReceipt}</code><CopyButton label="Creator File receipt reference" value={fileReceipt} /></div>
       </Receipt>
     </div>
   );
@@ -113,15 +167,15 @@ export function ReplayIndexPage({ feed, mode, navigate }: {
 }) {
   return (
     <div className="page-pad route-page">
-      <Heading index="04" eyebrow="POINT-IN-TIME EVIDENCE" title="REPLAY FILES" detail="Open a bag's embedded Replay. Demo stages are simulated and bag-specific; live staged observations need their own validated endpoint." />
+      <Heading index="04" eyebrow="POINT-IN-TIME EVIDENCE" title="REPLAY FILES" detail={mode === "LIVE" ? "Open a bag to load its separately checkpointed canonical Replay bundle. Stage availability is not inferred from the feed." : "Open a bag to inspect explicitly authored synthetic demo stages; there is no chain proof here."} />
       <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
       <div className="route-link-list">
         {feed.bags.map((bag) => {
-          const stages = replayStagesForBag(bag, mode);
+          const stages = mode === "DEMO" ? replayStagesForBag(bag, mode) : null;
           return (
             <AppLink href={"/bag/" + bag.id} navigate={navigate} className="route-result-link" key={bag.id}>
               <span>{"$" + bag.symbol} · {bag.name}<small>BLOCK {bag.blockNumber} / {mode === "DEMO" ? "SYNTHETIC DEMO" : "CURRENT FEED"}</small></span>
-              <span>{REPLAY_HORIZONS.slice(1).map((horizon) => horizon + ": " + stages[horizon].state).join(" / ")}<small>OPEN BAG ↗</small></span>
+              <span>{stages ? REPLAY_HORIZONS.slice(1).map((horizon) => horizon + ": " + stages[horizon].state).join(" / ") : "LOAD REAL REPLAY STAGES"}<small>OPEN BAG ↗</small></span>
             </AppLink>
           );
         })}
@@ -131,16 +185,30 @@ export function ReplayIndexPage({ feed, mode, navigate }: {
   );
 }
 
-export function WatchPage({ navigate }: { navigate: Navigate }) {
+export function WatchPage({ navigate, mode }: { navigate: Navigate; mode: DataMode }) {
   return (
     <div className="page-pad route-page">
-      <Heading index="05" eyebrow="FUTURE-ONLY EVIDENCE" title="RAT WATCH" detail="Follow recurring evidence, not buy signals. This design demo cannot create or confirm a production subscription." />
+      <Heading
+        index="05"
+        eyebrow="FUTURE-ONLY EVIDENCE"
+        title="RAT WATCH"
+        detail={mode === "DEMO"
+          ? "This design demo illustrates a watch interaction but cannot create a production subscription."
+          : "Real creator recurrence watches are managed through Telegram Rat. This site has no independent subscription authority."}
+      />
       <section className="route-card">
-        <CaseTab tone="orange">DEMO CONTROL / NOT A LIVE SUBSCRIPTION</CaseTab>
-        <p>The Watch buttons in demo dossiers change local interface state only. They do not submit an address, create a receipt, send Telegram alerts or persist across sessions.</p>
-        <p>The existing Telegram Rat belongs to the separate live beta. Subscription management and verified delivery receipts must be connected here before this becomes a production Watch console.</p>
+        <CaseTab tone="orange">{mode === "DEMO" ? "DEMO CONTROL / NOT A LIVE SUBSCRIPTION" : "LIVE / TELEGRAM-MANAGED CREATOR WATCH"}</CaseTab>
+        {mode === "DEMO" ? (
+          <p>The Watch buttons in demo dossiers change local interface state only. They do not submit an address, create a receipt, send Telegram alerts or persist across sessions.</p>
+        ) : (
+          <>
+            <p>Open a LIVE Bag and copy its source-reported creator command. Send that exact <code>/watch 0x...</code> command to Telegram Rat and confirm the bot's response before treating the watch as active.</p>
+            <p>Telegram also supports <code>/watches</code> to inspect accepted watches and <code>/unwatch 0x...</code> to remove one. This web page cannot inspect your Telegram subscriptions or confirm delivery.</p>
+            <p>Radar recipients are different protocol roles and cannot be watched through the current creator-only Telegram command.</p>
+          </>
+        )}
         <div className="route-actions">
-          <AppLink href="/radar" navigate={navigate} className="action primary">FIND AN ADDRESS →</AppLink>
+          <AppLink href="/dumpster" navigate={navigate} className="action primary">FIND A SOURCE-REPORTED CREATOR →</AppLink>
           <a href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer" className="action">OPEN TELEGRAM RAT ↗</a>
         </div>
       </section>
@@ -148,15 +216,62 @@ export function WatchPage({ navigate }: { navigate: Navigate }) {
   );
 }
 
-export function LedgerPage() {
+export function LedgerPage({ mode }: { mode: DataMode }) {
+  const [ledger, setLedger] = useState<LiveLedger | null>(null);
+  const [failure, setFailure] = useState("");
+  useEffect(() => {
+    if (mode !== "LIVE") return;
+    let active = true;
+    loadLiveLedger()
+      .then((result) => { if (active) setLedger(result); })
+      .catch((reason: unknown) => {
+        if (active) setFailure(reason instanceof Error ? reason.message : "DUMPSTER_LEDGER_UNAVAILABLE");
+      });
+    return () => { active = false; };
+  }, [mode]);
   return (
     <div className="page-pad route-page">
-      <Heading index="07" eyebrow="PUBLIC FUNDING EVIDENCE" title="DUMPSTER LEDGER" detail="Financial transparency must come from the current production authority, never from illustrative demo wallet balances." />
-      <section className="route-card">
-        <CaseTab tone="orange">LIVE ACCOUNTING NOT IN THIS DEMO</CaseTab>
-        <p>The current live beta presents pre-launch funding roles and the available ledger status. This V2 candidate has not yet integrated or independently validated its Ledger API, so no balances or transaction totals are shown here.</p>
-        <a href={liveBeta + "#dumpster-ledger"} target="_blank" rel="noopener noreferrer" className="action primary">VIEW EXISTING LIVE LEDGER ↗</a>
-      </section>
+      <Heading index="07" eyebrow="PUBLIC FUNDING EVIDENCE" title="DUMPSTER LEDGER"
+        detail="Owner-declared future funding roles are not on-chain custody proof. Unobserved token flows are not zero balances." />
+      {mode === "DEMO" ? (
+        <section className="route-card">
+          <CaseTab tone="orange">DESIGN DEMO / NO FUNDING EVIDENCE</CaseTab>
+          <p>Funding figures are intentionally absent from the visual demo. The live beta publishes a separate pre-launch Ledger authority.</p>
+          <a href={liveBeta + "#dumpster-ledger"} target="_blank" rel="noopener noreferrer" className="action primary">VIEW EXISTING LIVE LEDGER ↗</a>
+        </section>
+      ) : failure ? (
+        <section className="route-card">
+          <CaseTab tone="red">LEDGER UNAVAILABLE</CaseTab>
+          <p role="alert">{failure}. No synthetic balances, authority addresses or funding entries were substituted.</p>
+        </section>
+      ) : !ledger ? (
+        <section className="route-card"><p role="status">LOADING VALIDATED PUBLIC LEDGER…</p></section>
+      ) : (
+        <>
+          <div className="route-grid">
+            <section className="route-card">
+              <CaseTab tone="orange">{ledger.accountingState} / {ledger.tokenState}</CaseTab>
+              <h2>PRODUCTION ACCOUNTING IS DISABLED</h2>
+              <p>{ledger.explanation}</p>
+              <p>LAUNCH AUTHORIZATION: <b>{ledger.launchAuthorization}</b> · COVERAGE: <b>{ledger.coverage}</b></p>
+              <p>No token-flow entries can be inferred from this pre-launch projection. There is no verified zero balance, total raised or treasury transaction history.</p>
+              <ProofBoundary>{ledger.evidenceBoundary}</ProofBoundary>
+            </section>
+            <aside className="route-card">
+              <CaseTab>OWNER-DECLARED FUTURE ROLES</CaseTab>
+              <h2>TREASURY / POLICY ADDRESS</h2>
+              <div className="copyable-value"><code className="full-address">{ledger.treasury}</code><CopyButton label="declared treasury address" value={ledger.treasury} /></div>
+              <h2>PROJECT FEE RECIPIENT / POLICY ADDRESS</h2>
+              <div className="copyable-value"><code className="full-address">{ledger.projectFeeRecipient}</code><CopyButton label="declared project fee address" value={ledger.projectFeeRecipient} /></div>
+              <p className="route-note">These are configuration declarations, not proof of custody, contract roles, token transfers or marketing authority.</p>
+            </aside>
+          </div>
+          <Receipt title="CANONICAL PRE-LAUNCH LEDGER RECEIPT">
+            <div className="copyable-value"><code>{ledger.receiptId}</code><CopyButton label="canonical Ledger receipt" value={ledger.receiptId} /></div>
+            <small>Receipt format and pre-launch invariants are validated; this interface does not independently rehash the backend projection.</small>
+          </Receipt>
+        </>
+      )}
     </div>
   );
 }

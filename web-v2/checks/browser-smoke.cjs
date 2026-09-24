@@ -22,10 +22,21 @@ async function assertNoHorizontalOverflow(page, label, width) {
     body: document.body.scrollWidth,
     viewport: document.documentElement.clientWidth,
   }));
-  assert.ok(
-    result.doc <= width + 1 && result.body <= width + 1,
-    label + ": horizontal overflow " + JSON.stringify(result),
-  );
+  if (result.doc > width + 1 || result.body > width + 1) {
+    const offenders = await page.evaluate(() => [...document.querySelectorAll("main *")]
+      .filter((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.right > innerWidth + 1;
+      })
+      .slice(0, 12)
+      .map((element) => ({
+        tag: element.tagName, className: String(element.className).slice(0, 80),
+        text: (element.textContent || "").slice(0, 50),
+        right: Math.round(element.getBoundingClientRect().right),
+        scrollWidth: element.scrollWidth, clientWidth: element.clientWidth,
+      })));
+    assert.fail(label + ": horizontal overflow " + JSON.stringify({ ...result, offenders }));
+  }
 }
 
 async function ready(page, url) {
@@ -212,13 +223,28 @@ async function runViewport(browser, viewport) {
 async function runMockedLive(browser) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
+  // The old smoke fixture intentionally skipped receipt/checkpoint fields.
+  // LIVE mode now validates the real API contract; use a structurally honest
+  // empty response so this test still checks missing evidence, not a schema error.
+  const digest = "a".repeat(64);
+  const checkpointHash = "0x" + "b".repeat(64);
   const emptyFeed = {
     schemaVersion: "binrat.public-feed/0.1",
     chainId: 5042,
     asOfBlock: "123",
-    historyCoverage: "PARTIAL",
+    asOfBlockHash: checkpointHash,
+    historyCoverage: "UNVERIFIED",
     bags: [],
-    receipt: { receiptId: "binrat-public:test-empty" },
+    receipt: {
+      projectionVersion: "BINRAT_PUBLIC_PROJECTION_V0",
+      chainId: 5042,
+      asOfBlock: "123",
+      asOfBlockHash: checkpointHash,
+      historyCoverage: "UNVERIFIED",
+      inputDigest: digest,
+      outputDigest: digest,
+      receiptId: "binrat-public:" + digest,
+    },
   };
   const emptyRadar = {
     schemaVersion: "binrat.rat-radar-watchlist/0.1",
@@ -226,7 +252,7 @@ async function runMockedLive(browser) {
     chainId: 5042,
     asOfBlock: "123",
     coverage: {
-      historyCoverage: "PARTIAL",
+      historyCoverage: "UNVERIFIED",
       indexedLaunchCount: 0,
       swapReceiptCount: 0,
       acquisitionReceiptCount: 0,
@@ -236,11 +262,18 @@ async function runMockedLive(browser) {
     },
     method: {
       evidencedRole: "V3_SWAP_RECIPIENT",
+      freeLimit: 5,
+      ordering: [
+        "distinctLaunchCount DESC",
+        "medianFirstEntryBlockDelta ASC",
+        "acquisitionReceiptCount DESC",
+        "observedRecipientAddress ASC",
+      ],
       identityBoundary: "An observed recipient address is not automatically a human trader identity.",
       recommendationBoundary: "Ranking describes observed recurrence and timing; it is not a BUY/SELL recommendation.",
     },
     candidates: [],
-    receipt: { receiptId: "binrat-rat-radar:test-empty", evidenceDigest: "test-only" },
+    receipt: { receiptId: "binrat-rat-radar:" + digest, evidenceDigest: digest },
   };
   await page.route("**/api/feed", (route) => route.fulfill({ json: emptyFeed }));
   await page.route("**/api/rat-radar/watchlist", (route) => route.fulfill({ json: emptyRadar }));
@@ -252,9 +285,185 @@ async function runMockedLive(browser) {
       assert.match(text, /NO RADAR SHORTLIST YET/);
       assert.doesNotMatch(text, /FERAL|DEMO \+5m/);
       assert.equal((await page.locator(".demo-flag").innerText()).trim(), "PUBLIC LIVE");
+      // Native links must preserve LIVE mode on copied/new-tab destinations too.
+      assert.match(await page.locator('nav[aria-label="Primary"] a[href*="/dumpster"]').first().getAttribute("href"), /\?source=live$/);
       await ready(page, "/radar?source=live");
       assert.match(await page.locator("main").innerText(), /NO RADAR FILE IN THIS INDEX/);
       await assertNoHorizontalOverflow(page, "Mocked empty Radar", 390);
+    });
+
+    await check("mocked LIVE Replay/Ledger are canonical, recurrence 123 stays bounded and unavailable replay fails closed", async () => {
+      const id = "1".repeat(64);
+      const address = "0x" + "c".repeat(40);
+      const token = "0x" + "d".repeat(40);
+      const bag = {
+        id, source: "ARCPAD", token, symbol: "LIVE", name: "Live bag",
+        blockNumber: "100", blockHash: checkpointHash, txHash: checkpointHash,
+        logIndex: 0, reportedCreatorAddress: address, pool: token,
+        metadata: { imageUri: "", website: "", twitter: "", telegram: "" },
+        evidence: [{ state: "OBSERVED", code: "SOURCE_CREATOR", text: "ArcPad reported this address.",
+          sourceFactIds: [] }],
+        trashTrail: { coverage: "UNVERIFIED", priorLaunchCount: 0, prior: [] },
+      };
+      const liveFeed = { ...emptyFeed, bags: [bag] };
+      const candidate = {
+        rank: 1, observedRecipientAddress: token, distinctLaunchCount: 123,
+        acquisitionReceiptCount: 99, medianFirstEntryBlockDelta: 1.5,
+        earliestFirstEntryBlockDelta: 0, latestSeenBlock: "120",
+        reasonCodes: ["RECURRENT_RECIPIENT"], reasons: ["Observed recipient evidence."],
+        evidenceActivityIds: [id],
+      };
+      const liveRadar = {
+        ...emptyRadar,
+        coverage: {
+          ...emptyRadar.coverage, indexedLaunchCount: 189, swapReceiptCount: 200,
+          acquisitionReceiptCount: 100, distinctRecipientAddressCount: 485,
+          rankedAddressCount: 1, status: "PARTIAL",
+        },
+        candidates: [candidate],
+      };
+      const observation = {
+        kind: "OBSERVATION", label: "5m", status: "COMPLETE",
+        blockNumber: "122", blockHash: checkpointHash,
+        targetTimestampMs: 1_700_000_300_000, observedTimestampMs: 1_700_000_300_001,
+        evidenceId: "2".repeat(64), evidenceDigest: digest,
+      };
+      const replay = {
+        schemaVersion: "binrat.replay-bundle/0.1",
+        projectionVersion: "BINRAT_REPLAY_BUNDLE_V0",
+        chainId: 5042, asOfBlock: "123", asOfBlockHash: checkpointHash,
+        historyCoverage: "UNVERIFIED",
+        canonicalAuthority: {
+          chainId: 5042, asOfBlock: "123", asOfBlockHash: checkpointHash,
+          sourcePublicReceiptId: "binrat-public:" + digest,
+        },
+        coverage: { historyCoverage: "UNVERIFIED", observationCoverage: "PARTIAL",
+          availableHorizons: ["5m"], missingHorizons: ["1h", "24h"] },
+        launch: bag,
+        creatorFile: {
+          schemaVersion: "binrat.creator-file/0.1", chainId: 5042,
+          asOfBlock: "123", historyCoverage: "UNVERIFIED",
+          reportedCreatorAddress: address, indexedLaunchCount: 1,
+          launches: [{ ...bag, priorLaunchCount: 0 }],
+          receipt: { receiptId: "binrat-creator:" + digest, sourcePublicReceiptId: "binrat-public:" + digest },
+        },
+        intelligence: {
+          schemaVersion: "binrat.bag-intelligence/0.1", chainId: 5042,
+          asOfBlock: "123", bagId: id, token, reportedCreatorAddress: address,
+          observationCoverage: "PARTIAL",
+          snapshots: [{
+            horizonLabel: "5m", status: "COMPLETE", observationId: observation.evidenceId,
+            evidenceDigest: digest, observedBlock: "122", observedBlockHash: checkpointHash,
+            targetTimestampMs: observation.targetTimestampMs,
+            observedTimestampMs: observation.observedTimestampMs,
+          }],
+          receipt: { sourcePublicReceiptId: "binrat-public:" + digest,
+            observationEvidenceDigests: [digest], receiptId: "binrat-intelligence:" + digest },
+        },
+        stages: [
+          { kind: "LAUNCH", label: "LAUNCH", status: "OBSERVED", blockNumber: "100",
+            blockHash: checkpointHash, targetTimestampMs: null, observedTimestampMs: null,
+            evidenceId: "binrat-public:" + digest, evidenceDigest: null },
+          observation,
+        ],
+        receipt: {
+          projectionVersion: "BINRAT_REPLAY_BUNDLE_V0",
+          sourcePublicReceiptId: "binrat-public:" + digest,
+          creatorFileReceiptId: "binrat-creator:" + digest,
+          intelligenceReceiptId: "binrat-intelligence:" + digest,
+          observationEvidenceDigests: [digest], outputDigest: digest,
+          receiptId: "binrat-replay:" + digest,
+        },
+      };
+      const ledger = {
+        schemaVersion: "binrat.dumpster-ledger/0.1",
+        projectionVersion: "BINRAT_DUMPSTER_LEDGER_V0",
+        chainId: 5042, accountingState: "PRE_LAUNCH_AUTHORITIES_CONFIGURED",
+        tokenState: "NOT_LAUNCHED", launchAuthorization: "BLOCKED",
+        marketingAuthorized: false,
+        configuredAuthorities: {
+          status: "OWNER_SELECTED_PRE_LAUNCH", custodyEvidence: "OWNER_DECLARATION_ONLY",
+          onChainRoleProof: "NOT_YET_AVAILABLE",
+          launchMechanicsReceiptDigest: "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
+          treasury: { role: "TREASURY", address: "0xab063A9b53a2Ab832a941aE5890ea05c1672339D" },
+          projectFeeRecipient: { role: "PROJECT_FEE_RECIPIENT", address: "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866" },
+        },
+        fundingAuthority: { status: "PRELAUNCH_AUTHORITIES_CONFIGURED", accountingEnabled: false,
+          tokenAddress: null, creatorFeeRecipients: [], treasuryAddresses: [],
+          effectiveFromBlock: null, configVersion: null, categoryPolicyVersion: null },
+        totals: { entryCount: 0, inflowEntryCount: 0, outflowEntryCount: 0,
+          tokenInflowsRaw: "0", tokenOutflowsRaw: "0", byAsset: [] },
+        entries: [], coverage: { status: "NO_TOKEN_OBSERVATIONS_AVAILABLE",
+          fromBlock: null, throughBlock: null },
+        observedDataAvailability: {
+          tokenAddress: "NOT_YET_AVAILABLE", launchBlock: "NOT_YET_AVAILABLE",
+          launchTransaction: "NOT_YET_AVAILABLE", tokenRelatedInflows: "NOT_YET_AVAILABLE",
+          tokenRelatedOutflows: "NOT_YET_AVAILABLE",
+        },
+        utilityStatus: { source: "CAPABILITY_MANIFEST", shipped: [], building: [], planned: [] },
+        awaitingCanonicalAuthority: ["TOKEN_CONTRACT_ADDRESS"],
+        explanation: "BINRAT is not launched. Production accounting is disabled.",
+        evidenceBoundary: "Zero entries are not a zero balance.",
+        receipt: { manifestDigest: digest, entryEvidenceDigests: [], outputDigest: digest,
+          receiptId: "binrat-dumpster-ledger:" + digest },
+      };
+      await page.unroute("**/api/feed");
+      await page.unroute("**/api/rat-radar/watchlist");
+      await page.route("**/api/feed", (route) => route.fulfill({ json: liveFeed }));
+      await page.route("**/api/rat-radar/watchlist", (route) => route.fulfill({ json: liveRadar }));
+      await page.route("**/api/bag/**/replay", (route) => route.fulfill({ json: replay }));
+      await page.route("**/api/dumpster-ledger", (route) => route.fulfill({ json: ledger }));
+
+      await ready(page, "/radar?source=live");
+      assert.equal(await page.locator(".evidence-dossier .recurrence-marks i").count(), 8);
+      assert.match(await page.locator(".evidence-dossier .recurrence-marks").innerText(), /123 TOTAL/);
+      assert.doesNotMatch(await page.locator(".evidence-dossier").innerText(), /WATCH ARMED/);
+      await assertNoHorizontalOverflow(page, "Live Radar recurrence 123", 390);
+
+      await ready(page, "/bag/" + id + "?source=live");
+      await page.locator(".replay-proof-meta .checkpoint-rail").waitFor();
+      const tabs = page.locator('[role="tab"]');
+      await tabs.nth(1).click();
+      assert.match(await page.locator('[role="tabpanel"]').innerText(), /OBSERVED BLOCK 122/);
+      await tabs.nth(2).click();
+      assert.match(await page.locator('[role="tabpanel"]').innerText(), /NO OBSERVATION RECEIPT/);
+      assert.doesNotMatch(await page.locator("main").innerText(), /DEMO \+5m/);
+      await assertNoHorizontalOverflow(page, "Live Replay", 390);
+      await page.screenshot({ path: path.join(output, "mock-live-replay-390.png") });
+
+      await ready(page, "/ledger?source=live");
+      await page.getByText("CANONICAL PRE-LAUNCH LEDGER RECEIPT").waitFor();
+      const text = await page.locator("main").innerText();
+      assert.match(text, /PRODUCTION ACCOUNTING IS DISABLED/);
+      assert.match(text, /NOT_LAUNCHED/);
+      assert.match(text, /not a zero balance/i);
+      await assertNoHorizontalOverflow(page, "Live prelaunch Ledger", 390);
+      await page.screenshot({ path: path.join(output, "mock-live-ledger-390.png") });
+
+      // Live authority values are longer than DEMO labels: verify the badge
+      // itself stays within its card, as well as the entire narrow viewport.
+      await page.setViewportSize({ width: 320, height: 700 });
+      const badgeBounds = await page.locator(".route-card > .case-tab.orange").first()
+        .evaluate((badge) => {
+          const badgeRect = badge.getBoundingClientRect();
+          const cardRect = badge.closest(".route-card").getBoundingClientRect();
+          return { badgeRight: badgeRect.right, cardRight: cardRect.right };
+        });
+      assert.ok(badgeBounds.badgeRight <= badgeBounds.cardRight + 1,
+        "Live Ledger status badge must wrap within its card: " + JSON.stringify(badgeBounds));
+      await assertNoHorizontalOverflow(page, "Live prelaunch Ledger narrow phone", 320);
+      await page.screenshot({ path: path.join(output, "mock-live-ledger-320.png") });
+      await page.setViewportSize({ width: 390, height: 844 });
+
+      await page.unroute("**/api/bag/**/replay");
+      await page.route("**/api/bag/**/replay", (route) =>
+        route.fulfill({ status: 503, json: { error: "temporarily unavailable" } }));
+      await ready(page, "/bag/" + id + "?source=live");
+      await page.locator(".replay-proof-meta [role=alert]").waitFor();
+      const errorText = await page.locator("main").innerText();
+      assert.match(errorText, /REPLAY UNAVAILABLE/);
+      assert.match(errorText, /NO VALIDATED REPLAY STAGE/);
+      assert.doesNotMatch(errorText, /OBSERVED BLOCK 122/);
     });
   } finally {
     await context.close();

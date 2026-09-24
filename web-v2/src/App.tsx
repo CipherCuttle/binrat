@@ -1,6 +1,7 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon } from "./evidenceIntegrity";
-import { loadProductData, type DataMode } from "./data";
+import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
+import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
+import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import type {
@@ -71,7 +72,7 @@ export default function App() {
   const [route, setRoute] = useState<Route>(readRoute);
   const [feed, setFeed] = useState<PublicFeed | null>(null);
   const [radar, setRadar] = useState<RadarWatchlist | null>(null);
-  const [mode, setMode] = useState<DataMode>("DEMO");
+  const [mode, setMode] = useState<DataMode>(selectedDataMode);
   const [error, setError] = useState("");
   useEffect(() => {
     loadProductData()
@@ -123,15 +124,15 @@ export default function App() {
   ) : route.page === "radar" ? (
     <Radar radar={radar} mode={mode} selectedAddress={route.address} navigate={navigate} />
   ) : route.page === "creator" ? (
-    <CreatorFilePage feed={feed} address={route.address} mode={mode} navigate={navigate} />
+    <CreatorFilePage feed={feed} key={route.address.toLowerCase()} address={route.address} mode={mode} navigate={navigate} />
   ) : route.page === "method" ? (
     <MethodPage navigate={navigate} />
   ) : route.page === "replay" ? (
     <ReplayIndexPage feed={feed} mode={mode} navigate={navigate} />
   ) : route.page === "watch" ? (
-    <WatchPage navigate={navigate} />
+    <WatchPage navigate={navigate} mode={mode} />
   ) : route.page === "ledger" ? (
-    <LedgerPage />
+    <LedgerPage mode={mode} />
   ) : route.page === "binrat" ? (
     <TokenStatusPage />
   ) : route.page === "bag" ? (
@@ -159,7 +160,7 @@ export default function App() {
       </a>
       <ShellNav route={route} navigate={navigate} />
       <div className="workspace">
-        <StatusRail mode={mode} feed={feed} />
+        <StatusRail mode={mode} feed={feed} navigate={navigate} />
         <main id="content" tabIndex={-1}>
           {content}
         </main>
@@ -218,12 +219,15 @@ function ShellNav({
 function StatusRail({
   mode,
   feed,
+  navigate,
 }: {
   mode: DataMode;
   feed: PublicFeed | null;
+  navigate: (path: string) => void;
 }) {
   return (
     <header className="status-rail">
+      <AppLink className="mobile-brand" href="/" navigate={navigate} ariaLabel="BINRAT home">BINRAT <span aria-hidden="true">↗</span></AppLink>
       <span className="status-cluster">
         <i />
         {feed ? (mode === "DEMO" ? "DEMO INDEX READY" : "PUBLIC INDEX READY") : "INDEXING"}
@@ -588,11 +592,19 @@ function EvidenceDossier({
         <span>OBSERVED ROLE — NOT CREATOR IDENTITY</span>
         <b>V3_SWAP_RECIPIENT</b>
       </div>
-      <WatchControl
-        armed={watching}
-        onClick={() => setWatching((value) => !value)}
-        subject="ADDRESS"
-      />
+      {mode === "DEMO" ? (
+        <WatchControl
+          armed={watching}
+          onClick={() => setWatching((value) => !value)}
+          subject="ADDRESS"
+        />
+      ) : (
+        <p className="route-note" role="status">
+          LIVE RADAR RECIPIENT WATCH NOT AVAILABLE. Telegram Rat currently accepts
+          source-reported creator addresses only. This observed recipient is a
+          separate protocol role; no subscription has been created.
+        </p>
+      )}
       <div className="reason-list">
         {candidate.reasons.map((reason, index) => (
           <p key={reason}>
@@ -634,6 +646,20 @@ function BagDossier({
 }) {
   const [stage, setStage] = useState<ReplayHorizon>("LAUNCH");
   const [watching, setWatching] = useState(false);
+  const [liveReplay, setLiveReplay] = useState<LiveReplayBundle | null>(null);
+  const [replayError, setReplayError] = useState("");
+  useEffect(() => {
+    if (mode !== "LIVE") return;
+    let active = true;
+    setLiveReplay(null);
+    setReplayError("");
+    loadLiveReplayBundle(bag.id)
+      .then((result) => { if (active) setLiveReplay(result); })
+      .catch((reason: unknown) => {
+        if (active) setReplayError(reason instanceof Error ? reason.message : "REPLAY_BUNDLE_UNAVAILABLE");
+      });
+    return () => { active = false; };
+  }, [bag.id, mode]);
   const onReplayKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     const labels = REPLAY_HORIZONS;
     const current = labels.indexOf(stage);
@@ -647,7 +673,16 @@ function BagDossier({
     setStage(labels[target]);
     event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[target]?.focus();
   };
-  const stageData = replayStagesForBag(bag, mode);
+  // DEMO can use authored fixtures. LIVE can only show separately validated
+  // canonical Replay stages; even LAUNCH remains unavailable while loading.
+  const unavailable = (): ReplayStage => ({
+    state: "MISSING",
+    value: "NO VALIDATED REPLAY STAGE",
+    note: "No independently validated Replay bundle is loaded for this exact bag.",
+  });
+  const stageData: Record<ReplayHorizon, ReplayStage> = mode === "DEMO"
+    ? replayStagesForBag(bag, mode)
+    : liveReplay?.stages ?? { LAUNCH: unavailable(), "5m": unavailable(), "1h": unavailable(), "24h": unavailable() };
   return (
     <div className="page-pad bag-page">
       <AppLink className="back-link" href="/dumpster" navigate={navigate}>
@@ -664,11 +699,20 @@ function BagDossier({
           </h1>
         </div>
         <div className="case-actions">
-          <WatchControl
-            armed={watching}
-            onClick={() => setWatching((value) => !value)}
-            subject="CREATOR"
-          />
+          {mode === "DEMO" ? (
+            <WatchControl
+              armed={watching}
+              onClick={() => setWatching((value) => !value)}
+              subject="CREATOR"
+            />
+          ) : (
+            <div className="route-actions">
+              <span>TELEGRAM RAT / SOURCE-REPORTED CREATOR</span>
+              <CopyButton label="Telegram creator watch command" value={"/watch " + bag.reportedCreatorAddress} />
+              <a href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer" className="action">OPEN TELEGRAM RAT ↗</a>
+              <small>Paste the copied command in Telegram and confirm the bot receipt. No subscription was created here.</small>
+            </div>
+          )}
           <a className="action primary" href="#replay">
             OPEN REPLAY ↓
           </a>
@@ -799,6 +843,25 @@ function BagDossier({
           <b>{stageData[stage].value}</b>
           <p>{stageData[stage].note}</p>
         </div>
+        {mode === "LIVE" && (
+          <div className="replay-proof-meta">
+            {replayError ? (
+              <p role="alert">REPLAY UNAVAILABLE / {replayError}. No stages from the feed or demo have been substituted.</p>
+            ) : !liveReplay ? (
+              <p role="status">LOADING SEPARATELY CHECKPOINTED LIVE REPLAY…</p>
+            ) : (
+              <>
+                <CheckpointRail
+                  checkpoint={liveReplay.asOfBlock}
+                  coverage={liveReplay.historyCoverage}
+                  receiptId={liveReplay.receipt.receiptId}
+                />
+                <p>OBSERVATION COVERAGE / <CoverageStamp state={liveReplay.observationCoverage} /> · RECEIPT AUTHORITY / {liveReplay.receipt.sourcePublicReceiptId}</p>
+                <small>Receipt identifiers and chronology are structurally validated in this browser. Cryptographic projection verification remains the backend's responsibility.</small>
+              </>
+            )}
+          </div>
+        )}
         <ProofBoundary>
           Each horizon redraws the file from evidence available at that moment.
           Future observations never fill earlier gaps.

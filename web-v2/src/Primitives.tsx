@@ -22,7 +22,7 @@ export function AppLink({
     import.meta.env.BASE_URL === "/"
       ? ""
       : import.meta.env.BASE_URL.replace(/\/$/, "");
-  const resolvedHref = `${base}${href === "/" ? "/" : href}`;
+  const resolvedHref = `${base}${href === "/" ? "/" : href}${window.location.search}`;
   const follow = (event: MouseEvent<HTMLAnchorElement>) => {
     if (
       event.defaultPrevented ||
@@ -77,7 +77,8 @@ export function RecurrenceMarks({
   total?: number;
   compact?: boolean;
 }) {
-  const slots = Math.max(total, count);
+  // Decorative recurrence marks are bounded; a live recipient may appear on hundreds of launches.
+  const slots = Math.min(8, Math.max(total, count));
   return (
     <span
       className={compact ? "recurrence-marks compact" : "recurrence-marks"}
@@ -88,6 +89,7 @@ export function RecurrenceMarks({
           <span>{index + 1}</span>
         </i>
       ))}
+      {count > slots && <small className="recurrence-total">{count} TOTAL</small>}
     </span>
   );
 }

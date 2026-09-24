@@ -1,32 +1,59 @@
-import { demoFeed, demoRadar } from './fixtures';
-import type { PublicFeed, RadarWatchlist } from './types';
+import { demoFeed, demoRadar } from "./fixtures";
+import { adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar, adaptLiveReplay, adaptLiveLedger, type LiveCreatorFile, type LiveReplayBundle, type LiveLedger } from "./liveAdapter";
+import type { PublicFeed, RadarWatchlist } from "./types";
 
-export type DataMode = 'DEMO' | 'LIVE';
+export type DataMode = "DEMO" | "LIVE";
 
-const wantsLive = new URLSearchParams(window.location.search).get('source') === 'live';
+const wantsLive = new URLSearchParams(window.location.search).get("source") === "live";
+export const selectedDataMode: DataMode = wantsLive ? "LIVE" : "DEMO";
+
+async function readJson(path: string, unavailableCode: string): Promise<unknown> {
+  const response = await fetch(path, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error(unavailableCode);
+  return response.json() as Promise<unknown>;
+}
 
 export async function loadProductData(): Promise<{ feed: PublicFeed; radar: RadarWatchlist; mode: DataMode }> {
-  if (!wantsLive) return { feed: demoFeed, radar: demoRadar, mode: 'DEMO' };
-  const [feedResponse, radarResponse] = await Promise.all([
-    fetch('/api/feed', { headers: { accept: 'application/json' }, cache: 'no-store' }),
-    fetch('/api/rat-radar/watchlist', { headers: { accept: 'application/json' }, cache: 'no-store' })
+  if (!wantsLive) return { feed: demoFeed, radar: demoRadar, mode: "DEMO" };
+  const [feedRaw, radarRaw] = await Promise.all([
+    readJson("/api/feed", "PUBLIC_READ_PLANE_UNAVAILABLE"),
+    readJson("/api/rat-radar/watchlist", "RAT_RADAR_UNAVAILABLE"),
   ]);
-  if (!feedResponse.ok || !radarResponse.ok) throw new Error('PUBLIC_READ_PLANE_UNAVAILABLE');
-  const feed = await feedResponse.json() as PublicFeed;
-  const radar = await radarResponse.json() as RadarWatchlist;
-  assertFeed(feed);
-  assertRadar(radar);
-  return { feed, radar, mode: 'LIVE' };
+  // Requests may cross an advancing checkpoint. Validate both scopes separately
+  // instead of claiming they share the same receipt or inventing a common horizon.
+  const feed = adaptLiveFeed(feedRaw);
+  const radar = adaptLiveRadar(radarRaw);
+  return { feed, radar, mode: "LIVE" };
 }
 
-function assertFeed(value: PublicFeed) {
-  if (value.schemaVersion !== 'binrat.public-feed/0.1' || value.chainId !== 5042 || !Array.isArray(value.bags)) {
-    throw new Error('PUBLIC_FEED_SCHEMA_INVALID');
-  }
+/** 404 is a genuine not-indexed address. Every other failure remains an error. */
+export async function loadLiveCreatorFile(address: string): Promise<LiveCreatorFile | null> {
+  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) return null;
+  const response = await fetch("/api/creator/" + encodeURIComponent(address), {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("CREATOR_FILE_UNAVAILABLE");
+  return adaptLiveCreatorFile(await response.json() as unknown, address);
 }
 
-function assertRadar(value: RadarWatchlist) {
-  if (value.schemaVersion !== 'binrat.rat-radar-watchlist/0.1' || value.chainId !== 5042 || !Array.isArray(value.candidates)) {
-    throw new Error('RAT_RADAR_SCHEMA_INVALID');
-  }
+
+/** A replay can have a newer canonical checkpoint than the originally loaded feed. */
+export async function loadLiveReplayBundle(bagId: string): Promise<LiveReplayBundle> {
+  if (!/^[0-9a-f]{64}$/.test(bagId)) throw new Error("REPLAY_BAG_ID_INVALID");
+  return adaptLiveReplay(
+    await readJson("/api/bag/" + encodeURIComponent(bagId) + "/replay", "REPLAY_BUNDLE_UNAVAILABLE"),
+    bagId,
+  );
+}
+
+/** The current production authority exposes only a disabled, pre-launch ledger. */
+export async function loadLiveLedger(): Promise<LiveLedger> {
+  return adaptLiveLedger(await readJson("/api/dumpster-ledger", "DUMPSTER_LEDGER_UNAVAILABLE"));
 }

@@ -46,7 +46,101 @@ Finish the bounded product/frontend acceptance before resuming launch-operator p
 Legal/compliance, contract risk and disclosure review remain parallel launch-authorization
 gates; a visual release does not authorize token marketing or launch.
 
-### F0 — Inspect and choose the visual direction (CURRENT)
+### F0M — DO NEXT: mobile-first app experience (OWNER PRIORITY, 2026-09-24)
+
+**Decision:** The 320/360/390/430/768/1024/1440 px responsive GitHack demo is a
+technical baseline, **not owner-accepted mobile UX**. Stop piling breakpoint
+patches on the desktop layout. Recompose the phone as a real, task-first app,
+inspired by the interaction clarity of current Uniswap and investigative depth
+of Sentry, while preserving BINRAT's approved forensic-dumpster identity.
+This **supersedes the five-tab mobile shell and marketing-first mobile Home**
+in the older Product Surface V1 brief; desktop may retain its existing routes.
+Do not treat screenshots passing overflow checks as visual acceptance.
+
+**Exact next action / deliverable:** One isolated, reviewable mobile-first
+design changeset based on the V2 PR #23 validated data boundaries, initially
+using deterministic DEMO fixtures. The owner must be able to open a GitHack
+preview on an actual phone and inspect three complete screens:
+
+1. **Discover:** default repeat-visit screen, latest indexed Bag and genuinely
+   available observations, concise filter/search, source/coverage labels and
+   obvious Bag action. Campaign hero and full mascot scene move to first-run
+   introduction / About; never dominate the daily home.
+2. **Radar:** recurrence shortlist and selected observed-recipient summary
+   visible early, explicit role/sample/coverage, one-tap source receipts,
+   no trading signals, safety score or generic bubble-map visualization.
+3. **Bag / Replay:** key launch facts and reported creator first, chronological
+   history and frozen LAUNCH→5m→1h→24h stages; stage-specific checkpoint,
+   receipts, missing and error states remain intact and independently scoped.
+
+**Phone shell:** four text-labelled thumb-friendly destinations:
+Discover / Radar / Saved / More. Saved is a local bookmark, **never** an
+accepted Watch subscription. More contains Ledger, Replay index, Method,
+token status and onboarding. Keep Creator and Radar-recipient roles distinct;
+make contextual back/next navigation obvious and restore list scroll on
+return. Each destination has one dominant task, with technical proof in
+progressively disclosed accessible sheets/routes, not hidden or invented.
+Primary touch targets >=48 CSS px, body copy ~14–16 px or larger where
+appropriate, safe-area and system-font scaling, readable identifier copying,
+and explicit DEMO/LIVE and data-freshness labels.
+
+**Three bounded changesets (not a new 50-PR sprint):**
+
+- **M1 / DO NEXT — visual and structural proof:** split phone screen
+  compositions from desktop while sharing types/validators; extract
+  MobileShell, DiscoverScreen/LaunchCard, RadarScreen/RecipientRow and
+  BagScreen/ReplayTimeline; use existing Plex fonts and named BINRAT
+  tokens, component-owned CSS Modules and a static mascot fallback.
+  Prefer existing platform/browser APIs for initial navigation; adopt a
+  router only when typed deep links, browser Back and scroll restoration
+  are actually being implemented. Freeze 390 px reference screenshots
+  for the three screens before general breakpoint polish.
+- **M2 / truthful interactions and live reads:** preserve existing
+  `adaptLiveFeed/Radar/CreatorFile/Replay/Ledger` and independently
+  advancing checkpoint/receipt authority. Fetch screens independently
+  so unavailable Radar does not blank Discover; no DEMO fallback for
+  failed LIVE reads. Add typed routing (TanStack Router) and per-screen
+  cache (TanStack Query) only as justified, with explicit stale/error
+  states; selected Base UI accessible drawer/dialog primitives for filters
+  and proof detail. Saved is clearly local; real creator-only Telegram
+  Watch requires an accepted delivery/subscription receipt; no fake web
+  Watch state or unsupported Radar-recipient subscription.
+- **M3 / product motion and release qualification:** restrained Motion
+  microinteractions, then owner-approved mascot assets and lazy Rive
+  state-machine integration **only after the art exists**; tie triggers
+  to validated product events, with WebP and reduced-motion equivalents.
+  Consider Vite PWA only on an isolated controlled origin with valid
+  deep-link fallback, safe service-worker scope and **no stale LIVE
+  `/api/*` masquerading as current**. No React Native/native wrapper
+  or large component kit absent an independently justified requirement.
+
+**Reuse:** existing `web-v2` adapters, fixtures, Receipt/Checkpoint/Coverage
+primitives and Playwright checks; inspect `CipherCuttle/rekt-terminal`
+`apps/inkubator-lab/src/instrument-os/` motion/reduced-motion patterns,
+`apps/inkubator-lab/e2e/golden-screens.spec.ts` (Playwright + axe) and
+`apps/inkubator-lab/src/signal-system/tokens.css` as *patterns only*.
+Old BINRAT `design/binrat-rive-machine-demo-v0` has Canvas/CSS exploration,
+**not** a production `.riv` asset. No unverified paid libraries, blanket
+UI-kit adoption, borrowed branded artwork or new general graphics engine.
+
+**Acceptance / hostile review:** Test real workflows on an actual Android
+phone: discover latest Bag → Creator → frozen Replay → inspect receipt →
+save locally → leave/return at the same list position. Check 320, 360, 390,
+430 px phones; 768/1024 tablet; 1440 desktop; tap areas, Android Back,
+screen-reader/keyboard focus, large text, reduced motion, stale/offline,
+long 64-character identifiers, 503/malformed data, and non-overflow.
+Use Playwright screenshot + functional checks **and one independent visual
+hostile review**, fix Critical/High and perform at most one targeted rereview.
+Screenshots and passing CI alone do not imply owner visual acceptance.
+For LIVE/candidate cutover additionally require real read-only endpoint tests,
+deep-link/rollback verification and explicit owner authorization.
+
+**Authority:** This entry is a *roadmap instruction only*: no merge, production
+or candidate deployment, funding, trading, token launch/marketing or real
+subscription activation is authorized. Keep the current public V0 site
+available as rollback and preserve the separate legal/compliance gates.
+
+### F0 — Prior visual direction / reference only (MOBILE NOT ACCEPTED)
 
 - Show the already-published Product Surface V1 demo:
   https://ciphercuttle.github.io/binrat/ (Home),

@@ -188,6 +188,27 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
             BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
             node web-v2/checks/browser-smoke.cjs
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
+            node web-v2/checks/responsive-preview.cjs
+      - name: Read-only LIVE candidate against the existing public API
+        if: ${{ github.head_ref == 'feat/binrat-frontend-live-integration-pr3' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check web-v2/checks/live-candidate-smoke.cjs
+          if ! curl -fsS http://127.0.0.1:4174/ >/dev/null; then
+            (cd web-v2 && pnpm exec vite preview --host 127.0.0.1 --port 4174) > "$RUNNER_TEMP/binrat-vite-live.log" 2>&1 &
+            for attempt in $(seq 1 40); do
+              if curl -fsS http://127.0.0.1:4174/ >/dev/null; then break; fi
+              if [ "$attempt" -eq 40 ]; then cat "$RUNNER_TEMP/binrat-vite-live.log"; exit 1; fi
+              sleep 1
+            done
+          fi
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
+            node web-v2/checks/live-candidate-smoke.cjs
+
       - name: Upload viewport screenshots and failure evidence
         if: always()
         uses: actions/upload-artifact@v4
