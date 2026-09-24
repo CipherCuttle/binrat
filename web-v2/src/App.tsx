@@ -1,4 +1,5 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
+import { MobileBag, MobileDiscover, MobileMore, MobileRadar, MobileSaved, MobileShell, useMobileBookmarks } from "./mobile/MobileExperience";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
 import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
 import type { LiveReplayBundle } from "./liveAdapter";
@@ -27,6 +28,8 @@ import {
 type Route =
   | { page: "home" }
   | { page: "dumpster" }
+  | { page: "saved" }
+  | { page: "more" }
   | { page: "radar"; address?: string }
   | { page: "creator"; address: string }
   | { page: "method" }
@@ -51,7 +54,9 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
-  if (path === "/") return { page: "home" };
+  if (path === "/" || path === "/index.html") return { page: "home" };
+  if (path === "/saved") return { page: "saved" };
+  if (path === "/more") return { page: "more" };
   if (path === "/dumpster") return { page: "dumpster" };
   const radarAddress = addressFromRoute(path, "/radar/address/");
   if (radarAddress !== null) return { page: "radar", address: radarAddress };
@@ -68,7 +73,20 @@ function readRoute(): Route {
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
 }
 
+function useCompactViewport() {
+  const [compact, setCompact] = useState(() => window.matchMedia("(max-width: 720px)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 720px)");
+    const onChange = () => setCompact(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+  return compact;
+}
+
 export default function App() {
+  const compact = useCompactViewport();
+  const bookmarks = useMobileBookmarks();
   const [route, setRoute] = useState<Route>(readRoute);
   const [feed, setFeed] = useState<PublicFeed | null>(null);
   const [radar, setRadar] = useState<RadarWatchlist | null>(null);
@@ -131,6 +149,10 @@ export default function App() {
     <ReplayIndexPage feed={feed} mode={mode} navigate={navigate} />
   ) : route.page === "watch" ? (
     <WatchPage navigate={navigate} mode={mode} />
+  ) : route.page === "saved" ? (
+    <MobileSaved feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : route.page === "more" ? (
+    <MobileMore mode={mode} navigate={navigate} />
   ) : route.page === "ledger" ? (
     <LedgerPage mode={mode} />
   ) : route.page === "binrat" ? (
@@ -153,7 +175,29 @@ export default function App() {
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
-  return (
+  const mobileContent = error ? (
+    <div className="page-pad" role="alert"><h1>THE TRAIL WENT COLD.</h1><p>The public read plane did not return validated evidence. Nothing was synthesized.</p></div>
+  ) : !feed || !radar ? (
+    <div className="loading" role="status"><span /><p>RAT IS CHECKING THE RECEIPTS…</p></div>
+  ) : route.page === "home" || route.page === "dumpster" ? (
+    <MobileDiscover feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : route.page === "radar" ? (
+    <MobileRadar radar={radar} selectedAddress={route.address} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : route.page === "bag" && requestedBag ? (
+    <MobileBag key={requestedBag.id} bag={requestedBag} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : route.page === "saved" ? (
+    <MobileSaved feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : route.page === "more" ? (
+    <MobileMore mode={mode} navigate={navigate} />
+  ) : content;
+  return compact ? (
+    <div className="app-frame">
+      <a className="skip-link" href="#content">Skip to evidence</a>
+      <MobileShell page={route.page} mode={mode} checkpoint={feed?.asOfBlock ?? null} navigate={navigate}>
+        {mobileContent}
+      </MobileShell>
+    </div>
+  ) : (
     <div className="app-frame">
       <a className="skip-link" href="#content">
         Skip to evidence
