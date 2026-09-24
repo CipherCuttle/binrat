@@ -71,6 +71,19 @@ test('D1 admission enforces 10/user/day, 120/global/day and UTC rollover', async
   } finally { db.close(); }
 });
 
+test('concurrent D1 admissions cannot exceed either quota', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    const oneUser = await Promise.all(Array.from({ length: 30 }, (_, i) =>
+      reserveRatAiCall(db, i + 1, 333, now)));
+    assert.equal(oneUser.filter(Boolean).length, RAT_AI_USER_DAILY_LIMIT);
+    const manyUsers = await Promise.all(Array.from({ length: 200 }, (_, i) =>
+      reserveRatAiCall(db, 1, i + 1000, now)));
+    assert.equal(manyUsers.filter(Boolean).length,
+      RAT_AI_GLOBAL_DAILY_LIMIT - RAT_AI_USER_DAILY_LIMIT);
+  } finally { db.close(); }
+});
+
 test('AI only handles innocuous unclassified chat and rejects factual-looking output', async () => {
   assert.equal(isRatBanterEligible('hello rat, do you sleep?', understandRatMessage(
     'hello rat, do you sleep?', { allowUnaddressed: true })), true);
