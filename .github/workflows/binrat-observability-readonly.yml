@@ -1,0 +1,76 @@
+name: binrat-observability-readonly
+
+on:
+  push:
+    branches: [diag/binrat-observability-readonly-20260924]
+    paths: [.github/workflows/binrat-observability-readonly.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BINRAT_OBSERVABILITY_API_TOKEN: ${{ secrets.BINRAT_OBSERVABILITY_API_TOKEN }}
+      BINRAT_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Query BINRAT Worker historical telemetry without publishing raw logs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const token = process.env.BINRAT_OBSERVABILITY_API_TOKEN;
+          const account = process.env.BINRAT_CLOUDFLARE_ACCOUNT_ID;
+          if (!token || !account) {
+            console.error('Missing BINRAT_OBSERVABILITY_API_TOKEN or BINRAT_CLOUDFLARE_ACCOUNT_ID repository secret.');
+            process.exit(1);
+          }
+          if (!/^[0-9a-f]{32}$/i.test(account)) {
+            console.error('BINRAT_CLOUDFLARE_ACCOUNT_ID must be a 32-character hex account ID.');
+            process.exit(1);
+          }
+          const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+          const request = async (url, options = {}) => {
+            const response = await fetch(url, { ...options, headers, signal: AbortSignal.timeout(20000) });
+            const body = await response.json();
+            const codes = Array.isArray(body.errors) ? body.errors.map(item => item.code).filter(x => typeof x === 'number') : [];
+            return { response, body, codes };
+          };
+          (async () => {
+            const verification = await request('https://api.cloudflare.com/client/v4/user/tokens/verify');
+            console.log('Token verification:', verification.response.status, 'active:', verification.body.success === true && verification.body.result?.status === 'active', 'error codes:', verification.codes);
+            if (!verification.response.ok || !verification.body.success || verification.body.result?.status !== 'active') process.exit(1);
+
+            // Fixed incident window; POST is Cloudflare's query endpoint, with dry=true.
+            const timeframe = { from: Date.parse('2026-09-23T21:00:00Z'), to: Date.parse('2026-09-24T02:00:00Z') };
+            const query = {
+              dry: true, view: 'events', limit: 100, timeframe,
+              parameters: {
+                datasets: ['cloudflare-workers'],
+                filters: [{ key: '$metadata.service', operation: 'eq', type: 'string', value: 'binrat-edge-v0' }]
+              }
+            };
+            const result = await request(`https://api.cloudflare.com/client/v4/accounts/${account}/workers/observability/telemetry/query`, { method: 'POST', body: JSON.stringify(query) });
+            console.log('BINRAT telemetry query:', result.response.status, 'success:', result.body.success === true, 'error codes:', result.codes);
+            if (!result.response.ok || result.body.success === false || !result.body.result) process.exit(1);
+            const payload = result.body.result;
+            const events = payload.events?.events ?? [];
+            console.log('Matching count:', payload.events?.count ?? 'unreported', 'returned:', events.length);
+            console.log('Run status:', payload.run?.status ?? 'unreported', 'dry:', payload.run?.dry ?? 'unreported');
+            const grouped = {};
+            for (const event of events) {
+              const service = event.$metadata?.service ?? event.$workers?.scriptName;
+              if (service !== 'binrat-edge-v0') continue;
+              const key = [event.$workers?.eventType ?? 'unknown-trigger', event.$workers?.outcome ?? 'unknown-outcome'].join(' / ');
+              grouped[key] = (grouped[key] ?? 0) + 1;
+            }
+            console.log('BINRAT event groups:', JSON.stringify(grouped));
+            if (!events.length) console.log('No historical events returned; check Workers Logs enablement, retention, and query filter.');
+          })().catch(error => {
+            console.error('Diagnostic request failed:', error.name);
+            process.exitCode = 1;
+          });
+          NODE
