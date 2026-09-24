@@ -202,9 +202,9 @@ test('IP and wallet challenge limits persist in D1 and reset at next minute', as
   const db = await openDb();
   let now = NOW;
   try {
-    const run = (wallet: string, ip: string) => challenge(db, () => now, wallet, ip);
+    const run = (wallet: Hex, ip: string) => challenge(db, () => now, wallet, ip);
     for (let i = 0; i < 6; i += 1) {
-      const wallet = '0x' + (1000 + i).toString(16).padStart(40, '0');
+      const wallet = ('0x' + (1000 + i).toString(16).padStart(40, '0')) as Hex;
       assert.equal((await run(wallet, '192.0.2.42')).status, 201);
     }
     assert.equal((await run(OTHER.address, '192.0.2.42')).status, 429);
