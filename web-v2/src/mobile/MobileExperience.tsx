@@ -2,6 +2,7 @@ import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { AppLink, CopyButton, CoverageStamp } from "../Primitives";
 import { REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "../evidenceIntegrity";
 import { loadLiveReplayBundle, type DataMode } from "../data";
+import { RecipientActivityPanel } from "../RecipientActivityPanel";
 import type { LiveReplayBundle } from "../liveAdapter";
 import type { Bag, PublicFeed, RadarWatchlist } from "../types";
 import s from "./MobileExperience.module.css";
@@ -139,6 +140,9 @@ export function MobileRadar({ radar, mode, selectedAddress, bookmarks, navigate 
         <span>RADAR CHECKPOINT {radar.asOfBlock} · <CoverageStamp state={radar.coverage.historyCoverage}/></span>
       </details>
     </section> : <div className={s.empty}><strong>NO MATCHING RADAR FILE.</strong><p>No other recipient was substituted.</p></div>}
+    {(selected || (selectedAddress && /^0x[0-9a-f]{40}$/i.test(selectedAddress))) &&
+      <RecipientActivityPanel key={selected?.observedRecipientAddress ?? selectedAddress}
+        address={selected?.observedRecipientAddress ?? selectedAddress!} mode={mode} shortlistCheckpoint={radar.asOfBlock}/>}
     <div className={s.sectionHead}><div><small>PUBLIC SHORTLIST</small><h2>Other files</h2></div></div>
     <div className={s.radarList}>{radar.candidates.map(x =>
       <AppLink key={x.observedRecipientAddress} href={"/radar/address/" + x.observedRecipientAddress} navigate={navigate}

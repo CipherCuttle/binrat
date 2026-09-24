@@ -56,13 +56,16 @@ async function testPhone(browser, width, height) {
       await ready(page, route);
       await mobileNav(page, width, height);
       await noOverflow(page, route, width);
-      const label = route.includes("/bag/") ? "bag" : route === "/" ? "discover" : route.slice(1);
+      const label = route.includes("/bag/") ? "bag" : route === "/" ? "home" : route.slice(1);
       if (width === 390 || (width === 320 && ["discover", "radar", "bag"].includes(label))) {
         await page.screenshot({ path: path.join(output, label + "-" + width + ".png"), fullPage: true, animations: "disabled" });
       }
       process.stdout.write("PASS M1 " + width + "px " + label + "\n");
     }
     await ready(page, "/");
+    assert.match(await page.locator("main").innerText(), /THE RAT.*REMEMBERS/s);
+    assert.ok(await page.getByRole("link", { name: /OPEN RAT RADAR/ }).isVisible(), "phone Home Radar CTA");
+    await ready(page, "/dumpster");
     assert.match(await page.locator("main").innerText(), /FRESH EVIDENCE/i);
     const search = page.getByRole("searchbox");
     await search.fill("FERAL");

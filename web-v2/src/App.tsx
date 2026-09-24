@@ -4,6 +4,7 @@ import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZO
 import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
 import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
+import { RecipientActivityPanel } from "./RecipientActivityPanel";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import type {
   Bag,
@@ -338,13 +339,13 @@ function Home({
           <div className="action-row">
             <AppLink
               className="action primary"
-              href="/dumpster"
+              href="/radar"
               navigate={navigate}
             >
-              ENTER THE DUMPSTER <span>↗</span>
+              OPEN RAT RADAR <span>↗</span>
             </AppLink>
-            <AppLink className="action" href="/radar" navigate={navigate}>
-              OPEN RAT RADAR
+            <AppLink className="action" href="/dumpster" navigate={navigate}>
+              ENTER THE DUMPSTER
             </AppLink>
           </div>
           <p className="claim-line">
@@ -536,6 +537,8 @@ function Radar({ radar, radarError, mode, selectedAddress, navigate }: {
         detail="The shortlist endpoint is independent from the Feed."/>
       <EmptyState title="RAT RADAR UNAVAILABLE." detail={(radarError ?? "NO VALIDATED SHORTLIST") +
         ". No candidates or rankings were substituted."} />
+      {selectedAddress && /^0x[0-9a-f]{40}$/i.test(selectedAddress) &&
+        <div className="ns-standalone"><RecipientActivityPanel key={selectedAddress} address={selectedAddress} mode={mode}/></div>}
     </div>;
   }
   const selected = selectRadarCandidate(radar, selectedAddress);
@@ -546,7 +549,9 @@ function Radar({ radar, radarError, mode, selectedAddress, navigate }: {
         <PageHeading index="02" eyebrow="OBSERVED RECURRENCE / TIMING" title="RAT RADAR" detail="Inspectable observed recipient recurrence, subject to indexed coverage." />
         <p className="radar-sample-note">{counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES.</p>
         <CheckpointRail checkpoint={radar.asOfBlock} coverage={radar.coverage.historyCoverage} />
-        <EmptyState title={selectedAddress === undefined ? "NO RADAR FILE IN THIS INDEX." : "NO MATCHING RADAR ADDRESS."} detail="No public ranked dossier matches the requested address at this checkpoint. Nothing else was substituted." />
+        <EmptyState title={selectedAddress === undefined ? "NO RADAR FILE IN THIS INDEX." : "ADDRESS OUTSIDE PUBLIC SHORTLIST."} detail="No shortlist rank is assigned to this address. Valid direct links independently request public recipient activity." />
+        {selectedAddress && /^0x[0-9a-f]{40}$/i.test(selectedAddress) &&
+          <div className="ns-standalone"><RecipientActivityPanel key={selectedAddress} address={selectedAddress} mode={mode} shortlistCheckpoint={radar.asOfBlock}/></div>}
       </div>
     );
   }
@@ -682,6 +687,7 @@ function EvidenceDossier({
           </p>
         ))}
       </div>
+      <RecipientActivityPanel address={candidate.observedRecipientAddress} mode={mode} shortlistCheckpoint={checkpoint} />
       <Receipt
         title="ACQUISITION RECEIPTS"
         count={candidate.acquisitionReceiptCount}
