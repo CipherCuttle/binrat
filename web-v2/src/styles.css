@@ -1,17 +1,17 @@
 @font-face {
   font-family: Plex Mono;
-  src: url("/fonts/plex-mono-regular.woff2") format("woff2");
+  src: url("/CipherCuttle/binrat/binrat-mobile-m1-githack/web-v2/dist/fonts/plex-mono-regular.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: Plex Mono;
-  src: url("/fonts/plex-mono-medium.woff2") format("woff2");
+  src: url("/CipherCuttle/binrat/binrat-mobile-m1-githack/web-v2/dist/fonts/plex-mono-medium.woff2") format("woff2");
   font-weight: 600;
   font-display: swap;
 }
 @font-face {
   font-family: Plex Condensed;
-  src: url("/fonts/plex-condensed-bold.woff2") format("woff2");
+  src: url("/CipherCuttle/binrat/binrat-mobile-m1-githack/web-v2/dist/fonts/plex-condensed-bold.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
