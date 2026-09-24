@@ -21,7 +21,7 @@ This document governs presentation only. It does not create token-launch authori
 - Pons creator-fee recipient: **NOT_VERIFIED**
 - source repository: `https://github.com/CipherCuttle/binrat`
 - official website ownership, Telegram handle, X handle and token logo: **NOT_VERIFIED**
-- Pons listing metadata: **INTERNAL PRELAUNCH DRAFT, NOT SUBMITTABLE** — `docs/PONS_DISCOVERY_METADATA_V1.json`
+- Pons listing metadata: **INTERNAL PRELAUNCH DRAFT, NOT SUBMITTABLE** — `docs/PONS_DISCOVERY_CANDIDATE_V1.json`
 - production Pons accounting: **DISABLED**
 - Holder Gate: **TOKEN_AUTHORITY_NOT_CONFIGURED**
 - Arc research index: availability is determined by its independent live evidence-readiness checks
@@ -125,6 +125,6 @@ Token branding and distribution must never change the factual evidence shown for
 
 ## Discovery-to-listing handoff (planning only)
 
-`docs/PONS_DISCOVERY_METADATA_V1.json` is deliberately non-submittable. Name and ticker are proposals; token contract, execution receipt, logo, Pons treasury and project-fee wallet, verified site, Telegram and X are null until separately proven. Repository ownership proves only source location, not ownership of other domains or handles. The listing must never reuse this draft's empty socials or infer an official contract from a symbol match. No wallet link, `BUY` button or token-address copy affordance is authorized prelaunch.
+`docs/PONS_DISCOVERY_CANDIDATE_V1.json` is deliberately non-submittable. Name and ticker are proposals; token contract, execution receipt, logo, Pons treasury and project-fee wallet, verified site, Telegram and X are null until separately proven. Repository ownership proves only source location, not ownership of other domains or handles. The listing must never reuse this draft's empty socials or infer an official contract from a symbol match. No wallet link, `BUY` button or token-address copy affordance is authorized prelaunch.
 
 The same basic facts must agree across the staged preview website, `GET /api/capabilities` when separately deployed, Telegram `/token` when separately deployed, and the *future* Pons metadata submission. None of these preview assets changes the frozen historical ArcPad launch-config digest, the Arc 5042 evidence runtime, or PR #30's block on Robinhood funding and holder entitlements.
