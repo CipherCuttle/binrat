@@ -1,0 +1,75 @@
+name: rat-conversation-candidate-deploy
+
+on:
+  push:
+    branches:
+      - feat/binrat-rat-conversation-free-ai-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-rat-conversation-candidate-deploy
+  cancel-in-progress: false
+
+jobs:
+  isolated-candidate:
+    if: ${{ contains(github.event.head_commit.message, '[deploy-rat-candidate]') || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # Dedicated bot token only. Never use TELEGRAM_BOT_TOKEN or update @BinratBot's webhook.
+      RAT_CANDIDATE_BOT_TOKEN: ${{ secrets.RAT_CANDIDATE_BOT_TOKEN }}
+      RAT_CANDIDATE_ALLOWED_USER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID }}
+      # Both must be deliberately set; Workers Paid cannot guarantee zero overage otherwise.
+      RAT_RUN_AI_SMOKE: ${{ (vars.RAT_RUN_AI_SMOKE == 'true' && vars.RAT_FREE_NEURON_BUDGET_VERIFIED == 'true') && 'true' || 'false' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Fail closed on missing deployment secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Cloudflare API token/account ID GitHub secrets are missing; no deployment attempted"
+            exit 1
+          fi
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify source and candidate isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/deploy-rat-conversation-candidate.mjs
+          pnpm check
+          node <<'NODE'
+          const fs = require('fs');
+          const src = fs.readFileSync('scripts/deploy-rat-conversation-candidate.mjs', 'utf8');
+          for (const value of [
+            "const WORKER = 'binrat-rat-convo-candidate-20260925'",
+            "const DB_NAME = 'binrat-rat-convo-candidate-20260925'",
+            "workers_dev: true",
+            "RAT_AI_ENABLED: 'false'",
+            "RAT_CANDIDATE_SMOKE_ENABLED: 'true'"
+          ]) {
+            if (!src.includes(value)) throw new Error('Candidate deployment isolation changed');
+          }
+          NODE
+
+      - name: Provision separate D1 and deploy isolated Worker
+        run: node scripts/deploy-rat-conversation-candidate.mjs
