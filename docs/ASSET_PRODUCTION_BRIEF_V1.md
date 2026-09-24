@@ -4,6 +4,42 @@ Status: production brief; no final assets generated
 Reference asset: approved `web/assets/binrat-hero.webp` only  
 Direction: forensic dumpster noir, dirty physical evidence, pixel-adjacent edges, hard flash red, oxidized green, receipt bone, sodium orange. Avoid glossy Web3 gradients, coins, shields, candlesticks, finance arrows, and cute sticker packs.
 
+## Dumpster OS canonical extension (2026-09-24)
+
+**Full implementation-ready art and API inventory:**
+[`DUMPSTER_OS_VISUAL_SYSTEM_V1.md`](./DUMPSTER_OS_VISUAL_SYSTEM_V1.md).
+Its B01–B24 custom icon names, M01–M20 micrographic SVG recipes, exact React
+component signatures, material tokens, usage rules, desktop/phone composition
+and acceptance gates are canonical for the next visual batch.
+This original asset brief remains the authority for approved mascot anatomy,
+delivery dimensions, distribution art and the later Rive state machine.
+
+**Current status:** the original rat source is approved, but these **new**
+icon masters, texture layers, component assets and production `.riv` machine
+have **not** yet been generated or installed. Desktop aesthetic feedback was
+positive on PC mode; actual-phone approval is still unverified.
+
+- **D0 design/contact sheets:** original B01–B24 icons on dark + paper at
+  16/24 px; M01–M20 monochrome motif board; mascot fragment crops showing
+  consistent ear/eye and silhouette. Approve **one** cohesive material style.
+- **D1 first shippable batch:** B01–B13, M01–M08, the 12 utility-only
+  `@tabler/icons-react` imports, and five components:
+  `ScrapCard`, `EvidenceStamp`, `ReceiptSheet`,
+  `ScrapBookmark`, `SewerDivider`. Pin reviewed MIT dependency on
+  implementation, keep new original icon masters first-party, and retain
+  `web-v2` evidence adapters and existing `Primitives.tsx` until replacement
+  tests pass.
+- **D2 after D1 acceptance:** remaining icons/motifs only where needed;
+  `ReplaySpool`, `CreatorTag`, `RadarSignalCard`, mascot fragments,
+  restrained Motion and eventual Rive *after real layered art exists*.
+
+**No decorative correctness:** grime, rust, scratches and scan textures
+never cross source addresses, transaction hashes, checkpoint, copied IDs,
+body text or focus outlines. `OBSERVED`, `NOTED`, `UNKNOWN`, history
+`COMPLETE/PARTIAL/UNVERIFIED`, and Replay `MISSING` remain visible text
+independent of icons. A receipt is not automatically cryptographically proven,
+and a locally saved file is not an active Watch.
+
 ## Shared production rules
 
 - Master vectors use outlined paths plus clean fills; texture is supplied as optional overlay layers so small exports remain readable.
