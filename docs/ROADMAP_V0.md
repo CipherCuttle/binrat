@@ -46,11 +46,23 @@ Finish the bounded product/frontend acceptance before resuming launch-operator p
 Legal/compliance, contract risk and disclosure review remain parallel launch-authorization
 gates; a visual release does not authorize token marketing or launch.
 
-### F0N — DO NEXT: Dumpster OS iconography and micrographics (2026-09-24)
+### F0N — D0/D1 REVIEWABLE CANDIDATE: Dumpster OS (2026-09-24)
 
-**Status:** full design/API specification committed at
+**Status:** the first visual batch is now built in **draft PR #25**
+(`feat/binrat-dumpster-os-d1`) on top of draft PR #24: 13 original BINRAT
+P0 SVG icons, eight reusable metal/receipt micrographics, the pinned
+Tabler utility-icon whitelist and five shared artifact components.
+The **24-icon / 20-motif** full inventory remains the design specification,
+not a claim that every art master is implemented:
 [`docs/DUMPSTER_OS_VISUAL_SYSTEM_V1.md`](./DUMPSTER_OS_VISUAL_SYSTEM_V1.md).
-Icon/micrographic assets and library integration remain **NOT IMPLEMENTED**.
+The isolated `binrat-dumpster-os-d1-githack` branch contains the validated
+static DEMO and contact sheet:
+https://raw.githack.com/CipherCuttle/binrat/binrat-dumpster-os-d1-githack/web-v2/dist/index.html
+
+**Mechanical checks:** [D1 frontend/root and seven-width browser CI passed](https://github.com/CipherCuttle/binrat/actions/runs/35947245922);
+[separate DEMO GitHack build and visual contact-sheet checks passed](https://github.com/CipherCuttle/binrat/actions/runs/35947111394).
+Actual-phone and owner visual acceptance remain **OPEN**. Nothing is merged,
+production-deployed or approved for token launch/marketing.
 The owner liked the M1 **PC-mode** appearance and explicitly withdrew the
 earlier phone-size critique because it was made while viewing PC mode.
 Do **not** translate that into verified actual-phone acceptance.
@@ -62,16 +74,15 @@ field scavenger device. Increase rusted plate seams, controlled grime,
 receipt-paper artifacts, asymmetrical hardware, and small mascot fragments
 without harming legibility or source/evidence authority.
 
-**Exact next implementation (one bounded visual changeset after contact-sheet
-approval):**
+**Bounded delivery status and next art-review gate:**
 
-1. **D0 / art direction:** produce contact sheets for the proposed **24
+1. **D0 / reviewable contact sheets:** the DEMO Design Lab now renders for the proposed **24
    original BINRAT domain icons**, **20 material micrographics**, and approved
    mascot-fragment crops. Establish 16/24 px mono readability, dark/paper
    variants and common `24×24` geometry. Full icon/motif/API inventory
    and usable SVG recipes are in the linked spec; no synthetic or unapproved
    mascot redesign.
-2. **D1 / actual component implementation:** pin `@tabler/icons-react` as
+2. **D1 / candidate implementation:** pinned `@tabler/icons-react` as
    the **utility-only** family, import a whitelist of 12 action icons, produce
    the first **13 P0 BINRAT icons** and **M01–M08** micrographics, then
    implement five first-party reusable components:
@@ -79,7 +90,7 @@ approval):**
    `ScrapBookmark`, `SewerDivider`. Apply one shared contract first
    to Discover on desktop + phone, then Radar and Bag without another
    layout rewrite. Use CSS Modules and one visual token source.
-3. **D2 / gated embellishment:** add `ReplaySpool`, `CreatorTag`,
+3. **D2 / NOT STARTED — gated embellishment:** add `ReplaySpool`, `CreatorTag`,
    `RadarSignalCard`, quieter repeated rat fragments, and *only
    state-driven* Motion/Rive after verified art, payload budget and owner
    review. Do not ship all 20 motifs into JS just because they exist.
