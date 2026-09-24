@@ -30,6 +30,14 @@ import {
   createHolderChallenge,
   proveHolderWallet
 } from './holderAuth.js';
+import {
+  D1PonsCandidateAuthStore,
+  PONS_AUTH_CHAIN_ID,
+  PONS_AUTH_POLICY,
+  PONS_AUTH_PURPOSE,
+  createPonsChallenge,
+  provePonsWallet
+} from './ponsCandidateAuth.js';
 import type { D1DatabaseLike } from './d1Types.js';
 import {
   enqueueSyncCycle,
@@ -45,6 +53,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   CAPABILITY_MANIFEST_JSON?: string;
   BINRAT_FUNDING_CONFIG_JSON?: string;
   BINRAT_HOLDER_WALLET_AUTH_ENABLED?: string;
+  BINRAT_PONS_CANDIDATE_AUTH_ENABLED?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
   TELEGRAM_BOT_TOKEN?: string;
@@ -139,6 +148,14 @@ export async function handleWorkerRequest(
 
   if (request.method === 'POST' && pathname === '/api/holder/session') {
     return holderSession(request, env, origin, deps);
+  }
+
+  if (request.method === 'POST' && pathname === '/api/pons-candidate/challenge') {
+    return ponsCandidateChallenge(request, env, origin, deps);
+  }
+
+  if (request.method === 'POST' && pathname === '/api/pons-candidate/session') {
+    return ponsCandidateSession(request, env, origin, deps);
   }
 
   if (request.method === 'GET' && pathname === '/health') {
@@ -380,6 +397,85 @@ async function holderSession(
 
 function holderWalletAuthEnabled(env: BinratWorkerEnv): boolean {
   return env.BINRAT_HOLDER_WALLET_AUTH_ENABLED?.trim() === 'true';
+}
+
+function ponsCandidateAuthEnabled(env: BinratWorkerEnv): boolean {
+  return env.BINRAT_PONS_CANDIDATE_AUTH_ENABLED?.trim() === 'true';
+}
+
+async function ponsCandidateChallenge(
+  request: Request,
+  env: BinratWorkerEnv,
+  origin: string,
+  deps: WorkerDeps
+): Promise<Response> {
+  if (!ponsCandidateAuthEnabled(env)) {
+    return json(503, { error: 'PONS_CANDIDATE_AUTH_NOT_ENABLED' });
+  }
+  try {
+    const body = await readJsonBody(request);
+    const wallet = typeof body.wallet === 'string' ? body.wallet : '';
+    const challenge = await createPonsChallenge(
+      new D1PonsCandidateAuthStore(env.DB),
+      { wallet, origin, nowMs: deps.now() }
+    );
+    return json(201, {
+      schemaVersion: 'binrat.pons-candidate-challenge/0.1',
+      purpose: PONS_AUTH_PURPOSE,
+      policyId: PONS_AUTH_POLICY,
+      chainId: PONS_AUTH_CHAIN_ID,
+      wallet: challenge.wallet,
+      nonce: challenge.nonce,
+      message: challenge.message,
+      issuedAtMs: challenge.issuedAtMs,
+      expiresAtMs: challenge.expiresAtMs,
+      accessTier: 'FREE',
+      productionHolderEligibilityActive: false,
+      transactionSigning: false
+    });
+  } catch (error) {
+    return json(ponsAuthHttpStatus(error), { error: ponsAuthErrorCode(error) });
+  }
+}
+
+async function ponsCandidateSession(
+  request: Request,
+  env: BinratWorkerEnv,
+  origin: string,
+  deps: WorkerDeps
+): Promise<Response> {
+  if (!ponsCandidateAuthEnabled(env)) {
+    return json(503, { error: 'PONS_CANDIDATE_AUTH_NOT_ENABLED' });
+  }
+  try {
+    const body = await readJsonBody(request);
+    const result = await provePonsWallet(
+      new D1PonsCandidateAuthStore(env.DB),
+      {
+        nonce: typeof body.nonce === 'string' ? body.nonce : '',
+        message: typeof body.message === 'string' ? body.message : '',
+        signature: typeof body.signature === 'string' ? body.signature : '',
+        origin,
+        nowMs: deps.now()
+      }
+    );
+    return json(201, {
+      schemaVersion: 'binrat.pons-candidate-session/0.1',
+      token: result.token,
+      tokenType: 'Bearer',
+      wallet: result.session.wallet,
+      chainId: result.session.chainId,
+      policyId: result.session.policyId,
+      accessTier: result.session.accessTier,
+      issuedAtMs: result.session.issuedAtMs,
+      expiresAtMs: result.session.expiresAtMs,
+      candidateOnly: true,
+      productionHolderEligibilityActive: false,
+      transactionSigning: false
+    });
+  } catch (error) {
+    return json(ponsAuthHttpStatus(error), { error: ponsAuthErrorCode(error) });
+  }
 }
 
 async function telegramWebhook(
@@ -882,6 +978,28 @@ function holderHttpStatus(error: unknown): number {
     code === 'HOLDER_CHALLENGE_USED_OR_EXPIRED'
   ) return 401;
   if (code === 'HOLDER_GATE_FAILED' || code === 'HOLDER_SESSION_PERSISTENCE_FAILED') return 503;
+  return 400;
+}
+
+function ponsAuthErrorCode(error: unknown): string {
+  const message = error instanceof Error ? error.message : '';
+  if (/^PONS_AUTH_[A-Z0-9_]+$/.test(message)) return message;
+  if (/^HOLDER_(BODY_TOO_LARGE|JSON_INVALID|BODY_INVALID)$/.test(message)) {
+    return message.replace(/^HOLDER_/, 'PONS_AUTH_');
+  }
+  return 'PONS_AUTH_FAILED';
+}
+
+function ponsAuthHttpStatus(error: unknown): number {
+  const code = ponsAuthErrorCode(error);
+  if (code === 'PONS_AUTH_BODY_TOO_LARGE') return 413;
+  if (
+    code === 'PONS_AUTH_SIGNATURE_WALLET_MISMATCH' ||
+    code === 'PONS_AUTH_CHALLENGE_EXPIRED' ||
+    code === 'PONS_AUTH_CHALLENGE_USED_OR_UNKNOWN' ||
+    code === 'PONS_AUTH_CHALLENGE_USED_OR_EXPIRED'
+  ) return 401;
+  if (code === 'PONS_AUTH_FAILED' || code === 'PONS_AUTH_SESSION_PERSISTENCE_FAILED') return 503;
   return 400;
 }
 
