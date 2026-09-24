@@ -68,7 +68,18 @@ jobs:
               grouped[key] = (grouped[key] ?? 0) + 1;
             }
             console.log('BINRAT event groups:', JSON.stringify(grouped));
-            if (!events.length) console.log('No historical events returned; check Workers Logs enablement, retention, and query filter.');
+            if (!events.length) {
+              // Distinguish an absent service value from a mistaken exact-service filter.
+              // Never print other Workers' names or raw telemetry.
+              const values = await request(`https://api.cloudflare.com/client/v4/accounts/${account}/workers/observability/telemetry/values`, {
+                method: 'POST',
+                body: JSON.stringify({ datasets: ['cloudflare-workers'], key: '$metadata.service', type: 'string', timeframe })
+              });
+              console.log('Service-value probe:', values.response.status, 'success:', values.body.success === true, 'error codes:', values.codes);
+              if (!values.response.ok || values.body.success === false || !Array.isArray(values.body.result)) process.exit(1);
+              console.log('Distinct service values:', values.body.result.length, 'BINRAT present:', values.body.result.some(item => item.value === 'binrat-edge-v0'));
+              console.log('Zero matching events do not establish the sync failure cause.');
+            }
           })().catch(error => {
             console.error('Diagnostic request failed:', error.name);
             process.exitCode = 1;
