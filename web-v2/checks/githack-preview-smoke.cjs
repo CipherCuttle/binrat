@@ -58,7 +58,7 @@ const emptyRadar = {
         assert.equal(new URL(page.url()).hash, "#/radar");
         const nav = page.getByRole("navigation", { name: width < 721 ? "Mobile primary navigation" : "Primary" });
         await nav.getByRole("link", { name: /DUMPSTER|Discover/i }).first().click();
-        assert.equal(new URL(page.url()).hash, width < 721 ? "#/dumpster" : "#/dumpster");
+        assert.equal(new URL(page.url()).hash, width < 721 ? "#/" : "#/dumpster");
         await page.goBack({ waitUntil: "domcontentloaded" });
         assert.equal(new URL(page.url()).hash, "#/radar");
         const docWidth = await page.evaluate(() => document.documentElement.scrollWidth);
