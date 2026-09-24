@@ -1,6 +1,6 @@
 {
   "schemaVersion": "binrat.capability-manifest/0.1",
-  "updatedAt": "2026-09-21",
+  "updatedAt": "2026-09-24",
   "doctrine": {
     "roadmap": "docs/ROADMAP_V0.md",
     "philosophy": "docs/PHILOSOPHY.md",
@@ -9,7 +9,8 @@
     "launchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
     "launchExecutionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
     "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
-    "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md"
+    "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md",
+    "ponsSuccessorSelection": "docs/BINRAT_PONS_LAUNCH_SELECTION_V1.json"
   },
   "capabilities": {
     "intelligenceV1": {
@@ -139,5 +140,30 @@
     },
     "blockingGateCount": 2
   },
-  "invariant": "Degen can decide attention and priority. It cannot decide what is true."
+  "invariant": "Degen can decide attention and priority. It cannot decide what is true.",
+  "tokenLaunchSuccessor": {
+    "schemaVersion": "binrat.pons-successor/1",
+    "status": "SELECTED_CANDIDATE_BLOCKED",
+    "selectionDocument": "docs/BINRAT_PONS_LAUNCH_SELECTION_V1.json",
+    "tokenChainId": 4663,
+    "tokenLaunchRail": "PONS_V2_DIRECT_FACTORY",
+    "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "researchChainId": 5042,
+    "historicalArcConfigDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+    "historicalArcRoles": "HISTORICAL_ONLY_NOT_PONS",
+    "tokenAddress": null,
+    "deployer": null,
+    "creatorFeeRecipient": null,
+    "treasury": null,
+    "holderLoginPolicyId": "binrat.pons-candidate/v1",
+    "holderBalancePolicyId": null,
+    "holderThresholdRaw": null,
+    "holderAccessActive": false,
+    "accountingActive": false,
+    "freshPonsReceiptVerified": false,
+    "legalComplianceSatisfied": false,
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "ownerAuthority": "NOT_GRANTED"
+  }
 }
