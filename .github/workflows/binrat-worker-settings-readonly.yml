@@ -43,6 +43,19 @@ jobs:
             console.log('Invocation logs enabled:', logs?.invocation_logs ?? 'unreported');
             console.log('Log persistence enabled:', logs?.persist ?? 'unreported');
             console.log('Log sampling:', logs?.head_sampling_rate ?? 'unreported');
+            const versionResponse = await fetch(
+              `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/binrat-edge-v0/settings`,
+              { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(20000) }
+            );
+            const versionData = await versionResponse.json();
+            const versionCodes = Array.isArray(versionData.errors) ? versionData.errors.map(error => error.code).filter(Number.isInteger) : [];
+            console.log('Version settings HTTP:', versionResponse.status, 'success:', versionData.success === true, 'error codes:', versionCodes);
+            if (!versionResponse.ok || versionData.success !== true || !versionData.result) process.exit(1);
+            const current = versionData.result.observability;
+            console.log('Version observability enabled:', current?.enabled ?? 'unreported');
+            console.log('Version logs enabled:', current?.logs?.enabled ?? 'unreported');
+            console.log('Version logs persistent:', current?.logs?.persist ?? 'unreported');
+            console.log('Version log sampling:', current?.logs?.head_sampling_rate ?? 'unreported');
             // Never print the full response: it may contain unrelated Worker configuration.
           })().catch(error => {
             console.error('Read-only inspection failed:', error.name, error.message === 'Required Cloudflare secret is missing' ? error.message : '');
