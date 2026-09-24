@@ -1,0 +1,87 @@
+name: binrat-g01-owner-visual-candidate
+on:
+  push:
+    branches: [feat/binrat-north-star-slice-g0-g2]
+    paths:
+      - "scripts/north-star/build-g01.py"
+      - ".github/workflows/north-star-g01-assets.yml"
+  workflow_dispatch:
+
+# Candidate artwork and screenshots only; NEVER a preview publish, deployment, or release.
+permissions:
+  contents: write
+concurrency:
+  group: binrat-g01-owner-visual
+  cancel-in-progress: false
+
+jobs:
+  g01-visual-producer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/binrat-north-star-slice-g0-g2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pin reproducible imaging toolchain
+        run: python -m pip install "numpy==2.1.3" "pillow==11.1.0" "opencv-python-headless==4.11.0.86"
+      - name: Render exact-source G0.1 review composition and physically distinct portal art
+        run: |
+          python scripts/north-star/build-g01.py --source docs/design/north-star --out /tmp/binrat-g01
+      - name: Independent provenance, dimension, and capability checks
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          b=Path('/tmp/binrat-g01')
+          m=json.loads((b/'g01-manifest.json').read_text())
+          assert m['phase']=='G0.1_OWNER_VISUAL_REVIEW_PENDING'
+          assert m['owner_visual_gate']=='OPEN'
+          for label in ('radar','replay','ledger','creator','watch'):
+              p=b/'art'/f'portal-{label}-g01.webp'
+              assert p.is_file() and Image.open(p).size==(600,270)
+          assert Image.open(b/'review/g01-desktop-1672x941.png').size==(1672,941)
+          assert Image.open(b/'review/g01-mobile-firstview-390x844.png').size==(390,844)
+          assert Image.open(b/'review/g01-mobile-scroll-390x1442.png').size==(390,1442)
+          print('G01_FIVE_EMPTY_ART_AND_TWO_VIEWPORTS: PASS')
+          PY
+      - name: Stage separate public candidate art, never synthetic LIVE data
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import shutil
+          src=Path('/tmp/binrat-g01')
+          art=Path('web-v2/public/north-star-g01')
+          review=Path('docs/design/north-star/g01-review')
+          art.mkdir(parents=True, exist_ok=True)
+          review.mkdir(parents=True, exist_ok=True)
+          for name in ('radar','replay','ledger','creator','watch'):
+              shutil.copy2(src/'art'/f'portal-{name}-g01.webp',art/f'portal-{name}-g01.webp')
+          shutil.copy2(src/'g01-manifest.json',review/'g01-manifest.json')
+          for name in ('g01-desktop-1672x941','g01-mobile-firstview-390x844','g01-portal-art-contact'):
+              im=Image.open(src/'review'/f'{name}.png').convert('RGB')
+              im.save(review/f'{name}.jpg',format='JPEG',quality=90,optimize=True,subsampling=0)
+          print('G01_REVIEW_STAGED_NO_PROD_DEPLOY')
+          PY
+      - name: Commit source-derived visual review candidates into SAME draft PR
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web-v2/public/north-star-g01/ docs/design/north-star/g01-review/
+          if ! git diff --cached --quiet; then
+            git commit -m "art: add G0.1 physical portal candidates and desktop mobile visual review"
+            git push origin HEAD:feat/binrat-north-star-slice-g0-g2
+          fi
+      - name: Retain full-resolution reviewer artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-g01-visual-review-fullres
+          path: /tmp/binrat-g01/review/
+          retention-days: 7
+          if-no-files-found: warn
