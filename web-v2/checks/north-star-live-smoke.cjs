@@ -136,8 +136,16 @@ async function probe(browser, width, height) {
     await page.locator(".ns-recipient").waitFor();
     assert.equal(activityFetches, before, "DEMO must never fetch LIVE recipient activity");
     assert.match(await page.locator(".ns-recipient").innerText(), /SYNTHETIC SHORTLIST/);
+    const switcher = page.getByRole("link", { name: "Switch to public LIVE evidence" });
+    assert.match(await switcher.getAttribute("href"), /\/radar\?source=live$/);
     await noOverflow(page, width, "demo Radar");
-    console.log("PASS G2 " + width + "px DEMO boundary and reduced-motion layout");
+    radarFail = false; feedFail = false;
+    await switcher.click();
+    await page.locator(".ns-activity-row").waitFor();
+    assert.ok(activityFetches > before, "LIVE switch must fetch recipient activity");
+    assert.ok(await page.getByRole("link", { name: "Switch to deterministic DEMO data" }).isVisible());
+    await noOverflow(page, width, "live mode switch");
+    console.log("PASS G2 " + width + "px DEMO→LIVE source switch and reduced-motion layout");
   } catch (err) {
     await page.screenshot({ path: path.join(output, "FAIL-" + width + ".png"), fullPage: true }).catch(() => {});
     throw err;

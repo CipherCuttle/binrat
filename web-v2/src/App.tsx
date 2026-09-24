@@ -301,10 +301,14 @@ function StatusRail({
         CHECKPOINT <b>{feed?.asOfBlock ?? "—"}</b>
       </span>
       <span>
-        COVERAGE <CoverageStamp state={feed?.historyCoverage ?? "UNVERIFIED"} />
+        COVERAGE {feed ? <CoverageStamp state={feed.historyCoverage} /> : <b>UNAVAILABLE</b>}
       </span>
       <span className="demo-flag">
         {mode === "DEMO" ? "DETERMINISTIC DEMO DATA" : "PUBLIC LIVE"}
+        <a className="ns-mode-toggle" href={window.location.pathname + (mode === "DEMO" ? "?source=live" : "")}
+          aria-label={mode === "DEMO" ? "Switch to public LIVE evidence" : "Switch to deterministic DEMO data"}>
+          {mode === "DEMO" ? "OPEN LIVE ↗" : "OPEN DEMO ↗"}
+        </a>
       </span>
     </header>
   );
@@ -330,7 +334,8 @@ function Home({
   return (
     <div className="home-page">
       <section className="home-hero">
-        <RatPresence state="idle" label="FIELD UNIT / INDEX READY" />
+        <RatPresence state="idle" label={!feed && !radar ? "FIELD UNIT / PUBLIC SOURCES UNAVAILABLE" :
+          !feed || !radar ? "FIELD UNIT / PARTIAL READ PLANE" : "FIELD UNIT / INDEX READY"} />
         <div className="hero-copy">
           <CaseTab tone="orange">ARC LAUNCH MEMORY / CASE 001</CaseTab>
           <h1>
@@ -560,7 +565,9 @@ function Radar({ radar, radarError, mode, selectedAddress, navigate }: {
         <PageHeading index="02" eyebrow="OBSERVED RECURRENCE / TIMING" title="RAT RADAR" detail="Inspectable observed recipient recurrence, subject to indexed coverage." />
         <p className="radar-sample-note">{counts.displayed} DISPLAYED / {counts.ranked} RANKED / {counts.observed} OBSERVED ADDRESSES.</p>
         <CheckpointRail checkpoint={radar.asOfBlock} coverage={radar.coverage.historyCoverage} />
-        <EmptyState title={selectedAddress === undefined ? "NO RADAR FILE IN THIS INDEX." : "ADDRESS OUTSIDE PUBLIC SHORTLIST."} detail="No shortlist rank is assigned to this address. Valid direct links independently request public recipient activity." />
+        <EmptyState title={selectedAddress === undefined ? "NO RADAR FILE IN THIS INDEX." :
+          /^0x[0-9a-f]{40}$/i.test(selectedAddress) ? "ADDRESS OUTSIDE PUBLIC SHORTLIST." : "INVALID RECIPIENT ADDRESS."}
+          detail="No shortlist rank is assigned to this URL. Valid exact-address links independently request public recipient activity." />
         {selectedAddress && /^0x[0-9a-f]{40}$/i.test(selectedAddress) &&
           <div className="ns-standalone"><RecipientActivityPanel key={selectedAddress} address={selectedAddress} mode={mode} shortlistCheckpoint={radar.asOfBlock}/></div>}
       </div>
@@ -967,7 +974,7 @@ function RatPresence({ state, label }: { state: RatState; label: string }) {
       <div className="rat-overlay" aria-hidden="true">
         <span>SUBJECT / BINRAT</span>
         <span>ARC / 5042</span>
-        <span>RECORDER ACTIVE</span>
+        <span>READ-ONLY FIELD UNIT</span>
       </div>
       <figcaption>
         <span>{label}</span>

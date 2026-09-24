@@ -51,7 +51,11 @@ export function MobileShell({ page, mode, checkpoint, navigate, children }: {
       <AppLink href="/" navigate={navigate} className={s.brand} ariaLabel="BINRAT Discover">
         <span className={s.logo}>BR<span>↗</span></span><span>BINRAT<small>RECEIPTS DECIDE TRUTH.</small></span>
       </AppLink>
-      <div className={s.status}><i/><b>{mode === "DEMO" ? "DEMO" : "LIVE"}</b><small>ARC · 5042</small></div>
+      <a className={s.status} href={window.location.pathname + (mode === "DEMO" ? "?source=live" : "")}
+        aria-label={mode === "DEMO" ? "Switch to public LIVE evidence" : "Switch to deterministic DEMO data"}>
+        <i/><b>{mode === "DEMO" ? "DEMO" : "LIVE"}</b>
+        <small>{mode === "DEMO" ? "OPEN LIVE ↗" : "OPEN DEMO ↗"}</small>
+      </a>
     </header>
     <div className={s.rail}><span>FIELD TERMINAL / {current.toUpperCase()}</span><span>{checkpoint ? "BLOCK " + checkpoint : "INDEX NOT READY"}</span></div>
     <main id="content" tabIndex={-1} className={s.main}>{children}</main>
@@ -235,7 +239,7 @@ export function MobileMore({ mode, navigate }: { mode: DataMode; navigate: Go })
   return <div className={s.screen}><Lead eyebrow="04 / FIELD MANUAL" title="More" sub="Methods, transparency and other product instruments."/>
     <div className={s.moreList}>{links.map(([title,description,path],i)=>
       <AppLink key={path} href={path} navigate={navigate} className={s.moreRow}><b>0{i+1}</b><span><strong>{title}</strong><small>{description}</small></span><em>↗</em></AppLink>)}</div>
-    <div className={s.moreMascot}><img src={import.meta.env.BASE_URL+"binrat-hero.webp"} alt="" loading="lazy"/><div><strong>THE RAT REMEMBERS.</strong>
+    <div className={s.moreMascot}><img src={import.meta.env.BASE_URL+"binrat-character-master.png"} alt="" loading="lazy"/><div><strong>THE RAT REMEMBERS.</strong>
       <p>DEGEN DECIDES ATTENTION.<br/>RECEIPTS DECIDE TRUTH.</p><small>{mode==="DEMO"?"DETERMINISTIC DEMO":"PUBLIC LIVE"}</small></div></div>
   </div>;
 }

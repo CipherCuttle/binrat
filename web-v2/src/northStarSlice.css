@@ -96,3 +96,7 @@ body { background:#151426; }
 }
 
 .ns-service-alert { margin:12px 18px; padding:12px; background:#371e29; color:#fff0de; border:1px solid #cd765d; font:600 12px/1.5 "Plex Mono",monospace; overflow-wrap:anywhere; }
+
+.demo-flag { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ns-mode-toggle { display:inline-flex; min-height:28px; align-items:center; color:#ffdc7b; padding:4px 7px; border:1px solid #a78b65; white-space:nowrap; }
+.ns-mode-toggle:hover,.ns-mode-toggle:focus-visible { background:#42352c; color:#fff3ce; }

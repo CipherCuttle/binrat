@@ -17,7 +17,8 @@
   --m-body: "Plex Mono", ui-monospace, monospace;
   min-height: 100dvh;
   color: var(--m-text);
-  background: var(--m-bg);
+  background: linear-gradient(180deg,#11142ae9,#141a1cef), url("/binrat-world-background.png") center top / auto 900px no-repeat;
+  background-color: var(--m-bg);
   font-family: var(--m-body);
   overflow-x: clip;
   isolation: isolate;
