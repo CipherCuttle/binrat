@@ -9,6 +9,7 @@ import {
 
 const TOKEN = '0x0000000000000000000000000000000000000900';
 const WALLET = '0x0000000000000000000000000000000000000123';
+const NOW_MS = 1_800_000_000_000;
 const HASH = `0x${'a'.repeat(64)}`;
 const OTHER_HASH = `0x${'b'.repeat(64)}`;
 const policy: PonsCandidateAuthority = {
@@ -27,12 +28,15 @@ function fixture(changes: {
   balance?: bigint;
   hashAfterRead?: string;
   failRead?: boolean;
+  timestamp?: bigint;
+  chainAfterRead?: number;
 } = {}) {
   let reads = 0;
   let blockHashReads = 0;
+  let chainReads = 0;
   const port: PonsBalanceProbePort = {
-    async getChainId() { return changes.chainId ?? 4663; },
-    async getFinalizedBlock() { return { number: changes.finalized ?? 120n, hash: HASH }; },
+    async getChainId() { chainReads += 1; return chainReads > 1 && changes.chainAfterRead ? changes.chainAfterRead : changes.chainId ?? 4663; },
+    async getFinalizedBlock() { return { number: changes.finalized ?? 120n, hash: HASH, timestamp: changes.timestamp ?? 1_800_000_000n }; },
     async getBlockHash() {
       blockHashReads += 1;
       return blockHashReads > 1 && changes.hashAfterRead ? changes.hashAfterRead : HASH;
@@ -51,7 +55,7 @@ function fixture(changes: {
 
 test('planning config remains incomplete: no token address, no network calls, no access', async () => {
   const f = fixture();
-  const result = await probePonsHolderCandidate({ ...policy, tokenAddress: null }, WALLET, f.port);
+  const result = await probePonsHolderCandidate({ ...policy, tokenAddress: null }, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'TOKEN_AUTHORITY_NOT_CONFIGURED');
   assert.equal(result.accessTier, 'FREE');
   assert.equal(result.holderAccessGranted, false);
@@ -61,7 +65,7 @@ test('planning config remains incomplete: no token address, no network calls, no
 
 test('test balance may meet threshold but never creates actual holder access', async () => {
   const f = fixture();
-  const result = await probePonsHolderCandidate(policy, WALLET, f.port);
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'MEETS_CANDIDATE_THRESHOLD_NO_ACCESS');
   assert.equal(result.accessTier, 'FREE');
   assert.equal(result.holderAccessGranted, false);
@@ -73,7 +77,7 @@ test('test balance may meet threshold but never creates actual holder access', a
 
 test('threshold miss is disclosed with pinned finalized checkpoint', async () => {
   const f = fixture({ balance: 999n });
-  const result = await probePonsHolderCandidate(policy, WALLET, f.port);
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'BELOW_CANDIDATE_THRESHOLD');
   assert.equal(result.candidateThresholdMet, false);
   assert.equal(result.holderAccessGranted, false);
@@ -81,7 +85,7 @@ test('threshold miss is disclosed with pinned finalized checkpoint', async () =>
 
 test('Arc RPC cannot issue even candidate eligibility for Robinhood token', async () => {
   const f = fixture({ chainId: 5042 });
-  const result = await probePonsHolderCandidate(policy, WALLET, f.port);
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'PONS_RPC_CHAIN_MISMATCH');
   assert.equal(f.reads(), 0);
 });
@@ -96,7 +100,7 @@ test('bad token, unsigned thresholds, invalid network and invalid policy fail be
     { ...policy, policyId: 'production-live-unreviewed' }
   ]) {
     const f = fixture();
-    const result = await probePonsHolderCandidate(candidate, WALLET, f.port);
+    const result = await probePonsHolderCandidate(candidate, WALLET, f.port, NOW_MS);
     assert.equal(result.status, 'TOKEN_AUTHORITY_INVALID');
     assert.equal(f.reads(), 0);
   }
@@ -104,7 +108,7 @@ test('bad token, unsigned thresholds, invalid network and invalid policy fail be
 
 test('effective block not finalized returns no balance/privilege', async () => {
   const f = fixture({ finalized: 99n });
-  const result = await probePonsHolderCandidate(policy, WALLET, f.port);
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'PONS_FINALIZED_BLOCK_BEFORE_EFFECTIVE_BLOCK');
   assert.equal(result.candidateThresholdMet, null);
   assert.equal(f.reads(), 0);
@@ -112,7 +116,7 @@ test('effective block not finalized returns no balance/privilege', async () => {
 
 test('chain reorganization or inconsistent provider after balance read blocks result', async () => {
   const f = fixture({ hashAfterRead: OTHER_HASH });
-  const result = await probePonsHolderCandidate(policy, WALLET, f.port);
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'PONS_REORG_OR_INCONSISTENT_RPC');
   assert.equal(result.holderAccessGranted, false);
   assert.equal(f.reads(), 1);
@@ -120,7 +124,7 @@ test('chain reorganization or inconsistent provider after balance read blocks re
 
 test('read errors fail closed and never fabricate balance', async () => {
   const f = fixture({ failRead: true });
-  const result = await probePonsHolderCandidate(policy, WALLET, f.port);
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
   assert.equal(result.status, 'PONS_BALANCE_READ_FAILED');
   assert.equal(result.accessTier, 'FREE');
   assert.equal(result.candidateThresholdMet, null);
@@ -129,8 +133,26 @@ test('read errors fail closed and never fabricate balance', async () => {
 test('zero/invalid wallet cannot trigger chain reads', async () => {
   for (const wallet of ['not-an-address', '0x0000000000000000000000000000000000000000']) {
     const f = fixture();
-    const result = await probePonsHolderCandidate(policy, wallet, f.port);
+    const result = await probePonsHolderCandidate(policy, wallet, f.port, NOW_MS);
     assert.equal(result.status, 'TOKEN_AUTHORITY_INVALID');
     assert.equal(f.reads(), 0);
   }
+});
+
+test('stalled finalized RPC and timestamp in the future fail closed before balance read', async () => {
+  for (const timestamp of [1_799_999_600n, 1_800_000_040n]) {
+    const f = fixture({ timestamp });
+    const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
+    assert.equal(result.status, 'PONS_FINALIZED_BLOCK_STALE_OR_FUTURE');
+    assert.equal(result.holderAccessGranted, false);
+    assert.equal(f.reads(), 0);
+  }
+});
+
+test('provider changing chains after balance read cannot report candidate threshold hit', async () => {
+  const f = fixture({ chainAfterRead: 5042 });
+  const result = await probePonsHolderCandidate(policy, WALLET, f.port, NOW_MS);
+  assert.equal(result.status, 'PONS_RPC_CHAIN_MISMATCH');
+  assert.equal(result.holderAccessGranted, false);
+  assert.equal(f.reads(), 1);
 });
