@@ -25,6 +25,7 @@ test('memory resolves only explicit, role-safe references and expires after 30m'
     assert.ok(memory);
     assert.equal(resolveRatFollowup('and its previous launches?', memory), '/creator ' + creator);
     assert.equal(resolveRatFollowup('/status', memory), '/status');
+    assert.equal(resolveRatFollowup('  /status that same launch?', memory), '  /status that same launch?');
     assert.equal(resolveRatFollowup('what about 0x' + '1'.repeat(40), memory), 'what about 0x' + '1'.repeat(40));
     assert.equal(await loadRatMemory(db, 7, 43, now), null, 'other group member never inherits context');
     assert.equal(await loadRatMemory(db, 8, 42, now), null, 'other chat never inherits context');
