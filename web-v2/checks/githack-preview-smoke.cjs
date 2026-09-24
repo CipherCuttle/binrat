@@ -34,6 +34,10 @@ const emptyRadar = {
     for (const width of [390, 1440]) {
       const context = await browser.newContext({ viewport: { width, height: 900 } });
       const page = await context.newPage();
+      page.on("pageerror", error => console.error("GITHACK_PAGE_ERROR", error.message));
+      page.on("console", message => { if (message.type() === "error") console.error("GITHACK_CONSOLE_ERROR", message.text()); });
+      page.on("requestfailed", request => console.error("GITHACK_REQUEST_FAILED", request.url(), request.failure()?.errorText));
+
       let requests = [];
       await page.route(api + "/api/**", async (route) => {
         const url = route.request().url();
@@ -46,7 +50,13 @@ const emptyRadar = {
       });
       try {
         await page.goto(base + "/index.html#/radar", { waitUntil: "domcontentloaded" });
-        await page.getByRole("heading", { name: /RAT RADAR/ }).first().waitFor();
+        await page.waitForTimeout(1500);
+        console.log("GITHACK_BOOT_DIAG", JSON.stringify({
+          url:page.url(), body:(await page.locator("body").innerText()).slice(0,1200),
+          scriptUrls:await page.locator("script[src]").evaluateAll(xs=>xs.map(x=>x.getAttribute("src"))),
+          images:await page.locator("img").count(),
+        }));
+        await page.getByRole("heading", { name: /RAT RADAR/ }).first().waitFor({ timeout: 8000 });
         assert.equal(requests.length, 0, "DEMO must not request live API");
         const toggle = page.getByRole("link", { name: "Switch to public LIVE evidence" });
         assert.equal(new URL(await toggle.getAttribute("href"), base).search, "?source=live");
