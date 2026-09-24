@@ -89,14 +89,14 @@ function LaunchCard({ bag, mode, bookmarks, navigate, featured = false }: {
   </article>;
 }
 export function MobileDiscover({ feed, radar, mode, bookmarks, navigate }: {
-  feed: PublicFeed; radar: RadarWatchlist; mode: DataMode; bookmarks: Bookmarks; navigate: Go;
+  feed: PublicFeed; radar: RadarWatchlist | null; mode: DataMode; bookmarks: Bookmarks; navigate: Go;
 }) {
   const [search, setSearch] = useState("");
   const [repeats, setRepeats] = useState(false);
   const matches = feed.bags.filter(bag =>
     (bag.symbol + " " + bag.name + " " + bag.reportedCreatorAddress).toLowerCase().includes(search.toLowerCase()) &&
     (!repeats || bag.trashTrail.priorLaunchCount > 0));
-  const lead = radar.candidates[0];
+  const lead = radar?.candidates[0];
   return <div className={s.screen}>
     <Lead eyebrow="ARC / LAUNCH MEMORY" title="Discover" sub={mode === "DEMO" ?
       "Explore synthetic dossiers. Demo observations are not chain proof." : "Latest indexed launches and the evidence available right now."}
@@ -204,13 +204,13 @@ export function MobileBag({ bag, mode, bookmarks, navigate }: { bag: Bag; mode: 
       <AppLink href={"/creator/" + bag.reportedCreatorAddress} navigate={navigate} className={s.primary}>OPEN CREATOR HISTORY ↗</AppLink></section>
   </div>;
 }
-export function MobileSaved({ feed, radar, mode, bookmarks, navigate }: { feed: PublicFeed; radar: RadarWatchlist; mode: DataMode; bookmarks: Bookmarks; navigate: Go }) {
+export function MobileSaved({ feed, radar, mode, bookmarks, navigate }: { feed: PublicFeed | null; radar: RadarWatchlist | null; mode: DataMode; bookmarks: Bookmarks; navigate: Go }) {
   const items=bookmarks.saved.filter(x=>x.mode===mode);
   return <div className={s.screen}><Lead eyebrow="03 / LOCAL CASEBOOK" title="Saved" sub="Bookmarks on this device. Saving never starts a Telegram Watch subscription."/>
     <p className={s.savedNote}>{bookmarks.persistent ? "LOCAL / NO SERVER SYNC" : "STORAGE UNAVAILABLE / SESSION ONLY"}</p>
     {items.length ? items.map(item => {
-      const bag=item.kind==="bag"?feed.bags.find(x=>x.id===item.id):undefined;
-      const recipient=item.kind==="radar"?radar.candidates.find(x=>x.observedRecipientAddress.toLowerCase()===item.id.toLowerCase()):undefined;
+      const bag=item.kind==="bag"?feed?.bags.find(x=>x.id===item.id):undefined;
+      const recipient=item.kind==="radar"?radar?.candidates.find(x=>x.observedRecipientAddress.toLowerCase()===item.id.toLowerCase()):undefined;
       return <article className={s.savedCard} key={item.kind+item.id}><small>{item.kind==="bag"?"SAVED BAG":"SAVED RADAR RECIPIENT"}</small>
         {bag||recipient?<AppLink href={item.kind==="bag"?"/bag/"+item.id:"/radar/address/"+item.id} navigate={navigate} className={s.savedLink}>
           {bag?"$"+bag.symbol:short(recipient!.observedRecipientAddress)} ↗</AppLink>:<p>Not present at this checkpoint. Nothing substituted.</p>}

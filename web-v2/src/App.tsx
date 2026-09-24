@@ -91,17 +91,26 @@ export default function App() {
   const [feed, setFeed] = useState<PublicFeed | null>(null);
   const [radar, setRadar] = useState<RadarWatchlist | null>(null);
   const [mode, setMode] = useState<DataMode>(selectedDataMode);
-  const [error, setError] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [radarError, setRadarError] = useState<string | null>(null);
   useEffect(() => {
     loadProductData()
       .then((data) => {
         setFeed(data.feed);
         setRadar(data.radar);
         setMode(data.mode);
+        setFeedError(data.feedError);
+        setRadarError(data.radarError);
+        setLoaded(true);
       })
-      .catch((reason: unknown) =>
-        setError(reason instanceof Error ? reason.message : "DATA_UNAVAILABLE"),
-      );
+      .catch((reason: unknown) => {
+        // Unexpected transport/setup failure remains visible in both scopes.
+        const message = reason instanceof Error ? reason.message : "DATA_UNAVAILABLE";
+        setFeedError(message);
+        setRadarError(message);
+        setLoaded(true);
+      });
   }, []);
   useEffect(() => {
     const onPopState = () => setRoute(readRoute());
@@ -128,61 +137,62 @@ export default function App() {
   const requestedBag = feed && route.page === "bag"
     ? findBagAtCheckpoint(feed, route.id)
     : undefined;
-  const content = error ? (
-    <EmptyState
-      title="THE TRAIL WENT COLD."
-      detail="The public read plane did not return validated evidence. Nothing was synthesized."
-    />
-  ) : !feed || !radar ? (
+  const unavailable = (scope: string, code: string | null) => (
+    <section className="page-pad" role="alert">
+      <EmptyState title={scope + " UNAVAILABLE."}
+        detail={(code ?? "NO VALIDATED PUBLIC DATA") + ". No LIVE/DEMO substitution was made."} />
+    </section>
+  );
+  const content = !loaded ? (
     <Loading />
   ) : route.page === "home" ? (
-    <Home feed={feed} radar={radar} mode={mode} navigate={navigate} />
-  ) : route.page === "dumpster" ? (
-    <Dumpster feed={feed} navigate={navigate} />
+    <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
   ) : route.page === "radar" ? (
-    <Radar radar={radar} mode={mode} selectedAddress={route.address} navigate={navigate} />
-  ) : route.page === "creator" ? (
-    <CreatorFilePage feed={feed} key={route.address.toLowerCase()} address={route.address} mode={mode} navigate={navigate} />
+    <Radar radar={radar} radarError={radarError} mode={mode} selectedAddress={route.address} navigate={navigate} />
   ) : route.page === "method" ? (
     <MethodPage navigate={navigate} />
-  ) : route.page === "replay" ? (
-    <ReplayIndexPage feed={feed} mode={mode} navigate={navigate} />
   ) : route.page === "watch" ? (
     <WatchPage navigate={navigate} mode={mode} />
-  ) : route.page === "saved" ? (
-    <MobileSaved feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
-  ) : route.page === "more" ? (
-    <MobileMore mode={mode} navigate={navigate} />
   ) : route.page === "ledger" ? (
     <LedgerPage mode={mode} />
   ) : route.page === "binrat" ? (
     <TokenStatusPage />
+  ) : route.page === "more" ? (
+    <MobileMore mode={mode} navigate={navigate} />
+  ) : route.page === "saved" ? (
+    <MobileSaved feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : !feed ? (
+    unavailable("FEED", feedError)
+  ) : route.page === "dumpster" ? (
+    <Dumpster feed={feed} navigate={navigate} />
+  ) : route.page === "creator" ? (
+    <CreatorFilePage feed={feed} key={route.address.toLowerCase()} address={route.address} mode={mode} navigate={navigate} />
+  ) : route.page === "replay" ? (
+    <ReplayIndexPage feed={feed} mode={mode} navigate={navigate} />
   ) : route.page === "bag" ? (
     requestedBag ? (
       <BagDossier key={requestedBag.id} bag={requestedBag} mode={mode} navigate={navigate} />
     ) : (
       <section className="page-pad">
-        <EmptyState
-          title="NO MATCHING BAG IN THIS INDEX."
-          detail={"No bag matches this exact identifier at checkpoint " + feed.asOfBlock + ". Nothing else was substituted."}
-        />
+        <EmptyState title="NO MATCHING BAG IN THIS INDEX."
+          detail={"No bag matches this exact identifier at checkpoint " + feed.asOfBlock + ". Nothing else was substituted."} />
         <CheckpointRail checkpoint={feed.asOfBlock} coverage={feed.historyCoverage} />
-        <AppLink className="action" href="/dumpster" navigate={navigate}>
-          BACK TO THE DUMPSTER →
-        </AppLink>
+        <AppLink className="action" href="/dumpster" navigate={navigate}>BACK TO THE DUMPSTER →</AppLink>
       </section>
     )
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
-  const mobileContent = error ? (
-    <div className="page-pad" role="alert"><h1>THE TRAIL WENT COLD.</h1><p>The public read plane did not return validated evidence. Nothing was synthesized.</p></div>
-  ) : !feed || !radar ? (
+  const mobileContent = !loaded ? (
     <div className="loading" role="status"><span /><p>RAT IS CHECKING THE RECEIPTS…</p></div>
-  ) : route.page === "home" || route.page === "dumpster" ? (
-    <MobileDiscover feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+  ) : route.page === "home" ? (
+    <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
+  ) : route.page === "dumpster" ? (
+    feed ? <MobileDiscover feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+      : unavailable("FEED", feedError)
   ) : route.page === "radar" ? (
-    <MobileRadar radar={radar} selectedAddress={route.address} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+    radar ? <MobileRadar radar={radar} selectedAddress={route.address} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+      : <Radar radar={null} radarError={radarError} mode={mode} selectedAddress={route.address} navigate={navigate} />
   ) : route.page === "bag" && requestedBag ? (
     <MobileBag key={requestedBag.id} bag={requestedBag} mode={mode} bookmarks={bookmarks} navigate={navigate} />
   ) : route.page === "saved" ? (
@@ -193,7 +203,7 @@ export default function App() {
   return compact ? (
     <div className="app-frame">
       <a className="skip-link" href="#content">Skip to evidence</a>
-      <MobileShell page={route.page} mode={mode} checkpoint={feed?.asOfBlock ?? null} navigate={navigate}>
+      <MobileShell page={route.page} mode={mode} checkpoint={route.page === "radar" ? radar?.asOfBlock ?? null : feed?.asOfBlock ?? null} navigate={navigate}>
         {mobileContent}
       </MobileShell>
     </div>
@@ -295,16 +305,20 @@ function StatusRail({
 function Home({
   feed,
   radar,
+  feedError,
+  radarError,
   mode,
   navigate,
 }: {
-  feed: PublicFeed;
-  radar: RadarWatchlist;
+  feed: PublicFeed | null;
+  radar: RadarWatchlist | null;
+  feedError: string | null;
+  radarError: string | null;
   mode: DataMode;
   navigate: (path: string) => void;
 }) {
-  const latest = feed.bags[0];
-  const topRecipient = radar.candidates[0];
+  const latest = feed?.bags[0];
+  const topRecipient = radar?.candidates[0];
   return (
     <div className="home-page">
       <section className="home-hero">
@@ -343,12 +357,12 @@ function Home({
             <span>
               CHECKPOINT
               <br />
-              <b>{feed.asOfBlock}</b>
+              <b>{feed?.asOfBlock ?? "UNAVAILABLE"}</b>
             </span>
             <span>
               HISTORY
               <br />
-              <CoverageStamp state={feed.historyCoverage} />
+              <CoverageStamp state={feed?.historyCoverage ?? "UNVERIFIED"} />
             </span>
             <span>
               DATA MODE
@@ -369,6 +383,8 @@ function Home({
           </AppLink>
         </header>
         <div className="snapshot-grid">
+          {!feed && <p role="alert">PUBLIC FEED UNAVAILABLE: {feedError ?? "NO VALIDATED FEED"}. Nothing substituted.</p>}
+          {!radar && <p role="alert">RAT RADAR UNAVAILABLE: {radarError ?? "NO VALIDATED SHORTLIST"}. Nothing substituted.</p>}
           {latest ? (
             <AppLink className="latest-file" href={"/bag/" + latest.id} navigate={navigate}>
               <CaseTab>LATEST INDEXED BAG</CaseTab>
@@ -406,7 +422,7 @@ function Home({
             <Receipt title={mode === "DEMO" ? "DEMO INDEX RECEIPT / NOT CHAIN PROOF" : "PUBLIC FEED RECEIPT"} count={latest.evidence.length}>
               <p>Launch record at block <b>{latest.blockNumber}</b>.</p>
               <p>Creator history: <CoverageStamp state={latest.trashTrail.coverage} /></p>
-              <code>{feed.receipt.receiptId}</code>
+              <code>{feed?.receipt.receiptId}</code>
             </Receipt>
           ) : (
             <Receipt title="NO INDEX RECEIPT AVAILABLE">
@@ -510,9 +526,18 @@ function Dumpster({
   );
 }
 
-function Radar({ radar, mode, selectedAddress, navigate }: {
-  radar: RadarWatchlist; mode: DataMode; selectedAddress?: string; navigate: (path: string) => void;
+function Radar({ radar, radarError, mode, selectedAddress, navigate }: {
+  radar: RadarWatchlist | null; radarError: string | null; mode: DataMode;
+  selectedAddress?: string; navigate: (path: string) => void;
 }) {
+  if (!radar) {
+    return <div className="page-pad radar-page" role="alert">
+      <PageHeading index="02" eyebrow="OBSERVED RECURRENCE / TIMING" title="RAT RADAR"
+        detail="The shortlist endpoint is independent from the Feed."/>
+      <EmptyState title="RAT RADAR UNAVAILABLE." detail={(radarError ?? "NO VALIDATED SHORTLIST") +
+        ". No candidates or rankings were substituted."} />
+    </div>;
+  }
   const selected = selectRadarCandidate(radar, selectedAddress);
   const counts = radarShortlistCounts(radar);
   if (!selected) {

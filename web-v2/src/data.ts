@@ -1,4 +1,5 @@
 import { demoFeed, demoRadar } from "./fixtures";
+import { settleIndependentSlices } from "./independentSlices";
 import { adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar, adaptLiveReplay, adaptLiveLedger, type LiveCreatorFile, type LiveReplayBundle, type LiveLedger } from "./liveAdapter";
 import type { PublicFeed, RadarWatchlist } from "./types";
 
@@ -17,17 +18,20 @@ async function readJson(path: string, unavailableCode: string): Promise<unknown>
   return response.json() as Promise<unknown>;
 }
 
-export async function loadProductData(): Promise<{ feed: PublicFeed; radar: RadarWatchlist; mode: DataMode }> {
-  if (!wantsLive) return { feed: demoFeed, radar: demoRadar, mode: "DEMO" };
-  const [feedRaw, radarRaw] = await Promise.all([
-    readJson("/api/feed", "PUBLIC_READ_PLANE_UNAVAILABLE"),
-    readJson("/api/rat-radar/watchlist", "RAT_RADAR_UNAVAILABLE"),
-  ]);
-  // Requests may cross an advancing checkpoint. Validate both scopes separately
-  // instead of claiming they share the same receipt or inventing a common horizon.
-  const feed = adaptLiveFeed(feedRaw);
-  const radar = adaptLiveRadar(radarRaw);
-  return { feed, radar, mode: "LIVE" };
+export async function loadProductData(): Promise<{
+  feed: PublicFeed | null; radar: RadarWatchlist | null;
+  feedError: string | null; radarError: string | null; mode: DataMode;
+}> {
+  if (!wantsLive) return {
+    feed: demoFeed, radar: demoRadar, feedError: null, radarError: null, mode: "DEMO",
+  };
+  // Each request AND adapter is independently settled; malformed Radar cannot
+  // hide a valid Feed and a Feed outage cannot erase the Radar shortlist.
+  const slices = await settleIndependentSlices(
+    () => readJson("/api/feed", "PUBLIC_READ_PLANE_UNAVAILABLE").then(adaptLiveFeed),
+    () => readJson("/api/rat-radar/watchlist", "RAT_RADAR_UNAVAILABLE").then(adaptLiveRadar),
+  );
+  return { ...slices, mode: "LIVE" };
 }
 
 /** 404 is a genuine not-indexed address. Every other failure remains an error. */
