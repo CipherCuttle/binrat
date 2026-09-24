@@ -85,3 +85,7 @@ step is a block, not evidence of success.
 Rollback: disable the *candidate* flags or delete only the exact candidate
 Worker and D1 after exporting any evidence. Do not delete/alter production
 Worker, production D1, live bot webhook or Cloudflare API token.
+
+## Owner-authorized isolated run
+
+September 25, 2026: isolated candidate Worker/D1 provisioning and private readback were authorized; **no production cutover, no production Telegram bot webhook change, no merge and no paid-model overage authority**. A real model invocation remains gated on independent verification of unused account-wide free allocation; a separate sandbox bot and tester ID are required to activate Telegram DMs.
