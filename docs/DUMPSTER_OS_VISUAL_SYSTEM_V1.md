@@ -165,10 +165,10 @@ Implementation path: `web-v2/src/visual/components/`, with barrel `index.ts`. Al
 
 ```tsx
 import type { ReactNode } from "react";
-import type { Bag, CoverageState, EvidenceState, RadarCandidate, RatState } from "../types";
-import type { ReplayHorizon, ReplayStage } from "../evidenceIntegrity";
-import type { DataMode } from "../data";
-import type { Bookmark } from "../mobile/MobileExperience";
+import type { Bag, CoverageState, EvidenceState, RadarCandidate, RatState } from "../../types";
+import type { ReplayHorizon, ReplayStage } from "../../evidenceIntegrity";
+import type { DataMode } from "../../data";
+import type { Bookmark } from "../../mobile/MobileExperience";
 
 export type EvidenceStampProps =
   | { scope: "fact"; state: EvidenceState }
@@ -277,24 +277,28 @@ Proposed new paths (not present until their implementation PR):
 web-v2/src/visual/
   tokens.css
   icons/
+    BinratIcon.tsx             # typed wrapper for first-party icons
     utility.tsx                # explicit named Tabler imports, 12-action whitelist
     binrat/
       index.ts                 # only reviewed first-party component exports
       B01-RatHeadIcon.tsx      # follow pack numbering consistently
       ...                      # P0 first, P1 after small-size acceptance
   micrographics/
+    Micrographic.tsx           # aria-hidden material primitive
     index.tsx
     motifs.tsx                # clean monochrome SVG paths
     textures.css              # bounded optional overlays, no required images
   components/
     ScrapCard.tsx
     ScrapCard.module.css
+    RustRail.tsx
     EvidenceStamp.tsx
     ReceiptSheet.tsx
     ReplaySpool.tsx
     CreatorTag.tsx
     ScrapBookmark.tsx
     RadarSignalCard.tsx
+    SewerDivider.tsx
     RatPresence.tsx           # only once approved fragments exist
     index.ts
   __screenshots__/             # deterministic contact sheets, if repo policy permits
