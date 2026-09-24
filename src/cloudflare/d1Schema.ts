@@ -157,6 +157,7 @@ CREATE TABLE IF NOT EXISTS pons_candidate_auth_sessions (
   session_hash TEXT PRIMARY KEY,
   wallet TEXT NOT NULL,
   domain TEXT NOT NULL,
+  origin_url TEXT NOT NULL,
   chain_id INTEGER NOT NULL CHECK(chain_id=4663),
   policy_id TEXT NOT NULL CHECK(policy_id='binrat.pons-candidate/v1'),
   access_tier TEXT NOT NULL CHECK(access_tier='FREE'),
