@@ -18,6 +18,12 @@ import {
   type HolderPolicyEnv
 } from '../holder/eligibility.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
+import { understandRatMessage } from '../telegram/nlp.js';
+import {
+  entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
+  loadRatMemory, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
+  type RatAiBinding, type RatMemory
+} from './ratConversation.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
 import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore } from './ratWatch.js';
@@ -51,6 +57,10 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   TELEGRAM_WEBHOOK_SECRET?: string;
   TELEGRAM_REPLIES_ENABLED?: string;
   TELEGRAM_MAX_MESSAGES_PER_MINUTE?: string;
+  /** Both flags must be explicitly 'true'; inference is default-off. */
+  RAT_CONVERSATION_ENABLED?: string;
+  RAT_AI_ENABLED?: string;
+  AI?: RatAiBinding;
 }
 
 interface ReadyContext {
@@ -73,6 +83,7 @@ interface TelegramUser {
 interface TelegramMessage {
   message_id: number;
   chat: TelegramChat;
+  from?: TelegramUser;
   text?: string;
   reply_to_message?: {
     message_id: number;
@@ -497,12 +508,70 @@ async function telegramWebhook(
       return deps.externalFetch(localRequest);
     };
 
+    const authorId = Number.isSafeInteger(message.from?.id)
+      ? message.from!.id
+      : message.chat.type === 'private' ? message.chat.id : null;
+    const addressed = allowUnaddressed || /\b(?:binrat|rat)\b|\$binrat\b/i.test(message.text);
+    const memoryEnabled = env.RAT_CONVERSATION_ENABLED === 'true';
+    let memory: RatMemory | null = null;
+    if (memoryEnabled && addressed && authorId !== null) {
+      try { memory = await loadRatMemory(env.DB, message.chat.id, authorId, deps.now()); }
+      catch { /* Missing migration or D1 outage never compromises deterministic Rat replies. */ }
+    }
+
+    if (message.text.trim().toLowerCase() === '/forget') {
+      let forgotten = !memoryEnabled;
+      if (memoryEnabled && authorId !== null) {
+        try { await forgetRatMemory(env.DB, message.chat.id, authorId); forgotten = true; }
+        catch { /* Never claim deletion when D1 failed. */ }
+      }
+      const answer = forgotten
+        ? '🐀 conversation context cleared. i keep no raw user-message history.'
+        : '🐀 could not clear memory. try again when the database is back.';
+      const telegramMessageId = await sendMessage(token, message.chat.id, answer, deps.externalFetch);
+      await ledger.completeOperationalReply({
+        updateId: update.update_id, chatId: message.chat.id, intent: 'FORGET',
+        replyDigest: createHash('sha256').update(answer).digest('hex'), telegramMessageId
+      }, deps.now());
+      return json(200, { ok: true });
+    }
+
+    const effectiveText = addressed ? resolveRatFollowup(message.text, memory) : message.text;
+    const understanding = understandRatMessage(effectiveText, { allowUnaddressed });
     const reply = await renderRatReplyDetailed(
-      message.text,
+      effectiveText,
       config,
       localFetch,
       { allowUnaddressed }
     );
+
+    // AI only covers harmless, otherwise-unhandled small talk. Factual paths stay deterministic.
+    if (
+      reply?.intent === 'CLARIFY' && env.RAT_AI_ENABLED === 'true' &&
+      env.AI && addressed && authorId !== null &&
+      isRatBanterEligible(message.text, understanding)
+    ) {
+      let banter: string | null = null;
+      try {
+        if (await reserveRatAiCall(env.DB, message.chat.id, authorId, deps.now())) {
+          banter = await generateRatBanter(env.AI, message.text, memory?.lastBotReply ?? '');
+        }
+      } catch {
+        // Quota, unavailable AI or missing D1 migration: use the existing CLARIFY answer.
+      }
+      if (banter) {
+        const telegramMessageId = await sendMessage(token, message.chat.id, banter, deps.externalFetch);
+        await ledger.completeOperationalReply({
+          updateId: update.update_id, chatId: message.chat.id, intent: 'SMALLTALK',
+          replyDigest: createHash('sha256').update(banter).digest('hex'), telegramMessageId
+        }, deps.now());
+        if (memoryEnabled) {
+          try { await saveRatMemory(env.DB, message.chat.id, authorId, deps.now(), banter, null, memory); }
+          catch { /* Best-effort short-lived context, never part of evidence authority. */ }
+        }
+        return json(200, { ok: true, mode: 'SMALLTALK' });
+      }
+    }
 
     if (!reply) {
       await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
@@ -528,6 +597,15 @@ async function telegramWebhook(
       receiptIds: reply.receiptIds,
       telegramMessageId
     }, deps.now());
+
+    if (memoryEnabled && addressed && authorId !== null) {
+      try {
+        await saveRatMemory(
+          env.DB, message.chat.id, authorId, deps.now(), reply.text,
+          entityFromUnderstanding(understanding), memory
+        );
+      } catch { /* Memory failure cannot retroactively fail a successfully sent reply. */ }
+    }
 
     console.log(JSON.stringify({
       event: 'TELEGRAM_RAT_REPLY',
