@@ -148,7 +148,7 @@ jobs:
 
   frontend-v2-browser-smoke:
     name: frontend-v2-browser-smoke
-    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'fix/binrat-v2-evidence-integrity-pr1' || startsWith(github.head_ref, 'feat/binrat-frontend-')) }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'fix/binrat-v2-evidence-integrity-pr1' || startsWith(github.head_ref, 'feat/binrat-frontend-') || github.head_ref == 'feat/binrat-dumpster-os-d1') }}
     needs: [check]
     runs-on: ubuntu-latest
     timeout-minutes: 15
