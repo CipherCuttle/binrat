@@ -21,7 +21,7 @@ import { parseRepliesEnabled } from '../telegram/control.js';
 import { understandRatMessage } from '../telegram/nlp.js';
 import {
   entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
-  loadRatMemory, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
+  loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
   type RatAiBinding, type RatMemory
 } from './ratConversation.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
@@ -117,8 +117,18 @@ export default {
   fetch(request: Request, env: BinratWorkerEnv): Promise<Response> {
     return handleWorkerRequest(request, env);
   },
-  scheduled(_controller: unknown, env: BinratWorkerEnv): Promise<void> {
-    return enqueueSyncCycle(env);
+  async scheduled(_controller: unknown, env: BinratWorkerEnv): Promise<void> {
+    const now = Date.now();
+    // Opportunistic daily physical deletion; conversation TTL is enforced on every read.
+    const utc = new Date(now);
+    if (
+      (env.RAT_CONVERSATION_ENABLED === 'true' || env.RAT_AI_ENABLED === 'true') &&
+      utc.getUTCHours() === 0 && utc.getUTCMinutes() < 5
+    ) {
+      try { await pruneRatConversation(env.DB, now); }
+      catch { /* Maintenance must never block the indexer cron. */ }
+    }
+    await enqueueSyncCycle(env);
   },
   queue(batch: SyncQueueBatchLike, env: BinratWorkerEnv): Promise<void> {
     return handleSyncQueueBatch(batch, env);
