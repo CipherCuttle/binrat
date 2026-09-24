@@ -105,6 +105,7 @@ async function probe(browser, width, height) {
     assert.match(await page.locator("main").innerText(), /distinct indexed launches/);
     assert.doesNotMatch(await page.locator("main").innerText(), /FERAL|DEMO INDEX RECEIPT/);
     await page.goto(origin + "/dumpster?source=live", { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() => (document.querySelector("main")?.innerText || "").includes("FEED UNAVAILABLE"));
     assert.match(await page.locator("main").innerText(), /FEED UNAVAILABLE/);
     console.log("PASS G2 " + width + "px independent Radar survives Feed failure");
     // Outside a five-entry shortlist must not receive a fabricated rank or another recipient's receipts.

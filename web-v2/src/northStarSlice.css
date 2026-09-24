@@ -94,3 +94,5 @@ body { background:#151426; }
   .home-page .rat-presence img { object-position:50% 43%; }
   .home-page .hero-copy { background:#171329f0; }
 }
+
+.ns-service-alert { margin:12px 18px; padding:12px; background:#371e29; color:#fff0de; border:1px solid #cd765d; font:600 12px/1.5 "Plex Mono",monospace; overflow-wrap:anywhere; }

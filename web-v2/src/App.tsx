@@ -165,7 +165,10 @@ export default function App() {
   ) : !feed ? (
     unavailable("FEED", feedError)
   ) : route.page === "dumpster" ? (
-    <Dumpster feed={feed} navigate={navigate} />
+    <>
+      {radarError && <p className="ns-service-alert" role="alert">RADAR UNAVAILABLE: {radarError}. Feed content remains available.</p>}
+      <Dumpster feed={feed} navigate={navigate} />
+    </>
   ) : route.page === "creator" ? (
     <CreatorFilePage feed={feed} key={route.address.toLowerCase()} address={route.address} mode={mode} navigate={navigate} />
   ) : route.page === "replay" ? (
@@ -189,8 +192,10 @@ export default function App() {
   ) : route.page === "home" ? (
     <Home feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} navigate={navigate} />
   ) : route.page === "dumpster" ? (
-    feed ? <MobileDiscover feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
-      : unavailable("FEED", feedError)
+    feed ? <>
+      {radarError && <p className="ns-service-alert" role="alert">RADAR UNAVAILABLE: {radarError}. Feed content remains available.</p>}
+      <MobileDiscover feed={feed} radar={radar} mode={mode} bookmarks={bookmarks} navigate={navigate} />
+    </> : unavailable("FEED", feedError)
   ) : route.page === "radar" ? (
     radar ? <MobileRadar radar={radar} selectedAddress={route.address} mode={mode} bookmarks={bookmarks} navigate={navigate} />
       : <Radar radar={null} radarError={radarError} mode={mode} selectedAddress={route.address} navigate={navigate} />
@@ -215,7 +220,7 @@ export default function App() {
       </a>
       <ShellNav route={route} navigate={navigate} />
       <div className="workspace">
-        <StatusRail mode={mode} feed={feed} navigate={navigate} />
+        <StatusRail mode={mode} feed={feed} feedError={feedError} navigate={navigate} />
         <main id="content" tabIndex={-1}>
           {content}
         </main>
@@ -274,10 +279,12 @@ function ShellNav({
 function StatusRail({
   mode,
   feed,
+  feedError,
   navigate,
 }: {
   mode: DataMode;
   feed: PublicFeed | null;
+  feedError: string | null;
   navigate: (path: string) => void;
 }) {
   return (
@@ -285,7 +292,7 @@ function StatusRail({
       <AppLink className="mobile-brand" href="/" navigate={navigate} ariaLabel="BINRAT home">BINRAT <span aria-hidden="true">↗</span></AppLink>
       <span className="status-cluster">
         <i />
-        {feed ? (mode === "DEMO" ? "DEMO INDEX READY" : "PUBLIC INDEX READY") : "INDEXING"}
+        {feed ? (mode === "DEMO" ? "DEMO INDEX READY" : "PUBLIC INDEX READY") : feedError ? "FEED UNAVAILABLE" : "INDEXING"}
       </span>
       <span>
         ARC <b>5042</b>
@@ -363,7 +370,7 @@ function Home({
             <span>
               HISTORY
               <br />
-              <CoverageStamp state={feed?.historyCoverage ?? "UNVERIFIED"} />
+              {feed ? <CoverageStamp state={feed.historyCoverage} /> : <b>UNAVAILABLE</b>}
             </span>
             <span>
               DATA MODE
@@ -401,8 +408,10 @@ function Home({
               </div>
               <span className="open-cue">OPEN DOSSIER ↗</span>
             </AppLink>
-          ) : (
+          ) : feed ? (
             <EmptyState title="NO BAGS AT THIS CHECKPOINT." detail="No indexed launches are currently available. No example launch is substituted." />
+          ) : (
+            <EmptyState title="FEED UNAVAILABLE." detail="The public Feed failed; the missing result has not been presented as an empty index." />
           )}
           {topRecipient ? (
             <div className="radar-tease">
@@ -416,8 +425,10 @@ function Home({
                 OPEN THE EVIDENCE FILE →
               </AppLink>
             </div>
-          ) : (
+          ) : radar ? (
             <EmptyState title="NO RADAR SHORTLIST YET." detail="No ranked recipient address is present at this checkpoint." />
+          ) : (
+            <EmptyState title="RADAR UNAVAILABLE." detail="The public Radar failed; unknown coverage or counts have not been replaced with zero." />
           )}
           {latest ? (
             <Receipt title={mode === "DEMO" ? "DEMO INDEX RECEIPT / NOT CHAIN PROOF" : "PUBLIC FEED RECEIPT"} count={latest.evidence.length}>

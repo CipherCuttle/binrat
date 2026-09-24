@@ -215,9 +215,14 @@ export function MobileSaved({ feed, radar, mode, bookmarks, navigate }: { feed: 
     {items.length ? items.map(item => {
       const bag=item.kind==="bag"?feed?.bags.find(x=>x.id===item.id):undefined;
       const recipient=item.kind==="radar"?radar?.candidates.find(x=>x.observedRecipientAddress.toLowerCase()===item.id.toLowerCase()):undefined;
+      const radarAddress = item.kind === "radar" && /^0x[0-9a-f]{40}$/i.test(item.id);
       return <article className={s.savedCard} key={item.kind+item.id}><small>{item.kind==="bag"?"SAVED BAG":"SAVED RADAR RECIPIENT"}</small>
-        {bag||recipient?<AppLink href={item.kind==="bag"?"/bag/"+item.id:"/radar/address/"+item.id} navigate={navigate} className={s.savedLink}>
-          {bag?"$"+bag.symbol:short(recipient!.observedRecipientAddress)} ↗</AppLink>:<p>Not present at this checkpoint. Nothing substituted.</p>}
+        {bag || recipient || radarAddress ? <AppLink href={item.kind==="bag"?"/bag/"+item.id:"/radar/address/"+item.id} navigate={navigate} className={s.savedLink}>
+          {bag?"$"+bag.symbol:short(item.id)} ↗</AppLink> :
+          <p>{item.kind==="bag" && !feed ? "Feed unavailable. Saved identifier retained; no absence inferred." :
+            item.kind==="radar" && !radar ? "Radar unavailable. Saved identifier retained." :
+            "Not present at this checkpoint. Nothing substituted."}</p>}
+        {radarAddress && !recipient && <p>Outside current shortlist or Radar unavailable. Open this exact address to request public activity independently.</p>}
         <button type="button" onClick={()=>bookmarks.toggle(item)}>REMOVE ×</button></article>;
     }) : <div className={s.empty}><strong>YOUR CASEBOOK IS EMPTY.</strong><p>Save a Bag or Radar address to revisit it here.</p>
       <AppLink href="/" navigate={navigate} className={s.primary}>FIND A FILE ↗</AppLink></div>}
