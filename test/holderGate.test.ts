@@ -172,8 +172,15 @@ test('Worker preserves free truth and exposes strictly deeper holder projection 
   const runtime = new D1RuntimeStateStore(db, ARC_CHAIN_ID);
   let nowMs = Date.now();
   const eligibility = new FixtureHolderEligibilitySource({ [HOLDER.address]: 10n }, 10n);
-  const env: BinratWorkerEnv = { DB: db, BINRAT_HOLDER_WALLET_AUTH_ENABLED: 'true' };
-  const deps: WorkerDeps = { externalFetch: fetch, now: () => nowMs, holderEligibilitySource: eligibility };
+  const env: BinratWorkerEnv = {
+    DB: db,
+    BINRAT_HOLDER_WALLET_AUTH_ENABLED: 'true',
+    BINRAT_PONS_CANDIDATE_ROUTES_ENABLED: 'true'
+  };
+  const deps: WorkerDeps = {
+    externalFetch: fetch, now: () => nowMs, holderEligibilitySource: eligibility,
+    ponsCandidateTestRoutes: true
+  };
 
   try {
     const receipts = [];
@@ -258,6 +265,47 @@ test('Worker preserves free truth and exposes strictly deeper holder projection 
       new Request(`${ORIGIN}/api/rat-radar/watchlist`), env, deps
     );
     assert.deepEqual(await freeAfterResponse.json(), freeBefore);
+
+    // A real Pons-chain signature by the SAME wallet must not inherit the
+    // existing fixture Arc HOLDER tier or access the Arc full Radar projection.
+    const ponsChallengeResponse = await handleWorkerRequest(
+      new Request(`${ORIGIN}/api/pons-candidate/challenge`, {
+        method: 'POST',
+        headers: { origin: ORIGIN, 'content-type': 'application/json',
+          'cf-connecting-ip': '192.0.2.101' },
+        body: JSON.stringify({ wallet: HOLDER.address })
+      }), env, deps
+    );
+    assert.equal(ponsChallengeResponse.status, 201);
+    const ponsChallenge = await ponsChallengeResponse.json() as {
+      nonce: string; message: string; chainId: number;
+    };
+    assert.equal(ponsChallenge.chainId, 4663);
+    const ponsSignature = await HOLDER.signMessage({ message: ponsChallenge.message });
+    const ponsSessionResponse = await handleWorkerRequest(
+      new Request(`${ORIGIN}/api/pons-candidate/session`, {
+        method: 'POST',
+        headers: { origin: ORIGIN, 'content-type': 'application/json',
+          'cf-connecting-ip': '192.0.2.101' },
+        body: JSON.stringify({
+          nonce: ponsChallenge.nonce,
+          message: ponsChallenge.message,
+          signature: ponsSignature
+        })
+      }), env, deps
+    );
+    assert.equal(ponsSessionResponse.status, 201);
+    const ponsCandidateSession = await ponsSessionResponse.json() as {
+      token: string; accessTier: string; holderAccessGranted: boolean;
+    };
+    assert.equal(ponsCandidateSession.accessTier, 'FREE');
+    assert.equal(ponsCandidateSession.holderAccessGranted, false);
+    const ponsCannotUnlockArc = await handleWorkerRequest(
+      new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`, {
+        headers: { authorization: `Bearer ${ponsCandidateSession.token}` }
+      }), env, deps
+    );
+    assert.equal(ponsCannotUnlockArc.status, 401);
 
     const publicReceipt = await handleWorkerRequest(
       new Request(`${ORIGIN}/api/rat-radar/activity/${receipts[0]!.activityId}`), env, deps
