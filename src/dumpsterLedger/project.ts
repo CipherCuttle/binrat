@@ -1,4 +1,5 @@
 import { sha256Hex } from '../evidence/canonical.js';
+import { validatePonsSuccessorCandidate } from '../launchConfig/ponsCutover.js';
 import {
   CONFIGURED_PRODUCTION_AUTHORITIES,
   LAUNCH_MECHANICS_RECEIPT_DIGEST
@@ -22,6 +23,18 @@ export interface PublicDumpsterLedger {
   tokenState: string;
   launchAuthorization: string;
   marketingAuthorized: boolean;
+  /** The old address declarations belong to ArcPad V0, never Pons custody proof. */
+  historicalRoleScope?: 'ARCPAD_V0_HISTORICAL_ONLY_NOT_PONS';
+  successorToken?: {
+    status: 'SELECTED_CANDIDATE_BLOCKED';
+    tokenChainId: 4663;
+    researchChainId: 5042;
+    tokenAddress: null;
+    treasury: null;
+    creatorFeeRecipient: null;
+    holderAccessActive: false;
+    accountingActive: false;
+  };
   configuredAuthorities: typeof CONFIGURED_PRODUCTION_AUTHORITIES & {
     launchMechanicsReceiptDigest: typeof LAUNCH_MECHANICS_RECEIPT_DIGEST;
   };
@@ -96,6 +109,12 @@ export async function projectDumpsterLedger(
   source: 'PRODUCTION' | 'TEST_FIXTURE' = 'PRODUCTION'
 ): Promise<PublicDumpsterLedger> {
   const config = funding.config;
+  const successor = manifest.tokenLaunchSuccessor === undefined
+    ? null : validatePonsSuccessorCandidate(manifest.tokenLaunchSuccessor);
+  // An Arc V0 funding configuration must never masquerade as a Pons ledger.
+  if (successor && source === 'PRODUCTION' && config) {
+    throw new Error('DUMPSTER_LEDGER_PONS_FUNDING_CROSS_CHAIN_BLOCKED');
+  }
   if (
     manifest.launchAuthorization.status !== 'BLOCKED' ||
     manifest.launchAuthorization.marketingAuthorized !== false ||
@@ -134,6 +153,19 @@ export async function projectDumpsterLedger(
     tokenState: manifest.launchAuthorization.tokenState ?? 'UNVERIFIED',
     launchAuthorization: manifest.launchAuthorization.status,
     marketingAuthorized: manifest.launchAuthorization.marketingAuthorized,
+    ...(successor ? {
+      historicalRoleScope: 'ARCPAD_V0_HISTORICAL_ONLY_NOT_PONS' as const,
+      successorToken: {
+        status: successor.status,
+        tokenChainId: successor.tokenChainId,
+        researchChainId: successor.researchChainId,
+        tokenAddress: null as null,
+        treasury: null as null,
+        creatorFeeRecipient: null as null,
+        holderAccessActive: false as const,
+        accountingActive: false as const
+      }
+    } : {}),
     configuredAuthorities: {
       ...CONFIGURED_PRODUCTION_AUTHORITIES,
       launchMechanicsReceiptDigest: LAUNCH_MECHANICS_RECEIPT_DIGEST
@@ -194,8 +226,12 @@ export async function projectDumpsterLedger(
         ? 'BINRAT is not launched. Canonical funding configuration is present, but production accounting remains disabled until a reviewed on-chain observation source is implemented; totals remain zero.'
         : funding.status === 'TREASURY_AUTHORITY_INVALID'
           ? 'BINRAT is not launched. The supplied funding authority is invalid, so production accounting fails closed and no wallet or balance is presented as truth.'
-          : 'BINRAT is not launched. Owner-selected future treasury and project-fee authorities are configured, but no token, launch block, launch transaction, or token-flow observations exist. Production accounting remains disabled.',
-    evidenceBoundary: 'Configured authority is an owner policy declaration, not proof of custody or an observed token role. Zero pre-launch entries mean token observations are not yet available; they do not predict or preclude future flows. Ledger entries must be immutable on-chain facts bound to activated canonical funding authority.'
+          : successor
+            ? 'BINRAT token launch candidate: Pons on Robinhood 4663. Existing displayed wallet declarations refer to historical ArcPad V0 only. Pons treasury and fee recipient are NOT_VERIFIED; no token, launch receipt, or live accounting exists.'
+            : 'BINRAT is not launched. Owner-selected future treasury and project-fee authorities are configured, but no token, launch block, launch transaction, or token-flow observations exist. Production accounting remains disabled.',
+    evidenceBoundary: (successor
+      ? 'Historical ArcPad wallet roles are NOT Pons owner/fee custody evidence. No Pons accounting or holder access is active. '
+      : '') + 'Configured authority is an owner policy declaration, not proof of custody or an observed token role. Zero pre-launch entries mean token observations are not yet available; they do not predict or preclude future flows. Ledger entries must be immutable on-chain facts bound to activated canonical funding authority.'
   };
   const outputDigest = await sha256Hex(output);
   const receiptMaterial = {
