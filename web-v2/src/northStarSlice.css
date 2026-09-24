@@ -76,3 +76,21 @@
 @media(prefers-reduced-motion:reduce) {
   .home-page .rat-presence img,.radar-page .radar-row { transition:none; transform:none; }
 }
+
+/* Approved exact-source G0 art, reused as Git blobs, not regenerated or text-baked mockups.
+ * Provisional raw PNGs remain heavy; optimized transparent illustration layers await owner approval. */
+body { background:#151426; }
+.app-frame { background:#151426 url("/binrat-world-background.png") center top / max(100%, 1200px) auto no-repeat; }
+.home-page .home-hero { background:#261434 url("/binrat-world-background.png") center 42% / cover no-repeat; }
+.home-page .rat-presence { background:transparent; }
+.home-page .rat-presence::before {
+  background:linear-gradient(90deg,#141328f5 0%,#16142ce9 30%,#19162b9a 49%,#19162b00 78%),linear-gradient(0deg,#0c102044,transparent 40%);
+}
+.home-page .rat-presence img { object-position:55% 43%; filter:none; image-rendering:auto; }
+.home-page .rat-presence::after { pointer-events:none; }
+@media (max-width:720px) {
+  .app-frame { background-size:auto 720px; background-position:center top; }
+  .home-page .rat-presence::before { background:linear-gradient(0deg,#101122aa 0%,transparent 40%); }
+  .home-page .rat-presence img { object-position:50% 43%; }
+  .home-page .hero-copy { background:#171329f0; }
+}

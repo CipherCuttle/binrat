@@ -950,8 +950,8 @@ function RatPresence({ state, label }: { state: RatState; label: string }) {
   return (
     <figure className="rat-presence" data-rat-state={state}>
       <img
-        src={`${import.meta.env.BASE_URL}binrat-hero.webp`}
-        alt="BINRAT, the approved cyber-eyed dumpster rat mascot"
+        src={`${import.meta.env.BASE_URL}binrat-character-master.png`}
+        alt="BINRAT, the canonical scruffy charcoal rat with pink ears, segmented tail and red cyber-eye on viewer-right, in the dumpster at sunset"
       />
       <div className="rat-overlay" aria-hidden="true">
         <span>SUBJECT / BINRAT</span>
