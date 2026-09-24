@@ -1,0 +1,51 @@
+name: binrat-worker-settings-readonly
+
+on:
+  push:
+    branches: [diag/binrat-observability-readonly-20260924]
+    paths: [.github/workflows/binrat-worker-settings-readonly.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      BINRAT_CLOUDFLARE_ADMIN_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      BINRAT_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Read only deployed BINRAT Worker observability settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          (async () => {
+            const token = process.env.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN;
+            const account = process.env.BINRAT_CLOUDFLARE_ACCOUNT_ID;
+            if (!token || !account) throw new Error('Required Cloudflare secret is missing');
+            if (!/^[0-9a-f]{32}$/i.test(account)) throw new Error('Invalid account ID format');
+            const response = await fetch(
+              `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/binrat-edge-v0/script-settings`,
+              { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(20000) }
+            );
+            const data = await response.json();
+            const codes = Array.isArray(data.errors) ? data.errors.map(error => error.code).filter(Number.isInteger) : [];
+            console.log('Worker settings HTTP:', response.status, 'success:', data.success === true, 'error codes:', codes);
+            if (!response.ok || data.success !== true || !data.result) process.exit(1);
+            const obs = data.result.observability;
+            const logs = obs?.logs;
+            console.log('Observability enabled:', obs?.enabled ?? 'unreported');
+            console.log('Invocation sampling:', obs?.head_sampling_rate ?? 'unreported');
+            console.log('Workers Logs enabled:', logs?.enabled ?? 'unreported');
+            console.log('Invocation logs enabled:', logs?.invocation_logs ?? 'unreported');
+            console.log('Log persistence enabled:', logs?.persist ?? 'unreported');
+            console.log('Log sampling:', logs?.head_sampling_rate ?? 'unreported');
+            // Never print the full response: it may contain unrelated Worker configuration.
+          })().catch(error => {
+            console.error('Read-only inspection failed:', error.name, error.message === 'Required Cloudflare secret is missing' ? error.message : '');
+            process.exitCode = 1;
+          });
+          NODE
