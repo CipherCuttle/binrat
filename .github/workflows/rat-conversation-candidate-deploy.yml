@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: binrat-rat-conversation-candidate-deploy
@@ -73,3 +74,20 @@ jobs:
 
       - name: Provision separate D1 and deploy isolated Worker
         run: node scripts/deploy-rat-conversation-candidate.mjs
+
+      - name: Report isolated deployment result to PR #34
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo
+            echo "## RAT CANDIDATE DEPLOYMENT: $DEPLOY_STATUS"
+            echo "- commit: $GITHUB_SHA"
+            echo "- workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo '- production Worker and D1 were not selected by the candidate script.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment 34 --body-file "$GITHUB_STEP_SUMMARY"
