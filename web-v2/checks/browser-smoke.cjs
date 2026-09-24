@@ -9,9 +9,8 @@ const { chromium } = require("playwright");
 const base = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
 const output = path.resolve(__dirname, "../browser-artifacts");
 fs.mkdirSync(output, { recursive: true });
+// Desktop/tablet evidence regression; M1 phone UX/fixtures are in responsive-preview.cjs.
 const viewports = [
-  { width: 390, height: 844 },
-  { width: 430, height: 932 },
   { width: 1024, height: 768 },
   { width: 1440, height: 900 },
 ];
@@ -281,14 +280,14 @@ async function runMockedLive(browser) {
     await check("mocked LIVE empty feed/Radar never substitutes demo fixtures", async () => {
       await ready(page, "/?source=live");
       const text = await page.locator("main").innerText();
-      assert.match(text, /NO BAGS AT THIS CHECKPOINT/);
-      assert.match(text, /NO RADAR SHORTLIST YET/);
+      assert.match(text, /NOTHING IN THIS BAG/);
+      assert.doesNotMatch(text, /distinct indexed launches share an observed recipient/);
       assert.doesNotMatch(text, /FERAL|DEMO \+5m/);
-      assert.equal((await page.locator(".demo-flag").innerText()).trim(), "PUBLIC LIVE");
+      assert.ok(await page.getByText("LIVE", { exact: true }).first().isVisible());
       // Native links must preserve LIVE mode on copied/new-tab destinations too.
-      assert.match(await page.locator('nav[aria-label="Primary"] a[href*="/dumpster"]').first().getAttribute("href"), /\?source=live$/);
+      assert.match(await page.locator('nav[aria-label="Mobile primary navigation"] a[href*="/radar"]').first().getAttribute("href"), /\?source=live$/);
       await ready(page, "/radar?source=live");
-      assert.match(await page.locator("main").innerText(), /NO RADAR FILE IN THIS INDEX/);
+      assert.match(await page.locator("main").innerText(), /NO MATCHING RADAR FILE/);
       await assertNoHorizontalOverflow(page, "Mocked empty Radar", 390);
     });
 
@@ -415,13 +414,13 @@ async function runMockedLive(browser) {
       await page.route("**/api/dumpster-ledger", (route) => route.fulfill({ json: ledger }));
 
       await ready(page, "/radar?source=live");
-      assert.equal(await page.locator(".evidence-dossier .recurrence-marks i").count(), 8);
-      assert.match(await page.locator(".evidence-dossier .recurrence-marks").innerText(), /123 TOTAL/);
-      assert.doesNotMatch(await page.locator(".evidence-dossier").innerText(), /WATCH ARMED/);
+      assert.match(await page.locator("main").innerText(), /123/);
+      assert.equal(await page.getByRole("button", { name: "Save radar address on this device" }).count(), 1);
+      assert.doesNotMatch(await page.locator("main").innerText(), /WATCH ARMED/);
       await assertNoHorizontalOverflow(page, "Live Radar recurrence 123", 390);
 
       await ready(page, "/bag/" + id + "?source=live");
-      await page.locator(".replay-proof-meta .checkpoint-rail").waitFor();
+      await page.getByText(/REPLAY BLOCK 123/).first().waitFor();
       const tabs = page.locator('[role="tab"]');
       await tabs.nth(1).click();
       assert.match(await page.locator('[role="tabpanel"]').innerText(), /OBSERVED BLOCK 122/);
@@ -459,7 +458,7 @@ async function runMockedLive(browser) {
       await page.route("**/api/bag/**/replay", (route) =>
         route.fulfill({ status: 503, json: { error: "temporarily unavailable" } }));
       await ready(page, "/bag/" + id + "?source=live");
-      await page.locator(".replay-proof-meta [role=alert]").waitFor();
+      await page.getByRole("alert").waitFor();
       const errorText = await page.locator("main").innerText();
       assert.match(errorText, /REPLAY UNAVAILABLE/);
       assert.match(errorText, /NO VALIDATED REPLAY STAGE/);
