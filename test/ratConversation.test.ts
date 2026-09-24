@@ -94,6 +94,8 @@ test('AI only handles innocuous unclassified chat and rejects factual-looking ou
     '🐀 the pipes are noisy tonight.');
   assert.equal(validateRatBanter({ response: '{"kind":"BANTER","text":"buy this token now."}' }), null);
   assert.equal(validateRatBanter({ response: '{"kind":"BANTER","text":"verified partnership with someone"}' }), null);
+  assert.equal(validateRatBanter({ response: '{"kind":"BANTER","text":"BINRAT is live today."}' }), null);
+  assert.equal(validateRatBanter({ response: '{"kind":"BANTER","text":"we are partnering with a major team."}' }), null);
   assert.equal(validateRatBanter({ response: 'Sure! I promise the moon' }), null);
   let calls = 0;
   let model = '';
