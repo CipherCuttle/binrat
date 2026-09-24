@@ -1,0 +1,14 @@
+/* Dumpster OS token bridge: source of truth is the existing approved BINRAT palette.
+ * Consume these aliases in new visual components; do not create a second palette.
+ */
+:root {
+  --binrat-asphalt: var(--black, #101210);
+  --binrat-oxidized: var(--dumpster, #263b35);
+  --binrat-dark-steel: var(--panel, #1c201c);
+  --binrat-bone: var(--bone, #e4ddcc);
+  --binrat-receipt: var(--paper, #cec6b5);
+  --binrat-rust: var(--orange, #cf9567);
+  --binrat-fault-red: var(--red, #ff3948);
+  --binrat-seam: var(--line-hi, #596154);
+  --binrat-led-idle: var(--green, #a8b795);
+}
