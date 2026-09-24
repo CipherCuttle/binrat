@@ -46,7 +46,69 @@ Finish the bounded product/frontend acceptance before resuming launch-operator p
 Legal/compliance, contract risk and disclosure review remain parallel launch-authorization
 gates; a visual release does not authorize token marketing or launch.
 
-### F0M — DO NEXT: mobile-first app experience (OWNER PRIORITY, 2026-09-24)
+### F0N — DO NEXT: Dumpster OS iconography and micrographics (2026-09-24)
+
+**Status:** full design/API specification committed at
+[`docs/DUMPSTER_OS_VISUAL_SYSTEM_V1.md`](./DUMPSTER_OS_VISUAL_SYSTEM_V1.md).
+Icon/micrographic assets and library integration remain **NOT IMPLEMENTED**.
+The owner liked the M1 **PC-mode** appearance and explicitly withdrew the
+earlier phone-size critique because it was made while viewing PC mode.
+Do **not** translate that into verified actual-phone acceptance.
+
+**Product direction:** BINRAT should feel like a cursed salvaged forensic
+workstation run by the approved cyborg rat, not a generic dark dashboard.
+Desktop = multi-panel forensic control terminal; phone = one-task-at-a-time
+field scavenger device. Increase rusted plate seams, controlled grime,
+receipt-paper artifacts, asymmetrical hardware, and small mascot fragments
+without harming legibility or source/evidence authority.
+
+**Exact next implementation (one bounded visual changeset after contact-sheet
+approval):**
+
+1. **D0 / art direction:** produce contact sheets for the proposed **24
+   original BINRAT domain icons**, **20 material micrographics**, and approved
+   mascot-fragment crops. Establish 16/24 px mono readability, dark/paper
+   variants and common `24×24` geometry. Full icon/motif/API inventory
+   and usable SVG recipes are in the linked spec; no synthetic or unapproved
+   mascot redesign.
+2. **D1 / actual component implementation:** pin `@tabler/icons-react` as
+   the **utility-only** family, import a whitelist of 12 action icons, produce
+   the first **13 P0 BINRAT icons** and **M01–M08** micrographics, then
+   implement five first-party reusable components:
+   `ScrapCard`, `EvidenceStamp`, `ReceiptSheet`,
+   `ScrapBookmark`, `SewerDivider`. Apply one shared contract first
+   to Discover on desktop + phone, then Radar and Bag without another
+   layout rewrite. Use CSS Modules and one visual token source.
+3. **D2 / gated embellishment:** add `ReplaySpool`, `CreatorTag`,
+   `RadarSignalCard`, quieter repeated rat fragments, and *only
+   state-driven* Motion/Rive after verified art, payload budget and owner
+   review. Do not ship all 20 motifs into JS just because they exist.
+
+**Hard acceptance:** user can recognize BINRAT's look without the wordmark,
+find the primary next action on both devices, read all source/coverage labels,
+copy full 40/64-character identifiers, and see correct DEMO/LIVE and
+MISSING/PARTIAL/UNVERIFIED distinctions with textures and animations disabled.
+Check 320/360/390/430 phone, 768 tablet, 1024/1440 desktop,
+reduced motion, focus and contrast, Playwright/axe and *real phone* where
+available. One hostile visual review; fix Critical/High and one targeted
+rereview only if necessary. No generic bubble maps, faux proof seals or
+scores, no purchased art, no production/candidate deploy, merge, token
+activity or subscriptions without separate authority.
+
+**Execution boundary:** This visual lane may run before M2/M3 feature
+additions but must not block evidence integrity, create a new backend
+sprint or overturn the existing typed LIVE adapters in draft PR #23.
+Keep the existing M1 candidate in draft PR #24 and its isolated GitHack
+preview as visual reference; the production `web/` stays unchanged.
+
+### F0M — mobile-first app structure (M1 IN DRAFT PR #24; M2/M3 PENDING)
+
+**2026-09-24 status:** M1 candidate built, with desktop/tablet/phone browser
+tests passing at the documented head and a separate static GitHack DEMO.
+Visual direction was positively received **in PC mode**. Actual-phone
+acceptance is not established; an earlier apparent phone critique was
+withdrawn when the viewing mode was clarified.
+
 
 **Decision:** The 320/360/390/430/768/1024/1440 px responsive GitHack demo is a
 technical baseline, **not owner-accepted mobile UX**. Stop piling breakpoint
@@ -86,7 +148,7 @@ and explicit DEMO/LIVE and data-freshness labels.
 
 **Three bounded changesets (not a new 50-PR sprint):**
 
-- **M1 / DO NEXT — visual and structural proof:** split phone screen
+- **M1 / reviewable candidate — visual and structural proof:** split phone screen
   compositions from desktop while sharing types/validators; extract
   MobileShell, DiscoverScreen/LaunchCard, RadarScreen/RecipientRow and
   BagScreen/ReplayTimeline; use existing Plex fonts and named BINRAT
