@@ -5,6 +5,10 @@ import { loadLiveReplayBundle, type DataMode } from "../data";
 import type { LiveReplayBundle } from "../liveAdapter";
 import type { Bag, PublicFeed, RadarWatchlist } from "../types";
 import s from "./MobileExperience.module.css";
+import { BinratIcon } from "../visual/icons/binrat";
+import { Micrographic } from "../visual/micrographics";
+import { EvidenceStamp, RatOperator, ReceiptSheet, ScrapBookmark, ScrapCard, SewerDivider } from "../visual/components";
+import { UtilityIcon } from "../visual/utility";
 
 type Go = (path: string) => void;
 export type Bookmark = { kind: "bag" | "radar"; id: string; mode: DataMode };
@@ -32,23 +36,19 @@ export function useMobileBookmarks() {
 }
 type Bookmarks = ReturnType<typeof useMobileBookmarks>;
 function Icon({ name }: { name: "discover" | "radar" | "saved" | "more" }) {
-  const paths = {
-    discover: <><path d="m3 10 9-7 9 7v11H3z"/><path d="m9 14 3 3 4-5"/></>,
-    radar: <><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="m12 12 7-7"/></>,
-    saved: <path d="M5 3h14v18l-7-5-7 5z"/>,
-    more: <path d="M4 6h16M4 12h16M4 18h16"/>,
-  };
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+  if (name === "more") return <UtilityIcon name="menu" size={25} aria-hidden="true"/>;
+  const glyph = { discover: "dumpster", radar: "radar-ping", saved: "saved-scrap" } as const;
+  return <BinratIcon name={glyph[name]} decorative size={25}/>;
 }
 export function MobileShell({ page, mode, checkpoint, navigate, children }: {
   page: string; mode: DataMode; checkpoint: string | null; navigate: Go; children: ReactNode;
 }) {
-  const current = page === "radar" ? "Radar" : page === "saved" ? "Saved" : ["more", "ledger", "replay", "watch", "binrat", "method"].includes(page) ? "More" : "Discover";
+  const current = page === "radar" ? "Radar" : page === "saved" ? "Saved" : ["more", "ledger", "replay", "watch", "binrat", "method", "design-lab"].includes(page) ? "More" : "Discover";
   const tabs = [{ label: "Discover", name: "discover", path: "/" }, { label: "Radar", name: "radar", path: "/radar" }, { label: "Saved", name: "saved", path: "/saved" }, { label: "More", name: "more", path: "/more" }] as const;
-  return <div className={s.shell}>
+  return <div className={s.shell} data-dumpster-os="field-shell">
     <header className={s.header}>
       <AppLink href="/" navigate={navigate} className={s.brand} ariaLabel="BINRAT Discover">
-        <span className={s.logo}>BR<span>↗</span></span><span>BINRAT<small>RECEIPTS DECIDE TRUTH.</small></span>
+        <span className={s.logo}><BinratIcon name="rat-head" decorative size={29}/></span><span>BINRAT<small>RECEIPTS DECIDE TRUTH.</small></span>
       </AppLink>
       <div className={s.status}><i/><b>{mode === "DEMO" ? "DEMO" : "LIVE"}</b><small>ARC · 5042</small></div>
     </header>
@@ -61,24 +61,20 @@ export function MobileShell({ page, mode, checkpoint, navigate, children }: {
   </div>;
 }
 function Lead({ eyebrow, title, sub, aside }: { eyebrow: string; title: string; sub: string; aside?: ReactNode }) {
-  return <header className={s.lead}><span className={s.eyebrow}>↗ &nbsp;{eyebrow}</span><div className={s.leadTitle}><h1>{title}<em>.</em></h1>{aside}</div><p>{sub}</p></header>;
+  return <header className={s.lead}><span className={s.eyebrow}><Micrographic kind="claw-notch" tone="rust" size={17}/>{eyebrow}</span><div className={s.leadTitle}><h1>{title}<em>.</em></h1>{aside}</div><p>{sub}</p></header>;
 }
 function Coverage({ state }: { state: Bag["trashTrail"]["coverage"] }) {
-  return <span className={s.coverage} data-state={state.toLowerCase()}><i/>{state}</span>;
+  return <EvidenceStamp scope="coverage" state={state} className={s.coverage}/>;
 }
 function Save({ item, bookmarks, label }: { item: Bookmark; bookmarks: Bookmarks; label: string }) {
-  const selected = bookmarks.contains(item);
-  return <button type="button" className={selected ? s.saveActive : s.save} onClick={() => bookmarks.toggle(item)} aria-pressed={selected}
-    aria-label={selected ? "Remove " + label + " from saved files" : "Save " + label + " on this device"}>
-    <Icon name="saved"/>{selected ? "SAVED" : "SAVE"}
-  </button>;
+  return <ScrapBookmark item={item} saved={bookmarks.contains(item)} onToggle={bookmarks.toggle} label={label}/>;
 }
 function LaunchCard({ bag, mode, bookmarks, navigate, featured = false }: {
   bag: Bag; mode: DataMode; bookmarks: Bookmarks; navigate: Go; featured?: boolean;
 }) {
   const item: Bookmark = { kind: "bag", id: bag.id, mode };
-  return <article className={featured ? s.feature : s.launch}>
-    <div className={s.cardHead}><span>{featured ? "LATEST INDEXED / " : "FILE / "}BLK {bag.blockNumber}</span><Coverage state={bag.trashTrail.coverage}/></div>
+  return <ScrapCard as="article" variant={featured ? "oxide" : "steel"} className={featured ? s.feature : s.launch}>
+    <div className={s.cardHead}><BinratIcon name="bag-dossier" decorative size={18}/><span>{featured ? "LATEST INDEXED / " : "FILE / "}BLK {bag.blockNumber}</span><Coverage state={bag.trashTrail.coverage}/></div>
     <AppLink href={"/bag/" + bag.id} navigate={navigate} className={s.cardBody} ariaLabel={"Open " + bag.symbol + " dossier"}>
       <div className={s.symbol}><strong>{"$" + bag.symbol}</strong><span>{bag.name}</span></div>
       <div className={s.prior}><strong>{String(bag.trashTrail.priorLaunchCount).padStart(2, "0")}</strong><small>PRIOR INDEXED<br/>BAGS</small></div>
@@ -86,7 +82,7 @@ function LaunchCard({ bag, mode, bookmarks, navigate, featured = false }: {
     </AppLink>
     <div className={s.cardFoot}><span>{mode === "DEMO" ? "SYNTHETIC FILE" : "PUBLIC INDEX"} / ARC 5042</span>
       <div><Save item={item} bookmarks={bookmarks} label={"bag " + bag.symbol}/><AppLink className={s.open} href={"/bag/" + bag.id} navigate={navigate}>OPEN FILE ↗</AppLink></div></div>
-  </article>;
+  </ScrapCard>;
 }
 export function MobileDiscover({ feed, radar, mode, bookmarks, navigate }: {
   feed: PublicFeed; radar: RadarWatchlist; mode: DataMode; bookmarks: Bookmarks; navigate: Go;
@@ -102,13 +98,14 @@ export function MobileDiscover({ feed, radar, mode, bookmarks, navigate }: {
       "Explore synthetic dossiers. Demo observations are not chain proof." : "Latest indexed launches and the evidence available right now."}
       aside={<span className={s.counter}>{feed.bags.length} IN VIEW</span>}/>
     <div className={s.sectionHead}><div><small>01 / NEW IN THE BIN</small><h2>Fresh evidence</h2></div><small>BLOCK {feed.asOfBlock}</small></div>
-    <div className={s.filters}><label className={s.search}>⌕<span className="sr-only">Search tokens or addresses</span>
+    <div className={s.filters}><label className={s.search}><UtilityIcon name="search" size={22} aria-hidden="true"/><span className="sr-only">Search tokens or addresses</span>
       <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Token / reported creator"/></label>
       <button type="button" aria-pressed={repeats} onClick={() => setRepeats(v => !v)} className={repeats ? s.filterActive : s.filter}>↻ REPEATS</button></div>
     {matches.length ? <div className={s.feed}>{matches.map((bag, index) =>
       <LaunchCard key={bag.id} bag={bag} featured={index === 0} mode={mode} bookmarks={bookmarks} navigate={navigate}/>)}</div> :
       <div className={s.empty}><strong>NOTHING IN THIS BAG.</strong><p>No indexed launch matches the current filter.</p></div>}
-    {lead && <section className={s.teaser}><small>02 / RADAR SIGNAL</small><div><strong>{lead.distinctLaunchCount}</strong><p>distinct indexed launches share an observed recipient address.</p>
+    <SewerDivider kind="weld"/>
+    {lead && <section className={s.teaser}><span className={s.teaserRat}><RatOperator size="stamp"/></span><small>02 / RADAR SIGNAL</small><div><strong>{lead.distinctLaunchCount}</strong><p>distinct indexed launches share an observed recipient address.</p>
       <AppLink href={"/radar/address/" + lead.observedRecipientAddress} navigate={navigate} ariaLabel="Inspect radar recipient">↗</AppLink></div>
       <span>OBSERVED ROLE / NOT A BUY RECOMMENDATION</span></section>}
     <p className={s.boundary}>NO SCORE. NO BUY CALL. NO HUMAN IDENTITY INFERENCE.</p>
@@ -121,10 +118,11 @@ export function MobileRadar({ radar, mode, selectedAddress, bookmarks, navigate 
   return <div className={s.screen}>
     <Lead eyebrow="02 / OBSERVED RECURRENCE" title="Rat Radar" sub="Inspect recurring observed recipients and actual receipts, not trading signals."
       aside={<span className={s.counter}>{radar.candidates.length} SHOWN</span>}/>
+    <div className={s.operatorRail}><RatOperator size="stamp"/><div><b>OPERATOR 001 / RAT RADAR</b><span>RECURRENCE TRACES / SOURCE ROLES ONLY</span></div><BinratIcon name="radar-ping" decorative size={27}/></div>
     <div className={s.coverageBar}><span>INDEXED LAUNCHES <b>{radar.coverage.indexedLaunchCount}</b></span><span>OBSERVED ADDRESSES <b>{radar.coverage.distinctRecipientAddressCount}</b></span></div>
-    {selected ? <section className={s.radarCard}>
+    {selected ? <ScrapCard as="section" variant="steel" className={s.radarCard}>
       <div className={s.cardHead}><span>OPEN FILE / {String(selected.rank).padStart(2, "0")}</span><Coverage state={radar.coverage.historyCoverage}/></div>
-      <span className={s.meta}>OBSERVED V3 SWAP RECIPIENT</span><h2>{short(selected.observedRecipientAddress)}</h2>
+      <span className={s.meta}><BinratIcon name="observed-recipient" decorative size={18}/> OBSERVED V3 SWAP RECIPIENT</span><h2>{short(selected.observedRecipientAddress)}</h2>
       <div className={s.stats}><div><strong>{selected.distinctLaunchCount}</strong><small>DISTINCT<br/>LAUNCHES</small></div>
         <div><strong>+{selected.medianFirstEntryBlockDelta}</strong><small>MEDIAN ENTRY<br/>BLOCK DELTA</small></div>
         <div><strong>{selected.acquisitionReceiptCount}</strong><small>ACQUISITION<br/>RECEIPTS</small></div></div>
@@ -138,7 +136,8 @@ export function MobileRadar({ radar, mode, selectedAddress, bookmarks, navigate 
           {mode === "LIVE" && /^[0-9a-f]{64}$/i.test(id) && <a href={"/api/rat-radar/activity/" + id} target="_blank" rel="noopener noreferrer">PUBLIC JSON ↗</a>}</div>)}
         <span>RADAR CHECKPOINT {radar.asOfBlock} · <CoverageStamp state={radar.coverage.historyCoverage}/></span>
       </details>
-    </section> : <div className={s.empty}><strong>NO MATCHING RADAR FILE.</strong><p>No other recipient was substituted.</p></div>}
+    </ScrapCard> : <div className={s.empty}><strong>NO MATCHING RADAR FILE.</strong><p>No other recipient was substituted.</p></div>}
+    <SewerDivider kind="cable"/>
     <div className={s.sectionHead}><div><small>PUBLIC SHORTLIST</small><h2>Other files</h2></div></div>
     <div className={s.radarList}>{radar.candidates.map(x =>
       <AppLink key={x.observedRecipientAddress} href={"/radar/address/" + x.observedRecipientAddress} navigate={navigate}
@@ -172,18 +171,19 @@ export function MobileBag({ bag, mode, bookmarks, navigate }: { bag: Bag; mode: 
   return <div className={s.screen}>
     <AppLink href="/dumpster" navigate={navigate} className={s.back}>← BACK TO DISCOVER</AppLink>
     <Lead eyebrow={"BAG DOSSIER / BLOCK " + bag.blockNumber} title={"$" + bag.symbol} sub={bag.name} aside={<Coverage state={bag.trashTrail.coverage}/>}/>
-    <section className={s.bagOverview}><span className={s.meta}>SOURCE / ARCPAD · ARC 5042</span>
+    <ScrapCard as="section" variant="oxide" className={s.bagOverview}><span className={s.meta}><BinratIcon name="bag-dossier" decorative size={18}/> SOURCE / ARCPAD · ARC 5042</span>
       <div className={s.bagNumbers}><div><strong>{bag.trashTrail.priorLaunchCount}</strong><span>PRIOR INDEXED<br/>LAUNCHES</span></div>
         <div><strong>{bag.evidence.length}</strong><span>EVIDENCE<br/>ITEMS</span></div></div>
       <div className={s.creatorLine}><small>REPORTED CREATOR ADDRESS</small><code>{short(bag.reportedCreatorAddress)}</code>
         <AppLink href={"/creator/" + bag.reportedCreatorAddress} navigate={navigate}>OPEN CREATOR FILE ↗</AppLink></div>
       <div className={s.bagButtons}><Save item={{kind:"bag",id:bag.id,mode}} bookmarks={bookmarks} label={"bag " + bag.symbol}/>
-        <a href="#mobile-replay" className={s.primary}>INSPECT REPLAY ↓</a></div></section>
+        <a href="#mobile-replay" className={s.primary}>INSPECT REPLAY ↓</a></div></ScrapCard>
     <section className={s.evidence}><div className={s.sectionHead}><div><small>01 / WHAT WE KNOW</small><h2>Evidence</h2></div><Coverage state={bag.trashTrail.coverage}/></div>
       {bag.evidence.map(x => <p key={x.text} className={s.evidenceRow}><b>{x.state}</b><span>{x.text}</span></p>)}
-      <details className={s.details}><summary>LAUNCH FACTS & SOURCE IDS <b>＋</b></summary>
+      <ReceiptSheet title="EXACT LAUNCH FACTS" source="ARCPAD / ARC 5042" mode={mode} checkpoint={bag.blockNumber} className={s.paperProof}><details className={s.details}><summary>LAUNCH FACTS & SOURCE IDS <b>＋</b></summary>
         {([["TOKEN CONTRACT",bag.token],["TRANSACTION HASH",bag.txHash],["BAG ID / NOT RECEIPT",bag.id]] as const).map(([label,value]) =>
-          <div className={s.proof} key={label}><small>{label}</small><code>{value}</code><CopyButton label={label} value={value}/></div>)}</details></section>
+          <div className={s.proof} key={label}><small>{label}</small><code>{value}</code><CopyButton label={label} value={value}/></div>)}</details></ReceiptSheet></section>
+    <SewerDivider kind="paper"/>
     <section id="mobile-replay" className={s.replay} tabIndex={-1}>
       <div className={s.sectionHead}><div><small>02 / FROZEN EVIDENCE</small><h2>Replay Lab</h2></div></div>
       <p>What was knowable at each horizon? Missing stages remain missing.</p>
@@ -199,7 +199,7 @@ export function MobileBag({ bag, mode, bookmarks, navigate }: { bag: Bag; mode: 
           <><small>REPLAY BLOCK {liveReplay.asOfBlock} · <CoverageStamp state={liveReplay.historyCoverage}/></small>
             <div className={s.proof}><code>{liveReplay.receipt.receiptId}</code><CopyButton label="Replay receipt" value={liveReplay.receipt.receiptId}/></div>
             <p>Structural validation only. Backend remains cryptographic authority.</p></>}</div>}</section>
-    <section className={s.next}><small>03 / FOLLOW THE TRAIL</small><h2>One address. More bags?</h2>
+    <section className={s.next}><span className={s.nextRat}><RatOperator size="stamp"/></span><small>03 / FOLLOW THE TRAIL</small><h2>One address. More bags?</h2>
       <p>Reported address equality is not proof of human identity or common control.</p>
       <AppLink href={"/creator/" + bag.reportedCreatorAddress} navigate={navigate} className={s.primary}>OPEN CREATOR HISTORY ↗</AppLink></section>
   </div>;
@@ -223,6 +223,7 @@ export function MobileMore({ mode, navigate }: { mode: DataMode; navigate: Go })
   const links=[["RAT WATCH","Creator-only Telegram watches","/watch"],["REPLAY FILES","Frozen observation histories","/replay"],
     ["DUMPSTER LEDGER","Funding disclosure and authority","/ledger"],["$BINRAT STATUS","Current token state","/binrat"],
     ["THE METHOD","Evidence and ranking rules","/method"]];
+  if (mode === "DEMO") links.push(["DUMPSTER OS LAB","Custom icons, grime and component specimens","/design/dumpster-os"]);
   return <div className={s.screen}><Lead eyebrow="04 / FIELD MANUAL" title="More" sub="Methods, transparency and other product instruments."/>
     <div className={s.moreList}>{links.map(([title,description,path],i)=>
       <AppLink key={path} href={path} navigate={navigate} className={s.moreRow}><b>0{i+1}</b><span><strong>{title}</strong><small>{description}</small></span><em>↗</em></AppLink>)}</div>

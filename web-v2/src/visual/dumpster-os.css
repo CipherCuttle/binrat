@@ -1,0 +1,74 @@
+@import "./tokens.css";
+/* Dumpster OS D1 — edge materials, not text-hostile grime. Desktop control
+ * terminal and phone field device share shapes and semantic iconography. */
+.app-frame.dumpster-os { background-color:#101510; }
+.dumpster-os .os-design-link {display:flex;align-items:center;gap:9px;min-height:42px;padding:10px 14px;
+  margin:12px 11px 0;border:1px dashed #957b58;color:#e3b586;background:#272c20;
+  font:700 10px "Plex Mono",monospace;letter-spacing:.035em;}
+.dumpster-os .os-design-link:hover {border-color:#efc49a;background:#37412d;}
+.dumpster-os .os-sidebar-unit {display:flex;align-items:center;gap:11px;margin:18px 11px 0;
+  padding:9px;background:linear-gradient(110deg,#28372b,#17231b);border:1px solid #6a664d;}
+.dumpster-os .os-sidebar-unit > div {min-width:0;}
+.dumpster-os .os-sidebar-unit b {display:block;color:#ddaa73;font:700 10px "Plex Mono",monospace;}
+.dumpster-os .os-sidebar-unit small {display:block;color:#bdbb9e;font:9px "Plex Mono",monospace;margin-top:6px;}
+.dumpster-os .shell-nav {background:
+  linear-gradient(90deg,transparent 8%,#9d7a3f07 22%,transparent 35%),
+  repeating-linear-gradient(165deg,transparent 0 47px,#9e81530b 48px 49px,transparent 50px 90px),
+  linear-gradient(#28362b,#15221b 42%,#121c16 100%);
+  border-right:2px solid #746546;box-shadow:inset -5px 0 0 #121810;
+}
+.dumpster-os .shell-nav::before {content:"";display:block;position:absolute;left:0;right:0;top:0;height:8px;z-index:2;
+ background:repeating-linear-gradient(120deg,#c2885e 0 10px,#362c20 10px 18px);
+ opacity:.72;pointer-events:none;}
+.dumpster-os .shell-nav::after {content:"";position:absolute;left:9px;right:9px;bottom:7px;height:6px;opacity:.4;
+ background:repeating-linear-gradient(90deg,#b59163 0 11px,transparent 12px 22px);pointer-events:none;}
+.dumpster-os .brand-glyph svg {width:29px;height:29px;filter:drop-shadow(1px 2px #180f0e);}
+.dumpster-os .wordmark {border-bottom:1px solid #78674f;}
+.dumpster-os .shell-nav nav a.active {box-shadow:inset 3px 0 #d88a5c,inset 0 -1px #8e684831; background:#374438;}
+.dumpster-os .shell-nav nav a:hover {background:#2a392c;}
+.dumpster-os .status-rail {background:linear-gradient(90deg,#252f24,#161e17 55%,#373027);border-bottom:1px solid #8a7052;}
+.dumpster-os .status-cluster i {box-shadow:0 0 0 2px #473f32;}
+.dumpster-os .workspace {background:
+  radial-gradient(ellipse at 98% 2%,#74532b10,transparent 38%),
+  repeating-linear-gradient(0deg,transparent 0 78px,#a99a6610 79px 80px,transparent 81px 164px);}
+.dumpster-os .page-heading h1,.dumpster-os .section-title h2 {text-shadow:2px 2px 0 #0009; }
+.dumpster-os .home-hero {position:relative;border-bottom:2px solid #81694b;
+  background-image:repeating-linear-gradient(166deg,transparent 0 87px,#bd8f4910 88px 89px,transparent 90px 130px);}
+.dumpster-os .home-hero::after {content:"";position:absolute;left:14px;right:14px;bottom:2px;height:5px;opacity:.48;
+  background:repeating-linear-gradient(90deg,#987d59 0 20px,#1b221c 20px 32px);pointer-events:none;}
+.dumpster-os .os-home-divider {margin-inline:20px;}
+.dumpster-os .latest-file,.dumpster-os .radar-tease,.dumpster-os .evidence-dossier,.dumpster-os .case-sheet,.dumpster-os .creator-file {
+  position:relative;isolation:isolate;
+  border-color:#847452;box-shadow:inset 0 2px 0 #d4b37b22,4px 6px 0 #080c0a6b;
+}
+.dumpster-os .latest-file:before,.dumpster-os .evidence-dossier:before,.dumpster-os .case-sheet:before {
+  content:"";position:absolute;left:0;top:0;width:38px;height:32px;z-index:1;pointer-events:none;
+  background:radial-gradient(circle at 10px 9px,#b88e65 0 2px,#272c24 2.5px 4px,transparent 4.5px),
+             linear-gradient(90deg,#bb936b55 0 2px,transparent 2px),
+             linear-gradient(#c69d6555 0 2px,transparent 2px);}
+.dumpster-os .latest-file:after {content:"";position:absolute;right:5px;top:5px;width:39px;height:21px;pointer-events:none;
+ background:repeating-linear-gradient(115deg,transparent 0 6px,#c8905544 7px 9px,transparent 10px 18px);}
+.dumpster-os .launch-row,.dumpster-os .radar-row {border-bottom-color:#665e45;}
+.dumpster-os .launch-row:hover,.dumpster-os .radar-row:hover {background:linear-gradient(90deg,#354b39,#242f26);}
+.dumpster-os .radar-row.selected {outline:1px solid #ac895b;outline-offset:-1px;}
+.dumpster-os .case-sheet {border-top:3px solid #bc8255;}
+.dumpster-os .creator-file {border-top:3px solid #6f8b6c;}
+.dumpster-os .replay-lab {border-top:3px solid #a56a54;box-shadow:inset 0 3px #1d211c;}
+.dumpster-os .os-radar-operator {float:right;margin:0 0 8px 8px;opacity:.8;}
+.dumpster-os .evidence-receipt {background:
+  repeating-linear-gradient(0deg,transparent 0 31px,#66492e0d 32px 33px,transparent 34px 36px),
+  #ded3b7;color:#1e2b20;}
+.dumpster-os .replay-strip button {border-color:#796649;}
+.dumpster-os .claim-line {border-left:3px solid #b28050;padding-left:10px;}
+@media(max-width:1100px) {
+ .dumpster-os .shell-nav::after {display:none;}
+ .dumpster-os .os-sidebar-unit {display:none;}
+ .dumpster-os .os-design-link {display:none;}
+}
+@media(max-width:720px) {
+ .dumpster-os .workspace {background:transparent;}
+ .dumpster-os .os-design-link {display:none;}
+}
+@media(prefers-reduced-motion:reduce) {
+ .dumpster-os * {transition:none!important;animation:none!important;}
+}

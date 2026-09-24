@@ -1,4 +1,4 @@
-/* M1: task-based mobile acceptance plus tablet/desktop regression.
+/* M1 + Dumpster OS D1: task-based mobile acceptance, art samples and desktop regression.
  * Validated demo fixtures only; screenshots captured before owner visual review.
  */
 const assert = require("node:assert/strict");
@@ -12,7 +12,7 @@ const sizes = [
   [320, 720], [360, 780], [390, 844], [430, 932],
   [768, 1024], [1024, 768], [1440, 900],
 ];
-const routes = ["/", "/dumpster", "/radar", "/bag/bag-feral-arc-20418791"];
+const routes = ["/", "/dumpster", "/radar", "/bag/bag-feral-arc-20418791", "/design/dumpster-os"];
 async function ready(page, route) {
   await page.goto(base + route, { waitUntil: "domcontentloaded" });
   await page.locator("main h1").first().waitFor();
@@ -56,8 +56,13 @@ async function testPhone(browser, width, height) {
       await ready(page, route);
       await mobileNav(page, width, height);
       await noOverflow(page, route, width);
-      const label = route.includes("/bag/") ? "bag" : route === "/" ? "discover" : route.slice(1);
-      if (width === 390 || (width === 320 && ["discover", "radar", "bag"].includes(label))) {
+      if (route === "/design/dumpster-os") {
+        assert.equal(await page.locator("[data-os-icon]").count(), 13, "all first-party P0 icon samples");
+        assert.equal(await page.locator("[data-os-motif]").count(), 8, "all industrial micrographics");
+        assert.match(await page.locator("main").innerText(), /NOT CHAIN PROOF/);
+      }
+      const label = route.includes("/bag/") ? "bag" : route.includes("/design/") ? "dumpster-os" : route === "/" ? "discover" : route.slice(1);
+      if (width === 390 || (width === 320 && ["discover", "radar", "bag", "dumpster-os"].includes(label))) {
         await page.screenshot({ path: path.join(output, label + "-" + width + ".png"), fullPage: true, animations: "disabled" });
       }
       process.stdout.write("PASS M1 " + width + "px " + label + "\n");
@@ -119,7 +124,11 @@ async function testWide(browser, width, height) {
       assert.equal(await page.getByRole("navigation", { name: "Mobile primary navigation" }).count(), 0);
       assert.equal(await page.getByRole("navigation", { name: "Primary" }).getByRole("link").count(), 5);
       await noOverflow(page, route, width);
-      if (width === 768) await page.screenshot({ path: path.join(output, (route === "/" ? "home" : route.includes("/bag/") ? "bag" : route.slice(1)) + "-" + width + ".png"), fullPage: true });
+      if (route === "/design/dumpster-os") {
+        assert.equal(await page.locator("[data-os-icon]").count(),13);
+        assert.equal(await page.locator("[data-os-motif]").count(),8);
+      }
+      if (width === 768) await page.screenshot({ path: path.join(output, (route === "/" ? "home" : route.includes("/design/") ? "dumpster-os" : route.includes("/bag/") ? "bag" : route.slice(1)) + "-" + width + ".png"), fullPage: true });
       process.stdout.write("PASS M1 " + width + "px desktop/tablet " + route + "\n");
     }
   } finally { await context.close(); }

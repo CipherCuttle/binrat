@@ -1,0 +1,36 @@
+.scrap { position: relative; isolation: isolate; min-width:0; }
+.scrap > :not(.rivet) { position: relative; z-index:1; }
+.scrap.oxide { background: linear-gradient(115deg,#304838 0%,#253428 35%,#151d19 100%); border:1px solid #617056; box-shadow:inset 0 2px 0 #a5794428,inset 0 -3px 8px #10140e9c,0 4px 15px #0a0d0aa0; }
+.scrap.steel { background:linear-gradient(145deg,#263029,#1a211d 65%,#111915); border:1px solid #59604a; box-shadow:inset 0 1px 0 #b2a07928,inset -3px 0 8px #0b100bb0; }
+.scrap.paper { background:#d8cfb7;color:#181c15;border:1px solid #9f9076; }
+.bench { box-shadow: inset 0 2px #bc7f5038,0 12px 28px #080a0b99; }
+.field { box-shadow:inset 0 2px #bc7f5025,0 3px 8px #080a0b55; }
+.rivet { position:absolute!important;top:1px;right:1px;left:auto;opacity:.24;z-index:2!important;opacity:.8;color:#d3a06d;pointer-events:none; }
+.stamp { display:inline-flex;gap:6px;align-items:center;min-height:25px;width:max-content;max-width:100%;padding:4px 7px;border:1px solid #a49c7a;background:#373a2d;color:#efe2bd;font:700 10px/1.3 "Plex Mono",monospace;letter-spacing:.015em;white-space:nowrap; }
+.stateSlot {flex:none;width:8px;height:8px;border:1px solid currentColor;transform:rotate(45deg); }
+.stamp[data-state="partial"] {color:#f2d098;border-color:#ac7547;background:#453422;}
+.stamp[data-state="unverified"],.stamp[data-state="unknown"],.stamp[data-state="missing"] {color:#cdcabe;border-color:#858779;background:#3b3f38;}
+.stamp[data-state="observed"],.stamp[data-state="complete"] {color:#d1e1c0;border-color:#8b9b78;background:#33443a;}
+.stamp[data-state="noted"] {color:#e2c29c;border-color:#997e5e;background:#4a3a2b;}
+.receipt {min-width:0;position:relative;background:#d8cfb9;color:#1a251e;border:1px solid #998970;box-shadow:inset 3px 0 0 #e8e0cc,inset -3px 0 0 #b7a991,0 5px 0 #1d251d;overflow:hidden;}
+.receipt:before {content:"";pointer-events:none;position:absolute;right:5px;top:3px;width:44px;height:14px;background:repeating-linear-gradient(90deg,transparent 0 6px,#9d866429 6px 7px); }
+.receipt header {position:relative;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px 11px;border-bottom:2px dashed #9c8770;color:#252e24;font:700 12px "Plex Mono",monospace;}
+.receipt header small {margin-left:auto;color:#694d3c;font:700 9px/1.35 "Plex Mono",monospace;}
+.receiptMeta {margin:7px 14px;color:#584833;font:700 9px "Plex Mono",monospace;}
+.receiptBody {min-width:0;padding:6px 14px 16px;overflow-wrap:anywhere;}
+.receiptId {border-top:1px solid #ada18c;padding:10px 14px;font:11px/1.5 "Plex Mono",monospace;}
+.receiptId small {display:block;margin-bottom:6px;color:#544733;font:700 9px/1.4 "Plex Mono",monospace;}
+.receiptId code {display:block;word-break:break-all;}
+.paperTear {height:10px;background:radial-gradient(circle at 5px 0,transparent 5px,#ae997d 5.4px,#ae997d 6px,transparent 6.4px) 0 0/16px 10px repeat-x;}
+.scrapBookmark {display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:45px;min-width:79px;padding:8px 10px;cursor:pointer;border:1px solid #b58d5f;background:#2a3127;color:#f4dab6;font:700 11px "Plex Mono",monospace; }
+.scrapBookmark:focus-visible {outline:3px solid #f0d59b;outline-offset:2px;}
+.bookmarked {background:#56432c;color:#f2dfad;border-color:#eed39b;box-shadow:inset 0 0 0 1px #8b704e;}
+.divider {display:flex;align-items:center;gap:6px;margin:16px 0;color:#bd8656;opacity:.78;pointer-events:none;}
+.divider>span {height:1px;flex:1;background:repeating-linear-gradient(90deg,#ae7851 0 16px,transparent 17px 22px); }
+.divider.paper>span {border-top:2px dotted #ac9a7b;background:none;}
+.divider.cable>span {background:linear-gradient(#526557 50%,transparent 51%);}
+.ratOperator {position:relative;display:inline-block;flex:none;width:46px;height:46px;overflow:hidden;border:2px solid #a47e55;clip-path:polygon(0 0,100% 0,100% 75%,76% 100%,0 100%);background:#1f2f23;box-shadow:inset 0 0 8px #1117;}
+.ratOperator img {width:100%;height:100%;object-fit:cover;object-position:68% 28%;filter:saturate(.7) contrast(1.2);}
+.ratOperator i {position:absolute;inset:0;background:linear-gradient(145deg,transparent 38%,#cf692422),repeating-linear-gradient(0deg,transparent 0 8px,#0e0d080f 8px 9px);pointer-events:none;}
+.ratPanel {width:74px;height:74px;}
+@media(prefers-reduced-motion:reduce) { .scrap,.scrap * {animation:none!important;transition:none!important;} }
