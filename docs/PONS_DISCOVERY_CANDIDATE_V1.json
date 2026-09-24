@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "binrat.pons-discovery/1",
+  "status": "DRAFT_NOT_PUBLISHABLE",
+  "identity": {
+    "name": "BINRAT",
+    "symbol": "BINRAT",
+    "description": "A dumpster-rat meme with a real launch-evidence research product. BINRAT's existing Creator Files, Replay, Radar and Watch examine Arc launches with public receipts. The intended token is a separate, not-yet-launched Pons V2 candidate on Robinhood Chain. No token-safety certification or investment promise.",
+    "logoUrl": null
+  },
+  "token": {
+    "chainId": 4663,
+    "rail": "PONS_V2_DIRECT_FACTORY",
+    "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "tokenAddress": null,
+    "launchTransaction": null,
+    "ponsListingUrl": null
+  },
+  "research": {
+    "chainId": 5042,
+    "coverage": "ARC_RESEARCH_ONLY",
+    "ponsLaunchIndexingStatus": "NOT_VERIFIED"
+  },
+  "destinations": {
+    "officialWebsite": null,
+    "officialTelegram": null,
+    "officialX": null,
+    "officialDiscord": null,
+    "officialFarcaster": null,
+    "verifiedGithub": "https://github.com/CipherCuttle/binrat",
+    "telegramCandidate": "https://t.me/BinratBot",
+    "telegramCandidateStatus": "USER_REPORTED_OWNERSHIP_NOT_INDEPENDENTLY_VERIFIED"
+  },
+  "proof": {
+    "websiteControl": "NOT_VERIFIED",
+    "telegramControl": "NOT_VERIFIED",
+    "xControl": "NOT_VERIFIED",
+    "logoApproval": "NOT_APPROVED",
+    "ponsDeployerCustody": "NOT_VERIFIED",
+    "ponsFeeRecipientCustody": "NOT_VERIFIED",
+    "ponsTreasuryCustody": "NOT_VERIFIED",
+    "readOnlyPonsMechanics": {
+      "source": "docs/PONS_LAUNCH_READINESS_V0.md",
+      "observedOn": "2026-09-22",
+      "historicBlock": "69767635",
+      "freshReadRequired": true,
+      "currentStateVerified": false
+    }
+  },
+  "authority": {
+    "launchAuthorized": false,
+    "marketingAuthorized": false,
+    "metadataPublishAuthorized": false,
+    "contractPublished": false,
+    "holderEntitlementActive": false,
+    "fundingObserverActive": false
+  }
+}

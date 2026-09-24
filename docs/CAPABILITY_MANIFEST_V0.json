@@ -10,7 +10,8 @@
     "launchExecutionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
     "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
     "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md",
-    "ponsSuccessorSelection": "docs/BINRAT_PONS_LAUNCH_SELECTION_V1.json"
+    "ponsSuccessorSelection": "docs/BINRAT_PONS_LAUNCH_SELECTION_V1.json",
+    "ponsDiscoveryDraft": "docs/PONS_DISCOVERY_CANDIDATE_V1.json"
   },
   "capabilities": {
     "intelligenceV1": {
@@ -165,5 +166,19 @@
     "marketingAuthorized": false,
     "launchAuthorized": false,
     "ownerAuthority": "NOT_GRANTED"
+  },
+  "tokenLaunchDiscovery": {
+    "schemaVersion": "binrat.pons-discovery/1",
+    "status": "DRAFT_NOT_PUBLISHABLE",
+    "source": "docs/PONS_DISCOVERY_CANDIDATE_V1.json",
+    "tokenChainId": 4663,
+    "researchChainId": 5042,
+    "officialWebsite": null,
+    "officialTelegram": null,
+    "officialX": null,
+    "verifiedGithub": "https://github.com/CipherCuttle/binrat",
+    "tokenAddress": null,
+    "ponsListingUrl": null,
+    "metadataPublishAuthorized": false
   }
 }

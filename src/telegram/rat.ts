@@ -7,6 +7,10 @@ import {
 } from '../launchConfig/config.js';
 import { REQUIRED_LAUNCH_GATE_IDS } from '../launchConfig/gateMatrix.js';
 import {
+  validatePonsDiscoveryManifest,
+  type PonsDiscoveryManifest
+} from '../launchConfig/ponsDiscovery.js';
+import {
   validatePonsSuccessorCandidate,
   type PonsSuccessorCandidate
 } from '../launchConfig/ponsCutover.js';
@@ -46,6 +50,7 @@ export interface CapabilityManifest {
     configDigest?: string;
   };
   tokenLaunchSuccessor?: PonsSuccessorCandidate;
+  tokenLaunchDiscovery?: PonsDiscoveryManifest;
   launchGateStatus?: {
     matrix: string;
     matrixDigest: string;
@@ -150,6 +155,9 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
       throw new Error('CAPABILITY_MANIFEST_PONS_LEGACY_CONTEXT_MISSING');
     }
   }
+  if (root.tokenLaunchDiscovery !== undefined) {
+    validatePonsDiscoveryManifest(root.tokenLaunchDiscovery,root.tokenLaunchSuccessor);
+  }
   if (root.launchGateStatus !== undefined) {
     const gateStatus = record(root.launchGateStatus);
     const statuses = record(gateStatus.statuses);
@@ -248,6 +256,11 @@ function staticPlan(
         ponsCreatorFeeRecipient: manifest.tokenLaunchSuccessor ? 'NOT_VERIFIED' : undefined,
         legacyArcRoleContext: manifest.tokenLaunchSuccessor
           ? 'Historical ArcPad V0 declarations only; not proof of Pons custody.' : undefined,
+        ponsListingStatus: manifest.tokenLaunchDiscovery?.status,
+        officialWebsiteStatus: manifest.tokenLaunchDiscovery ? 'NOT_VERIFIED' : undefined,
+        officialTelegramStatus: manifest.tokenLaunchDiscovery ? 'NOT_VERIFIED' : undefined,
+        officialXStatus: manifest.tokenLaunchDiscovery ? 'NOT_VERIFIED' : undefined,
+        verifiedRepository: manifest.tokenLaunchDiscovery?.verifiedGithub,
         tokenAddressState: manifest.launchConfiguration?.tokenAddressState ?? 'UNKNOWN',
         holderGateStatus: manifest.launchConfiguration?.holderGateStatus ?? 'UNKNOWN',
         tokenMessage: tokenState === 'NOT_LAUNCHED'
