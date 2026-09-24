@@ -101,11 +101,6 @@ export function MobileDiscover({ feed, radar, mode, bookmarks, navigate }: {
     <Lead eyebrow="ARC / LAUNCH MEMORY" title="Discover" sub={mode === "DEMO" ?
       "Explore synthetic dossiers. Demo observations are not chain proof." : "Latest indexed launches and the evidence available right now."}
       aside={<span className={s.counter}>{feed.bags.length} IN VIEW</span>}/>
-    <section className={s.mascot}>
-      <div><small>FIELD UNIT 001 / {mode === "DEMO" ? "SIMULATION" : "PUBLIC INDEX"}</small>
-        <strong>THE RAT<br/>REMEMBERS<span>.</span></strong><p>He gets the scraps.<br/>You get the receipts.</p></div>
-      <img src={import.meta.env.BASE_URL + "binrat-hero.webp"} alt="" loading="lazy"/>
-    </section>
     <div className={s.sectionHead}><div><small>01 / NEW IN THE BIN</small><h2>Fresh evidence</h2></div><small>BLOCK {feed.asOfBlock}</small></div>
     <div className={s.filters}><label className={s.search}>⌕<span className="sr-only">Search tokens or addresses</span>
       <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Token / reported creator"/></label>
