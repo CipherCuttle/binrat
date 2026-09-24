@@ -239,3 +239,36 @@
     font-size: 12px;
   }
 }
+
+/* Discovery copy only: no new visual direction or unverified social CTAs. */
+.token-discovery-path {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.token-discovery-path p {
+  margin: 0 0 13px;
+  max-width: 440px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--bone);
+}
+.token-discovery-path strong { color: var(--good); font-size: 11px; }
+.token-discovery-path a {
+  color: var(--bone);
+  text-underline-offset: 3px;
+  font-size: 12px;
+}
+.historical-authorities {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--line);
+  padding-top: 13px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.historical-authorities summary { cursor: pointer; line-height: 1.7; }
+.historical-authorities p { margin: 10px 0; line-height: 1.8; }
+.historical-authorities code { overflow-wrap: anywhere; color: var(--bone); }
+@media (max-width: 520px) {
+  .token-discovery-path p, .historical-authorities { font-size: 12px; }
+}
