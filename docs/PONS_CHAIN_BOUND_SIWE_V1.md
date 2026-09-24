@@ -7,7 +7,7 @@ This PR implements a **separate, EOA-only Robinhood 4663 login realm**, not prod
 - SIWE challenge binds exact HTTPS origin (or HTTP localhost for fixtures), chain 4663, wallet address, purpose, resource, nonce, issue time and expiry.
 - One-time nonce is consumed via an atomic conditional D1 update after signature verification. Only FREE candidate sessions can be persisted.
 - D1 candidate tables require chain_id=4663, fixed versioned candidate policy and FREE tier. Session tokens are 256-bit random strings; only their hashes are persisted.
-- Session retrieval requires the matching origin, candidate policy, expiry and chain. Old Arc bearer tokens and even valid historical Arc HOLDER sessions cannot cross into this realm.
+- Session retrieval requires the **full canonical origin (scheme, host and port)**, candidate policy, expiry and chain. Sessions issued for HTTP localhost do not validate on HTTPS localhost. Old Arc bearer tokens and even valid historical Arc HOLDER sessions cannot cross into this realm.
 - No token address, threshold, live balance-source integration, upgraded data entitlement, production deployment, wallet transaction, approval or funding action occurs.
 - EIP-1271 contract-wallet authentication is unsupported by this candidate and needs separate reviewed chain-specific verification before production if those wallets are to be supported.
 
