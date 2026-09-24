@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { loadLiveRecipientActivity, type PublicRadarActivity, type PublicRecipientActivity } from "./recipientActivity";
 import type { DataMode } from "./data";
 import { CopyButton } from "./Primitives";
+import { publicApiUrl } from "./previewRuntime";
 
 const isAddress = (value: string) => /^0x[0-9a-f]{40}$/i.test(value);
 const short = (value: string) => value.length > 20 ? value.slice(0, 10) + "…" + value.slice(-8) : value;
@@ -29,7 +30,7 @@ function ActivityEvidenceSheet({ activity, checkpoint, onClose }: {
       <dt>{label}</dt><dd><code>{value}</code><CopyButton label={label.toLowerCase()} value={value}/></dd>
     </div>)}</dl>
     <a className="ns-raw-link" target="_blank" rel="noopener noreferrer"
-      href={"/api/rat-radar/activity/" + encodeURIComponent(activity.activityId)}>
+      href={publicApiUrl("/api/rat-radar/activity/" + encodeURIComponent(activity.activityId))}>
       OPEN EXACT PUBLIC ACTIVITY JSON ↗
     </a>
     <p className="ns-caution">Structural validation only. This evidence digest came from the backend and has not been independently rehashed here. Protocol roles do not establish human identity or trading intent.</p>

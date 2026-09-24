@@ -1,3 +1,5 @@
+import { publicApiUrl } from "./previewRuntime";
+
 /**
  * Public Rat Radar recipient-activity transport boundary.
  * The backend remains evidence authority: these checks validate transport and
@@ -150,7 +152,7 @@ export async function loadLiveRecipientActivity(
 ): Promise<PublicRecipientActivity> {
   if (!ADDRESS.test(requestedAddress)) throw new Error('RAT_RADAR_RECIPIENT_INVALID');
   const response = await fetcher(
-    '/api/rat-radar/address/' + encodeURIComponent(requestedAddress.toLowerCase()) + '/activity',
+    publicApiUrl('/api/rat-radar/address/' + encodeURIComponent(requestedAddress.toLowerCase()) + '/activity'),
     { headers: { accept: 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(15000) },
   );
   if (!response.ok) throw new Error('RAT_RADAR_RECIPIENT_ACTIVITY_UNAVAILABLE');

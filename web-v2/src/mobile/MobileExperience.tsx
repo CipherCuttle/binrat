@@ -3,6 +3,7 @@ import { AppLink, CopyButton, CoverageStamp } from "../Primitives";
 import { REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "../evidenceIntegrity";
 import { loadLiveReplayBundle, type DataMode } from "../data";
 import { RecipientActivityPanel } from "../RecipientActivityPanel";
+import { publicApiUrl, sourceSwitchHref } from "../previewRuntime";
 import type { LiveReplayBundle } from "../liveAdapter";
 import type { Bag, PublicFeed, RadarWatchlist } from "../types";
 import s from "./MobileExperience.module.css";
@@ -51,7 +52,7 @@ export function MobileShell({ page, mode, checkpoint, navigate, children }: {
       <AppLink href="/" navigate={navigate} className={s.brand} ariaLabel="BINRAT Discover">
         <span className={s.logo}>BR<span>↗</span></span><span>BINRAT<small>RECEIPTS DECIDE TRUTH.</small></span>
       </AppLink>
-      <a className={s.status} href={window.location.pathname + (mode === "DEMO" ? "?source=live" : "")}
+      <a className={s.status} href={sourceSwitchHref(mode === "DEMO")}
         aria-label={mode === "DEMO" ? "Switch to public LIVE evidence" : "Switch to deterministic DEMO data"}>
         <i/><b>{mode === "DEMO" ? "DEMO" : "LIVE"}</b>
         <small>{mode === "DEMO" ? "OPEN LIVE ↗" : "OPEN DEMO ↗"}</small>
@@ -140,7 +141,7 @@ export function MobileRadar({ radar, mode, selectedAddress, bookmarks, navigate 
         {selected.reasons.map((reason, i) => <p key={reason}><b>0{i + 1}</b> {reason}</p>)}
         <span className={s.meta}>{mode === "DEMO" ? "SYNTHETIC IDS / NOT CHAIN RECEIPTS" : "PUBLIC ACTIVITY IDS"}</span>
         {selected.evidenceActivityIds.map(id => <div className={s.proof} key={id}><code>{id}</code><CopyButton value={id} label="activity identifier"/>
-          {mode === "LIVE" && /^[0-9a-f]{64}$/i.test(id) && <a href={"/api/rat-radar/activity/" + id} target="_blank" rel="noopener noreferrer">PUBLIC JSON ↗</a>}</div>)}
+          {mode === "LIVE" && /^[0-9a-f]{64}$/i.test(id) && <a href={publicApiUrl("/api/rat-radar/activity/" + id)} target="_blank" rel="noopener noreferrer">PUBLIC JSON ↗</a>}</div>)}
         <span>RADAR CHECKPOINT {radar.asOfBlock} · <CoverageStamp state={radar.coverage.historyCoverage}/></span>
       </details>
     </section> : <div className={s.empty}><strong>NO MATCHING RADAR FILE.</strong><p>No other recipient was substituted.</p></div>}

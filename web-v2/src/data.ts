@@ -1,5 +1,6 @@
 import { demoFeed, demoRadar } from "./fixtures";
 import { settleIndependentSlices } from "./independentSlices";
+import { publicApiUrl } from "./previewRuntime";
 import { adaptLiveCreatorFile, adaptLiveFeed, adaptLiveRadar, adaptLiveReplay, adaptLiveLedger, type LiveCreatorFile, type LiveReplayBundle, type LiveLedger } from "./liveAdapter";
 import type { PublicFeed, RadarWatchlist } from "./types";
 
@@ -9,7 +10,7 @@ const wantsLive = new URLSearchParams(window.location.search).get("source") === 
 export const selectedDataMode: DataMode = wantsLive ? "LIVE" : "DEMO";
 
 async function readJson(path: string, unavailableCode: string): Promise<unknown> {
-  const response = await fetch(path, {
+  const response = await fetch(publicApiUrl(path), {
     headers: { accept: "application/json" },
     cache: "no-store",
     signal: AbortSignal.timeout(15000),
@@ -37,7 +38,7 @@ export async function loadProductData(): Promise<{
 /** 404 is a genuine not-indexed address. Every other failure remains an error. */
 export async function loadLiveCreatorFile(address: string): Promise<LiveCreatorFile | null> {
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) return null;
-  const response = await fetch("/api/creator/" + encodeURIComponent(address), {
+  const response = await fetch(publicApiUrl("/api/creator/" + encodeURIComponent(address)), {
     headers: { accept: "application/json" },
     cache: "no-store",
     signal: AbortSignal.timeout(15000),

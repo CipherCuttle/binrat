@@ -1,5 +1,6 @@
 import { useState, type MouseEvent, type ReactNode } from "react";
 import type { CoverageState } from "./types";
+import { routeHref } from "./previewRuntime";
 
 type Navigate = (path: string) => void;
 
@@ -18,11 +19,7 @@ export function AppLink({
   ariaLabel?: string;
   ariaCurrent?: "page";
 }) {
-  const base =
-    import.meta.env.BASE_URL === "/"
-      ? ""
-      : import.meta.env.BASE_URL.replace(/\/$/, "");
-  const resolvedHref = `${base}${href === "/" ? "/" : href}${window.location.search}`;
+  const resolvedHref = routeHref(href);
   const follow = (event: MouseEvent<HTMLAnchorElement>) => {
     if (
       event.defaultPrevented ||

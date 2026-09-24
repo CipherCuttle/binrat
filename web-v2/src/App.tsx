@@ -5,6 +5,7 @@ import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode 
 import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { RecipientActivityPanel } from "./RecipientActivityPanel";
+import { isGitHackPreview, publicApiUrl, shareableRouteUrl, sourceSwitchHref } from "./previewRuntime";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import type {
   Bag,
@@ -53,8 +54,9 @@ const appBase = () =>
     : import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function readRoute(): Route {
-  const path =
-    window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
+  const path = (isGitHackPreview
+    ? window.location.hash.slice(1).split("?")[0]
+    : window.location.pathname.replace(appBase(), "")).replace(/\/$/, "") || "/";
   if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/saved") return { page: "saved" };
   if (path === "/more") return { page: "more" };
@@ -116,7 +118,11 @@ export default function App() {
   useEffect(() => {
     const onPopState = () => setRoute(readRoute());
     window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
+    if (isGitHackPreview) window.addEventListener("hashchange", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      if (isGitHackPreview) window.removeEventListener("hashchange", onPopState);
+    };
   }, []);
   useEffect(() => {
     document
@@ -124,9 +130,11 @@ export default function App() {
       ?.focus({ preventScroll: true });
   }, [route]);
   const navigate = (path: string) => {
-    const target = `${appBase()}${path === "/" ? "/" : path}`;
-    if (target !== window.location.pathname)
-      window.history.pushState({}, "", target + window.location.search);
+    const target = isGitHackPreview
+      ? window.location.pathname + window.location.search + "#" + path
+      : `${appBase()}${path === "/" ? "/" : path}` + window.location.search;
+    if (target !== window.location.pathname + window.location.search + window.location.hash)
+      window.history.pushState({}, "", target);
     setRoute(readRoute());
     window.scrollTo({
       top: 0,
@@ -305,7 +313,7 @@ function StatusRail({
       </span>
       <span className="demo-flag">
         {mode === "DEMO" ? "DETERMINISTIC DEMO DATA" : "PUBLIC LIVE"}
-        <a className="ns-mode-toggle" href={window.location.pathname + (mode === "DEMO" ? "?source=live" : "")}
+        <a className="ns-mode-toggle" href={sourceSwitchHref(mode === "DEMO")}
           aria-label={mode === "DEMO" ? "Switch to public LIVE evidence" : "Switch to deterministic DEMO data"}>
           {mode === "DEMO" ? "OPEN LIVE ↗" : "OPEN DEMO ↗"}
         </a>
@@ -674,7 +682,7 @@ function EvidenceDossier({
         OPEN FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}
       </CaseTab>
       <h2>{short(candidate.observedRecipientAddress)}</h2>
-      <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /><CopyButton label="address dossier link" value={window.location.origin + appBase() + "/radar/address/" + candidate.observedRecipientAddress + window.location.search} /></div>
+      <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /><CopyButton label="address dossier link" value={shareableRouteUrl("/radar/address/" + candidate.observedRecipientAddress)} /></div>
       <div className="dossier-recurrence">
         <span>DISTINCT LAUNCH RECURRENCE</span>
         <b>{candidate.distinctLaunchCount}</b>
@@ -716,7 +724,7 @@ function EvidenceDossier({
             <code>{id}</code>
             <CopyButton label="activity identifier" value={id} />
             {mode === "LIVE" && /^[0-9a-f]{64}$/i.test(id) &&
-              <a className="source-link" href={"/api/rat-radar/activity/" + id} target="_blank" rel="noopener noreferrer">PUBLIC ACTIVITY JSON ↗</a>}
+              <a className="source-link" href={publicApiUrl("/api/rat-radar/activity/" + id)} target="_blank" rel="noopener noreferrer">PUBLIC ACTIVITY JSON ↗</a>}
           </div>
         ))}
       </Receipt>
