@@ -63,7 +63,7 @@ async function testPhone(browser, width, height) {
       process.stdout.write("PASS M1 " + width + "px " + label + "\n");
     }
     await ready(page, "/");
-    assert.match(await page.locator("main").innerText(), /Fresh evidence/);
+    assert.match(await page.locator("main").innerText(), /FRESH EVIDENCE/i);
     const search = page.getByRole("searchbox");
     await search.fill("FERAL");
     assert.equal(await page.getByRole("link", { name: "Open FERAL dossier" }).count(), 1);
