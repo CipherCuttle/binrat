@@ -74,7 +74,9 @@ if (
   candidate.token.contractAddress !== null ||
   candidate.token.launchTransaction !== null ||
   candidate.token.launchBlock !== null ||
-  Object.values(candidate.ownerRoles).some(v => v !== null && v !== 'NOT_SUPPLIED') ||
+  candidate.ownerRoles.deployer !== null ||
+  candidate.ownerRoles.treasury !== null ||
+  candidate.ownerRoles.creatorFeeRecipient !== null ||
   candidate.ownerRoles.custodyProof !== 'NOT_SUPPLIED' ||
   candidate.presentation.logoUrl !== null ||
   candidate.presentation.verifiedWebsiteUrl !== null ||
@@ -91,7 +93,7 @@ if (
   manifest.launchAuthorization.marketingAuthorized !== false
 ) throw new Error('PONS_DISCOVERY_UNVERIFIED_LISTING_ESCALATION');
 
-if (/href=["']https?:\\/\\/(?:t\\.me|x\\.com|twitter\\.com)\\//i.test(html)) {
+if (['https://t.me/', 'https://x.com/', 'https://twitter.com/'].some(url => html.includes('href="' + url))) {
   throw new Error('PONS_UNVERIFIED_SOCIAL_LINK_IN_PREVIEW');
 }
 if (html.includes('BUY $BINRAT') || html.includes('CONNECT TO BUY')) {
