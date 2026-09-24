@@ -19,6 +19,7 @@ import {
 } from '../holder/eligibility.js';
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { understandRatMessage } from '../telegram/nlp.js';
+import { handleRatCandidateSmoke } from './ratCandidateSmoke.js';
 import {
   entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
   loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
@@ -61,6 +62,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   RAT_CONVERSATION_ENABLED?: string;
   RAT_AI_ENABLED?: string;
   AI?: RatAiBinding;
+  RAT_CANDIDATE_SMOKE_ENABLED?: string;
+  RAT_CANDIDATE_SMOKE_SECRET?: string;
 }
 
 interface ReadyContext {
@@ -145,6 +148,10 @@ export async function handleWorkerRequest(
     origin = url.origin;
   } catch {
     return json(400, { error: 'INVALID_PATH' });
+  }
+
+  if (request.method === 'POST' && pathname === '/__candidate/rat-smoke') {
+    return handleRatCandidateSmoke(request, env, deps.now());
   }
 
   if (request.method === 'POST' && pathname === '/telegram/webhook') {
