@@ -1,0 +1,11 @@
+{
+  "sourceCommit": "4d3727ab67da0db878b040c8ee64ae93bb3e0ac2",
+  "sourceBranch": "feat/binrat-north-star-slice-g0-g2",
+  "preview": true,
+  "upstream": "https://binrat-edge-v0.pettevik.workers.dev",
+  "apiProxy": "https://binrat-githack-proxy-v2.onrender.com",
+  "experiment": "bento-v1",
+  "visualApproval": "PENDING",
+  "backendMode": "GET_ONLY_PUBLIC_PROXY",
+  "tokenLaunch": "NOT_AUTHORIZED"
+}
