@@ -1,4 +1,5 @@
-/* LEGACY G2 PRESENTATION: preserved for existing routes and regression safety only.\n * Current owner-approved STRUCTURAL TARGET is docs/design/BENTO_DASHBOARD_V1.md.\n * Do not copy old Home visuals, left/sidebar hero or art direction into the new bento. */\nimport { useEffect, useState, type KeyboardEvent } from "react";
+/* LEGACY G2 PRESENTATION: preserved for existing routes and regression safety only.\n * Current owner-approved STRUCTURAL TARGET is docs/design/BENTO_DASHBOARD_V1.md.\n * Do not copy old Home visuals, left/sidebar hero or art direction into the new bento. */
+import { useEffect, useState, type KeyboardEvent } from "react";
 import BentoHome from "./experiments/BentoHome";
 import { MobileBag, MobileDiscover, MobileMore, MobileRadar, MobileSaved, MobileShell, useMobileBookmarks } from "./mobile/MobileExperience";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
