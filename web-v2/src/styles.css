@@ -1,4 +1,4 @@
-@font-face {
+/* LEGACY V2 CSS: not an approved visual style guide for the owner\'s current bento dashboard.\n * Preserve existing screens until a new scoped implementation passes separate visual review. */\n@font-face {
   font-family: Plex Mono;
   src: url("/fonts/plex-mono-regular.woff2") format("woff2");
   font-display: swap;

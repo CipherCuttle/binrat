@@ -164,8 +164,6 @@ jobs:
         with:
           node-version: 22
       - name: Install and build isolated V2 frontend
-        env:
-          VITE_BINRAT_BENTO_EXPERIMENT: '1'
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm --dir web-v2 build
@@ -198,9 +196,6 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
             BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
             node web-v2/checks/north-star-live-smoke.cjs
-          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
-            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
-            node web-v2/checks/macro-bento-smoke.cjs
       - name: Read-only LIVE candidate against the existing public API
         if: ${{ github.head_ref == 'feat/binrat-frontend-live-integration-pr3' }}
         shell: bash

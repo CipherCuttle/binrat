@@ -1,19 +1,13 @@
-# BINRAT agent/operator tooling defaults
+# BINRAT — ACTIVE AGENT CONTRACT
 
-Scope: this repository, including the V2 frontend and release-candidate checks.
+Read this file before editing the frontend. **One and only one current visual direction:** [docs/design/BENTO_DASHBOARD_V1.md](docs/design/BENTO_DASHBOARD_V1.md), transcribed from the owner's 2026-09-24 bento-dashboard screenshot and structural wireframe. Its original image was supplied in the conversation, not committed to GitHub. Treat the visual contract as awaiting pixel-level owner approval. Earlier G0/G0.1, North Star, Dumpster OS, giant-rat homepage, five illustrated portals and previous macro-bento CSS are **rejected/retired**. Never treat historical Git objects, unmerged old branch designs, model-generated references or existing V2 visual CSS as active design authority.
 
-## Preferred path — no third-party browser agent by default
+The required direction is restrained charcoal asymmetric bento: horizontal navigation, short identity/intro plus Radar CTA, one large **real** Arc macro terminal, a small original rat beside it, functional Radar first, secondary Replay/Ledger/Creator/Watch panels. No five decorative CRTs, default giant illustrative homepage, fake charts or counterfeit metric tiles. User-supplied image/wireframe governs composition; the written spec preserves its intent.
 
-- Inspect branches, files, PRs and CI with the native GitHub integration or `git`/`gh`.
-- Run reproducible checks in GitHub Actions. For frontend work, use the pinned CI Playwright runner and the repository's `web-v2/checks/` scripts, not an external browser-automation service.
-- For live public API checks, use direct, read-only HTTPS through `curl` or Playwright's native request client. The canonical current gate is `node web-v2/checks/live-candidate-smoke.cjs`, run after the isolated V2 build and preview start. Only public GETs may be forwarded.
-- For current external reference material, prefer primary sources and built-in web search if available.
-- Do **not** use TinyFish or another third-party web/browser agent by default. If a native route is genuinely blocked, report the limitation instead of silently introducing an external tool or extra cost.
+**Separate source authority:** current typed public API adapters, `docs/CAPABILITY_MANIFEST_V0.json`, evidence/route implementation and public Worker GET schemas. Preserve exact observed-address vs reported-creator distinction, independent checkpoints, fail-closed LIVE/DEMO separation and honest readiness/coverage. Keep source rat anatomy from `docs/design/north-star/binrat-character-master.png` only as brand provenance, not old composition authority. Working M1 mobile bottom navigation and existing real paths remain until replaced with separately tested/accepted alternatives.
 
-## Evidence / release constraints
+Engineering: inspect exact PR head/worktree and avoid overwriting others. PLAN → CHANGESET → VERIFY → VERDICT; smallest coherent diff; implement → test → one hostile review → fix critical/high → one targeted rereview if needed → owner visual decision. Use existing React/Vite and native GitHub Actions/Playwright checks. Source-backed values remain semantic HTML, never painted into art. Real data can be unavailable; it must not silently become DEMO. Tests at 320, 360, 390, 430, 768, 1024 and 1440 px; check actual utility, typography, focus, responsive order, images and provenance.
 
-- LIVE and DEMO must remain isolated. Missing, stale, or invalid LIVE evidence fails closed; never fill it with fixtures.
-- A single transient `SYNC_FAILED` is logged and sampled in a bounded health preflight. Acceptance requires two consecutive healthy snapshots; exhaustion blocks release. This does not repair the underlying sync issue.
-- Screenshot gates: 390px and 430px phone, 1024px tablet, 1440px desktop; separate DEMO responsive checks additionally cover 320px, 360px, and 768px.
-- V2 release-candidate CI is **read-only** against the existing public API. Do not infer deployment authority from a green build. No merge, production cutover, token launch, signing, or fund movement without specific owner authorization.
-- Prefer small diffs, exact-head CI, one bounded hostile review, then closure or an explicit blocker.
+**Authority:** draft PR #31 frontend work and isolated GET-only verification only. Visual approval PENDING. No merge, production deploy, GitHack republish, API mutation, D1 write, token launch, signing, wallet, trading or fund movement without distinct explicit user authorization. Existing published GitHack G2 is older and not a reference for the new composition.
+
+Historic visual specs have been removed from the active branch deliberately. Use `git history` only for forensic provenance, never to auto-restore design instructions. Product roadmap is planning, not design authority.

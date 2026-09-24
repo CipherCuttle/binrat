@@ -1,4 +1,4 @@
-import { publicApiUrl } from "../previewRuntime";
+import { publicApiUrl } from "./previewRuntime";
 
 export interface PublicHealth {
   ok: boolean;

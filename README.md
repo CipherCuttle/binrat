@@ -21,4 +21,6 @@ pnpm watch
 pnpm inspect 0xTOKEN
 ```
 
-See `docs/PRD.md`, `docs/CODEPLAN.md`, `docs/CLAIM_BOUNDARY.md`, and `docs/DONOR_PROVENANCE.md`.
+Frontend **current owner design direction**: [`docs/design/BENTO_DASHBOARD_V1.md`](docs/design/BENTO_DASHBOARD_V1.md). Engineering agent entry: [`AGENTS.md`](AGENTS.md). The existing GitHack G2 preview is visually obsolete and is not the owner-approved new design.
+
+Product and evidence documentation: `docs/PRD.md`, `docs/CODEPLAN.md`, `docs/CLAIM_BOUNDARY.md`, and `docs/DONOR_PROVENANCE.md`.
