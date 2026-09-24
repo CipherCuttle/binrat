@@ -1,5 +1,9 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { MobileBag, MobileDiscover, MobileMore, MobileRadar, MobileSaved, MobileShell, useMobileBookmarks } from "./mobile/MobileExperience";
+import { BinratIcon } from "./visual/icons/binrat";
+import { RatOperator, SewerDivider } from "./visual/components";
+import { DesignLabPage } from "./visual/DesignLab";
+import "./visual/dumpster-os.css";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
 import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
 import type { LiveReplayBundle } from "./liveAdapter";
@@ -30,6 +34,7 @@ type Route =
   | { page: "dumpster" }
   | { page: "saved" }
   | { page: "more" }
+  | { page: "design-lab" }
   | { page: "radar"; address?: string }
   | { page: "creator"; address: string }
   | { page: "method" }
@@ -57,6 +62,7 @@ function readRoute(): Route {
   if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/saved") return { page: "saved" };
   if (path === "/more") return { page: "more" };
+  if (path === "/design/dumpster-os") return { page: "design-lab" };
   if (path === "/dumpster") return { page: "dumpster" };
   const radarAddress = addressFromRoute(path, "/radar/address/");
   if (radarAddress !== null) return { page: "radar", address: radarAddress };
@@ -135,6 +141,8 @@ export default function App() {
     />
   ) : !feed || !radar ? (
     <Loading />
+  ) : route.page === "design-lab" ? (
+    <DesignLabPage mode={mode} navigate={navigate} />
   ) : route.page === "home" ? (
     <Home feed={feed} radar={radar} mode={mode} navigate={navigate} />
   ) : route.page === "dumpster" ? (
@@ -191,18 +199,18 @@ export default function App() {
     <MobileMore mode={mode} navigate={navigate} />
   ) : content;
   return compact ? (
-    <div className="app-frame">
+    <div className="app-frame dumpster-os">
       <a className="skip-link" href="#content">Skip to evidence</a>
       <MobileShell page={route.page} mode={mode} checkpoint={feed?.asOfBlock ?? null} navigate={navigate}>
         {mobileContent}
       </MobileShell>
     </div>
   ) : (
-    <div className="app-frame">
+    <div className="app-frame dumpster-os">
       <a className="skip-link" href="#content">
         Skip to evidence
       </a>
-      <ShellNav route={route} navigate={navigate} />
+      <ShellNav route={route} mode={mode} navigate={navigate} />
       <div className="workspace">
         <StatusRail mode={mode} feed={feed} navigate={navigate} />
         <main id="content" tabIndex={-1}>
@@ -215,9 +223,11 @@ export default function App() {
 
 function ShellNav({
   route,
+  mode,
   navigate,
 }: {
   route: Route;
+  mode: DataMode;
   navigate: (path: string) => void;
 }) {
   const current = (route.page === "bag" || route.page === "creator") ? "DUMPSTER" : route.page.toUpperCase();
@@ -229,7 +239,7 @@ function ShellNav({
         navigate={navigate}
         ariaLabel="BINRAT home"
       >
-        <span className="brand-glyph">BR↗</span>
+        <span className="brand-glyph"><BinratIcon name="rat-head" size={32} decorative/></span>
         <span>
           BINRAT<small>ARC / 5042</small>
         </span>
@@ -251,6 +261,10 @@ function ShellNav({
         <span>$BINRAT</span>
         <b>NOT_LAUNCHED</b>
       </AppLink>
+      {mode === "DEMO" && <AppLink href="/design/dumpster-os" navigate={navigate} className="os-design-link">
+        <BinratIcon name="cyborg-eye" size={19} decorative/> INSPECT DUMPSTER OS ↗
+      </AppLink>}
+      <div className="os-sidebar-unit"><RatOperator size="stamp"/><div><b>FIELD UNIT 001</b><small>SCAVENGER / ACTIVE</small></div></div>
       <p className="shell-motto">
         DEGEN DECIDES ATTENTION.
         <br />
@@ -358,6 +372,7 @@ function Home({
           </div>
         </div>
       </section>
+      <SewerDivider kind="weld" className="os-home-divider"/>
       <section className="live-snapshot" aria-labelledby="snapshot-title">
         <header className="section-title">
           <div>
@@ -625,6 +640,7 @@ function EvidenceDossier({
       <CaseTab tone="orange">
         OPEN FILE / INSPECTION ORDER {String(candidate.rank).padStart(2, "0")}
       </CaseTab>
+      <RatOperator className="os-radar-operator" size="stamp"/>
       <h2>{short(candidate.observedRecipientAddress)}</h2>
       <div className="copyable-value"><code className="full-address">{candidate.observedRecipientAddress}</code><CopyButton label="observed recipient address" value={candidate.observedRecipientAddress} /><CopyButton label="address dossier link" value={window.location.origin + appBase() + "/radar/address/" + candidate.observedRecipientAddress + window.location.search} /></div>
       <div className="dossier-recurrence">
