@@ -3,6 +3,8 @@
 Status: planning document  
 Rule: roadmap items are not promises, launch dates, or claims of future token value.
 
+> **Owner-selected successor launch direction (2026-09-24): Pons V2 on Robinhood Chain 4663.** See [Pons canonical selection / migration contract](PONS_CANONICAL_TRANSITION_V1.md) and its [candidate policy JSON](BINRAT_PONS_LAUNCH_SELECTION_V1.json). Historical ArcPad launch configuration and dated receipts below remain immutable evidence and are **not** the intended next token rail. Existing Arc 5042 intelligence remains unchanged. This docs-only decision has no runtime/manifest, merge, token-marketing or launch-authorization effect; live launch authority is BLOCKED. The eventual cutover must update all status-bearing surfaces atomically after its own tests.
+
 ## CURRENT PRODUCT STATE — PUBLIC LIVE BETA / TOKEN LAUNCH BLOCKED
 
 Status semantics are canonicalized in `docs/CAPABILITY_MANIFEST_V0.json`.
