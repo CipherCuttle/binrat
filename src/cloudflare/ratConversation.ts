@@ -45,7 +45,7 @@ export function entityFromUnderstanding(value: RatUnderstanding | null): RatEnti
 
 /** Narrow, inspectable follow-ups only. Never infer an address role from a bare address. */
 export function resolveRatFollowup(text: string, memory: RatMemory | null): string {
-  if (!memory || !memory.value || text.startsWith('/') || /0x[a-fA-F0-9]{40}/.test(text)) return text;
+  if (!memory || !memory.value || text.trimStart().startsWith('/') || /0x[a-fA-F0-9]{40}/.test(text)) return text;
   const normalized = text.trim().replace(/^(?:hey[ ,]+)?(?:binrat|rat)[,:! ]+/i, '');
   if (memory.kind === 'CREATOR' && (
     /\b(?:its|their|that|this|same)\s+(?:previous|past|earlier|other)\s+launches?\b/i.test(normalized) ||
