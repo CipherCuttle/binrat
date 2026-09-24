@@ -17,3 +17,6 @@ A separate Cloudflare Worker `binrat-journey-preview.pettevik.workers.dev` provi
 ## Publication and rollback
 
 The workflow `.github/workflows/binrat-githack-preview.yml` builds, performs isolated browser checks, updates ONLY `preview-binrat-g2`, deploys ONLY the isolated Cloudflare proxy and verifies CORS/health. PR #31 remains draft/unmerged; production Worker `binrat-edge-v0` is not modified. For rollback, remove the generated preview branch and delete the isolated preview Worker in the Cloudflare dashboard; do not delete or alter production services. Never include preview Worker in the token/holder production manifest.
+
+## First publication fallback
+The static GitHack preview is published independently of Cloudflare credentials. If either GitHub Actions secret `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` is missing, the optional isolated Worker deploy step is skipped, the workflow reports the limitation, and DEMO remains usable while LIVE fails visibly without fixture substitution. Adding both secrets and rerunning an explicitly tagged preview publish closes the backend gate. This does NOT justify granting access to production Worker credentials to arbitrary third-party CORS proxies.

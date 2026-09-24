@@ -72,14 +72,17 @@ jobs:
             BINRAT_PREVIEW_URL="http://127.0.0.1:4175" \
             node web-v2/checks/githack-preview-smoke.cjs
 
-      - name: Ensure separate preview Worker credentials are configured
+      - name: Publish ONLY the isolated GitHack bundle branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo "::error::Missing CLOUDFLARE_API_TOKEN"; exit 1; }
-          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          node scripts/publish-githack-static.mjs | tee /tmp/githack-publish.log
+          grep -q 'GITHACK_PREVIEW_PUBLISHED' /tmp/githack-publish.log
 
       - name: Deploy ONLY the separate public read-only proxy
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -107,15 +110,11 @@ jobs:
           echo "PREVIEW_PROXY_READ_ONLY: PASS"
           echo "PUBLIC_UPSTREAM_HTTP_STATUS: $status"
 
-      - name: Publish ONLY the isolated GitHack bundle branch
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Surface missing isolated Worker credentials
+        if: ${{ env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == '' }}
         shell: bash
         run: |
-          set -euo pipefail
-          node scripts/publish-githack-static.mjs | tee /tmp/githack-publish.log
-          grep -q 'GITHACK_PREVIEW_PUBLISHED' /tmp/githack-publish.log
-
+          echo "::warning::Static GitHack preview is published, but the independent LIVE API proxy was not deployed because Cloudflare credentials are missing. DEMO works; LIVE remains fail-closed."
       - name: Report exact preview and rollback boundaries
         if: always()
         shell: bash

@@ -1,4 +1,4 @@
-import { publicApiUrl } from "./previewRuntime";
+import { publicApiUrl } from "./previewRuntime.js";
 
 /**
  * Public Rat Radar recipient-activity transport boundary.
