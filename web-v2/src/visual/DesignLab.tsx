@@ -64,7 +64,7 @@ export function DesignLabPage({ mode, navigate }: { mode: DataMode; navigate: (p
         <BinratIcon name="cyborg-eye" decorative size={43}/></div>
     </section>
     <footer className={s.footer}><span>13 DOMAIN ICONS / 8 MOTIFS / 5 ARTIFACT PRIMITIVES</span>
-      <b>NO SAFE/RUG SCORES. NO BUY CALLS. NO IDENTITY INFERENCE.</b>
+      <b>NO SAFETY RATINGS. NO BUY CALLS. NO IDENTITY INFERENCE.</b>
       <AppLink href="/" navigate={navigate}>BACK TO PRODUCT ↗</AppLink></footer>
   </div>;
 }
