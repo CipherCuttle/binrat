@@ -29,3 +29,59 @@ At 4,500 input + 250 output tokens, published approximate pricing is 33.85 neuro
 `test/ratConversation.test.ts` freezes context, quota, validation and prune invariants; `test/cloudflareRatConversationWorker.test.ts` runs the actual Worker webhook with mocked Telegram and AI. Both are offline, cost-zero tests; they are **not** proof that the Cloudflare model responds to this prompt or that live billing remains zero.
 
 Rollback: set both flags to `false` without schema rollback. Keep existing tables inert and preserve deterministic replies. This PR does not change public evidence schemas or authority.
+
+## Authorized isolated candidate gate (September 25, 2026)
+
+The \`rat-conversation-candidate-deploy\` workflow runs **only** on the exact
+\`feat/binrat-rat-conversation-free-ai-v1\` branch when the head commit contains
+\`[deploy-rat-candidate]\` (or after an explicitly selected workflow dispatch).
+It executes full \`pnpm check\` on that branch before any Cloudflare write and
+requires existing \`CLOUDFLARE_API_TOKEN\` and \`CLOUDFLARE_ACCOUNT_ID\`
+GitHub Actions secrets. Missing credentials fail before provisioning.
+
+The script pins only:
+- Worker: \`binrat-rat-convo-candidate-20260925\`;
+- D1: \`binrat-rat-convo-candidate-20260925\`;
+- Workers AI: \`AI\` binding;
+- no assets, cron triggers, queue producers/consumers or production RPC secret;
+- production \`binrat-edge-v0\` and \`binrat-v0\` remain untouched.
+
+Candidate defaults: memory ON, Telegram replies OFF, public Telegram AI OFF.
+An authenticated private \`POST /__candidate/rat-smoke\` route is available
+**only** with candidate flag and a high-entropy Worker secret. It has no
+user-supplied prompt and one D1-fenced call per UTC day. Its JSON response
+exposes actual model-reported token counts (if supplied) and a **derived**
+neuron estimate (5,500 per million input tokens + 36,400 per million output
+tokens). It deliberately cannot claim account-billed neurons, which require
+Cloudflare dashboard verification. Unauthenticated requests cannot spend AI
+or write budgets.
+
+For a separate private Telegram acceptance, set GitHub Actions secret
+\`RAT_CANDIDATE_BOT_TOKEN\` **for a newly created test/sandbox bot only**,
+and GitHub Actions variable \`RAT_CANDIDATE_ALLOWED_USER_ID\` to the tester's
+numeric Telegram user ID. The workflow verifies \`getMe\`: the candidate bot
+username must contain \`test\`, \`sandbox\` or \`candidate\`, and cannot be
+\`BinratBot\`. Only then does it install that *separate* token/secret, enable
+deterministic replies with chat+sender memory for that one tester's **DMs**
+and register the candidate webhook. Group chats and every other sender are
+acknowledged but ignored. Public Telegram AI remains **OFF**.
+
+To run exactly one *actual* AI request, **first** check Cloudflare's
+**account-wide** free daily neuron headroom and plan in the dashboard. Set
+both GitHub Actions variables \`RAT_FREE_NEURON_BUDGET_VERIFIED=true\` and
+\`RAT_RUN_AI_SMOKE=true\`, then explicitly rerun the guarded workflow.
+Without both variables the workflow deploys and tests the HTTP/auth surface
+but performs **zero paid or free model inference calls**. On a paid account
+even a one-shot request could incur a tiny overage when the free allocation
+was already used: no script can guarantee zero invoice charges without an
+account-level consumption check.
+
+Acceptance requires CI, separate Worker/D1 readback, default-off public
+Telegram AI, HTTP health, rejected unauthenticated AI smoke, single measured
+AI sample if separately permitted, and a private DM rehearsal when a distinct
+test-bot token + tester ID exist. Do not repoint the production bot. A failed
+step is a block, not evidence of success.
+
+Rollback: disable the *candidate* flags or delete only the exact candidate
+Worker and D1 after exporting any evidence. Do not delete/alter production
+Worker, production D1, live bot webhook or Cloudflare API token.
