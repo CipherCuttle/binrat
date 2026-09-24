@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "binrat.pons-launch-selection/1.0",
+  "documentStatus": "OWNER_SELECTED_PLANNING_CANDIDATE_NOT_RUNTIME_AUTHORITY",
+  "selectedTokenNetwork": {
+    "name": "Robinhood Chain",
+    "chainId": 4663,
+    "rail": "Pons V2 direct factory",
+    "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e"
+  },
+  "researchNetwork": {
+    "name": "Arc",
+    "chainId": 5042,
+    "role": "existing evidence and research runtime, not token chain"
+  },
+  "historicalSupersededCandidate": {
+    "path": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+    "rail": "ArcPad USDC standard",
+    "status": "FROZEN_HISTORICAL_EVIDENCE_NOT_TO_BE_REWRITTEN",
+    "digest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8"
+  },
+  "readOnlyEvidence": {
+    "path": "docs/PONS_LAUNCH_READINESS_V0.md",
+    "candidatePr": 20,
+    "status": "READ_ONLY_SNAPSHOT_NOT_LAUNCH_AUTHORITY",
+    "currentSnapshotMustBeRefreshed": true
+  },
+  "candidatePolicy": {
+    "configId": 0,
+    "pair": "NATIVE_ETH",
+    "creatorTaxBps": 0,
+    "buybackEnabled": false,
+    "extraOpeningTaxExemptions": [],
+    "founderOpeningBuy": false,
+    "directFactoryLaunch": true,
+    "privatePresalePlanned": false,
+    "discountedInsiderRoundPlanned": false,
+    "hiddenTeamAllocationPlanned": false
+  },
+  "observedSnapshotNotFutureGuarantee": {
+    "snipeTaxStartBps": 9900,
+    "snipeTaxSeconds": 3,
+    "observedAtRobinhoodBlock": "69767635",
+    "needsFreshOnchainCheck": true
+  },
+  "ownerInputs": {
+    "deployer": null,
+    "creatorFeeRecipient": null,
+    "treasury": null,
+    "launchSalt": null,
+    "finalTokenMetadata": null,
+    "verifiedWebsite": null,
+    "verifiedTelegram": null,
+    "verifiedX": null,
+    "ownerCustodyProofStatus": "NOT_SUPPLIED",
+    "doNotInheritArcRoleAddressesSilently": true
+  },
+  "token": {
+    "status": "NOT_LAUNCHED",
+    "address": null,
+    "transaction": null,
+    "launchBlock": null
+  },
+  "holderEntitlement": {
+    "balanceChainId": 4663,
+    "researchChainId": 5042,
+    "thresholdRaw": null,
+    "eligibilityActive": false,
+    "walletAuthStatus": "NOT_ACTIVATED",
+    "balanceSourceStatus": "NOT_REVIEWED",
+    "publicEvidenceRemainsFree": true
+  },
+  "funding": {
+    "feeRevenueSource": "DISCLOSED_PONS_CREATOR_FEE_SHARE_NOT_CURVE_PROCEEDS",
+    "productionObserverStatus": "NOT_ACTIVATED",
+    "forecastedRevenue": null
+  },
+  "authorization": {
+    "legalComplianceSatisfied": false,
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "mergeAuthorized": false,
+    "ownerLaunchAuthority": "NOT_GRANTED"
+  },
+  "migrationGates": [
+    "VERIFY_CURRENT_PONS_CONTRACT_AND_FEE_STATE",
+    "FREEZE_AND_PROVE_OWNER_INPUTS",
+    "REVIEW_PONS_SECURITY_AND_COMPLIANCE",
+    "REPLACE_ARC_RUNTIME_LAUNCH_REFERENCES_ATOMICALLY",
+    "REBIND_LEDGER_AND_HOLDER_SOURCE_TO_4663",
+    "PASS_FAIL_CLOSED_STATUS_AND_ROLE_TESTS",
+    "VERIFY_WEBSITE_TELEGRAM_GITHUB_AGREEMENT",
+    "EXPLICIT_OWNER_LAUNCH_AUTHORITY"
+  ]
+}
