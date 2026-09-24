@@ -220,3 +220,12 @@
 @media(prefers-reduced-motion:reduce) {
   .shell *,.shell *::before,.shell *::after {transition-duration:0.01ms!important;animation-duration:0.01ms!important;scroll-behavior:auto!important;}
 }
+
+/* One bounded visual hostile-review repair: keep rank and Replay labels legible. */
+.radarRow > span,.radarRowActive > span { min-width:0; }
+.tab strong,.tabActive strong { font-size:22px; }
+@media(max-width:360px) {
+  .sectionHead h2 { font-size:27px; }
+  .radarRow > b,.radarRowActive > b { font-size:22px; }
+  .tab strong,.tabActive strong { font-size:18px; }
+}
