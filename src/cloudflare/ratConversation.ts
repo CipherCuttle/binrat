@@ -116,7 +116,7 @@ export async function reserveRatAiCall(
     return result.meta?.changes === 1;
   };
   // Apply user quota first: rejected spam must not consume scarce GLOBAL slots.
-  if (!(await reserve('USER:' + chatId + ':' + userId, RAT_AI_USER_DAILY_LIMIT))) return false;
+  if (!(await reserve('USER:' + userId, RAT_AI_USER_DAILY_LIMIT))) return false;
   return reserve('GLOBAL', RAT_AI_GLOBAL_DAILY_LIMIT);
 }
 /** Physical cleanup of expired context and old budget counters, called from the daily cron window. */
