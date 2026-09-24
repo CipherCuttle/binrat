@@ -64,6 +64,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   AI?: RatAiBinding;
   RAT_CANDIDATE_SMOKE_ENABLED?: string;
   RAT_CANDIDATE_SMOKE_SECRET?: string;
+  /** Candidate-only private Telegram beta allowlist. No effect unless explicitly populated. */
+  RAT_CANDIDATE_ALLOWED_USER_ID?: string;
 }
 
 interface ReadyContext {
@@ -465,6 +467,15 @@ async function telegramWebhook(
     if (!message?.text) {
       await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
       return json(200, { ok: true, ignored: true });
+    }
+
+    if (env.RAT_CANDIDATE_ALLOWED_USER_ID) {
+      const allowed = Number(env.RAT_CANDIDATE_ALLOWED_USER_ID);
+      if (!Number.isSafeInteger(allowed) || message.chat.type !== 'private' ||
+          message.from?.id !== allowed) {
+        await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
+        return json(200, { ok: true, ignored: true, reason: 'CANDIDATE_PRIVATE_ONLY' });
+      }
     }
 
     const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
