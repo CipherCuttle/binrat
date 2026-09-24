@@ -29,14 +29,14 @@ export function DesignLabPage({ mode, navigate }: { mode: DataMode; navigate: (p
     <section className={s.chapter}><header><small>01 / SILHOUETTES · FIRST-PARTY</small><h2>THE RAT'S TOOLBOX</h2>
       <p>Thirteen original production-candidate glyphs. Clean one-color silhouettes first; optional rust and scratch at larger sizes. Labels remain readable without icons.</p></header>
       <div className={s.iconGrid}>{iconNames.map((name,i)=>
-        <div className={s.iconSpec} key={name}><div className={s.iconStage}>
+        <div className={s.iconSpec} key={name} data-os-icon={name}><div className={s.iconStage}>
           <span>{String(i+1).padStart(2,"0")}</span><BinratIcon name={name} decorative size={42}/><BinratIcon name={name} decorative size={20}/>
         </div><b>{iconLabels[name]}</b><code>{name.toUpperCase().replaceAll("-","_")}</code></div>)}</div>
     </section>
     <section className={s.chapter}><header><small>02 / MICROGRAPHICS · MATERIAL HARDWARE</small><h2>RUST, RIVETS, SEAMS.</h2>
       <p>Eight reusable framing parts. They never imply evidence quality; their purpose is to make ordinary app surfaces look like found instruments.</p></header>
       <div className={s.motifGrid}>{motifNames.map((kind,i)=>
-        <div className={s.motifSpec} key={kind}><span>M{String(i+1).padStart(2,"0")}</span>
+        <div className={s.motifSpec} key={kind} data-os-motif={kind}><span>M{String(i+1).padStart(2,"0")}</span>
           <Micrographic kind={kind} size={63} tone={i%2===0?"rust":"bone"}/>
           <b>{kind.toUpperCase().replaceAll("-"," ")}</b></div>)}</div>
     </section>
