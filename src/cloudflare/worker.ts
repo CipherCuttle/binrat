@@ -31,6 +31,7 @@ import {
   proveHolderWallet
 } from './holderAuth.js';
 import type { D1DatabaseLike } from './d1Types.js';
+import { handlePonsCandidateRoute } from './ponsCandidateRoutes.js';
 import {
   enqueueSyncCycle,
   handleSyncQueueBatch,
@@ -45,6 +46,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   CAPABILITY_MANIFEST_JSON?: string;
   BINRAT_FUNDING_CONFIG_JSON?: string;
   BINRAT_HOLDER_WALLET_AUTH_ENABLED?: string;
+  /** Candidate routes require test-only dependency opt-in as well; setting this alone does nothing. */
+  BINRAT_PONS_CANDIDATE_ROUTES_ENABLED?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
   TELEGRAM_BOT_TOKEN?: string;
@@ -96,6 +99,8 @@ export interface WorkerDeps {
   externalFetch: typeof fetch;
   now: () => number;
   holderEligibilitySource?: HolderEligibilitySource;
+  /** Not present in DEFAULT_DEPS: a deployed Worker cannot expose candidate routes via env alone. */
+  ponsCandidateTestRoutes?: boolean;
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -139,6 +144,14 @@ export async function handleWorkerRequest(
 
   if (request.method === 'POST' && pathname === '/api/holder/session') {
     return holderSession(request, env, origin, deps);
+  }
+
+  if (pathname.startsWith('/api/pons-candidate/')) {
+    if (deps.ponsCandidateTestRoutes !== true ||
+        env.BINRAT_PONS_CANDIDATE_ROUTES_ENABLED?.trim() !== 'true') {
+      return json(404, { error: 'NOT_FOUND' });
+    }
+    return handlePonsCandidateRoute(request, pathname, origin, env.DB, deps.now());
   }
 
   if (request.method === 'GET' && pathname === '/health') {
