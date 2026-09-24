@@ -54,7 +54,7 @@ for (const full of paths) {
 }
 const metadata = JSON.stringify({ sourceCommit: SOURCE_SHA, sourceBranch: "feat/binrat-north-star-slice-g0-g2",
   preview: true, upstream: "https://binrat-edge-v0.pettevik.workers.dev",
-  apiProxy: "https://binrat-journey-preview.pettevik.workers.dev",
+  apiProxy: "https://binrat-githack-proxy-v2.onrender.com",
   backendMode: "GET_ONLY_PUBLIC_PROXY", tokenLaunch: "NOT_AUTHORIZED" }, null, 2);
 const marker = await api("/git/blobs", "POST", { content: metadata, encoding: "utf-8" });
 tree.push({ path: "preview-build.json", mode: "100644", type: "blob", sha: marker.sha });

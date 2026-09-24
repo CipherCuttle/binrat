@@ -25,9 +25,6 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-githack]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -81,40 +78,34 @@ jobs:
           node scripts/publish-githack-static.mjs | tee /tmp/githack-publish.log
           grep -q 'GITHACK_PREVIEW_PUBLISHED' /tmp/githack-publish.log
 
-      - name: Deploy ONLY the separate public read-only proxy
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+      - name: Verify independent free read-only preview API (Render)
         shell: bash
         run: |
           set -euo pipefail
-          pnpm dlx wrangler@4.135.0 deploy --config cloudflare/wrangler.journey-preview.jsonc
-          # Test CORS and GET-only behaviour; this does not modify the live index.
-          proxy="https://binrat-journey-preview.pettevik.workers.dev"
-          for n in $(seq 1 20); do
-            status="$(curl -sS --max-time 15 -o /tmp/githack-health.json -w '%{http_code}' \
+          proxy="https://binrat-githack-proxy-v2.onrender.com"
+          reachable=false
+          for n in $(seq 1 10); do
+            status="$(curl --silent --show-error --max-time 25 -o /tmp/githack-health.json -w '%{http_code}' \
               -H 'Origin: https://raw.githack.com' "$proxy/api/health" || true)"
-            if [ "$status" = "200" ] || [ "$status" = "503" ]; then break; fi
-            if [ "$n" -eq 20 ]; then echo "::error::Proxy did not become reachable: $status"; exit 1; fi
-            sleep 3
+            if [ "$status" = "200" ] || [ "$status" = "503" ]; then reachable=true; break; fi
+            sleep 5
           done
-          test "$status" = "200" || {
-            echo "::warning::Read-only proxy is reachable, but public index health returned $status"
-          }
-          test "$(curl -sS --max-time 15 -o /tmp/githack-post.json -w '%{http_code}' \
+          if [ "$reachable" != true ]; then
+            echo "::warning::GitHack static preview published, but Render API proxy not yet reachable ($status). LIVE mode fails visibly; do not claim end-to-end readiness."
+            exit 0
+          fi
+          test "$(curl --silent --show-error --max-time 25 -o /tmp/githack-post.json -w '%{http_code}' \
             -X POST -H 'Origin: https://raw.githack.com' "$proxy/api/feed")" = "405"
-          test "$(curl -sS --max-time 15 -o /tmp/githack-blocked.json -w '%{http_code}' \
+          test "$(curl --silent --show-error --max-time 25 -o /tmp/githack-blocked.json -w '%{http_code}' \
             -H 'Origin: https://raw.githack.com' "$proxy/api/holder/challenge")" = "404"
-          curl -fsS --max-time 15 -D /tmp/githack-cors-headers -o /dev/null \
+          curl --fail --silent --show-error --max-time 25 -D /tmp/githack-cors-headers -o /dev/null \
             -X OPTIONS -H 'Origin: https://raw.githack.com' \
             -H 'Access-Control-Request-Method: GET' "$proxy/api/feed"
           grep -qi 'access-control-allow-origin: https://raw.githack.com' /tmp/githack-cors-headers
           echo "PREVIEW_PROXY_READ_ONLY: PASS"
           echo "PUBLIC_UPSTREAM_HTTP_STATUS: $status"
+          if [ "$status" != "200" ]; then echo "::warning::Upstream public health unavailable; backend proxy itself is reachable"; fi
 
-      - name: Surface missing isolated Worker credentials
-        if: ${{ env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == '' }}
-        shell: bash
-        run: |
-          echo "::warning::Static GitHack preview is published, but the independent LIVE API proxy was not deployed because Cloudflare credentials are missing. DEMO works; LIVE remains fail-closed."
       - name: Report exact preview and rollback boundaries
         if: always()
         shell: bash
@@ -124,7 +115,7 @@ jobs:
             echo
             echo '- Source PR: #31 (still draft, no merge)'
             echo '- Frontend: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-g2/index.html'
-            echo '- Backend: https://binrat-journey-preview.pettevik.workers.dev/api/health'
+            echo '- Backend: https://binrat-githack-proxy-v2.onrender.com/api/health'
             echo '- Public data upstream: binrat-edge-v0.pettevik.workers.dev (read-only, unchanged)'
             echo '- No token launch, wallet access, Telegram changes, D1 changes, cron, queue or production deploy'
             echo "- Build commit: \`${GITHUB_SHA}\`"

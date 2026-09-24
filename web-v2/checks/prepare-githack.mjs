@@ -29,6 +29,6 @@ for (const path of ["binrat-character-master.png", "binrat-world-background.png"
 const js = readdirSync(dir).filter(name => name.endsWith(".js"));
 if (!js.length) throw Error("STATIC_JS_MISSING");
 const bundles = js.map(name => readFileSync(join(dir.pathname, name), "utf8")).join("\n");
-if (!bundles.includes("binrat-journey-preview.pettevik.workers.dev"))
+if (!bundles.includes("binrat-githack-proxy-v2.onrender.com"))
   throw Error("STATIC_PREVIEW_API_ORIGIN_MISSING");
 console.log("GITHACK_STATIC_ASSETS_READY", { cssCount, jsCount: js.length });

@@ -2,7 +2,7 @@
 declare const __BINRAT_GITHACK_PREVIEW__: boolean;
 declare const __BINRAT_VITE_BASE__: string;
 export const isGitHackPreview = typeof __BINRAT_GITHACK_PREVIEW__ !== "undefined" && __BINRAT_GITHACK_PREVIEW__;
-export const previewApiOrigin = "https://binrat-journey-preview.pettevik.workers.dev";
+export const previewApiOrigin = "https://binrat-githack-proxy-v2.onrender.com";
 export function publicApiUrl(path: string): string {
   if (!/^\/api\/[a-z0-9/_-]+$/i.test(path)) throw new Error("PUBLIC_API_PATH_INVALID");
   return (isGitHackPreview ? previewApiOrigin : "") + path;

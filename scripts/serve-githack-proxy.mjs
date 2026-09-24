@@ -17,7 +17,7 @@ const server = createServer(async (req, res) => {
       if (typeof value === "string") headers.set(key, value);
     }
     // Bodyless by design: only public GET/OPTIONS are forwarded. POST is denied.
-    const incoming = new Request("https://binrat-journey-readonly-proxy.onrender.com" + req.url, {
+    const incoming = new Request("https://binrat-githack-proxy-v2.onrender.com" + req.url, {
       method: req.method, headers,
     });
     const outgoing = await proxy.fetch(incoming);

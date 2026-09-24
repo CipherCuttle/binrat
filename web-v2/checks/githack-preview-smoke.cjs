@@ -2,7 +2,7 @@
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 const base = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4175").replace(/\/$/, "");
-const api = "https://binrat-journey-preview.pettevik.workers.dev";
+const api = "https://binrat-githack-proxy-v2.onrender.com";
 const digest = "d".repeat(64);
 const hash = "0x" + "a".repeat(64);
 const emptyFeed = {
@@ -56,7 +56,7 @@ const emptyRadar = {
           scriptUrls:await page.locator("script[src]").evaluateAll(xs=>xs.map(x=>x.getAttribute("src"))),
           images:await page.locator("img").count(),
         }));
-        await page.getByRole("heading", { name: /RAT RADAR/ }).first().waitFor({ timeout: 8000 });
+        await page.getByRole("heading", { name: /rat radar/i }).first().waitFor({ timeout: 8000 });
         assert.equal(requests.length, 0, "DEMO must not request live API");
         const toggle = page.getByRole("link", { name: "Switch to public LIVE evidence" });
         assert.equal(new URL(await toggle.getAttribute("href"), base).search, "?source=live");
