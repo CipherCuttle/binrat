@@ -1,4 +1,6 @@
-/* HISTORICAL G2 ART SCAFFOLD, NOT CURRENT DESIGN AUTHORITY.\n * The current owner bento target is docs/design/BENTO_DASHBOARD_V1.md. */\n/* G2: truthful live HTML inside CSS-only industrial/paper frames.
+/* HISTORICAL G2 ART SCAFFOLD, NOT CURRENT DESIGN AUTHORITY.
+ * The current owner bento target is docs/design/BENTO_DASHBOARD_V1.md. */
+/* G2: truthful live HTML inside CSS-only industrial/paper frames.
  * The owner's annotated reference PNGs must never become text-baked UI backgrounds. */
 .home-page .action.primary { background:#ffce55; border-color:#ffc247; color:#211819; font-weight:800; }
 .home-page .action.primary:hover { background:#fff0b3; }

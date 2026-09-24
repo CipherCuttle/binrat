@@ -1,5 +1,9 @@
 /** Static GitHack V2 preview acceptance against explicitly mocked public endpoint responses. */
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const captures = path.resolve(__dirname, "../browser-artifacts/githack-bento-v1");
+fs.mkdirSync(captures,{recursive:true});
 const { chromium } = require("playwright");
 const base = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4175").replace(/\/$/, "");
 const api = "https://binrat-githack-proxy-v2.onrender.com";
@@ -76,5 +80,56 @@ const emptyRadar = {
         console.log("GITHACK_STATIC_PREVIEW_PASS", { width, requests: requests.length, url: page.url() });
       } finally { await context.close(); }
     }
+
+    // Preview-specific tests: experiment query + hash routing + relative assets.
+    for (const width of [390,1440]) {
+      const context=await browser.newContext({viewport:{width,height:900},reducedMotion:"reduce"});
+      const page=await context.newPage();
+      const requests=[];
+      const healthy={ok:true,chainId:5042,indexReady:true,checkpointBlock:"120",
+        launchCount:0,runtimeFresh:true,runtimeUpdatedAtMs:Date.now(),
+        historyBackfillComplete:false,observationReady:false,lastSyncError:null};
+      await page.route(api+"/api/**",async route=>{
+        const url=route.request().url(),method=route.request().method();
+        requests.push({url,method});
+        if(method!=="GET")throw Error("GITHACK_NON_READ_ONLY_REQUEST");
+        const body=url.endsWith("/api/feed")?emptyFeed:
+          url.endsWith("/api/rat-radar/watchlist")?emptyRadar:
+          url.endsWith("/api/health")?healthy:null;
+        await route.fulfill({status:body?200:404,contentType:"application/json",
+          headers:{"access-control-allow-origin":"*"},
+          body:JSON.stringify(body??{error:"NOT_FOUND"})});
+      });
+      try {
+        await page.goto(base+"/index.html?experiment=bento-v1#/",{waitUntil:"domcontentloaded"});
+        await page.getByTestId("binrat-bento-home").waitFor({timeout:12000});
+        assert.equal(requests.length,0,"DEMO bento must not request the LIVE API");
+        await page.waitForFunction(()=>{
+          const img=document.querySelector('[data-testid="binrat-bento-home"] img');
+          return img && img.complete && img.naturalWidth>0;
+        },null,{timeout:10000});
+        const toggle=page.locator('a[href*="source=live"]').first();
+        const destination=new URL(await toggle.getAttribute("href"),base);
+        assert.equal(destination.searchParams.get("experiment"),"bento-v1");
+        assert.equal(destination.hash,"#/");
+        const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+        assert.ok(overflow<=1,"GitHack bento horizontal overflow "+width+": "+overflow);
+        await page.screenshot({path:path.join(captures,"demo-"+width+"x900.png"),fullPage:false});
+        await toggle.click();
+        await page.locator('[data-testid="bento-health-state"]:text-is("READY")').waitFor({timeout:12000});
+        assert.equal(new URL(page.url()).hash,"#/");
+        assert.equal(new URL(page.url()).searchParams.get("experiment"),"bento-v1");
+        for(const route of ["/api/health","/api/feed","/api/rat-radar/watchlist"])
+          assert.ok(requests.some(x=>x.url===api+route),"missing proxied "+route);
+        assert.ok(requests.every(x=>x.method==="GET"));
+        await page.screenshot({path:path.join(captures,"mocked-live-"+width+"x900.png"),fullPage:false});
+        await page.getByRole("link",{name:/EXPLORE RAT RADAR/}).click();
+        assert.equal(new URL(page.url()).hash,"#/radar");
+        console.log("GITHACK_BENTO_V1_PASS",{width,requests:requests.length});
+      }finally{await context.close();}
+    }
+    fs.writeFileSync(path.join(captures,"README.txt"),
+      "Isolated bento-v1 static GitHack preview. Build SHA="+(process.env.GITHUB_SHA||"LOCAL")+
+      "\nDEMO is synthetic. Mocked LIVE screenshots are NOT production data. Owner visual approval pending.\n");
   } finally { await browser.close(); }
 })().catch(error => { console.error("GITHACK_STATIC_PREVIEW_FAILED", error); process.exitCode = 1; });

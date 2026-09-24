@@ -167,7 +167,7 @@ export default function BentoHome(props:Props) {
           </div>
           <small className={s.disclosure}>{mode==="DEMO"?"SYNTHETIC DEMO / ALL FIGURES ILLUSTRATIVE":
             "READ-ONLY PUBLIC DATA / INDEPENDENT CHECKPOINTS"} · NO SAFETY SCORE · NO BUY CALL</small>
-          <div className={s.ratWindow} aria-hidden="true"><img src="/binrat-hero.webp" alt="" decoding="async"/></div>
+          <div className={s.ratWindow} aria-hidden="true"><img src={import.meta.env.BASE_URL + "binrat-hero.webp"} alt="" decoding="async"/></div>
         </section>
         <MacroTerminal feed={props.feed} radar={props.radar} feedError={props.feedError}
           radarError={props.radarError} loaded={props.loaded} mode={mode} readAtMs={props.readAtMs}/>

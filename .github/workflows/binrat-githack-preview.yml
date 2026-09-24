@@ -12,7 +12,7 @@ on:
       - "cloudflare/wrangler.journey-preview.jsonc"
   workflow_dispatch:
 
-# Preview publishing is opt-in by commit tag, never silently triggered by normal WIP pushes.
+# Preview publishing requires an explicit commit tag. Separate bento-v1 branch preserves old G2.
 concurrency:
   group: binrat-githack-journey-preview
   cancel-in-progress: false
@@ -40,11 +40,11 @@ jobs:
         run: |
           pnpm check
           pnpm --dir web-v2 check
-      - name: Compile static GitHack frontend
+      - name: Compile isolated bento-v1 GitHack frontend
         shell: bash
         run: |
           set -euo pipefail
-          VITE_BINRAT_GITHACK_PREVIEW=1 pnpm --dir web-v2 exec vite build --base=./
+          VITE_BINRAT_GITHACK_PREVIEW=1 VITE_BINRAT_BENTO_EXPERIMENT=1 pnpm --dir web-v2 exec vite build --base=./
           node web-v2/checks/prepare-githack.mjs
       - name: Install isolated browser
         shell: bash
@@ -52,7 +52,7 @@ jobs:
           set -euo pipefail
           npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
           node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
-      - name: Verify static hash routes and remote API transport
+      - name: Verify bento-v1 and legacy hash routes
         shell: bash
         run: |
           set -euo pipefail
@@ -113,8 +113,8 @@ jobs:
           {
             echo '## BINRAT isolated GitHack user-journey preview'
             echo
-            echo '- Source PR: #31 (still draft, no merge)'
-            echo '- Frontend: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-g2/index.html'
+            echo '- Source PR: #31 (still draft; owner visual approval pending; isolated review preview only)'
+            echo '- Frontend: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-v1/index.html?experiment=bento-v1#/'
             echo '- Backend: https://binrat-githack-proxy-v2.onrender.com/api/health'
             echo '- Public data upstream: binrat-edge-v0.pettevik.workers.dev (read-only, unchanged)'
             echo '- No token launch, wallet access, Telegram changes, D1 changes, cron, queue or production deploy'
@@ -127,11 +127,11 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Preserve local test screenshots on failure
-        if: failure()
+      - name: Preserve GitHack visual-review screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: githack-journey-preview-failure
+          name: githack-bento-v1-preview-screenshots
           path: web-v2/browser-artifacts/
-          retention-days: 3
-          if-no-files-found: ignore
+          retention-days: 7
+          if-no-files-found: warn

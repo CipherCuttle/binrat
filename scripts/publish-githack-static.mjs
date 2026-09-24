@@ -4,7 +4,7 @@ import { join, relative } from "node:path";
 const TOKEN = process.env.GITHUB_TOKEN;
 const REPO = process.env.GITHUB_REPOSITORY;
 const SOURCE_SHA = process.env.GITHUB_SHA;
-const BRANCH = "preview-binrat-g2";
+const BRANCH = "preview-binrat-bento-v1";
 if (!TOKEN || REPO !== "CipherCuttle/binrat" || !/^[a-f0-9]{40}$/.test(SOURCE_SHA ?? ""))
   throw Error("PREVIEW_PUBLISH_AUTHORITY_INVALID");
 const dist = new URL("../web-v2/dist/", import.meta.url).pathname;
@@ -54,13 +54,13 @@ for (const full of paths) {
 }
 const metadata = JSON.stringify({ sourceCommit: SOURCE_SHA, sourceBranch: "feat/binrat-north-star-slice-g0-g2",
   preview: true, upstream: "https://binrat-edge-v0.pettevik.workers.dev",
-  apiProxy: "https://binrat-githack-proxy-v2.onrender.com",
+  apiProxy: "https://binrat-githack-proxy-v2.onrender.com", experiment: "bento-v1", visualApproval: "PENDING",
   backendMode: "GET_ONLY_PUBLIC_PROXY", tokenLaunch: "NOT_AUTHORIZED" }, null, 2);
 const marker = await api("/git/blobs", "POST", { content: metadata, encoding: "utf-8" });
 tree.push({ path: "preview-build.json", mode: "100644", type: "blob", sha: marker.sha });
 const newTree = await api("/git/trees", "POST", { tree });
 const commit = await api("/git/commits", "POST", {
-  message: "preview: publish isolated G2 static bundle from " + SOURCE_SHA.slice(0, 12),
+  message: "preview: publish isolated bento-v1 static bundle from " + SOURCE_SHA.slice(0, 12),
   tree: newTree.sha, parents: prior ? [prior.object.sha] : [],
 });
 if (prior) {
