@@ -43,7 +43,7 @@ function Icon({ name }: { name: "discover" | "radar" | "saved" | "more" }) {
 export function MobileShell({ page, mode, checkpoint, navigate, children }: {
   page: string; mode: DataMode; checkpoint: string | null; navigate: Go; children: ReactNode;
 }) {
-  const current = page === "radar" ? "Radar" : page === "saved" ? "Saved" : ["more", "ledger", "replay", "watch", "binrat", "method"].includes(page) ? "More" : "Discover";
+  const current = page === "radar" ? "Radar" : page === "saved" ? "Saved" : ["more", "ledger", "replay", "watch", "binrat", "method", "design-lab"].includes(page) ? "More" : "Discover";
   const tabs = [{ label: "Discover", name: "discover", path: "/" }, { label: "Radar", name: "radar", path: "/radar" }, { label: "Saved", name: "saved", path: "/saved" }, { label: "More", name: "more", path: "/more" }] as const;
   return <div className={s.shell} data-dumpster-os="field-shell">
     <header className={s.header}>
