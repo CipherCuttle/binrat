@@ -280,7 +280,10 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         '/watch 0x... — alert on a future launch from this indexed reported creator address',
         '/unwatch 0x... — stop watching that reported address',
         '/watches — list this chat\'s watched reported addresses',
-        '/proof — rules of the bin'
+        '/proof — rules of the bin',
+        '/feedback bug: <message> — private suggestion box (when enabled)',
+        '/feedback idea: <message> — suggest a feature (when enabled)',
+        '/feedback delete — erase your saved suggestions'
       ];
     case 'STATUS':
       return [
