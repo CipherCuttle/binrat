@@ -8,6 +8,7 @@ const defaults = Object.freeze({
   paidSeats: 25,
   seatPriceUsd: 12,
   merchantFeeBps: 500,
+  vatRateBps: 0, // optional illustrative VAT-inclusive consumer price sensitivity
   seatVariableCostUsd: 2,
   fixedCostUsd: 600
 });
@@ -32,14 +33,19 @@ export function evaluateScenario(input = {}) {
   wholeNumber(x.paidSeats, 'paidSeats', 1000000);
   wholeNumber(x.seatPriceUsd, 'seatPriceUsd', 1000000);
   wholeNumber(x.merchantFeeBps, 'merchantFeeBps', 10000);
+  wholeNumber(x.vatRateBps, 'vatRateBps', 10000);
   wholeNumber(x.seatVariableCostUsd, 'seatVariableCostUsd', 1000000);
   wholeNumber(x.fixedCostUsd, 'fixedCostUsd');
   const volumeCents = BigInt(x.volumeUsd) * 100n;
   const feeBps = BigInt(x.effectiveFeeBps);
   const seats = BigInt(x.paidSeats);
   const grossSeatsCents = seats * BigInt(x.seatPriceUsd) * 100n;
+  // Optional illustrative VAT-inclusive pricing; no legal tax determination.
+  // Payment processing is assumed charged on gross consumer receipts.
+  const exVatCents = roundedDiv(grossSeatsCents * 10000n, 10000n + BigInt(x.vatRateBps));
+  const vatReservedCents = grossSeatsCents - exVatCents;
   const merchantCents = roundedDiv(grossSeatsCents * BigInt(x.merchantFeeBps), 10000n);
-  const paidNetCents = grossSeatsCents - merchantCents;
+  const paidNetCents = exVatCents - merchantCents;
   const projectFeeCents = roundedDiv(volumeCents * feeBps, 10000n);
   const seatCostCents = seats * BigInt(x.seatVariableCostUsd) * 100n;
   const fixedCents = BigInt(x.fixedCostUsd) * 100n;
@@ -58,6 +64,7 @@ export function evaluateScenario(input = {}) {
     assumptions: x,
     projectFeeReceiptsUsd: usd(projectFeeCents),
     seatRevenueGrossUsd: usd(grossSeatsCents),
+    vatReserveUsd: usd(vatReservedCents),
     merchantFeesUsd: usd(merchantCents),
     seatRevenueNetUsd: usd(paidNetCents),
     seatVariableCostUsd: usd(seatCostCents),

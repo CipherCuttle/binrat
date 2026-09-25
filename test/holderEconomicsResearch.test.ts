@@ -108,3 +108,27 @@ test('discounted Pro holder unit-cost stress still requires paying seats', () =>
   assert.equal(pass.monthlyContributionBeforeOmittedCostsUsd, 6.88);
   assert.equal(pass.projectFeeReceiptsUsd, 0);
 });
+
+test('VAT-inclusive consumer price stress increases zero-token Pro break-even', () => {
+  const common=['--volumeUsd=0','--effectiveFeeBps=0','--merchantFeeBps=800','--vatRateBps=2500','--fixedCostUsd=2000'];
+  const below29=evaluate([...common,'--paidSeats=118','--seatPriceUsd=29','--seatVariableCostUsd=4']);
+  const at29=evaluate([...common,'--paidSeats=119','--seatPriceUsd=29','--seatVariableCostUsd=4']);
+  const below19=evaluate([...common,'--paidSeats=187','--seatPriceUsd=19','--seatVariableCostUsd=3']);
+  const at19=evaluate([...common,'--paidSeats=188','--seatPriceUsd=19','--seatVariableCostUsd=3']);
+  assert.equal(below29.monthlyContributionBeforeOmittedCostsUsd,-8.16);
+  assert.equal(at29.monthlyContributionBeforeOmittedCostsUsd,8.72);
+  assert.equal(below19.monthlyContributionBeforeOmittedCostsUsd,-2.84);
+  assert.equal(at19.monthlyContributionBeforeOmittedCostsUsd,7.84);
+  assert.equal(at29.vatReserveUsd,690.2);
+  const bad=spawnSync(process.execPath,[cli,'--vatRateBps=10001'],{encoding:'utf8'});
+  assert.notEqual(bad.status,0);
+});
+
+test('25 percent cash buffer includes per-seat service cost exactly once',()=>{
+  const common=['--volumeUsd=0','--effectiveFeeBps=0','--merchantFeeBps=800','--vatRateBps=2500','--fixedCostUsd=2000','--seatPriceUsd=29','--seatVariableCostUsd=4'];
+  const below=evaluate([...common,'--paidSeats=157']);
+  const meets=evaluate([...common,'--paidSeats=158']);
+  assert.equal(below.seatRevenueNetUsd < 1.25*(below.fixedCostUsd+below.seatVariableCostUsd),true);
+  assert.equal(meets.seatRevenueNetUsd >= 1.25*(meets.fixedCostUsd+meets.seatVariableCostUsd),true);
+  assert.equal(meets.projectFeeReceiptsUsd,0);
+});

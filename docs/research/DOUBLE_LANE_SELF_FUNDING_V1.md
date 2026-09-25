@@ -37,7 +37,7 @@ A token purchase is NOT project revenue. Holding NEVER yields unlimited RPC, API
 
 ## Zero-token-revenue scenarios (invented inputs)
 
-All price and cost values below are sensitivity tests, NOT real BINRAT prices, demand, expected Pons payments or audited accounting. Taxes, founder wage, one-time legal/audit/launch expenses, VAT and other omitted items are additional.
+All price and cost values below are sensitivity tests, NOT real BINRAT prices, demand, expected Pons payments or audited accounting. The first table assumes prices EXCLUDE VAT, if applicable. Founder salary, one-time legal/audit/launch expenses and other omitted items are additional. Actual VAT, rates and place-of-supply require professional review.
 
 | Case | Payment/refund haircut | Variable cost / paid seat | Monthly fixed cost | Net per seat | Break-even paid seats |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -45,9 +45,11 @@ All price and cost values below are sensitivity tests, NOT real BINRAT prices, d
 | USD 29 Pro | 8% assumed | USD 4 | USD 2,000 | USD 22.68 | 89 |
 | USD 24 discounted Pro | 8% assumed | USD 4 | USD 2,000 | USD 18.08 | 111 |
 
+**VAT-inclusive B2C stress (if 25% VAT applies):** a USD 29 gross price contains USD 5.80 tax, the illustrative 8% payment/refund haircut is USD 2.32 charged on the gross price, and USD 4 variable cost leaves USD 16.88 contribution per seat. Covering USD 2,000 fixed then needs **119 paid seats**, not 89. A USD 19 gross price leaves USD 10.68 after USD 3 variable cost and requires **188 seats**, not 139. This is a hypothetical stress, NOT BINRAT's tax determination; B2B, EU/non-EU and other purchaser conditions may differ. Swedish standard VAT is 25% on taxable supplies unless a legal exception applies: https://www.skatteverket.se/foretag/moms/saljavarorochtjanster/momssatspavarorochtjanster.4.58d555751259e4d66168000409.html . Reproduce with --vatRateBps=2500 in the offline calculator.
+
 At 25 full-price USD 29 seats with zero Pons receipts and these assumptions, the modeled monthly contribution is MINUS USD 1,433. If 1,000 accounts each use USD 1/month of holder-only service, that creates USD 1,000 in costs without any new subscription income. Protect both the per-user benefit and the global monthly subsidy cap, including cannibalized full-price subscriptions. The existing offline economics calculator and research tests reproduce these sensitivity cases.
 
-**Cash acceptance gate (proposed):** two actual reconciled monthly payment cycles with collected paid-service contribution (before token fees) >= 1.25 times observed fully loaded recurring operating expense, and an independently funded three-month cash reserve, plus separately budgeted legal, security and launch costs. If demand is lower, maintain a cost-capped truthful beta; do not launch the token expecting trading to rescue it. Annual prepayments have future service/refund liabilities, not instantly earned free cash. This gate does not replace counsel, security or explicit token-launch authority.
+**Cash acceptance gate (proposed):** two actual reconciled monthly payment cycles with collected paid-service revenue NET OF VAT DUE, payment fees and refunds (before token fees) >= 1.25 times observed fully loaded recurring operating expense (including per-seat service costs counted exactly ONCE), and an independently funded three-month cash reserve, plus separately budgeted legal, security and launch costs. If demand is lower, maintain a cost-capped truthful beta; do not launch the token expecting trading to rescue it. Annual prepayments have future service/refund liabilities, not instantly earned free cash. At a hypothetical VAT-inclusive USD 29 price, 8% processor/refund haircut, USD 4 variable service cost and USD 2,000 fixed cost, this stricter 25%-above-cost cash gate needs 158 paid seats, not merely the 119 break-even seats. This gate does not replace counsel, security or explicit token-launch authority.
 
 ## Lane A: actual dual-chain launch evidence — isolated engineering PR
 
