@@ -3,8 +3,9 @@ import test from 'node:test';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import {
   RAT_AI_GLOBAL_DAILY_LIMIT, RAT_AI_GATEWAY, RAT_AI_MODEL, RAT_AI_USER_DAILY_LIMIT,
-  entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
-  loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory, validateRatBanter
+  entityFromUnderstanding, forgetRatBanterTurns, forgetRatMemory, generateRatBanter,
+  isRatBanterEligible, loadRatBanterTurns, loadRatMemory, pruneRatConversation,
+  reserveRatAiCall, resolveRatFollowup, saveRatBanterTurn, saveRatMemory, validateRatBanter
 } from '../src/cloudflare/ratConversation.js';
 import { understandRatMessage } from '../src/telegram/nlp.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
@@ -112,4 +113,78 @@ test('AI only handles innocuous unclassified chat and rejects factual-looking ou
   assert.equal(result, '🐀 found some crumbs.');
   assert.equal(calls, 1);
   assert.equal(model, RAT_AI_MODEL);
+});
+
+
+test('private smalltalk keeps only three recent exchanges, isolates users and expires in 30m', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    const turns = [
+      "Oi rat, don't eat my cheese.",
+      'The fridge is guarded by a hamster called Boris.',
+      "Fine. Negotiate with him.",
+      "What's his name again?"
+    ];
+    for (let i = 0; i < turns.length; i++) {
+      await saveRatBanterTurn(db, 51, 81, 300 + i, now + i, turns[i]!, '🐀 not admitting anything.');
+    }
+    await saveRatBanterTurn(db, 51, 81, 303, now + 3, 'duplicate', 'duplicate');
+    const read = await loadRatBanterTurns(db, 51, 81, now + 100);
+    assert.equal(read.length, 3, 'oldest of four exchanges is excluded from prompt');
+    assert.equal(read[0]?.userText, turns[1]);
+    assert.equal(read[2]?.userText, turns[3]);
+    assert.equal(await loadRatBanterTurns(db, 51, 82, now + 100).then(x=>x.length), 0);
+    assert.equal(await loadRatBanterTurns(db, 52, 81, now + 100).then(x=>x.length), 0);
+    assert.deepEqual(await loadRatBanterTurns(db, 51, 81, now + 30 * 60_000 + 4), []);
+    await pruneRatConversation(db, now + 30 * 60_000 + 4);
+    const count = await db.prepare('SELECT COUNT(*) AS n FROM rat_smalltalk_turns')
+      .first<{ n: number }>();
+    assert.equal(count?.n, 0, 'cron physically clears expired turns');
+  } finally { db.close(); }
+});
+
+test('private chat deletion is scoped and excludes obvious credentials', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    await saveRatBanterTurn(db, 51, 81, 400, now, 'my password is bad', '🐀 no');
+    await saveRatBanterTurn(db, 51, 81, 401, now, 'my hamster is Boris', '🐀 yes');
+    await saveRatBanterTurn(db, 51, 82, 402, now, 'hi rat', '🐀 hi');
+    assert.equal((await loadRatBanterTurns(db, 51, 81, now)).length, 1);
+    await forgetRatBanterTurns(db, 51, 81);
+    assert.deepEqual(await loadRatBanterTurns(db, 51, 81, now), []);
+    assert.equal((await loadRatBanterTurns(db, 51, 82, now)).length, 1);
+  } finally { db.close(); }
+});
+
+test('Boris roleplay remains smalltalk but explicit roadmap is evidence-only', async () => {
+  const banter = "Boris says you're banned. What's your next move?";
+  const understood = understandRatMessage(banter, { allowUnaddressed: true });
+  assert.equal(understood?.intent, 'ROADMAP', 'free-text parser initially interprets next as roadmap');
+  assert.equal(isRatBanterEligible(banter, understood), false, 'no contextual override without memory');
+  assert.equal(isRatBanterEligible(banter, understood, true), true, 'active roleplay disambiguates next move');
+  assert.equal(isRatBanterEligible('/roadmap', understandRatMessage('/roadmap'), true), false);
+  assert.equal(isRatBanterEligible("Boris: what's next for the BINRAT project?",
+    understandRatMessage("Boris: what's next for the BINRAT project?", { allowUnaddressed: true }), true), false);
+});
+
+test('AI receives Boris from prior user messages, not from the bot or hardcoded prompt', async () => {
+  let observed: Array<{ role: string; content: string }> = [];
+  const previous = [
+    { userText: 'The fridge is guarded by a hamster named Boris. Negotiate with him.',
+      botReply: '🐀 I know a rat who negotiates with teeth.' },
+    { userText: "What's the hamster's name again?",
+      botReply: '🐀 I only know a suspiciously well-dressed hamster.' }
+  ];
+  const out = await generateRatBanter({ run: async (_model, input) => {
+    observed = input.messages;
+    return { response: '{"kind":"BANTER","text":"Boris is still guarding the cheese."}' };
+  } }, "Boris says you're banned. What's your next move?", previous[1]!.botReply, previous);
+  assert.equal(out, '🐀 Boris is still guarding the cheese.');
+  assert.equal(observed[0]?.role, 'system');
+  assert.doesNotMatch(observed[0]?.content ?? '', /Boris/);
+  assert.deepEqual(observed.slice(1).map(m=>m.role), [
+    'user','assistant','user','assistant','user'
+  ]);
+  assert.match(observed[1]?.content ?? '', /hamster named Boris/);
+  assert.match(observed[5]?.content ?? '', /next move/);
 });
