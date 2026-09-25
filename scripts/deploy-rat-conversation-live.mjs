@@ -117,7 +117,17 @@ gate(cfg.ai?.binding === 'AI', 'AI_BINDING_MISSING');
 cfg.vars.TELEGRAM_REPLIES_ENABLED = 'true';
 cfg.vars.RAT_CONVERSATION_ENABLED = 'true';
 cfg.vars.RAT_FEEDBACK_ENABLED = 'true';
-cfg.vars.RAT_AI_ENABLED = process.env.RAT_FREE_PLAN_VERIFIED === 'true'
+const aiTrialApproved = process.env.RAT_AI_TRIAL_APPROVED === 'true';
+if (aiTrialApproved) {
+  // The account is Workers Paid: D1 bounds attempts, completion tokens cap inference
+  // per call. The shared daily free allowance may be consumed by unrelated Workers.
+  const policy = readFileSync('src/cloudflare/ratConversation.ts', 'utf8');
+  gate(policy.includes('RAT_AI_GLOBAL_DAILY_LIMIT = 30;') &&
+       policy.includes('RAT_AI_USER_DAILY_LIMIT = 10;') &&
+       policy.includes('max_completion_tokens: 160') &&
+       policy.includes('enable_thinking: false'), 'AI_TRIAL_BOUNDARY_DRIFT');
+}
+cfg.vars.RAT_AI_ENABLED = aiTrialApproved || process.env.RAT_FREE_PLAN_VERIFIED === 'true'
   ? 'true' : 'false';
 cfg.vars.BINRAT_PUBLIC_SITE_URL = process.env.BINRAT_PUBLIC_SITE_URL?.trim() || WORKER_URL;
 if (/^[1-9]\d{3,16}$/.test(process.env.RAT_FEEDBACK_ADMIN_USER_ID ?? '')) {
@@ -127,8 +137,9 @@ delete cfg.vars.RAT_CANDIDATE_ALLOWED_USER_ID;
 delete cfg.vars.RAT_CANDIDATE_SMOKE_ENABLED;
 // No candidate-only smoke endpoint activated and never repoint Telegram or create bots.
 writeFileSync(CONFIG, JSON.stringify(cfg, null, 2));
-gate(cfg.vars.RAT_AI_ENABLED !== 'true' || process.env.RAT_FREE_PLAN_VERIFIED === 'true',
-  'UNVERIFIED_PAID_INFERENCE_RISK');
+gate(cfg.vars.RAT_AI_ENABLED !== 'true' || aiTrialApproved ||
+     process.env.RAT_FREE_PLAN_VERIFIED === 'true', 'UNAUTHORIZED_INFERENCE_RISK');
+if (aiTrialApproved) note('Bounded GLM trial authorized: 10/user/day, 30/global/day, <=160 completion tokens, no model search/tools. Workers Paid overage is possible if other account uses exhaust 10k free neurons.');
 
 // Before touching D1, verify candidate Worker bundles and the original production asset tree
 // hasn't diverged from the reviewed live Rat Radar baseline.
@@ -173,6 +184,6 @@ if (token) {
   note('Telegram webhook remote readback not possible without GitHub bot token. Deploy script did not call setWebhook or deleteWebhook. Test Telegram DM to verify routing.');
 }
 note('LIVE_HEALTH_PASS: Telegram replies ON; 30-minute memory ON; /feedback ON; ' +
-  'AI small-talk ' + (afterHealth.aiEnabled ? 'ON' : 'OFF pending Free-plan verification') + '.');
+  'AI small-talk ' + (afterHealth.aiEnabled ? 'ON (30/day bounded trial)' : 'OFF pending free/overage approval') + '.');
 note('TEST NOW: https://t.me/BinratBot  — send /help, /feedback, /feedback idea:..., then /feedback delete.');
 note('AI free-use cap remains 10/user/day and 120/global/day; confirm account-wide neurons in Cloudflare.');
