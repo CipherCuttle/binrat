@@ -304,3 +304,44 @@ test('recipient scout is explicitly pending and never masquerades as an active w
     assert.doesNotMatch(output[0]??'',/watch armed|alerts enabled/);
   }finally{db.close();}
 });
+
+
+test('failed Scout caption edit retries the SAME Telegram photo rather than sending a duplicate',async()=>{
+  const db=new D1CompatDatabase();await db.exec(D1_SCHEMA_SQL);
+  try{
+    let photoCalls=0,editCalls=0;
+    const now=Date.now();
+    const fetchMock:typeof fetch=async(input)=>{
+      const url=String(input);
+      if(url.endsWith('/sendPhoto')){
+        photoCalls++;
+        return new Response(JSON.stringify({ok:true,result:{message_id:999}}),{status:200});
+      }
+      if(url.endsWith('/editMessageCaption')){
+        editCalls++;
+        return editCalls===1
+          ? new Response(JSON.stringify({ok:false}),{status:502})
+          : new Response(JSON.stringify({ok:true,result:{message_id:999}}),{status:200});
+      }
+      throw new Error('UNEXPECTED_FETCH:'+url);
+    };
+    const env={DB:db,TELEGRAM_BOT_TOKEN:'123:secret',
+      TELEGRAM_WEBHOOK_SECRET:'hook-secret',TELEGRAM_REPLIES_ENABLED:'true',
+      RAT_SCOUT_ENABLED:'true'};
+    const request=telegramRequest(2500,'/scout','hook-secret');
+    const deps={externalFetch:fetchMock,now:()=>now};
+    const failed=await handleWorkerRequest(request.clone(),env,deps);
+    assert.equal(failed.status,503);
+    const staged=await db.prepare('SELECT telegram_message_id AS id FROM rat_scout_progress WHERE update_id=?')
+      .bind(2500).first<{id:number}>();
+    assert.equal(staged?.id,999);
+    assert.equal(photoCalls,1);
+    const recovered=await handleWorkerRequest(request.clone(),env,deps);
+    assert.equal(recovered.status,200);
+    assert.equal(photoCalls,1,'retry reuses original photo ID');
+    assert.equal(editCalls,2);
+    assert.equal((await new D1TelegramLedger(db).get(2500))?.telegramMessageId,999);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM rat_scout_progress')
+      .first<{n:number}>())?.n,0);
+  }finally{db.close();}
+});
