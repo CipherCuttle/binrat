@@ -148,6 +148,11 @@ test('a source-only log or a transaction that failed cannot masquerade as a real
   await assert.rejects(collectPonsReceiptProof(
     mockClient(undefined, { changeReceipt: receipt => ({...receipt, status:'reverted'}) }), opts
   ), /PONS_PROOF_RECEIPT_HEADER_CONFLICT/);
+  await assert.rejects(collectPonsReceiptProof(mockClient(undefined, {
+    changeReceipt: receipt => ({
+      ...receipt, logs: [{...receipt.logs[0], blockHash: hex(99999)}]
+    })
+  }), opts), /PONS_PROOF_RECEIPT_LOG_BLOCK_CONFLICT/);
 });
 
 test('receipt-level ABI conflict, wrong log topic, and missing receipt fail closed', async () => {

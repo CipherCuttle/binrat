@@ -129,7 +129,11 @@ export async function collectPonsReceiptProof(
       );
       if (exact.length !== 1) throw new Error('PONS_PROOF_RECEIPT_LOG_MISSING');
       const [log] = exact;
-      if (!log || log.topics[0]?.toLowerCase() !== TOPIC0 ||
+      if (!log || log.blockNumber !== event.blockNumber ||
+          !same(log.blockHash, event.blockHash)) {
+        throw new Error('PONS_PROOF_RECEIPT_LOG_BLOCK_CONFLICT');
+      }
+      if (log.topics[0]?.toLowerCase() !== TOPIC0 ||
           !Array.isArray(log.topics) || log.topics.length !== 4) {
         throw new Error('PONS_PROOF_RECEIPT_TOPIC_MISMATCH');
       }
