@@ -146,6 +146,14 @@ export async function saveRatBanterTurn(
   ).bind(updateId, chatId, userId, userText.slice(0, MAX_STORED_USER_CHARS),
     botReply.slice(0, MAX_STORED_REPLY_CHARS), nowMs, nowMs + MEMORY_TTL_MS).run();
   if (!result.success) throw new Error('RAT_SMALLTALK_MEMORY_WRITE_FAILED');
+  // Enforce the retention bound in storage as well as in prompt construction.
+  // Concurrent Telegram retries share update_id; the most recent three survive.
+  const trimmed = await db.prepare(
+    'DELETE FROM rat_smalltalk_turns WHERE chat_id=? AND user_id=? AND update_id NOT IN ' +
+    '(SELECT update_id FROM rat_smalltalk_turns WHERE chat_id=? AND user_id=? ' +
+    'ORDER BY created_at_ms DESC, update_id DESC LIMIT ?)'
+  ).bind(chatId, userId, chatId, userId, MAX_RECENT_TURNS).run();
+  if (!trimmed.success) throw new Error('RAT_SMALLTALK_MEMORY_TRIM_FAILED');
 }
 
 export async function forgetRatBanterTurns(
