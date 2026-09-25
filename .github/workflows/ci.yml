@@ -151,7 +151,8 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'fix/binrat-v2-evidence-integrity-pr1' || startsWith(github.head_ref, 'feat/binrat-frontend-') || github.head_ref == 'feat/binrat-north-star-slice-g0-g2') }}
     env:
       BINRAT_BRANCH_SHA: ${{ github.event.pull_request.head.sha }}
-    needs: [check]
+    # Frontend checks and viewport screenshots must run even when unrelated backend
+    # tests fail. The root check job remains required independently by branch policy.
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
