@@ -115,3 +115,7 @@ LIMIT 50;
 \`\`\`
 
 This query must be run only in the authorized Cloudflare D1 dashboard, never from a public website. The Telegram \`/feedback inbox\` command is a private summary and deliberately omits submitter IDs. Only the operator should have DB export access. Existing public evidence and token-related data are unaffected.
+
+## Owner production test authority — 25 September 2026
+
+Owner explicitly approved testing the existing public `@BinratBot` in Telegram and capturing opted-in `/feedback` from end users. This approval authorizes one guarded live Worker deployment when full exact-branch tests, GitHub deployment credentials, bot identity, webhook, D1 and queue checks all pass. The deployment must retain existing frontend assets, queues, indexed research, bot webhook and launch authority. Missing secrets or failed preflight means STOP, not a replacement deployment. Do not authorize any paid Workers AI overage; keep model inference disabled until no-charge eligibility is independently confirmed.
