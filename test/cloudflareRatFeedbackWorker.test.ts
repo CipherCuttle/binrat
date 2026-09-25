@@ -90,6 +90,26 @@ test('private-only feedback refuses to store group posts and confirms privacy he
   } finally { db.close(); }
 });
 
+test('inbox is private to the configured owner DM and never leaks through group replies', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    const sent: string[] = [];
+    const env = { DB: db, ...envBase, RAT_FEEDBACK_ADMIN_USER_ID: '999' };
+    const deps = { now: () => now, externalFetch: sender(sent) };
+    await handleWorkerRequest(request(970, '/feedback bug: the radar filter breaks'), env, deps);
+    await handleWorkerRequest(request(971, '/feedback inbox', 321, 123), env, deps);
+    assert.match(sent[1] ?? '', /private to the BINRAT operator/);
+    assert.doesNotMatch(sent[1] ?? '', /radar filter breaks/);
+    await handleWorkerRequest(request(972, '/feedback inbox', -100, 999, 'supergroup'), env, deps);
+    assert.match(sent[2] ?? '', /DM me/);
+    assert.doesNotMatch(sent[2] ?? '', /radar filter breaks/);
+    await handleWorkerRequest(request(973, '/feedback inbox', 999, 999), env, deps);
+    assert.match(sent[3] ?? '', /#970 \[BUG\]/);
+    assert.match(sent[3] ?? '', /radar filter breaks/);
+    assert.doesNotMatch(sent[3] ?? '', /123/, 'the admin inbox does not reveal user IDs');
+  } finally { db.close(); }
+});
+
 test('failed Telegram ACK does not duplicate or charge twice when Telegram retries', async () => {
   const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
   try {
