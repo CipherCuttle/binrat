@@ -53,17 +53,21 @@ gate(process.env.GITHUB_REF === 'refs/heads/feat/binrat-rat-conversation-free-ai
   'REF_NOT_EXACT_APPROVED_BRANCH');
 gate(process.env.RAT_LIVE_DEPLOY_APPROVED === 'true',
   'LIVE_DEPLOY_APPROVAL_GATE_CLOSED');
-for (const name of ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID', 'TELEGRAM_BOT_TOKEN']) {
+for (const name of ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID']) {
   gate(Boolean(process.env[name]?.trim()), 'MISSING_REQUIRED_SECRET:' + name);
 }
-const token = process.env.TELEGRAM_BOT_TOKEN.trim();
-const telegram = await getJson('https://api.telegram.org/bot' + token + '/getMe');
-gate(telegram.ok === true && String(telegram.result?.username ?? '').toLowerCase() === 'binratbot',
-  'GITHUB_BOT_TOKEN_IS_NOT_BINRATBOT');
-const beforeHook = await getJson('https://api.telegram.org/bot' + token + '/getWebhookInfo');
-gate(beforeHook.ok === true && beforeHook.result?.url === WEBHOOK_URL,
-  'EXISTING_BOT_WEBHOOK_DIFFERS_FROM_LIVE_WORKER');
-note('Confirmed existing @BinratBot webhook; no Telegram setWebhook/deleteWebhook calls.');
+const token = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? '';
+if (token) {
+  const telegram = await getJson('https://api.telegram.org/bot' + token + '/getMe');
+  gate(telegram.ok === true && String(telegram.result?.username ?? '').toLowerCase() === 'binratbot',
+    'GITHUB_BOT_TOKEN_IS_NOT_BINRATBOT');
+  const beforeHook = await getJson('https://api.telegram.org/bot' + token + '/getWebhookInfo');
+  gate(beforeHook.ok === true && beforeHook.result?.url === WEBHOOK_URL,
+    'EXISTING_BOT_WEBHOOK_DIFFERS_FROM_LIVE_WORKER');
+  note('Verified current @BinratBot webhook with its existing GitHub bot token; no cutover.');
+} else {
+  note('GitHub Telegram bot token absent; require BOTH preinstalled production Worker Telegram secrets. No webhook mutation will occur.');
+}
 
 const beforeHealth = await getJson(WORKER_URL + '/health');
 gate(beforeHealth.ok === true && beforeHealth.service === 'binrat-cloudflare-edge',
@@ -84,7 +88,14 @@ writeFileSync(provision, JSON.stringify({
 const info = jsonFromOutput(cli(['d1', 'info', PRODUCTION_DB, '--json', '--config', provision]));
 gate(findUuid(info) === EXPECTED_DB_ID, 'PRODUCTION_D1_ID_MISMATCH');
 cli(['queues','info', PRODUCTION_QUEUE, '--config', provision]);
-note('Pinned existing D1 and sync queue verified. No new infrastructure provisioned.');
+// Cloudflare exposes secret NAMES only. Use the existing Worker bindings without
+// copying, decrypting or exposing token values; fail before any migration/deploy.
+const listed = jsonFromOutput(cli(['secret','list','--name',PRODUCTION_WORKER,'--config',provision]));
+gate(Array.isArray(listed), 'PRODUCTION_SECRET_METADATA_UNAVAILABLE');
+const names = new Set(listed.map(item => item?.name).filter(name => typeof name === 'string'));
+gate(names.has('TELEGRAM_BOT_TOKEN') && names.has('TELEGRAM_WEBHOOK_SECRET'),
+  'PRODUCTION_TELEGRAM_WORKER_SECRETS_MISSING');
+note('Pinned existing D1 and sync queue verified; live Worker already has BOTH Telegram secret bindings. No new infrastructure or bot tokens provisioned.');
 
 const fs = await import('node:fs');
 const cfg = JSON.parse(
@@ -147,9 +158,14 @@ gate(afterHealth.ok === true && afterHealth.repliesEnabled === true &&
   afterHealth.feedbackEnabled === true &&
   afterHealth.aiEnabled === (cfg.vars.RAT_AI_ENABLED === 'true'),
   'POSTDEPLOY_FEATURE_HEALTH_MISMATCH');
-const afterHook = await getJson('https://api.telegram.org/bot' + token + '/getWebhookInfo');
-gate(afterHook.ok === true && afterHook.result?.url === WEBHOOK_URL,
-  'POSTDEPLOY_BOT_WEBHOOK_CHANGED');
+if (token) {
+  const afterHook = await getJson('https://api.telegram.org/bot' + token + '/getWebhookInfo');
+  gate(afterHook.ok === true && afterHook.result?.url === WEBHOOK_URL,
+    'POSTDEPLOY_BOT_WEBHOOK_CHANGED');
+  note('Telegram remotely confirmed that the webhook URL remained unchanged.');
+} else {
+  note('Telegram webhook remote readback not possible without GitHub bot token. Deploy script did not call setWebhook or deleteWebhook. Test Telegram DM to verify routing.');
+}
 note('LIVE_HEALTH_PASS: Telegram replies ON; 30-minute memory ON; /feedback ON; ' +
   'AI small-talk ' + (afterHealth.aiEnabled ? 'ON' : 'OFF pending Free-plan verification') + '.');
 note('TEST NOW: https://t.me/BinratBot  — send /help, /feedback, /feedback idea:..., then /feedback delete.');
