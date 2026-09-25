@@ -19,3 +19,5 @@ This isolated adapter pins numeric chain 4663 and requires an **explicit operato
 4. Only then add a separate 4663 checkpoint, replay fixture and non-production backfill path with tested reorg rollback, retry, per-chain health and Chain-scoped Watch. All absent fields remain UNKNOWN / PARTIAL rather than zero or success.
 
 No live RPC was invoked by this PR. No production D1 writes, queue activation, 4663 coverage claim, token launch, merge or deployment.
+
+Hostile review #5316888726: every touched event block is now revalidated at scan end and its historical factory code checked independently. A provider with unchanged endpoint hashes but a changed interior block fails closed. This does not replace real-chain receipt verification or finality policy.

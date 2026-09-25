@@ -116,6 +116,9 @@ export class PonsV2LaunchSource {
       address: this.factory, event: ponsTokenLaunchedEvent, fromBlock, toBlock, strict: true
     });
     const verified = new Map<string, PonsV2LaunchEvent>();
+    // A provider may return incompatible per-block answers even when range
+    // endpoints remain identical. Remember every event block for a final fence.
+    const touchedHashes = new Map<bigint, Hex>();
     for (const log of logs) {
       if (log.address.toLowerCase() !== this.factory.toLowerCase() ||
         log.blockNumber == null || log.blockHash == null || log.transactionHash == null ||
@@ -126,9 +129,20 @@ export class PonsV2LaunchSource {
       if (!token || !curve || !deployer || !pairToken ||
         launchConfigId === undefined || graduationThreshold === undefined ||
         token.toLowerCase() === curve.toLowerCase()) throw new Error('PONS_MALFORMED_LAUNCH_ARGS');
-      if (log.blockNumber < fromBlock || log.blockNumber > toBlock ||
-        (await this.getBlockHash(log.blockNumber)) !== log.blockHash.toLowerCase()) {
+      if (log.blockNumber < fromBlock || log.blockNumber > toBlock) {
         throw new Error('PONS_NONCANONICAL_LAUNCH_LOG');
+      }
+      const recordedHash = log.blockHash.toLowerCase() as Hex;
+      const earlier = touchedHashes.get(log.blockNumber);
+      if (earlier && earlier !== recordedHash) throw new Error('PONS_LOG_BLOCK_HASH_CONFLICT');
+      if (!earlier) {
+        if ((await this.getBlockHash(log.blockNumber)) !== recordedHash) {
+          throw new Error('PONS_NONCANONICAL_LAUNCH_LOG');
+        }
+        // Endpoint bytecode alone cannot establish the emitter's historical
+        // authority on each interior block when historical RPCs disagree.
+        await this.assertAuthority(log.blockNumber);
+        touchedHashes.set(log.blockNumber, recordedHash);
       }
       const fields = {
         chainId: PONS_CHAIN_ID, factory: this.factory.toLowerCase(),
@@ -155,9 +169,13 @@ export class PonsV2LaunchSource {
       }
       verified.set(eventId, row);
     }
-    // A reorg during eth_getLogs is a hard error; no cursor may be committed.
+    // A reorg / inconsistent RPC during eth_getLogs is a hard error. Range
+    // endpoints are not sufficient: reread every touched interior block.
     if ((await this.getBlockHash(fromBlock)) !== fromHash ||
         (await this.getBlockHash(toBlock)) !== toHash) throw new Error('PONS_SCAN_REORG');
+    for (const [block, expectedHash] of touchedHashes) {
+      if ((await this.getBlockHash(block)) !== expectedHash) throw new Error('PONS_SCAN_REORG');
+    }
     return [...verified.values()].sort((a, b) =>
       a.blockNumber === b.blockNumber ? a.logIndex - b.logIndex : a.blockNumber < b.blockNumber ? -1 : 1);
   }

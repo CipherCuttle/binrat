@@ -22,15 +22,20 @@ const eventLog = {
 };
 function fakeClient(changes: {
   chainId?: number; bytecode?: string; logs?: unknown[]; blockHash?: string;
-  flipReorg?: boolean; getLogsError?: Error
+  flipReorg?: boolean; flipInteriorReorg?: boolean; badInteriorCode?: boolean; getLogsError?: Error
 } = {}): PublicClient {
   let scans = 0;
+  let interiorReads = 0;
   const client = {
     async getChainId() { return changes.chainId ?? PONS_CHAIN_ID; },
     async getBlockNumber() { return 200n; },
-    async getBytecode() { return changes.bytecode ?? code; },
+    async getBytecode({ blockNumber }: { blockNumber: bigint }) {
+      if (changes.badInteriorCode && blockNumber === 101n) return '0x6002';
+      return changes.bytecode ?? code;
+    },
     async getBlock({ blockNumber }: { blockNumber: bigint }) {
       if (blockNumber === 100n && changes.flipReorg && scans++ > 1) return { hash: hash('f') };
+      if (blockNumber === 101n && changes.flipInteriorReorg && interiorReads++ > 0) return { hash: hash('f') };
       return { hash: changes.blockHash ?? (blockNumber === 100n ? hash('a') : hash('b')) };
     },
     async getLogs() {
@@ -120,6 +125,24 @@ test('RPC errors, mismatched receipt hash and mid-scan reorg never return a part
     const src = new PonsV2LaunchSource({client:c.client,expectedFactoryCodeHash:codeHash});
     await assert.rejects(src.catchUp(100n,101n),c.error);
   }
+});
+
+test('an interior event block can reorg while both range endpoint hashes remain unchanged', async () => {
+  const interior = { ...eventLog, blockNumber: 101n, blockHash: hash('b') };
+  const src = new PonsV2LaunchSource({
+    client: fakeClient({ flipInteriorReorg: true, logs: [interior] }),
+    expectedFactoryCodeHash: codeHash
+  });
+  await assert.rejects(src.catchUp(100n, 102n), /PONS_SCAN_REORG/);
+});
+
+test('historical factory code at interior event blocks must match the explicit pin', async () => {
+  const interior = { ...eventLog, blockNumber: 101n, blockHash: hash('b') };
+  const src = new PonsV2LaunchSource({
+    client: fakeClient({ badInteriorCode: true, logs: [interior] }),
+    expectedFactoryCodeHash: codeHash
+  });
+  await assert.rejects(src.catchUp(100n, 102n), /PONS_FACTORY_CODE_HASH_DRIFT/);
 });
 
 test('identical replay duplicate dedups without cross-chain aliasing', async () => {
