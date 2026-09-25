@@ -127,3 +127,8 @@ GitHub Actions production and candidate workflows map their runtime environment 
 Both prefixed Cloudflare GitHub secrets must be accessible to the workflow in the branch context; if they exist only as GitHub Environment secrets, the workflow must be assigned that protected environment by an operator rather than silently falling back to another token. The Workers AI flag remains off unless the Cloudflare plan and free-inference risk have been explicitly verified. No production token launch, merge, bot cutover or chargeable AI authority follows from this credential correction.
 
 Rollout checkpoint: 25 September 2026 08:07 UTC. Existing BINRAT-prefixed GitHub secrets, current bot identity and webhook, production D1/queue, and current Worker secret bindings were all verified. First attempt stopped on Wrangler packaging because generated config lived outside the checkout. The generated live config now stays at the checkout root so `main` and static `assets` resolve correctly. The retry retains all safety gates and performs no webhook re-registration.
+
+
+## 25 September owner continuation — dedicated AI Gateway cost preflight
+
+Owner requested activation of small talk on the existing production Telegram bot after the Workers Paid subscription was disclosed. Before any new model invocation or public AI flag, test the dedicated `binrat-rat-capped-v1` gateway provisioner independently; require Cloudflare to read back both spend-limit rules and rate limits. Production remains AI-off until the real model smoke and bounded deployment meet their own acceptance gates. This step does not itself authorize an uncapped billing exposure.
