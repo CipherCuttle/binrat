@@ -2,7 +2,7 @@
 
 ## Objective
 
-Create a strict boundary between BINRAT's internal evidence/indexing state and any consumer-facing web/API projection.
+Create a strict boundary between BINRAT's internal evidence/indexing state and the public JSON API projection.
 
 The browser must never read the raw SQLite evidence store directly. Internal field names and inferred semantics must not leak into product copy by accident.
 
@@ -112,13 +112,9 @@ Every public projection binds:
 
 The receipt is projection identity, not a claim that the underlying token is safe or truthful, and not proof that the supplied history is exhaustive.
 
-## Browser boundary during the 72-hour experiment
+## Backend-only consumer boundary
 
-The browser remains fixture-only.
-
-`web/data-source.js` is the only browser data-source entry point and currently returns `FIXTURE` mode. The app fails closed if that mode changes unexpectedly.
-
-No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARBAGE experiment matures, a later branch may add an `EVIDENCE_PROJECTION` adapter only if the experiment/read-plane gates pass.
+The active repository contains no browser adapter or static frontend. Public JSON responses remain versioned, receipt-bound and fail closed on missing evidence. Any future UI starts as a separately authorized project without inheriting earlier visual assumptions.
 
 ## Acceptance
 
@@ -132,6 +128,5 @@ No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARB
 - V0 history coverage is always `UNVERIFIED`;
 - absent history is always `UNKNOWN` in V0;
 - output has a digest-bound projection receipt;
-- web consumes data through `web/data-source.js` only;
-- browser remains fixture-only and noindex;
+- public API consumers validate the exact schema, checkpoint, history coverage and projection receipt;
 - no live-data, token-launch, trading, signing, transaction-submission, or capital authority is introduced.
