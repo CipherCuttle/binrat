@@ -65,14 +65,23 @@ function mockClient(
   } = {}
 ): PublicClient {
   let readsOf100 = 0;
-  const receipts = new Map(rows.map(row => [
-    row.transactionHash.toLowerCase(),
-    {
-      transactionHash: row.transactionHash, blockNumber: row.blockNumber,
-      blockHash: row.blockHash, status: 'success',
-      logs: [rawLog(row)]
+  const receipts = new Map<string, {
+    transactionHash: Hex; blockNumber: bigint; blockHash: Hex;
+    status: string; logs: ReturnType<typeof rawLog>[];
+  }>();
+  for (const row of rows) {
+    const key = row.transactionHash.toLowerCase();
+    const existing = receipts.get(key);
+    if (existing) {
+      if (existing.blockNumber !== row.blockNumber) throw new Error('INVALID_MOCK_TX_CROSS_BLOCK');
+      existing.logs.push(rawLog(row));
+    } else {
+      receipts.set(key, {
+        transactionHash: row.transactionHash, blockNumber: row.blockNumber,
+        blockHash: row.blockHash, status: 'success', logs: [rawLog(row)]
+      });
     }
-  ]));
+  }
   return {
     async getChainId() { return changes.chainId ?? PONS_CHAIN_ID; },
     async getBlockNumber() { return changes.head ?? 300n; },
@@ -122,12 +131,13 @@ test('three distinct tx receipts cross-check getLogs, receipt ABI, historical co
 });
 
 test('a transaction with multiple launches cannot count twice as distinct evidence', async () => {
+  const sharedTx = { ...launch(1, 0), blockNumber: 100n, blockHash: blockHash(100n) };
   const result = await collectPonsReceiptProof(
-    mockClient([launch(0), launch(1, 0), launch(2), launch(3)]), opts
+    mockClient([launch(0), sharedTx, launch(2), launch(3)]), opts
   );
   assert.equal(new Set(result.receipts.map(x => x.receipt.transactionHash)).size, 3);
   await assert.rejects(collectPonsReceiptProof(
-    mockClient([launch(0), launch(1, 0), launch(2)]), opts
+    mockClient([launch(0), sharedTx, launch(2)]), opts
   ), /PONS_PROOF_THREE_DISTINCT_TX_REQUIRED/);
 });
 
