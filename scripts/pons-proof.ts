@@ -27,7 +27,7 @@ if (command === 'probe') {
   const result = await probePonsHistoricalFactory(client, block);
   process.stdout.write(JSON.stringify(result, null, 2) + '\n');
 } else if (command === 'collect') {
-  onlyArgs(args, ['rpc', 'from', 'to', 'code-hash', 'max-windows', 'out']);
+  onlyArgs(args, ['rpc', 'from', 'to', 'code-hash', 'max-windows', 'window-blocks', 'out']);
   const fromBlock = requiredBlock(args.from, 'from');
   const toBlock = requiredBlock(args.to, 'to');
   const hash = args['code-hash'];
@@ -35,8 +35,9 @@ if (command === 'probe') {
     throw new Error('PONS_OPERATOR_CONFIRMED_HISTORICAL_CODE_PIN_REQUIRED');
   }
   const maxWindows = args['max-windows'] ? Number(args['max-windows']) : 12;
+  const windowBlocks = args['window-blocks'] ? requiredBlock(args['window-blocks'], 'window-blocks') : 500n;
   const proof = await collectPonsReceiptProof(client, {
-    fromBlock, toBlock, expectedFactoryCodeHash: hash as Hex, maxWindows
+    fromBlock, toBlock, expectedFactoryCodeHash: hash as Hex, maxWindows, windowBlocks
   });
   const text = JSON.stringify(proof, null, 2) + '\n';
   if (args.out) {
@@ -47,7 +48,7 @@ if (command === 'probe') {
   }
   process.stdout.write(text);
 } else {
-  throw new Error('PONS_USAGE: probe --block N | collect --from N --to N --code-hash 0x... [--max-windows 12] [--out path] [--rpc https://...]');
+  throw new Error('PONS_USAGE: probe --block N | collect --from N --to N --code-hash 0x... [--max-windows 12] [--window-blocks 500] [--out path] [--rpc https://...]');
 }
 
 function parseArgs(values: string[]): Record<string, string> {

@@ -22,6 +22,8 @@ export interface PonsProofOptions {
   expectedFactoryCodeHash: Hex;
   /** Max 12 * 500-block RPC windows in one explicit operator invocation. */
   maxWindows?: number;
+  /** Provider-compatible window size; bounded to 1..500 blocks. */
+  windowBlocks?: bigint;
   /** Sampling head buffer, deliberately NOT called finality. */
   headBufferBlocks?: bigint;
 }
@@ -87,18 +89,22 @@ export async function collectPonsReceiptProof(
 ): Promise<PonsProofBundle> {
   const { fromBlock, toBlock, expectedFactoryCodeHash } = options;
   const maxWindows = options.maxWindows ?? 12;
+  const windowBlocks = options.windowBlocks ?? 500n;
   const buffer = options.headBufferBlocks ?? 64n;
   if (!Number.isSafeInteger(maxWindows) || maxWindows < 1 || maxWindows > 12) {
     throw new Error('PONS_PROOF_WINDOW_LIMIT');
   }
+  if (windowBlocks < 1n || windowBlocks > 500n) {
+    throw new Error('PONS_PROOF_WINDOW_SIZE_LIMIT');
+  }
   if (fromBlock < 0n || toBlock < fromBlock ||
-      toBlock - fromBlock + 1n > BigInt(maxWindows) * 500n) {
+      toBlock - fromBlock + 1n > BigInt(maxWindows) * windowBlocks) {
     throw new Error('PONS_PROOF_SCAN_SPAN_UNBOUNDED');
   }
   if (buffer < 64n) throw new Error('PONS_PROOF_HEAD_BUFFER_TOO_SMALL');
   if (!isHash(expectedFactoryCodeHash)) throw new Error('PONS_FACTORY_CODE_PIN_REQUIRED');
   const source = new PonsV2LaunchSource({
-    client, expectedFactoryCodeHash, maxWindowBlocks: 500n
+    client, expectedFactoryCodeHash, maxWindowBlocks: windowBlocks
   });
   const head = await source.getHeadBlockNumber();
   if (toBlock > head || head - toBlock < buffer) throw new Error('PONS_PROOF_HEAD_BUFFER_REQUIRED');
@@ -108,8 +114,8 @@ export async function collectPonsReceiptProof(
   const seenToken = new Set<string>();
   const blockFences = new Map<bigint, Hex>();
   let scannedThrough = fromBlock - 1n;
-  for (let first = fromBlock; first <= toBlock && receipts.length < 3; first += 500n) {
-    const last = first + 499n > toBlock ? toBlock : first + 499n;
+  for (let first = fromBlock; first <= toBlock && receipts.length < 3; first += windowBlocks) {
+    const last = first + windowBlocks - 1n > toBlock ? toBlock : first + windowBlocks - 1n;
     const events = await source.catchUp(first, last);
     scannedThrough = last;
     for (const event of events) {

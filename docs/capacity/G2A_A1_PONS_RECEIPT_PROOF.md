@@ -41,10 +41,12 @@ RPC may be needed and should be treated as a separate dependency.
    pnpm exec tsx scripts/pons-proof.ts collect \
      --from <START_BLOCK> --to <END_BLOCK> \
      --code-hash 0x<INDEPENDENTLY_CHECKED_64_HEX> \
-     --max-windows 12 --out .local/pons-4663-three-receipts.json
+     --max-windows 12 --window-blocks 200 \
+     --out .local/pons-4663-three-receipts.json
    ```
 
-   Re-run with a different archive RPC for independent comparison. The
+   Set `--window-blocks` at or below the provider's documented filtered-log
+   limit (maximum 500). Re-run with a different archive RPC for independent comparison. The
    output file is create-only, mode 0600 and is **never** auto-imported into
    Worker, D1, Telegram or a strategy; keep private RPC credentials in environment.
    A new output must be compared by event ID, block hash, tx hash, raw receipt

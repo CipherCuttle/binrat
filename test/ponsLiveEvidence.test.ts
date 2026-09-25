@@ -187,6 +187,12 @@ test('bad historical code, wrong chain, insufficient head buffer, and unbounded 
   await assert.rejects(collectPonsReceiptProof(mockClient(), {
     ...opts, maxWindows: 13
   }), /PONS_PROOF_WINDOW_LIMIT/);
+  await assert.rejects(collectPonsReceiptProof(mockClient(), {
+    ...opts, windowBlocks: 501n
+  }), /PONS_PROOF_WINDOW_SIZE_LIMIT/);
+  await assert.rejects(collectPonsReceiptProof(mockClient(), {
+    ...opts, fromBlock: 1n, toBlock: 401n, maxWindows: 2, windowBlocks: 200n
+  }), /PONS_PROOF_SCAN_SPAN_UNBOUNDED/);
 });
 
 test('post-receipt interior block reorg invalidates the entire bundle', async () => {
