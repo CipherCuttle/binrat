@@ -150,6 +150,10 @@
 @media(max-width:389px) {
  .intro h1 {font-size:clamp(38px,12vw,47px);}
 }
+/* 390px measured: 371.7px title inside a 366px intro. Keep the word unbroken. */
+@media(min-width:390px) and (max-width:429px) {
+ .intro h1 {font-size:clamp(55px,13.5vw,58px);}
+}
 @media(max-width:359px) {
  .metrics {grid-template-columns:1fr;} .panelHead {flex-wrap:wrap;}
  .other {grid-template-columns:1fr;} .module:first-child {grid-column:auto;}
