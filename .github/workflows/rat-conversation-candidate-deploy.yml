@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
       # Dedicated bot token only. Never use TELEGRAM_BOT_TOKEN or update @BinratBot's webhook.
       RAT_CANDIDATE_BOT_TOKEN: ${{ secrets.RAT_CANDIDATE_BOT_TOKEN }}
       RAT_CANDIDATE_ALLOWED_USER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID }}
