@@ -9,7 +9,9 @@ const PRODUCTION_DB = 'binrat-v0';
 const PRODUCTION_QUEUE = 'binrat-sync-v0';
 const WORKER_URL = 'https://binrat-edge-v0.pettevik.workers.dev';
 const WEBHOOK_URL = WORKER_URL + '/telegram/webhook';
-const CONFIG = '/tmp/binrat-rat-live-wrangler.jsonc';
+// Wrangler resolves both main and static assets relative to the config directory.
+// Use the Actions checkout root, never /tmp, so both paths resolve safely.
+const CONFIG = 'wrangler.rat-live.generated.jsonc';
 // Pin the known existing D1 ID from the reviewed Rat Radar live-deploy workflow.
 const EXPECTED_DB_ID = '46814564-1a41-449a-88e5-c1349eed3a27';
 const WRANGLER = ['dlx', 'wrangler@4.135.0'];
