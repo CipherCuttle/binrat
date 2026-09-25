@@ -7,6 +7,7 @@
   "assets": {
     "directory": "./web"
   },
+  "ai": { "binding": "AI" },
   "d1_databases": [
     {
       "binding": "DB",
@@ -46,6 +47,9 @@
     "BINRAT_HOLDER_WALLET_AUTH_ENABLED": "false",
     "BINRAT_HOLDER_GATE_ENABLED": "false",
     "TELEGRAM_REPLIES_ENABLED": "false",
+    "RAT_CONVERSATION_ENABLED": "false",
+    "RAT_AI_ENABLED": "false",
+    "RAT_FEEDBACK_ENABLED": "false",
     "TELEGRAM_MAX_MESSAGES_PER_MINUTE": "12",
     "BINRAT_PUBLIC_SITE_URL": "https://REPLACE_WITH_PUBLIC_SITE"
   }

@@ -1,0 +1,102 @@
+name: rat-conversation-live-deploy
+
+on:
+  push:
+    branches:
+      - feat/binrat-rat-conversation-free-ai-v1
+  workflow_dispatch:
+    inputs:
+      confirm_live:
+        description: 'Type DEPLOY_BOT for normal rollout, or DEPLOY_BOT_AI for the 30-call/day AI trial'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: binrat-live-rat-deploy
+  cancel-in-progress: false
+
+jobs:
+  production-rat:
+    if: ${{ contains(github.event.head_commit.message, '[deploy-rat-live]') || contains(github.event.head_commit.message, '[deploy-rat-ai-trial]') || (github.event_name == 'workflow_dispatch' && (inputs.confirm_live == 'DEPLOY_BOT' || inputs.confirm_live == 'DEPLOY_BOT_AI')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      # Optional when the existing Worker already holds its bot + webhook secret.
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      BINRAT_PUBLIC_SITE_URL: ${{ vars.BINRAT_PUBLIC_SITE_URL }}
+      RAT_FEEDBACK_ADMIN_USER_ID: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
+      # Never infer Free/Paid from the plan history; false until explicitly verified.
+      RAT_FREE_PLAN_VERIFIED: ${{ vars.RAT_FREE_PLAN_VERIFIED == 'true' && 'true' || 'false' }}
+      RAT_LIVE_DEPLOY_APPROVED: 'true'
+      # Paid-account trial is deliberately scoped to one explicitly marked deployment.
+      RAT_AI_TRIAL_APPROVED: ${{ (contains(github.event.head_commit.message, '[deploy-rat-ai-trial]') || inputs.confirm_live == 'DEPLOY_BOT_AI') && 'true' || 'false' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require existing BINRAT-prefixed Cloudflare credentials before touching infrastructure
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing GitHub Actions secret $name; production remains unchanged"
+              exit 1
+            fi
+          done
+          if [ -z "${TELEGRAM_BOT_TOKEN:-}" ]; then
+            echo 'GitHub Telegram token not set: the deployment script must verify the existing Worker has both Telegram secrets; no token will be copied or exposed.'
+          fi
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify pinned live baseline and full regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feat/binrat-rat-conversation-free-ai-v1"
+          git fetch origin feat/binrat-rat-radar-v0
+          git diff --quiet origin/feat/binrat-rat-radar-v0 HEAD -- web/ src/cloudflare/d1Store.ts src/cloudflare/syncQueue.ts
+          node --check scripts/deploy-rat-conversation-live.mjs
+          pnpm check
+          # The production script performs a strict Wrangler dry-run with resolved live bindings.
+
+      - name: Prove current GLM model returns valid JSON before public AI toggle
+        if: env.RAT_AI_TRIAL_APPROVED == 'true'
+        run: node scripts/smoke-rat-ai-live.mjs
+
+      - name: Migrate feedback and roll out to live @BinratBot
+        run: node scripts/deploy-rat-conversation-live.mjs
+
+      - name: Report exact deployment outcome to PR #34
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## RAT LIVE ROLLOUT: $RESULT"
+            echo "- commit: $GITHUB_SHA"
+            echo "- workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "- no Telegram webhook cutover attempted"
+            echo "- check step logs for migration/deployment boundary before declaring live"
+          } >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment 34 --body-file "$GITHUB_STEP_SUMMARY"

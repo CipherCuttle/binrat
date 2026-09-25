@@ -1,0 +1,22 @@
+name: rat-ai-free-plan-check
+on:
+  push:
+    branches:
+      - feat/binrat-rat-conversation-free-ai-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: ${{ contains(github.event.head_commit.message, '[check-rat-ai-plan]') || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect Cloudflare Workers plan (read-only, no inference)
+        run: node scripts/check-rat-ai-plan.mjs
