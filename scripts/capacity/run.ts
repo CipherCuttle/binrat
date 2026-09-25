@@ -40,4 +40,4 @@ if (coldSerial.endToEndP95Ms < 500 ||
     fanout.unique !== profile.targetDAU ||
     fanout.peakPerSecond > 25 || fanout.drainSeconds >= 900 ||
     outcomes.length !== profile.openSessions || outcomes.filter(Boolean).length !== 100 ||
-    steady.distribution.PUBLIC_CACHED !== steady.requests * 0.7) process.exitCode = 1;
+    steady.distribution.PUBLIC_CACHED * 100 !== steady.requests * 70) process.exitCode = 1;
