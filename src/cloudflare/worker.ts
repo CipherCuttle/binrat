@@ -20,6 +20,10 @@ import {
 import { parseRepliesEnabled } from '../telegram/control.js';
 import { understandRatMessage } from '../telegram/nlp.js';
 import {
+  parseScoutRequest, projectScoutCreators, readScoutObservationRows, renderScoutCaption
+} from '../telegram/scout.js';
+import { sendScoutDiggingPoster, editScoutPoster } from '../telegram/scoutMedia.js';
+import {
   parseRatFeedback, validateRatFeedbackBody, saveRatFeedback,
   deleteRatFeedback, pruneRatFeedback, listRecentRatFeedback
 } from './ratFeedback.js';
@@ -66,6 +70,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   /** Both flags must be explicitly 'true'; inference is default-off. */
   RAT_CONVERSATION_ENABLED?: string;
   RAT_FEEDBACK_ENABLED?: string;
+  /** Disabled on production until isolated Scout candidate acceptance. */
+  RAT_SCOUT_ENABLED?: string;
   RAT_FEEDBACK_ADMIN_USER_ID?: string;
   RAT_AI_ENABLED?: string;
   // Trial lease: when present, AI automatically stops at this Unix millisecond timestamp.
@@ -600,6 +606,48 @@ async function telegramWebhook(
         telegramMessageId
       }, deps.now());
       return json(200, { ok: true });
+    }
+
+    // Read-only research mode: explicit /scout or a properly addressed natural-language
+    // request. Never LLM-route research or treat recipient activity as creator facts.
+    const scoutRequest = (message.chat.type === 'private' ||
+      /^\/scout(?:@[a-z0-9_]+)?\b/i.test(message.text) ||
+      /\b(?:binrat|rat)\b/i.test(message.text))
+      ? parseScoutRequest(message.text) : null;
+    if (env.RAT_SCOUT_ENABLED === 'true' && scoutRequest) {
+      if (scoutRequest === 'RECIPIENTS_UNAVAILABLE') {
+        const answer='🐀 recipient scout needs verified swap timestamps and quote values. '+
+          'No USD ape threshold or recipient alerts are enabled. /scout creators works with source-backed launches.';
+        const telegramMessageId=await sendMessage(token,message.chat.id,answer,deps.externalFetch);
+        await ledger.completeOperationalReply({
+          updateId:update.update_id,chatId:message.chat.id,intent:'SCOUT_RECIPIENTS_PENDING',
+          replyDigest:createHash('sha256').update(answer).digest('hex'),telegramMessageId
+        },deps.now());
+        return json(200,{ok:true,scout:'RECIPIENTS_PENDING'});
+      }
+      // The poster is the canonical STATIC rat. Approved mood derivatives do
+      // not yet exist; DIGGING is a truthful caption on the same Telegram card.
+      const posterId=await sendScoutDiggingPoster(token,message.chat.id,origin,deps.externalFetch);
+      let caption='🐀 PIPE JAM. ArcPad live index not ready; no creator shortlist returned. Try /scout later.';
+      let result:ReturnType<typeof projectScoutCreators>|null=null;
+      try {
+        const ready=await readyContext(env);
+        if (ready) {
+          const rows=await readScoutObservationRows(env.DB,ready.feed);
+          result=projectScoutCreators(ready.feed,rows,deps.now());
+          caption=renderScoutCaption(result);
+        }
+      } catch {
+        caption='🐀 PIPE JAM. The latest source-backed creator snapshot could not be verified. '+
+          'No wallet suggestions were fabricated. Try /scout again later.';
+      }
+      await editScoutPoster(token,message.chat.id,posterId,caption,result,origin,deps.externalFetch);
+      await ledger.completeOperationalReply({
+        updateId:update.update_id,chatId:message.chat.id,intent:'SCOUT_CREATORS',
+        replyDigest:createHash('sha256').update(caption).digest('hex'),
+        telegramMessageId:posterId
+      },deps.now());
+      return json(200,{ok:true,scout:'CREATORS',resultCount:result?.candidates.length??0});
     }
 
     let allowUnaddressed = message.chat.type === 'private';
