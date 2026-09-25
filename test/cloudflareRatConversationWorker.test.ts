@@ -229,7 +229,9 @@ test('Boris DM regression: user-named hamster survives followups, next move stay
     ] as const) {
       const result = await handleWorkerRequest(request(id, text), env, deps);
       assert.equal(result.status, 200, 'real webhook route must remain available');
-      assert.equal((await new D1TelegramLedger(db).get(id))?.intent, 'SMALLTALK');
+      const receipt = await new D1TelegramLedger(db).get(id);
+      assert.equal(receipt?.state, 'REPLIED');
+      assert.equal(receipt?.answerPlanJson, null, 'small talk must never invent a factual plan');
     }
     assert.equal(prompts.length, 4);
     assert.match(prompts[2]?.map(m=>m.content).join(' ') ?? '', /hamster named Boris/);
