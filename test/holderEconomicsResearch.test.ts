@@ -85,3 +85,26 @@ test('dual-chain stress keeps subscription revenue separate from token fees', ()
   const hypotheticalFees = evaluate(['--volumeUsd=0', '--effectiveFeeBps=35', '--paidSeats=25', '--fixedCostUsd=2000']);
   assert.equal(hypotheticalFees.breakEvenEligibleMonthlyVolumeUsd, 504286);
 });
+
+test('zero-token-fee Pro sensitivity gates at 139 $19 seats and 89 $29 seats', () => {
+  const common = ['--volumeUsd=0','--effectiveFeeBps=0','--merchantFeeBps=800','--fixedCostUsd=2000'];
+  const below19 = evaluate([...common,'--seatPriceUsd=19','--seatVariableCostUsd=3','--paidSeats=138']);
+  const pass19 = evaluate([...common,'--seatPriceUsd=19','--seatVariableCostUsd=3','--paidSeats=139']);
+  const below29 = evaluate([...common,'--seatPriceUsd=29','--seatVariableCostUsd=4','--paidSeats=88']);
+  const pass29 = evaluate([...common,'--seatPriceUsd=29','--seatVariableCostUsd=4','--paidSeats=89']);
+  assert.equal(below19.monthlyContributionBeforeOmittedCostsUsd, -1.76);
+  assert.equal(pass19.monthlyContributionBeforeOmittedCostsUsd, 12.72);
+  assert.equal(below29.monthlyContributionBeforeOmittedCostsUsd, -4.16);
+  assert.equal(pass29.monthlyContributionBeforeOmittedCostsUsd, 18.52);
+  assert.equal(pass29.projectFeeReceiptsUsd, 0);
+});
+
+test('discounted Pro holder unit-cost stress still requires paying seats', () => {
+  const common = ['--volumeUsd=0','--effectiveFeeBps=0','--merchantFeeBps=800','--fixedCostUsd=2000',
+    '--seatPriceUsd=24','--seatVariableCostUsd=4'];
+  const below = evaluate([...common,'--paidSeats=110']);
+  const pass = evaluate([...common,'--paidSeats=111']);
+  assert.equal(below.monthlyContributionBeforeOmittedCostsUsd, -11.2);
+  assert.equal(pass.monthlyContributionBeforeOmittedCostsUsd, 6.88);
+  assert.equal(pass.projectFeeReceiptsUsd, 0);
+});
