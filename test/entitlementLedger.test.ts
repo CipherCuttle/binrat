@@ -5,17 +5,20 @@ import { ENTITLEMENTS_CANDIDATE_SQL } from '../src/entitlements/schema.js';
 import { D1EntitlementsCandidate, type MeteredRequest } from '../src/entitlements/ledger.js';
 
 const NOW=1_800_000_000_000;
-async function setup(options={enabled:true,allowOfflineFixtures:true}) {
+async function setup(options: {enabled?:boolean;allowOfflineFixtures?:boolean;now?:()=>number}={}) {
   const db=new D1CompatDatabase();
   await db.exec(ENTITLEMENTS_CANDIDATE_SQL);
-  const ledger=new D1EntitlementsCandidate(db,options);
+  const ledger=new D1EntitlementsCandidate(db,{
+    enabled:options.enabled ?? true,allowOfflineFixtures:options.allowOfflineFixtures ?? true,
+    now:options.now ?? (()=>NOW)
+  });
   return {db,ledger};
 }
 const period={accountId:'acct_demo',periodId:'2026-09',fundingRef:'offline-receipt-001',
   globalCapUnits:100,arcCapUnits:80,ponsCapUnits:40,expiresAtMs:NOW+86_400_000};
 const request=(key:string,chainId:5042|4663,units:number):MeteredRequest=>({
   accountId:period.accountId,periodId:period.periodId,requestKey:key,chainId,
-  feature:'EXTENDED_RADAR',units,nowMs:NOW
+  feature:'EXTENDED_RADAR',units
 });
 test('both entitlement grants and spending default OFF; no payment URL or holder route enables Pro', async()=>{
   const {db,ledger}=await setup({enabled:false,allowOfflineFixtures:false});
@@ -68,11 +71,10 @@ test('reserve, consume, duplicate, release, refund and final-key replay are idem
     assert.equal((await ledger.balance(period.accountId,period.periodId)).globalAvailable,100);
   } finally {db.close();}
 });
-test('expired period, revoked period and unsupported public/unknown chain fail closed',async()=>{
+test('revoked period and unsupported public/unknown chain fail closed',async()=>{
   const {db,ledger}=await setup();
   try {
     await ledger.openOfflinePeriod(period);
-    assert.equal((await ledger.reserve({...request('late',5042,1),nowMs:period.expiresAtMs})).outcome,'EXHAUSTED');
     await assert.rejects(ledger.reserve({...request('invalid',5042,1),chainId:999 as 5042}),/CHAIN_UNSUPPORTED/);
     await assert.rejects(ledger.reserve({...request('free',5042,1),feature:'PUBLIC_RECEIPT' as 'DEEP_REPLAY'}),/CLASS_UNSUPPORTED/);
     const reserved=request('open',5042,3);
@@ -83,6 +85,31 @@ test('expired period, revoked period and unsupported public/unknown chain fail c
     assert.equal((await ledger.balance(period.accountId,period.periodId)).active,false);
   } finally {db.close();}
 });
+test('expired and revoked duplicates never re-authorize reserved or consumed requests',async()=>{
+  let current=NOW;
+  const {db,ledger}=await setup({now:()=>current});
+  try {
+    await ledger.openOfflinePeriod(period);
+    const reserved=request('reserved',5042,1);
+    const consumed=request('consumed',4663,1);
+    assert.equal((await ledger.reserve(reserved)).outcome,'RESERVED');
+    assert.equal((await ledger.reserve(consumed)).outcome,'RESERVED');
+    assert.equal(await ledger.consume(consumed),'CONSUMED');
+    current=period.expiresAtMs;
+    assert.equal((await ledger.reserve(reserved)).outcome,'EXHAUSTED');
+    assert.equal((await ledger.reserve(consumed)).outcome,'EXHAUSTED');
+    await assert.rejects(ledger.consume(consumed),/CONSUME_DENIED/);
+    assert.equal((await ledger.balance(period.accountId,period.periodId)).active,false);
+    const spoofed={...request('spoofed-timestamp',4663,1),nowMs:NOW};
+    assert.equal((await ledger.reserve(spoofed)).outcome,'EXHAUSTED');
+    // A fresh second period proves revoke blocks duplicates independently.
+    current=NOW;
+    assert.equal(await ledger.revokePeriod(period.accountId,period.periodId),true);
+    assert.equal((await ledger.reserve(reserved)).outcome,'EXHAUSTED');
+    await assert.rejects(ledger.consume(consumed),/CONSUME_DENIED/);
+  } finally {db.close();}
+});
+
 test('offline fixture funding identity is immutable, even across two accounts',async()=>{
   const {db,ledger}=await setup();
   try {

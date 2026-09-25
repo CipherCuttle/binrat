@@ -23,7 +23,6 @@ export interface MeteredRequest {
   chainId: ResearchChain;
   feature: MeteredFeature;
   units: number;
-  nowMs: number;
 }
 
 interface ReservationRow {
@@ -35,7 +34,7 @@ interface ReservationRow {
   units: number;
   state: ReservationState;
 }
-type LedgerOptions = { enabled?: boolean; allowOfflineFixtures?: boolean };
+type LedgerOptions = { enabled?: boolean; allowOfflineFixtures?: boolean; now?: () => number };
 function safeId(id: string, name: string): void {
   if (typeof id !== 'string' || !/^[a-zA-Z0-9_:/.-]{1,128}$/.test(id)) throw new Error(name + '_INVALID');
 }
@@ -54,9 +53,12 @@ function written(n: unknown): boolean { return n === 1; }
 export class D1EntitlementsCandidate {
   private readonly enabled: boolean;
   private readonly fixtures: boolean;
+  private readonly now: () => number;
   constructor(private readonly db: D1DatabaseLike, options: LedgerOptions = {}) {
     this.enabled = options.enabled === true;
     this.fixtures = options.allowOfflineFixtures === true;
+    // Production callers cannot substitute user-supplied timestamps for expiry.
+    this.now = options.now ?? Date.now;
   }
 
   // Only offline fixtures can create a period in this slice. No wallet token,
@@ -67,7 +69,8 @@ export class D1EntitlementsCandidate {
       [input.fundingRef,'FUNDING']] as const) safeId(value,key);
     [input.globalCapUnits,input.arcCapUnits,input.ponsCapUnits].forEach(n=>safeUnits(n,true));
     safeNow(input.expiresAtMs);
-    if (input.expiresAtMs === 0) throw new Error('ENTITLEMENT_EXPIRY_INVALID');
+    const now = this.now(); safeNow(now);
+    if (input.expiresAtMs <= now) throw new Error('ENTITLEMENT_EXPIRY_INVALID');
     const result = await this.db.prepare(
       'INSERT OR IGNORE INTO candidate_entitlement_periods ' +
       '(account_id,period_id,funding_source,funding_ref,global_cap_units,arc_cap_units,pons_cap_units,expires_at_ms,state) ' +
@@ -81,6 +84,7 @@ export class D1EntitlementsCandidate {
     if (!existing ||
       existing.funding_ref !== input.fundingRef ||
       existing.funding_source !== 'OFFLINE_FIXTURE' ||
+      existing.state !== 'ACTIVE' ||
       existing.global_cap_units !== input.globalCapUnits ||
       existing.arc_cap_units !== input.arcCapUnits ||
       existing.pons_cap_units !== input.ponsCapUnits ||
@@ -90,11 +94,15 @@ export class D1EntitlementsCandidate {
     return 'DUPLICATE';
   }
 
-  private async existing(input: MeteredRequest): Promise<ReservationRow | null> {
+  private async existing(input: MeteredRequest, nowMs: number): Promise<ReservationRow | null> {
+    // A duplicate does not confer authority after the period expires or is
+    // revoked. Apply the same fail-closed active-period gate to both paths.
     return this.db.prepare(
-      'SELECT account_id,period_id,request_key,chain_id,cost_class,units,state ' +
-      'FROM candidate_entitlement_reservations WHERE account_id=? AND period_id=? AND request_key=?'
-    ).bind(input.accountId,input.periodId,input.requestKey).first<ReservationRow>();
+      'SELECT r.account_id,r.period_id,r.request_key,r.chain_id,r.cost_class,r.units,r.state ' +
+      'FROM candidate_entitlement_reservations r JOIN candidate_entitlement_periods p ' +
+      'ON p.account_id=r.account_id AND p.period_id=r.period_id ' +
+      "WHERE r.account_id=? AND r.period_id=? AND r.request_key=? AND p.state='ACTIVE' AND p.expires_at_ms>?"
+    ).bind(input.accountId,input.periodId,input.requestKey,nowMs).first<ReservationRow>();
   }
   private assertMatch(old: ReservationRow, input: MeteredRequest): void {
     if (old.chain_id !== input.chainId || old.cost_class !== input.feature || old.units !== input.units) {
@@ -108,12 +116,13 @@ export class D1EntitlementsCandidate {
   async reserve(input: MeteredRequest): Promise<ReserveResult> {
     if (!this.enabled) throw new Error('ENTITLEMENTS_DISABLED');
     safeId(input.accountId,'ACCOUNT'); safeId(input.periodId,'PERIOD');
-    safeId(input.requestKey,'REQUEST'); safeUnits(input.units); safeNow(input.nowMs);
+    safeId(input.requestKey,'REQUEST'); safeUnits(input.units);
+    const now = this.now(); safeNow(now);
     if (input.chainId !== 5042 && input.chainId !== 4663) throw new Error('ENTITLEMENT_CHAIN_UNSUPPORTED');
     if (!['EXTENDED_RADAR','DEEP_REPLAY','PRO_ALERT'].includes(input.feature)) {
       throw new Error('ENTITLEMENT_CLASS_UNSUPPORTED');
     }
-    const old = await this.existing(input);
+    const old = await this.existing(input, now);
     if (old) { this.assertMatch(old,input); return {outcome:'DUPLICATE',state:old.state}; }
     // A single conditional SQLite write is the quota admission point. Both
     // cross-chain and per-chain sums count RESERVED + CONSUMED, never refunded
@@ -132,30 +141,30 @@ export class D1EntitlementsCandidate {
       "AND r.state IN ('RESERVED','CONSUMED')),0)";
     const result = await this.db.prepare(sql).bind(
       input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,
-      input.units,input.nowMs,input.nowMs,
-      input.accountId,input.periodId,input.nowMs,
+      input.units,now,now,
+      input.accountId,input.periodId,now,
       input.units,input.chainId,input.units,input.chainId
     ).run();
     if (written(result.meta?.changes)) return {outcome:'RESERVED',state:'RESERVED'};
     // Recheck duplicate after the contested write: same key concurrent calls
     // cannot silently double-debit, and conflicting parameters fail closed.
-    const raced = await this.existing(input);
+    const raced = await this.existing(input, now);
     if (raced) { this.assertMatch(raced,input); return {outcome:'DUPLICATE',state:raced.state}; }
     return {outcome:'EXHAUSTED'};
   }
 
   async consume(input: MeteredRequest): Promise<'CONSUMED' | 'DUPLICATE'> {
     if (!this.enabled) throw new Error('ENTITLEMENTS_DISABLED');
-    safeNow(input.nowMs);
+    const now = this.now(); safeNow(now);
     const result=await this.db.prepare(
       "UPDATE candidate_entitlement_reservations SET state='CONSUMED',updated_at_ms=? " +
       "WHERE account_id=? AND period_id=? AND request_key=? AND chain_id=? AND cost_class=? AND units=? " +
       "AND state='RESERVED' AND EXISTS (SELECT 1 FROM candidate_entitlement_periods p " +
       "WHERE p.account_id=? AND p.period_id=? AND p.state='ACTIVE' AND p.expires_at_ms>?)"
-    ).bind(input.nowMs,input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,
-      input.units,input.accountId,input.periodId,input.nowMs).run();
+    ).bind(now,input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,
+      input.units,input.accountId,input.periodId,now).run();
     if (written(result.meta?.changes)) return 'CONSUMED';
-    const old=await this.existing(input);
+    const old=await this.existing(input, now);
     if (old) {
       this.assertMatch(old,input);
       if (old.state==='CONSUMED') return 'DUPLICATE';
@@ -165,23 +174,23 @@ export class D1EntitlementsCandidate {
 
   async release(input: MeteredRequest): Promise<boolean> {
     if (!this.enabled) throw new Error('ENTITLEMENTS_DISABLED');
-    safeNow(input.nowMs);
+    const now = this.now(); safeNow(now);
     const result=await this.db.prepare(
       "UPDATE candidate_entitlement_reservations SET state='RELEASED',updated_at_ms=? " +
       "WHERE account_id=? AND period_id=? AND request_key=? AND chain_id=? AND cost_class=? AND units=? " +
       "AND state='RESERVED'"
-    ).bind(input.nowMs,input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,input.units).run();
+    ).bind(now,input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,input.units).run();
     return written(result.meta?.changes);
   }
 
   async refundConsumed(input: MeteredRequest): Promise<boolean> {
     if (!this.enabled) throw new Error('ENTITLEMENTS_DISABLED');
-    safeNow(input.nowMs);
+    const now = this.now(); safeNow(now);
     const result=await this.db.prepare(
       "UPDATE candidate_entitlement_reservations SET state='REFUNDED',updated_at_ms=? " +
       "WHERE account_id=? AND period_id=? AND request_key=? AND chain_id=? AND cost_class=? AND units=? " +
       "AND state='CONSUMED'"
-    ).bind(input.nowMs,input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,input.units).run();
+    ).bind(now,input.accountId,input.periodId,input.requestKey,input.chainId,input.feature,input.units).run();
     return written(result.meta?.changes);
   }
 
@@ -200,6 +209,7 @@ export class D1EntitlementsCandidate {
   }> {
     if (!this.enabled) throw new Error('ENTITLEMENTS_DISABLED');
     safeId(accountId,'ACCOUNT');safeId(periodId,'PERIOD');
+    const now = this.now(); safeNow(now);
     const r=await this.db.prepare(
       'SELECT p.state,p.expires_at_ms,p.global_cap_units,p.arc_cap_units,p.pons_cap_units, ' +
       "COALESCE(SUM(CASE WHEN r.state IN ('RESERVED','CONSUMED') THEN r.units ELSE 0 END),0) AS spent, " +
@@ -210,9 +220,9 @@ export class D1EntitlementsCandidate {
       'WHERE p.account_id=? AND p.period_id=? GROUP BY p.account_id,p.period_id'
     ).bind(accountId,periodId).first<Record<string,number|string>>();
     if (!r) return {active:false,globalAvailable:0,arcAvailable:0,ponsAvailable:0};
-    // Caller must also check expiry before granting work. balance is diagnostic,
-    // not an authority decision; reserve() itself checks server-side expiry.
-    if (r.state!=='ACTIVE') return {active:false,globalAvailable:0,arcAvailable:0,ponsAvailable:0};
+    // Balance is diagnostic, not authority; reserve/consume use the same
+    // server-clock expiry and active-period predicate on their SQL paths.
+    if (r.state!=='ACTIVE' || Number(r.expires_at_ms) <= now) return {active:false,globalAvailable:0,arcAvailable:0,ponsAvailable:0};
     return {
       active:true,
       globalAvailable:Math.max(0,Number(r.global_cap_units)-Number(r.spent)),

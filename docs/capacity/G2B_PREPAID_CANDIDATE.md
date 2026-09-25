@@ -16,3 +16,5 @@ Stacked on PR #37 at `114b0572de3f3d153d24a155b8cfbbea07f38670`; separate from G
 This is local D1-compatible simulation, **not** a distributed production race proof. G2B next requires real nonproduction Cloudflare D1 concurrent 1K-client contention, immutable provider event ledger, authenticated signed hosted fiat webhooks, out-of-order/refund/chargeback tests, merchant/legal/tax gate, per-cost routing and server monthly infrastructure ceiling. Exact D1 execution cost and 4663 RPC spend remain unmeasured. Do not publish Pro or charge any user until the checkout and compliance gates pass.
 
 No merge, deployment, payments, token action, production table or CI network spend authorized.
+
+Hostile review #5316888981 closure: duplicate reservation and duplicate consumption now join an ACTIVE, unexpired period before returning a success-class result. All timestamps are taken from the ledger's injected trusted server clock rather than request payload; diagnostic balance also reports expiration. Production integrations must never inject a clock from untrusted HTTP inputs.
