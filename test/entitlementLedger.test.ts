@@ -64,7 +64,7 @@ test('reserve, consume, duplicate, release, refund and final-key replay are idem
     assert.equal((await ledger.reserve(r)).outcome,'RESERVED');
     assert.equal(await ledger.release(r),true);
     assert.equal(await ledger.release(r),false);
-    await assert.rejects(ledger.consume(r),/CONSUME_DENIED/);
+    await assert.rejects(ledger.consume(r),/FINAL_REQUEST_KEY/);
     assert.equal((await ledger.balance(period.accountId,period.periodId)).globalAvailable,100);
   } finally {db.close();}
 });
