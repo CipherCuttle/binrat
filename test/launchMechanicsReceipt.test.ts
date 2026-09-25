@@ -109,10 +109,10 @@ test('receipt existence cannot authorize launch or marketing', async () => {
 });
 
 test('launch status remains consistent across doctrine and public status surfaces', async () => {
-  const [roadmap, doctrine, website, telegram, dumpster, holder] = await Promise.all([
+  const [roadmap, doctrine, manifestText, telegram, dumpster, holder] = await Promise.all([
     readFile(new URL('../docs/ROADMAP_V0.md', import.meta.url), 'utf8'),
     readFile(new URL('../docs/TOKEN_LAUNCH_DOCTRINE.md', import.meta.url), 'utf8'),
-    readFile(new URL('../web/index.html', import.meta.url), 'utf8'),
+    readFile(MANIFEST_URL, 'utf8'),
     readFile(new URL('../src/telegram/rat.ts', import.meta.url), 'utf8'),
     readFile(new URL('../docs/DUMPSTER_LEDGER_V0.md', import.meta.url), 'utf8'),
     readFile(new URL('../src/holder/eligibility.ts', import.meta.url), 'utf8')
@@ -120,8 +120,13 @@ test('launch status remains consistent across doctrine and public status surface
 
   assert.match(roadmap, /BLOCKED.*marketingAuthorized=false.*tokenState=NOT_LAUNCHED/);
   assert.match(doctrine, /marketingAuthorized.*launchAuthorized.*false/);
-  assert.match(website, /\$BINRAT IS NOT LIVE\./);
-  assert.match(website, /NO OFFICIAL BINRAT CONTRACT EXISTS/);
+  const status=(JSON.parse(manifestText) as {
+    launchAuthorization:{status:string;tokenState:string;marketingAuthorized:boolean;launchAuthorized:boolean}
+  }).launchAuthorization;
+  assert.equal(status.status,'BLOCKED');
+  assert.equal(status.tokenState,'NOT_LAUNCHED');
+  assert.equal(status.marketingAuthorized,false);
+  assert.equal(status.launchAuthorized,false);
   assert.match(telegram, /no official \$BINRAT token is launched yet\./);
   assert.match(dumpster, /tokenState: NOT_LAUNCHED/);
   assert.match(dumpster, /launchAuthorization: BLOCKED/);
