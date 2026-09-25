@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm_live:
-        description: 'Type DEPLOY_BOT to roll out to the existing live @BinratBot Worker'
+        description: 'Type DEPLOY_BOT for normal rollout, or DEPLOY_BOT_AI for the 30-call/day AI trial'
         required: true
         type: string
 
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   production-rat:
-    if: ${{ contains(github.event.head_commit.message, '[deploy-rat-live]') || (github.event_name == 'workflow_dispatch' && inputs.confirm_live == 'DEPLOY_BOT') }}
+    if: ${{ contains(github.event.head_commit.message, '[deploy-rat-live]') || contains(github.event.head_commit.message, '[deploy-rat-ai-trial]') || (github.event_name == 'workflow_dispatch' && (inputs.confirm_live == 'DEPLOY_BOT' || inputs.confirm_live == 'DEPLOY_BOT_AI')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -34,6 +34,8 @@ jobs:
       # Never infer Free/Paid from the plan history; false until explicitly verified.
       RAT_FREE_PLAN_VERIFIED: ${{ vars.RAT_FREE_PLAN_VERIFIED == 'true' && 'true' || 'false' }}
       RAT_LIVE_DEPLOY_APPROVED: 'true'
+      # Paid-account trial is deliberately scoped to one explicitly marked deployment.
+      RAT_AI_TRIAL_APPROVED: ${{ (contains(github.event.head_commit.message, '[deploy-rat-ai-trial]') || inputs.confirm_live == 'DEPLOY_BOT_AI') && 'true' || 'false' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -74,6 +76,10 @@ jobs:
           node --check scripts/deploy-rat-conversation-live.mjs
           pnpm check
           # The production script performs a strict Wrangler dry-run with resolved live bindings.
+
+      - name: Prove current GLM model returns valid JSON before public AI toggle
+        if: env.RAT_AI_TRIAL_APPROVED == 'true'
+        run: node scripts/smoke-rat-ai-live.mjs
 
       - name: Migrate feedback and roll out to live @BinratBot
         run: node scripts/deploy-rat-conversation-live.mjs
