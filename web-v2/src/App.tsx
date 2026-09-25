@@ -224,6 +224,8 @@ export default function App() {
         <AppLink className="action" href="/dumpster" navigate={navigate}>BACK TO THE DUMPSTER →</AppLink>
       </section>
     )
+  ) : route.page === "ponsCase" ? (
+    unavailable("PONS CASE", "OPEN IN PONS SNAPSHOT MODE")
   ) : (
     <Placeholder name={route.name} navigate={navigate} />
   );
