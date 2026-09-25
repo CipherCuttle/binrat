@@ -20,6 +20,12 @@ jobs:
       - run: python3 -m py_compile scripts/cutover-cloudflare-telegram.py scripts/publish-cloudflare-capability-manifest.py scripts/deploy-cloudflare-web-assets.py scripts/deploy-rat-watch-candidate.py scripts/deploy-rat-radar-candidate.py
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - name: Check isolated k6 driver syntax (no HTTP calls)
+        run: node --check bench/k6-capacity.js
+      - name: Offline capacity/fanout/quota baseline (no external requests)
+        run: |
+          pnpm bench:smoke
+          pnpm bench:synthetic
 
 
   rat-radar-candidate-deploy:

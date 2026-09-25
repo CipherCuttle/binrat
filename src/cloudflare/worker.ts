@@ -1,4 +1,8 @@
 import { createHash } from 'node:crypto';
+import {
+  capacityBudgetGuard, capacityMetric, capacityRoute, instrumentD1, makeD1CapacityMeter,
+  type CapacityEnv
+} from '../capacity/foundation.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
 import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
@@ -40,7 +44,7 @@ import {
   type SyncQueueProducerLike
 } from './syncQueue.js';
 
-export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
+export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv, CapacityEnv {
   DB: D1DatabaseLike;
   SYNC_QUEUE?: SyncQueueProducerLike;
   CAPABILITY_MANIFEST_JSON?: string;
@@ -115,7 +119,35 @@ export default {
     return enqueueSyncCycle(env);
   },
   queue(batch: SyncQueueBatchLike, env: BinratWorkerEnv): Promise<void> {
-    return handleSyncQueueBatch(batch, env);
+    if (env.BINRAT_CAPACITY_TELEMETRY_ENABLED !== 'true') return handleSyncQueueBatch(batch, env);
+    const meter = makeD1CapacityMeter();
+    let acked = 0;
+    let retried = 0;
+    const wrapped: SyncQueueBatchLike = {
+      messages: batch.messages.map((message) => ({
+        body: message.body,
+        ack() { acked++; message.ack(); },
+        retry(options) { retried++; message.retry(options); }
+      }))
+    };
+    const started = Date.now();
+    return handleSyncQueueBatch(wrapped, { ...env, DB: instrumentD1(env.DB, meter) }).finally(() => {
+      const first = batch.messages[0]?.body;
+      const valid = first && typeof first === 'object' && !Array.isArray(first)
+        ? first as { kind?: unknown; enqueuedAtMs?: unknown } : null;
+      const kind = typeof valid?.kind === 'string' && ['SYNC_CYCLE','OBSERVATION_CYCLE','RAT_WATCH_CYCLE','RAT_RADAR_CYCLE'].includes(valid.kind)
+        ? valid.kind : 'INVALID';
+      const queueWaitMs = typeof valid?.enqueuedAtMs === 'number' && Number.isSafeInteger(valid.enqueuedAtMs)
+        ? Math.max(0, started - valid.enqueuedAtMs) : null;
+      capacityMetric({
+        kind: 'QUEUE', chainId: 5042, job: kind, durationMs: Math.max(0, Date.now() - started),
+        queueWaitMs, messages: batch.messages.length, acked, retried,
+        d1Operations: meter.operations, d1RowsReturned: meter.rowsReturned,
+        d1RowsReadReported: meter.rowsReadUnknown ? null : meter.rowsReadReported,
+        d1RowsReadUnknown: meter.rowsReadUnknown, d1RowsWrittenReported: meter.rowsWrittenReported,
+        d1FailedOperations: meter.failedOperations
+      });
+    });
   }
 };
 
@@ -123,6 +155,39 @@ export async function handleWorkerRequest(
   request: Request,
   env: BinratWorkerEnv,
   deps: WorkerDeps = DEFAULT_DEPS
+): Promise<Response> {
+  const rejected = capacityBudgetGuard(request, env);
+  if (env.BINRAT_CAPACITY_TELEMETRY_ENABLED !== 'true') {
+    return rejected ?? dispatchWorkerRequest(request, env, deps);
+  }
+  const started = deps.now();
+  const meter = makeD1CapacityMeter();
+  const route = capacityRoute(request);
+  let response: Response | null = null;
+  try {
+    response = rejected ?? await dispatchWorkerRequest(request, {
+      ...env, DB: instrumentD1(env.DB, meter)
+    }, deps);
+    return response;
+  } finally {
+    capacityMetric({
+      kind: 'HTTP', chainId: route.route.startsWith('/api/pons-candidate/') ? 4663 : 5042,
+      route: route.route, costClass: route.costClass, status: response?.status ?? 0,
+      durationMs: Math.max(0, deps.now() - started),
+      cacheControl: response?.headers.get('cache-control') ?? null,
+      cacheHit: response?.headers.get('cf-cache-status') === 'HIT',
+      d1Operations: meter.operations, d1RowsReturned: meter.rowsReturned,
+      d1RowsReadReported: meter.rowsReadUnknown ? null : meter.rowsReadReported,
+      d1RowsReadUnknown: meter.rowsReadUnknown, d1RowsWrittenReported: meter.rowsWrittenReported,
+      d1FailedOperations: meter.failedOperations
+    });
+  }
+}
+
+async function dispatchWorkerRequest(
+  request: Request,
+  env: BinratWorkerEnv,
+  deps: WorkerDeps
 ): Promise<Response> {
   let pathname: string;
   let origin: string;

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "binrat.capacity-profile/1",
+  "status": "PROPOSED_NOT_MEASURED",
+  "parentCommit": "54825038129d9bf4c9730664919cb7e83dd74211",
+  "targetDAU": 10000,
+  "openSessions": 1000,
+  "workload": {
+    "cachedPublic": 70,
+    "uncachedRead": 15,
+    "authenticated": 10,
+    "premium": 5
+  },
+  "chains": [
+    5042,
+    4663
+  ],
+  "steady": {
+    "rps": 100,
+    "durationSeconds": 1800,
+    "requests": 180000
+  },
+  "burst": {
+    "rps": 300,
+    "durationSeconds": 300,
+    "requests": 90000
+  },
+  "cacheHitProfiles": [
+    0,
+    50,
+    90,
+    99
+  ],
+  "gates": {
+    "cachedP95MsExclusive": 500,
+    "cachedP99MsExclusive": 1500,
+    "systemErrorRateExclusive": 0.01,
+    "sourceLagMsExclusive": 180000,
+    "telegramGlobalPerSecondMax": 25,
+    "telegramPerChatPerSecondMax": 1,
+    "fanoutRecipients": 10000,
+    "fanoutDrainSecondsExclusive": 900,
+    "quotaConcurrentAttempts": 1000,
+    "minimumGenuinePonsReplayFixtures": 3
+  },
+  "costClasses": {
+    "PUBLIC_CACHED": "edge_read",
+    "PUBLIC_MISS": "indexed_d1_read",
+    "ACCOUNT": "auth_and_quota",
+    "PREMIUM": "prepaid_optional_work",
+    "SOURCE": "per_chain_rpc_d1_write",
+    "ALERT": "telegram_outbox"
+  },
+  "spend": {
+    "stagingAuthorized": false,
+    "stagingMaxUsd": 0,
+    "monthlyAllInMaxUsd": null,
+    "isolatedWorkersPaidRequired": true
+  },
+  "truth": {
+    "currentApiCache": "NO_STORE",
+    "current4663LaunchIndexer": false,
+    "currentBilling": false,
+    "fullLoadTest": "NOT_RUN",
+    "currentProductionDeployReadback": "NOT_VERIFIED"
+  }
+}
