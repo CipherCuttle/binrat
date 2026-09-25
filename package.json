@@ -23,6 +23,7 @@
     "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts",
     "telegram:serve": "tsx src/telegram/server.ts",
     "pons:launch-receipt": "tsx scripts/pons-launch-receipt.ts",
+    "pons:evidence:verify": "node scripts/verify-pons-evidence.mjs",
     "bench:synthetic": "tsx scripts/capacity/run.ts",
     "bench:smoke": "tsx scripts/capacity/run.ts --smoke"
   },

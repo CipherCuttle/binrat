@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "BINRAT_PONS_4663_RECEIPT_PROOF_V1",
+  "providerId": "tenderly-public-gateway",
+  "providerEndpoint": "https://robinhood-chain.gateway.tenderly.co",
+  "evidenceLevel": "SINGLE_PROVIDER_CONSISTENT_NOT_INDEPENDENT",
+  "chainId": 4663,
+  "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+  "expectedHistoricalFactoryCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+  "sampledAtHead": "72459737",
+  "headBufferBlocks": "64",
+  "scannedFrom": "72448800",
+  "scannedThrough": "72449299",
+  "receiptCount": 3,
+  "receipts": [
+    {
+      "launch": {
+        "schemaVersion": "PONS_V2_FACTORY_EVENT_V1",
+        "chainId": 4663,
+        "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+        "launchId": "e8d34e247269bfbc869d8c72dcc430311a6ccad56d5f3901b9f08b37b1d061b8",
+        "eventId": "e6bb120d64116788ff2ba1700529b76fa8720a45e90d6797286db95031ccd384",
+        "blockNumber": "72448839",
+        "blockHash": "0x3873ad5c71732949e5bafb3b2a4e628d6dacf629eb91aa6f57f172693f17e4cb",
+        "txHash": "0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb",
+        "logIndex": 128,
+        "token": "0xb0ee78dffa46dbe4e667e9dddc6e3ddae33563d9",
+        "curve": "0xf22a1f125df55879821cfa366a6d74166c6bab91",
+        "originalDeployer": "0x54ec7ec16f034a33f8976917549248b6eb639c39",
+        "creatorFeeRecipientAtLaunch": null,
+        "creatorFeeRecipientEvidence": "NOT_IN_LAUNCH_EVENT",
+        "pairToken": "0x0000000000000000000000000000000000000000",
+        "launchConfigId": "0",
+        "graduationThreshold": "4200000000000000000",
+        "phaseAtLaunch": "NOT_GRADUATED"
+      },
+      "receipt": {
+        "transactionHash": "0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb",
+        "blockNumber": "72448839",
+        "blockHash": "0x3873ad5c71732949e5bafb3b2a4e628d6dacf629eb91aa6f57f172693f17e4cb",
+        "status": "success",
+        "logIndex": 128,
+        "emitter": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+        "topics": [
+          "0x8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607",
+          "0x000000000000000000000000b0ee78dffa46dbe4e667e9dddc6e3ddae33563d9",
+          "0x000000000000000000000000f22a1f125df55879821cfa366a6d74166c6bab91",
+          "0x00000000000000000000000054ec7ec16f034a33f8976917549248b6eb639c39"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003a4965bf58a40000"
+      }
+    },
+    {
+      "launch": {
+        "schemaVersion": "PONS_V2_FACTORY_EVENT_V1",
+        "chainId": 4663,
+        "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+        "launchId": "5f0b2e4035d2bb0c0b284d7d93b9ca356584bce6ef75481b334a19a1d06643cb",
+        "eventId": "ab227d386eba2feac387833007887a4d920e57cfdfd1990cd886ef5c54e1f858",
+        "blockNumber": "72448843",
+        "blockHash": "0x6cb4227ba23b0ab9b30fb5f35712d0725a14333caf9e6e7f2574d60a2dc3b2a4",
+        "txHash": "0xed62a34f8fb33d942e33332737ce28806849124253ed085ba43f0b9737344d0c",
+        "logIndex": 85,
+        "token": "0xc83326ab6941e9cb7167865c91a499e8856cd607",
+        "curve": "0xf496a794e86b999d57f2ea9e389955080e639fdb",
+        "originalDeployer": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+        "creatorFeeRecipientAtLaunch": null,
+        "creatorFeeRecipientEvidence": "NOT_IN_LAUNCH_EVENT",
+        "pairToken": "0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3",
+        "launchConfigId": "0",
+        "graduationThreshold": "264112936947239365305859",
+        "phaseAtLaunch": "NOT_GRADUATED"
+      },
+      "receipt": {
+        "transactionHash": "0xed62a34f8fb33d942e33332737ce28806849124253ed085ba43f0b9737344d0c",
+        "blockNumber": "72448843",
+        "blockHash": "0x6cb4227ba23b0ab9b30fb5f35712d0725a14333caf9e6e7f2574d60a2dc3b2a4",
+        "status": "success",
+        "logIndex": 85,
+        "emitter": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+        "topics": [
+          "0x8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607",
+          "0x000000000000000000000000c83326ab6941e9cb7167865c91a499e8856cd607",
+          "0x000000000000000000000000f496a794e86b999d57f2ea9e389955080e639fdb",
+          "0x0000000000000000000000000e1651aec67b2a049a4fa6aeb6c1c305aabfc35b"
+        ],
+        "data": "0x000000000000000000000000aa07a0e9209e16ac99708c3ec70159c6ef3128a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000037ed974bd733a066e603"
+      }
+    },
+    {
+      "launch": {
+        "schemaVersion": "PONS_V2_FACTORY_EVENT_V1",
+        "chainId": 4663,
+        "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+        "launchId": "4e027ebf3c53a93d10d3e63fd82a24c5510f9c8018a8a6886607bf5cecdfe5fb",
+        "eventId": "8fbd86582ba0c68b7b65c3dc37b8772a9b57fe5964cb84bd6533cb89c18c9e23",
+        "blockNumber": "72448913",
+        "blockHash": "0x975376aa9e118e26642c5ca3fb915ab87b79194faf2b60b6abfd32eeba7ff524",
+        "txHash": "0x2c7c538b8125f45ed135dad62b8f1ad1e95462651f8884a443af820dd3a1950f",
+        "logIndex": 22,
+        "token": "0x358723911b813c20029a9a88b115e54a0b3d2cc3",
+        "curve": "0x86c81cbd3767ab7844472651e9da07a094c16890",
+        "originalDeployer": "0xa10691fa4b13a8fa5b488f3429e4df7d432b005a",
+        "creatorFeeRecipientAtLaunch": null,
+        "creatorFeeRecipientEvidence": "NOT_IN_LAUNCH_EVENT",
+        "pairToken": "0x0000000000000000000000000000000000000000",
+        "launchConfigId": "0",
+        "graduationThreshold": "4200000000000000000",
+        "phaseAtLaunch": "NOT_GRADUATED"
+      },
+      "receipt": {
+        "transactionHash": "0x2c7c538b8125f45ed135dad62b8f1ad1e95462651f8884a443af820dd3a1950f",
+        "blockNumber": "72448913",
+        "blockHash": "0x975376aa9e118e26642c5ca3fb915ab87b79194faf2b60b6abfd32eeba7ff524",
+        "status": "success",
+        "logIndex": 22,
+        "emitter": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+        "topics": [
+          "0x8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607",
+          "0x000000000000000000000000358723911b813c20029a9a88b115e54a0b3d2cc3",
+          "0x00000000000000000000000086c81cbd3767ab7844472651e9da07a094c16890",
+          "0x000000000000000000000000a10691fa4b13a8fa5b488f3429e4df7d432b005a"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003a4965bf58a40000"
+      }
+    }
+  ],
+  "limitations": [
+    "One RPC provider; independent provider and block explorer agreement not proven.",
+    "Head buffer is not L1 finality or a Robinhood finality guarantee.",
+    "Factory source commit and supplied code hash are not proof of deployed source equivalence.",
+    "Fee recipient at launch, curve trades, V4 graduation, live indexer, and chain-scoped Watch remain unproven."
+  ]
+}
