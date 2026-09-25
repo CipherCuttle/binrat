@@ -128,7 +128,8 @@ if (aiTrialApproved) {
        policy.includes('enable_thinking: false') &&
        policy.includes("RAT_AI_GATEWAY = 'binrat-rat-capped-v1'") &&
        policy.includes('gateway: { id: RAT_AI_GATEWAY, skipCache: true }') &&
-       readFileSync('src/cloudflare/worker.ts','utf8').includes('ratAiActive(env, deps.now())'),
+       readFileSync('src/cloudflare/worker.ts','utf8').includes('ratAiActive(env, deps.now())') &&
+       readFileSync('src/cloudflare/worker.ts','utf8').includes("message.chat.type === 'private' && env.AI"),
        'AI_TRIAL_BOUNDARY_DRIFT');
   // Cloudflare independently blocks the gateway at USD 0.05/day or USD 0.50/30days,
   // whichever arrives first; fail BEFORE any Worker deployment if unavailable.
