@@ -133,6 +133,8 @@ test('private smalltalk keeps only three recent exchanges, isolates users and ex
     assert.equal(read.length, 3, 'oldest of four exchanges is excluded from prompt');
     assert.equal(read[0]?.userText, turns[1]);
     assert.equal(read[2]?.userText, turns[3]);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM rat_smalltalk_turns')
+      .first<{ n: number }>())?.n, 3, 'D1 physically retains no more than three turns');
     assert.equal(await loadRatBanterTurns(db, 51, 82, now + 100).then(x=>x.length), 0);
     assert.equal(await loadRatBanterTurns(db, 52, 81, now + 100).then(x=>x.length), 0);
     assert.deepEqual(await loadRatBanterTurns(db, 51, 81, now + 30 * 60_000 + 4), []);
