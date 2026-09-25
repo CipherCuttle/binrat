@@ -157,17 +157,20 @@ export function projectScoutCreators(
 
 export function renderScoutCaption(value: ScoutProjection): string {
   const days = 'LAST 14 DAYS';
+  const utc = (ms:number) => new Date(ms).toISOString().slice(0,16).replace('T',' ');
   const intro = '🐀 ' + (value.candidates.length ? 'FOUND SOME TRACKS' : 'EMPTY PAWS') +
     '\n' + days + ' · ArcPad / Arc ' + value.chainId +
     '\nRole: source-reported creator (not proven trader)' +
-    '\nsource checkpoint: #' + value.asOfBlock;
+    '\nsource checkpoint: #' + value.asOfBlock +
+    '\nUTC window: '+utc(value.windowStartMs)+' → '+utc(value.windowEndMs)+' UTC';
   const groups = value.candidates.map((row,i)=> {
     const symbols = row.launches.slice(0,2).map(x =>
       x.symbol.replace(/[^\p{L}\p{N}$_.-]/gu, '').slice(0,18) || '?'
     ).join(', ');
     const more = row.launches.length>2 ? ' (+'+(row.launches.length-2)+' more)' : '';
     return (i+1)+'. '+row.address+'\n   '+row.launchCount14d+
-      ' indexed launches · '+symbols+more;
+      ' indexed launches · '+symbols+more+
+      '\n   latest source timestamp: '+utc(row.latestLaunchTimestampMs)+' UTC';
   });
   const footer = '\nMC: unavailable · 24h volume: unavailable (USD source not verified)' +
     '\nHistory: '+value.historyCoverage+

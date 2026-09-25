@@ -240,7 +240,7 @@ test('candidate /scout updates the same canonical rat photo with verified 14-day
     const fetchMock:typeof fetch=async(input,init)=>{
       const uri=String(input);
       const method=uri.endsWith('/sendPhoto')?'sendPhoto':
-        uri.endsWith('/editMessageCaption')?'editMessageCaption':'UNEXPECTED';
+        uri.endsWith('/editMessageMedia')?'editMessageMedia':'UNEXPECTED';
       assert.notEqual(method,'UNEXPECTED','Scout must not call the AI, sendMessage or arbitrary endpoints');
       const body=JSON.parse(String(init?.body??'{}')) as Record<string,unknown>;
       calls.push({method,body});
@@ -260,14 +260,19 @@ test('candidate /scout updates the same canonical rat photo with verified 14-day
       env,{externalFetch:fetchMock,now:()=>now}
     );
     assert.equal(response.status,200);
-    assert.deepEqual(calls.map(x=>x.method),['sendPhoto','editMessageCaption']);
+    assert.deepEqual(calls.map(x=>x.method),['sendPhoto','editMessageMedia']);
     assert.equal(inferenceCalls,0);
-    assert.match(String(calls[0]?.body.photo??''),/\/assets\/binrat-hero\.webp$/);
+    assert.match(String(calls[0]?.body.photo??''),/\/assets\/telegram\/digging\.png$/);
     assert.match(String(calls[0]?.body.caption??''),/DIGGING/);
     assert.equal(calls[1]?.body.message_id,777);
-    assert.match(String(calls[1]?.body.caption??''),new RegExp(launch.creator));
-    assert.match(String(calls[1]?.body.caption??''),/MC: unavailable/);
-    assert.match(String(calls[1]?.body.caption??''),/History: UNVERIFIED/);
+    const updatedMedia=calls[1]?.body.media as {type:string;media:string;caption:string};
+    assert.equal(updatedMedia.type,'photo');
+    assert.match(updatedMedia.media,/\/assets\/telegram\/evidence-found\.png$/);
+    assert.match(updatedMedia.caption,new RegExp(launch.creator));
+    assert.match(updatedMedia.caption,/MC: unavailable/);
+    assert.match(updatedMedia.caption,/History: UNVERIFIED/);
+    assert.match(updatedMedia.caption,/UTC window:/);
+    assert.match(updatedMedia.caption,/latest source timestamp:/);
     const markup=calls[1]?.body.reply_markup as {inline_keyboard:Array<Array<{url:string}>>};
     assert.match(markup.inline_keyboard[0]?.[0]?.url??'',/\/api\/creator\/0x/);
     const record=await new D1TelegramLedger(db).get(2221);
@@ -306,7 +311,7 @@ test('recipient scout is explicitly pending and never masquerades as an active w
 });
 
 
-test('failed Scout caption edit retries the SAME Telegram photo rather than sending a duplicate',async()=>{
+test('transient Scout media edit retries the SAME Telegram photo rather than sending a duplicate',async()=>{
   const db=new D1CompatDatabase();await db.exec(D1_SCHEMA_SQL);
   try{
     let photoCalls=0,editCalls=0;
@@ -317,7 +322,7 @@ test('failed Scout caption edit retries the SAME Telegram photo rather than send
         photoCalls++;
         return new Response(JSON.stringify({ok:true,result:{message_id:999}}),{status:200});
       }
-      if(url.endsWith('/editMessageCaption')){
+      if(url.endsWith('/editMessageMedia')){
         editCalls++;
         return editCalls===1
           ? new Response(JSON.stringify({ok:false}),{status:502})

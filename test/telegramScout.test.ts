@@ -67,6 +67,8 @@ test('14-day exact cutoff excludes backfilled old/missing/conflicting observatio
   assert.match(caption,/24h volume: unavailable/);
   assert.match(caption,/UNVERIFIED/);
   assert.match(caption,/Role: source-reported creator/);
+  assert.match(caption,/UTC window: 2026-09-11 09:00 → 2026-09-25 09:00 UTC/);
+  assert.match(caption,/latest source timestamp: 2026-09-22 09:00 UTC/);
   assert.match(caption,new RegExp(creator1));
   assert.ok(caption.length<=1024);
 });
