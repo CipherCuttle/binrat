@@ -44,7 +44,7 @@ function health(){return{ok:true,chainId:5042,indexReady:true,checkpointBlock:"1
   targetBlock:"1001",liveCaughtUp:true,launchCount:517,historyBackfillComplete:false,
   observationReady:false,lastSyncError:null,runtimeFresh:true,runtimeUpdatedAtMs:Date.now()};}
 const url=(mode="demo")=>origin+"/?experiment=bento-v1"+(mode==="live"?"&source=live":"");
-const sizes=[[320,720],[360,800],[390,844],[430,932],[768,900],[1024,768],[1440,900],[1672,941]];
+const sizes=[[320,720],[360,800],[390,844],[430,932],[721,900],[768,900],[1024,768],[1100,800],[1440,900],[1672,941]];
 async function mock(page,state){
   await page.route("https://ipfs.io/ipfs/**",async r=>r.fulfill({status:200,contentType:"image/png",body:transparent}));
   await page.route("**/api/**",async route=>{
@@ -80,6 +80,24 @@ async function screenshot(browser,w,h,mode){
     await page.locator("img").first().evaluate(img=>img.decode().catch(()=>{}));
     const bounds=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,width:innerWidth}));
     assert.ok(bounds.doc<=w+1&&bounds.body<=w+1,"horizontal overflow "+JSON.stringify(bounds));
+    if(w<=720){
+      const nav=page.getByRole("navigation",{name:"Mobile primary navigation"});
+      assert.ok(await nav.isVisible(),"M1 mobile navigation hidden at "+w);
+      for(const label of ["Discover","Radar","Saved","More"]){
+        const link=nav.getByRole("link",{name:label,exact:true});
+        const rect=await link.boundingBox();
+        assert.ok(rect&&rect.width>=40&&rect.height>=44,"mobile "+label+" touch target at "+w);
+      }
+    }else if(w<=1100){
+      const nav=page.getByRole("navigation",{name:"BINRAT desktop navigation"});
+      assert.ok(await nav.isVisible(),"desktop navigation hidden between 721–1100px at "+w);
+      for(const label of ["DUMPSTER","RADAR","REPLAY","LEDGER","WATCH"]){
+        const link=nav.getByRole("link",{name:label,exact:true});
+        const rect=await link.boundingBox();
+        assert.ok(rect&&rect.height>=44&&rect.x>=0&&rect.x+rect.width<=w+1,
+          "desktop "+label+" inaccessible at "+w);
+      }
+    }
     const firstTile=page.getByTestId("launch-portrait-wall")
       .locator('a[aria-label^="Open indexed launch"]').first();
     if(await firstTile.count()){
@@ -94,6 +112,11 @@ async function screenshot(browser,w,h,mode){
     assert.ok(columns<=4,"gallery must mount bounded columns");
     await page.screenshot({path:path.join(output,mode+"-"+w+"x"+h+"-firstview.png"),fullPage:false});
     if(w===390)await page.screenshot({path:path.join(output,mode+"-"+w+"x"+h+"-full.png"),fullPage:true});
+    if(w===768&&mode==="demo"){
+      const nav=page.getByRole("navigation",{name:"BINRAT desktop navigation"});
+      await nav.getByRole("link",{name:"RADAR",exact:true}).click();
+      assert.equal(new URL(page.url()).pathname,"/radar","tablet RADAR navigation routes to the working page");
+    }
     console.log("BENTO SCREENSHOT PASS",mode,w,h,"bounded DOM, no overflow");
   }finally{await ctx.close();}
 }
