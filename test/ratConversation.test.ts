@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import {
-  RAT_AI_GLOBAL_DAILY_LIMIT, RAT_AI_MODEL, RAT_AI_USER_DAILY_LIMIT,
+  RAT_AI_GLOBAL_DAILY_LIMIT, RAT_AI_GATEWAY, RAT_AI_MODEL, RAT_AI_USER_DAILY_LIMIT,
   entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
   loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory, validateRatBanter
 } from '../src/cloudflare/ratConversation.js';
@@ -100,7 +100,8 @@ test('AI only handles innocuous unclassified chat and rejects factual-looking ou
   assert.equal(validateRatBanter({ response: 'Sure! I promise the moon' }), null);
   let calls = 0;
   let model = '';
-  const result = await generateRatBanter({ run: async (id, input) => {
+  const result = await generateRatBanter({ run: async (id, input, options) => {
+    assert.deepEqual(options, {gateway: {id: RAT_AI_GATEWAY, skipCache: true}});
     calls++; model = id;
     assert.equal(input.max_completion_tokens, 160);
     assert.equal(input.stream, false);
