@@ -1,0 +1,19 @@
+name: rat-ai-cost-gateway-gate
+on:
+  push:
+    branches:
+      - feat/binrat-rat-conversation-free-ai-v1
+permissions:
+  contents: read
+jobs:
+  provision-and-verify:
+    if: ${{ contains(github.event.head_commit.message, '[gate-rat-ai]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure only BINRAT dedicated AI Gateway; no model calls
+        run: node scripts/provision-rat-ai-gateway.mjs
