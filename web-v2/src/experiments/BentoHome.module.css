@@ -146,6 +146,10 @@
  .module {padding:11px;min-height:100px;} .module:first-child {grid-column:1/-1;}
  .module strong {font-size:19px;} .module>span {font-size:10px;}
 }
+/* The 320–389px headline previously overran the introduction's content box. */
+@media(max-width:389px) {
+ .intro h1 {font-size:clamp(47px,13.75vw,54px);}
+}
 @media(max-width:359px) {
  .metrics {grid-template-columns:1fr;} .panelHead {flex-wrap:wrap;}
  .other {grid-template-columns:1fr;} .module:first-child {grid-column:auto;}
