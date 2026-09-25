@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "binrat.telegram-mood-assets/1",
+  "master": "web/assets/binrat-character-master.png",
+  "format": "PNG",
+  "dimensions": [
+    480,
+    480
+  ],
+  "pixelGrid": [
+    96,
+    96
+  ],
+  "scaledBy": "nearest-neighbor x5",
+  "license": "Owner-supplied/generated for BINRAT",
+  "states": {
+    "idle-neutral": {
+      "path": "/assets/telegram/idle-neutral.png",
+      "gitBlob": "c75f616445f1310e985e69f1840f275c667ff8b9"
+    },
+    "cheeky": {
+      "path": "/assets/telegram/cheeky.png",
+      "gitBlob": "54279a79e9e080a7cb69a58f10d264be2e3f9085"
+    },
+    "inquisitive": {
+      "path": "/assets/telegram/inquisitive.png",
+      "gitBlob": "2b91d048214aa473c7d2359afffbb2bcbdd02a9d"
+    },
+    "digging": {
+      "path": "/assets/telegram/digging.png",
+      "gitBlob": "9b15800059df77447017c9fd4ca58e2455b8b858"
+    },
+    "evidence-found": {
+      "path": "/assets/telegram/evidence-found.png",
+      "gitBlob": "20cb2e82679bddf782c8bfa1a23f46928392bcde"
+    },
+    "repeat-creator": {
+      "path": "/assets/telegram/repeat-creator.png",
+      "gitBlob": "60f0fd1e4ac298f73840eabaa3c2049bdfebf1d0"
+    },
+    "alert": {
+      "path": "/assets/telegram/alert.png",
+      "gitBlob": "36f6df57f4cb469d2b8ea63eff65588a0b3f8b37"
+    },
+    "empty-paws": {
+      "path": "/assets/telegram/empty-paws.png",
+      "gitBlob": "10c2fdcaf46c7c73ea4616316cf2f9f7d19245c9"
+    },
+    "error": {
+      "path": "/assets/telegram/error.png",
+      "gitBlob": "5c74f19e363d1267bcce75125ad1db2f97887574"
+    },
+    "profile": {
+      "path": "/assets/telegram/profile.png",
+      "gitBlob": "12663c0d67f320cdd51658f98bf54de542a21119"
+    },
+    "insulted": {
+      "path": "/assets/telegram/insulted.png",
+      "gitBlob": "487f6b10a09756404ac637e621eb17a59cf02665"
+    }
+  }
+}
