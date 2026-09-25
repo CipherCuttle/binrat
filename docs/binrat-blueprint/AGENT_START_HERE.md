@@ -6,6 +6,8 @@ Read [README](README.md), [DIRECTION_AND_DECISIONS](DIRECTION_AND_DECISIONS.md) 
 
 **Facts fail closed.** A transfer proves a transfer, not shared owner; creator/deployer/fee-recipient are different factual roles; peak FDV is not verified circulating market cap; a curve receipt is not V4 trading; missing history is not a success or failure. Chain, source, tx, block hash, as-of time, evidence references and coverage state must accompany derived claims. Never mix DEMO and LIVE.
 
+**BEFORE ANY FIGMA WORK:** Read and complete [PRE_FIGMA_AGENT_CONTRACT](PRE_FIGMA_AGENT_CONTRACT.md). Verify current skill versions and distinguish actually loaded/installed skills from merely read public instructions. Produce the short preflight brief and skill-run manifest. Do not adopt automatic aesthetic hooks, copy a prefab library or assume owner visual approval.
+
 **If on visual/Figma work:** Read [HYBRID_FIGMA_UX_BRIEF](HYBRID_FIGMA_UX_BRIEF.md), [DESIGN_INTELLIGENCE_AND_SKILLS](DESIGN_INTELLIGENCE_AND_SKILLS.md); compare three complete hybrid studies with identical fictional/verified fixtures and owner-approve an entire journey before tokens or templates. No productive frontend changes before the appropriate design gate.
 
 **If on Svelte work:** Start from approved Figma frames and executable Storybook components once they exist. Reuse existing patterns; propose exceptional new ones with reasoning and screenshots. Test 320/360/390/430px, desktop, reduced motion, keyboard, focus, loading/error/unknown/stale. CI and visual screenshot equality never substitute for owner's initial design acceptance.

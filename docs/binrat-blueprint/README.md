@@ -8,10 +8,11 @@
 2. [DECISION_LEDGER.md](DECISION_LEDGER.md) — accepted versus candidate, experiment, deferred and rejected.
 3. [PRODUCT_AND_EVIDENCE_CONTRACT.md](PRODUCT_AND_EVIDENCE_CONTRACT.md) — features, Rat Trap, outcome metrics, alerts and monetization.
 4. [HYBRID_FIGMA_UX_BRIEF.md](HYBRID_FIGMA_UX_BRIEF.md) — Figma exploration, rat's world, complete user journeys and visual acceptance.
-5. [DESIGN_INTELLIGENCE_AND_SKILLS.md](DESIGN_INTELLIGENCE_AND_SKILLS.md) — contextual professional design playbooks, AI skills, creative freedom and browser review.
-6. [PONS_LOW_COST_DATA_PLAN.md](PONS_LOW_COST_DATA_PLAN.md) — free-first sources, historical analysis, evidence normalization, costs and tooling.
-7. [ROADMAP_AND_ACCEPTANCE.md](ROADMAP_AND_ACCEPTANCE.md) — dependency-aware build gates and acceptance.
-8. [AGENT_START_HERE.md](AGENT_START_HERE.md) — short mandatory handoff for new coding agents.
+5. [PRE_FIGMA_AGENT_CONTRACT.md](PRE_FIGMA_AGENT_CONTRACT.md) — **mandatory design skill and task preflight before touching the Figma canvas**.
+6. [DESIGN_INTELLIGENCE_AND_SKILLS.md](DESIGN_INTELLIGENCE_AND_SKILLS.md) — contextual professional design playbooks, AI skills, creative freedom and browser review.
+7. [PONS_LOW_COST_DATA_PLAN.md](PONS_LOW_COST_DATA_PLAN.md) — free-first sources, historical analysis, evidence normalization, costs and tooling.
+8. [ROADMAP_AND_ACCEPTANCE.md](ROADMAP_AND_ACCEPTANCE.md) — dependency-aware build gates and acceptance.
+9. [AGENT_START_HERE.md](AGENT_START_HERE.md) — short mandatory handoff for new coding agents.
 
 ## Authority and conflict rules
 

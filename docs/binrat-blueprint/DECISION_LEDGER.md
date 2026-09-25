@@ -23,6 +23,7 @@
 | D17 | ACCEPTED | Real owner-approved pixelated rat, prominent on home, restrained in dossiers | No replacement generic mascot |
 | D18 | ACCEPTED | Source-backed findings shared across site and Telegram; measured delivery latency | Two surfaces may vary in personality, not truth |
 | D19 | ACCEPTED | PLAN → CHANGESET → VERIFY → VERDICT, one hostile review, one targeted re-review for material fixes | End unbounded review loops |
+| D20 | ACCEPTED | Mandatory **pre-Figma design-skill/process gate**: load applicable verified skills, record genuine run/read status, apply task-specific professional defaults, independent brief critique before Figma, no automatic style hooks | Prevent the earlier error of giving an unprepared LLM a blank canvas; behavior rules precede visual work, final aesthetics remain owner-selected |
 | P01 | PREFERRED CANDIDATE | Svelte 5/SvelteKit/TypeScript; React/TS fallback | Validate actual implementation quality, Cloudflare and one complete prototype |
 | P02 | PREFERRED CANDIDATE | Bits UI, Storybook, Svelte Flow, ECharts, optional PixiJS, Playwright and axe-core | Install only when a proved screen/task needs it |
 | P03 | PREFERRED CANDIDATE | viem, two public RPC proofs, scoped Blockscout, SQLite + DuckDB/Parquet, R2/D1 as needed | Recheck quotas, coverage, licensing and cost |

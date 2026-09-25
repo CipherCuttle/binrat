@@ -2,6 +2,8 @@
 
 **Accepted direction:** give every coding LLM the *reasoning habits* of a good designer and actual approved screen/component exemplars, not an arbitrary giant style guide. **No global aesthetic is approved in this document.** The hybrid concept and Figma are accepted. A final theme, palette, typography and layout are TBD until the owner approves a complete interaction.
 
+**Mandatory pre-Figma operating contract:** [PRE_FIGMA_AGENT_CONTRACT.md](PRE_FIGMA_AGENT_CONTRACT.md). Load the relevant skills, record actually available/invoked versions, frame the screen tasks, then critique the brief **before** any Figma file or canvas creation; no automatic opinionated style enforcement. Skill names in documentation do not mean they are installed in the next agent's environment.
+
 ## Three tiers, different authority
 
 1. **Non-negotiable:** facts/provenance and coverage truth; usable keyboard/focus navigation; accessible alternatives for essential interactions; readable contrast, proper semantics; functional tap/CTA targets; responsive access; reduced motion. Apply objective tests and identify what still requires manual inspection.
