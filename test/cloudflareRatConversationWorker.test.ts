@@ -142,6 +142,28 @@ test('private candidate bot ignores everybody except the explicitly allowed DM s
   } finally { db.close(); }
 });
 
+test('paid-account model quota is never spent by group chatter', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    let called = 0; const sent: string[] = [];
+    const env = { ...base, DB: db, RAT_AI_ENABLED: 'true',
+      RAT_CONVERSATION_ENABLED: 'true',
+      RAT_AI_TRIAL_EXPIRES_AT_MS: String(now + 86_400_000),
+      AI: { run: async () => { called++; return {
+        response: '{"kind":"BANTER","text":"lurking in the bin."}'
+      }; } }
+    };
+    const response = await handleWorkerRequest(
+      request(932, 'rat hello rat, do you nap?', -100, 123, 'supergroup'),
+      env, { now: () => now, externalFetch: sender(sent) }
+    );
+    assert.equal(response.status, 200);
+    assert.equal(called, 0);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM rat_ai_daily_budget')
+      .first<{ n: number }>())?.n, 0);
+  } finally { db.close(); }
+});
+
 test('expired live trial stops all model calls without breaking deterministic Telegram replies', async () => {
   const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
   try {
