@@ -184,7 +184,10 @@ export async function handleWorkerRequest(
       service: 'binrat-cloudflare-edge',
       capabilityStatus: manifest?.capabilities.telegramRatV0?.engineeringStatus ?? 'UNKNOWN',
       launchAuthorization: manifest?.launchAuthorization.status ?? 'UNVERIFIED_REMOTE_STATUS',
-      repliesEnabled
+      repliesEnabled,
+      conversationEnabled: env.RAT_CONVERSATION_ENABLED === 'true',
+      aiEnabled: env.RAT_AI_ENABLED === 'true' && Boolean(env.AI),
+      feedbackEnabled: env.RAT_FEEDBACK_ENABLED === 'true'
     });
   }
 
