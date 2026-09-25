@@ -127,6 +127,25 @@ export class PonsD1Store {
   return (rows.results??[]).map(r=>{const f=JSON.parse(r.payload_json) as IndexedPonsLaunch;
    validateIndexedFact(f);return f;});
  }
+ async priorByDeployer(deployer:string,beforeBlock:string,beforeIndex:number,limit=5):
+  Promise<{count:number;launches:IndexedPonsLaunch[]}>{
+  if(!/^0x[0-9a-f]{40}$/i.test(deployer)||!/^(0|[1-9][0-9]*)$/.test(beforeBlock)||
+   !Number.isSafeInteger(Number(beforeBlock))||!Number.isSafeInteger(beforeIndex)||
+   beforeIndex<0||!Number.isSafeInteger(limit)||limit<1||limit>20)
+   throw Error('PONS_CREATOR_QUERY_INVALID');
+  const cp=await this.checkpoint();if(!cp||cp.status!=='READY')throw Error('PONS_NOT_READY');
+  const where='chain_id=4663 AND deployer=? AND block_number<=? AND (block_number<? OR (block_number=? AND log_index<?))';
+  const args=[deployer.toLowerCase(),cp.lastBlock,Number(beforeBlock),Number(beforeBlock),beforeIndex];
+  const count=await this.db.prepare('SELECT COUNT(*) AS n FROM pons_launch_facts WHERE '+where)
+   .bind(...args).first<{n:number}>();
+  const rows=await this.db.prepare('SELECT payload_json FROM pons_launch_facts WHERE '+where+
+   ' ORDER BY block_number DESC,log_index DESC LIMIT ?').bind(...args,limit).all<FactRow>();
+  const verify=await this.checkpoint();
+  if(!verify||verify.version!==cp.version||verify.status!=='READY')throw Error('PONS_READ_CHECKPOINT_CHANGED');
+  const launches=(rows.results??[]).map(r=>{const f=JSON.parse(r.payload_json) as IndexedPonsLaunch;
+   validateIndexedFact(f);return f;});
+  return {count:count?.n??0,launches};
+ }
  async factCount():Promise<number>{
   const r=await this.db.prepare('SELECT COUNT(*) AS n FROM pons_launch_facts WHERE chain_id=4663')
    .first<{n:number}>();return r?.n??0;

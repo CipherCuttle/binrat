@@ -20,13 +20,13 @@ export async function handlePonsPublicGet(request:Request,db:D1DatabaseLike,nowM
   if(!cp)return reply(503,{error:'PONS_INDEX_NOT_INITIALIZED',chainId:4663});
   if(cp.status!=='READY')return reply(503,{error:'PONS_REORG_HALT',chainId:4663,
    checkpointBlock:cp.lastBlock.toString(),dataReleased:false});
+  if(cp.nextBlock===cp.fromBlock)return reply(503,{error:'PONS_NO_CONFIRMED_RANGE',chainId:4663});
   const stale=nowMs-cp.updatedAtMs>180000||nowMs<cp.updatedAtMs;
   const coverage={chainId:4663,factory:A.factory.toLowerCase(),authorityId:A.authorityId,
    factoryRuntimeCodeHash:A.runtimeCodeHash,confirmationDepth:12,
    scannedFromBlock:cp.fromBlock.toString(),asOfBlock:cp.lastBlock.toString(),
    asOfBlockHash:cp.lastHash,generatedAt:new Date(cp.updatedAtMs).toISOString(),
-   historyCoverage:'INDEXED_FROM_WINDOW_START',historyComplete:cp.fromBlock===Number(A.fromBlock)?
-    false:false,metadataCoverage:'FACTORY_EVENT_ONLY',
+   historyCoverage:'INDEXED_FROM_WINDOW_START',historyComplete:false,metadataCoverage:'FACTORY_EVENT_ONLY',
    fundingCoverage:'NOT_COLLECTED',stale,sourceMode:'PONS_INDEXED',
    noIdentityAttribution:true};
   if(url.pathname==='/api/pons/health'){
@@ -57,14 +57,13 @@ export async function handlePonsPublicGet(request:Request,db:D1DatabaseLike,nowM
    if(!/^[0-9a-f]{64}$/.test(id))return reply(400,{error:'PONS_LAUNCH_ID_INVALID'});
    const launch=await store.launch(id);
    if(!launch)return reply(404,{error:'PONS_LAUNCH_NOT_IN_CAPTURED_WINDOW',...coverage});
-   const prior=(await store.byDeployer(launch.deployer,50)).filter(x=>x.id!==launch.id&&
-    (BigInt(x.blockNumber)<BigInt(launch.blockNumber)||
-    (x.blockNumber===launch.blockNumber&&x.logIndex<launch.logIndex))).slice(0,5);
+   const prior=await store.priorByDeployer(launch.deployer,launch.blockNumber,launch.logIndex,5);
    const after=await store.checkpoint();
    if(!after||after.version!==cp.version||after.status!=='READY')
     return reply(503,{error:'PONS_CHECKPOINT_CHANGED'});
    return reply(200,{schemaVersion:'binrat.pons-launch-case/0.1',...coverage,launch,
-    previousSameDeployerWithinCapturedWindow:prior,
+    previousSameDeployerWithinCapturedWindow:prior.launches,
+    priorMatchesInIndexedWindow:prior.count,olderMatchesTruncated:prior.count>prior.launches.length,
     proofBoundary:'Exact address recurrence is not human identity or beneficial ownership.'},!stale);
   }
   if(url.pathname.startsWith('/api/pons/creator/')){
