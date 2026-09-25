@@ -129,6 +129,7 @@ export function projectScoutCreators(
     if (time.timestampMs < cutoff || time.timestampMs > nowMs) continue;
     observedInWindow++;
     const address = bag.reportedCreatorAddress.toLowerCase();
+    if (!/^0x[0-9a-f]{40}$/.test(address)) continue;
     const record = byCreator.get(address) ?? { address, latest: 0, bags: [] };
     record.latest = Math.max(record.latest, time.timestampMs);
     record.bags.push(bag);
@@ -158,9 +159,12 @@ export function renderScoutCaption(value: ScoutProjection): string {
   const days = 'LAST 14 DAYS';
   const intro = '🐀 ' + (value.candidates.length ? 'FOUND SOME TRACKS' : 'EMPTY PAWS') +
     '\n' + days + ' · ArcPad / Arc ' + value.chainId +
+    '\nRole: source-reported creator (not proven trader)' +
     '\nsource checkpoint: #' + value.asOfBlock;
   const groups = value.candidates.map((row,i)=> {
-    const symbols = row.launches.slice(0,2).map(x=>x.symbol.slice(0,18)).join(', ');
+    const symbols = row.launches.slice(0,2).map(x =>
+      x.symbol.replace(/[^\p{L}\p{N}$_.-]/gu, '').slice(0,18) || '?'
+    ).join(', ');
     const more = row.launches.length>2 ? ' (+'+(row.launches.length-2)+' more)' : '';
     return (i+1)+'. '+row.address+'\n   '+row.launchCount14d+
       ' indexed launches · '+symbols+more;
