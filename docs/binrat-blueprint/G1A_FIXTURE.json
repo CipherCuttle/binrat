@@ -1,0 +1,116 @@
+{
+  "fixtureId": "BINRAT-G1A-PONS-4663-20260926-v1",
+  "verified": {
+    "status": "OBSERVED_HISTORICAL_SNAPSHOT_NOT_LIVE",
+    "source": "https://github.com/CipherCuttle/binrat/blob/feat/binrat-g2a-a1-pons-receipt-proof-v1/evidence/pons/4663/2026-09-25/manifest.json",
+    "chainId": 4663,
+    "protocol": "Pons V2",
+    "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "verifiedFactoryReceiptsInProof": 3,
+    "lead": {
+      "token": "0xb0ee78dffa46dbe4e667e9dddc6e3ddae33563d9",
+      "curve": "0xf22a1f125df55879821cfa366a6d74166c6bab91",
+      "originalDeployer": "0x54ec7ec16f034a33f8976917549248b6eb639c39",
+      "pair": "native ETH",
+      "block": 72448839,
+      "time": "2026-09-25T18:40:22Z",
+      "tx": "0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb",
+      "explorer": "https://robinscan.io/tx/0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb",
+      "tokenName": null,
+      "ticker": null,
+      "feeRecipient": "UNKNOWN",
+      "directFunder": "UNKNOWN",
+      "pricing": "UNKNOWN",
+      "marketCap": "UNKNOWN",
+      "curveHistory": "NOT_RECONSTRUCTED",
+      "graduation": "UNKNOWN",
+      "v4": "UNKNOWN"
+    },
+    "asOf": "2026-09-25T19:07:57Z",
+    "caveat": "Official Blockscout UI returned conflicting record for lead receipt on 2026-09-25; rely on independent archive RPC verification plus Robinscan for this narrow factory proof."
+  },
+  "demo": {
+    "banner": "DEMO — FICTIONAL SCENARIO: no funder, price, activity or alerts below were observed on chain.",
+    "id": "DEMO-PONS-001",
+    "name": "MOLD (fictional)",
+    "symbol": "$MOLD (DEMO)",
+    "chainId": 4663,
+    "pair": "native ETH",
+    "phase": "SIMULATED_CURVE_ACTIVE",
+    "addresses": "DEMO- prefixed only; never explorer-linked",
+    "funding": [
+      {
+        "source": "DEMO-FUNDER-A",
+        "target": "DEMO-LAUNCHER-MOLD",
+        "minutesBeforeLaunch": 23,
+        "eth": 0.18
+      },
+      {
+        "source": "DEMO-FUNDER-A",
+        "target": "DEMO-LAUNCHER-GRIME",
+        "minutesBeforeLaunch": 34,
+        "eth": 0.11
+      },
+      {
+        "source": "DEMO-FUNDER-A",
+        "target": "DEMO-LAUNCHER-SLUDGE",
+        "minutesBeforeLaunch": 42,
+        "eth": 0.14
+      }
+    ],
+    "previous": [
+      {
+        "name": "GRIME (DEMO)",
+        "ageDays": 9,
+        "peakEstimatedFDV_USD": 48000,
+        "latestEstimatedFDV_USD": 7200,
+        "timeToPeakHours": 9,
+        "coverage": "SIMULATED_7D"
+      },
+      {
+        "name": "SLUDGE (DEMO)",
+        "ageDays": 5,
+        "peakEstimatedFDV_USD": 31500,
+        "latestEstimatedFDV_USD": 12500,
+        "timeToPeakHours": 17,
+        "coverage": "SIMULATED_3D_PARTIAL_7D"
+      },
+      {
+        "name": "DUST (DEMO)",
+        "ageDays": 1,
+        "peakEstimatedFDV_USD": null,
+        "latestEstimatedFDV_USD": null,
+        "timeToPeakHours": null,
+        "coverage": "SIMULATED_IMMATURE_PRICE_UNKNOWN"
+      }
+    ],
+    "windows": [
+      "6h",
+      "24h",
+      "3d",
+      "7d"
+    ],
+    "metricPanels": [
+      "funding activity DEMO",
+      "historical estimated FDV DEMO",
+      "exit liquidity UNKNOWN"
+    ],
+    "watch": {
+      "kind": "PREVIEW_ONLY",
+      "target": "DEMO-FUNDER-A",
+      "event": "hypothetical next funded launcher",
+      "channel": "Telegram preview",
+      "latency": "UNMEASURED",
+      "quota": "NOT_PROVISIONED",
+      "success": "Demo preview saved locally. No monitoring enabled."
+    },
+    "caveat": "No proof of same human or predictive pattern; 3-example fictional cohort does not establish anything."
+  },
+  "sharedRules": [
+    "Same values in all three visual studies",
+    "Separate verified real case and fictional case; DEMO always visible",
+    "One primary action and at most three observations first screen",
+    "No live status without running ingestion or production watch",
+    "No wallet-ownership or investment inference"
+  ]
+}
