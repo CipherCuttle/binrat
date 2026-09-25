@@ -50,7 +50,8 @@ test('pinned upstream ABI decodes factory launch roles exactly (no invented crea
     { type: 'address', name: 'pairToken' }, { type: 'uint256', name: 'launchConfigId' },
     { type: 'uint256', name: 'graduationThreshold' }
   ], [sourceArgs.pairToken, sourceArgs.launchConfigId, sourceArgs.graduationThreshold]);
-  const decoded = decodeEventLog({ abi: [ponsTokenLaunchedEvent], topics, data });
+  const exactTopics = topics.filter((topic): topic is `0x${string}` => typeof topic === 'string') as [`0x${string}`, ...`0x${string}`[]];
+  const decoded = decodeEventLog({ abi: [ponsTokenLaunchedEvent], topics: exactTopics, data });
   assert.deepEqual(decoded.args, sourceArgs);
   assert.equal('creatorFeeRecipient' in decoded.args, false);
 });
