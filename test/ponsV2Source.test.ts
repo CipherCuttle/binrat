@@ -30,7 +30,7 @@ function fakeClient(changes: {
     async getBlockNumber() { return 200n; },
     async getBytecode() { return changes.bytecode ?? code; },
     async getBlock({ blockNumber }: { blockNumber: bigint }) {
-      if (blockNumber === 100n && changes.flipReorg && scans++ > 0) return { hash: hash('f') };
+      if (blockNumber === 100n && changes.flipReorg && scans++ > 1) return { hash: hash('f') };
       return { hash: changes.blockHash ?? (blockNumber === 100n ? hash('a') : hash('b')) };
     },
     async getLogs() {
