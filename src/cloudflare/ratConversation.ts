@@ -2,6 +2,8 @@ import type { D1DatabaseLike } from './d1Types.js';
 import type { RatUnderstanding } from '../telegram/nlp.js';
 
 export const RAT_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
+// Never send live inference outside this dedicated, spend-limited Cloudflare AI Gateway.
+export const RAT_AI_GATEWAY = 'binrat-rat-capped-v1';
 // A deliberately small public trial: the account is Workers Paid, so other apps can consume
 // the shared free allowance. The D1 gate bounds total calls and overage exposure.
 export const RAT_AI_GLOBAL_DAILY_LIMIT = 30;
@@ -18,7 +20,7 @@ export interface RatAiBinding {
     temperature: number;
     stream: false;
     chat_template_kwargs?: { enable_thinking: boolean };
-  }): Promise<unknown>;
+  }, options?: { gateway: { id: string; skipCache: boolean } }): Promise<unknown>;
 }
 export interface RatMemory {
   kind: 'CREATOR' | 'LAUNCH' | 'NONE';
@@ -182,6 +184,6 @@ export async function generateRatBanter(
     messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
     max_completion_tokens: 160, temperature: 0.4, stream: false,
     chat_template_kwargs: { enable_thinking: false }
-  });
+  }, { gateway: { id: RAT_AI_GATEWAY, skipCache: true } });
   return validateRatBanter(output);
 }
