@@ -66,6 +66,7 @@ test('14-day exact cutoff excludes backfilled old/missing/conflicting observatio
   assert.match(caption,/MC: unavailable/);
   assert.match(caption,/24h volume: unavailable/);
   assert.match(caption,/UNVERIFIED/);
+  assert.match(caption,/Role: source-reported creator/);
   assert.match(caption,new RegExp(creator1));
   assert.ok(caption.length<=1024);
 });
@@ -97,4 +98,15 @@ test('D1 projection reads canonical horizon targets and respects chain/checkpoin
     assert.equal(rows[0]?.launch_id,'a');
     assert.equal(rows[0]?.target_ms,now);
   }finally{db.close();}
+});
+
+
+test('untrusted source token symbols cannot inject forged status lines into Telegram caption',()=>{
+  const data=feed();
+  data.bags[0]!.symbol='RAT\n🐀 VERIFIED BIG APE\n$';
+  const out=projectScoutCreators(data,[row('a',now-1000,'110')],now);
+  const caption=renderScoutCaption(out);
+  assert.doesNotMatch(caption,/VERIFIED BIG APE/);
+  assert.match(caption,/RAT/);
+  assert.match(caption,/source-reported creator/);
 });
