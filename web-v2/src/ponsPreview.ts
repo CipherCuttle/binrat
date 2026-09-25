@@ -16,6 +16,8 @@ export type PonsPreviewSnapshot={
 const expectedFactory="0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e";
 const expectedHash="0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84";
 const obj=(v:unknown):v is Record<string,unknown>=>typeof v==="object"&&v!==null&&!Array.isArray(v);
+// Canonical Pons launch IDs are sha256 *without* a 0x prefix; EVM hashes retain 0x.
+const sha256=/^[0-9a-f]{64}$/i;
 const hex40=/^0x[0-9a-f]{40}$/i, hex64=/^0x[0-9a-f]{64}$/i,numeric=/^(0|[1-9]\d{0,18})$/;
 const bounded=(v:unknown,max=600)=>v===null||(typeof v==="string"&&v.length<=max);
 export function parsePonsSnapshot(value:unknown):PonsPreviewSnapshot {
@@ -32,7 +34,7 @@ export function parsePonsSnapshot(value:unknown):PonsPreviewSnapshot {
  const ids=new Set<string>(), events=new Set<string>();
  let prevBlock=BigInt(String(value.asOfBlock)),prevIndex=Number.MAX_SAFE_INTEGER;
  for(const row of value.launches){
-  if(!obj(row)||!hex64.test(String(row.id))||!hex40.test(String(row.token))||
+  if(!obj(row)||!sha256.test(String(row.id))||!hex40.test(String(row.token))||
     !hex40.test(String(row.curve))||!hex40.test(String(row.deployer))||
     !hex40.test(String(row.pairToken))||!hex64.test(String(row.txHash))||
     !hex64.test(String(row.blockHash))||!numeric.test(String(row.blockNumber))||
