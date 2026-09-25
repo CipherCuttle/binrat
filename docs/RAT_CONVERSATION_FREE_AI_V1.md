@@ -137,3 +137,8 @@ Owner requested activation of small talk on the existing production Telegram bot
 ## Real-model acceptance gate (one fixed-prompt request)
 
 The dedicated `binrat-rat-capped-v1` AI Gateway readback on 25 September 2026 confirmed 3 requests/min and two spend-limit rules ($0.05/day and $0.50/30 days). Proceed with the *single fixed-prompt Cloudflare model smoke* before any public AI activation. The smoke must not send Telegram messages, redeploy Workers, or allow arbitrary prompts; failed JSON validation blocks rollout. Existing public AI remains off until that test and release CI pass.
+
+
+## Owner-requested bounded live small-talk trial — 25 September 2026
+
+Prerequisites met: Cloudflare subscription verified Workers Paid, isolated AI Gateway independent readback PASS (3 req/min; cost caps $0.05/day and $0.50/30 days), real `@cf/zai-org/glm-4.7-flash` fixed-prompt response HTTP 200 with valid one-line BANTER JSON and 1.1604 reported neurons. Owner has asked to activate live small talk and continue after Workers Paid was disclosed. Authorize **one bounded live trial** under the existing strict deployment gates: 30 global AI attempts/UTC day, 10 per user, <=160 completion tokens, inference only for eligible harmless banter, 7-day automatic AI expiry, no webhook cutover, no token/launch action, no merge. Acknowledge that gateway spending is eventually consistent: a small amount of postpaid overage remains possible and $0.50 is a configured gateway limit, not an account-wide hard spending ceiling. Preserve existing production D1, queue, web assets, bot secrets and feedback.
