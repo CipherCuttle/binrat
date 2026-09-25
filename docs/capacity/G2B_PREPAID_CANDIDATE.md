@@ -18,3 +18,19 @@ This is local D1-compatible simulation, **not** a distributed production race pr
 No merge, deployment, payments, token action, production table or CI network spend authorized.
 
 Hostile review #5316888981 closure: duplicate reservation and duplicate consumption now join an ACTIVE, unexpired period before returning a success-class result. All timestamps are taken from the ledger's injected trusted server clock rather than request payload; diagnostic balance also reports expiration. Production integrations must never inject a clock from untrusted HTTP inputs.
+
+## Next isolated step — signed funding-event receipts, still OFF
+
+`D1FundingEventCandidate` adds an append-only, signed **offline fixture** event
+ledger for ordered `AUTHORIZED`, `REFUNDED`, `CHARGEBACK` and `REVOKED`
+receipts. It stores a payload digest rather than raw provider data, rejects
+event-id and funding-revision conflicts, preserves out-of-order receipts for
+audit, and makes update/delete impossible with SQL triggers. The derived status
+always returns `grantAuthority:false`: these receipts cannot create or extend a
+quota period. There is still no merchant, checkout, real webhook endpoint,
+provider secret, production migration, Worker import or money acceptance.
+
+Real D1 multi-client contention remains unqualified because no isolated D1
+resource or staging-spend authorization was available. The deterministic
+SQLite/D1-compatible fixtures are a correctness rehearsal, not a Cloudflare
+durability or throughput measurement.

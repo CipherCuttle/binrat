@@ -28,4 +28,36 @@ CREATE TABLE IF NOT EXISTS candidate_entitlement_reservations (
 );
 CREATE INDEX IF NOT EXISTS idx_candidate_entitlement_account_cost
   ON candidate_entitlement_reservations(account_id,period_id,state,chain_id);
+
+-- Append-only signed-fixture funding receipts. These rows never create an
+-- entitlement period and are not a payment-provider integration.
+CREATE TABLE IF NOT EXISTS candidate_entitlement_funding_events (
+  event_id TEXT PRIMARY KEY,
+  provider TEXT NOT NULL CHECK(provider='OFFLINE_SIGNED_FIXTURE'),
+  funding_ref TEXT NOT NULL,
+  account_id TEXT NOT NULL,
+  period_id TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK(revision>=1),
+  action TEXT NOT NULL CHECK(action IN ('AUTHORIZED','REFUNDED','CHARGEBACK','REVOKED')),
+  payload_sha256 TEXT NOT NULL CHECK(length(payload_sha256)=64),
+  occurred_at_ms INTEGER NOT NULL CHECK(occurred_at_ms>=0),
+  received_at_ms INTEGER NOT NULL CHECK(received_at_ms>=0),
+  UNIQUE(provider,funding_ref,revision)
+);
+CREATE INDEX IF NOT EXISTS idx_candidate_funding_latest
+  ON candidate_entitlement_funding_events(provider,funding_ref,revision DESC);
+CREATE TRIGGER IF NOT EXISTS candidate_funding_events_identity_fence
+  BEFORE INSERT ON candidate_entitlement_funding_events
+  WHEN EXISTS (
+    SELECT 1 FROM candidate_entitlement_funding_events
+    WHERE provider=NEW.provider AND funding_ref=NEW.funding_ref
+      AND (account_id<>NEW.account_id OR period_id<>NEW.period_id)
+  )
+  BEGIN SELECT RAISE(ABORT,'CANDIDATE_FUNDING_IDENTITY_CONFLICT'); END;
+CREATE TRIGGER IF NOT EXISTS candidate_funding_events_no_update
+  BEFORE UPDATE ON candidate_entitlement_funding_events
+  BEGIN SELECT RAISE(ABORT,'CANDIDATE_FUNDING_EVENT_IMMUTABLE'); END;
+CREATE TRIGGER IF NOT EXISTS candidate_funding_events_no_delete
+  BEFORE DELETE ON candidate_entitlement_funding_events
+  BEGIN SELECT RAISE(ABORT,'CANDIDATE_FUNDING_EVENT_IMMUTABLE'); END;
 `;
