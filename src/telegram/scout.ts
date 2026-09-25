@@ -92,7 +92,7 @@ export function projectScoutCreators(
 ): ScoutProjection {
   if (!Number.isSafeInteger(nowMs) || nowMs < SCOUT_WINDOW_MS) throw new Error('SCOUT_NOW_INVALID');
   if (feed.schemaVersion !== 'binrat.public-feed/0.1' ||
-      !Number.isSafeInteger(feed.chainId) || feed.chainId < 1 ||
+      feed.chainId !== 5042 ||
       !/^\d+$/.test(feed.asOfBlock)) throw new Error('SCOUT_FEED_INVALID');
   const asOfBlock = BigInt(feed.asOfBlock);
   const cutoff = nowMs - SCOUT_WINDOW_MS;
@@ -141,7 +141,7 @@ export function projectScoutCreators(
     .map(record => ({
       role: 'ARCPAD_REPORTED_CREATOR', address:record.address,
       launchCount14d:record.bags.length, latestLaunchTimestampMs:record.latest,
-      launches:record.bags.sort((a,b)=>Number(BigInt(b.blockNumber)-BigInt(a.blockNumber)))
+      launches:record.bags.sort((a,b)=>BigInt(b.blockNumber)>BigInt(a.blockNumber)?1:BigInt(b.blockNumber)<BigInt(a.blockNumber)?-1:0)
         .map(bag=>({id:bag.id,symbol:bag.symbol,token:bag.token,blockNumber:bag.blockNumber}))
     }));
   return {
