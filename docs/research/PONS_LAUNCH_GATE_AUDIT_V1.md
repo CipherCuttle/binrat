@@ -60,3 +60,7 @@ Preflight may proceed in parallel in three non-overlapping work packets: (A) col
 Hard stop: any chain/bytecode/fee drift, failed ownership proof, adverse/unresolved legal classification, contradictory official identities or missing explicit authority leaves launch and marketing BLOCKED. After another PR changes canonical launch/holder docs, rerun cross-file checks against its exact head.
 
 Sources inside repo: docs/PONS_LAUNCH_READINESS_V0.md, docs/BINRAT_PONS_LAUNCH_SELECTION_V1.json, docs/PONS_CUTOVER_CANDIDATE_V1.md, docs/PONS_DISCOVERY_CANDIDATE_V1.json, docs/CAPABILITY_MANIFEST_V0.json and frozen docs/LAUNCH_GATE_MATRIX_V0.json.
+
+## Two-chain intelligence gate (owner direction 2026-09-25)
+
+The conditional Pons **token** launch remains 4663 only. Separately, owner direction is for the public intelligence product to provide real Arc 5042 **and** Robinhood 4663 launch evidence at intended token launch, not a cosmetic dual-chain tab. The existing Pons read-only token-launch receipt, login candidate and metadata preview do not implement Robinhood launch indexing. Required new engineering: independent verified Pons launch/curve/graduation event adapter, chain-bound Watch, preserved ArcPad identities, per-chain freshness, actual 4663 activity receipts and truthful public parity. See DUAL_CHAIN_LAUNCH_ARCHITECTURE_V1.md. Product parity is a user-facing launch-claim gate, **not** a substitute for Pons legal, contract, wallet-custody or execution authority; both gates remain separate.

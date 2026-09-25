@@ -8,7 +8,7 @@ Public facts and reproducible receipts remain available for free. Token holding,
 
 Current verified engineering: free Radar and public receipts exist; holder engineering passed on its own earlier conditions but current 4663 candidate FREE-only login and probe are deliberately separate and fail closed. There is no verified Pons token, approved minimum holding threshold, active production entitlement or Robinhood funding observer. Never present this proposed menu as shipped.
 
-The highest market-fit uncertainty: BINRAT's existing research is Arc 5042; proposed token buyers would enter via a Robinhood 4663 Pons listing. Measure whether the same person actually values Arc research and Robinhood token exposure. Do not assume distributing a token on a different chain creates Pons research coverage.
+Previous market-fit mismatch: BINRAT's existing implementation serves Arc 5042 while proposed token buyers enter through a Robinhood 4663 Pons listing. **Owner direction as of 2026-09-25 is meaningful Arc AND Robinhood intelligence at intended token launch.** This is an implementation and evidence gate, not a current shipped feature. Independently verify 4663 Pons launch ingestion, creator-role evidence, live activity and basic Watch before replacing this gap with a dual-chain claim. See DUAL_CHAIN_LAUNCH_ARCHITECTURE_V1.md.
 
 ## Product menu for testing only
 
@@ -76,3 +76,17 @@ The first observational cohort should measure alert freshness, support cost per 
 Do not ship a holder gate with unverified token/threshold/source, or a fee-funded runway forecast with no real observed Pons inflows. Kill any exclusive feature that hides underlying factual receipts, invites investors to expect returns, or lets holdings influence the result of an investigation. Defer costly API/Radar depth until at least some users finish and request the free product's real research workflow.
 
 Research verdict: SMALL EXPERIMENT for utility/WTP; DEFER monetized holder activation until actual token, credible demand, verified service costs, independent legal review and 4663 technical proof.
+
+## Dual-chain product decision and cost stress (2026-09-25)
+
+Two-chain research expands the potential useful audience but incurs an additional actual Pons indexer, RPC/archive and backfill path, chain-scoped Watch and alert delivery, larger D1 budgets and regression work. Separate usage and revenue by chain; do not count the same user twice or assume a Pons token buyer uses Arc research. All original $600, $100k and 0.35% examples remain synthetic sensitivity baselines, not dual-chain launch budgets.
+
+At zero token revenue and the original invented $12/seat minus 5% payments minus $2 variable cost (= $9.40 nominal monthly contribution per paying seat), illustration:
+- $600 fixed budget: 64 seats to cover it.
+- $1,200 fixed budget: 128 seats.
+- $2,000 fixed budget: 213 seats.
+- $5,000 fixed budget: 532 seats.
+
+At $2,000 fixed costs, zero verified token fees and 25 paid seats, contribution is **-$1,765/month** before omitted items. Even an unrealistically generous 0.35% realized effective project fee rate requires ~$504,286 eligible monthly trading volume in that example to break even; do not label that a Pons forecast. Test these with --fixedCostUsd=2000 in the independent offline calculator.
+
+Operating rule: preserve public receipts on both indexed chains; put per-chain quotas and spending controls on expensive high-frequency Watch, historical backfills and bulk API access. A Robinhood RPC/D1 surge must not take Arc public receipts down. If budget collapses, visibly downgrade update freshness instead of silently returning 'nothing happened'. Charge for optional research service capacity independently of owning the token, when legal and operational gates permit. Premium wallet entitlement remains inactive until actual 4663 canonical token and chain-bound eligibility are reviewed. Free dual-chain value must be real before pricing it.

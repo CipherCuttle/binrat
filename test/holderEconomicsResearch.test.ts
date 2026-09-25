@@ -75,3 +75,13 @@ test('lab fails closed if modeled break-even exceeds safe integer range', () => 
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /RESEARCH_BREAK_EVEN_OUT_OF_RANGE/);
 });
+
+test('dual-chain stress keeps subscription revenue separate from token fees', () => {
+  const result = evaluate(['--volumeUsd=0', '--effectiveFeeBps=0', '--paidSeats=25', '--fixedCostUsd=2000']);
+  assert.equal(result.seatRevenueNetUsd, 285);
+  assert.equal(result.projectFeeReceiptsUsd, 0);
+  assert.equal(result.monthlyContributionBeforeOmittedCostsUsd, -1765);
+  assert.equal(result.breakEvenEligibleMonthlyVolumeUsd, null);
+  const hypotheticalFees = evaluate(['--volumeUsd=0', '--effectiveFeeBps=35', '--paidSeats=25', '--fixedCostUsd=2000']);
+  assert.equal(hypotheticalFees.breakEvenEligibleMonthlyVolumeUsd, 504286);
+});
