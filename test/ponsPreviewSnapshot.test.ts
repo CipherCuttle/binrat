@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
+import {sha256Hex} from "../src/evidence/canonical.js";
 import {PONS_PREVIEW_AUTHORITY as a,safeDirectMetadata,buildPonsPreviewSnapshot,type PonsLog} from "../src/ponsPreview/snapshot.js";
 const h="0x"+"a".repeat(64),f="0x"+"b".repeat(64);
 const addr=(n:number)=>"0x"+n.toString(16).padStart(40,"0");
@@ -13,12 +14,15 @@ const build=(logs:PonsLog[])=>buildPonsPreviewSnapshot({
   scannedFromBlock:26842000n,factoryCodeHash:a.runtimeCodeHash,
   logs,metadataByTx:new Map([[f,safeDirectMetadata(null)]])
 });
-test("recent creator recurrence counts older matching launches only; newest-first, unique IDs",()=>{
+test("recent creator recurrence counts older matching launches only; newest-first, unique IDs",async()=>{
   const result=build([mk(26842200n,2,1),mk(26842300n,3,2),mk(26842100n,1,1)]);
   assert.equal(result.chainId,4663);
   assert.deepEqual(result.launches.map(x=>x.blockNumber),["26842300","26842200","26842100"]);
   assert.deepEqual(result.launches.map(x=>x.previousFromSameDeployerWithinWindow),[0,1,0]);
   assert.equal(new Set(result.launches.map(x=>x.id)).size,3);
+  const source=result.launches[0]!;
+  assert.equal(source.id,await sha256Hex({kind:"PONS_V2_LAUNCH_V1",chainId:4663,
+    factory:a.factory.toLowerCase(),txHash:source.txHash,token:source.token}));
   assert.equal(result.historyCoverage,"RECENT_WINDOW_ONLY");
   assert.equal(result.fundingCoverage,"NOT_COLLECTED");
 });

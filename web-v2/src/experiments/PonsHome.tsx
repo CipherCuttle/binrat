@@ -1,5 +1,6 @@
 import {useEffect,useMemo,useState} from "react";
 import {AppLink} from "../Primitives";
+import {isGitHackPreview} from "../previewRuntime";
 import {safeTokenPortrait} from "./LaunchPortraitWall";
 import {loadPonsPreview,compactAddress,ponsTokenUrl,ponsTxUrl,
  type PonsPreviewSnapshot,type PonsPreviewLaunch} from "../ponsPreview";
@@ -126,7 +127,7 @@ export default function PonsHome({navigate,selectedId}:Props){
         <AppLink href="/" navigate={navigate}>PONS LAUNCHES</AppLink>
         <a href="https://robinhoodchain.blockscout.com/" target="_blank" rel="noreferrer noopener">BLOCKSCOUT ↗</a>
       </nav>
-      <a className={s.sourceSwitch} href={window.location.pathname+"?experiment=bento-v1#/"}>BACK TO DEMO ↗</a>
+      <a className={s.sourceSwitch} href={isGitHackPreview?window.location.pathname+"?experiment=bento-v1#/" : import.meta.env.BASE_URL+"?experiment=bento-v1"}>BACK TO DEMO ↗</a>
     </header>
     <div className={s.canvas}>
       <div className={s.hero}>
@@ -142,7 +143,7 @@ export default function PonsHome({navigate,selectedId}:Props){
             <a className={s.secondary} href="https://docs.ponsfamily.com/v2" target="_blank" rel="noreferrer noopener">
               PONS SOURCE DOCS ↗</a>
           </div>
-          <small className={s.disclosure}>CONFIRMED SOURCE SNAPSHOT · NO BUY/SELL CALL · NO CLEAN-WALLET VERDICT · NO FUNDING CLAIMS</small>
+          <small className={s.disclosure}>SINGLE-RPC 12-CONFIRMATION SOURCE SNAPSHOT · NO BUY/SELL CALL · NO CLEAN-WALLET VERDICT · NO FUNDING CLAIMS</small>
           <div className={s.ratWindow} aria-hidden="true">
             <img src={import.meta.env.BASE_URL+"binrat-hero.webp"} alt="" decoding="async"/>
           </div>
@@ -219,7 +220,7 @@ export default function PonsHome({navigate,selectedId}:Props){
         </div>
         {matches.length>80&&<p className={p.scanHint}>Showing the first 80 matches. Narrow your search to inspect older captures.</p>}
       </section>}
-      <footer className={s.footer}>BINRAT · PONS V2 / 4663 · READ-ONLY SOURCE SNAPSHOT
+      <footer className={s.footer}>BINRAT · PONS V2 / 4663 · READ-ONLY SOURCE SNAPSHOT · NOT INDEPENDENTLY WITNESSED
         <a href="https://docs.ponsfamily.com/v2" target="_blank" rel="noreferrer noopener">PROTOCOL SOURCE ↗</a></footer>
     </div>
   </div>;

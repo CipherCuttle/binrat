@@ -2,6 +2,7 @@
  * Factory epoch/code hash follow SENTRY M2A's reviewed 2026-08-03 R1 authority.
  * This bounded recent window is NOT full creator history or a funding trace. */
 import { createHash } from "node:crypto";
+import {canonicalJson} from "../evidence/canonical.js";
 
 export const PONS_PREVIEW_AUTHORITY = Object.freeze({
   chainId:4663,
@@ -76,7 +77,10 @@ export function buildPonsPreviewSnapshot(input:{
     identities.add(key);
     const metadata=input.metadataByTx.get(log.transactionHash.toLowerCase())??safeDirectMetadata(null);
     launches.push({
-      id:createHash("sha256").update("PONS_4663:"+a.factory.toLowerCase()+":"+key+":"+log.token.toLowerCase()).digest("hex"),
+      id:createHash("sha256").update(canonicalJson({
+        kind:"PONS_V2_LAUNCH_V1",chainId:a.chainId,factory:a.factory.toLowerCase(),
+        txHash:log.transactionHash.toLowerCase(),token:log.token.toLowerCase()
+      })).digest("hex"),
       token:log.token.toLowerCase(),curve:log.curve.toLowerCase(),
       deployer:log.deployer.toLowerCase(),pairToken:log.pairToken.toLowerCase(),
       blockNumber:log.blockNumber.toString(),blockHash:log.blockHash.toLowerCase(),
