@@ -106,6 +106,7 @@ export default function () {
 export function sessionPoll() {
   // A VU approximates a think-time client, NOT a browser/WebSocket connection.
   const chain = expectedChain();
-  exercise('/api/feed', chain, true);
+  // Initial staggering matters: 1K simultaneous first polls are NOT ~25 RPS.
   sleep(30 + (__VU % 21));
+  exercise('/api/feed', chain, true);
 }

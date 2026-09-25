@@ -164,6 +164,30 @@ export function simulateFanout(subscribers: number, chainId = 4663): {
   return { unique: sender.count(), retries, drainSeconds: second, peakPerSecond: peak, duplicateDeliveries: duplicates };
 }
 
+// Bounded synthetic Queue retry/DLQ rehearsal. Never issues real Telegram requests.
+export class FakeDeliveryQueue {
+  private readonly delivered = new Set<string>();
+  private readonly deadLetters = new Set<string>();
+  private readonly attempts = new Map<string, number>();
+  private readonly nextRetryAt = new Map<string, number>();
+  constructor(private readonly maxRetries = 5) {
+    if (!Number.isSafeInteger(maxRetries) || maxRetries < 0 || maxRetries > 10) throw new Error('QUEUE_RETRY_LIMIT_INVALID');
+  }
+  deliver(id: string, nowSeconds: number, providerStatus: 'OK' | '429' | 'TIMEOUT'): 'SENT' | 'DUPLICATE' | 'DELAYED' | 'RETRY' | 'DLQ' {
+    if (this.delivered.has(id)) return 'DUPLICATE';
+    if (this.deadLetters.has(id)) return 'DLQ';
+    if ((this.nextRetryAt.get(id) ?? 0) > nowSeconds) return 'DELAYED';
+    if (providerStatus === 'OK') { this.delivered.add(id); return 'SENT'; }
+    const attempted = (this.attempts.get(id) ?? 0) + 1;
+    this.attempts.set(id, attempted);
+    if (attempted > this.maxRetries) { this.deadLetters.add(id); return 'DLQ'; }
+    this.nextRetryAt.set(id, nowSeconds + Math.min(60, 2 ** attempted));
+    return 'RETRY';
+  }
+  retryAt(id: string): number | null { return this.nextRetryAt.get(id) ?? null; }
+  stats(): { sent: number; deadLetters: number } { return { sent: this.delivered.size, deadLetters: this.deadLetters.size }; }
+}
+
 export class FakeAtomicQuota {
   private remaining: number;
   private keys = new Map<string, boolean>();

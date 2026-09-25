@@ -5,7 +5,7 @@ import worker from '../src/cloudflare/worker.js';
 import { capacityRoute, capacityBudgetGuard, instrumentD1, makeD1CapacityMeter } from '../src/capacity/foundation.js';
 import {
   runVirtualLoad, FakeRpc, FakeD1, FakeImmutableReceipts,
-  FakeTelegram, FakeAtomicQuota, FakeSignedPayment, simulateFanout
+  FakeTelegram, FakeDeliveryQueue, FakeAtomicQuota, FakeSignedPayment, simulateFanout
 } from '../src/capacity/synthetic.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
 
@@ -132,6 +132,19 @@ test('10K fake alert recipients drain under 25/sec with replay dedup and synthet
   assert.equal(sender.send('4663:fixture:chat-1'), 'SENT');
   assert.equal(sender.send('4663:fixture:chat-1'), 'DUPLICATE');
   assert.equal(sender.count(), 1);
+});
+test('synthetic Queue retries back off, exhaust into DLQ, and never duplicate successful deliveries', () => {
+  const queue = new FakeDeliveryQueue(2);
+  assert.equal(queue.deliver('4663:event:chat-1', 0, '429'), 'RETRY');
+  assert.equal(queue.deliver('4663:event:chat-1', 1, 'OK'), 'DELAYED');
+  assert.equal(queue.retryAt('4663:event:chat-1'), 2);
+  assert.equal(queue.deliver('4663:event:chat-1', 2, 'TIMEOUT'), 'RETRY');
+  assert.equal(queue.retryAt('4663:event:chat-1'), 6);
+  assert.equal(queue.deliver('4663:event:chat-1', 6, '429'), 'DLQ');
+  assert.equal(queue.deliver('4663:event:chat-1', 120, 'OK'), 'DLQ');
+  assert.equal(queue.deliver('5042:event:chat-1', 0, 'OK'), 'SENT');
+  assert.equal(queue.deliver('5042:event:chat-1', 1, 'OK'), 'DUPLICATE');
+  assert.deepEqual(queue.stats(), { sent: 1, deadLetters: 1 });
 });
 test('1K simultaneous fake quota reservations cannot exceed 100 prepaid units', async () => {
   const quota = new FakeAtomicQuota(100);
