@@ -105,7 +105,7 @@ function MacroTerminal({feed,radar,feedError,radarError,loaded,readAtMs,mode}: O
 function RadarBento({radar,radarError,loaded,mode,navigate}:Pick<Props,"radar"|"radarError"|"loaded"|"mode"|"navigate">) {
   const [repeatOnly,setRepeatOnly]=useState(false);
   const rows=radar?.candidates.filter(x=>!repeatOnly||x.distinctLaunchCount>=2)??[];
-  return <section className={s.radar} aria-labelledby="bento-radar-title">
+  return <section className={s.radar} data-testid="bento-radar" aria-labelledby="bento-radar-title">
     <div className={s.panelHead}><div><small>02 / INVESTIGATION WORKBENCH</small>
       <h2 id="bento-radar-title">RAT RADAR <span>↗</span></h2>
       <p>Observed recipient recurrence across indexed launches. An address is not a verified human identity.</p></div>
@@ -168,13 +168,17 @@ export default function BentoHome(props:Props) {
           </div>
           <small className={s.disclosure}>{mode==="DEMO"?"SYNTHETIC DEMO / ALL FIGURES ILLUSTRATIVE":
             "READ-ONLY PUBLIC DATA / INDEPENDENT CHECKPOINTS"} · NO SAFETY SCORE · NO BUY CALL</small>
-          <div className={s.ratWindow} aria-hidden="true"><img src={import.meta.env.BASE_URL + "binrat-hero.webp"} alt="" decoding="async"/></div>
+
         </section>
-        <MacroTerminal feed={props.feed} radar={props.radar} feedError={props.feedError}
-          radarError={props.radarError} loaded={props.loaded} mode={mode} readAtMs={props.readAtMs}/>
+        <div className={s.terminalCluster}>
+          <MacroTerminal feed={props.feed} radar={props.radar} feedError={props.feedError}
+            radarError={props.radarError} loaded={props.loaded} mode={mode} readAtMs={props.readAtMs}/>
+          <div className={s.ratWindow} aria-hidden="true" data-testid="bento-rat">
+            <img src={import.meta.env.BASE_URL + "binrat-character-master.png"} alt="" decoding="async"/>
+          </div>
+        </div>
       </div>
-      <LaunchPortraitWall feed={props.feed} error={props.feedError} loaded={props.loaded}
-        mode={mode} navigate={navigate}/>
+
       <div className={s.bentoGrid}>
         <RadarBento radar={props.radar} radarError={props.radarError} loaded={props.loaded}
           mode={mode} navigate={navigate}/>
@@ -185,6 +189,8 @@ export default function BentoHome(props:Props) {
               <span>{desc}</span></AppLink>)}
         </div>
       </div>
+      <LaunchPortraitWall feed={props.feed} error={props.feedError} loaded={props.loaded}
+        mode={mode} navigate={navigate}/>
       <footer className={s.footer}>BINRAT / LAUNCH EVIDENCE · IMAGE ≠ ENDORSEMENT · RECURRENCE ≠ PROFIT
         <AppLink href="/method" navigate={navigate}>SOURCE METHOD & COVERAGE ↗</AppLink></footer>
     </div>

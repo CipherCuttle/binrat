@@ -78,6 +78,22 @@ async function screenshot(browser,w,h,mode){
       assert.equal(state.requests.health,0,"DEMO never reads LIVE health");
     }
     await page.locator("img").first().evaluate(img=>img.decode().catch(()=>{}));
+    const radarBox=await page.getByTestId("bento-radar").boundingBox();
+    const galleryBox=await page.getByTestId("launch-portrait-wall").boundingBox();
+    assert.ok(radarBox&&galleryBox&&radarBox.y<galleryBox.y,
+      "featured Rat Radar must precede the optional token gallery at "+w);
+    const rat=page.getByTestId("bento-rat");
+    assert.ok(await rat.isVisible(),"canonical rat missing at "+w);
+    assert.ok((await rat.locator("img").getAttribute("src")).endsWith("/binrat-character-master.png"),
+      "hero rat must use the canonical source, not the retired hero derivative");
+    await rat.locator("img").evaluate(img=>img.decode());
+    const ratBox=await rat.boundingBox();
+    assert.ok(ratBox&&ratBox.x>=0&&ratBox.x+ratBox.width<=w+1&&ratBox.y>=0,
+      "rat must remain within the viewport at "+w);
+    const introBox=await page.locator('[class*="intro"]').first().boundingBox();
+    const titleBox=await page.getByRole("heading",{name:/THE RAT.*REMEMBERS/i}).first().boundingBox();
+    assert.ok(introBox&&titleBox&&titleBox.x+titleBox.width<=introBox.x+introBox.width+2,
+      "hero heading clips beyond introduction at "+w);
     const bounds=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,width:innerWidth}));
     assert.ok(bounds.doc<=w+1&&bounds.body<=w+1,"horizontal overflow "+JSON.stringify(bounds));
     if(w<=720){
