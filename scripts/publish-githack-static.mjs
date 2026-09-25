@@ -4,7 +4,7 @@ import { join, relative } from "node:path";
 const TOKEN = process.env.GITHUB_TOKEN;
 const REPO = process.env.GITHUB_REPOSITORY;
 const SOURCE_SHA = process.env.GITHUB_SHA;
-const BRANCH = "preview-binrat-bento-v1";
+const BRANCH = "preview-binrat-bento-pr31";
 if (!TOKEN || REPO !== "CipherCuttle/binrat" || !/^[a-f0-9]{40}$/.test(SOURCE_SHA ?? ""))
   throw Error("PREVIEW_PUBLISH_AUTHORITY_INVALID");
 const dist = new URL("../web-v2/dist/", import.meta.url).pathname;
@@ -61,6 +61,7 @@ const metadata = JSON.stringify({ sourceCommit: SOURCE_SHA, sourceBranch: "feat/
   preview: true, upstream: "https://binrat-edge-v0.pettevik.workers.dev",
   apiProxy: "https://binrat-githack-proxy-v2.onrender.com", experiment: "bento-v1", visualApproval: "PENDING",
   backendMode: "GET_ONLY_PUBLIC_PROXY", tokenLaunch: "NOT_AUTHORIZED",
+  ponsSnapshotMode: "FROZEN_FROM_EXISTING_VERIFIED_PREVIEW_NOT_FRESH",
   ponsSnapshot: { chainId:4663, asOfBlock:ponsSnapshot.asOfBlock,
     capturedAt:ponsSnapshot.generatedAt, count:ponsSnapshot.launches.length,
     coverage:ponsSnapshot.historyCoverage, funding:ponsSnapshot.fundingCoverage } }, null, 2);

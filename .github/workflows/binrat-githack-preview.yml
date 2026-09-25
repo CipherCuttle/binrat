@@ -12,7 +12,7 @@ on:
       - "cloudflare/wrangler.journey-preview.jsonc"
   workflow_dispatch:
 
-# Preview publishing requires an explicit commit tag. Separate bento-v1 branch preserves old G2.
+# Preview publishing requires an explicit commit tag. The new PR31 branch preserves the older published preview.
 concurrency:
   group: binrat-githack-journey-preview
   cancel-in-progress: false
@@ -36,16 +36,30 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Check repository and existing frontend contract
+      - name: Check exact frontend contract (root CI remains a separate required gate)
         run: |
-          pnpm check
           pnpm --dir web-v2 check
-      - name: Acquire confirmed Pons V2 source snapshot (read-only)
+      - name: Pin the previously verified, FROZEN read-only Pons snapshot
         shell: bash
         run: |
           set -euo pipefail
-          pnpm exec tsx scripts/preview/build-pons-snapshot.ts
-          test -s web-v2/public/pons-preview-snapshot.json
+          # This is the PR31 *visual* preview, not a new Pons source collection.
+          # Leave the existing Pons lane untouched; mark its snapshot stale in-app.
+          snapshot="https://raw.githubusercontent.com/CipherCuttle/binrat/c31b1d4726eade25ba257f48022879e538394394/pons-preview-snapshot.json"
+          mkdir -p web-v2/public
+          curl --fail --silent --show-error --location --retry 3 --max-time 30 "$snapshot" \
+            -o web-v2/public/pons-preview-snapshot.json
+          test "$(git hash-object web-v2/public/pons-preview-snapshot.json)" = \
+            "4c6e6a806638ad805d91855106d1a927a9537307"
+          node --input-type=module -e '
+            import fs from "node:fs";
+            const p=JSON.parse(fs.readFileSync("web-v2/public/pons-preview-snapshot.json","utf8"));
+            if(p.chainId!==4663 || p.historyCoverage!=="RECENT_WINDOW_ONLY" ||
+               p.confirmationDepth!==12 || p.generatedAt!=="2026-09-25T10:24:53.268Z" ||
+               !Array.isArray(p.launches) || p.launches.length!==55)
+              throw Error("FROZEN_PONS_PREVIEW_SNAPSHOT_INVALID");
+            console.log("FROZEN_PONS_SNAPSHOT_REUSED",p.asOfBlock,p.generatedAt,p.launches.length);
+          '
       - name: Compile isolated bento-v1 GitHack frontend
         shell: bash
         run: |
@@ -92,6 +106,34 @@ jobs:
           node scripts/publish-githack-static.mjs | tee /tmp/githack-publish.log
           grep -q 'GITHACK_PREVIEW_PUBLISHED' /tmp/githack-publish.log
 
+      - name: Verify GitHack public HTML, JavaScript, CSS and approved artwork
+        shell: bash
+        run: |
+          set -euo pipefail
+          site="https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-pr31"
+          for attempt in $(seq 1 12); do
+            if curl --fail --silent --show-error --location --max-time 20 \
+                "$site/preview-build.json" -o /tmp/binrat-preview-build.json && \
+                node -e 'const x=require("/tmp/binrat-preview-build.json");if(x.sourceCommit!==process.env.GITHUB_SHA || x.experiment!=="bento-v1")process.exit(1)'; then
+              break
+            fi
+            if [ "$attempt" -eq 12 ]; then echo "::error::GitHack did not expose the published exact source commit"; exit 1; fi
+            sleep 5
+          done
+          curl --fail --silent --show-error --location --max-time 20 "$site/index.html" -o /tmp/binrat-githack-index.html
+          node --input-type=module -e '
+            import fs from "node:fs";
+            const html=fs.readFileSync("/tmp/binrat-githack-index.html","utf8");
+            if(!/\.\/assets\/[^" ]+\.js/.test(html) || !/\.\/assets\/[^" ]+\.css/.test(html))
+              throw Error("GITHACK_STATIC_INDEX_MISSING_RELATIVE_ASSETS");
+          '
+          js="$(grep -oE '\./assets/[^"]+\.js' /tmp/binrat-githack-index.html | head -1)"
+          css="$(grep -oE '\./assets/[^"]+\.css' /tmp/binrat-githack-index.html | head -1)"
+          for item in "$js" "$css" "./binrat-character-master.png"; do
+            curl --fail --silent --show-error --location --max-time 20 "$site/${item#./}" -o /dev/null
+          done
+          echo "PUBLIC_GITHACK_PR31_ASSETS_PASS $site/index.html?experiment=bento-v1#/"
+
       - name: Verify independent free read-only preview API (Render)
         shell: bash
         run: |
@@ -128,11 +170,11 @@ jobs:
             echo '## BINRAT isolated GitHack user-journey preview'
             echo
             echo '- Source PR: #31 (still draft; owner visual approval pending; isolated review preview only)'
-            echo '- Pons read-only snapshot preview: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-v1/index.html?experiment=bento-v1&source=pons#/'
-            echo '- Arc DEMO unchanged: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-v1/index.html?experiment=bento-v1#/'
+            echo '- Pons read-only snapshot preview: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-pr31/index.html?experiment=bento-v1&source=pons#/'
+            echo '- Arc DEMO unchanged: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-pr31/index.html?experiment=bento-v1#/'
             echo '- Backend: https://binrat-githack-proxy-v2.onrender.com/api/health'
             echo '- Public data upstream: binrat-edge-v0.pettevik.workers.dev (read-only, unchanged)'
-            echo '- Pons: one confirmed, recent-window factory-log snapshot with limited direct-factory metadata, NOT real-time, NO funding tracing'
+            echo '- Pons: pinned 2026-09-25T10:24:53Z already verified static snapshot, now STALE; NOT recaptured, real-time, or funding tracing'
             echo '- No token launch, wallet access, Telegram changes, D1 changes, cron, queue or production deploy'
             echo "- Build commit: \`${GITHUB_SHA}\`"
             echo
