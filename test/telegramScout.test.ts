@@ -110,3 +110,9 @@ test('untrusted source token symbols cannot inject forged status lines into Tele
   assert.match(caption,/RAT/);
   assert.match(caption,/source-reported creator/);
 });
+
+
+test('unverified Pons feed cannot be mislabeled ArcPad or combined across chains',()=>{
+  const other={...feed(),chainId:4663} as PublicFeed;
+  assert.throws(()=>projectScoutCreators(other,[],now),/SCOUT_FEED_INVALID/);
+});
