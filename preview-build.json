@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "237dc606316d055b4061797ae00133bfb877bf1c",
+  "sourceBranch": "feat/binrat-north-star-slice-g0-g2",
+  "preview": true,
+  "upstream": "https://binrat-edge-v0.pettevik.workers.dev",
+  "apiProxy": "https://binrat-githack-proxy-v2.onrender.com",
+  "experiment": "bento-v1",
+  "visualApproval": "PENDING",
+  "backendMode": "GET_ONLY_PUBLIC_PROXY",
+  "tokenLaunch": "NOT_AUTHORIZED",
+  "ponsSnapshotMode": "FROZEN_FROM_EXISTING_VERIFIED_PREVIEW_NOT_FRESH",
+  "ponsSnapshot": {
+    "chainId": 4663,
+    "asOfBlock": "72153242",
+    "capturedAt": "2026-09-25T10:24:53.268Z",
+    "count": 55,
+    "coverage": "RECENT_WINDOW_ONLY",
+    "funding": "NOT_COLLECTED"
+  }
+}
