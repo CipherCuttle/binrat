@@ -69,8 +69,7 @@ jobs:
           git diff --quiet origin/feat/binrat-rat-radar-v0 HEAD -- web/ src/cloudflare/d1Store.ts src/cloudflare/syncQueue.ts
           node --check scripts/deploy-rat-conversation-live.mjs
           pnpm check
-          pnpm dlx wrangler@4.135.0 deploy --dry-run --config cloudflare/wrangler.example.jsonc --outdir /tmp/rat-preflight || true
-          # The production script performs its own strict Wrangler dry-run with real verified IDs.
+          # The production script performs a strict Wrangler dry-run with resolved live bindings.
 
       - name: Migrate feedback and roll out to live @BinratBot
         run: node scripts/deploy-rat-conversation-live.mjs
