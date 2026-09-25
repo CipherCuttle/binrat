@@ -1,5 +1,7 @@
 {
   "schemaVersion": "BINRAT_PONS_4663_RECEIPT_PROOF_V1",
+  "providerId": "tenderly-public-gateway",
+  "providerEndpoint": "https://robinhood-chain.gateway.tenderly.co",
   "evidenceLevel": "SINGLE_PROVIDER_CONSISTENT_NOT_INDEPENDENT",
   "chainId": 4663,
   "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
