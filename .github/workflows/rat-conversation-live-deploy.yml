@@ -25,8 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      # Optional when the existing Worker already holds its bot + webhook secret.
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       BINRAT_PUBLIC_SITE_URL: ${{ vars.BINRAT_PUBLIC_SITE_URL }}
       RAT_FEEDBACK_ADMIN_USER_ID: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
@@ -39,16 +40,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Require production credentials before touching infrastructure
+      - name: Require existing BINRAT-prefixed Cloudflare credentials before touching infrastructure
         shell: bash
         run: |
           set -euo pipefail
-          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID TELEGRAM_BOT_TOKEN; do
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
             if [ -z "${!name:-}" ]; then
               echo "::error::Missing GitHub Actions secret $name; production remains unchanged"
               exit 1
             fi
           done
+          if [ -z "${TELEGRAM_BOT_TOKEN:-}" ]; then
+            echo 'GitHub Telegram token not set: the deployment script must verify the existing Worker has both Telegram secrets; no token will be copied or exposed.'
+          fi
 
       - uses: pnpm/action-setup@v4
         with:
