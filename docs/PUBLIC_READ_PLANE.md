@@ -2,9 +2,9 @@
 
 ## Objective
 
-Create a strict boundary between BINRAT's internal evidence/indexing state and any consumer-facing web/API projection.
+Create a strict boundary between BINRAT's internal evidence/indexing state and any public JSON projection.
 
-The browser must never read the raw SQLite evidence store directly. Internal field names and inferred semantics must not leak into product copy by accident.
+API consumers must not read the raw SQLite evidence store directly. Internal field names and inferred semantics must not leak into published facts.
 
 ## Frozen pipeline
 
@@ -20,10 +20,7 @@ PUBLIC_PROJECTION_V0
         +--> digest-bound projection receipt
         |
         v
-PUBLIC JSON / WEB ADAPTER
-        |
-        v
-THE DUMPSTER
+PUBLIC JSON PROJECTION
 ```
 
 ## Public schema
@@ -112,13 +109,9 @@ Every public projection binds:
 
 The receipt is projection identity, not a claim that the underlying token is safe or truthful, and not proof that the supplied history is exhaustive.
 
-## Browser boundary during the 72-hour experiment
+## Backend-only consumer boundary
 
-The browser remains fixture-only.
-
-`web/data-source.js` is the only browser data-source entry point and currently returns `FIXTURE` mode. The app fails closed if that mode changes unexpectedly.
-
-No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARBAGE experiment matures, a later branch may add an `EVIDENCE_PROJECTION` adapter only if the experiment/read-plane gates pass.
+No frontend, browser adapter or static site is part of this branch. Any future UI must validate source roles, checkpoints, coverage and receipt fields against the actual public contract and obtain a new owner-approved visual direction.
 
 ## Acceptance
 
@@ -132,6 +125,5 @@ No network fetch to live BINRAT evidence is authorized in V0. After the HOT GARB
 - V0 history coverage is always `UNVERIFIED`;
 - absent history is always `UNKNOWN` in V0;
 - output has a digest-bound projection receipt;
-- web consumes data through `web/data-source.js` only;
-- browser remains fixture-only and noindex;
+- public API consumer validation is source-bound and preserves receipt and coverage fields;
 - no live-data, token-launch, trading, signing, transaction-submission, or capital authority is introduced.
