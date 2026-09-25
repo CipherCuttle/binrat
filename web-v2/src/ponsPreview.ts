@@ -1,4 +1,5 @@
-/** Static, confirmed Pons snapshot transport. Independent of Arc LIVE and DEMO. */
+/** Pons transport: static by default; optional same-origin indexed API fails closed. */
+import {isGitHackPreview} from './previewRuntime';
 export type PonsPreviewLaunch={
   id:string;token:string;curve:string;deployer:string;pairToken:string;
   blockNumber:string;blockHash:string;txHash:string;logIndex:number;launchConfigId:string;
@@ -7,10 +8,11 @@ export type PonsPreviewLaunch={
   previousFromSameDeployerWithinWindow:number;
 };
 export type PonsPreviewSnapshot={
-  schemaVersion:"binrat.pons-preview/0.1";chainId:4663;factory:string;authorityId:string;
+  schemaVersion:"binrat.pons-preview/0.1"|"binrat.pons-index-feed/0.1";chainId:4663;factory:string;authorityId:string;
   factoryRuntimeCodeHash:string;generatedAt:string;asOfBlock:string;asOfBlockHash:string;
-  scannedFromBlock:string;confirmationDepth:12;historyCoverage:"RECENT_WINDOW_ONLY";
-  metadataCoverage:"DIRECT_FACTORY_INPUT_ONLY";fundingCoverage:"NOT_COLLECTED";
+  scannedFromBlock:string;confirmationDepth:12;historyCoverage:"RECENT_WINDOW_ONLY"|"INDEXED_FROM_WINDOW_START";
+  metadataCoverage:"DIRECT_FACTORY_INPUT_ONLY"|"FACTORY_EVENT_ONLY";fundingCoverage:"NOT_COLLECTED";
+  sourceMode?:"PONS_INDEXED";stale?:boolean;historyComplete?:boolean;
   launches:PonsPreviewLaunch[];
 };
 const expectedFactory="0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e";
@@ -60,7 +62,34 @@ export function parsePonsSnapshot(value:unknown):PonsPreviewSnapshot {
  }
  return value as PonsPreviewSnapshot;
 }
+export function parsePonsIndexedFeed(value:unknown):PonsPreviewSnapshot {
+ if(!obj(value)||value.schemaVersion!=='binrat.pons-index-feed/0.1'||
+   value.sourceMode!=='PONS_INDEXED'||value.historyCoverage!=='INDEXED_FROM_WINDOW_START'||
+   value.metadataCoverage!=='FACTORY_EVENT_ONLY'||value.historyComplete!==false||
+   typeof value.stale!=='boolean'||!Array.isArray(value.launches)||value.launches.length>100||
+   !numeric.test(String(value.scannedFromBlock))||
+   BigInt(String(value.scannedFromBlock))<26841846n)
+  throw Error('PONS_INDEX_SCHEMA_INVALID');
+ // Collector G1 stores factory events only; direct-call artwork remains absent.
+ if(value.launches.some((x:unknown)=>!obj(x)||!sha256.test(String(x.eventId))||
+   !sha256.test(String(x.factId))||!obj(x.metadata)||x.metadata.status!=='NOT_AVAILABLE'))
+  throw Error('PONS_INDEX_METADATA_UNVERIFIED');
+ const checked=parsePonsSnapshot({...value,schemaVersion:'binrat.pons-preview/0.1',
+  historyCoverage:'RECENT_WINDOW_ONLY',metadataCoverage:'DIRECT_FACTORY_INPUT_ONLY'});
+ return {...checked,schemaVersion:'binrat.pons-index-feed/0.1',
+  historyCoverage:'INDEXED_FROM_WINDOW_START',metadataCoverage:'FACTORY_EVENT_ONLY',
+  sourceMode:'PONS_INDEXED',stale:value.stale,historyComplete:false};
+}
 export async function loadPonsPreview(signal?:AbortSignal):Promise<PonsPreviewSnapshot>{
+ if(import.meta.env.VITE_PONS_INDEX_API_ENABLED==='true'&&!isGitHackPreview){
+  const response=await fetch('/api/pons/feed?limit=100',{cache:'no-store',
+   headers:{accept:'application/json'},signal:signal?
+    AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)});
+  if(!response.ok)throw Error('PONS_INDEX_NOT_READY_HTTP_'+response.status);
+  const data=await response.text();
+  if(data.length>700000)throw Error('PONS_INDEX_RESPONSE_OVERSIZE');
+  return parsePonsIndexedFeed(JSON.parse(data) as unknown);
+ }
  const url=import.meta.env.BASE_URL+"pons-preview-snapshot.json";
  const response=await fetch(url,{cache:"no-store",headers:{accept:"application/json"},
   signal:signal ? AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)});
