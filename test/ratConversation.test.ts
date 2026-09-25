@@ -46,7 +46,7 @@ test('launch followups reference the exact previous ID, not a guessed token', ()
     'bare EVM address must not become remembered creator');
 });
 
-test('D1 admission enforces 10/user/day, 120/global/day and UTC rollover', async () => {
+test('D1 admission enforces 10/user/day, 30/global/day and UTC rollover', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
   try {
@@ -102,8 +102,9 @@ test('AI only handles innocuous unclassified chat and rejects factual-looking ou
   let model = '';
   const result = await generateRatBanter({ run: async (id, input) => {
     calls++; model = id;
-    assert.equal(input.max_completion_tokens, 250);
+    assert.equal(input.max_completion_tokens, 160);
     assert.equal(input.stream, false);
+    assert.deepEqual(input.chat_template_kwargs, { enable_thinking: false });
     assert.match(input.messages[1]!.content, /previous turn/i);
     return { choices: [{ message: { content: '{"kind":"BANTER","text":"found some crumbs."}' } }] };
   } }, 'hello rat', 'previous turn');
