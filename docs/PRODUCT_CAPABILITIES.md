@@ -1,15 +1,16 @@
-# BINRAT — technical route map (NOT a visual spec)
+# BINRAT — Backend capability inventory (no frontend)
 
-Current frontend design authority: `docs/design/BENTO_DASHBOARD_V1.md`, based on the owner's latest bento screenshot and wireframe. Technical data authority remains the validated public API and `docs/CAPABILITY_MANIFEST_V0.json`.
+There is no implemented or approved frontend on this branch. Public HTTP responses, their schemas and source receipts are the product contracts, not any retired screen or route layout. Refer to `docs/CAPABILITY_MANIFEST_V0.json` for actual deployment and launch-authorization state.
 
-- Dumpster `/dumpster` → exact Bag `/bag/:id`: independently validated launch feed and source-reported token metadata, including untrusted `imageUri`. Token images are not project endorsements.
-- Radar `/radar` → `/radar/address/:address`: observed recipient recurrence, independently validated coverage, public activity IDs and receipts. An observed recipient is NOT a known human creator.
-- Creator `/creator/:address`: source-reported creator address from a specific indexed launch. No invented Creator directory.
-- Replay `/replay`: real available frozen case observations only; unavailable horizons remain unavailable.
-- Ledger `/ledger`: financial transparency / currently prelaunch-limited; NOT an alternative public launch-history feed.
-- Watch `/watch`: truthful Telegram confirmation and accepted subscription boundaries. Saved local bookmarks are NOT Watch subscriptions.
-- Method `/method`: actual ranking, checkpoint and coverage explanation.
+- `GET /health` and `GET /api/health`: service health and independently validated index readiness; an HTTP 200 response with `ok:false` is not READY.
+- `GET /api/capabilities`: explicit feature and launch-authorization manifest.
+- `GET /api/feed` and `GET /api/bag/:id`: indexed source-reported launches and exact supporting evidence, with coverage and checkpoint.
+- `GET /api/creator/:address`: history of an exact source-reported creator address, never proof of a common human identity.
+- `GET /api/replay/:id`: available point-in-time observation horizons and honest missing stages.
+- `GET /api/rat-radar/watchlist` and related address/activity endpoints: observed swap-recipient recurrence, independently validated timestamps, source receipts and incomplete-history warnings.
+- `GET /api/dumpster-ledger`: existing prelaunch-limited financial projection; absent transactions are not implied to have occurred.
+- Authenticated Telegram webhook and existing Watch commands: separate backend capabilities; no new callback permissions, media hosting or production cutover are implied.
 
-`GET /api/health` independently supplies launchCount, index readiness, runtime freshness and checkpoint. `GET /api/feed` and `GET /api/rat-radar/watchlist` have independent timestamps, error and coverage states. A 200 health response can still contain `ok:false`. Never convert partial/unavailable data into synthetic LIVE totals or a fabricated historical chart.
+Arc 5042 evidence and Robinhood/Pons 4663 evidence must remain isolated until exact source and checkpoint compatibility are independently established. Feed/Radar/Health may have different checkpoints; unavailable data cannot silently become synthetic LIVE data.
 
-Display real source-reported token artwork on exact linked-launch records when safe and available, with a controlled missing-image fallback. Never invent a human portrait from an address. This document grants no merge, deployment, token-launch, wallet, trading or fund authority.
+No future UI composition, palette, library, component structure or asset selection is prescribed here.

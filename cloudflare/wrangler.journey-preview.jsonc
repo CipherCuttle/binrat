@@ -1,7 +1,0 @@
-{
-  // Separate, READ-ONLY proxy Worker. No assets, D1, queues, cron, Telegram or secrets.
-  "name": "binrat-journey-preview",
-  "main": "src/preview/readOnlyProxy.ts",
-  "compatibility_date": "2026-09-18",
-  "workers_dev": true
-}

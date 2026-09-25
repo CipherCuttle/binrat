@@ -9,7 +9,7 @@ Status semantics are canonicalized in `docs/CAPABILITY_MANIFEST_V0.json`.
 
 Verified public-beta runtime as of 2026-09-19:
 
-- BINRAT web frontend served as Cloudflare Worker static assets;
+- A web frontend was previously served by Cloudflare Worker static assets; this is a dated deployment fact, not a component in the new backend-only candidate;
 - public read API served by the same Cloudflare Worker;
 - Arc launch indexing and historical backfill persisted in D1;
 - deterministic observation reconstruction active in a separately bounded Queue lane;
@@ -25,21 +25,14 @@ This public product state does **not** authorize token launch or token marketing
 
 A capability may be `ENGINEERING_PASS` without being `DEPLOYED` or `PUBLIC_LIVE`.
 
-## ACTIVE FRONTEND EXECUTION — OWNER'S BENTO DASHBOARD (2026-09-24)
+## FRONTEND RESET — BACKEND-ONLY CANDIDATE (2026-09-25)
 
-**Current design authority:** [docs/design/BENTO_DASHBOARD_V1.md](./design/BENTO_DASHBOARD_V1.md) reflects the owner's exact bento screenshot and wireframe in conversation on 2026-09-24 22:53 UTC. No historic North Star, Dumpster OS, G0/G0.1 portal, previous macro-bento mockup, icon inventory or earlier design review is authoritative. The existing G2 preview and draft macro experiment are visually rejected. Prior wording about completed/approved visual candidates applied to the historical test cases only, not current acceptance.
+The owner rejected **all** prior frontend implementations and current visual rules. This unmerged candidate removes the legacy website, the V2 React app, all active design documents, published-preview build tooling, static hosting configuration, frontend tests, and web-only dependencies. There is no approved visual direction or implementation to reuse. A new frontend is a separate future project chosen from an empty canvas, not a conversion of the retired bento, G2 or any archived design.
 
-**P0 — Current next frontend slice (draft PR #31; visual hold):** First remove conflicting visual documentation and retire the rejected experiment without changing production. Rebuild a scoped React/CSS **asymmetric bento homepage** from the owner's current wireframe: horizontal nav, memorable but restrained introduction, real yellow Radar action, **one** legible physical macro CRT containing independently validated Health/Feed/Radar state, small original rat near the terminal, featured interactive Rat Radar bento, then truthful entry tiles for Replay Lab, Ledger, Creator Files and Watch. The other modules are not five fabricated analytical dashboards. Existing static art and CSS are not visual references. No unapproved Rive/icon-library/micrographic sprint precedes this first slice.
+Backend priorities are independent of visual acceptance: reliable chain-isolated launch ingestion (including separately verified Pons work), bounded historical evidence, public API accuracy, honest coverage/freshness, indexed creator and observed-recipient role separation, replay-safe Telegram functionality and cost-capped operations. Production website removal, Cloudflare asset unbinding, preview-branch cleanup, Telegram media relocation, merging or deployment are **not** implied by this source-only reset.
 
-**P1 — Truthful interaction:** Reuse current source-backed Feed/Radar/address/evidence types and routes; Radar receives real observed-recipient recurrence, linked activity evidence and a meaningful filter or drill-down. Empty, stale, partial and error states stay distinct. Never construct false synchronized statistics from different checkpoints; DEMO cannot silently replace LIVE. Historical charts await validated time-series data. Secondary tiles link to existing honest capabilities and disclose prelaunch/limited or Telegram confirmation boundaries.
+### PARKED — launch-operator tasks (INDEPENDENT AUTHORIZATION GATES)
 
-**P2 — Intentional phone layout:** Recompose the same bento purposefully on 320/360/390/430 px phones. Preserve the currently working four-label M1 mobile navigation (Discover/Radar/Saved/More) and its tested route/data semantics as a baseline, but do not mistake old appearance or overflow-free screenshots for owner visual approval. Intro+CTA → useful macro snapshot → featured Radar → secondary modules, with clear touch targets and legible essential text.
-
-**P3 — Visual and engineering acceptance:** Build/test isolated experiment first. Run `pnpm check`, V2 typechecks, existing regression browser tests, exact-mode mocked LIVE/DEMO error and health checks, real GET-only candidate verification separately, and screenshots at 320/360/390/430/768/1024/1440/reference desktop. Review side-by-side with the **current owner image**, not archived generated images or current G2 CSS. One bounded hostile review, fix Critical/High, one targeted rereview if needed. Owner visual sign-off and authorization to republish GitHack, merge or deploy are each **separate gates**. Existing production `web/`, public Worker, D1 and token authority remain unchanged.
-
-**Independent product roadmap:** Once this small visual/functional slice passes, complete source-correct Bag, Creator, Replay, future-only Watch and Ledger deep links screen by screen; then consider extra graphics and distribution artwork on specific owner direction. Product milestones are not prescriptions to reintroduce rejected visual motifs. Legal/compliance, audit, token marketing and token launch remain separate unfulfilled authorization gates.
-
-### PARKED — launch-operator tasks (AFTER frontend acceptance)
 
 The owner reports that dedicated addresses have been created; **no public
 addresses have been bound or verified by this repository**. Do not ask for

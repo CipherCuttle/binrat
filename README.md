@@ -1,26 +1,17 @@
-# BINRAT
+# BINRAT — Backend and evidence services
 
-> He gets the scraps. You get the receipts.
+BINRAT indexes launch activity, maintains source-backed address and observation records, and publishes time-bound public evidence. This branch contains **no frontend**: no website, HTML, React, CSS, client-side routes, design system, web artwork, static-asset hosting or GitHack publishing pipeline. No aesthetic direction has been selected for any future UI.
 
-BINRAT is an autonomous Arc launch-intelligence project. New launches are **HOT GARBAGE**. BINRAT watches launch events, preserves chain-authoritative facts, reconstructs creator history, records point-in-time observations, and publishes replayable receipts.
+The API, Arc indexer, historical replay, public projections, D1/Queue integration, Pons backend candidate and Telegram service remain separate technical capabilities. Their claimed deployment state is governed by `docs/CAPABILITY_MANIFEST_V0.json`, not by this unmerged branch. Existing public web deployments are **not** deleted by a Git commit.
 
-The current public beta runs on Cloudflare: static web assets + Worker API + D1 persistence + Queue-driven live/history/observation work + the Telegram Rat. Local development still supports SQLite-backed CLI workflows.
+Install and verify the backend:
 
-The token is not launched. This repository does not contain signing, trading, buy/sell recommendation, or capital-execution authority. Token launch and token marketing remain explicitly blocked in the canonical capability manifest.
-
-## V0
-
-V0 indexes ArcPad `TokenCreated` events on Arc mainnet, maintains deterministic creator provenance, handles replay/reorgs, reconstructs frozen observation horizons, and exposes public evidence through web/API/Telegram surfaces.
-
-```bash
-cp .env.example .env
-pnpm install
+```sh
+pnpm install --frozen-lockfile
 pnpm check
-pnpm backfill
-pnpm watch
-pnpm inspect 0xTOKEN
+pnpm serve:live
 ```
 
-Frontend **current owner design direction**: [`docs/design/BENTO_DASHBOARD_V1.md`](docs/design/BENTO_DASHBOARD_V1.md). Engineering agent entry: [`AGENTS.md`](AGENTS.md). The existing GitHack G2 preview is visually obsolete and is not the owner-approved new design.
+The local server now serves JSON APIs only. Cloudflare's candidate Wrangler configuration has no static assets binding; **do not deploy this configuration over a public website without an explicit migration plan**.
 
-Product and evidence documentation: `docs/PRD.md`, `docs/CODEPLAN.md`, `docs/CLAIM_BOUNDARY.md`, and `docs/DONOR_PROVENANCE.md`.
+Source-of-truth technical docs: `AGENTS.md`, `docs/PRODUCT_CAPABILITIES.md`, `docs/CLAIM_BOUNDARY.md`, `docs/PHILOSOPHY.md`, `docs/ROADMAP_V0.md`. Previous visual experiments remain recoverable only as Git history and are not requirements. No merge, production deployment, token launch, wallet access, trading, funds or webhook cutover is authorized by this reset.
