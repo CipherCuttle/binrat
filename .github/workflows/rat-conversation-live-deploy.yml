@@ -1,0 +1,93 @@
+name: rat-conversation-live-deploy
+
+on:
+  push:
+    branches:
+      - feat/binrat-rat-conversation-free-ai-v1
+  workflow_dispatch:
+    inputs:
+      confirm_live:
+        description: 'Type DEPLOY_BOT to roll out to the existing live @BinratBot Worker'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: binrat-live-rat-deploy
+  cancel-in-progress: false
+
+jobs:
+  production-rat:
+    if: ${{ contains(github.event.head_commit.message, '[deploy-rat-live]') || (github.event_name == 'workflow_dispatch' && inputs.confirm_live == 'DEPLOY_BOT') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      BINRAT_PUBLIC_SITE_URL: ${{ vars.BINRAT_PUBLIC_SITE_URL }}
+      RAT_FEEDBACK_ADMIN_USER_ID: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
+      # Never infer Free/Paid from the plan history; false until explicitly verified.
+      RAT_FREE_PLAN_VERIFIED: ${{ vars.RAT_FREE_PLAN_VERIFIED == 'true' && 'true' || 'false' }}
+      RAT_LIVE_DEPLOY_APPROVED: 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require production credentials before touching infrastructure
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID TELEGRAM_BOT_TOKEN; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing GitHub Actions secret $name; production remains unchanged"
+              exit 1
+            fi
+          done
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify pinned live baseline and full regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feat/binrat-rat-conversation-free-ai-v1"
+          git fetch origin feat/binrat-rat-radar-v0
+          git diff --quiet origin/feat/binrat-rat-radar-v0 HEAD -- web/ src/cloudflare/d1Store.ts src/cloudflare/syncQueue.ts
+          node --check scripts/deploy-rat-conversation-live.mjs
+          pnpm check
+          pnpm dlx wrangler@4.135.0 deploy --dry-run --config cloudflare/wrangler.example.jsonc --outdir /tmp/rat-preflight || true
+          # The production script performs its own strict Wrangler dry-run with real verified IDs.
+
+      - name: Migrate feedback and roll out to live @BinratBot
+        run: node scripts/deploy-rat-conversation-live.mjs
+
+      - name: Report exact deployment outcome to PR #34
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## RAT LIVE ROLLOUT: $RESULT"
+            echo "- commit: $GITHUB_SHA"
+            echo "- workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "- no Telegram webhook cutover attempted"
+            echo "- check step logs for migration/deployment boundary before declaring live"
+          } >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment 34 --body-file "$GITHUB_STEP_SUMMARY"
