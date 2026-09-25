@@ -1,13 +1,13 @@
 # BINRAT Intelligence V1
 
-Status: IMPLEMENTATION ACTIVE  
+Status: HISTORICAL RESEARCH REFERENCE; frontend portions retired 2026-09-25  
 Base: `de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e`  
 Branch: `feat/binrat-intelligence-v1`  
 Merge authority: NONE
 
 ## Objective
 
-Turn the working ArcPad launch terminal into a memory/evidence product without rebuilding the working ingestion or frontend.
+Extend the ArcPad ingestion backend into source-backed creator memory, bounded observations and replayable public JSON evidence. The historical frontend described below no longer exists in the active tree.
 
 The pre-token V1 target is deliberately bounded:
 
@@ -15,7 +15,7 @@ The pre-token V1 target is deliberately bounded:
 2. Creator Files / Trash Trails;
 3. deterministic 5m / 1h / 24h on-chain observations;
 4. a derived WHAT CHANGED timeline;
-5. a small presentation-only animation island.
+5. deterministic public API integration and claim-boundary checks.
 
 Anything that does not materially improve creator memory, longitudinal evidence, or presentation is roadmap work.
 
@@ -137,7 +137,7 @@ This closes the architectural gap where a resumed live checkpoint could advance 
 1. contract + donor freeze + capability probe + observation ledger skeleton;
 2. 5m/1h/24h historical/forward observation sync;
 3. Creator File + WHAT CHANGED projections + additive API;
-4. UI integration + small animation island + visible roadmap;
+4. public API integration + backend-only evidence validation;
 5. integrated verification and one hostile review.
 
 This is one branch and one PR. Internal commits are checkpoints, not separate governance stages.
