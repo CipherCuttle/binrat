@@ -12,7 +12,13 @@ export interface VirtualResult {
   serviceP95Ms: number;
   endToEndP95Ms: number;
   endToEndP99Ms: number;
-  maxQueued: number;
+  delayedRequests: number;
+  maxWaitMs: number;
+  cachedCandidateRequests: number;
+  simulatedCacheHits: number;
+  simulatedCacheMisses: number;
+  candidateOnlyP95Ms: number;
+  candidateOnlyP99Ms: number;
   distribution: Record<WorkClass, number>;
 }
 const work: readonly WorkClass[] = ['PUBLIC_CACHED', 'PUBLIC_MISS', 'ACCOUNT', 'PREMIUM'];
@@ -34,7 +40,11 @@ export function runVirtualLoad(rps: number, seconds: number, lanes: number, cach
   const distribution = Object.fromEntries(work.map((kind) => [kind, 0])) as Record<WorkClass, number>;
   const latencies: number[] = [];
   const serviceTimes: number[] = [];
-  let maxQueued = 0;
+  let delayedRequests = 0;
+  let maxWaitMs = 0;
+  let simulatedCacheHits = 0;
+  let simulatedCacheMisses = 0;
+  const cachedCandidateLatencies: number[] = [];
   const count = rps * seconds;
   for (let i = 0; i < count; i++) {
     const arrival = (i * 1_000) / rps;
@@ -43,6 +53,10 @@ export function runVirtualLoad(rps: number, seconds: number, lanes: number, cach
     distribution[type]++;
     // Cold-cache profiles replace intended cached hits with expensive indexed reads.
     const isCacheMiss = type === 'PUBLIC_CACHED' && (i * 37 % 100) >= cacheHitPct;
+    if (type === 'PUBLIC_CACHED') {
+      if (isCacheMiss) simulatedCacheMisses++;
+      else simulatedCacheHits++;
+    }
     const service = isCacheMiss ? services.PUBLIC_MISS : services[type];
     let lane = 0;
     for (let j = 1; j < lanes; j++) if (ends[j]! < ends[lane]!) lane = j;
@@ -51,17 +65,25 @@ export function runVirtualLoad(rps: number, seconds: number, lanes: number, cach
     ends[lane] = completion;
     latencies.push(completion - arrival);
     serviceTimes.push(service);
-    if (start > arrival) maxQueued++;
+    if (type === 'PUBLIC_CACHED') cachedCandidateLatencies.push(completion - arrival);
+    if (start > arrival) delayedRequests++;
+    maxWaitMs = Math.max(maxWaitMs, start - arrival);
   }
   latencies.sort((a, b) => a - b);
   serviceTimes.sort((a, b) => a - b);
+  cachedCandidateLatencies.sort((a, b) => a - b);
   return {
     kind: 'VIRTUAL_ONLY_NOT_WORKER_CAPACITY',
     requests: count, rps, seconds, lanes, cacheHitPct,
     serviceP95Ms: percentile(serviceTimes, 0.95),
     endToEndP95Ms: percentile(latencies, 0.95),
     endToEndP99Ms: percentile(latencies, 0.99),
-    maxQueued, distribution
+    delayedRequests, maxWaitMs,
+    cachedCandidateRequests: cachedCandidateLatencies.length,
+    simulatedCacheHits, simulatedCacheMisses,
+    candidateOnlyP95Ms: percentile(cachedCandidateLatencies, 0.95),
+    candidateOnlyP99Ms: percentile(cachedCandidateLatencies, 0.99),
+    distribution
   };
 }
 

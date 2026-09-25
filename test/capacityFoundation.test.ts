@@ -82,6 +82,31 @@ test('deterministic 100 RPS workload includes all four classes and rejects cold 
   assert.ok(cold.endToEndP95Ms >= 500); // intentional failing architecture baseline
   assert.ok(warm.endToEndP95Ms < cold.endToEndP95Ms);
   assert.equal(warm.kind, 'VIRTUAL_ONLY_NOT_WORKER_CAPACITY');
+  assert.equal(cold.simulatedCacheHits, 0);
+  assert.equal(cold.simulatedCacheMisses, 2_100);
+  assert.equal(warm.simulatedCacheHits + warm.simulatedCacheMisses, 2_100);
+  assert.ok(cold.candidateOnlyP95Ms > warm.candidateOnlyP95Ms);
+  assert.equal(cold.delayedRequests, 2999);
+  assert.ok(cold.maxWaitMs > 0);
+});
+test('cold/warm cache sensitivity cannot be masked by the aggregate ACCOUNT/PREMIUM p95', () => {
+  const cold = runVirtualLoad(100, 30, 16, 0);
+  const nearWarm = runVirtualLoad(100, 30, 16, 99);
+  assert.equal(cold.simulatedCacheHits, 0);
+  assert.ok(nearWarm.simulatedCacheHits > 2_000);
+  assert.ok(cold.candidateOnlyP95Ms > nearWarm.candidateOnlyP95Ms);
+  assert.ok(cold.simulatedCacheMisses > nearWarm.simulatedCacheMisses);
+  assert.equal(nearWarm.cachedCandidateRequests, 2_100);
+});
+test('k6 full-contract driver demands response-bound chain and source verification, not just VU labels', () => {
+  const k6 = readFileSync(new URL('../bench/k6-capacity.js', import.meta.url), 'utf8');
+  assert.match(k6, /body\.chainId === targetChain/);
+  assert.match(k6, /body\.sourceVerified === true/);
+  assert.match(k6, /body\.asOfBlockHash/);
+  assert.match(k6, /chainId=\$\{targetChain\}/);
+  assert.match(k6, /cache_evidence/);
+  assert.match(k6, /1000/);
+  assert.match(k6, /sleep\(/);
 });
 test('RPC 429 and timeout do not turn into empty healthy source data', async () => {
   await assert.rejects(new FakeRpc('429').getBlockHash(100), (e: Error & {status?: number}) => e.status === 429);
