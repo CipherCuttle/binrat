@@ -171,6 +171,24 @@ async function contract(browser){
     state.health=health();state.feed=feed(2);state.feed.bags[0].metadata.imageUri="javascript:alert(1)";
     await page.goto(url("live"));await ready(page);
     assert.equal(await page.getByTestId("launch-portrait-wall").locator("a[aria-label^='Open indexed launch'] img").count(),0,"unsafe source URI rejected");
+    state.status.health=503;
+    await page.goto(url("live"));await ready(page);
+    await page.locator('[data-testid="bento-health-state"]:text-is("UNAVAILABLE")').waitFor();
+    assert.equal(await page.getByTestId("bento-launch-count").innerText(),"—",
+      "failed Health must not reuse a previously ready total");
+    state.status.health=200;
+    state.feed=feed(0);
+    state.radar={...radar,coverage:{...radar.coverage,indexedLaunchCount:0,
+      swapReceiptCount:0,acquisitionReceiptCount:0,distinctRecipientAddressCount:0,
+      rankedAddressCount:0,status:"NO_SWAP_EVIDENCE"},candidates:[]};
+    await page.goto(url("live"));await ready(page);
+    await page.getByText("NO INDEXED LAUNCHES AT THIS CHECKPOINT.").waitFor();
+    await page.getByText("NO OBSERVED RECIPIENTS MATCH THIS FILTER AT THE CURRENT CHECKPOINT.").waitFor();
+    assert.match(await page.getByTestId("binrat-bento-home").innerText(),/UNVERIFIED/,
+      "empty observations must retain unknown history coverage");
+    assert.equal(await page.getByRole("link",{name:/Inspect observed recipient/}).count(),0,
+      "empty Radar must not invent a ranked candidate");
+    console.log("BENTO CONTRACT PASS: failed Health clears totals; independently validated empty Feed and Radar preserve UNVERIFIED coverage");
     console.log("BENTO CONTRACT PASS: independent feed/Radar failures, stale/contradictory health, unsafe media");
   }finally{await ctx.close();}
 }
