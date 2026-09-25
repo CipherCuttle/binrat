@@ -51,6 +51,11 @@ jobs:
         run: |
           set -euo pipefail
           VITE_BINRAT_GITHACK_PREVIEW=1 VITE_BINRAT_BENTO_EXPERIMENT=1 pnpm --dir web-v2 exec vite build --base=./
+          # Vite's configured publicDir is ../web/assets; the newly acquired Pons
+          # snapshot lives in web-v2/public and is deliberately NOT copied by Vite.
+          # Include exactly this validated read-only snapshot in the isolated dist.
+          install -m 0644 web-v2/public/pons-preview-snapshot.json web-v2/dist/pons-preview-snapshot.json
+          cmp web-v2/public/pons-preview-snapshot.json web-v2/dist/pons-preview-snapshot.json
           node web-v2/checks/prepare-githack.mjs
       - name: Install isolated browser
         shell: bash
