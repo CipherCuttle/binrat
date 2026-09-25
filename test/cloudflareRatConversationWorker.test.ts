@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import { handleWorkerRequest } from '../src/cloudflare/worker.js';
 import { D1TelegramLedger } from '../src/cloudflare/telegramLedger.js';
-import { loadRatMemory } from '../src/cloudflare/ratConversation.js';
+import { loadRatBanterTurns, loadRatMemory } from '../src/cloudflare/ratConversation.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
 
 const manifest = JSON.stringify({
@@ -196,5 +196,84 @@ test('AI unavailable or out of budget falls back without disabling the determini
       { now: () => now, externalFetch: sender(sent) });
     assert.equal(response.status, 200);
     assert.match(sent[0] ?? '', /didn.t catch the scent/);
+  } finally { db.close(); }
+});
+
+
+test('Boris DM regression: user-named hamster survives followups, next move stays fictional, /roadmap remains factual', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    const sent: string[] = [];
+    const prompts: Array<Array<{role:string;content:string}>> = [];
+    const env = { ...base, DB: db, RAT_CONVERSATION_ENABLED: 'true',
+      RAT_AI_ENABLED: 'true', RAT_AI_TRIAL_EXPIRES_AT_MS: String(now + 7 * 86_400_000),
+      AI: { run: async (_model: string, input: {messages:Array<{role:string;content:string}>}) => {
+        prompts.push(input.messages);
+        const replies = [
+          'I shall claim the cheese.',
+          'I negotiate with teeth.',
+          'The hamster is Boris.',
+          'I tunnel under the fridge.'
+        ];
+        return { response: JSON.stringify({
+          kind: 'BANTER', text: replies[prompts.length - 1] ?? 'Still hungry.'
+        }) };
+      } }
+    };
+    const deps = { now: () => now, externalFetch: sender(sent) };
+    for (const [id, text] of [
+      [980, 'Oi rat, I caught you stealing cheese from my fridge.'],
+      [981, 'My fridge is guarded by a hamster named Boris. Negotiate with him.'],
+      [982, "What's the hamster's name again?"],
+      [983, "Boris says you're banned. What's your next move?"]
+    ] as const) {
+      const result = await handleWorkerRequest(request(id, text), env, deps);
+      assert.equal(result.status, 200, 'real webhook route must remain available');
+      assert.equal((await new D1TelegramLedger(db).get(id))?.intent, 'SMALLTALK');
+    }
+    assert.equal(prompts.length, 4);
+    assert.match(prompts[2]?.map(m=>m.content).join(' ') ?? '', /hamster named Boris/);
+    assert.match(prompts[3]?.map(m=>m.content).join(' ') ?? '', /hamster named Boris/);
+    assert.match(sent[2] ?? '', /Boris/);
+    assert.match(sent[3] ?? '', /tunnel under the fridge/);
+    assert.doesNotMatch(sent[3] ?? '', /Intelligence V1|launch authorization/);
+    assert.equal((await loadRatBanterTurns(db, 321, 123, now)).length, 3);
+
+    const roadmap = await handleWorkerRequest(request(984, '/roadmap'), env, deps);
+    assert.equal(roadmap.status, 200);
+    assert.equal(prompts.length, 4, 'explicit roadmap never spends AI');
+    assert.match(sent[4] ?? '', /Intelligence V1/);
+    assert.match((await new D1TelegramLedger(db).get(984))?.answerPlanJson ?? '', /ROADMAP/);
+
+    const forgotten = await handleWorkerRequest(request(985, '/forget'), env, deps);
+    assert.equal(forgotten.status, 200);
+    assert.deepEqual(await loadRatBanterTurns(db, 321, 123, now), []);
+    assert.equal(await loadRatMemory(db, 321, 123, now), null);
+    assert.match(sent[5] ?? '', /context cleared/);
+  } finally { db.close(); }
+});
+
+test('private banter memory is never shared with another sender or group', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    const sent: string[] = []; const contexts: string[] = [];
+    const env = { ...base, DB: db, RAT_CONVERSATION_ENABLED: 'true',
+      RAT_AI_ENABLED: 'true', RAT_AI_TRIAL_EXPIRES_AT_MS: String(now + 7 * 86_400_000),
+      AI: { run: async (_model: string, input: {messages:Array<{content:string}>}) => {
+        contexts.push(input.messages.map(m=>m.content).join('\n'));
+        return {response: '{"kind":"BANTER","text":"the cheese is mine."}'};
+      } }
+    };
+    const deps = { now: () => now, externalFetch: sender(sent) };
+    await handleWorkerRequest(request(990,'My hamster is called Crumbly.'),env,deps);
+    await handleWorkerRequest(request(991,'Hello, stranger.',321,456),env,deps);
+    assert.equal(contexts.length,2);
+    assert.doesNotMatch(contexts[1]??'',/Crumbly/);
+    assert.deepEqual(await loadRatBanterTurns(db,321,456,now),[
+      {userText:'Hello, stranger.',botReply:'🐀 the cheese is mine.'}
+    ]);
+    await handleWorkerRequest(request(992,'rat hello from a group',-100,123,'supergroup'),env,deps);
+    assert.equal(contexts.length,2,'no group AI calls or group raw user-message storage');
+    assert.deepEqual(await loadRatBanterTurns(db,-100,123,now),[]);
   } finally { db.close(); }
 });
