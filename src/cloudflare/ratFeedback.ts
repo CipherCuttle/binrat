@@ -8,6 +8,7 @@ export type RatFeedbackKind = 'BUG' | 'IDEA' | 'GENERAL';
 export type RatFeedbackCommand =
   | { action: 'HELP' }
   | { action: 'DELETE' }
+  | { action: 'INBOX' }
   | { action: 'SUBMIT'; kind: RatFeedbackKind; body: string };
 
 export interface RatFeedbackReceipt {
@@ -26,6 +27,7 @@ export function parseRatFeedback(text: string): RatFeedbackCommand | null {
   let body = (match[1] ?? '').trim();
   if (!body || /^(?:help|privacy)$/i.test(body)) return { action: 'HELP' };
   if (/^(?:delete|forget|remove)$/i.test(body)) return { action: 'DELETE' };
+  if (/^inbox$/i.test(body)) return { action: 'INBOX' };
   let kind: RatFeedbackKind = 'GENERAL';
   const category = body.match(/^(bug|idea|general)\s*[: -]\s*(.*)$/is);
   if (category) {
@@ -128,4 +130,25 @@ export async function pruneRatFeedback(db: D1DatabaseLike, nowMs: number): Promi
     db.prepare('DELETE FROM rat_feedback_budget WHERE day_utc < ?').bind(cutoffDay)
   ]);
   if (results.some(item => !item.success)) throw new Error('RAT_FEEDBACK_PRUNE_FAILED');
+}
+
+/** Operator-only output is gated by the verified Telegram sender ID in the Worker. */
+export async function listRecentRatFeedback(
+  db: D1DatabaseLike, limit = 5
+): Promise<Array<{ updateId: number; kind: RatFeedbackKind; excerpt: string; createdAtMs: number }>> {
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 8) {
+    throw new Error('RAT_FEEDBACK_LIMIT_INVALID');
+  }
+  const rows = await db.prepare(
+    'SELECT update_id,kind,body,created_at_ms FROM rat_feedback ' +
+    'ORDER BY created_at_ms DESC,update_id DESC LIMIT ?'
+  ).bind(limit).all<{
+    update_id: number; kind: RatFeedbackKind; body: string; created_at_ms: number
+  }>();
+  if (!rows.success) throw new Error('RAT_FEEDBACK_LIST_FAILED');
+  return (rows.results ?? []).map(row => ({
+    updateId: row.update_id, kind: row.kind,
+    excerpt: row.body.slice(0, 300),
+    createdAtMs: row.created_at_ms
+  }));
 }
