@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { decodeEventLog, encodeAbiParameters, encodeEventTopics, keccak256, type Address, type PublicClient } from 'viem';
+import { decodeEventLog, encodeAbiParameters, encodeEventTopics, getAddress, keccak256, type Address, type PublicClient } from 'viem';
 import { deriveEventId } from '../src/core/identity.js';
 import {
   PONS_CHAIN_ID, PONS_V2_FACTORY, PonsV2LaunchSource, ponsTokenLaunchedEvent,
@@ -52,7 +52,10 @@ test('pinned upstream ABI decodes factory launch roles exactly (no invented crea
   ], [sourceArgs.pairToken, sourceArgs.launchConfigId, sourceArgs.graduationThreshold]);
   const exactTopics = topics.filter((topic): topic is `0x${string}` => typeof topic === 'string') as [`0x${string}`, ...`0x${string}`[]];
   const decoded = decodeEventLog({ abi: [ponsTokenLaunchedEvent], topics: exactTopics, data });
-  assert.deepEqual(decoded.args, sourceArgs);
+  assert.deepEqual(decoded.args, { ...sourceArgs,
+    token: getAddress(sourceArgs.token), curve: getAddress(sourceArgs.curve),
+    deployer: getAddress(sourceArgs.deployer), pairToken: getAddress(sourceArgs.pairToken)
+  });
   assert.equal('creatorFeeRecipient' in decoded.args, false);
 });
 
