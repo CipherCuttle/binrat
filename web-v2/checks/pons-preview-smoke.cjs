@@ -46,7 +46,11 @@ const fixture={schemaVersion:"binrat.pons-preview/0.1",chainId:4663,factory,
       assert.ok(overflow<=1,"Pons home horizontal overflow "+width+": "+overflow);
       await page.screenshot({path:path.join(captures,"fixture-home-"+width+"x850.png"),fullPage:false});
       await page.getByRole("link",{name:/SNIFF THE NEWEST LAUNCH/}).click();
-      assert.equal(new URL(page.url()).hash,"#/pons/"+fixture.launches[0].id);
+      const destination=new URL(page.url());
+      const expected="/pons/"+fixture.launches[0].id;
+      // Standard Vite uses pathname, static GitHack uses hash navigation.
+      assert.equal(destination.hash?destination.hash.slice(1):destination.pathname,expected);
+      assert.equal(destination.searchParams.get("source"),"pons");
       await page.getByTestId("pons-case").waitFor();
       await page.getByTestId("pons-scan-button").click();
       await page.getByTestId("pons-scan-result").waitFor();
