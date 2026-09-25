@@ -132,3 +132,8 @@ Rollout checkpoint: 25 September 2026 08:07 UTC. Existing BINRAT-prefixed GitHub
 ## 25 September owner continuation — dedicated AI Gateway cost preflight
 
 Owner requested activation of small talk on the existing production Telegram bot after the Workers Paid subscription was disclosed. Before any new model invocation or public AI flag, test the dedicated `binrat-rat-capped-v1` gateway provisioner independently; require Cloudflare to read back both spend-limit rules and rate limits. Production remains AI-off until the real model smoke and bounded deployment meet their own acceptance gates. This step does not itself authorize an uncapped billing exposure.
+
+
+## Real-model acceptance gate (one fixed-prompt request)
+
+The dedicated `binrat-rat-capped-v1` AI Gateway readback on 25 September 2026 confirmed 3 requests/min and two spend-limit rules ($0.05/day and $0.50/30 days). Proceed with the *single fixed-prompt Cloudflare model smoke* before any public AI activation. The smoke must not send Telegram messages, redeploy Workers, or allow arbitrary prompts; failed JSON validation blocks rollout. Existing public AI remains off until that test and release CI pass.
