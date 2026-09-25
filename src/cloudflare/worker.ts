@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto';
-import { handlePonsPublicGet } from '../ponsIndex/api.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
 import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
@@ -42,8 +41,6 @@ import {
 
 export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   DB: D1DatabaseLike;
-  PONS_DB?: D1DatabaseLike;
-  BINRAT_PONS_PUBLIC_API_ENABLED?: string;
   SYNC_QUEUE?: SyncQueueProducerLike;
   CAPABILITY_MANIFEST_JSON?: string;
   BINRAT_FUNDING_CONFIG_JSON?: string;
@@ -181,11 +178,6 @@ export async function handleBinratApiRequest(
   }
 
   try {
-    if (pathname.startsWith('/api/pons/')) {
-      if (env.BINRAT_PONS_PUBLIC_API_ENABLED !== 'true' || !env.PONS_DB)
-        return json(503, { error: 'PONS_PUBLIC_API_NOT_ENABLED', chainId: 4663 });
-      return handlePonsPublicGet(request, env.PONS_DB, deps.now());
-    }
     if (pathname === '/api/capabilities') return capabilities(env);
     if (pathname === '/api/health') return health(env);
     if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
