@@ -25,8 +25,9 @@ import {
 } from './ratFeedback.js';
 import { handleRatCandidateSmoke } from './ratCandidateSmoke.js';
 import {
-  entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
-  loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
+  entityFromUnderstanding, forgetRatBanterTurns, forgetRatMemory, generateRatBanter,
+  isRatBanterEligible, loadRatBanterTurns, loadRatMemory, pruneRatConversation,
+  reserveRatAiCall, resolveRatFollowup, saveRatBanterTurn, saveRatMemory,
   type RatAiBinding, type RatMemory
 } from './ratConversation.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
@@ -632,19 +633,30 @@ async function telegramWebhook(
     const addressed = allowUnaddressed || /\b(?:binrat|rat)\b|\$binrat\b/i.test(message.text);
     const memoryEnabled = env.RAT_CONVERSATION_ENABLED === 'true';
     let memory: RatMemory | null = null;
+    let banterHistory: Awaited<ReturnType<typeof loadRatBanterTurns>> = [];
     if (memoryEnabled && addressed && authorId !== null) {
       try { memory = await loadRatMemory(env.DB, message.chat.id, authorId, deps.now()); }
       catch { /* Missing migration or D1 outage never compromises deterministic Rat replies. */ }
+      // The conversational archive is intentionally private-DM only; group messages
+      // never become raw D1 user-message history or model context.
+      if (message.chat.type === 'private' && ratAiActive(env, deps.now())) {
+        try { banterHistory = await loadRatBanterTurns(env.DB, message.chat.id, authorId, deps.now()); }
+        catch { /* Missing additive table degrades to stateless AI, not facts or group memory. */ }
+      }
     }
 
     if (message.text.trim().toLowerCase() === '/forget') {
       let forgotten = false;
       if (authorId !== null) {
-        try { await forgetRatMemory(env.DB, message.chat.id, authorId); forgotten = true; }
+        try {
+          await forgetRatBanterTurns(env.DB, message.chat.id, authorId);
+          await forgetRatMemory(env.DB, message.chat.id, authorId);
+          forgotten = true;
+        }
         catch { /* Never claim deletion when D1 failed, even with memory toggled OFF. */ }
       }
       const answer = forgotten
-        ? '🐀 conversation context cleared. i keep no raw user-message history.'
+        ? '🐀 30-minute DM chat context cleared. /feedback delete erases separately submitted feedback.'
         : '🐀 cannot confirm deletion. memory is not active if its flag is off; contact an operator if this persists.';
       const telegramMessageId = await sendMessage(token, message.chat.id, answer, deps.externalFetch);
       await ledger.completeOperationalReply({
@@ -665,15 +677,18 @@ async function telegramWebhook(
 
     // AI only covers harmless, otherwise-unhandled small talk. Factual paths stay deterministic.
     if (
-      reply?.intent === 'CLARIFY' && ratAiActive(env, deps.now()) &&
+      (reply?.intent === 'CLARIFY' || (reply?.intent === 'ROADMAP' && banterHistory.length > 0)) &&
+      ratAiActive(env, deps.now()) &&
       // Paid-account trial: only private DMs may spend the shared AI quota.
       message.chat.type === 'private' && env.AI && addressed && authorId !== null &&
-      isRatBanterEligible(message.text, understanding)
+      isRatBanterEligible(message.text, understanding, banterHistory.length > 0)
     ) {
       let banter: string | null = null;
       try {
         if (await reserveRatAiCall(env.DB, message.chat.id, authorId, deps.now())) {
-          banter = await generateRatBanter(env.AI, message.text, memory?.lastBotReply ?? '');
+          banter = await generateRatBanter(
+            env.AI, message.text, memory?.lastBotReply ?? '', banterHistory
+          );
         }
       } catch {
         // Quota, unavailable AI or missing D1 migration: use the existing CLARIFY answer.
@@ -686,7 +701,12 @@ async function telegramWebhook(
         }, deps.now());
         if (memoryEnabled) {
           try { await saveRatMemory(env.DB, message.chat.id, authorId, deps.now(), banter, null, memory); }
-          catch { /* Best-effort short-lived context, never part of evidence authority. */ }
+          catch { /* Best-effort typed context, never evidence authority. */ }
+          try {
+            await saveRatBanterTurn(
+              env.DB, message.chat.id, authorId, update.update_id, deps.now(), message.text, banter
+            );
+          } catch { /* Never log private input; DM still works if D1 storage is unavailable. */ }
         }
         return json(200, { ok: true, mode: 'SMALLTALK' });
       }
