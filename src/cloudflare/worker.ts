@@ -666,7 +666,8 @@ async function telegramWebhook(
     // AI only covers harmless, otherwise-unhandled small talk. Factual paths stay deterministic.
     if (
       reply?.intent === 'CLARIFY' && ratAiActive(env, deps.now()) &&
-      env.AI && addressed && authorId !== null &&
+      // Paid-account trial: only private DMs may spend the shared AI quota.
+      message.chat.type === 'private' && env.AI && addressed && authorId !== null &&
       isRatBanterEligible(message.text, understanding)
     ) {
       let banter: string | null = null;
