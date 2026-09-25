@@ -1,7 +1,6 @@
-import { createReadStream, mkdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { createServer, type ServerResponse } from 'node:http';
-import { dirname, extname, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { ArcPadLaunchSource } from './arc/arcpadSource.js';
 import { ArcObservationSource } from './arc/observationSource.js';
@@ -18,9 +17,6 @@ import { projectReplayBundle } from './public/replayBundle.js';
 import { SqliteStore } from './store/sqliteStore.js';
 import { validateCapabilityManifest } from './telegram/rat.js';
 
-// Source and compiled entrypoints both resolve the same repo-owned web directory.
-const here = dirname(fileURLToPath(import.meta.url));
-const webRoot = realpathSync(resolve(here, here.endsWith(`${sep}dist${sep}src`) ? '../../web' : '../web'));
 const dbPath = resolve(process.env.BINRAT_DB_PATH ?? './data/binrat.sqlite');
 const capabilityManifestPath = resolve(process.cwd(), 'docs/CAPABILITY_MANIFEST_V0.json');
 mkdirSync(dirname(dbPath), { recursive: true });
@@ -152,11 +148,6 @@ function json(response: ServerResponse, status: number, value: unknown): void {
   response.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
   response.end(JSON.stringify(value));
 }
-const mime: Record<string, string> = {
-  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
-  '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2'
-};
 const server = createServer(async (request, response) => {
   try {
     if (request.method !== 'GET') { json(response, 405, { error: 'METHOD_NOT_ALLOWED' }); return; }
@@ -241,16 +232,8 @@ const server = createServer(async (request, response) => {
       json(response, 200, { schemaVersion: feed.schemaVersion, chainId: feed.chainId, asOfBlock: feed.asOfBlock, historyCoverage: feed.historyCoverage, bag, receipt: feed.receipt });
       return;
     }
-    if (pathname.startsWith('/api/')) { json(response, 404, { error: 'NOT_FOUND' }); return; }
-    const path = resolve(webRoot, pathname === '/' ? 'index.html' : `.${pathname}`);
-    if (!path.startsWith(`${webRoot}${sep}`)) { json(response, 403, { error: 'FORBIDDEN' }); return; }
-    let file: string;
-    try {
-      file = realpathSync(path);
-      if (!file.startsWith(`${webRoot}${sep}`) || !statSync(file).isFile()) throw new Error();
-    } catch { json(response, 404, { error: 'NOT_FOUND' }); return; }
-    response.writeHead(200, { 'content-type': mime[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-    createReadStream(file).on('error', () => response.destroy()).pipe(response);
+    json(response, 404, { error: 'NOT_FOUND' });
+    return;
   } catch {
     if (!response.headersSent) json(response, 503, { ready: false, reason: 'PUBLIC_PROJECTION_UNAVAILABLE' });
     else response.destroy();

@@ -7,7 +7,6 @@ on:
     paths:
       - "src/**"
       - "cloudflare/**"
-      - "web/**"
       - "docs/CAPABILITY_MANIFEST_V0.json"
       - "scripts/deploy-rat-radar-candidate.py"
       - ".github/workflows/rat-radar-candidate-deploy.yml"
