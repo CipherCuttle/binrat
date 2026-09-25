@@ -101,7 +101,7 @@
 .footer a {color:var(--amber);font-weight:800;min-height:32px;}
 @media(max-width:1100px) {
  .hero {grid-template-columns:minmax(0,4fr) minmax(0,6fr);}
- .masthead {gap:14px;} .masthead nav {gap:12px;}
+ .masthead {gap:14px;} .masthead nav {display:none;}
  .intro h1 {font-size:clamp(57px,6vw,81px);}
  .bentoGrid {gap:14px;} .other {grid-template-columns:1fr;}
  .module:first-child {grid-column:auto;}

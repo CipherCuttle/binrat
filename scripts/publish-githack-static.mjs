@@ -42,6 +42,11 @@ try {
 }
 const paths = walk(dist);
 if (paths.length === 0) throw Error("PREVIEW_BUNDLE_EMPTY");
+const ponsSnapshot = JSON.parse(readFileSync(join(dist, "pons-preview-snapshot.json"), "utf8"));
+if (ponsSnapshot.chainId !== 4663 || ponsSnapshot.historyCoverage !== "RECENT_WINDOW_ONLY" ||
+    ponsSnapshot.confirmationDepth !== 12 || !Array.isArray(ponsSnapshot.launches) ||
+    ponsSnapshot.launches.length === 0)
+  throw Error("PONS_VERIFIED_STATIC_SNAPSHOT_MISSING");
 const tree = [];
 for (const full of paths) {
   const path = relative(dist, full).replaceAll("\\", "/");
@@ -55,7 +60,10 @@ for (const full of paths) {
 const metadata = JSON.stringify({ sourceCommit: SOURCE_SHA, sourceBranch: "feat/binrat-north-star-slice-g0-g2",
   preview: true, upstream: "https://binrat-edge-v0.pettevik.workers.dev",
   apiProxy: "https://binrat-githack-proxy-v2.onrender.com", experiment: "bento-v1", visualApproval: "PENDING",
-  backendMode: "GET_ONLY_PUBLIC_PROXY", tokenLaunch: "NOT_AUTHORIZED" }, null, 2);
+  backendMode: "GET_ONLY_PUBLIC_PROXY", tokenLaunch: "NOT_AUTHORIZED",
+  ponsSnapshot: { chainId:4663, asOfBlock:ponsSnapshot.asOfBlock,
+    capturedAt:ponsSnapshot.generatedAt, count:ponsSnapshot.launches.length,
+    coverage:ponsSnapshot.historyCoverage, funding:ponsSnapshot.fundingCoverage } }, null, 2);
 const marker = await api("/git/blobs", "POST", { content: metadata, encoding: "utf-8" });
 tree.push({ path: "preview-build.json", mode: "100644", type: "blob", sha: marker.sha });
 const newTree = await api("/git/trees", "POST", { tree });

@@ -152,6 +152,7 @@ export default function BentoHome(props:Props) {
           <AppLink key={title} href={["/dumpster","/radar","/replay","/ledger","/watch"][i]!}
             navigate={navigate}>{title}</AppLink>)}
       </nav>
+      <a className={s.sourceSwitch} href={window.location.pathname+"?experiment=bento-v1&source=pons#/"}>PONS SNAPSHOT ↗</a>
       <a className={s.sourceSwitch} href={sourceSwitchHref(mode==="DEMO")}>
         {mode==="DEMO"?"DEMO · SWITCH TO LIVE":"PUBLIC SOURCE · SWITCH TO DEMO"} ↗</a>
     </header>

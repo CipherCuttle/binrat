@@ -1,6 +1,7 @@
 /* LEGACY G2 PRESENTATION: preserved for existing routes and regression safety only.\n * Current owner-approved STRUCTURAL TARGET is docs/design/BENTO_DASHBOARD_V1.md.\n * Do not copy old Home visuals, left/sidebar hero or art direction into the new bento. */
 import { useEffect, useState, type KeyboardEvent } from "react";
 import BentoHome from "./experiments/BentoHome";
+import PonsHome from "./experiments/PonsHome";
 import { MobileBag, MobileDiscover, MobileMore, MobileRadar, MobileSaved, MobileShell, useMobileBookmarks } from "./mobile/MobileExperience";
 import { bagIdFromPath, findBagAtCheckpoint, radarShortlistCounts, REPLAY_HORIZONS, replayStagesForBag, type ReplayHorizon, type ReplayStage } from "./evidenceIntegrity";
 import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode } from "./data";
@@ -42,6 +43,7 @@ type Route =
   | { page: "ledger" }
   | { page: "binrat" }
   | { page: "bag"; id: string }
+  | { page: "ponsCase"; id: string }
   | { page: "placeholder"; name: string };
 const primaryNav = [
   ["DUMPSTER", "/dumpster"],
@@ -73,6 +75,7 @@ function readRoute(): Route {
   if (path === "/watch") return { page: "watch" };
   if (path === "/ledger") return { page: "ledger" };
   if (path === "/binrat") return { page: "binrat" };
+  if (/^\/pons\/[0-9a-f]{64}$/.test(path)) return { page: "ponsCase", id:path.slice(6) };
   if (path.startsWith("/bag/"))
     return { page: "bag", id: bagIdFromPath(path) };
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
@@ -100,9 +103,10 @@ export default function App() {
   const [feedError, setFeedError] = useState<string | null>(null);
   const [radarError, setRadarError] = useState<string | null>(null);
   const [readAtMs, setReadAtMs] = useState<number | null>(null);
+  const ponsPreview = new URLSearchParams(window.location.search).get("source") === "pons";
   const bento = import.meta.env.VITE_BINRAT_BENTO_EXPERIMENT === "1" &&
     new URLSearchParams(window.location.search).get("experiment") === "bento-v1" &&
-    route.page === "home";
+    (route.page === "home" || (ponsPreview && route.page === "ponsCase"));
   useEffect(() => {
     let active = true;
     let request: AbortController | null = null;
@@ -178,7 +182,8 @@ export default function App() {
     </section>
   );
   const content = bento ? (
-    <BentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />
+    (ponsPreview ? <PonsHome navigate={navigate} selectedId={route.page === "ponsCase" ? route.id : undefined} /> :
+    <BentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />)
   ) : !loaded ? (
     <Loading />
   ) : route.page === "home" ? (
@@ -223,7 +228,8 @@ export default function App() {
     <Placeholder name={route.name} navigate={navigate} />
   );
   const mobileContent = bento ? (
-    <BentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />
+    (ponsPreview ? <PonsHome navigate={navigate} selectedId={route.page === "ponsCase" ? route.id : undefined} /> :
+    <BentoHome feed={feed} radar={radar} feedError={feedError} radarError={radarError} mode={mode} loaded={loaded} readAtMs={readAtMs} navigate={navigate} />)
   ) : !loaded ? (
     <div className="loading" role="status"><span /><p>RAT IS CHECKING THE RECEIPTS…</p></div>
   ) : route.page === "home" ? (
@@ -243,7 +249,7 @@ export default function App() {
   ) : route.page === "more" ? (
     <MobileMore mode={mode} navigate={navigate} />
   ) : content;
-  return compact ? (
+  return compact && !ponsPreview ? (
     <div className="app-frame">
       <a className="skip-link" href="#content">Skip to evidence</a>
       <MobileShell page={route.page} mode={mode} checkpoint={route.page === "radar" ? radar?.asOfBlock ?? null : feed?.asOfBlock ?? null} navigate={navigate}>

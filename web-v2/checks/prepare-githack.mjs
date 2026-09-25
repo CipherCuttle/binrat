@@ -23,6 +23,12 @@ for (const filename of readdirSync(dir)) {
   cssCount++;
 }
 if (cssCount === 0) throw Error("STATIC_CSS_MISSING");
+const pons = new URL("./pons-preview-snapshot.json", root);
+if (!existsSync(pons)) throw Error("PONS_SNAPSHOT_NOT_INCLUDED_IN_GITHACK_BUILD");
+const snapshot=JSON.parse(readFileSync(pons,"utf8"));
+if(snapshot.chainId!==4663 || snapshot.historyCoverage!=="RECENT_WINDOW_ONLY" ||
+  snapshot.confirmationDepth!==12 || !Array.isArray(snapshot.launches) || !snapshot.launches.length)
+  throw Error("PONS_STATIC_SNAPSHOT_INVALID");
 for (const path of ["binrat-character-master.png", "binrat-world-background.png", "favicon.png"]) {
   if (!existsSync(new URL("./" + path, root))) throw Error("STATIC_SOURCE_ASSET_MISSING:" + path);
 }

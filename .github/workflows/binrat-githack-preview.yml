@@ -24,7 +24,7 @@ jobs:
   publish-journey-preview:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-githack]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -40,6 +40,12 @@ jobs:
         run: |
           pnpm check
           pnpm --dir web-v2 check
+      - name: Acquire confirmed Pons V2 source snapshot (read-only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/preview/build-pons-snapshot.ts
+          test -s web-v2/public/pons-preview-snapshot.json
       - name: Compile isolated bento-v1 GitHack frontend
         shell: bash
         run: |
@@ -68,6 +74,9 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
             BINRAT_PREVIEW_URL="http://127.0.0.1:4175" \
             node web-v2/checks/githack-preview-smoke.cjs
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4175" \
+            node web-v2/checks/pons-preview-smoke.cjs
 
       - name: Publish ONLY the isolated GitHack bundle branch
         env:
@@ -114,9 +123,11 @@ jobs:
             echo '## BINRAT isolated GitHack user-journey preview'
             echo
             echo '- Source PR: #31 (still draft; owner visual approval pending; isolated review preview only)'
-            echo '- Frontend: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-v1/index.html?experiment=bento-v1#/'
+            echo '- Pons read-only snapshot preview: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-v1/index.html?experiment=bento-v1&source=pons#/'
+            echo '- Arc DEMO unchanged: https://raw.githack.com/CipherCuttle/binrat/preview-binrat-bento-v1/index.html?experiment=bento-v1#/'
             echo '- Backend: https://binrat-githack-proxy-v2.onrender.com/api/health'
             echo '- Public data upstream: binrat-edge-v0.pettevik.workers.dev (read-only, unchanged)'
+            echo '- Pons: one confirmed, recent-window factory-log snapshot with limited direct-factory metadata, NOT real-time, NO funding tracing'
             echo '- No token launch, wallet access, Telegram changes, D1 changes, cron, queue or production deploy'
             echo "- Build commit: \`${GITHUB_SHA}\`"
             echo
