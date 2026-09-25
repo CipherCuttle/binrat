@@ -1,5 +1,5 @@
 /** Isolated, append-only Pons D1 read model. Checkpoints advance atomically with facts. */
-import {PONS_PREVIEW_AUTHORITY as A} from '../ponsPreview/snapshot.js';
+import {PONS_PREVIEW_AUTHORITY as A} from './sourceSnapshot.js';
 import type {D1DatabaseLike} from '../cloudflare/d1Types.js';
 import {digest,PONS_MAX_FACTS_PER_CYCLE,validateIndexedFact,type IndexedPonsLaunch} from './model.js';
 const hex64=/^0x[0-9a-f]{64}$/i, sha=/^[0-9a-f]{64}$/;

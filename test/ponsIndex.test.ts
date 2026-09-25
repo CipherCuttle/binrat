@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
-import {PONS_PREVIEW_AUTHORITY as A,type PonsLog} from '../src/ponsPreview/snapshot.js';
+import {PONS_PREVIEW_AUTHORITY as A,type PonsLog} from '../src/ponsIndex/sourceSnapshot.js';
 import {PONS_D1_SCHEMA_SQL} from '../src/ponsIndex/schema.js';
 import {indexedPonsFacts,PONS_MAX_FACTS_PER_CYCLE} from '../src/ponsIndex/model.js';
 import {PonsD1Store} from '../src/ponsIndex/store.js';

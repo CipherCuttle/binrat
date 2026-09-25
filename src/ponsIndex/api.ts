@@ -1,5 +1,5 @@
 /** Default-off Pons GET-only API. Does not touch the Arc read projection. */
-import {PONS_PREVIEW_AUTHORITY as A} from '../ponsPreview/snapshot.js';
+import {PONS_PREVIEW_AUTHORITY as A} from './sourceSnapshot.js';
 import type {D1DatabaseLike} from '../cloudflare/d1Types.js';
 import {PonsD1Store} from './store.js';
 

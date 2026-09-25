@@ -1,7 +1,7 @@
 /** Read-only Robinhood 4663 factory acquisition. HTTP alone commits confirmed evidence.
  * Optional WS subscriptions may wake a cycle but cannot advance the checkpoint. */
 import {createPublicClient,defineChain,http,keccak256,parseAbiItem,type Address} from 'viem';
-import {PONS_PREVIEW_AUTHORITY as A,type PonsLog} from '../ponsPreview/snapshot.js';
+import {PONS_PREVIEW_AUTHORITY as A,type PonsLog} from './sourceSnapshot.js';
 import {PonsD1Store} from './store.js';
 import {indexedPonsFacts,PONS_MAX_FACTS_PER_CYCLE} from './model.js';
 

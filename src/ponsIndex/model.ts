@@ -2,7 +2,7 @@
 import {createHash} from 'node:crypto';
 import {canonicalJson} from '../evidence/canonical.js';
 import {PONS_PREVIEW_AUTHORITY as A,type PonsLaunchPreview,type PonsLog,
-  type Metadata,buildPonsPreviewSnapshot} from '../ponsPreview/snapshot.js';
+  type Metadata,buildPonsPreviewSnapshot} from './sourceSnapshot.js';
 export type IndexedPonsLaunch=PonsLaunchPreview & {eventId:string;factId:string};
 const hex64=/^0x[0-9a-f]{64}$/i,hex40=/^0x[0-9a-f]{40}$/i,sha=/^[0-9a-f]{64}$/;
 export const PONS_CHAIN_ID=4663 as const;
