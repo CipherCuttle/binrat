@@ -23,6 +23,7 @@ import {
   parseScoutRequest, projectScoutCreators, readScoutObservationRows, renderScoutCaption
 } from '../telegram/scout.js';
 import { sendScoutDiggingPoster, editScoutPoster } from '../telegram/scoutMedia.js';
+import { loadScoutProgress, saveScoutProgress, deleteScoutProgress, pruneScoutProgress } from './scoutProgress.js';
 import {
   parseRatFeedback, validateRatFeedbackBody, saveRatFeedback,
   deleteRatFeedback, pruneRatFeedback, listRecentRatFeedback
@@ -156,6 +157,8 @@ export default {
       catch { /* Maintenance must never block the indexer cron. */ }
       try { await pruneRatFeedback(env.DB, now); }
       catch { /* Feedback maintenance is best-effort. */ }
+      try { await pruneScoutProgress(env.DB, now); }
+      catch { /* Scout send progress is best-effort and never blocks indexing. */ }
     }
     await enqueueSyncCycle(env);
   },
@@ -627,7 +630,14 @@ async function telegramWebhook(
       }
       // The poster is the canonical STATIC rat. Approved mood derivatives do
       // not yet exist; DIGGING is a truthful caption on the same Telegram card.
-      const posterId=await sendScoutDiggingPoster(token,message.chat.id,origin,deps.externalFetch);
+      const previous=await loadScoutProgress(env.DB,update.update_id,message.chat.id,deps.now());
+      const posterId=previous?.telegramMessageId ??
+        await sendScoutDiggingPoster(token,message.chat.id,origin,deps.externalFetch);
+      if (!previous) {
+        // Save the Telegram message ID BEFORE source lookup. On a retry following
+        // a failed edit we update the original media rather than sending a duplicate.
+        await saveScoutProgress(env.DB,update.update_id,message.chat.id,posterId,deps.now());
+      }
       let caption='🐀 PIPE JAM. ArcPad live index not ready; no creator shortlist returned. Try /scout later.';
       let result:ReturnType<typeof projectScoutCreators>|null=null;
       try {
@@ -647,6 +657,7 @@ async function telegramWebhook(
         replyDigest:createHash('sha256').update(caption).digest('hex'),
         telegramMessageId:posterId
       },deps.now());
+      await deleteScoutProgress(env.DB,update.update_id).catch(()=>{});
       return json(200,{ok:true,scout:'CREATORS',resultCount:result?.candidates.length??0});
     }
 
