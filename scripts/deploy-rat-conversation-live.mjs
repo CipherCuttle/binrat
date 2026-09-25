@@ -151,7 +151,11 @@ note('Both additive migrations applied to verified live D1. Existing chain/evide
 const result = cli(['deploy','--keep-vars','--config',CONFIG], {timeout:180_000});
 gate(result.includes(PRODUCTION_WORKER) || result.includes(WORKER_URL),
   'WRANGLER_DEPLOY_CONFIRMATION_MISSING');
-note('Existing Worker deployed; existing secrets retained; bot webhook unchanged.');
+const postSecrets = jsonFromOutput(cli(['secret','list','--name',PRODUCTION_WORKER,'--config',provision]));
+gate(Array.isArray(postSecrets) &&
+  ['TELEGRAM_BOT_TOKEN','TELEGRAM_WEBHOOK_SECRET'].every(name => postSecrets.some(item => item?.name === name)),
+  'POSTDEPLOY_TELEGRAM_SECRET_BINDING_MISSING');
+note('Existing Worker deployed; both Telegram secret bindings still present; no webhook mutation.');
 const afterHealth = await getJson(WORKER_URL + '/health');
 gate(afterHealth.ok === true && afterHealth.repliesEnabled === true &&
   afterHealth.conversationEnabled === true &&
