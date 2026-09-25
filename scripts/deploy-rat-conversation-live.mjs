@@ -147,7 +147,14 @@ if (aiTrialApproved) {
 cfg.vars.RAT_AI_ENABLED = aiTrialApproved || process.env.RAT_FREE_PLAN_VERIFIED === 'true'
   ? 'true' : 'false';
 if (aiTrialApproved) {
-  cfg.vars.RAT_AI_TRIAL_EXPIRES_AT_MS = String(Date.now() + 7 * 86_400_000);
+  // This is a continuation of the already-authorized seven-day trial, not a new trial.
+  // Read the existing live expiry and preserve it exactly, so redeploys cannot
+  // silently extend paid inference or reset the owner's authorization boundary.
+  const existingExpiry = Number(beforeHealth.aiTrialExpiresAtMs);
+  gate(beforeHealth.aiEnabled === true && Number.isSafeInteger(existingExpiry) &&
+       existingExpiry > Date.now() && existingExpiry < Date.now() + 7 * 86_400_000,
+       'EXISTING_AI_TRIAL_NOT_ACTIVE_OR_EXPIRY_INVALID');
+  cfg.vars.RAT_AI_TRIAL_EXPIRES_AT_MS = String(existingExpiry);
 } else {
   delete cfg.vars.RAT_AI_TRIAL_EXPIRES_AT_MS;
 }
@@ -170,18 +177,19 @@ note('Exact candidate Worker bundle: dry-run PASS.');
 // Additive-only migrations on the existing D1, never a full schema rewrite.
 for (const path of [
   'cloudflare/migrations/20260925_rat_conversation.sql',
-  'cloudflare/migrations/20260925_rat_feedback.sql'
+  'cloudflare/migrations/20260925_rat_feedback.sql',
+  'cloudflare/migrations/20260925_rat_smalltalk_turns.sql'
 ]) {
   gate(fs.existsSync(path), 'MISSING_ADDITIVE_MIGRATION');
   cli(['d1','execute','DB','--remote','--yes','--file',path,'--config',CONFIG], {timeout:180_000});
 }
 const tables = cli(['d1','execute','DB','--remote','--yes','--json','--command',
-  "SELECT name FROM sqlite_master WHERE name IN ('rat_conversation_context','rat_ai_daily_budget','rat_feedback','rat_feedback_budget') ORDER BY name;",
+  "SELECT name FROM sqlite_master WHERE name IN ('rat_conversation_context','rat_ai_daily_budget','rat_feedback','rat_feedback_budget','rat_smalltalk_turns') ORDER BY name;",
   '--config',CONFIG]);
-for (const t of ['rat_conversation_context','rat_ai_daily_budget','rat_feedback','rat_feedback_budget']) {
+for (const t of ['rat_conversation_context','rat_ai_daily_budget','rat_feedback','rat_feedback_budget','rat_smalltalk_turns']) {
   gate(tables.includes(t), 'LIVE_ADDITIVE_D1_TABLE_MISSING:' + t);
 }
-note('Both additive migrations applied to verified live D1. Existing chain/evidence tables untouched.');
+note('Three additive migrations verified on live D1, including private 30-minute chat turns. Existing chain/evidence tables untouched.');
 
 const result = cli(['deploy','--keep-vars','--config',CONFIG], {timeout:180_000});
 gate(result.includes(PRODUCTION_WORKER) || result.includes(WORKER_URL),
