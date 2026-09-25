@@ -283,7 +283,10 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         '/proof — rules of the bin',
         '/feedback bug: <message> — private suggestion box (when enabled)',
         '/feedback idea: <message> — suggest a feature (when enabled)',
-        '/feedback delete — erase your saved suggestions'
+        '/feedback delete — erase your saved suggestions',
+        '/forget — erase your 30-minute conversational context',
+        'private AI chat retains up to 3 short recent exchanges for 30 minutes; /forget clears them',
+        'feedback is separate: /feedback delete removes suggestions'
       ];
     case 'STATUS':
       return [
