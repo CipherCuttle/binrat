@@ -3,7 +3,13 @@ import type { ScoutProjection } from './scout.js';
 interface ApiResult<T> {
   ok?: boolean;
   result?: T;
+  description?: string;
 }
+/** Telegram 400 "message is not modified" proves this exact edit already succeeded.
+ * A failed ledger commit can replay the same edit after a successful prior response. */
+const alreadyApplied = (status:number, data:ApiResult<unknown>|null) =>
+  status===400 && typeof data?.description==='string' &&
+  /message is not modified/i.test(data.description);
 const MAX_CAPTION = 1024;
 
 /** Approved-source pixel-art derivatives in this isolated draft. No arbitrary remote media. */
@@ -61,6 +67,7 @@ export async function editScoutPoster(
   });
   const mediaData=await mediaResponse.json().catch(()=>null) as ApiResult<unknown>|null;
   if (mediaResponse.ok && mediaData?.ok===true) return;
+  if (alreadyApplied(mediaResponse.status,mediaData)) return;
   // An unavailable/unsupported state image must not strand the original digging card.
   // Rate limits and 5xx are transient: fail closed and let the durable retry reuse messageId.
   if (mediaResponse.status!==400 && mediaResponse.status!==404)
@@ -70,6 +77,7 @@ export async function editScoutPoster(
     body:JSON.stringify({chat_id:chatId,message_id:messageId,caption,reply_markup:markup})
   });
   const captionData=await captionResponse.json().catch(()=>null) as ApiResult<unknown>|null;
-  if (!captionResponse.ok || captionData?.ok!==true)
+  if ((!captionResponse.ok || captionData?.ok!==true) &&
+      !alreadyApplied(captionResponse.status,captionData))
     throw new Error('TELEGRAM_SCOUT_EDIT_FAILED');
 }

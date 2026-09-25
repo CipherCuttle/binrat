@@ -69,3 +69,30 @@ test('Unsupported mood media falls back to caption edit of existing message; tra
     /TELEGRAM_SCOUT_EDIT_FAILED/);
   assert.equal(attempts,1,'no duplicate and no caption fallback on transient failure');
 });
+
+test('Replay after a committed Telegram edit accepts only explicit message-is-not-modified',async()=>{
+  const requestMedia:string[]=[];
+  const applied:typeof fetch=async(input)=>{
+    requestMedia.push(String(input).split('/').pop()!);
+    return new Response(JSON.stringify({ok:false,description:'Bad Request: message is not modified'}),{status:400});
+  };
+  await editScoutPoster('test',5,77,'Already sent',projection([1]),'https://binrat.test',applied);
+  assert.deepEqual(requestMedia,['editMessageMedia'],'already applied media must not trigger a second API edit');
+  const fallback:string[]=[];
+  const captionAlreadyApplied:typeof fetch=async(input)=>{
+    const endpoint=String(input).split('/').pop()!;
+    fallback.push(endpoint);
+    return endpoint==='editMessageMedia'
+      ? new Response(JSON.stringify({ok:false,description:'Bad Request: failed to get HTTP URL content'}),{status:400})
+      : new Response(JSON.stringify({ok:false,description:'Bad Request: message is not modified'}),{status:400});
+  };
+  await editScoutPoster('test',5,77,'Already sent',projection([]),'https://binrat.test',captionAlreadyApplied);
+  assert.deepEqual(fallback,['editMessageMedia','editMessageCaption']);
+  let requests=0;
+  const unknown400:typeof fetch=async()=>{requests++;
+    return new Response(JSON.stringify({ok:false,description:'Bad Request: message not found'}),{status:400});
+  };
+  await assert.rejects(editScoutPoster('test',5,77,'No edit proof',projection([]),'https://binrat.test',unknown400),
+    /TELEGRAM_SCOUT_EDIT_FAILED/);
+  assert.equal(requests,2,'unknown 400 is NOT silently accepted');
+});
