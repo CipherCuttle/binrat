@@ -63,6 +63,7 @@ test('AI is opt-in, consumes D1 reservation once, records digest not raw user te
     let called = 0; const sent: string[] = [];
     const env = { ...base, DB: db,
       RAT_CONVERSATION_ENABLED: 'true', RAT_AI_ENABLED: 'true',
+      RAT_AI_TRIAL_EXPIRES_AT_MS: String(now + 7 * 86_400_000),
       AI: { run: async () => { called++; return {
         choices: [{ message: { content: '{"kind":"BANTER","text":"the bin never sleeps."}' } }]
       }; } }
@@ -138,6 +139,27 @@ test('private candidate bot ignores everybody except the explicitly allowed DM s
     assert.equal(allowed.status, 200);
     assert.equal((await new D1TelegramLedger(db).get(922))?.state, 'REPLIED');
     assert.equal(sent.length, 1);
+  } finally { db.close(); }
+});
+
+test('expired live trial stops all model calls without breaking deterministic Telegram replies', async () => {
+  const db = new D1CompatDatabase(); await db.exec(D1_SCHEMA_SQL);
+  try {
+    let inferenceCount = 0; const sent: string[] = [];
+    const env = { ...base, DB: db, RAT_AI_ENABLED: 'true',
+      RAT_CONVERSATION_ENABLED: 'true',
+      RAT_AI_TRIAL_EXPIRES_AT_MS: String(now - 1),
+      AI: { run: async () => { inferenceCount++; return {
+        response: '{"kind":"BANTER","text":"sleeping in the bin."}'
+      }; } }
+    };
+    const response = await handleWorkerRequest(request(931, 'hello rat, do you nap?'), env,
+      { now: () => now, externalFetch: sender(sent) });
+    assert.equal(response.status, 200);
+    assert.equal(inferenceCount, 0);
+    assert.match(sent[0] ?? '', /didn.t catch the scent/);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM rat_ai_daily_budget')
+      .first<{ n: number }>())?.n, 0);
   } finally { db.close(); }
 });
 
