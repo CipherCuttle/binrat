@@ -72,7 +72,7 @@ test('reorg against prior 12-confirmed checkpoint persists HALT and hides feed w
   const rpc=source({head:26841959,logs:[log(26841946)]});
   await bootstrapPonsWindow(store,rpc,1000,2n);
   await collectOneConfirmedRange(store,rpc,1001);
-  const bad:PonsReadSource={...rpc,blockHash:async block=>block===101n?h(900):h(Number(block))};
+  const bad:PonsReadSource={...rpc,blockHash:async block=>block===BigInt(26841947)?h(900):h(Number(block))};
   await assert.rejects(collectOneConfirmedRange(store,bad,1002),/PONS_REORG_HALT/);
   assert.equal((await store.checkpoint())?.status,'REORG_HALT');
   assert.equal(await store.factCount(),1);
@@ -99,15 +99,15 @@ test('SENTRY identities match, duplicate and modified facts do not overwrite app
  const db=new D1CompatDatabase();await db.exec(PONS_D1_SCHEMA_SQL);
  try{
   const store=new PonsD1Store(db);
-  const prev=await store.initialize(100n,h(26841945),500);
-  const facts=indexedPonsFacts({from:100n,through:100n,throughHash:h(26841946),capturedAtMs:501,logs:[log(26841946)]});
+  const prev=await store.initialize(26841946n,h(26841945),500);
+  const facts=indexedPonsFacts({from:26841946n,through:26841946n,throughHash:h(26841946),capturedAtMs:501,logs:[log(26841946)]});
   const f=facts[0]!;
   assert.match(f.eventId,/^[0-9a-f]{64}$/);assert.notEqual(f.eventId,f.id);
-  await store.appendRange({expected:prev,from:100n,through:100n,throughHash:h(26841946),facts,nowMs:501});
-  await assert.rejects(store.appendRange({expected:prev,from:100n,through:100n,throughHash:h(26841946),
+  await store.appendRange({expected:prev,from:26841946n,through:26841946n,throughHash:h(26841946),facts,nowMs:501});
+  await assert.rejects(store.appendRange({expected:prev,from:26841946n,through:26841946n,throughHash:h(26841946),
    facts:[{...f,metadata:{...f.metadata,status:'DIRECT_FACTORY_INPUT',name:'evil',symbol:'EVIL'}}],
    nowMs:502}),/PONS_FACT_COLLISION/);
-  await assert.rejects(store.appendRange({expected:prev,from:100n,through:100n,throughHash:h(26841946),facts,nowMs:503}));
+  await assert.rejects(store.appendRange({expected:prev,from:26841946n,through:26841946n,throughHash:h(26841946),facts,nowMs:503}));
   assert.equal(await store.factCount(),1);
   assert.equal((await store.checkpoint())?.nextBlock,26841947);
   await assert.rejects(db.prepare("UPDATE pons_launch_facts SET deployer='broken'").run(),/PONS_FACT_IMMUTABLE/);
@@ -118,9 +118,9 @@ test('default-off Pons GET routes never fall through to Arc and support separate
  await db.exec(PONS_D1_SCHEMA_SQL);await arc.exec(D1_SCHEMA_SQL);
  const store=new PonsD1Store(db);
  try{
-  const cp=await store.initialize(100n,h(26841945),Date.now());
-  await store.appendRange({expected:cp,from:100n,through:100n,throughHash:h(26841946),
-   facts:indexedPonsFacts({from:100n,through:100n,throughHash:h(26841946),
+  const cp=await store.initialize(26841946n,h(26841945),Date.now());
+  await store.appendRange({expected:cp,from:26841946n,through:26841946n,throughHash:h(26841946),
+   facts:indexedPonsFacts({from:26841946n,through:26841946n,throughHash:h(26841946),
     capturedAtMs:Date.now(),logs:[log(26841946)]}),nowMs:Date.now()});
   const no=await handleWorkerRequest(request('/api/pons/feed'),{DB:arc,PONS_DB:db});
   assert.equal(no.status,503);
