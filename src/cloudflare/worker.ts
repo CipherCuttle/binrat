@@ -21,7 +21,7 @@ import { parseRepliesEnabled } from '../telegram/control.js';
 import { understandRatMessage } from '../telegram/nlp.js';
 import {
   parseRatFeedback, validateRatFeedbackBody, saveRatFeedback,
-  deleteRatFeedback, pruneRatFeedback
+  deleteRatFeedback, pruneRatFeedback, listRecentRatFeedback
 } from './ratFeedback.js';
 import { handleRatCandidateSmoke } from './ratCandidateSmoke.js';
 import {
@@ -65,6 +65,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   /** Both flags must be explicitly 'true'; inference is default-off. */
   RAT_CONVERSATION_ENABLED?: string;
   RAT_FEEDBACK_ENABLED?: string;
+  RAT_FEEDBACK_ADMIN_USER_ID?: string;
   RAT_AI_ENABLED?: string;
   AI?: RatAiBinding;
   RAT_CANDIDATE_SMOKE_ENABLED?: string;
@@ -513,6 +514,20 @@ async function telegramWebhook(
         intent = 'FEEDBACK_DELETE';
         const count = await deleteRatFeedback(env.DB, message.from!.id);
         feedbackReply = '🐀 deleted ' + count + ' stored feedback item(s) tied to your Telegram user ID.';
+      } else if (feedback.action === 'INBOX') {
+        intent = 'FEEDBACK_INBOX';
+        const adminId = Number(env.RAT_FEEDBACK_ADMIN_USER_ID);
+        if (!Number.isSafeInteger(adminId) || adminId <= 0 || message.from!.id !== adminId) {
+          feedbackReply = '🐀 this inbox is private to the BINRAT operator.';
+        } else {
+          const latest = await listRecentRatFeedback(env.DB, 5);
+          feedbackReply = latest.length === 0
+            ? '🐀 no stored feedback yet.'
+            : '🐀 latest feedback (up to 5; full items in D1):\n\n' +
+              latest.map(item => '#' + item.updateId + ' [' + item.kind + '] ' +
+                new Date(item.createdAtMs).toISOString().slice(0, 10) + '\n' +
+                item.excerpt).join('\n\n');
+        }
       } else {
         intent = 'FEEDBACK_SUBMIT';
         const valid = validateRatFeedbackBody(feedback.body);
