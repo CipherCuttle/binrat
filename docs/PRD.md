@@ -2,14 +2,7 @@
 
 ## Product thesis
 
-BINRAT is an autonomous launch-intelligence memecoin project on Arc. The mascot is a cyber-rat living in a dumpster. New launches are garbage bags; BINRAT digs through them, remembers which creator addresses recur, and keeps the receipts.
-
-**Brand:** BINRAT  
-**Ticker:** `$BINRAT`  
-**Feed:** HOT GARBAGE  
-**Creator-address history:** TRASH TRAIL  
-**Evidence artifact:** RECEIPT  
-**Primary line:** He gets the scraps. You get the receipts.
+BINRAT is an ArcPad launch-intelligence and evidence-preservation project. It indexes source-reported launch events, maintains deterministic creator-address provenance and records auditable, time-bound observations. The repository has no website, no visual assets and no authorized frontend direction; earlier mascot or UI copy does not prescribe a future style.
 
 ## User problem
 
