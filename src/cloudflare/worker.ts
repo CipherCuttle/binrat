@@ -67,6 +67,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   RAT_FEEDBACK_ENABLED?: string;
   RAT_FEEDBACK_ADMIN_USER_ID?: string;
   RAT_AI_ENABLED?: string;
+  // Trial lease: when present, AI automatically stops at this Unix millisecond timestamp.
+  RAT_AI_TRIAL_EXPIRES_AT_MS?: string;
   AI?: RatAiBinding;
   RAT_CANDIDATE_SMOKE_ENABLED?: string;
   RAT_CANDIDATE_SMOKE_SECRET?: string;
@@ -123,6 +125,16 @@ export interface WorkerDeps {
 const MAX_BODY_BYTES = 64 * 1024;
 const DEFAULT_DEPS: WorkerDeps = { externalFetch: fetch, now: Date.now };
 const botIdentityCache = new Map<string, Promise<TelegramUser>>();
+
+function ratAiActive(env: BinratWorkerEnv, nowMs: number): boolean {
+  if (env.RAT_AI_ENABLED !== 'true' || !env.AI) return false;
+  if (env.RAT_AI_TRIAL_EXPIRES_AT_MS !== undefined) {
+    const expiresAt = Number(env.RAT_AI_TRIAL_EXPIRES_AT_MS);
+    if (!Number.isSafeInteger(expiresAt) || expiresAt <= nowMs) return false;
+  }
+  return true;
+}
+
 
 export default {
   fetch(request: Request, env: BinratWorkerEnv): Promise<Response> {
@@ -187,7 +199,8 @@ export async function handleWorkerRequest(
       launchAuthorization: manifest?.launchAuthorization.status ?? 'UNVERIFIED_REMOTE_STATUS',
       repliesEnabled,
       conversationEnabled: env.RAT_CONVERSATION_ENABLED === 'true',
-      aiEnabled: env.RAT_AI_ENABLED === 'true' && Boolean(env.AI),
+      aiEnabled: ratAiActive(env, Date.now()),
+      aiTrialExpiresAtMs: env.RAT_AI_TRIAL_EXPIRES_AT_MS ?? null,
       feedbackEnabled: env.RAT_FEEDBACK_ENABLED === 'true'
     });
   }
@@ -652,7 +665,7 @@ async function telegramWebhook(
 
     // AI only covers harmless, otherwise-unhandled small talk. Factual paths stay deterministic.
     if (
-      reply?.intent === 'CLARIFY' && env.RAT_AI_ENABLED === 'true' &&
+      reply?.intent === 'CLARIFY' && ratAiActive(env, deps.now()) &&
       env.AI && addressed && authorId !== null &&
       isRatBanterEligible(message.text, understanding)
     ) {
