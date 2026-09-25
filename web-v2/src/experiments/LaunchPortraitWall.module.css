@@ -56,3 +56,20 @@
  .column { animation:none !important; }
  .tile { transition:none; }
 }
+
+/* Arc homepage gallery is explicitly paged, visible and still read-only.
+   Existing .wall/.column classes above remain for isolated Pons snapshots. */
+.arcGallery .wall {height:auto;min-height:150px;overflow:visible;perspective:none;background:#172021;border-color:#45514b;}
+.arcGallery .wall::after,.arcGallery .pixelBackground {display:none;}
+.arcGallery .columns {position:relative;inset:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  transform:none;transform-style:flat;overflow:visible;padding:10px;gap:10px;}
+.arcGallery .tile {height:112px;flex:none;box-shadow:none;border-color:#657267;}
+.arcGallery .tile:hover,.arcGallery .tile:focus-visible {transform:none;box-shadow:none;border-color:#f4d087;}
+.pager {display:flex;align-items:center;gap:9px;font:700 10px ui-monospace,monospace;color:#eac985;}
+.pager button {min-height:44px;padding:9px 10px;border:1px solid #827651;background:#1d2825;color:#f4d087;
+  font:700 10px ui-monospace,monospace;cursor:pointer;}
+.pager button:disabled {opacity:.42;cursor:default;}
+@media(max-width:720px) {
+ .arcGallery .columns {grid-template-columns:repeat(2,minmax(0,1fr));padding:8px;gap:8px;}
+ .arcGallery .tile {height:98px;}
+}

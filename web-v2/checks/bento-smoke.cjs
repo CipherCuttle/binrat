@@ -72,7 +72,7 @@ async function screenshot(browser,w,h,mode){
     if(mode==="live"){
       await page.locator('[data-testid="bento-health-state"]:text-is("READY")').waitFor();
       assert.equal(await page.getByTestId("bento-launch-count").innerText(),"517");
-      assert.equal(await page.getByTestId("launch-portrait-wall").getAttribute("data-visible-tiles"),"24");
+      assert.equal(await page.getByTestId("launch-portrait-wall").getAttribute("data-visible-tiles"),"8");
     }else{
       assert.match(await page.getByTestId("binrat-bento-home").innerText(),/SYNTHETIC DEMO/);
       assert.equal(state.requests.health,0,"DEMO never reads LIVE health");
@@ -87,9 +87,14 @@ async function screenshot(browser,w,h,mode){
     assert.ok((await rat.locator("img").getAttribute("src")).endsWith("/binrat-character-master.png"),
       "hero rat must use the canonical source, not the retired hero derivative");
     await rat.locator("img").evaluate(img=>img.decode());
+    const macroBox=await page.locator('section[aria-labelledby="bento-macro-title"]').boundingBox();
     const ratBox=await rat.boundingBox();
     assert.ok(ratBox&&ratBox.x>=0&&ratBox.x+ratBox.width<=w+1&&ratBox.y>=0,
       "rat must remain within the viewport at "+w);
+    assert.ok(macroBox&&ratBox&&(w<=860?
+      ratBox.y+ratBox.height<=macroBox.y+2 :
+      ratBox.x+ratBox.width<=macroBox.x-1),
+      "rat must not obscure terminal evidence or footer at "+w);
     const introBox=await page.locator('[class*="intro"]').first().boundingBox();
     const titleBox=await page.getByRole("heading",{name:/THE RAT.*REMEMBERS/i}).first().boundingBox();
     assert.ok(introBox&&titleBox&&titleBox.x+titleBox.width<=introBox.x+introBox.width+2,
@@ -124,8 +129,9 @@ async function screenshot(browser,w,h,mode){
       assert.ok(middle>=view.y+8 && middle<=view.y+view.height-8,
         "visible portrait must actually be inside gallery viewport");
     }
-    const columns=await page.getByTestId("launch-portrait-column").count();
-    assert.ok(columns<=4,"gallery must mount bounded columns");
+    const cards=await page.getByTestId("launch-portrait-wall")
+      .locator('a[aria-label^="Open indexed launch"]').count();
+    assert.ok(cards<=8,"gallery must mount no more than eight fully visible cards per page");
     await page.screenshot({path:path.join(output,mode+"-"+w+"x"+h+"-firstview.png"),fullPage:false});
     if(w===390)await page.screenshot({path:path.join(output,mode+"-"+w+"x"+h+"-full.png"),fullPage:true});
     if(w===768&&mode==="demo"){
@@ -154,30 +160,36 @@ async function contract(browser){
     assert.equal(await page.getByTestId("bento-launch-count").innerText(),"517");
     assert.match(await page.getByTestId("binrat-bento-home").innerText(),/DIFFERENT SOURCE CHECKPOINTS/);
     assert.match(await page.getByTestId("binrat-bento-home").innerText(),/3 DISTINCT LAUNCHES/);
-    assert.equal(await page.getByTestId("launch-portrait-wall").getAttribute("data-visible-tiles"),"24");
-    assert.equal(await page.getByTestId("launch-portrait-wall").locator("a").count(),25,
-      "24 visible portrait links + one browse link, independent of the 500 record data pool");
+    assert.equal(await page.getByTestId("launch-portrait-wall").getAttribute("data-visible-tiles"),"8");
+    assert.equal(await page.getByTestId("launch-portrait-wall").locator("a").count(),9,
+      "Eight visible portrait links + one browse link, independent of the 500 record pool");
     assert.equal(await page.getByTestId("launch-portrait-wall").locator("a[aria-label^='Open indexed launch'] img").count(),1,
       "Only exact source-reported imagery may load; absent images get placeholders");
-    assert.equal(await page.getByTestId("launch-portrait-column").count(),4);
+    assert.equal(await page.getByTestId("launch-portrait-grid").locator("a").count(),8,
+      "Eight linked cards must be fully reachable on the active page");
+    await page.getByRole("button",{name:"NEXT LAUNCH PAGE"}).click();
+    assert.equal(await page.getByTestId("launch-portrait-grid").locator("a").count(),8);
+    await page.getByRole("link",{name:/Open indexed launch TOK8 /}).waitFor();
+    await page.getByRole("button",{name:"PREVIOUS LAUNCH PAGE"}).click();
+    await page.getByRole("link",{name:/Open indexed launch TOK0 /}).waitFor();
     await page.getByRole("button",{name:/REPEAT RECIPIENTS/}).click();
     assert.equal(await page.getByRole("link",{name:/Inspect observed recipient/}).count(),1);
     const first=page.getByRole("link",{name:/Open indexed launch TOK0 /});
     assert.ok((await first.getAttribute("href")).includes("/bag/"+launch(0).id));
     await first.focus();
-    const css=await page.getByTestId("launch-portrait-column").first()
+    const css=await page.getByTestId("launch-portrait-grid")
       .evaluate(el=>getComputedStyle(el).animationName);
     assert.equal(css,"none","prefers-reduced-motion must stop drifting");
     await first.click();
     assert.ok(new URL(page.url()).pathname.endsWith("/bag/"+launch(0).id));
-    console.log("BENTO CONTRACT PASS: 500 pool, 24 mounted, source image, real links, reduced motion");
+    console.log("BENTO CONTRACT PASS: 500 pool, eight accessible cards per page, explicit paging, source image, real links");
     await page.goto(url("live"));await ready(page);
     state.status.feed=503;
     await page.goto(url("live"));await page.getByText(/LAUNCH FEED UNAVAILABLE/).waitFor();
     assert.match(await page.getByTestId("binrat-bento-home").innerText(),/3 DISTINCT LAUNCHES/);
     state.status.feed=200;state.status.radar=503;
     await page.goto(url("live"));await page.getByText(/RADAR UNAVAILABLE/).waitFor();
-    assert.equal(await page.getByTestId("launch-portrait-wall").getAttribute("data-visible-tiles"),"24");
+    assert.equal(await page.getByTestId("launch-portrait-wall").getAttribute("data-visible-tiles"),"8");
     state.status.radar=200;state.health={...health(),ok:false,indexReady:false,runtimeFresh:false};
     await page.goto(url("live"));await page.locator('[data-testid="bento-health-state"]:text-is("STALE")').waitFor();
     assert.equal(await page.getByTestId("bento-launch-count").innerText(),"—");
@@ -218,7 +230,7 @@ async function contract(browser){
    fs.writeFileSync(path.join(output,"README.txt"),
      "PR #31 / bento-v1 isolated experiment. SHA="+(process.env.BINRAT_BRANCH_SHA||"LOCAL")+
      "; DEMO = deterministic synthetic fixture; LIVE screenshots = mocked 500-record Feed, health 1001, Feed 1000, Radar 999, NOT production observations.\n"+
-     "Browser DPR=1, reduced motion; original pixel-world background, source-URI portrait validation, 24 mounted tiles. Owner visual approval PENDING.\n");
+     "Browser DPR=1, reduced motion; source-URI portrait allowlist, eight fully visible tiles per page and accessible paging. Owner visual approval PENDING.\n");
    console.log("BENTO-V1: ALL CONTRACTS AND SCREENSHOTS PASS");
  }finally{await browser.close();}
 })().catch(e=>{console.error("BENTO-V1 FAILED",e);process.exitCode=1;});
