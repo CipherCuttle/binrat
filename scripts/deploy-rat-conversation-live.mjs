@@ -127,7 +127,9 @@ if (aiTrialApproved) {
        policy.includes('max_completion_tokens: 160') &&
        policy.includes('enable_thinking: false') &&
        policy.includes("RAT_AI_GATEWAY = 'binrat-rat-capped-v1'") &&
-       policy.includes('gateway: { id: RAT_AI_GATEWAY, skipCache: true }'), 'AI_TRIAL_BOUNDARY_DRIFT');
+       policy.includes('gateway: { id: RAT_AI_GATEWAY, skipCache: true }') &&
+       readFileSync('src/cloudflare/worker.ts','utf8').includes('ratAiActive(env, deps.now())'),
+       'AI_TRIAL_BOUNDARY_DRIFT');
   // Cloudflare independently blocks the gateway at USD 0.05/day or USD 0.50/30days,
   // whichever arrives first; fail BEFORE any Worker deployment if unavailable.
   try {
@@ -143,6 +145,11 @@ if (aiTrialApproved) {
 }
 cfg.vars.RAT_AI_ENABLED = aiTrialApproved || process.env.RAT_FREE_PLAN_VERIFIED === 'true'
   ? 'true' : 'false';
+if (aiTrialApproved) {
+  cfg.vars.RAT_AI_TRIAL_EXPIRES_AT_MS = String(Date.now() + 7 * 86_400_000);
+} else {
+  delete cfg.vars.RAT_AI_TRIAL_EXPIRES_AT_MS;
+}
 cfg.vars.BINRAT_PUBLIC_SITE_URL = process.env.BINRAT_PUBLIC_SITE_URL?.trim() || WORKER_URL;
 if (/^[1-9]\d{3,16}$/.test(process.env.RAT_FEEDBACK_ADMIN_USER_ID ?? '')) {
   cfg.vars.RAT_FEEDBACK_ADMIN_USER_ID = process.env.RAT_FEEDBACK_ADMIN_USER_ID;
