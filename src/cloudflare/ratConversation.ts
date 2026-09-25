@@ -2,7 +2,9 @@ import type { D1DatabaseLike } from './d1Types.js';
 import type { RatUnderstanding } from '../telegram/nlp.js';
 
 export const RAT_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
-export const RAT_AI_GLOBAL_DAILY_LIMIT = 120;
+// A deliberately small public trial: the account is Workers Paid, so other apps can consume
+// the shared free allowance. The D1 gate bounds total calls and overage exposure.
+export const RAT_AI_GLOBAL_DAILY_LIMIT = 30;
 export const RAT_AI_USER_DAILY_LIMIT = 10;
 export const RAT_AI_RESERVED_NEURONS_PER_CALL = 60;
 const MEMORY_TTL_MS = 30 * 60_000;
@@ -15,6 +17,7 @@ export interface RatAiBinding {
     max_completion_tokens: number;
     temperature: number;
     stream: false;
+    chat_template_kwargs?: { enable_thinking: boolean };
   }): Promise<unknown>;
 }
 export interface RatMemory {
@@ -177,7 +180,8 @@ export async function generateRatBanter(
   if (system.length + prompt.length > MAX_PROMPT_CHARS) return null;
   const output = await ai.run(RAT_AI_MODEL, {
     messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
-    max_completion_tokens: 250, temperature: 0.5, stream: false
+    max_completion_tokens: 160, temperature: 0.4, stream: false,
+    chat_template_kwargs: { enable_thinking: false }
   });
   return validateRatBanter(output);
 }
