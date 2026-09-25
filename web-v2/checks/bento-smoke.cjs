@@ -93,7 +93,7 @@ async function screenshot(browser,w,h,mode){
     const introBox=await page.locator('[class*="intro"]').first().boundingBox();
     const titleBox=await page.getByRole("heading",{name:/THE RAT.*REMEMBERS/i}).first().boundingBox();
     assert.ok(introBox&&titleBox&&titleBox.x+titleBox.width<=introBox.x+introBox.width+2,
-      "hero heading clips beyond introduction at "+w);
+      "hero heading clips beyond introduction at "+w+"; title="+JSON.stringify(titleBox)+" intro="+JSON.stringify(introBox));
     const bounds=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,width:innerWidth}));
     assert.ok(bounds.doc<=w+1&&bounds.body<=w+1,"horizontal overflow "+JSON.stringify(bounds));
     if(w<=720){

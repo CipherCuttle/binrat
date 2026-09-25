@@ -148,7 +148,7 @@
 }
 /* The 320–389px headline previously overran the introduction's content box. */
 @media(max-width:389px) {
- .intro h1 {font-size:clamp(47px,13.75vw,54px);}
+ .intro h1 {font-size:clamp(38px,12vw,47px);}
 }
 @media(max-width:359px) {
  .metrics {grid-template-columns:1fr;} .panelHead {flex-wrap:wrap;}
