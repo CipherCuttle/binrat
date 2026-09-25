@@ -1,0 +1,29 @@
+# G1a hostile UX preflight review
+
+**⚠ DEGRADED: single-context adversarial review, NOT a separate independent design agent.** Current session exposes no independent Task/subagent tool. Figma Weave model discovery rejected because the user's Weave account is not linked. Impeccable `critique` executable and two-assessment detector/browser command were NOT run: the target is a document, not a live page, and installing a downloaded binary or hooks is outside scope. A genuine independent reviewer is a **PENDING** contractual G1a condition unless owner explicitly substitutes this manual review. Do not re-label this as an external review.
+
+## Separate hostile assessment of frozen scenario, before a Figma file
+
+Review target: `PREFIGMA_BRIEF.md`, `G1A_FIXTURE.json`, three rationales in `HYBRID_STUDIES.md`. Source- and platform-independent criteria: can a rushed user (a) spot which facts are verified, (b) find one main action, (c) understand why funders are UNKNOWN, (d) view a simulated advanced use case without mistaking it for live evidence, (e) reach a watch preview and understand no notification exists?
+
+| Severity | Issue spotted by adversarial pass | Applied correction / acceptance test |
+|---|---|---|
+| Critical | Mixing a real token address with fictional funder paths or FDV could create a misleading screenshot and fabricated relationship | Two separate case IDs and persistent status banners. Real receipt NEVER has a fictional value in its panels. All hypothetical paths show `DEMO-*` labels with NO explorer links. Test a cropped screenshot of every frame for visible DEMO context. |
+| High | A massive artwork hero may hide the observed token and CTA at 320px | DOM/visual order puts finding and CTA first or simultaneously visible. Mobile test must confirm first viewport contains `Pons`, source status, address short ID and `Investigate`. Rat can remain prominent without becoming the only content. |
+| High | A preview Watch success state could be mistaken for actual alert activation | CTA says `Preview watch`, confirmation `Preview saved locally. No monitoring enabled`; explicit latency unmeasured/quota not provisioned. Never say `Alert on`, `Watching` or `instant`. Test return visit does not imply backend persistence. |
+| High | Raw receipts and missing funding may be collapsed into a seemingly comprehensive 'verified' label | `Verified factory event` applies only to exact PR #40 event; display funding, fee recipient, pricing and V4 as UNKNOWN. Historical snapshot as-of date visible; real-time `LIVE` badge absent. Source inconsistency described accessibly in details. |
+| Medium | Three visual metaphors may differ so much that tasks cannot be compared | One immutable `G1A_FIXTURE.json`, same scene, same two case IDs, same primary action semantics, same 3 prior synthetic rows and four windows. Compare whole journeys and mobile rather than hero thumbnails. |
+| Medium | Reported 'historical temperature' from three synthetic stories sounds predictive | No combined gauge or forecasts. Three labeled panels and full sample (GRIME, SLUDGE, immature DUST); sample caveat persistent. No actual performance claims for verified receipt. |
+| Medium | Bureau source-stamp looks like a provenance attestation even for hypothetical facts | Real verified stamp is source-bound and clickable. DEMO stamp explicitly says `SIMULATED` and has no tx/explorer link. Test that a user can correctly distinguish them in an unprompted 5-second trial. |
+| Medium | Living Case File could impose theatrical gestures on repeat investigative actions | One-step jump to source, Rat Trap and Back, without mandatory page turns. Reduced-motion version instant. Test experts can reach receipt from dossier with one intentional action. |
+| Medium | Bad source state could look like zero launches; invalid address or stale block mistaken for current truth | Distinct `no launches in observed window`, `provider error`, `historical snapshot` and `not investigated` copy. Every case states source cutoff and limitation. |
+
+## Nielsen-style qualitative acceptance, not an executable score
+
+Visibility: current source state, as-of and preview-only status visible. Real-world match: plain English next actions before rat jargon. Control: Discover/Back/Close always work. Consistency: exact address, role and status semantics identical across three concepts. Error prevention: no fake source hyperlinks. Recognition: at most three initial observations, one lead CTA. Efficiency: experts can bypass theatrics. Minimalism: express world mostly on home. Recovery: provider errors actionable without fabricated fallback. Help: inline explanations for `originalDeployer`, `FDV`, `not investigated` rather than tooltips as sole carrier.
+
+## Independent review handoff prompt
+
+Review ONLY the exact five frozen artifacts plus supplied art and PR #43 contract. Assume the proposed three metaphors are optional, challenge all of them equally. Evaluate the real and fictional case boundary, primary action above fold at 320px, users' understanding of `unknown` vs `no`, chronologically oriented Rat Trap, mobile order, source-lag messaging, keyboard/reduced-motion, Watch preview truth and whether any rat illustration visually suppresses the actual evidence. Do NOT select a style, invent palette, install code or review old rejected frontend. Return Critical/High functional contradictions and a falsifiable test for each. Ignore purely aesthetic taste unless the design prevents comprehension. One review only; if Critical/High, repair and one targeted rereview.
+
+**Gate:** scenario specification and structured manual critique are complete; external independent review NOT COMPLETE. Do not claim G1a passed until independent review or explicit owner acceptance of this degraded substitute, and until rat master provenance for asset import is confirmed.
