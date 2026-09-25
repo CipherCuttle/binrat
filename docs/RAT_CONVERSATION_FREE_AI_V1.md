@@ -89,3 +89,29 @@ Worker, production D1, live bot webhook or Cloudflare API token.
 ## Owner-authorized isolated run
 
 September 25, 2026: isolated candidate Worker/D1 provisioning and private readback were authorized; **no production cutover, no production Telegram bot webhook change, no merge and no paid-model overage authority**. A real model invocation remains gated on independent verification of unused account-wide free allocation; a separate sandbox bot and tester ID are required to activate Telegram DMs.
+
+
+## Live BINRAT and end-user feedback (owner-approved extension)
+
+The owner has authorized a guarded deployment to the **existing** \`@BinratBot\`, not a separate test-bot cutover. This approval is scoped to conversation memory, bounded free-AI small talk when no paid inference can occur, and an explicit private feedback inbox. Deployment remains blocked until GitHub Actions passes the production-credential preflight and verifies the current bot's \`getMe\`, existing webhook URL, production Worker identity, pinned D1 and queue IDs. No merge authority or token/launch authority is implied.
+
+The \`rat-conversation-live-deploy\` workflow is triggered only by a head commit bearing \`[deploy-rat-live]\` on the exact experiment branch or a manually confirmed dispatch. It tests the exact source, compares production web assets, applies only two additive D1 migrations to the pinned existing D1, deploys to the existing Worker with \`--keep-vars\` to retain Cloudflare dashboard vars and existing secrets, and verifies \`/health\` and the unchanged bot webhook after deployment. It never creates D1, queues, bots or a replacement webhook. Any missing or mismatched prerequisite halts without asserting success.
+
+Production flags upon passing all gates: \`TELEGRAM_REPLIES_ENABLED=true\`, \`RAT_CONVERSATION_ENABLED=true\`, \`RAT_FEEDBACK_ENABLED=true\`. **\`RAT_AI_ENABLED=false\` until \`RAT_FREE_PLAN_VERIFIED=true\` is explicitly established in GitHub Actions variables after inspecting the Cloudflare account.** Workers Paid may bill beyond the account's shared free allocation; no user authorization to incur charges is implied. The existing deterministic Rat and multi-turn typed memory work without an LLM.
+
+### User feedback
+
+Users may opt in in a **private DM** with \`/feedback bug: ...\`, \`/feedback idea: ...\`, or \`/feedback <message>\`. Bare conversations are **never** silently archived as feedback. \`/feedback\` or \`/feedback privacy\` explains the retention policy; \`/feedback delete\` permanently removes the sender's submitted D1 rows and user-specific rate counters. \`/feedback inbox\` is a read-only view of five most recent 300-character excerpts **only** when used in a DM from the exact \`RAT_FEEDBACK_ADMIN_USER_ID\` configured in GitHub Actions vars. Unconfigured or different users get no data; group chats are always denied even for the owner.
+
+Each submission has a source Telegram update receipt ID, category (BUG/IDEA/GENERAL), 1,200-character maximum, consented text, sender Telegram user ID for deletion and timestamp. D1 stores 90 days maximum with daily cron pruning. No raw ordinary conversation messages are retained in the feedback table, and feedback is never used as a model prompt or published automatically. A basic secret-like content filter warns against sending private keys/passwords; it is not a substitute for avoiding sensitive information. Quotas: max three submissions/user/UTC day and 100 globally/day; durable webhook dedupe avoids duplicate saves or double charging on Telegram send retry.
+
+Operator can inspect the full inbox privately via the Cloudflare D1 console query:
+
+\`\`\`sql
+SELECT update_id, kind, body, datetime(created_at_ms / 1000, 'unixepoch') AS received_utc
+FROM rat_feedback
+ORDER BY created_at_ms DESC, update_id DESC
+LIMIT 50;
+\`\`\`
+
+This query must be run only in the authorized Cloudflare D1 dashboard, never from a public website. The Telegram \`/feedback inbox\` command is a private summary and deliberately omits submitter IDs. Only the operator should have DB export access. Existing public evidence and token-related data are unaffected.
