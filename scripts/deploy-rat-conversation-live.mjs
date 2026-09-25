@@ -125,7 +125,21 @@ if (aiTrialApproved) {
   gate(policy.includes('RAT_AI_GLOBAL_DAILY_LIMIT = 30;') &&
        policy.includes('RAT_AI_USER_DAILY_LIMIT = 10;') &&
        policy.includes('max_completion_tokens: 160') &&
-       policy.includes('enable_thinking: false'), 'AI_TRIAL_BOUNDARY_DRIFT');
+       policy.includes('enable_thinking: false') &&
+       policy.includes("RAT_AI_GATEWAY = 'binrat-rat-capped-v1'") &&
+       policy.includes('gateway: { id: RAT_AI_GATEWAY, skipCache: true }'), 'AI_TRIAL_BOUNDARY_DRIFT');
+  // Cloudflare independently blocks the gateway at USD 0.05/day or USD 0.50/30days,
+  // whichever arrives first; fail BEFORE any Worker deployment if unavailable.
+  try {
+    const guard = execFileSync('node', ['scripts/provision-rat-ai-gateway.mjs'], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+      env: process.env, timeout: 50_000
+    });
+    gate(guard.includes('RAT_GATEWAY_READBACK: VERIFIED'), 'GATEWAY_READBACK_MISSING');
+    note('Verified dedicated AI Gateway: 3 requests/minute, USD 0.05/day and USD 0.50/30days. Other gateways untouched.');
+  } catch {
+    throw new Error('GATEWAY_SPEND_LIMIT_PROVISION_OR_READBACK_FAILED_AI_REMAINS_OFF');
+  }
 }
 cfg.vars.RAT_AI_ENABLED = aiTrialApproved || process.env.RAT_FREE_PLAN_VERIFIED === 'true'
   ? 'true' : 'false';
