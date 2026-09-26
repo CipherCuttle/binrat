@@ -527,12 +527,12 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   to { transform: translate3d(1.4%, -1.2%, 0) scale(1.021); }
 }
 @media (max-width: 760px) {
-  .grain-wave-sky { opacity: .63; }
+  .grain-wave-sky { opacity: .76; }
   .grain-wave-currents { filter: blur(12px); opacity: .58; }
   .grain-wave-grain { opacity: .10; background-size: 120px 120px, 14px 19px; }
   .grain-wave-clouds { opacity: .47; }
   .grain-wave-canvas {
-    opacity: .79;
+    opacity: .90;
     mask-image: linear-gradient(180deg, #0009 0%, #000 36%, #000 70%, #0009 89%, transparent 100%);
   }
   .grain-wave-copy-shade {
@@ -543,10 +543,10 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   .g4-world .masthead::before { opacity: .11; }
 }
 @media (max-width: 350px) {
-  .grain-wave-sky { opacity: .53; }
+  .grain-wave-sky { opacity: .68; }
   .grain-wave-currents { opacity: .49; filter: blur(10px); }
   .grain-wave-grain { opacity: .075; }
-  .grain-wave-canvas { opacity: .72; }
+  .grain-wave-canvas { opacity: .86; }
 }
 @media (prefers-reduced-motion: reduce) {
   .grain-wave-sky { opacity: .8; }

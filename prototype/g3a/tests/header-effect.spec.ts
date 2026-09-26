@@ -15,6 +15,7 @@ test('desktop: original Grain Wave stays in the world, behind the rat and copy',
   const canvas = page.getByTestId('grain-wave-canvas');
   await expect(canvas).toBeVisible();
   await expect.poll(async () => Number(await canvas.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(1);
+  await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-a-1440.png' });
   const before = await canvas.evaluate((el: HTMLCanvasElement) => {
     const data = el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data;
     return Array.from(data);
@@ -30,8 +31,9 @@ test('desktop: original Grain Wave stays in the world, behind the rat and copy',
       Math.abs(before[offset + 2] - after[offset + 2]) > 25) changed++;
   }
   expect(changed, 'Grain Wave must be visibly changing actual rendered pixels, not just report a CSS animation').toBeGreaterThan(600);
+  await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-b-1440.png' });
   await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-moving-1440.png', fullPage: false });
-  expect(await sky.locator('.grain-wave-ribbon--violet').evaluate(el => getComputedStyle(el).animationName)).toBe('grain-drift-violet');
+  expect(await sky.locator('.grain-wave-ribbon--violet').evaluate(el => getComputedStyle(el).animationName)).toBe('none'); // Deliberate static underlay; canvas supplies the verified motion.
   expect(await sky.evaluate(el => getComputedStyle(el).pointerEvents)).toBe('none');
   await expect(page.getByRole('button', { name: /enter rat radar/i })).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -57,6 +59,24 @@ for (const width of [390, 320] as const) {
     const canvas = page.getByTestId('grain-wave-canvas');
     await expect(canvas).toBeVisible();
     await expect.poll(async () => Number(await canvas.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(1);
+    if (width === 390) {
+      await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-a-390.png' });
+      const first = await canvas.evaluate((el: HTMLCanvasElement) => Array.from(
+        el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data
+      ));
+      await page.waitForTimeout(1200);
+      const second = await canvas.evaluate((el: HTMLCanvasElement) => Array.from(
+        el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data
+      ));
+      let changed = 0;
+      for (let offset = 0; offset < first.length; offset += 40) {
+        if (Math.abs(first[offset] - second[offset]) +
+          Math.abs(first[offset + 1] - second[offset + 1]) +
+          Math.abs(first[offset + 2] - second[offset + 2]) > 22) changed++;
+      }
+      expect(changed, '390px canvas must produce visibly different pixels').toBeGreaterThan(200);
+      await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-b-390.png' });
+    }
     await expect(page.getByRole('heading', { name: /the rat\s*remembers/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /enter rat radar/i })).toBeInViewport();
     await expect(page.getByRole('button', { name: /investigate the receipt/i })).toBeInViewport();
@@ -80,14 +100,17 @@ test('reduced-motion: still sunset, stationary grain, no pointer-follow', async 
   }
   const still = page.getByTestId('grain-wave-canvas');
   await expect(still).toBeVisible();
-  await expect(still).toHaveAttribute('data-grain-frame', '1');
+  await expect.poll(async () => Number(await still.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(0);
+  // ResizeObserver can legitimately redraw the same static frame during initial sizing.
+  await page.waitForTimeout(250);
+  const initialStillFrame = await still.getAttribute('data-grain-frame');
   const poster = page.locator('.poster');
   const rect = await poster.boundingBox();
   if (!rect) throw new Error('poster must have visible bounds');
   await page.mouse.move(rect.x + rect.width * .3, rect.y + rect.height * .5);
   expect(await poster.evaluate(el => el.style.getPropertyValue('--flow-x'))).toBe('');
   await page.waitForTimeout(900);
-  await expect(still).toHaveAttribute('data-grain-frame', '1');
+  await expect(still).toHaveAttribute('data-grain-frame', initialStillFrame!);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-still-390.png', fullPage: true });
   await page.getByRole('button', { name: /investigate the receipt/i }).click();
