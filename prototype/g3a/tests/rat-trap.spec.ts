@@ -47,7 +47,7 @@ for (const viewport of [
 
     await expect(page.getByText('PRICE UNKNOWN · no simulated headline data')).toBeVisible();
     await expect(page.getByText(/exit liquidity unknown/i).first()).toBeVisible();
-    await expect(page.getByText(/shared funding address—not shared human ownership/i)).toBeVisible();
+    await expect(page.getByText(/doesn.t prove shared ownership, safety or profitability/i)).toBeVisible();
     expect(await fitsViewport()).toBe(true);
 
     await page.getByRole('button', { name: /unfold small relationship view/i }).click();
