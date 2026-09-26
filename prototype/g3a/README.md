@@ -1,8 +1,8 @@
-# BINRAT G3a disposable interaction prototype
+# BINRAT G3a/G3b disposable interaction prototype
 
 Isolated Svelte 5 + Vite experiment implementing one frozen journey:
 
-`Fresh Garbage → optional receipt retrieval → Dig Deeper → back`
+`Fresh Garbage → optional receipt retrieval → verified Dig Deeper receipt → separate fictional Rat Trap → back`
 
 ## Truth boundary
 
@@ -10,6 +10,8 @@ Isolated Svelte 5 + Vite experiment implementing one frozen journey:
 - The Pons V2 factory event is a verified historical snapshot, **not live**.
 - Funding, pricing, fee recipient, graduation and V4 status remain unknown or not reconstructed.
 - MOLD is a separate fictional DEMO and is never attached to the historical token.
+- The MOLD demo uses the frozen v3 fixture's four fictional transfers, three previous launches and fixed 6h/24h/3d/7d eligibility counts.
+- A shared fictional funding address demonstrates an address relationship, never common human ownership.
 - No wallet, trading, payment, monitoring, backend or network API is present.
 
 The rat asset is the owner-supplied 1536×1536 JPEG from the G1a package, SHA-256

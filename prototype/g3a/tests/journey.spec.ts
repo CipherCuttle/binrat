@@ -36,7 +36,7 @@ for (const viewport of [
 
     await page.getByRole('button', { name: /investigate/i }).click();
     await expect(page.getByTestId('retrieval')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /digging up the receipt/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /the rat found a receipt/i })).toBeFocused();
     const retrievalSource = page.getByRole('link', { name: /open original robinscan/i });
     await expect(retrievalSource).toBeVisible();
     await expect(retrievalSource).toHaveAttribute('href', receiptUrl);
@@ -46,7 +46,8 @@ for (const viewport of [
     await page.getByRole('button', { name: /skip retrieval/i }).click();
     await expect(page.getByTestId('investigation')).toBeVisible();
     await expect(page.getByRole('heading', { name: /pons v2 \/ factory receipt/i })).toBeFocused();
-    await expect(page.getByText('Funding UNKNOWN · Pricing NOT RECONSTRUCTED')).toBeVisible();
+    await expect(page.getByText('Direct funding:')).toBeVisible();
+    await expect(page.getByText('Pricing and market cap:')).toBeVisible();
     const dossierSource = page.getByRole('link', { name: /open robinscan source receipt/i });
     await expect(dossierSource).toHaveAttribute('href', receiptUrl);
     expect(await fitsViewport()).toBe(true);
@@ -85,6 +86,14 @@ test('critical screens have no automatically detectable accessibility violations
   expect(results.violations).toEqual([]);
 
   await page.getByRole('button', { name: /skip retrieval/i }).click();
+  results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.getByRole('button', { name: /explore fictional rat trap demo/i }).click();
+  results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.getByRole('button', { name: /select fictional funder/i }).click();
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });
