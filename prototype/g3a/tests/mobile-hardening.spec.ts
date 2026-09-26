@@ -29,7 +29,7 @@ for (const width of widths) {
     await enterTrap(page);
     await expect(page.getByRole('heading', { name: /this wallet looks familiar/i })).toBeFocused();
     await checkAxe(page);
-    const funder = page.getByRole('button', { name: /select fictional funder/i });
+    const funder = page.getByRole('button', { name: /inspect fictional funder/i });
     await funder.focus();
     await page.keyboard.press('Space');
     await expect(funder).toHaveAttribute('aria-expanded', 'true');
@@ -70,7 +70,7 @@ for (const width of widths) {
     await expect(page.getByTestId('retrieval')).toHaveCount(0);
 
     await page.getByRole('button', { name: /explore fictional rat trap demo/i }).click();
-    await page.getByRole('button', { name: /select fictional funder/i }).click();
+    await page.getByRole('button', { name: /inspect fictional funder/i }).click();
     await page.getByRole('button', { name: '7d', exact: true }).click();
     await page.getByRole('button', { name: /unfold small relationship view/i }).click();
     await page.evaluate(() => history.back());
@@ -91,7 +91,7 @@ for (const width of [320, 390] as const) {
   test(`horizontal regions support arrow keys at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await enterTrap(page);
-    await page.getByRole('button', { name: /select fictional funder/i }).click();
+    await page.getByRole('button', { name: /inspect fictional funder/i }).click();
     await expect(page.getByText(/Swipe sideways to inspect GRIME, SLUDGE and DUST/i)).toBeVisible();
     const cards = page.getByRole('region', { name: /previous fictional funded launches/i });
     await cards.focus();
