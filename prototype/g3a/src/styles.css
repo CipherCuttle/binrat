@@ -43,11 +43,11 @@ button:disabled { cursor: not-allowed; }
 .masthead nav :is(a, button):hover, .masthead nav .nav-active { color: var(--sea); }
 .network { white-space: nowrap; font-size: .73rem; color: #c8d3d5; border: 1px solid #77748d80; border-radius: 100px; padding: 9px 13px; }
 .poster { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); min-height: 604px; max-width: 1800px; margin: auto; background:
-    radial-gradient(ellipse 34% 28% at 65% 67%, #f7ecc8ed 0%, #ffd08a9c 37%, transparent 100%),
+    radial-gradient(ellipse 43% 29% at 56% 69%, #f7ecc8c8 0%, #ffd08a98 37%, transparent 100%),
     radial-gradient(ellipse 76% 24% at 48% 56%, #c060a899, transparent 88%),
     radial-gradient(ellipse 45% 25% at 93% 90%, #145a9680, transparent 95%),
     linear-gradient(180deg, #2b1f8f 0%, #473198 26%, #7b3db3 39%, #c060a8 60%, #f2ad63 79%, #202449 100%); }
-.poster::before { content:""; position:absolute; inset:0; z-index:-1; opacity:.24; pointer-events:none; background-image: radial-gradient(#ffe0ad 1px, transparent 1px),radial-gradient(#f8d2f7 1px, transparent 1px); background-size: 17px 19px, 31px 33px; background-position: 0 0, 6px 7px; mask-image: linear-gradient(#000, transparent 66%); }
+.poster::before { content:""; position:absolute; inset:0; z-index:-1; opacity:.14; pointer-events:none; background-image: radial-gradient(#ffe0ad 1px, transparent 1px),radial-gradient(#f8d2f7 1px, transparent 1px); background-size: 17px 19px, 31px 33px; background-position: 0 0, 6px 7px; mask-image: linear-gradient(#000, transparent 66%); }
 .poster-copy { z-index: 4; padding: clamp(42px,5vw,75px) 0 94px clamp(24px,5vw,85px); align-self: center; }
 .poster-copy .eyebrow { color: #f6ce8e; text-shadow: 0 1px 15px #39183d; }
 .display-title { margin: 14px 0 22px; font: 950 clamp(4rem, 6.5vw, 7.15rem)/.94 "Arial Black", "Avenir Next", sans-serif; letter-spacing: -.09em; text-wrap: balance; filter: drop-shadow(0 5px 11px #2c203e88); }
@@ -463,8 +463,8 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   width: 110%;
   height: 106%;
   overflow: visible;
-  filter: blur(16px);
-  opacity: .74;
+  filter: blur(12px);
+  opacity: .86;
 }
 .grain-wave-ribbon { transform-box: fill-box; transform-origin: center; }
 .grain-wave-ribbon--violet { animation: grain-drift-violet 47s ease-in-out infinite alternate; }
@@ -496,7 +496,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, #111638b3 0%, #231b50a1 27%, #24194857 48%, transparent 69%),
+    linear-gradient(90deg, #111638a5 0%, #231b5087 27%, #24194835 48%, transparent 69%),
     linear-gradient(180deg, #16123e29 0%, transparent 38%, #111b378a 100%);
 }
 @keyframes grain-drift-violet {
