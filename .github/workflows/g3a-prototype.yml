@@ -1,15 +1,15 @@
-name: G4-R masked header effect verification
+name: G4-R2 original grain-wave verification
 
 on:
   push:
     branches:
-      - experiment/binrat-g4r-header-cta5-inspired-20260926
+      - experiment/binrat-g4r2-grain-wave-20260927
     paths:
       - 'prototype/g3a/**'
       - '.github/workflows/g3a-prototype.yml'
   pull_request:
     branches:
-      - experiment/binrat-g4r-cinematic-20260926
+      - experiment/binrat-g4r-header-cta5-inspired-20260926
     paths:
       - 'prototype/g3a/**'
       - '.github/workflows/g3a-prototype.yml'
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   refresh-static-dist:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g4r-header-cta5-inspired-20260926'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g4r2-grain-wave-20260927'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -43,7 +43,7 @@ jobs:
           git add -A dist
           if ! git diff --cached --quiet -- dist; then
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(g4r): freeze tested static distribution'
-            git push origin HEAD:refs/heads/experiment/binrat-g4r-header-cta5-inspired-20260926
+            git push origin HEAD:refs/heads/experiment/binrat-g4r2-grain-wave-20260927
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
       - name: Verify no distribution drift if already committed
@@ -55,7 +55,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: g4r-header-source-evidence
+          name: g4r2-grain-source-evidence
           path: |
             prototype/g3a/evidence/screenshots
             prototype/g3a/test-results
@@ -89,13 +89,13 @@ jobs:
         env:
           PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/${{ github.event.pull_request.head.sha }}/prototype/g3a/dist/index.html
         run: |
-          echo "Immutable G4-R preview: $PUBLISHED_URL"
+          echo "Immutable G4-R2 preview: $PUBLISHED_URL"
           pnpm test:published
       - name: Upload actual browser screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: g4r-header-pr-evidence
+          name: g4r2-grain-pr-evidence
           path: |
             prototype/g3a/evidence/screenshots
             prototype/g3a/test-results
