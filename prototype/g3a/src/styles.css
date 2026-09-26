@@ -1192,8 +1192,9 @@ code {
 }
 
 .launch-strip article.ineligible {
-  opacity: 0.68;
-  border-top-color: #756686;
+  /* Keep all historical rows readable, including horizontally offscreen ones. */
+  background: #1c192d;
+  border-top-color: #a99bbb;
 }
 
 .launch-strip header span {
