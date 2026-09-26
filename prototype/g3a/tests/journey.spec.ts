@@ -14,7 +14,7 @@ for (const viewport of [
 
     await expect(page.getByTestId('discovery')).toBeVisible();
     await expect(page.getByText('VERIFIED HISTORICAL SNAPSHOT')).toBeVisible();
-    await expect(page.getByText('NOT LIVE', { exact: true })).toBeVisible();
+    await expect(page.getByText('⊘ NOT LIVE', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /investigate/i })).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   });
