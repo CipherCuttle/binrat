@@ -91,3 +91,20 @@ Installed Figma `figma-use` and `figma-generate-design` were loaded before Figma
 **Actual visual QA:** both desktop and full mobile screenshots plus 390×844 cropped first-fold screenshot were taken from Figma. A single screenshot-led correction added a readable dark backing to the desktop evidence-limit footnote and restored the first *approved reference's* tagline, "FOR A MORE HONEST DEGEN WORLD." Live Figma structural check after this correction PASS: all 3 frames show same verified-historical/NOT LIVE/token/network/time/funding-unknown/pricing-absent data, same original rat hash, and a visible primary CTA; 390×844 viewport contains the entire primary action. Three original G2 pages still exist. This was an art-directed screen recreation using the first approved image **as a reference**, not a pixel-exact capture of generated imagery or functioning prototype; visual approval of the actual Figma result remains with owner.
 
 **Boundaries:** STOP at this desktop + matching mobile first-fold recreation. No G2b expansion to 24 screens, permanent visual styles, tokens, Svelte code, new external image generation, merge, deployment, backend/Pons, Telegram or trading changes. PRs #43/#44 remain unmerged; G2b is an additional explorative page inside the same Figma file. 
+
+
+## G2c — Underground Arcade investigative hypotheses (2026-09-26)
+
+Exploratory editable page [62:2](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-2), owner approval pending. Frozen v3 fixture `BINRAT-G1A-PONS-4663-20260926-v3`; exact approved rat IMAGE hash `446d543bce1412a8b605b46c3c5c26816c80b35e` reused with FIT, no redraw. Original studies preserved.
+
+| Screen | A — Dumpster Intelligence Machine | B — Evidence-Led Underground Arcade |
+|---|---|---|
+| Desktop discovery | [62:3](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-3) | [62:34](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-34) |
+| 390 mobile discovery | [62:60](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-60) | [62:83](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-83) |
+| 390 × 844 first fold | [62:106](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-106) | [62:123](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-123) |
+| Desktop Dig Deeper | [62:140](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-140) | [62:174](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-174) |
+| Investigate storyboard | [62:208](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-208) | [62:223](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-223) |
+
+[Side-by-side owner comparison](https://www.figma.com/design/zFjrfxW4xL7xhsrdMmZLx7?node-id=62-238). A makes factory evidence an environmental instrument and offers a source desk; B uses editorial hierarchy and compact receipt index. Both explicitly mark VERIFIED HISTORICAL SNAPSHOT / NOT LIVE and UNKNOWN funding/pricing/V4, and segregate MOLD DEMO. The UI is exploratory editable artwork, not interactive production or verified accessible controls.
+
+**QA status:** figma-use and figma-generate-design read; G1A fixture v3 and canonical UX/evidence brief read; source G2b frame 46:3 structurally inspected. Eleven new Figma frames created and IDs returned; screenshots obtained for desktop discovery A/B, mobile discovery A/B and comparison. 320px stress inspection, independent critique and post-fix visual inspection are still outstanding; Anthropic frontend-design and Impeccable were not executed in this pass. No Svelte, backend, Telegram, trading or production modifications. Both PRs remain draft and unmerged. Do not mark G2c complete until remaining checks and owner approval.
