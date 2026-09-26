@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "binrat.rat-radar-evidence-lab/0.1",
+  "synthetic": true,
+  "warning": "ENTIRELY SYNTHETIC. Seeded addresses, intermediary labels and launch events are test fixtures, not observed blockchain evidence or financial outcomes.",
+  "chainId": 5042,
+  "asOfBlock": 360,
+  "launches": [
+    {
+      "launchId": "lab-alpha",
+      "launchBlock": 100,
+      "poolSeed": 10,
+      "tokenSeed": 20
+    },
+    {
+      "launchId": "lab-beta",
+      "launchBlock": 200,
+      "poolSeed": 11,
+      "tokenSeed": 21
+    },
+    {
+      "launchId": "lab-gamma",
+      "launchBlock": 300,
+      "poolSeed": 12,
+      "tokenSeed": 22
+    }
+  ],
+  "recipientSeeds": {
+    "knownIntermediary": 500,
+    "heldOutIntermediary": 501,
+    "unclassifiedRecurring": 50,
+    "unclassifiedOneOff": 51
+  },
+  "evaluatorOnlyLabels": {
+    "50": "UNCLASSIFIED_RECIPIENT",
+    "51": "UNCLASSIFIED_RECIPIENT",
+    "500": "FIXTURE_VERIFIED_INTERMEDIARY",
+    "501": "FIXTURE_HELD_OUT_INTERMEDIARY"
+  },
+  "acquisitions": [
+    {
+      "launchId": "lab-alpha",
+      "blockNumber": 101,
+      "logIndex": 1,
+      "recipientSeed": 500
+    },
+    {
+      "launchId": "lab-beta",
+      "blockNumber": 201,
+      "logIndex": 1,
+      "recipientSeed": 500
+    },
+    {
+      "launchId": "lab-gamma",
+      "blockNumber": 301,
+      "logIndex": 1,
+      "recipientSeed": 500
+    },
+    {
+      "launchId": "lab-alpha",
+      "blockNumber": 102,
+      "logIndex": 2,
+      "recipientSeed": 501
+    },
+    {
+      "launchId": "lab-beta",
+      "blockNumber": 202,
+      "logIndex": 2,
+      "recipientSeed": 501
+    },
+    {
+      "launchId": "lab-alpha",
+      "blockNumber": 104,
+      "logIndex": 3,
+      "recipientSeed": 50
+    },
+    {
+      "launchId": "lab-beta",
+      "blockNumber": 206,
+      "logIndex": 3,
+      "recipientSeed": 50
+    },
+    {
+      "launchId": "lab-alpha",
+      "blockNumber": 101,
+      "logIndex": 4,
+      "recipientSeed": 51
+    }
+  ]
+}
