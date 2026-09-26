@@ -25,3 +25,10 @@ Known limitation: SVG fractal-noise filters and `transform-box` differ slightly 
 The source-branch [GitHub Actions run 36278066680](https://github.com/CipherCuttle/binrat/actions/runs/36278066680) completed successfully: clean pnpm/Vite production build and **30/30 Playwright tests passed**. A single bounded visual adjustment made the cream horizon broader and softened the old dot field/copy shade; that run validates the adjusted implementation and committed `dist/` build at `bcb5ee7cfc052d1ed26dc97575efba4ff29e0f5c`.
 
 The uploaded `g4r2-grain-source-evidence` artifact contains 1440px desktop, 390px and 320px home, 390px still/reduced-motion and Radar screenshots. Those images were inspected: title and CTAs stay readable at both mobile widths; rat and original skyline retain prominence; Radar is separate and its paper remains unanimated. Exact-head published GitHack smoke and physical Android owner approval are separate gates, not implied by these screenshot checks.
+
+
+## R3 visibility correction (owner's GitHack report)
+
+Owner confirmed G4-R2 looked static. Its broad SVG gradients were blurred and traveled only 1–2% over 47–62 seconds, while mobile opacity was reduced further. Existence checks were not an adequate acceptance test. R3 keeps the same homepage layout and isolated draft PR, but adds a tiny canvas action drawing **high-contrast, fine, moving sunset contour lines** over the original still gradient. No pointer input, heavy shader or dependency. Frame rate is capped to approximately 19fps desktop and 14fps mobile; only the in-view homepage canvas runs. Reduced motion paints one static frame.
+
+Playwright now reads actual rendered canvas pixels before/after 1.4 seconds and demands a measurable frame change. It also checks animation is frozen under reduced motion and captures a second desktop screenshot. Visual acceptance still requires direct inspection on Android; the numeric motion check alone does not establish taste or visual quality.

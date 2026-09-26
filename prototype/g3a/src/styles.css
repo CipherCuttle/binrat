@@ -434,6 +434,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 }
 
 /* G4-R2: Original pixel-grained sky currents. Only inside the homepage poster.
+   R3: visible canvas contour motion replaces invisible 1-2% SVG drift.
    The illustrated rat and semantic copy remain above all atmosphere. */
 .g4-world .masthead { isolation: isolate; overflow: hidden; }
 .g4-world .masthead::before {
@@ -467,9 +468,23 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   opacity: .86;
 }
 .grain-wave-ribbon { transform-box: fill-box; transform-origin: center; }
-.grain-wave-ribbon--violet { animation: grain-drift-violet 47s ease-in-out infinite alternate; }
-.grain-wave-ribbon--rose { animation: grain-drift-rose 55s ease-in-out infinite alternate; }
-.grain-wave-ribbon--sunset { animation: grain-drift-sunset 62s ease-in-out infinite alternate; }
+/* Static SVG underlay: canvas supplies visible movement, preventing competing
+   slow motions and avoiding a doubly animated fall-back. */
+.grain-wave-ribbon--violet,
+.grain-wave-ribbon--rose,
+.grain-wave-ribbon--sunset { animation: none; }
+.grain-wave-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  image-rendering: auto;
+  opacity: .97;
+  mask-image: linear-gradient(90deg, #000 0%, #000 52%, #000e 70%, #0009 90%, transparent 100%);
+}
 .grain-wave-clouds {
   position: absolute;
   inset: 0;
@@ -516,6 +531,10 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   .grain-wave-currents { filter: blur(12px); opacity: .58; }
   .grain-wave-grain { opacity: .10; background-size: 120px 120px, 14px 19px; }
   .grain-wave-clouds { opacity: .47; }
+  .grain-wave-canvas {
+    opacity: .79;
+    mask-image: linear-gradient(180deg, #0009 0%, #000 36%, #000 70%, #0009 89%, transparent 100%);
+  }
   .grain-wave-copy-shade {
     background:
       linear-gradient(180deg, #111638b8 0%, #211a51a6 39%, #25195145 63%, transparent 83%),
@@ -527,12 +546,14 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   .grain-wave-sky { opacity: .53; }
   .grain-wave-currents { opacity: .49; filter: blur(10px); }
   .grain-wave-grain { opacity: .075; }
+  .grain-wave-canvas { opacity: .72; }
 }
 @media (prefers-reduced-motion: reduce) {
   .grain-wave-sky { opacity: .8; }
   .grain-wave-ribbon { animation: none !important; transform: none !important; }
   .grain-wave-currents { filter: blur(13px); }
   .grain-wave-grain { opacity: .13; }
+  .grain-wave-canvas { opacity: .78; }
   .g4-world .masthead::before { animation: none !important; }
   .grain-wave-sky, .grain-wave-currents { transition: none !important; }
 }

@@ -11,7 +11,26 @@ test('desktop: original Grain Wave stays in the world, behind the rat and copy',
   await expect(sky.locator('stop[stop-color="#2b1f8f"]')).toHaveCount(1);
   await expect(sky.locator('stop[stop-color="#7b3db3"]')).toHaveCount(2);
   await expect(sky.locator('stop[stop-color="#f7ecc8"]')).toHaveCount(1);
-  expect(await page.locator('video, canvas, .hero-flow-mask').count()).toBe(0);
+  expect(await page.locator('video, .hero-flow-mask').count()).toBe(0);
+  const canvas = page.getByTestId('grain-wave-canvas');
+  await expect(canvas).toBeVisible();
+  await expect.poll(async () => Number(await canvas.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(1);
+  const before = await canvas.evaluate((el: HTMLCanvasElement) => {
+    const data = el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data;
+    return Array.from(data);
+  });
+  await page.waitForTimeout(1400);
+  const after = await canvas.evaluate((el: HTMLCanvasElement) => Array.from(
+    el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data
+  ));
+  let changed = 0;
+  for (let offset = 0; offset < before.length; offset += 40) {
+    if (Math.abs(before[offset] - after[offset]) +
+      Math.abs(before[offset + 1] - after[offset + 1]) +
+      Math.abs(before[offset + 2] - after[offset + 2]) > 25) changed++;
+  }
+  expect(changed, 'Grain Wave must be visibly changing actual rendered pixels, not just report a CSS animation').toBeGreaterThan(600);
+  await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-moving-1440.png', fullPage: false });
   expect(await sky.locator('.grain-wave-ribbon--violet').evaluate(el => getComputedStyle(el).animationName)).toBe('grain-drift-violet');
   expect(await sky.evaluate(el => getComputedStyle(el).pointerEvents)).toBe('none');
   await expect(page.getByRole('button', { name: /enter rat radar/i })).toBeInViewport();
@@ -35,6 +54,9 @@ for (const width of [390, 320] as const) {
     await expect(sky).toBeVisible();
     expect(Number(await sky.evaluate(el => getComputedStyle(el).opacity))).toBeLessThan(.8);
     await expect(page.locator('.rat-stage img')).toBeVisible();
+    const canvas = page.getByTestId('grain-wave-canvas');
+    await expect(canvas).toBeVisible();
+    await expect.poll(async () => Number(await canvas.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(1);
     await expect(page.getByRole('heading', { name: /the rat\s*remembers/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /enter rat radar/i })).toBeInViewport();
     await expect(page.getByRole('button', { name: /investigate the receipt/i })).toBeInViewport();
@@ -56,11 +78,16 @@ test('reduced-motion: still sunset, stationary grain, no pointer-follow', async 
   for (const ribbon of await sky.locator('.grain-wave-ribbon').all()) {
     expect(await ribbon.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
   }
+  const still = page.getByTestId('grain-wave-canvas');
+  await expect(still).toBeVisible();
+  await expect(still).toHaveAttribute('data-grain-frame', '1');
   const poster = page.locator('.poster');
   const rect = await poster.boundingBox();
   if (!rect) throw new Error('poster must have visible bounds');
   await page.mouse.move(rect.x + rect.width * .3, rect.y + rect.height * .5);
   expect(await poster.evaluate(el => el.style.getPropertyValue('--flow-x'))).toBe('');
+  await page.waitForTimeout(900);
+  await expect(still).toHaveAttribute('data-grain-frame', '1');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-still-390.png', fullPage: true });
   await page.getByRole('button', { name: /investigate the receipt/i }).click();

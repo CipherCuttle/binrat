@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from 'svelte';
   import { demo, receipt, shortAddress, usd, type DemoWindow } from './fixture';
+  import { grainWave } from './grainWave';
 
   type Scene = 'discovery' | 'radar' | 'retrieving' | 'investigation' | 'rat-trap';
 
@@ -292,6 +293,7 @@
           <path class="grain-wave-ribbon grain-wave-ribbon--rose" fill="url(#gw-rose)" d="M-110 304 C150 194 298 407 534 309 S958 230 1310 371 L1310 474 C965 361 807 451 552 412 S126 457 -110 396Z" />
           <path class="grain-wave-ribbon grain-wave-ribbon--sunset" fill="url(#gw-sunset)" d="M-110 449 C183 346 343 504 603 416 S1048 360 1310 489 L1310 597 C1014 484 818 559 564 523 S173 572 -110 525Z" />
         </svg>
+        <canvas class="grain-wave-canvas" use:grainWave aria-hidden="true" data-testid="grain-wave-canvas"></canvas>
         <span class="grain-wave-clouds"></span>
         <span class="grain-wave-grain"></span>
         <span class="grain-wave-copy-shade"></span>
