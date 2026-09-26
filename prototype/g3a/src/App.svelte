@@ -128,7 +128,7 @@
   };
 
   const openRadar = () => {
-    radarCaseOpen = false;
+    radarCaseOpen = typeof window !== 'undefined' && window.matchMedia('(min-width: 761px)').matches;
     pushScene('radar');
   };
 
@@ -385,7 +385,7 @@
 {:else if scene === 'retrieving'}
   <main class="retrieval" data-testid="retrieval" aria-labelledby="retrieval-title">
     <header class="compact-header">
-      <strong>♛ BINRAT / SOURCE RETRIEVAL</strong>
+      <strong>BINRAT <span aria-hidden="true">/</span> Receipt scanner</strong>
       <span>PRELOADED ARCHIVE / NOT LIVE</span>
     </header>
 
@@ -429,7 +429,7 @@
 {:else if scene === 'investigation'}
   <main class="investigation" data-testid="investigation">
     <header class="compact-header">
-      <strong>♛ BINRAT / DIG DEEPER</strong>
+      <strong>BINRAT <span aria-hidden="true">/</span> Dig Deeper</strong>
       <span>VERIFIED HISTORICAL / NOT LIVE</span>
     </header>
 
@@ -455,8 +455,8 @@
         <p>Token <code>{receipt.token}</code></p>
 
         <section class="fact-section">
-          <p class="section-number">01 / DOCUMENTED FACTS</p>
-          <h2>OBSERVED ON CHAIN</h2>
+          <p class="section-number">01 / What is documented</p>
+          <h2>Observed on chain</h2>
           <dl>
             <div><dt>Factory</dt><dd><code>{receipt.factory}</code></dd></div>
             <div><dt>Original deployer</dt><dd><code>{receipt.originalDeployer}</code></dd></div>
@@ -467,14 +467,14 @@
 
         <section class="source-section">
           <p class="section-number">02 / UNDERLYING TRANSACTION ↗</p>
-          <h2>SOURCE / FACTORY TRANSACTION</h2>
+          <h2>Original factory transaction</h2>
           <code>{receipt.transaction}</code>
           <a href={receipt.explorer} target="_blank" rel="noreferrer">Open Robinscan source receipt ↗</a>
         </section>
 
         <section class="provenance-section" aria-labelledby="provenance-title">
           <p class="section-number">03 / PROVENANCE AND CAVEATS</p>
-          <h2 id="provenance-title">WHAT WAS ACTUALLY VERIFIED</h2>
+          <h2 id="provenance-title">What was actually verified</h2>
           <p>Frozen proof captured {receipt.asOf.replace('T', ' ').replace('Z', ' UTC')}. Two independent archive-capable RPC providers (SolidRPC and Tenderly) agreed on the receipt core, corroborated by Robinscan.</p>
           <a href={receipt.evidenceManifest} target="_blank" rel="noreferrer">Open the frozen independent proof manifest ↗</a>
           <p class="provenance-warning">Explorer caveat: on 25 Sep 2026, the official Blockscout transaction UI displayed an unrelated record for this transaction hash. That conflicting UI result was not counted as corroboration. Use the archived proof manifest and Robinscan for this narrow factory-event verification.</p>
@@ -483,7 +483,7 @@
 
         <section class="unknown-section" aria-labelledby="unsupported-title">
           <p class="section-number">04 / UNSUPPORTED ≠ ABSENT</p>
-          <h2 id="unsupported-title">NOT ESTABLISHED BY THIS RECEIPT</h2>
+          <h2 id="unsupported-title">What this receipt can't tell us</h2>
           <ul>
             <li>Direct funding: <strong>UNKNOWN</strong></li>
             <li>Pricing and market cap: <strong>NOT RECONSTRUCTED</strong></li>
@@ -511,7 +511,7 @@
 {:else}
   <main class="rat-trap" data-testid="rat-trap">
     <header class="compact-header demo-header">
-      <strong>♛ BINRAT / RAT TRAP DEMO</strong>
+      <strong>BINRAT <span aria-hidden="true">/</span> Rat Trap <small>(demo)</small></strong>
       <span>FICTIONAL / PRELOADED / NO MONITORING</span>
     </header>
 
@@ -532,20 +532,20 @@
             <div><dt>Exit liquidity</dt><dd class="unknown">UNKNOWN</dd></div>
           </dl>
           <button class="funder-trigger" type="button" onclick={revealFunder} aria-expanded={funderRevealed} aria-controls={funderRevealed ? "rat-trap-reveal" : undefined}>
-            <span>SELECT FICTIONAL FUNDER</span><strong>DEMO-FUNDER-A</strong><small>4 transfers appear in this fictional ledger →</small>
+            <span>Inspect fictional funder</span><strong>DEMO-FUNDER-A</strong><small>4 transfers appear in this fictional ledger →</small>
           </button>
         </article>
 
         <aside class="trap-rat" aria-label="Rat Trap status">
           <img src="./rat-original.jpg" alt="Approved BINRAT rat inspecting the fictional case" width="1536" height="1536" />
-          <p>{funderRevealed ? 'TRAP SPRUNG' : 'WAITING FOR A FUNDER'}</p>
+          <p>{funderRevealed ? 'Earlier transfers found' : 'Choose a fictional funder'}</p>
         </aside>
       </div>
 
       {#if funderRevealed}
         <section id="rat-trap-reveal" class="trap-reveal" data-testid="rat-trap-reveal" aria-labelledby="shared-funder-title">
           <div class="reveal-banner">
-            <p>FICTIONAL ADDRESS RELATIONSHIP FOUND</p>
+            <p>Fictional address relationship</p>
             <h2 id="shared-funder-title" bind:this={revealHeading} tabindex="-1">One funder. Four transfers. Three earlier launches.</h2>
             <p>This demonstrates a shared funding address—not shared human ownership, safety or profitability.</p>
           </div>
