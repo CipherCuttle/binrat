@@ -1,0 +1,62 @@
+name: React Bits Pro license probe (isolated)
+
+on:
+  push:
+    branches:
+      - experiment/binrat-reactbits-license-probe-20260926
+    paths:
+      - .github/workflows/reactbits-license-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-cta5-entitlement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Verify repo secret can access licensed CTA 5 registry
+        shell: bash
+        env:
+          REACTBITS_LICENSE_KEY: ${{ secrets.REACTBITS_LICENSE_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+
+          if [[ -z "${REACTBITS_LICENSE_KEY:-}" ]]; then
+            echo "FAIL: REACTBITS_LICENSE_KEY is not available to this workflow."
+            exit 1
+          fi
+          echo "Secret is available to this workflow; checking CTA 5 entitlement..."
+
+          response_file="$RUNNER_TEMP/reactbits-cta5-private.json"
+          trap 'rm -f "$response_file"' EXIT
+          status="$(curl --silent --show-error --location --retry 1 --max-time 30 \
+            --output "$response_file" --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${REACTBITS_LICENSE_KEY}" \
+            'https://pro.reactbits.dev/api/r/pro/cta-5.json')"
+
+          case "$status" in
+            200)
+              node - "$response_file" <<'NODE'
+          const fs = require('node:fs');
+          let data;
+          try {
+            data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          } catch {
+            console.error('FAIL: registry returned HTTP 200 but not valid JSON.');
+            process.exit(1);
+          }
+          if (!data || !Array.isArray(data.files) || data.files.length === 0) {
+            console.error('FAIL: HTTP 200 did not contain a valid CTA 5 registry item.');
+            process.exit(1);
+          }
+          console.log('PASS: repo secret authenticated and CTA 5 returned a valid licensed registry item.');
+          NODE
+              ;;
+            401) echo "FAIL: React Bits Pro rejected this key (HTTP 401)."; exit 1 ;;
+            403) echo "FAIL: key lacks access to CTA 5 or account entitlement (HTTP 403)."; exit 1 ;;
+            404) echo "FAIL: CTA 5 registry path was not found (HTTP 404)."; exit 1 ;;
+            *) echo "FAIL: React Bits Pro registry returned HTTP $status."; exit 1 ;;
+          esac
