@@ -35,3 +35,8 @@ Playwright now reads actual rendered canvas pixels before/after 1.4 seconds and 
 
 
 Targeted CI repair: first visibility run 36279236421 **passed the real 1.4-second rendered-pixel difference assertion** and 28 tests, but two preexisting-style assertions were stale: one expected the now deliberately static SVG underlay to animate, and another assumed reduced-motion resize setup can paint only once. The targeted correction checks the actual moving canvas at desktop **and 390px** and checks that a settled reduced-motion frame count remains unchanged; mobile canvas brightness is raised slightly to make the effect unmistakable on Android while retaining dark text protection. Screenshot evidence now includes phase A/B hero captures for direct visual comparison.
+
+
+## Visibility repair verification
+
+CI source run [36279442083](https://github.com/CipherCuttle/binrat/actions/runs/36279442083) built the 2D wave code and passed all **30/30** Playwright tests. Unlike the original CSS-only gate, tests now read actual canvas pixels **1.4 seconds apart at 1440px** and **1.2 seconds apart at 390px**, require measurable differences, and capture both frame phases. A settled prefers-reduced-motion run verifies no ongoing frame advances. The committed static distribution was refreshed to build commit `16990d3705533db9358697f6da4c2d4afe3414e5`. Desktop and 390px captured frames show curved, fine-grained moving color contours rather than an invisible slow radial drift. Remaining gates: exact-head published GitHack smoke and owner's physical Android visual approval. No merge authorization.
