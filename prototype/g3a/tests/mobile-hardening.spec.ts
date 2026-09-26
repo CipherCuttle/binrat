@@ -27,7 +27,7 @@ for (const width of widths) {
   test(`Rat Trap expanded states, keyboard and axe at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await enterTrap(page);
-    await expect(page.getByRole('heading', { name: /who fed the mold/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /this wallet looks familiar/i })).toBeFocused();
     await checkAxe(page);
     const funder = page.getByRole('button', { name: /select fictional funder/i });
     await funder.focus();
@@ -52,7 +52,7 @@ for (const width of widths) {
     const unfold = page.getByRole('button', { name: /unfold small relationship view/i });
     await unfold.focus();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('heading', { name: /shared address, not shared owner/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /same funder. ownership unproven/i })).toBeFocused();
     await expect(page.getByTestId('relationship-map')).toBeVisible();
     await checkAxe(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -79,7 +79,7 @@ for (const width of widths) {
     await page.evaluate(() => history.forward());
     await expect(page.getByTestId('relationship-map')).toBeVisible();
     await expect(page.getByTestId('thermometer-output')).toContainText('1 / 3');
-    await expect(page.getByRole('heading', { name: /shared address, not shared owner/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /same funder. ownership unproven/i })).toBeFocused();
     await page.getByRole('button', { name: /back to verified receipt/i }).click();
     await expect(page.getByTestId('investigation')).toBeVisible();
     await page.getByRole('button', { name: /back to fresh garbage/i }).click();
