@@ -15,6 +15,10 @@ test('capture inspected desktop and mobile states', async ({ page }) => {
   await page.screenshot({ path: `${evidence}/desktop-rat-trap-entry.png`, fullPage: true });
   await page.getByRole('button', { name: /select fictional funder/i }).click();
   await page.screenshot({ path: `${evidence}/desktop-rat-trap-reveal.png`, fullPage: true });
+  await page.getByRole('button', { name: '7d', exact: true }).click();
+  await page.screenshot({ path: `${evidence}/desktop-rat-trap-7d.png`, fullPage: true });
+  await page.getByRole('button', { name: /unfold small relationship view/i }).click();
+  await page.screenshot({ path: `${evidence}/desktop-relationship.png`, fullPage: true });
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: /back to verified receipt/i }).click();
@@ -40,6 +44,11 @@ test('capture inspected desktop and mobile states', async ({ page }) => {
   await page.getByRole('button', { name: /skip retrieval/i }).click();
   await page.screenshot({ path: `${evidence}/mobile-320-investigation.png`, fullPage: true });
   await page.getByRole('button', { name: /explore fictional rat trap demo/i }).click();
+  await page.screenshot({ path: `${evidence}/mobile-320-rat-trap-entry.png`, fullPage: true });
   await page.getByRole('button', { name: /select fictional funder/i }).click();
   await page.screenshot({ path: `${evidence}/mobile-320-rat-trap-reveal.png`, fullPage: true });
+  await page.getByRole('button', { name: '7d', exact: true }).click();
+  await page.screenshot({ path: `${evidence}/mobile-320-rat-trap-7d.png`, fullPage: true });
+  await page.getByRole('button', { name: /unfold small relationship view/i }).click();
+  await page.screenshot({ path: `${evidence}/mobile-320-relationship.png`, fullPage: true });
 });

@@ -1192,8 +1192,9 @@ code {
 }
 
 .launch-strip article.ineligible {
-  opacity: 0.68;
-  border-top-color: #756686;
+  /* Keep all historical rows readable, including horizontally offscreen ones. */
+  background: #1c192d;
+  border-top-color: #a99bbb;
 }
 
 .launch-strip header span {
@@ -1866,5 +1867,49 @@ code {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* G3c: keyboard-visible horizontal regions and source limitations only. */
+.scrollable-region:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 4px;
+  scroll-behavior: auto;
+}
+.receipt-provenance {
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: var(--muted) !important;
+}
+.provenance-section {
+  margin-top: 44px;
+  padding: 18px;
+  border: 1px solid var(--teal);
+  background: #211936;
+  overflow-wrap: anywhere;
+}
+.provenance-section h2 {
+  color: var(--teal);
+  font-size: 1.05rem;
+}
+.provenance-section a {
+  color: var(--teal);
+  font-weight: 800;
+}
+.provenance-warning {
+  border-left: 4px solid var(--yellow);
+  padding: 8px 12px;
+  color: var(--paper) !important;
+  background: #292036;
+}
+
+/* A visual affordance for the intentionally horizontal Android strips. */
+.scroll-hint { display: none; }
+@media (max-width: 760px) {
+  .scroll-hint {
+    display: block;
+    color: var(--teal);
+    font: 800 0.72rem/1.45 "Courier New", monospace;
+    margin: 14px 0 8px;
   }
 }

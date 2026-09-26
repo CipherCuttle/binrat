@@ -1,13 +1,15 @@
-name: G3a disposable prototype
+name: G3c isolated mobile investigation verification
 
 on:
   push:
     branches:
-      - g3a-interactive-prototype-20260926
+      - experiment/binrat-g3c-mobile-20260926
     paths:
       - 'prototype/g3a/**'
       - '.github/workflows/g3a-prototype.yml'
   pull_request:
+    branches:
+      - experiment/binrat-g3b-reviewed-20260926
     paths:
       - 'prototype/g3a/**'
       - '.github/workflows/g3a-prototype.yml'
@@ -16,9 +18,12 @@ permissions:
   contents: read
 
 jobs:
-  browser-verification:
+  refresh-static-dist:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g3c-mobile-20260926'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: prototype/g3a
@@ -32,15 +37,67 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build
       - run: pnpm test
-      - name: Test the published GitHack build
-        env:
-          PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/g3a-interactive-prototype-20260926/prototype/g3a/dist/index.html
-        run: pnpm test:published
-      - name: Upload inspected screenshots
+      - name: Commit fresh distribution ONLY to the isolated G3c branch
+        id: dist
+        run: |
+          git add -A dist
+          if ! git diff --cached --quiet -- dist; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(g3c): freeze tested static distribution'
+            git push origin HEAD:refs/heads/experiment/binrat-g3c-mobile-20260926
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify no distribution drift if already committed
+        if: steps.dist.outputs.changed != 'true'
+        run: |
+          git diff --exit-code -- dist
+          test -z "$(git ls-files --others --exclude-standard dist)"
+      - name: Upload browser screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: g3a-browser-evidence
-          path: prototype/g3a/evidence/screenshots
+          name: g3c-source-browser-evidence
+          path: |
+            prototype/g3a/evidence/screenshots
+            prototype/g3a/test-results
+          if-no-files-found: warn
+          retention-days: 7
+
+  browser-verification:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: prototype/g3a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - name: Verify committed distribution matches source build
+        run: |
+          git diff --exit-code -- dist
+          test -z "$(git ls-files --others --exclude-standard dist)"
+      - run: pnpm test
+      - name: Test immutable G3c GitHack for exact PR head
+        env:
+          PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/${{ github.event.pull_request.head.sha }}/prototype/g3a/dist/index.html
+        run: |
+          echo "Immutable G3c preview: $PUBLISHED_URL"
+          pnpm test:published
+      - name: Upload actual browser screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g3c-pr-browser-evidence
+          path: |
+            prototype/g3a/evidence/screenshots
+            prototype/g3a/test-results
           if-no-files-found: warn
           retention-days: 7

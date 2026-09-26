@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, tick } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import { demo, receipt, shortAddress, usd, type DemoWindow } from './fixture';
 
   type Scene = 'discovery' | 'retrieving' | 'investigation' | 'rat-trap';
@@ -10,6 +10,7 @@
   let funderRevealed = $state(false);
   let relationshipVisible = $state(false);
   let sceneHeading = $state<HTMLElement | null>(null);
+  let demoEntryButton = $state<HTMLButtonElement | null>(null);
   let revealHeading = $state<HTMLElement | null>(null);
   let relationshipHeading = $state<HTMLElement | null>(null);
   let intervalId: number | undefined;
@@ -37,16 +38,82 @@
     finishId = undefined;
   };
 
-  const focusScene = async () => {
+  // One history entry per scene, not per reveal or thermometer selection.
+  // Retrieval completion replaces its entry: Back never replays a finished scan.
+  type RouteSnapshot = {
+    version: 1;
+    scene: Scene;
+    selectedWindow: DemoWindow;
+    funderRevealed: boolean;
+    relationshipVisible: boolean;
+  };
+
+  const snapshot = (target: Scene = scene): RouteSnapshot => ({
+    version: 1,
+    scene: target,
+    selectedWindow,
+    funderRevealed,
+    relationshipVisible
+  });
+
+  const readRoute = (state: unknown): RouteSnapshot | null => {
+    if (!state || typeof state !== 'object') return null;
+    const candidate = (state as { binratG3c?: RouteSnapshot }).binratG3c;
+    if (
+      candidate?.version !== 1 ||
+      !['discovery', 'retrieving', 'investigation', 'rat-trap'].includes(candidate.scene) ||
+      !['6h', '24h', '3d', '7d'].includes(candidate.selectedWindow)
+    ) return null;
+    return candidate;
+  };
+
+  const replaceRoute = () => {
+    window.history.replaceState({ ...(window.history.state ?? {}), binratG3c: snapshot() }, '');
+  };
+
+  const focusScene = async (from?: Scene) => {
     await tick();
-    sceneHeading?.focus();
+    if (scene === 'investigation' && from === 'rat-trap') {
+      demoEntryButton?.focus();
+    } else if (scene === 'rat-trap' && relationshipVisible) {
+      relationshipHeading?.focus();
+    } else if (scene === 'rat-trap' && funderRevealed) {
+      revealHeading?.focus();
+    } else {
+      sceneHeading?.focus();
+    }
+  };
+
+  const pushScene = (next: Scene) => {
+    window.history.pushState({ ...(window.history.state ?? {}), binratG3c: snapshot(next) }, '');
+    scene = next;
+    void focusScene();
+  };
+
+  const restoreRoute = (route: RouteSnapshot, from?: Scene) => {
+    clearTimers();
+    selectedWindow = route.selectedWindow;
+    funderRevealed = route.funderRevealed;
+    relationshipVisible = route.relationshipVisible;
+    // Forward/reload into an interrupted retrieval settles on its preloaded receipt.
+    // It never starts a second playback or makes a fresh network request.
+    scene = route.scene === 'retrieving' ? 'investigation' : route.scene;
+    progress = scene === 'discovery' ? 0 : 100;
+    if (route.scene === 'retrieving') replaceRoute();
+    void focusScene(from);
   };
 
   const openInvestigation = () => {
+    const wasRetrieving = scene === 'retrieving';
     clearTimers();
     progress = 100;
-    scene = 'investigation';
-    void focusScene();
+    if (wasRetrieving) {
+      scene = 'investigation';
+      replaceRoute();
+      void focusScene();
+    } else {
+      pushScene('investigation');
+    }
   };
 
   const beginRetrieval = () => {
@@ -57,9 +124,7 @@
 
     clearTimers();
     progress = 8;
-    scene = 'retrieving';
-    void focusScene();
-
+    pushScene('retrieving');
     intervalId = window.setInterval(() => {
       progress = Math.min(96, progress + 4);
     }, 120);
@@ -68,35 +133,79 @@
 
   const returnToDiscovery = () => {
     clearTimers();
-    progress = 0;
-    scene = 'discovery';
-    void focusScene();
+    if (readRoute(window.history.state)) {
+      window.history.go(scene === 'rat-trap' ? -2 : -1);
+    } else {
+      progress = 0;
+      scene = 'discovery';
+      replaceRoute();
+      void focusScene();
+    }
   };
 
   const openRatTrap = () => {
     funderRevealed = false;
     relationshipVisible = false;
     selectedWindow = '24h';
-    scene = 'rat-trap';
-    void focusScene();
+    pushScene('rat-trap');
   };
 
   const returnToInvestigation = () => {
-    scene = 'investigation';
-    void focusScene();
+    if (readRoute(window.history.state)) {
+      window.history.back();
+    } else {
+      scene = 'investigation';
+      replaceRoute();
+      void focusScene('rat-trap');
+    }
   };
 
   const revealFunder = async () => {
     funderRevealed = true;
+    replaceRoute();
     await tick();
     revealHeading?.focus();
   };
 
   const revealRelationship = async () => {
     relationshipVisible = true;
+    replaceRoute();
     await tick();
     relationshipHeading?.focus();
   };
+
+  const chooseWindow = (window: DemoWindow) => {
+    selectedWindow = window;
+    replaceRoute();
+    // The selected button retains DOM focus while the live numerator changes.
+  };
+
+  const scrollHorizontal = (event: KeyboardEvent) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    const region = event.currentTarget as HTMLElement;
+    if (region.scrollWidth <= region.clientWidth) return;
+    event.preventDefault();
+    region.scrollBy({
+      left: event.key === 'ArrowRight' ? 260 : -260,
+      behavior: 'instant'
+    });
+  };
+
+  onMount(() => {
+    const saved = readRoute(window.history.state);
+    if (saved) {
+      restoreRoute(saved);
+    } else {
+      replaceRoute();
+    }
+    const onPopState = (event: PopStateEvent) => {
+      const target = readRoute(event.state);
+      if (target) restoreRoute(target, scene);
+      else clearTimers();
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  });
 
   onDestroy(clearTimers);
 </script>
@@ -139,6 +248,7 @@
             <strong>⊘ NOT LIVE</strong>
           </div>
           <p>Verified factory event. A preloaded historical record — not a live query.</p>
+          <p class="receipt-provenance">Source: two independent archive RPCs and Robinscan; an official Blockscout UI conflict is documented in Dig Deeper.</p>
           <dl>
             <div><dt>Token</dt><dd>{shortAddress(receipt.token)}</dd></div>
             <div><dt>Network</dt><dd>{receipt.protocol} / Robinhood 4663</dd></div>
@@ -273,8 +383,17 @@
           <a href={receipt.explorer} target="_blank" rel="noreferrer">Open Robinscan source receipt ↗</a>
         </section>
 
+        <section class="provenance-section" aria-labelledby="provenance-title">
+          <p class="section-number">03 / PROVENANCE AND CAVEATS</p>
+          <h2 id="provenance-title">WHAT WAS ACTUALLY VERIFIED</h2>
+          <p>Frozen proof captured {receipt.asOf.replace('T', ' ').replace('Z', ' UTC')}. Two independent archive-capable RPC providers (SolidRPC and Tenderly) agreed on the receipt core, corroborated by Robinscan.</p>
+          <a href={receipt.evidenceManifest} target="_blank" rel="noreferrer">Open the frozen independent proof manifest ↗</a>
+          <p class="provenance-warning">Explorer caveat: on 25 Sep 2026, the official Blockscout transaction UI displayed an unrelated record for this transaction hash. That conflicting UI result was not counted as corroboration. Use the archived proof manifest and Robinscan for this narrow factory-event verification.</p>
+          <p>The event records <code>originalDeployer</code>, not the creator fee recipient. It does not establish human identity, funding, trading history, graduation, V4 state or a finality guarantee.</p>
+        </section>
+
         <section class="unknown-section" aria-labelledby="unsupported-title">
-          <p class="section-number">03 / UNSUPPORTED ≠ ABSENT</p>
+          <p class="section-number">04 / UNSUPPORTED ≠ ABSENT</p>
           <h2 id="unsupported-title">NOT ESTABLISHED BY THIS RECEIPT</h2>
           <ul>
             <li>Direct funding: <strong>UNKNOWN</strong></li>
@@ -291,7 +410,7 @@
         <h2>THE REAL RECEIPT STOPS HERE.</h2>
         <p>No verified direct funder. No relationship inferred.</p>
         <p>Try a completely separate fictional case to test the intended funding-history investigation.</p>
-        <button class="demo-entry" type="button" onclick={openRatTrap}>Explore fictional Rat Trap DEMO</button>
+        <button class="demo-entry" bind:this={demoEntryButton} type="button" onclick={openRatTrap}>Explore fictional Rat Trap DEMO</button>
       </aside>
     </div>
 
@@ -323,7 +442,7 @@
             <div><dt>Historical behavior</dt><dd>Not yet historical</dd></div>
             <div><dt>Exit liquidity</dt><dd class="unknown">UNKNOWN</dd></div>
           </dl>
-          <button class="funder-trigger" type="button" onclick={revealFunder} aria-expanded={funderRevealed}>
+          <button class="funder-trigger" type="button" onclick={revealFunder} aria-expanded={funderRevealed} aria-controls={funderRevealed ? "rat-trap-reveal" : undefined}>
             <span>SELECT FICTIONAL FUNDER</span><strong>DEMO-FUNDER-A</strong><small>4 transfers appear in this fictional ledger →</small>
           </button>
         </article>
@@ -335,7 +454,7 @@
       </div>
 
       {#if funderRevealed}
-        <section class="trap-reveal" data-testid="rat-trap-reveal" aria-labelledby="shared-funder-title">
+        <section id="rat-trap-reveal" class="trap-reveal" data-testid="rat-trap-reveal" aria-labelledby="shared-funder-title">
           <div class="reveal-banner">
             <p>FICTIONAL ADDRESS RELATIONSHIP FOUND</p>
             <h2 id="shared-funder-title" bind:this={revealHeading} tabindex="-1">ONE FUNDER. FOUR TRANSFERS. THREE PREVIOUS LAUNCHES.</h2>
@@ -361,7 +480,7 @@
               <div><p>HISTORICAL THERMOMETER / SYNTHETIC DEMO</p><h3 id="thermometer-title">HOW MUCH HISTORY IS MATURE ENOUGH?</h3></div>
               <div class="window-selector" role="group" aria-label="Historical window">
                 {#each windows as window}
-                  <button type="button" class:active={selectedWindow === window} aria-pressed={selectedWindow === window} onclick={() => (selectedWindow = window)}>{window}</button>
+                  <button type="button" class:active={selectedWindow === window} aria-pressed={selectedWindow === window} onclick={() => chooseWindow(window)}>{window}</button>
                 {/each}
               </div>
             </div>
@@ -371,7 +490,8 @@
               <strong>{windowData.priceSupported} / {windowData.ageEligible}</strong><span>eligible launches with simulated headline price data</span>
             </div>
 
-            <div class="launch-strip" aria-label="Previous fictional funded launches">
+            <p class="scroll-hint">Swipe sideways to inspect GRIME, SLUDGE and DUST. Keyboard: Tab here, then ← / →.</p>
+            <div class="launch-strip scrollable-region" role="region" tabindex="0" aria-label="Previous fictional funded launches — use left and right arrow keys to scroll" onkeydown={scrollHorizontal}>
               {#each demo.previous as previous}
                 {@const isEligible = previous.eligible.includes(selectedWindow)}
                 {@const transfer = demo.transfers.find((item) => item.launch === previous.name)}
@@ -395,7 +515,8 @@
             <p class="metric-warning">Headline peak/latest values are synthetic fixture fields—not window-specific curves or returns. No survival, holding-period or profitability claim.</p>
           </section>
 
-          <section class="evidence-lanes" aria-label="Evidence boundaries">
+          <p class="scroll-hint">Swipe sideways for all three evidence boundaries. Keyboard: Tab here, then ← / →.</p>
+          <section class="evidence-lanes scrollable-region" role="region" tabindex="0" aria-label="Three fictional evidence boundaries — use left and right arrow keys to scroll" onkeydown={scrollHorizontal}>
             <article><strong>FUNDING ACTIVITY</strong><span>4 fictional address transfers</span></article>
             <article><strong>HISTORICAL TOKEN BEHAVIOR</strong><span>2 launches have synthetic headline values</span></article>
             <article><strong>EXIT LIQUIDITY</strong><span>UNKNOWN for every launch</span></article>
