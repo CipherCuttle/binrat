@@ -93,7 +93,7 @@ test('critical screens have no automatically detectable accessibility violations
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 
-  await page.getByRole('button', { name: /select fictional funder/i }).click();
+  await page.getByRole('button', { name: /inspect fictional funder/i }).click();
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });
