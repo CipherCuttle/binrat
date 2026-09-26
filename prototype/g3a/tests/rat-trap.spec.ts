@@ -27,7 +27,7 @@ for (const viewport of [
     await expect(page.getByText(/nothing here belongs to the historical pons receipt/i)).toBeVisible();
     expect(await fitsViewport()).toBe(true);
 
-    const funder = page.getByRole('button', { name: /select fictional funder/i });
+    const funder = page.getByRole('button', { name: /inspect fictional funder/i });
     await funder.focus();
     await page.keyboard.press('Enter');
     await expect(page.getByTestId('rat-trap-reveal')).toBeVisible();
