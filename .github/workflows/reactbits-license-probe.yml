@@ -78,6 +78,20 @@ jobs:
           }
           NODE
           else
+            # Classify the provider error without echoing its response body or the secret.
+            node - "$pro_file" <<'NODE'
+          const fs = require('node:fs');
+          let body = {};
+          try { body = JSON.parse(fs.readFileSync(process.argv[2], 'utf8')); } catch {}
+          const msg = [body.error, body.message, body.code].filter(x => typeof x === 'string').join(' ').toLowerCase();
+          let reason = 'UNCLASSIFIED_DENIAL';
+          if (/invalid|unrecognized|unknown/.test(msg) && /key|license|token/.test(msg)) reason = 'INVALID_KEY';
+          else if (/expired|revoked/.test(msg)) reason = 'EXPIRED_OR_REVOKED';
+          else if (/starter|upgrade|plan|tier|entitlement/.test(msg)) reason = 'PLAN_OR_ENTITLEMENT';
+          else if (/rate limit|quota|too many/.test(msg)) reason = 'RATE_LIMITED';
+          else if (/missing|unauthorized/.test(msg) && /key|license|token/.test(msg)) reason = 'MISSING_OR_REJECTED_AUTH';
+          console.log('Provider error category: ' + reason);
+          NODE
             echo "CTA 5 remains inaccessible (HTTP $pro_status)."
             exit 1
           fi
