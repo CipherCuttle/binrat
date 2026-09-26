@@ -30,7 +30,7 @@ test('published GitHack build completes the primary journey', async ({ page }) =
   await expect(page.getByRole('link', { name: /frozen independent proof manifest/i })).toHaveAttribute('href', /55af899617fc38af71b746e3e90a9f2de3e6e53a/);
   await expect(page.getByText(/official Blockscout transaction UI displayed an unrelated record/i)).toBeVisible();
   await page.getByRole('button', { name: /explore fictional rat trap demo/i }).click();
-  await page.getByRole('button', { name: /select fictional funder/i }).click();
+  await page.getByRole('button', { name: /inspect fictional funder/i }).click();
   await expect(page.getByTestId('funding-transfer')).toHaveCount(4);
   await page.getByRole('button', { name: '7d', exact: true }).click();
   await expect(page.getByTestId('thermometer-output')).toContainText('1 / 3');
