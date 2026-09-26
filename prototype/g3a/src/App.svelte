@@ -2,14 +2,17 @@
   import { onDestroy, onMount, tick } from 'svelte';
   import { demo, receipt, shortAddress, usd, type DemoWindow } from './fixture';
 
-  type Scene = 'discovery' | 'retrieving' | 'investigation' | 'rat-trap';
+  type Scene = 'discovery' | 'radar' | 'retrieving' | 'investigation' | 'rat-trap';
 
   let scene = $state<Scene>('discovery');
   let progress = $state(0);
+  let radarCaseOpen = $state(false);
+  let scanEntry = $state<'discovery' | 'radar'>('discovery');
   let selectedWindow = $state<DemoWindow>('24h');
   let funderRevealed = $state(false);
   let relationshipVisible = $state(false);
   let sceneHeading = $state<HTMLElement | null>(null);
+  let radarCaseHeading = $state<HTMLElement | null>(null);
   let demoEntryButton = $state<HTMLButtonElement | null>(null);
   let revealHeading = $state<HTMLElement | null>(null);
   let relationshipHeading = $state<HTMLElement | null>(null);
@@ -44,6 +47,8 @@
     version: 1;
     scene: Scene;
     selectedWindow: DemoWindow;
+    radarCaseOpen?: boolean;
+    scanEntry?: 'discovery' | 'radar';
     funderRevealed: boolean;
     relationshipVisible: boolean;
   };
@@ -52,6 +57,8 @@
     version: 1,
     scene: target,
     selectedWindow,
+    radarCaseOpen,
+    scanEntry,
     funderRevealed,
     relationshipVisible
   });
@@ -61,7 +68,7 @@
     const candidate = (state as { binratG3c?: RouteSnapshot }).binratG3c;
     if (
       candidate?.version !== 1 ||
-      !['discovery', 'retrieving', 'investigation', 'rat-trap'].includes(candidate.scene) ||
+      !['discovery', 'radar', 'retrieving', 'investigation', 'rat-trap'].includes(candidate.scene) ||
       !['6h', '24h', '3d', '7d'].includes(candidate.selectedWindow)
     ) return null;
     return candidate;
@@ -73,7 +80,9 @@
 
   const focusScene = async (from?: Scene) => {
     await tick();
-    if (scene === 'investigation' && from === 'rat-trap') {
+    if (scene === 'radar' && radarCaseOpen) {
+      radarCaseHeading?.focus();
+    } else if (scene === 'investigation' && from === 'rat-trap') {
       demoEntryButton?.focus();
     } else if (scene === 'rat-trap' && relationshipVisible) {
       relationshipHeading?.focus();
@@ -93,6 +102,8 @@
   const restoreRoute = (route: RouteSnapshot, from?: Scene) => {
     clearTimers();
     selectedWindow = route.selectedWindow;
+    radarCaseOpen = Boolean(route.radarCaseOpen);
+    scanEntry = route.scanEntry === 'radar' ? 'radar' : 'discovery';
     funderRevealed = route.funderRevealed;
     relationshipVisible = route.relationshipVisible;
     // Forward/reload into an interrupted retrieval settles on its preloaded receipt.
@@ -116,7 +127,27 @@
     }
   };
 
+  const openRadar = () => {
+    radarCaseOpen = false;
+    pushScene('radar');
+  };
+
+  const selectRadarCase = async () => {
+    radarCaseOpen = true;
+    replaceRoute();
+    await tick();
+    radarCaseHeading?.focus();
+  };
+
+  const closeRadarCase = async () => {
+    radarCaseOpen = false;
+    replaceRoute();
+    await tick();
+    sceneHeading?.focus();
+  };
+
   const beginRetrieval = () => {
+    scanEntry = scene === 'radar' ? 'radar' : 'discovery';
     if (prefersReducedMotion()) {
       openInvestigation();
       return;
@@ -133,8 +164,12 @@
 
   const returnToDiscovery = () => {
     clearTimers();
+    if (scene === 'radar') {
+      window.history.back();
+      return;
+    }
     if (readRoute(window.history.state)) {
-      window.history.go(scene === 'rat-trap' ? -2 : -1);
+      window.history.go((scene === 'rat-trap' ? -2 : -1) - (scanEntry === 'radar' ? 1 : 0));
     } else {
       progress = 0;
       scene = 'discovery';
@@ -215,83 +250,137 @@
 </svelte:head>
 
 {#if scene === 'discovery'}
-  <main class="discovery" data-testid="discovery">
-    <header class="masthead" aria-label="Primary navigation">
-      <a class="brand" href="#fresh-garbage" aria-label="BINRAT Fresh Garbage">
-        <span aria-hidden="true">♛</span>
-        <strong>BINRAT</strong>
+  <main class="discovery g4-world" data-testid="discovery">
+    <header class="masthead">
+      <a class="brand" href="#fresh-garbage" aria-label="BINRAT home">
+        <img src="./rat-original.jpg" alt="" width="1536" height="1536" />
+        <span><strong>BINRAT</strong><small>Trash in. Truth out.</small></span>
       </a>
-      <nav aria-label="Prototype sections">
-        <a href="#fresh-garbage" aria-current="page">Investigate</a>
-        <a href="#evidence-limit">How it works</a>
-        <span class="network">PONS V2 / ROBINHOOD 4663</span>
+      <nav aria-label="Primary navigation">
+        <button type="button" onclick={openRadar}>Rat Radar</button>
+        <a href="#product-dock">Explore</a>
+        <a href="#evidence-limit">Our method</a>
       </nav>
+      <span class="network">Pons-first · Robinhood 4663</span>
     </header>
 
     <section class="poster" id="fresh-garbage" aria-labelledby="fresh-title">
       <div class="poster-copy">
-        <img class="rat-cameo" src="./rat-original.jpg" alt="" width="1536" height="1536" />
-        <p class="eyebrow">LAUNCH INTELLIGENCE / PONS FIRST</p>
-        <p class="tagline">FOR A MORE HONEST DEGEN WORLD.</p>
-        <h1 id="fresh-title" class="display-title" bind:this={sceneHeading} tabindex="-1">
-          <span>FRESH</span>
-          <em>GARBAGE</em>
-        </h1>
-        <div class="ribbons" aria-label="Historical factory receipt">
-          <span>A HISTORICAL PONS LAUNCH.</span>
-          <span>A VERIFIED FACTORY RECEIPT.</span>
-        </div>
-
-        <article class="receipt-card" aria-label="Verified historical launch summary">
-          <div class="status-row">
-            <strong>✓ VERIFIED HISTORICAL SNAPSHOT</strong>
-            <strong>⊘ NOT LIVE</strong>
-          </div>
-          <p>Verified factory event. A preloaded historical record — not a live query.</p>
-          <p class="receipt-provenance">Source: two independent archive RPCs and Robinscan; an official Blockscout UI conflict is documented in Dig Deeper.</p>
-          <dl>
-            <div><dt>Token</dt><dd>{shortAddress(receipt.token)}</dd></div>
-            <div><dt>Network</dt><dd>{receipt.protocol} / Robinhood 4663</dd></div>
-            <div><dt>Timestamp (UTC)</dt><dd>25 Sep 18:40 UTC</dd></div>
-            <div><dt>Funding</dt><dd class="unknown">{receipt.funding}</dd></div>
-            <div><dt>Pricing</dt><dd>{receipt.pricing}</dd></div>
-          </dl>
-        </article>
-
+        <p class="eyebrow">Open-source intelligence. Closer to reality.</p>
+        <h1 id="fresh-title" class="display-title" bind:this={sceneHeading} tabindex="-1">The rat<br /><em>remembers.</em></h1>
+        <p class="hero-deck">Signals fade. Narratives change. The dumpster never forgets.</p>
+        <p class="hero-description">Start with the receipts. Follow what is documented, and leave the rest marked unknown.</p>
         <div class="primary-actions">
-          <button class="investigate" type="button" onclick={beginRetrieval}>
-            <span aria-hidden="true">⌕</span> Investigate <span aria-hidden="true">→</span>
-          </button>
-          <a class="receipt-link" href={receipt.explorer} target="_blank" rel="noreferrer">
-            ▣ View verified receipt <span aria-hidden="true">↗</span>
-          </a>
+          <button class="enter-dumpster" type="button" onclick={openRadar}>Enter Rat Radar <span aria-hidden="true">↗</span></button>
+          <button class="investigate" type="button" onclick={beginRetrieval}>Investigate the receipt <span aria-hidden="true">→</span></button>
         </div>
-
-        <p class="audit-line" id="evidence-limit">
-          Historical verified factory receipt · Funding UNKNOWN · Pricing not reconstructed
-        </p>
-
-        <details class="demo-case">
-          <summary><strong>{demo.label}</strong> — {demo.name}</summary>
-          <p>{demo.description} First inspect the real receipt, then enter the separate Rat Trap demonstration.</p>
-        </details>
+        <p class="world-label">People <span>/</span> patterns <span>/</span> proof</p>
       </div>
-
-      <figure class="rat-stage">
-        <img src="./rat-original.jpg" alt="The approved BINRAT pixel-art rat leaning from a dumpster in a purple city alley" width="1536" height="1536" />
-        <figcaption>
-          <strong>GARBAGE<br />INTO RECEIPTS</strong>
-          <span>Archived factory event / block {receipt.block}</span>
-        </figcaption>
+      <figure class="rat-stage" aria-label="BINRAT's original approved artwork">
+        <img src="./rat-original.jpg" alt="The original BINRAT rat looking out from a dumpster in a pixel-art cyberpunk alley" width="1536" height="1536" />
       </figure>
+      <div class="skyline skyline-near" aria-hidden="true"></div>
     </section>
 
-    <footer class="principles" aria-label="Prototype principles">
-      <span><strong>FIND EARLY</strong>Pons-first, source-bound.</span>
-      <span><strong>VERIFY</strong>Read the original receipt.</span>
-      <span><strong>INVESTIGATE</strong>Facts ≠ speculation.</span>
-      <span><strong>NO FAKE SIGNALS</strong>Demo is clearly labelled.</span>
-    </footer>
+    <section class="product-dock" id="product-dock" aria-label="Explore BINRAT">
+      <div class="dock-title"><div><span class="eyebrow">The dumpster is open</span><h2>Pick a thread.</h2></div><p>One real historical receipt to explore. The rest is a look at where BINRAT is going.</p></div>
+      <div class="product-grid">
+        <button class="product-tile available" type="button" onclick={openRadar}>
+          <span class="product-symbol" aria-hidden="true">◎</span>
+          <span class="product-name">Rat Radar <span aria-hidden="true">↗</span></span>
+          <span class="product-explain">A historical Pons receipt, with its source attached.</span>
+          <span class="mini-radar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="product-status">Explore the prototype</span>
+        </button>
+        <article class="product-tile upcoming">
+          <span class="product-symbol" aria-hidden="true">▣</span><h3>Replay Lab</h3>
+          <p>See the sequence, not just the headline.</p><span class="product-status">Planned · no live feed</span>
+        </article>
+        <article class="product-tile upcoming">
+          <span class="product-symbol" aria-hidden="true">⌁</span><h3>Ledger</h3>
+          <p>Follow on-chain evidence without inventing the rest.</p><span class="product-status">Planned</span>
+        </article>
+        <article class="product-tile upcoming">
+          <span class="product-symbol" aria-hidden="true">◉</span><h3>Watch</h3>
+          <p>Keep an eye on addresses and launches that matter.</p><span class="product-status">Planned · no alerts active</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="world-proof" id="evidence-limit" aria-labelledby="proof-title">
+      <div class="proof-copy"><span class="eyebrow">Something the rat actually found</span><h2 id="proof-title">A receipt beats a rumor.</h2><p>We have one independently checked historical Pons V2 factory event. This isn't a live feed, and the launch's funding and price history haven't been reconstructed.</p></div>
+      <article class="receipt-card" aria-label="Verified historical launch summary">
+        <div class="status-row"><strong>VERIFIED HISTORICAL SNAPSHOT</strong><strong>⊘ NOT LIVE</strong></div>
+        <dl>
+          <div><dt>Token</dt><dd>{shortAddress(receipt.token)}</dd></div>
+          <div><dt>Network</dt><dd>Robinhood Chain 4663</dd></div>
+          <div><dt>Captured (UTC)</dt><dd>25 Sep 2026</dd></div>
+          <div><dt>Direct funding</dt><dd class="unknown">{receipt.funding}</dd></div>
+          <div><dt>Price history</dt><dd>{receipt.pricing}</dd></div>
+        </dl>
+        <p class="receipt-provenance">Source: two independent archive RPCs and Robinscan; an official Blockscout UI conflict is documented in Dig Deeper.</p>
+        <a class="receipt-link" href={receipt.explorer} target="_blank" rel="noreferrer">View verified receipt ↗</a>
+      </article>
+    </section>
+    <footer class="world-footer"><strong>BINRAT</strong><span>The dumpster never forgets.</span><small>Historical fixture · no wallet, trades or live monitoring</small></footer>
+  </main>
+{:else if scene === 'radar'}
+  <main class="radar" data-testid="radar">
+    <header class="masthead">
+      <button class="brand brand-button" type="button" onclick={returnToDiscovery} aria-label="BINRAT home">
+        <img src="./rat-original.jpg" alt="" width="1536" height="1536" />
+        <span><strong>BINRAT</strong><small>The rat remembers.</small></span>
+      </button>
+      <nav aria-label="Radar navigation"><button class="nav-active" type="button" aria-current="page">Radar</button><button type="button" onclick={returnToDiscovery}>Dumpster</button></nav>
+      <span class="network">Pons-first · Historical snapshot</span>
+    </header>
+    <section class="radar-hero" aria-labelledby="radar-title">
+      <div>
+        <p class="eyebrow">Observe. Connect. Question. Dig deeper.</p>
+        <h1 id="radar-title" bind:this={sceneHeading} tabindex="-1">Rat Radar</h1>
+        <p>The same address can tell different stories. Here's one factory event we can actually verify.</p>
+      </div>
+      <img src="./rat-original.jpg" alt="" width="1536" height="1536" />
+    </section>
+    <div class="radar-toolbar" aria-label="Radar source filters">
+      <span class="radar-tab current">Observed receipts <span>1</span></span>
+      <span class="radar-tab paused">Launch trends · planned</span>
+      <span class="toolbar-spacer"></span>
+      <span class="toolbar-pill">Robinhood 4663</span>
+      <span class="toolbar-pill">25 Sep 2026 snapshot</span>
+    </div>
+    <div class="radar-workspace" class:case-open={radarCaseOpen}>
+      <section class="radar-list" aria-labelledby="radar-list-title">
+        <div class="workspace-heading"><div><p class="eyebrow">Evidence, not a leaderboard</p><h2 id="radar-list-title">Observed launches</h2></div><span class="verified-count">1 verified receipt</span></div>
+        <p class="list-context">This preview contains one frozen historical event—not a comprehensive list or live rankings.</p>
+        <div class="table-head" aria-hidden="true"><span>Token / network</span><span>Observed</span><span>Evidence</span><span></span></div>
+        <button type="button" class="launch-row" aria-expanded={radarCaseOpen} aria-controls="radar-case-file" onclick={selectRadarCase}>
+          <span class="launch-identity"><span class="record-number">01</span><span><strong>{shortAddress(receipt.token)}</strong><small>Pons V2 · native ETH pair</small></span></span>
+          <span class="launch-date">25 Sep 2026<small>18:40 UTC</small></span>
+          <span class="launch-status">Factory event<small>Verified historical</small></span>
+          <span class="row-arrow" aria-hidden="true">↗</span>
+        </button>
+        <div class="radar-empty"><strong>That's the verified set for this experiment.</strong><p>Funding, market cap and graduation are still unknown. No imaginary whales hiding in the next row.</p></div>
+        <div class="separate-demo"><span class="demo-stamp">Separate fictional demonstration</span><h3>Want to see where a funding investigation could go?</h3><p>After the real receipt, there's a clearly fictional MOLD case with four example transfers.</p></div>
+      </section>
+
+      <aside class="radar-case" id="radar-case-file" aria-label="Selected historical case file">
+        <button class="case-mobile-back" type="button" onclick={closeRadarCase}>← Back to observed launches</button>
+        <div class="case-topline"><span>Case file / 001</span><span>Observed, not an identity.</span></div>
+        <div class="case-title-row"><div><p class="eyebrow">The receipt is real. The missing pieces stay missing.</p><h2 bind:this={radarCaseHeading} tabindex="-1">{shortAddress(receipt.token, 7, 6)}</h2><p>Pons V2 · Robinhood Chain</p></div><span class="case-stamp">Factory event<br />verified</span></div>
+        <div class="case-chips"><span>Historical</span><span>Native ETH pair</span><span>No live query</span></div>
+        <div class="case-metrics">
+          <div><span>Block</span><strong>{receipt.block}</strong></div>
+          <div><span>Observed (UTC)</span><strong>18:40</strong></div>
+          <div><span>Direct funder</span><strong class="unknown">Unknown</strong></div>
+        </div>
+        <div class="case-section"><h3>What we actually have</h3><p>A factory event matching this token, original deployer and bonding curve. Confirmed against independent archived evidence.</p><a href={receipt.explorer} target="_blank" rel="noreferrer">Open original source ↗</a></div>
+        <div class="case-section case-boundary"><h3>Where the trail stops</h3><p>No verified direct funding relationship, token price history, graduation or V4 state from this receipt.</p></div>
+        <button class="case-investigate" type="button" onclick={beginRetrieval}>Scan the archived receipt <span aria-hidden="true">→</span></button>
+        <p class="case-footnote">Frozen fixture {receipt.fixtureId}. This is a historical playback, not a network scan.</p>
+      </aside>
+    </div>
+    <footer class="radar-footer"><span>One real record. Sources attached.</span><button type="button" onclick={returnToDiscovery}>← Back to the dumpster</button></footer>
   </main>
 {:else if scene === 'retrieving'}
   <main class="retrieval" data-testid="retrieval" aria-labelledby="retrieval-title">
@@ -302,8 +391,8 @@
 
     <div class="retrieval-instrument" role="dialog" aria-modal="true" aria-labelledby="retrieval-title" aria-describedby="retrieval-detail">
       <div class="retrieval-copy">
-        <p class="eyebrow">FACTORY INTAKE / BLOCK {receipt.block}</p>
-        <h1 id="retrieval-title" bind:this={sceneHeading} tabindex="-1">THE RAT FOUND A RECEIPT.</h1>
+        <p class="eyebrow">Historical receipt / block {receipt.block}</p>
+        <h1 id="retrieval-title" bind:this={sceneHeading} tabindex="-1">A little something turned up.</h1>
         <p id="retrieval-detail">Playing back the frozen fixture and exposing each documented field.</p>
       </div>
 
@@ -407,7 +496,7 @@
       <aside class="next-rail">
         <img src="./rat-original.jpg" alt="Approved BINRAT rat artwork" width="1536" height="1536" />
         <p class="demo-stamp">DEMO — FICTIONAL</p>
-        <h2>THE REAL RECEIPT STOPS HERE.</h2>
+        <h2>The real trail stops here.</h2>
         <p>No verified direct funder. No relationship inferred.</p>
         <p>Try a completely separate fictional case to test the intended funding-history investigation.</p>
         <button class="demo-entry" bind:this={demoEntryButton} type="button" onclick={openRatTrap}>Explore fictional Rat Trap DEMO</button>
@@ -429,7 +518,7 @@
     <section class="trap-shell" aria-labelledby="rat-trap-title">
       <div class="trap-intro">
         <p class="demo-stamp">DEMO — FICTIONAL SCENARIO</p>
-        <h1 id="rat-trap-title" bind:this={sceneHeading} tabindex="-1">WHO FED THE MOLD?</h1>
+        <h1 id="rat-trap-title" bind:this={sceneHeading} tabindex="-1">This wallet looks familiar.</h1>
         <p>MOLD, every address and every transfer below are fictional. Nothing here belongs to the historical Pons receipt.</p>
       </div>
 
@@ -457,13 +546,13 @@
         <section id="rat-trap-reveal" class="trap-reveal" data-testid="rat-trap-reveal" aria-labelledby="shared-funder-title">
           <div class="reveal-banner">
             <p>FICTIONAL ADDRESS RELATIONSHIP FOUND</p>
-            <h2 id="shared-funder-title" bind:this={revealHeading} tabindex="-1">ONE FUNDER. FOUR TRANSFERS. THREE PREVIOUS LAUNCHES.</h2>
+            <h2 id="shared-funder-title" bind:this={revealHeading} tabindex="-1">One funder. Four transfers. Three earlier launches.</h2>
             <p>This demonstrates a shared funding address—not shared human ownership, safety or profitability.</p>
           </div>
 
           <article class="funding-ledger" aria-labelledby="ledger-title">
             <div class="ledger-heading">
-              <div><span>FUNDING ACTIVITY / DEMO</span><h3 id="ledger-title">DEMO-FUNDER-A</h3></div><strong>4 FICTIONAL TRANSFERS</strong>
+              <div><span>Example funding / fictional</span><h3 id="ledger-title">DEMO-FUNDER-A</h3></div><strong>4 FICTIONAL TRANSFERS</strong>
             </div>
             <ol>
               {#each demo.transfers as transfer}
@@ -477,7 +566,7 @@
 
           <section class="thermometer" aria-labelledby="thermometer-title">
             <div class="thermometer-heading">
-              <div><p>HISTORICAL THERMOMETER / SYNTHETIC DEMO</p><h3 id="thermometer-title">HOW MUCH HISTORY IS MATURE ENOUGH?</h3></div>
+              <div><p>Historical windows / fictional demo</p><h3 id="thermometer-title">Which launches have enough history?</h3></div>
               <div class="window-selector" role="group" aria-label="Historical window">
                 {#each windows as window}
                   <button type="button" class:active={selectedWindow === window} aria-pressed={selectedWindow === window} onclick={() => chooseWindow(window)}>{window}</button>
@@ -524,7 +613,7 @@
 
           {#if relationshipVisible}
             <section class="relationship-reveal" aria-labelledby="relationship-title" data-testid="relationship-map">
-              <div class="relationship-copy"><p>SMALL RELATIONSHIP VIEW / DEMO</p><h3 id="relationship-title" bind:this={relationshipHeading} tabindex="-1">SHARED ADDRESS, NOT SHARED OWNER</h3></div>
+              <div class="relationship-copy"><p>SMALL RELATIONSHIP VIEW / DEMO</p><h3 id="relationship-title" bind:this={relationshipHeading} tabindex="-1">Same funder. Ownership unproven.</h3></div>
               <div class="relationship-map" aria-label="DEMO-FUNDER-A funded four fictional launchers">
                 <strong>DEMO-FUNDER-A</strong><div class="relationship-lines" aria-hidden="true"></div>
                 <div class="relationship-targets">
