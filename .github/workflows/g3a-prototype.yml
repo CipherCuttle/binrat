@@ -1,0 +1,46 @@
+name: G3a disposable prototype
+
+on:
+  push:
+    branches:
+      - g3a-interactive-prototype-20260926
+    paths:
+      - 'prototype/g3a/**'
+      - '.github/workflows/g3a-prototype.yml'
+  pull_request:
+    paths:
+      - 'prototype/g3a/**'
+      - '.github/workflows/g3a-prototype.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: prototype/g3a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - run: pnpm test
+      - name: Test the published GitHack build
+        env:
+          PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/g3a-interactive-prototype-20260926/prototype/g3a/dist/index.html
+        run: pnpm test:published
+      - name: Upload inspected screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g3a-browser-evidence
+          path: prototype/g3a/evidence/screenshots
+          if-no-files-found: warn
+          retention-days: 7
