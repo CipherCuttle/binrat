@@ -1,0 +1,128 @@
+name: G4a Field Instrument browser verification
+on:
+  push:
+    branches: [experiment/binrat-g4a-field-instrument-20260926]
+    paths: ['prototype/g3a/**', '.github/workflows/g4a-field-instrument.yml']
+  pull_request:
+    branches: [experiment/binrat-g4a-integration-20260926]
+    paths: ['prototype/g3a/**', '.github/workflows/g4a-field-instrument.yml']
+permissions:
+  contents: read
+jobs:
+  build-browser-and-freeze-evidence:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g4a-field-instrument-20260926'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Pin exact unchanged G3c comparison baseline
+        uses: actions/checkout@v4
+        with:
+          ref: cd7e7e986d0412c72ee00b45ffe98146a40e16ae
+          path: baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+      - name: Install G4a and browser runtime
+        working-directory: prototype/g3a
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          pnpm build
+          pnpm test
+      - name: Build pinned G3c without mutating baseline
+        working-directory: baseline/prototype/g3a
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Browser-capture both actual apps on identical fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd baseline/prototype/g3a && pnpm preview --port 4174 >/tmp/binrat-g3c.log 2>&1) &
+          G3C_PID=$!
+          (cd prototype/g3a && pnpm preview --port 4173 >/tmp/binrat-g4a.log 2>&1) &
+          G4A_PID=$!
+          trap 'kill $G3C_PID $G4A_PID 2>/dev/null || true' EXIT
+          for port in 4173 4174; do
+            ready=false
+            for attempt in $(seq 1 50); do
+              if curl -fsS "http://127.0.0.1:$port/" >/dev/null; then ready=true; break; fi
+              sleep 2
+            done
+            if [ "$ready" != true ]; then
+              cat /tmp/binrat-g3c.log /tmp/binrat-g4a.log
+              exit 1
+            fi
+          done
+          cd prototype/g3a
+          node scripts/g4a-compare.mjs
+      - name: Freeze rebuilt distribution and selected actual screenshots
+        run: |
+          git add -A -- prototype/g3a/dist
+          cd prototype/g3a/evidence/visual-g4a
+          git add -- mobile-390-discovery-comparison.png mobile-390-investigation-comparison.png mobile-390-first-reveal-comparison.png mobile-320-discovery-comparison.png desktop-1440-discovery-comparison.png desktop-1440-first-reveal-comparison.png g4a-mobile-390-discovery.png g4a-mobile-390-first-reveal.png g4a-desktop-1440-discovery.png
+          cd ../../../..
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(g4a): freeze tested GitHack build and visual comparisons'
+            git push origin HEAD:refs/heads/experiment/binrat-g4a-field-instrument-20260926
+          fi
+      - name: Upload full source screenshots and comparisons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g4a-source-visual-evidence
+          path: |
+            prototype/g3a/evidence/screenshots
+            prototype/g3a/evidence/visual-g4a
+            prototype/g3a/test-results
+          if-no-files-found: warn
+          retention-days: 14
+  pr-source-and-published-verification:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+      - name: Build and test exact PR source
+        working-directory: prototype/g3a
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          pnpm build
+          pnpm test
+      - name: Check immutable distribution and actual screenshot receipts
+        run: |
+          git diff --exit-code -- prototype/g3a/dist
+          test -z "$(git ls-files --others --exclude-standard prototype/g3a/dist)"
+          test -s prototype/g3a/evidence/visual-g4a/mobile-390-discovery-comparison.png
+          test -s prototype/g3a/evidence/visual-g4a/mobile-390-first-reveal-comparison.png
+          test -s prototype/g3a/evidence/visual-g4a/desktop-1440-discovery-comparison.png
+      - name: Exercise actual GitHack preview for immutable PR head
+        working-directory: prototype/g3a
+        env:
+          PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/${{ github.event.pull_request.head.sha }}/prototype/g3a/dist/index.html
+        run: |
+          echo "Immutable G4a GitHack: $PUBLISHED_URL"
+          pnpm test:published
+      - name: Upload browser screenshots and failure traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g4a-pr-browser-evidence
+          path: |
+            prototype/g3a/evidence/screenshots
+            prototype/g3a/evidence/visual-g4a
+            prototype/g3a/test-results
+          if-no-files-found: warn
+          retention-days: 14
