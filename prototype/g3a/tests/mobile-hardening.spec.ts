@@ -92,6 +92,7 @@ for (const width of [320, 390] as const) {
     await page.setViewportSize({ width, height: 844 });
     await enterTrap(page);
     await page.getByRole('button', { name: /select fictional funder/i }).click();
+    await expect(page.getByText(/Swipe sideways to inspect GRIME, SLUDGE and DUST/i)).toBeVisible();
     const cards = page.getByRole('region', { name: /previous fictional funded launches/i });
     await cards.focus();
     await expect(cards).toBeFocused();

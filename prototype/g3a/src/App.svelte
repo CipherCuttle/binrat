@@ -490,6 +490,7 @@
               <strong>{windowData.priceSupported} / {windowData.ageEligible}</strong><span>eligible launches with simulated headline price data</span>
             </div>
 
+            <p class="scroll-hint">Swipe sideways to inspect GRIME, SLUDGE and DUST. Keyboard: Tab here, then ← / →.</p>
             <div class="launch-strip scrollable-region" role="region" tabindex="0" aria-label="Previous fictional funded launches — use left and right arrow keys to scroll" onkeydown={scrollHorizontal}>
               {#each demo.previous as previous}
                 {@const isEligible = previous.eligible.includes(selectedWindow)}
@@ -514,6 +515,7 @@
             <p class="metric-warning">Headline peak/latest values are synthetic fixture fields—not window-specific curves or returns. No survival, holding-period or profitability claim.</p>
           </section>
 
+          <p class="scroll-hint">Swipe sideways for all three evidence boundaries. Keyboard: Tab here, then ← / →.</p>
           <section class="evidence-lanes scrollable-region" role="region" tabindex="0" aria-label="Three fictional evidence boundaries — use left and right arrow keys to scroll" onkeydown={scrollHorizontal}>
             <article><strong>FUNDING ACTIVITY</strong><span>4 fictional address transfers</span></article>
             <article><strong>HISTORICAL TOKEN BEHAVIOR</strong><span>2 launches have synthetic headline values</span></article>
