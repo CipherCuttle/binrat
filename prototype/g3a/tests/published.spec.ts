@@ -13,6 +13,14 @@ test('published GitHack build completes the primary journey', async ({ page }) =
     if (!loaded) await page.waitForTimeout(5_000);
   }
   expect(loaded).toBe(true);
+
+  // GitHack may show a one-time external-content notice before the proxied
+  // branch build. Exercise that real first-visit path instead of bypassing it.
+  const openPage = page.getByRole('button', { name: 'Open the page' });
+  if (await openPage.isVisible()) {
+    await openPage.click();
+  }
+
   await expect(page.getByTestId('discovery')).toBeVisible();
   await expect(page.getByRole('button', { name: /investigate/i })).toBeInViewport();
   await page.getByRole('button', { name: /investigate/i }).click();
