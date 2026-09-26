@@ -36,7 +36,7 @@ for (const viewport of [
 
     await page.getByRole('button', { name: /investigate/i }).click();
     await expect(page.getByTestId('retrieval')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /the rat found a receipt/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /a little something turned up/i })).toBeFocused();
     const retrievalSource = page.getByRole('link', { name: /open original robinscan/i });
     await expect(retrievalSource).toBeVisible();
     await expect(retrievalSource).toHaveAttribute('href', receiptUrl);
