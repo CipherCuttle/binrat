@@ -30,33 +30,54 @@ jobs:
           fi
           echo "Secret is available to this workflow; checking CTA 5 entitlement..."
 
-          response_file="$RUNNER_TEMP/reactbits-cta5-private.json"
-          trap 'rm -f "$response_file"' EXIT
-          status="$(curl --silent --show-error --location --retry 1 --max-time 30 \
-            --output "$response_file" --write-out '%{http_code}' \
+          # The two probes distinguish a missing/invalid secret from Starter-only access.
+          # No licensed response body, header or key is printed or uploaded.
+          starter_file="$RUNNER_TEMP/reactbits-starter-private.json"
+          pro_file="$RUNNER_TEMP/reactbits-cta5-private.json"
+          trap 'rm -f "$starter_file" "$pro_file"' EXIT
+
+          starter_status="$(curl --silent --show-error --location --retry 1 --max-time 30 \
+            --output "$starter_file" --write-out '%{http_code}' \
+            --header "Authorization: Bearer ${REACTBITS_LICENSE_KEY}" \
+            'https://pro.reactbits.dev/api/r/starter/mono-waves-tw.json')"
+          pro_status="$(curl --silent --show-error --location --retry 1 --max-time 30 \
+            --output "$pro_file" --write-out '%{http_code}' \
             --header "Authorization: Bearer ${REACTBITS_LICENSE_KEY}" \
             'https://pro.reactbits.dev/api/r/pro/cta-5.json')"
 
-          case "$status" in
-            200)
-              node - "$response_file" <<'NODE'
+          # Only safe summaries; the error payloads and licensed source remain private.
+          echo "Starter component: HTTP $starter_status"
+          echo "Pro CTA 5: HTTP $pro_status"
+
+          if [[ "$starter_status" == "200" ]]; then
+            node - "$starter_file" <<'NODE'
           const fs = require('node:fs');
-          let data;
           try {
-            data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+            const data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+            if (!Array.isArray(data.files) || data.files.length < 1) process.exit(1);
+            console.log('PASS: starter registry entitlement authenticated.');
           } catch {
-            console.error('FAIL: registry returned HTTP 200 but not valid JSON.');
+            console.error('FAIL: starter response is not a valid registry item.');
             process.exit(1);
           }
-          if (!data || !Array.isArray(data.files) || data.files.length === 0) {
-            console.error('FAIL: HTTP 200 did not contain a valid CTA 5 registry item.');
-            process.exit(1);
-          }
-          console.log('PASS: repo secret authenticated and CTA 5 returned a valid licensed registry item.');
           NODE
-              ;;
-            401) echo "FAIL: React Bits Pro rejected this key (HTTP 401)."; exit 1 ;;
-            403) echo "FAIL: key lacks access to CTA 5 or account entitlement (HTTP 403)."; exit 1 ;;
-            404) echo "FAIL: CTA 5 registry path was not found (HTTP 404)."; exit 1 ;;
-            *) echo "FAIL: React Bits Pro registry returned HTTP $status."; exit 1 ;;
-          esac
+          else
+            echo "Starter component unavailable (HTTP $starter_status)."
+          fi
+
+          if [[ "$pro_status" == "200" ]]; then
+            node - "$pro_file" <<'NODE'
+          const fs = require('node:fs');
+          try {
+            const data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+            if (!Array.isArray(data.files) || data.files.length < 1) process.exit(1);
+            console.log('PASS: CTA 5 registry entitlement authenticated.');
+          } catch {
+            console.error('FAIL: CTA 5 response is not a valid registry item.');
+            process.exit(1);
+          }
+          NODE
+          else
+            echo "CTA 5 remains inaccessible (HTTP $pro_status)."
+            exit 1
+          fi
