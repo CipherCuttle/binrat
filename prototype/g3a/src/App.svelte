@@ -18,6 +18,7 @@
   let relationshipHeading = $state<HTMLElement | null>(null);
   let intervalId: number | undefined;
   let finishId: number | undefined;
+  let ambientFrame: number | undefined;
 
   const windows = Object.keys(demo.windows) as DemoWindow[];
   const windowData = $derived(demo.windows[selectedWindow]);
@@ -33,6 +34,30 @@
 
   const prefersReducedMotion = () =>
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Original Svelte implementation: the licensed React Bits Pro CTA 5 source is not used.
+  // Cursor movement is decorative, gentle, and disabled for reduced motion/coarse input.
+  const moveAmbient = (event: PointerEvent) => {
+    if (prefersReducedMotion() || !window.matchMedia('(pointer: fine)').matches) return;
+    const host = event.currentTarget as HTMLElement;
+    const rect = host.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 20;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 13;
+    if (ambientFrame !== undefined) window.cancelAnimationFrame(ambientFrame);
+    ambientFrame = window.requestAnimationFrame(() => {
+      host.style.setProperty('--flow-x', `${x.toFixed(1)}px`);
+      host.style.setProperty('--flow-y', `${y.toFixed(1)}px`);
+      ambientFrame = undefined;
+    });
+  };
+
+  const resetAmbient = (event: PointerEvent) => {
+    if (ambientFrame !== undefined) window.cancelAnimationFrame(ambientFrame);
+    ambientFrame = undefined;
+    const host = event.currentTarget as HTMLElement;
+    host.style.setProperty('--flow-x', '0px');
+    host.style.setProperty('--flow-y', '0px');
+  };
 
   const clearTimers = () => {
     if (intervalId) window.clearInterval(intervalId);
@@ -242,7 +267,10 @@
     return () => window.removeEventListener('popstate', onPopState);
   });
 
-  onDestroy(clearTimers);
+  onDestroy(() => {
+    clearTimers();
+    if (ambientFrame !== undefined) window.cancelAnimationFrame(ambientFrame);
+  });
 </script>
 
 <svelte:head>
@@ -264,7 +292,14 @@
       <span class="network">Pons-first · Robinhood 4663</span>
     </header>
 
-    <section class="poster" id="fresh-garbage" aria-labelledby="fresh-title">
+    <section class="poster" id="fresh-garbage" aria-labelledby="fresh-title" onpointermove={moveAmbient} onpointerleave={resetAmbient}>
+      <!-- A masked, independently authored ember/aurora field inspired by the public CTA 5 visual.
+           Decorative only: static gradient fallback, no video download or WebGL dependency. -->
+      <div class="hero-flow-mask" aria-hidden="true" data-testid="hero-flow-mask">
+        <span class="hero-flow hero-flow--warm"></span>
+        <span class="hero-flow hero-flow--violet"></span>
+        <span class="hero-flow hero-flow--glow"></span>
+      </div>
       <div class="poster-copy">
         <p class="eyebrow">Open-source intelligence. Closer to reality.</p>
         <h1 id="fresh-title" class="display-title" bind:this={sceneHeading} tabindex="-1">The rat<br /><em>remembers.</em></h1>
