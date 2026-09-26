@@ -3,7 +3,7 @@ name: G4-R isolated mobile investigation verification
 on:
   push:
     branches:
-      - experiment/binrat-g4r-mobile-20260926
+      - experiment/binrat-g4r-cinematic-20260926
     paths:
       - 'prototype/g3a/**'
       - '.github/workflows/g3a-prototype.yml'
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   refresh-static-dist:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g4r-mobile-20260926'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g4r-cinematic-20260926'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -43,7 +43,7 @@ jobs:
           git add -A dist
           if ! git diff --cached --quiet -- dist; then
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(g4r): freeze tested static distribution'
-            git push origin HEAD:refs/heads/experiment/binrat-g4r-mobile-20260926
+            git push origin HEAD:refs/heads/experiment/binrat-g4r-cinematic-20260926
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
       - name: Verify no distribution drift if already committed
