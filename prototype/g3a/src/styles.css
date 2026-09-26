@@ -222,7 +222,7 @@ dd { margin: 0; font-weight: 620; overflow-wrap: anywhere; }
 .funder-trigger:hover { background: #45644f; }
 .trap-rat { border-radius: 16px; background: #d6dccf; padding: 14px; display: grid; align-content: center;
   justify-items: center; gap: 10px; border: 1px solid #c3d0c0; }
-.trap-rat img { width: min(100%,205px); aspect-ratio: 1; border-radius: 12px; object-fit: cover; image-rendering: pixelated; }
+.trap-rat img { width: min(100%,205px); height: 205px; aspect-ratio: 1; border-radius: 12px; object-fit: cover; image-rendering: pixelated; }
 .trap-rat p { margin: 0; color: #405746; font-size: .83rem; text-align: center; font-weight: 650; }
 .trap-reveal { margin-top: 26px; padding-top: 18px; border-top: 1px solid #b8c9b9; }
 .reveal-banner { padding: 21px 24px; border-radius: 15px; background: #314a3c; color: #fbf7ec; position: relative; }
@@ -307,12 +307,12 @@ dd { margin: 0; font-weight: 620; overflow-wrap: anywhere; }
   .rat-stage { display: none; }
   .poster-copy { max-width: 680px; margin: 0 auto; width: 100%; }
   .rat-cameo { display: block; position: absolute; right: 0; top: 58px; width: clamp(135px,26vw,185px);
-    aspect-ratio: 1; border-radius: 14px; object-fit: cover; image-rendering: pixelated; box-shadow: 0 8px 20px rgba(44,46,38,.12); }
+    height: clamp(135px,26vw,185px); aspect-ratio: 1; border-radius: 14px; object-fit: cover; image-rendering: pixelated; box-shadow: 0 8px 20px rgba(44,46,38,.12); }
   .display-title { max-width: 76%; margin-bottom: 18px; font-size: clamp(4.3rem,9vw,6.9rem); }
   .principles { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .trap-workbench { grid-template-columns: 1fr; }
   .trap-rat { display: flex; justify-content: center; gap: 15px; }
-  .trap-rat img { width: 82px; }
+  .trap-rat img { width: 82px; height: 82px; }
 }
 @media (max-width: 600px) {
   .masthead, .compact-header { min-height: 57px; padding: 11px 16px; gap: 10px; }
@@ -327,7 +327,7 @@ dd { margin: 0; font-weight: 620; overflow-wrap: anywhere; }
   .eyebrow { font-size: .78rem; margin-bottom: 5px; }
   .tagline { margin-bottom: 17px; font-size: .78rem; }
   .display-title { max-width: 77%; font-size: clamp(2.65rem,11vw,4rem); margin-bottom: 15px; }
-  .rat-cameo { top: 44px; width: clamp(105px,31vw,130px); border-radius: 11px; }
+  .rat-cameo { top: 44px; width: clamp(92px,27vw,116px); height: clamp(92px,27vw,116px); border-radius: 11px; }
   .ribbons { gap: 5px; margin-bottom: 14px; }
   .ribbons span { padding: 5px 8px; font-size: .68rem; }
   .receipt-card { padding: 16px 15px; border-radius: 13px; }
@@ -373,7 +373,7 @@ dd { margin: 0; font-weight: 620; overflow-wrap: anywhere; }
     padding: 15px; border-radius: 12px; }
   .next-rail img { width: 85px; height: 85px; grid-row: 1 / 4; }
   .next-rail .demo-stamp { font-size: .65rem; }
-  .next-rail h2 { font-size: 1.35rem; }
+  .next-rail h2 { grid-column: 2; grid-row: 2 / 4; font-size: 1.35rem; }
   .next-rail p { grid-column: 1 / -1; font-size: .79rem; }
   .next-rail .demo-entry { grid-column: 1 / -1; width: 100%; }
   .back-row { padding: 0 13px 25px; }
@@ -384,7 +384,7 @@ dd { margin: 0; font-weight: 620; overflow-wrap: anywhere; }
   .mold-receipt { padding: 18px; }
   .mold-receipt dl > div { grid-template-columns: minmax(88px,.8fr) minmax(0,1.2fr); }
   .trap-rat { min-height: 95px; }
-  .trap-rat img { width: 70px; }
+  .trap-rat img { width: 70px; height: 70px; }
   .reveal-banner { padding: 20px 17px; }
   .reveal-banner h2 { font-size: 1.9rem; }
   .funding-ledger, .thermometer, .relationship-reveal { padding: 17px; }
@@ -402,7 +402,7 @@ dd { margin: 0; font-weight: 620; overflow-wrap: anywhere; }
   .masthead nav a { font-size: .71rem; }
   .poster { padding-left: 13px; padding-right: 13px; }
   .receipt-card { padding: 14px 12px; }
-  .rat-cameo { width: 102px; }
+  .rat-cameo { width: 92px; height: 92px; }
   .display-title { font-size: 2.7rem; }
   .ribbons span { font-size: .64rem; }
   .funding-ledger li { font-size: .77rem; }
