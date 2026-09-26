@@ -36,7 +36,7 @@ for (const viewport of [
 
     await page.getByRole('button', { name: /investigate/i }).click();
     await expect(page.getByTestId('retrieval')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /the rat found a receipt/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /a little something turned up/i })).toBeFocused();
     const retrievalSource = page.getByRole('link', { name: /open original robinscan/i });
     await expect(retrievalSource).toBeVisible();
     await expect(retrievalSource).toHaveAttribute('href', receiptUrl);
@@ -93,7 +93,7 @@ test('critical screens have no automatically detectable accessibility violations
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 
-  await page.getByRole('button', { name: /select fictional funder/i }).click();
+  await page.getByRole('button', { name: /inspect fictional funder/i }).click();
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });
