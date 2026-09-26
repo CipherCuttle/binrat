@@ -249,7 +249,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 .reveal-banner { background:#e5d8c2;color:#293d35;padding:25px;border:1px solid #ccb99f; }
 .reveal-banner h2 { font-size:clamp(1.8rem,3vw,3rem);letter-spacing:-.055em;line-height:1.1;margin:11px 0 12px; }
 .reveal-banner p { line-height:1.5;margin:0; }
-.reveal-banner > p:first-child { text-transform:uppercase;font-size:.7rem;font-weight:850;color:#607c68;letter-spacing:.06em; }
+.reveal-banner > p:first-child { text-transform:uppercase;font-size:.7rem;font-weight:850;color:#40594c;letter-spacing:.06em; }
 .ledger-heading,.thermometer-heading { display:flex;justify-content:space-between;gap:20px;align-items:center; }
 .ledger-heading span,.thermometer-heading p,.relationship-copy p { color:var(--sea);font-size:.71rem;letter-spacing:.05em; }
 .ledger-heading h3,.thermometer-heading h3 { margin:8px 0;font-size:1.35rem;letter-spacing:-.025em; }
