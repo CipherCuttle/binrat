@@ -431,3 +431,113 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   html { scroll-behavior:auto; }
   *,*::before,*::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
 }
+
+/* G4-R header study: an independently designed, CTA 5-inspired rounded motion field.
+   Decorative behind the ORIGINAL illustrated rat and semantic Svelte content.
+   No React Bits Pro implementation, video asset, dependency or canvas renderer. */
+.g4-world .masthead {
+  isolation: isolate;
+  overflow: hidden;
+}
+.g4-world .masthead::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -60px -14%;
+  pointer-events: none;
+  opacity: .42;
+  background:
+    radial-gradient(ellipse at 23% 48%, #ffab7b27 0%, transparent 43%),
+    linear-gradient(107deg, transparent 27%, #b86da922 43%, #ffc78518 54%, transparent 74%);
+  animation: masthead-glow 22s ease-in-out infinite alternate;
+}
+.g4-world .masthead > * {
+  position: relative;
+  z-index: 1;
+}
+/* Keep the main illustrated hero's intrinsic dimensions and content unchanged. */
+.poster {
+  overflow: hidden;
+}
+.hero-flow-mask {
+  position: absolute;
+  z-index: 0;
+  inset: clamp(11px, 2vw, 26px);
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: clamp(18px, 2.4vw, 30px);
+  opacity: .61;
+  contain: paint;
+  mask-image: linear-gradient(90deg, #000 0%, #000 53%, #0009 69%, transparent 92%);
+  background: radial-gradient(ellipse at 31% 67%, #e37b8c1f, transparent 71%);
+  transform: translate3d(var(--flow-x, 0px), var(--flow-y, 0px), 0);
+  transition: transform .8s cubic-bezier(.22, 1, .36, 1);
+}
+.hero-flow {
+  position: absolute;
+  display: block;
+  inset: -38%;
+  pointer-events: none;
+  will-change: transform;
+}
+.hero-flow--warm {
+  opacity: .84;
+  background:
+    radial-gradient(ellipse 29% 32% at 28% 52%, #ffedbbbe 0%, #ffad827a 40%, transparent 73%),
+    radial-gradient(ellipse 40% 22% at 49% 40%, #ffe2a552 0%, #e871a750 50%, transparent 82%);
+  transform-origin: 38% 55%;
+  animation: slow-ember 19s cubic-bezier(.45,.05,.56,.95) infinite alternate;
+}
+.hero-flow--violet {
+  opacity: .71;
+  background:
+    radial-gradient(ellipse 34% 39% at 50% 38%, #a254d077 0%, #df65934d 53%, transparent 80%),
+    radial-gradient(ellipse 32% 37% at 19% 61%, #f3a87b8c 0%, transparent 79%);
+  mix-blend-mode: screen;
+  transform-origin: 41% 37%;
+  animation: slow-aurora 25s ease-in-out infinite alternate;
+}
+.hero-flow--glow {
+  opacity: .58;
+  background:
+    linear-gradient(113deg, transparent 27%, #ffe4b455 39%, #fcaeaa26 45%, transparent 62%),
+    radial-gradient(ellipse 49% 20% at 48% 64%, #ffe8be50, transparent 85%);
+  mix-blend-mode: screen;
+  animation: slow-glint 16s ease-in-out infinite alternate;
+}
+@keyframes slow-ember {
+  0% { transform: translate3d(-4%, 1%, 0) rotate(-10deg) scale(1.03); }
+  50% { transform: translate3d(3%, -2%, 0) rotate(4deg) scale(1.15); }
+  100% { transform: translate3d(-2%, 4%, 0) rotate(11deg) scale(1.04); }
+}
+@keyframes slow-aurora {
+  0% { transform: translate3d(6%, -5%, 0) rotate(12deg) scale(.95); }
+  50% { transform: translate3d(-5%, 3%, 0) rotate(-7deg) scale(1.06); }
+  100% { transform: translate3d(1%, -3%, 0) rotate(9deg) scale(1.14); }
+}
+@keyframes slow-glint {
+  from { transform: translate3d(-8%, 4%, 0) rotate(-4deg) scale(.93); }
+  to { transform: translate3d(9%, -5%, 0) rotate(5deg) scale(1.1); }
+}
+@keyframes masthead-glow {
+  from { transform: translate3d(-7%, 0, 0); }
+  to { transform: translate3d(7%, 0, 0); }
+}
+@media (max-width:760px) {
+  /* Keep the original rat in frame and avoid an animated wash over small text. */
+  .hero-flow-mask {
+    inset: 10px;
+    opacity: .37;
+    border-radius: 18px;
+    mask-image: linear-gradient(180deg, #000a 0%, #0007 42%, transparent 88%);
+  }
+  .hero-flow--glow { opacity: .29; }
+  .g4-world .masthead::before { opacity: .18; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .hero-flow-mask { transition: none; transform: none; opacity: .34; }
+  .hero-flow, .g4-world .masthead::before { animation: none !important; }
+  .hero-flow--warm { transform: none; }
+  .hero-flow--violet { transform: none; }
+  .hero-flow--glow { transform: none; }
+}
