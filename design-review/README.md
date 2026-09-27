@@ -18,7 +18,7 @@ For each version: choose the surface/device, enter any 1–5 ratings you actuall
 - G6a GitHack is **source-only**: all eight reviewed art PNGs are missing from the committed build. The locally assembled full-art G6a preview is a different artifact and is intentionally not misrepresented as a GitHack snapshot.
 - Animated Grain Wave variants are included to collect comparative preference evidence, not to reverse the owner's static-art decision.
 - Old fixture/demo readouts are not current trading intelligence. Historic Figma-only concepts lack compiled GitHack pages and are not given invented GitHack URLs.
-- Local storage is device/origin scoped. No backend is collecting reviews, and this assistant cannot see them until you export/paste the JSON or manually create a GitHub issue.
+- **Shared-origin privacy warning:** `raw.githack.com` hosts code from many repositories under one origin. Other pages on that origin could access its localStorage. Do not enter credentials or sensitive personal material into this experimental review desk. Export JSON or host the desk on a dedicated origin before collecting confidential design feedback. No backend collects reviews, and the assistant cannot see them until you export/paste JSON or manually create a GitHub issue.
 
 ## Verify
 
