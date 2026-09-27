@@ -1,4 +1,4 @@
-name: BINRAT approved frontend integration
+name: BINRAT static pixel frontend integration
 on:
   push:
     branches:
@@ -35,38 +35,34 @@ jobs:
           node-version: '22'
           cache: pnpm
           cache-dependency-path: prototype/g3a/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - name: Install the owner's pinned React Bits component (never commit licensed source)
-        env:
-          REACTBITS_LICENSE_KEY: ${{ secrets.REACTBITS_LICENSE_KEY }}
-        run: node scripts/install-licensed-grain.mjs
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build
       - run: pnpm test
-      - name: Verify source distribution boundary
+      - name: Assert no shader, licensed source or superseded bundle
         run: |
-          test -z "$(git ls-files -- src/premium-grain)"
           test -z "$(find dist -name '*.map' -print -quit)"
-          test -z "$(git status --porcelain -- src/premium-grain)"
-          git diff --exit-code -- package.json pnpm-lock.yaml
-      - name: Freeze only tested public bundle
+          test -z "$(git ls-files -- src/premium-grain src/officialGrainMount.ts src/grainWave.ts)"
+          test -z "$(find dist -iname '*grain*wave*' -o -iname '*three*' -o -iname '*react*')"
+          ! grep -RE 'REACTBITS_LICENSE_KEY|@react-three/fiber|official-grain-host' dist
+      - name: Freeze only the tested public bundle and regenerated lockfile
         run: |
-          git add -A dist
-          if ! git diff --cached --quiet -- dist; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(frontend): freeze verified approved R5 distribution'
+          git add -A dist pnpm-lock.yaml
+          if ! git diff --cached --quiet -- dist pnpm-lock.yaml; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(frontend): freeze G6 static sunset without Grain Wave'
             git push origin HEAD:refs/heads/integration/binrat-r5-approved-20260927
           fi
-      - name: Archive rendered visual evidence only
+      - name: Upload browser screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: binrat-approved-r5-integration-evidence
+          name: binrat-g6-static-frontend-evidence
           path: |
             prototype/g3a/evidence/screenshots
             prototype/g3a/test-results
           if-no-files-found: warn
           retention-days: 7
-  committed-bundle-and-githack:
+  published-static-build:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -86,22 +82,13 @@ jobs:
           cache-dependency-path: prototype/g3a/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - name: Never expose licensed TSX or CSS in git
-        run: |
-          test -z "$(git ls-files -- src/premium-grain)"
-          test -z "$(find dist -name '*.map' -print -quit)"
       - run: pnpm test
-      - name: Exact immutable GitHack journey
+      - name: Assert no 3D dependency or old effect bundle
+        run: |
+          test -z "$(find dist -name '*.map' -print -quit)"
+          test -z "$(git ls-files -- src/premium-grain src/officialGrainMount.ts src/grainWave.ts)"
+          test -z "$(find dist -iname '*grain*wave*' -o -iname '*three*' -o -iname '*react*')"
+      - name: Verify immutable GitHack historical/demo journey
         env:
           PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/${{ github.event.pull_request.head.sha }}/prototype/g3a/dist/index.html
         run: pnpm test:published
-      - name: Archive browser screenshots and traces
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: binrat-approved-r5-published-evidence
-          path: |
-            prototype/g3a/evidence/screenshots
-            prototype/g3a/test-results
-          if-no-files-found: warn
-          retention-days: 7

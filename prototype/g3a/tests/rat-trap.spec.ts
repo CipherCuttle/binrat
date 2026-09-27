@@ -14,7 +14,7 @@ for (const viewport of [
   test(`fictional Rat Trap journey is complete and bounded at ${viewport.width}px`, async ({ page }) => {
     const fitsViewport = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
     await page.setViewportSize(viewport);
-    await page.goto('./?static-sky=1');
+    await page.goto('./');
 
     await page.getByRole('button', { name: /investigate/i }).click();
     await page.getByRole('button', { name: /skip retrieval/i }).click();

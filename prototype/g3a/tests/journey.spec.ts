@@ -10,7 +10,7 @@ for (const viewport of [
 ]) {
   test(`mobile discovery fits ${viewport.width}px and keeps action visible`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await page.goto('./?static-sky=1');
+    await page.goto('./');
 
     await expect(page.getByTestId('discovery')).toBeVisible();
     await expect(page.getByText('VERIFIED HISTORICAL SNAPSHOT')).toBeVisible();
@@ -27,7 +27,7 @@ for (const viewport of [
   test(`complete journey fits and works at ${viewport.width}px`, async ({ page }) => {
     const fitsViewport = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
     await page.setViewportSize(viewport);
-    await page.goto('./?static-sky=1');
+    await page.goto('./');
 
     const source = page.getByRole('link', { name: /view verified receipt/i });
     await expect(source).toBeVisible();
@@ -61,7 +61,7 @@ for (const viewport of [
 }
 
 test('keyboard activates the primary action', async ({ page }) => {
-  await page.goto('./?static-sky=1');
+  await page.goto('./');
   const action = page.getByRole('button', { name: /investigate/i });
   await action.focus();
   await page.keyboard.press('Enter');
@@ -70,7 +70,7 @@ test('keyboard activates the primary action', async ({ page }) => {
 
 test('reduced motion bypasses the animated retrieval', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('./?static-sky=1');
+  await page.goto('./');
   await page.getByRole('button', { name: /investigate/i }).click();
   await expect(page.getByTestId('investigation')).toBeVisible();
   await expect(page.getByTestId('retrieval')).toHaveCount(0);
@@ -78,7 +78,7 @@ test('reduced motion bypasses the animated retrieval', async ({ page }) => {
 
 test('critical screens have no automatically detectable accessibility violations', async ({ page }) => {
   test.setTimeout(60000);
-  await page.goto('./?static-sky=1');
+  await page.goto('./');
   let results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 

@@ -1,7 +1,4 @@
 node_modules/
 playwright-report/
 test-results/
-
-# Official paid component is downloaded in authenticated CI only, not redistributed.
-src/premium-grain/
 .env.local

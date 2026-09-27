@@ -433,197 +433,75 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   *,*::before,*::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
 }
 
-/* Approved R5: the official licensed component supplies the grainy animation.
-   Only copy receives localized shading; do not cover the wave with a second
-   gradient, hand-made contour renderer, or full-screen overlay. */
+/* G6 ART-DIRECTION BRIDGE — static sunset only.
+   Placeholder until the owner approves compositable pixel-art assets from
+   the two supplied visual references. Absolutely no Grain Wave/React/WebGL. */
 .g4-world .poster {
   overflow:hidden;
-  background:#333333;
+  background:#251542;
 }
-.g4-world .grain-wave-sky {
+.g4-world .pixel-sunset-sky {
   position:absolute;
   inset:0;
   z-index:0;
-  isolation:isolate;
-  overflow:hidden;
   pointer-events:none;
-  background:#333333;
-  opacity:1;
+  background:
+    radial-gradient(ellipse 28% 19% at 42% 67%, #ffdd91 0%, #ffa35d 38%, transparent 94%),
+    radial-gradient(ellipse 80% 23% at 46% 64%, #ff9a88b8 0%, #ff7c99a8 38%, transparent 93%),
+    radial-gradient(ellipse 110% 30% at 54% 41%, #ba3d9b99 12%, transparent 95%),
+    linear-gradient(180deg,#21124a 0%,#422176 24%,#74318e 39%,#bb508d 57%,#ee9569 72%,#241c40 100%);
 }
-.g4-world .official-grain-host {
+.g4-world .pixel-sunset-sky::before {
+  content:"";
   position:absolute;
   inset:0;
-  z-index:0;
-  width:100%;
-  height:100%;
   pointer-events:none;
-  opacity:1;
+  opacity:.12;
+  background-image:radial-gradient(#ffd39b 1px,transparent 1px),radial-gradient(#1c144f 1px,transparent 1px);
+  background-size:17px 19px,13px 17px;
+  background-position:0 0,6px 5px;
 }
-.official-grain-host > div,
-.official-grain-host canvas {
-  display:block;
-  width:100% !important;
-  height:100% !important;
-  pointer-events:none !important;
-}
-.official-grain-host script {display:none !important;}
-.g4-world .poster-copy {
-  position:relative;
-  z-index:4;
-  isolation:isolate;
-}
+.g4-world .poster-copy {position:relative;z-index:4;isolation:isolate;}
 .g4-world .poster-copy::before {
   content:"";
   position:absolute;
-  inset:-12px -16px -24px -35px;
+  inset:-16px -20px -30px -40px;
   z-index:-1;
   pointer-events:none;
-  background:radial-gradient(ellipse 78% 76% at 28% 46%,#111021ed 0%,#111021c4 47%,#1110214c 76%,transparent 98%);
+  background:radial-gradient(ellipse 70% 76% at 24% 48%,#1c153dc9 0%,#25194091 52%,transparent 95%);
 }
-.g4-world .rat-stage {z-index:2;overflow:hidden;}
+.g4-world .rat-stage {position:relative;z-index:2;}
 .g4-world .rat-stage img {
   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#0008 13%,#000 30%,#000 100%);
   mask-image:linear-gradient(90deg,transparent 0%,#0008 13%,#000 30%,#000 100%);
 }
-.g4-world .skyline-near {opacity:.66;}
 @media(max-width:760px) {
-  .g4-world .poster {
-    display:grid;
-    grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto 190px auto;
-    min-height:0;
-    background:#151223;
+  .g4-world .poster {display:grid;grid-template-columns:minmax(0,1fr);min-height:0;}
+  .g4-world .poster-copy {padding:23px 18px 5px;}
+  .g4-world .poster-copy::before {
+    inset:-10px -12px -12px;
+    background:linear-gradient(180deg,#21133bc7 0%,#26183c9c 64%,transparent 100%);
   }
-  .g4-world .poster-copy {
-    grid-row:1;
-    align-self:start;
-    padding:22px 18px 0;
-    max-width:550px;
-    background:#151223;
-  }
-  .g4-world .poster-copy::before {display:none;}
-  .g4-world .poster-copy .eyebrow {
-    margin:0 0 8px;
-    max-width:none;
-    font-size:.61rem;
-    line-height:1.4;
-    letter-spacing:.12em;
-  }
-  .g4-world .display-title {
-    font-size:clamp(2.85rem,10.4vw,3.85rem);
-    line-height:.94;
-    margin:6px 0 12px;
-    letter-spacing:-.078em;
-  }
-  .g4-world .hero-deck {
-    font-size:clamp(.88rem,3.8vw,1.03rem);
-    line-height:1.3;
-    margin:0 0 6px;
-  }
-  .g4-world .hero-description {
-    max-width:380px;
-    font-size:.79rem;
-    line-height:1.35;
-    margin:0;
-  }
-  .g4-world .primary-actions {
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:8px;
-    margin-top:14px;
-  }
+  .g4-world .display-title {font-size:clamp(2.9rem,10.5vw,4rem);line-height:.96;margin:9px 0 14px;}
+  .g4-world .hero-deck {font-size:.94rem;line-height:1.36;margin-bottom:7px;}
+  .g4-world .hero-description {font-size:.81rem;line-height:1.4;}
+  .g4-world .primary-actions {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:17px;}
   .g4-world .enter-dumpster,.g4-world .investigate {
-    display:flex;
-    flex:1 1 auto;
-    justify-content:space-between;
-    gap:6px;
-    min-width:0;
-    min-height:52px;
-    padding:10px 12px;
-    text-align:left;
-    font-size:.75rem;
-    line-height:1.22;
+    display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:52px;
+    min-width:0;padding:10px 12px;text-align:left;font-size:.76rem;line-height:1.2;
   }
-  .g4-world .enter-dumpster {box-shadow:0 4px 0 #603541,0 7px 22px #08071630;}
-  .g4-world .investigate {background:#171426c7;border:1px solid #ffe1bc99;}
-  .g4-world .world-label {display:none;}
-  /* Keep the official shader at a demo-like landscape aspect ratio on phones,
-     then feather the original pixel-art rat across its bottom edge. */
-  html:not(.grain-demo-isolate) .g4-world .grain-wave-sky {
-    position:relative;
-    inset:auto;
-    grid-row:2;
-    width:100%;
-    height:190px;
-    z-index:1;
-    background:#333333;
-  }
-  .g4-world .rat-stage {
-    position:relative;
-    grid-row:3;
-    z-index:2;
-    width:100%;
-    min-height:0;
-    height:clamp(300px,88vw,385px);
-    margin-top:-40px;
-    overflow:hidden;
-  }
+  .g4-world .world-label {margin:16px 0 0;}
+  .g4-world .rat-stage {min-height:300px;height:clamp(300px,87vw,390px);margin-top:-24px;}
   .g4-world .rat-stage img {
-    position:absolute;
-    inset:-7% 0 auto;
-    width:100%;
-    height:115%;
-    max-width:none;
-    object-fit:cover;
-    object-position:50% 35%;
-    -webkit-mask-image:linear-gradient(180deg,transparent 0%,#0008 9%,#000 23%,#000 90%,transparent 100%);
-    mask-image:linear-gradient(180deg,transparent 0%,#0008 9%,#000 23%,#000 90%,transparent 100%);
+    position:absolute;inset:-7% 0 auto;width:100%;height:115%;max-width:none;
+    object-fit:cover;object-position:50% 35%;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000a 12%,#000 24%,#000 90%,transparent 100%);
+    mask-image:linear-gradient(180deg,transparent 0%,#000a 12%,#000 24%,#000 90%,transparent 100%);
   }
-  .g4-world .skyline-near {height:70px;opacity:.42;}
 }
 @media(max-width:350px) {
-  .g4-world .poster-copy {padding:18px 14px 0;}
-  .g4-world .display-title {font-size:2.75rem;}
-  .g4-world .hero-description {font-size:.73rem;}
-  .g4-world .enter-dumpster,.g4-world .investigate {padding:9px 9px;font-size:.69rem;}
-  .g4-world .poster {grid-template-rows:auto 175px auto;}
-  html:not(.grain-demo-isolate) .g4-world .grain-wave-sky {height:175px;}
-  .g4-world .rat-stage {height:300px;}
-}
-/* Full-screen side-by-side comparison of EXACT documented React Bits settings:
-   /index.html?demo-isolate=1  — no BINRAT copy, artwork, masks or shading. */
-html.grain-demo-isolate,html.grain-demo-isolate body {margin:0;width:100%;height:100%;overflow:hidden;background:#333333;}
-html.grain-demo-isolate .g4-world {min-height:100svh;height:100svh;overflow:hidden;background:#333333;}
-html.grain-demo-isolate .g4-world .masthead,
-html.grain-demo-isolate .g4-world .poster-copy,
-html.grain-demo-isolate .g4-world .rat-stage,
-html.grain-demo-isolate .g4-world .skyline-near,
-html.grain-demo-isolate .g4-world .product-dock,
-html.grain-demo-isolate .g4-world .world-proof,
-html.grain-demo-isolate .g4-world .world-footer {display:none !important;}
-html.grain-demo-isolate .g4-world .poster {
-  display:block;
-  height:100svh;
-  min-height:100svh;
-  width:100%;
-  max-width:none;
-  margin:0;
-  background:#333333;
-}
-html.grain-demo-isolate .g4-world .poster::before {display:none;}
-html.grain-demo-isolate .g4-world .grain-wave-sky {inset:0;opacity:1;}
-@media(prefers-reduced-motion:reduce) {
-  .g4-world .official-grain-host {display:none;}
-}
-
-/* Low-power/unsupported fallback is a deliberately static, visible treatment.
-   It never runs an imitation shader or intercepts navigation. */
-/* The phone layout uses a later, more specific background shorthand.
-   Explicitly override that declaration for unsupported/reduced-motion cases. */
-.g4-world .grain-wave-sky.grain-wave-fallback,
-html:not(.grain-demo-isolate) .g4-world .grain-wave-sky.grain-wave-fallback {
-  background-color:#333333 !important;
-  background-image:
-    radial-gradient(ellipse 65% 68% at 65% 45%,#e984b2a8 0%,transparent 78%),
-    linear-gradient(145deg,#ff6666 0%,#bf5eaf 50%,#6666ff 100%) !important;
+  .g4-world .poster-copy {padding:18px 14px 4px;}
+  .g4-world .display-title {font-size:2.72rem;}
+  .g4-world .enter-dumpster,.g4-world .investigate {padding:9px;font-size:.69rem;}
+  .g4-world .rat-stage {height:300px;min-height:300px;}
 }

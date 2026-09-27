@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from 'svelte';
   import { demo, receipt, shortAddress, usd, type DemoWindow } from './fixture';
-  import { mountOfficialGrainWave } from './officialGrainMount';
 
   type Scene = 'discovery' | 'radar' | 'retrieving' | 'investigation' | 'rat-trap';
 
@@ -268,11 +267,9 @@
     </header>
 
     <section class="poster" id="fresh-garbage" aria-labelledby="fresh-title">
-      <!-- Actual licensed React Bits Pro Starter Grain Wave, mounted as an isolated React island.
-           Licensed source is fetched from the registry by CI, never committed. -->
-      <div class="grain-wave-sky" aria-hidden="true" data-testid="grain-wave-sky">
-        <div class="official-grain-host" data-testid="official-grain-host" use:mountOfficialGrainWave></div>
-      </div>
+      <!-- Temporary, motion-free sunset. The G6 pixel-art asset pack will
+           replace this CSS backdrop; the owner's rat artwork is unchanged. -->
+      <div class="pixel-sunset-sky" aria-hidden="true" data-testid="static-hero-sky"></div>
       <div class="poster-copy">
         <p class="eyebrow">Open-source intelligence. Closer to reality.</p>
         <h1 id="fresh-title" class="display-title" bind:this={sceneHeading} tabindex="-1">The rat<br /><em>remembers.</em></h1>
