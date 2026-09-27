@@ -16,3 +16,33 @@ No claims of aesthetic equivalence to React Bits should be made until owner comp
 
 ### Portrait aspect-ratio correction
 Actual post-CI inspection found that merely extending an absolutely positioned fullscreen shader behind text/photo exposes an empty dark wedge on Android: its portrait aspect ratio changes the demo wave's shape radically. The integrated portrait homepage now presents the **official component in an uncluttered ~2:1 landscape stage** between compact copy and the original rat, overlapping the artwork by 40px for a continuous fade. Desktop still uses the full hero canvas, and `?demo-isolate=1` remains the untouched full-viewport preset for direct comparison. The visual assertion now checks the dedicated stage and original rat first-fold position rather than the old 76px decorative strip.
+
+## Final R5 isolated mobile composition (owner visual gate)
+
+The portrait experiment that extended an absolute fullscreen shader to a tall
+unoccluded strip produced an empty dark wedge. It was superseded on the
+**same draft branch** by the final R5 composition: on <=760px, the paid
+component runs in its own fully exposed 2:1 landscape stage (190px at 390px;
+175px at 320px) between compact copy and the original pixel-art rat.
+The original rat artwork enters with a 40px overlap and feathered top mask.
+The desktop integrated hero retains its fullscreen official shader.
+
+Normal mobile and desktop use the original demo speed/count/grain/wave shape
+and colors, selecting the demo's dark `#333333` background for readability.
+The comparison `?demo-isolate=1` keeps the exact original white/gray theme
+background options and **no BINRAT artwork, shading, copy or layout crop**.
+
+Isolated source build https://github.com/CipherCuttle/binrat/actions/runs/36302640674
+passed **32/32** Playwright browser checks (plus one intentionally skipped
+published check; that test runs on PR). The suite checks actual shader-frame
+changes at 1440, 390 and 320 and 390/1440 demo isolates; reduced-motion
+fallback, Rat Radar and historical-versus-fictional case boundaries stay intact.
+Verified screenshot artifact ID 10926367498 has composed mobile 390, 320,
+desktop 1440, isolate 390/1440 phase pairs, reduced-motion and full journey
+states.
+
+Public build is frozen in the branch at commit
+`73c2bffcc1af8da76fb156a427c0e37b41167ff2`.
+A Git comparison to PR #51 shows no paid TSX/CSS in history or diff; no license
+key or source maps shipped. Owner Android review remains essential: technical
+proof of animation is not visual approval. No merge or production deployment.
