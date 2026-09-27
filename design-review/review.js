@@ -75,7 +75,7 @@ function drawList(){
     btn.type="button";btn.dataset.id=v.id;btn.setAttribute("aria-current",String(v.id===selected));
     btn.append(el("strong",v.name),el("small",v.group+" · PR #"+v.pr));
     if(state.reviews[v.id])btn.append(el("span","Saved","tag"));
-    btn.addEventListener("click",()=>select(v.id));li.append(btn);list.append(li)
+    btn.addEventListener("click",()=>select(v.id,true));li.append(btn);list.append(li)
   });
   $("count").textContent="("+matches.length+"/"+V.length+")"
 }
@@ -110,7 +110,7 @@ function updateForm(){
   r.version=selected;r.preview=current().url;r.updatedAt=new Date().toISOString();
   persist();drawSummary();drawList();updateIssue()
 }
-function select(id){
+function select(id,fromList=false){
   if(!byId[id])return;
   selected=id;const v=current();
   $("current-title").textContent=v.name;$("reviewVersion").textContent=v.name;
@@ -123,7 +123,8 @@ function select(id){
   $("loadIframe").textContent="Show preview here";embedded=false;
   populate();drawList();drawSummary();updateIssue();
   const u=new URL(location.href);u.searchParams.set("v",id);history.replaceState(null,"",u);
-  $("versus").value="";$("choice").value="";$("compareWhy").value=""
+  $("versus").value="";$("choice").value="";$("compareWhy").value="";
+  if(fromList&&window.matchMedia("(max-width:820px)").matches){document.querySelector(".preview").scrollIntoView({block:"start",behavior:"auto"})}
 }
 function loadPreview(){
   if(embedded){
@@ -199,14 +200,15 @@ function makeDigest(){
     "\n\nIdentify evidence-backed recurring preferences and contradictory likes/dislikes by design, surface and device. Do not treat ratings as immutable style rules. Keep canonical rat, live/demo truth boundary and isolated draft PRs intact."
 }
 async function copy(value){
+  const previous=$("copyFallback");if(previous)previous.remove();
   try {
     if(!navigator.clipboard?.writeText)throw Error("clipboard unavailable");
     await navigator.clipboard.writeText(value);$("saveStatus").textContent="Copied to clipboard"
   } catch(err){
-    const box=el("textarea");box.value=value;box.setAttribute("aria-label","Copy fallback");
-    box.style.cssText="width:100%;height:160px";
-    $("summary").replaceWith(box);box.focus();box.select();
-    $("saveStatus").textContent="Clipboard blocked. Selected text is ready to copy; reload to restore the summary."
+    const box=el("textarea");box.id="copyFallback";box.value=value;box.setAttribute("aria-label","Copy fallback");
+    box.style.cssText="width:100%;min-height:160px;color:#eff9f3;background:#102127;border:1px solid #7dafa1";
+    $("summary").insertAdjacentElement("afterend",box);box.focus();box.select();
+    $("saveStatus").textContent="Clipboard blocked. Selected text is ready to copy below."
   }
 }
 function saveComparison(){
