@@ -29,9 +29,28 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Browser acceptance at 1440, 390 and 320
         run: node design-review/test/browser.mjs
+      - name: Published immutable GitHack desk smoke (push only)
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://raw.githack.com/CipherCuttle/binrat/${GITHUB_SHA}/design-review"
+          for asset in index.html review.js review.css versions.json; do
+            curl -fsSL --retry 5 --retry-delay 4 --max-time 30 "$base/$asset" -o "/tmp/binrat-published-$asset"
+            test -s "/tmp/binrat-published-$asset"
+          done
+          grep -q 'BINRAT / Frontend review desk' /tmp/binrat-published-index.html
+          grep -q 'binrat.design-feedback.v1' /tmp/binrat-published-review.js
+          node -e "const fs=require('fs');if(JSON.parse(fs.readFileSync('/tmp/binrat-published-versions.json')).length!==21)process.exit(1)"
+          echo "Verified published desk: $base/index.html"
+      - name: Probe the original 21 GitHack links (advisory)
+        if: github.event_name == 'push'
+        run: node design-review/test/published-links.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: binrat-design-review-viewport-screenshots
-          path: /tmp/binrat-*.png
+          path: |
+            /tmp/binrat-*.png
+            /tmp/binrat-preview-link-status.json
           if-no-files-found: ignore
