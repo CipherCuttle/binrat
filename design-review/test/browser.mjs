@@ -42,13 +42,34 @@ try {
     assert.ok(json.reviews[0].feedback.likes.includes('Warm paper dossier'));
     const issue=await page.locator('#issue').getAttribute('href');
     assert.ok(issue.includes('issues/new?title=')&&decodeURIComponent(issue).includes('Warm paper dossier'));
+    await page.locator('#versus').selectOption('g4r');
+    await page.locator('#choice').selectOption('A');
+    await page.locator('#compareWhy').fill('Prefer the light paper dossier, but keep the cinematic Rat Radar structure.');
+    await page.locator('#saveComparison').click();
+    const comparisonDownload=page.waitForEvent('download');
+    await page.locator('#export').click();
+    const compared=JSON.parse(fs.readFileSync(await (await comparisonDownload).path(),'utf8'));
+    assert.equal(compared.comparisons.length,1,'Pairwise preference persists');
+    await page.locator('#versionList [data-id="g3c"]').click();
+    await page.locator('#r-overall').selectOption('2');
+    await page.locator('#versionList [data-id="g4a"]').click();
+    assert.equal(await page.locator('#r-overall').inputValue(),'5','Ratings remain isolated per version');
     await page.screenshot({path:'/tmp/binrat-review-'+width+'.png',fullPage:false});
     await page.locator('#review-title').scrollIntoViewIfNeeded();
     await page.screenshot({path:'/tmp/binrat-feedback-'+width+'.png',fullPage:false});
     assert.deepEqual(errors,[],'No script errors at '+width);
     await page.close()
   }
-  console.log('PASS: pinned catalog, responsive 1440/390/320, local persistence, per-version form, export and issue draft.');
+  const fallback=await browser.newPage({viewport:{width:390,height:844}});
+  await fallback.addInitScript(()=>Object.defineProperty(navigator,'clipboard',{value:undefined,configurable:true}));
+  await fallback.goto(origin+'/?v=g6a');
+  await fallback.locator('#copyDigest').click();
+  assert.equal(await fallback.locator('#copyFallback').count(),1,'Clipboard fallback is available');
+  await fallback.locator('#r-overall').selectOption('4');
+  assert.equal(await fallback.locator('#summary').count(),1,'Clipboard fallback must not destroy the live summary');
+  assert.ok((await fallback.locator('#summary').textContent()).includes('Reviewed: 1/21'));
+  await fallback.close();
+  console.log('PASS: 21 URLs, 1440/390/320 layout, local persistence, version isolation, pairwise comparison, JSON export, GitHub draft and denied-clipboard recovery.');
 } finally {
   if(browser)await browser.close();
   server.close();
