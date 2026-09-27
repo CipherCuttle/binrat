@@ -54,7 +54,14 @@ export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
         attribute:'class',
         forcedTheme:'dark',
         enableSystem:false,
-        children:createElement(OfficialGrainWave,demoDefaults)
+        // Isolated: the demo's exact white/gray background options.
+        // Integrated: select the demo's dark-mode background in both theme paths.
+        // The React island can resolve light despite a forced dark provider.
+        // No opaque mask/filter hides the original wave shader.
+        children:createElement(OfficialGrainWave,demoIsolate?demoDefaults:{
+          ...demoDefaults,
+          lightBackground:'#333333'
+        })
       }));
     }
     host.dataset.grainRuntime='official-mounted';
