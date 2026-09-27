@@ -615,3 +615,11 @@ html.grain-demo-isolate .g4-world .grain-wave-sky {inset:0;opacity:1;}
 @media(prefers-reduced-motion:reduce) {
   .g4-world .official-grain-host {display:none;}
 }
+
+/* Low-power/unsupported fallback is a deliberately static, visible treatment.
+   It never runs an imitation shader or intercepts navigation. */
+.g4-world .grain-wave-sky.grain-wave-fallback {
+  background:
+    radial-gradient(ellipse 65% 68% at 65% 45%,#e984b2a8 0%,transparent 78%),
+    linear-gradient(145deg,#ff6666 0%,#bf5eaf 50%,#6666ff 100%);
+}

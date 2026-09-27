@@ -4,7 +4,7 @@ This Svelte 5 + Vite prototype implements the **owner-approved R5
 discovery hero**, the archived Pons V2 receipt scanner, evidence-first
 Rat Radar, and a strictly separate fictional Rat Trap.
 
-The homepage mounts the **official React Bits Pro Starter Grain Wave**
+The homepage lazy-loads the **official React Bits Pro Starter Grain Wave**
 as a small React island. The paid component is downloaded only into
 the ignored `src/premium-grain/` workspace from the owner's authenticated
 Starter registry. Its exact TSX/CSS hashes are pinned in
@@ -40,6 +40,10 @@ source build and browser tests for immutable GitHack previews; this is
 - No live backend, wallet, trading, payment, alerting, or network API.
 - The original owner-supplied `rat-original.jpg` is unchanged:
   SHA-256 `43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc`.
+
+## Runtime hardening
+
+On supported devices, the React/Three shader is loaded after feature and motion checks. On WebGL2 failure, context loss, hidden tabs or reduced motion, a lightweight static background remains visible and all navigation works. The renderer is disposed on scene changes; browser tests cover GPU failure and context loss.
 
 ## Visual acceptance
 

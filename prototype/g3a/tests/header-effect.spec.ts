@@ -109,3 +109,41 @@ for(const width of [390,1440] as const) {
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   });
 }
+
+test('WebGL2 unavailable: static branded sky, no 3D canvas, all mobile actions work',async ({page})=>{
+  await page.addInitScript(() => {
+    const original=HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext=function(...args) {
+      if(args[0]==='webgl2') return null;
+      return Reflect.apply(original,this,args);
+    } as typeof original;
+  });
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('./');
+  const host=page.getByTestId('official-grain-host');
+  await expect(host).toHaveAttribute('data-grain-runtime','webgl-unavailable');
+  await expect(host.locator('canvas')).toHaveCount(0);
+  await expect(page.getByTestId('grain-wave-sky')).toHaveClass(/grain-wave-fallback/);
+  expect(await page.getByTestId('grain-wave-sky').evaluate(el=>getComputedStyle(el).backgroundImage)).not.toBe('none');
+  await expect(page.getByRole('button',{name:/enter rat radar/i})).toBeInViewport();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.getByRole('button',{name:/enter rat radar/i}).click();
+  await expect(page.getByTestId('radar')).toBeVisible();
+});
+test('WebGL context loss: static fallback replaces shader without trapping input',async ({page})=>{
+  test.setTimeout(60000);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('./');
+  const host=page.getByTestId('official-grain-host');
+  await expect(host).toHaveAttribute('data-grain-runtime','official-mounted',{timeout:15000});
+  await host.locator('canvas').evaluate(canvas=>
+    canvas.dispatchEvent(new Event('webglcontextlost',{cancelable:true}))
+  );
+  await expect(host).toHaveAttribute('data-grain-runtime','context-lost',{timeout:10000});
+  await expect(host.locator('canvas')).toHaveCount(0);
+  await expect(page.getByTestId('grain-wave-sky')).toHaveClass(/grain-wave-fallback/);
+  await page.getByRole('button',{name:/investigate the receipt/i}).click();
+  await expect(page.getByTestId('investigation')).toBeVisible();
+});
