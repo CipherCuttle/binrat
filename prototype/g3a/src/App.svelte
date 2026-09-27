@@ -285,6 +285,7 @@
         </div>
         <p class="world-label">People <span>/</span> patterns <span>/</span> proof</p>
       </div>
+      <div class="hero-wave-window" aria-hidden="true"></div>
       <figure class="rat-stage" aria-label="BINRAT's original approved artwork">
         <img src="./rat-original.jpg" alt="The original BINRAT rat looking out from a dumpster in a pixel-art cyberpunk alley" width="1536" height="1536" />
       </figure>
