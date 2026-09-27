@@ -64,6 +64,9 @@ function initialize(){
   $("saveComparison").addEventListener("click",saveComparison);
   const queryId=new URL(location.href).searchParams.get("v");
   select(byId[queryId]?queryId:"g6a");
+  if(byId[queryId]&&window.matchMedia("(max-width:820px)").matches){
+    requestAnimationFrame(()=>document.querySelector(".preview").scrollIntoView({block:"start",behavior:"instant"}))
+  }
   if(!storageOK)$("saveStatus").textContent="Local storage unavailable. Export JSON before leaving."
 }
 function drawList(){
