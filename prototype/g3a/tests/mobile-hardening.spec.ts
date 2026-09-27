@@ -10,7 +10,7 @@ const counts = {
 } as const;
 
 async function enterTrap(page: Page) {
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   await page.getByRole('button', { name: /investigate/i }).click();
   await page.getByRole('button', { name: /skip retrieval/i }).click();
   await expect(page.getByTestId('investigation')).toBeVisible();
@@ -60,7 +60,7 @@ for (const width of widths) {
 
   test(`browser history restores scenes and expanded Rat Trap at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('./');
+    await page.goto('./?static-sky=1');
     await page.getByRole('button', { name: /investigate/i }).click();
     await expect(page.getByTestId('retrieval')).toBeVisible();
     await page.evaluate(() => history.back());
@@ -114,7 +114,7 @@ for (const width of [320, 390] as const) {
 }
 
 test('reload of interrupted scan settles on dossier without replay', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   await page.getByRole('button', { name: /investigate/i }).click();
   await expect(page.getByTestId('retrieval')).toBeVisible();
   await page.reload();
@@ -126,7 +126,7 @@ test('reload of interrupted scan settles on dossier without replay', async ({ pa
 
 test('reduced-motion shortcut remains correct after Back and Forward', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   await page.getByRole('button', { name: /investigate/i }).click();
   await expect(page.getByTestId('investigation')).toBeVisible();
   await expect(page.getByTestId('retrieval')).toHaveCount(0);
@@ -137,7 +137,7 @@ test('reduced-motion shortcut remains correct after Back and Forward', async ({ 
 });
 
 test('frozen proof provenance and original UNKNOWN limits remain discoverable', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   await expect(page.getByText(/two independent archive RPCs and Robinscan/i)).toBeVisible();
   await page.getByRole('button', { name: /investigate/i }).click();
   await page.getByRole('button', { name: /skip retrieval/i }).click();

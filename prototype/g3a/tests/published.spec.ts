@@ -25,7 +25,8 @@ test('published GitHack build completes the primary journey', async ({ page }) =
   await expect(page.getByText(/official Blockscout UI conflict is documented/i)).toBeVisible();
   await expect(page.getByRole('button', { name: /investigate/i })).toBeInViewport();
   await page.getByRole('button', { name: /investigate/i }).click();
-  await page.getByRole('button', { name: /skip retrieval/i }).click();
+  const skip = page.getByRole('button', { name: /skip retrieval/i });
+  if (await skip.isVisible()) await skip.click(); // Auto-completion is also a valid path.
   await expect(page.getByTestId('investigation')).toBeVisible();
   await expect(page.getByRole('link', { name: /frozen independent proof manifest/i })).toHaveAttribute('href', /55af899617fc38af71b746e3e90a9f2de3e6e53a/);
   await expect(page.getByText(/official Blockscout transaction UI displayed an unrelated record/i)).toBeVisible();

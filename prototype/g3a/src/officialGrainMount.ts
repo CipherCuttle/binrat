@@ -2,13 +2,12 @@ import { createElement, type ComponentType } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { ThemeProvider } from 'next-themes';
 import type { Action } from 'svelte/action';
-import * as OfficialModule from './premium-grain/grain-wave';
+import GrainWave from './premium-grain/grain-wave';
 import './premium-grain/grain-wave.css';
 
 // Run the real licensed React component in a tiny React island without
 // migrating BINRAT's Svelte 5 discovery / scanner / Radar application.
-const GrainWave = (OfficialModule.default ?? (OfficialModule as {GrainWave?:ComponentType<any>}).GrainWave) as ComponentType<any>;
-if (!GrainWave) throw new Error('Official React Bits Grain Wave export unavailable');
+const OfficialGrainWave = GrainWave as ComponentType<any>;
 const demoDefaults = {
   width:'100%',
   height:'100%',
@@ -30,6 +29,7 @@ const demoDefaults = {
 };
 export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const staticSky=new URLSearchParams(location.search).has('static-sky');
   let root:Root|undefined;
   let stopped=false;
   function unmount() {
@@ -38,9 +38,9 @@ export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
   }
   function update() {
     if(stopped) return;
-    if(reduced.matches) {
+    if(reduced.matches || staticSky) {
       unmount();
-      host.dataset.grainRuntime='reduced-motion';
+      host.dataset.grainRuntime=reduced.matches?'reduced-motion':'static-sky';
       return;
     }
     if(!root) {
@@ -49,7 +49,7 @@ export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
         attribute:'class',
         forcedTheme:'dark',
         enableSystem:false,
-        children:createElement(GrainWave,demoDefaults)
+        children:createElement(OfficialGrainWave,demoDefaults)
       }));
     }
     host.dataset.grainRuntime='official-mounted';
