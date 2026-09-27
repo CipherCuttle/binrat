@@ -433,127 +433,55 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   *,*::before,*::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
 }
 
-/* G4-R2: Original pixel-grained sky currents. Only inside the homepage poster.
-   R3: visible canvas contour motion replaces invisible 1-2% SVG drift.
-   The illustrated rat and semantic copy remain above all atmosphere. */
+/* R4: actual licensed React Bits Pro Grain Wave runtime, only in discovery hero.
+   No hand-built contour layer. The CSS fallback renders without JS/WebGL. */
 .g4-world .masthead { isolation: isolate; overflow: hidden; }
-.g4-world .masthead::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  opacity: .19;
-  background: linear-gradient(105deg, transparent 19%, #7b3db32e 48%, #ffd08a22 75%, transparent 96%);
-}
 .g4-world .masthead > * { position: relative; z-index: 1; }
 .poster { overflow: hidden; }
 .grain-wave-sky {
   position: absolute;
   inset: 0;
   z-index: 0;
-  isolation: isolate;
   overflow: hidden;
   pointer-events: none;
-  contain: paint;
-  opacity: .91;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 42% 37% at 68% 65%, #f7ecc8e0, #f2ad637d 45%, transparent 80%),
+    linear-gradient(180deg, #2b1f8f, #7b3db3 39%, #c060a8 65%, #f2ad63 84%, #242047);
 }
-.grain-wave-currents {
-  position: absolute;
-  inset: -3% -5%;
-  width: 110%;
-  height: 106%;
-  overflow: visible;
-  filter: blur(12px);
-  opacity: .86;
-}
-.grain-wave-ribbon { transform-box: fill-box; transform-origin: center; }
-/* Static SVG underlay: canvas supplies visible movement, preventing competing
-   slow motions and avoiding a doubly animated fall-back. */
-.grain-wave-ribbon--violet,
-.grain-wave-ribbon--rose,
-.grain-wave-ribbon--sunset { animation: none; }
-.grain-wave-canvas {
+.official-grain-host {
   position: absolute;
   inset: 0;
-  display: block;
+  z-index: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  mix-blend-mode: screen;
-  image-rendering: auto;
-  opacity: .97;
-  mask-image: linear-gradient(90deg, #000 0%, #000 52%, #000e 70%, #0009 90%, transparent 100%);
+  opacity: 1;
 }
-.grain-wave-clouds {
-  position: absolute;
-  inset: 0;
-  opacity: .7;
-  background:
-    radial-gradient(ellipse 34% 13% at 4% 87%, #103e83ba 0%, #145a967d 48%, transparent 100%),
-    radial-gradient(ellipse 40% 11% at 90% 86%, #123f80ac 0%, #145a965b 51%, transparent 100%),
-    radial-gradient(ellipse 26% 10% at 77% 56%, #19518773 0%, transparent 100%);
+.official-grain-host > div,
+.official-grain-host canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  pointer-events: none !important;
 }
-/* Stationary small fractal-noise tile; image-rendering retains subtle pixel grain. */
-.grain-wave-grain {
-  position: absolute;
-  inset: 0;
-  opacity: .20;
-  mix-blend-mode: soft-light;
-  image-rendering: pixelated;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144' viewBox='0 0 144 144'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.59' numOctaves='2' stitchTiles='stitch' seed='12'/%3E%3C/filter%3E%3Crect width='144' height='144' filter='url(%23n)' opacity='.72'/%3E%3C/svg%3E"),
-    radial-gradient(#fff5e879 .65px, transparent 1px);
-  background-size: 144px 144px, 13px 17px;
-}
-/* Keep the title and action surface dark; leave peach/cream light around the rat. */
+.official-grain-host script { display: none !important; }
 .grain-wave-copy-shade {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    linear-gradient(90deg, #111638a5 0%, #231b5087 27%, #24194835 48%, transparent 69%),
-    linear-gradient(180deg, #16123e29 0%, transparent 38%, #111b378a 100%);
+    linear-gradient(90deg, #101237ca 0%, #1712469c 29%, #281b6330 51%, transparent 71%),
+    linear-gradient(180deg, #19134021 0%, transparent 51%, #10152e91 100%);
 }
-@keyframes grain-drift-violet {
-  from { transform: translate3d(-1.7%, -.8%, 0) scale(1.005); }
-  to { transform: translate3d(2%, 1.4%, 0) scale(1.024); }
-}
-@keyframes grain-drift-rose {
-  from { transform: translate3d(1.7%, .5%, 0) scale(1.018); }
-  to { transform: translate3d(-1.8%, -1.1%, 0) scale(1.005); }
-}
-@keyframes grain-drift-sunset {
-  from { transform: translate3d(-1%, 1%, 0) scale(1.006); }
-  to { transform: translate3d(1.4%, -1.2%, 0) scale(1.021); }
-}
-@media (max-width: 760px) {
-  .grain-wave-sky { opacity: .76; }
-  .grain-wave-currents { filter: blur(12px); opacity: .58; }
-  .grain-wave-grain { opacity: .10; background-size: 120px 120px, 14px 19px; }
-  .grain-wave-clouds { opacity: .47; }
-  .grain-wave-canvas {
-    opacity: .90;
-    mask-image: linear-gradient(180deg, #0009 0%, #000 36%, #000 70%, #0009 89%, transparent 100%);
-  }
+@media (max-width:760px) {
   .grain-wave-copy-shade {
     background:
-      linear-gradient(180deg, #111638b8 0%, #211a51a6 39%, #25195145 63%, transparent 83%),
-      linear-gradient(90deg, #14163a66, transparent 87%);
+      linear-gradient(180deg, #171137c7 0%, #21135094 37%, #291d5762 65%, transparent 88%),
+      linear-gradient(90deg, #16113f55, transparent 85%);
   }
-  .g4-world .masthead::before { opacity: .11; }
 }
-@media (max-width: 350px) {
-  .grain-wave-sky { opacity: .68; }
-  .grain-wave-currents { opacity: .49; filter: blur(10px); }
-  .grain-wave-grain { opacity: .075; }
-  .grain-wave-canvas { opacity: .86; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .grain-wave-sky { opacity: .8; }
-  .grain-wave-ribbon { animation: none !important; transform: none !important; }
-  .grain-wave-currents { filter: blur(13px); }
-  .grain-wave-grain { opacity: .13; }
-  .grain-wave-canvas { opacity: .78; }
-  .g4-world .masthead::before { animation: none !important; }
-  .grain-wave-sky, .grain-wave-currents { transition: none !important; }
+@media (prefers-reduced-motion:reduce) {
+  .official-grain-host { display:none; }
 }

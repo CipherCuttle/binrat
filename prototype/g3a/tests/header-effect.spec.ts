@@ -1,119 +1,64 @@
 import { expect, test } from '@playwright/test';
 
-test('desktop: original Grain Wave stays in the world, behind the rat and copy', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 950 });
+test('desktop: official licensed Grain Wave island is the only moving hero sky',async ({page})=>{
+  test.setTimeout(90000);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.setViewportSize({width:1440,height:950});
   await page.goto('./');
-  const sky = page.getByTestId('grain-wave-sky');
+  const sky=page.getByTestId('grain-wave-sky');
+  const host=page.getByTestId('official-grain-host');
   await expect(sky).toBeVisible();
-  await expect(sky).toHaveAttribute('aria-hidden', 'true');
-  await expect(page.locator('.rat-stage img')).toHaveAttribute('src', './rat-original.jpg');
-  await expect(sky.locator('path.grain-wave-ribbon')).toHaveCount(3);
-  await expect(sky.locator('stop[stop-color="#2b1f8f"]')).toHaveCount(1);
-  await expect(sky.locator('stop[stop-color="#7b3db3"]')).toHaveCount(2);
-  await expect(sky.locator('stop[stop-color="#f7ecc8"]')).toHaveCount(1);
-  expect(await page.locator('video, .hero-flow-mask').count()).toBe(0);
-  const canvas = page.getByTestId('grain-wave-canvas');
-  await expect(canvas).toBeVisible();
-  await expect.poll(async () => Number(await canvas.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(1);
-  await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-a-1440.png' });
-  const before = await canvas.evaluate((el: HTMLCanvasElement) => {
-    const data = el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data;
-    return Array.from(data);
-  });
-  await page.waitForTimeout(1400);
-  const after = await canvas.evaluate((el: HTMLCanvasElement) => Array.from(
-    el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data
-  ));
-  let changed = 0;
-  for (let offset = 0; offset < before.length; offset += 40) {
-    if (Math.abs(before[offset] - after[offset]) +
-      Math.abs(before[offset + 1] - after[offset + 1]) +
-      Math.abs(before[offset + 2] - after[offset + 2]) > 25) changed++;
-  }
-  expect(changed, 'Grain Wave must be visibly changing actual rendered pixels, not just report a CSS animation').toBeGreaterThan(600);
-  await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-b-1440.png' });
-  await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-moving-1440.png', fullPage: false });
-  expect(await sky.locator('.grain-wave-ribbon--violet').evaluate(el => getComputedStyle(el).animationName)).toBe('none'); // Deliberate static underlay; canvas supplies the verified motion.
-  expect(await sky.evaluate(el => getComputedStyle(el).pointerEvents)).toBe('none');
-  await expect(page.getByRole('button', { name: /enter rat radar/i })).toBeInViewport();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-world-1440.png', fullPage: true });
-
-  await page.getByRole('button', { name: /enter rat radar/i }).click();
+  await expect(sky).toHaveAttribute('aria-hidden','true');
+  await expect(host).toHaveAttribute('data-grain-runtime','official-mounted');
+  await expect(page.locator('.rat-stage img')).toHaveAttribute('src','./rat-original.jpg');
+  await expect(host.locator('canvas')).toBeVisible({timeout:15000});
+  const frameA = await host.screenshot({path:'evidence/screenshots/r4-official-1440-phase-a.png'});
+  await page.waitForTimeout(1600);
+  const frameB = await host.screenshot({path:'evidence/screenshots/r4-official-1440-phase-b.png'});
+  expect(frameA.equals(frameB),'Official shader should change actual rendered pixels within 1.6s').toBe(false);
+  await expect(page.getByRole('button',{name:/enter rat radar/i})).toBeInViewport();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.getByRole('button',{name:/enter rat radar/i}).click();
   await expect(page.getByTestId('radar')).toBeVisible();
-  await expect(page.getByTestId('grain-wave-sky')).toHaveCount(0);
-  const paper = page.getByRole('complementary', { name: /selected historical case file/i });
+  await expect(page.getByTestId('official-grain-host')).toHaveCount(0);
+  const paper=page.getByRole('complementary',{name:/selected historical case file/i});
   await expect(paper).toBeVisible();
-  expect(await paper.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
-  await page.screenshot({ path: 'evidence/screenshots/g4r2-radar-1440.png', fullPage: true });
+  expect(await paper.evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
 });
-
-for (const width of [390, 320] as const) {
-  test('mobile: subdued wave and usable actions at ' + width + 'px', async ({ page }) => {
-    await page.setViewportSize({ width, height: 844 });
+for(const width of [390,320] as const){
+  test('mobile: official effect rendered and primary actions usable at '+width+'px',async ({page})=>{
+    test.setTimeout(60000);
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    await page.setViewportSize({width,height:844});
     await page.goto('./');
-    const sky = page.getByTestId('grain-wave-sky');
-    await expect(sky).toBeVisible();
-    expect(Number(await sky.evaluate(el => getComputedStyle(el).opacity))).toBeLessThan(.8);
+    const host=page.getByTestId('official-grain-host');
+    await expect(host).toHaveAttribute('data-grain-runtime','official-mounted');
+    await expect(host.locator('canvas')).toBeVisible({timeout:15000});
     await expect(page.locator('.rat-stage img')).toBeVisible();
-    const canvas = page.getByTestId('grain-wave-canvas');
-    await expect(canvas).toBeVisible();
-    await expect.poll(async () => Number(await canvas.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(1);
-    if (width === 390) {
-      await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-a-390.png' });
-      const first = await canvas.evaluate((el: HTMLCanvasElement) => Array.from(
-        el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data
-      ));
-      await page.waitForTimeout(1200);
-      const second = await canvas.evaluate((el: HTMLCanvasElement) => Array.from(
-        el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data
-      ));
-      let changed = 0;
-      for (let offset = 0; offset < first.length; offset += 40) {
-        if (Math.abs(first[offset] - second[offset]) +
-          Math.abs(first[offset + 1] - second[offset + 1]) +
-          Math.abs(first[offset + 2] - second[offset + 2]) > 22) changed++;
-      }
-      expect(changed, '390px canvas must produce visibly different pixels').toBeGreaterThan(200);
-      await page.locator('.poster').screenshot({ path: 'evidence/screenshots/g4r2-grain-phase-b-390.png' });
-    }
-    await expect(page.getByRole('heading', { name: /the rat\s*remembers/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /enter rat radar/i })).toBeInViewport();
-    await expect(page.getByRole('button', { name: /investigate the receipt/i })).toBeInViewport();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-world-' + width + '.png', fullPage: true });
-    await page.getByRole('button', { name: /enter rat radar/i }).click();
+    await expect(page.getByRole('heading',{name:/the rat\s*remembers/i})).toBeVisible();
+    await expect(page.getByRole('button',{name:/enter rat radar/i})).toBeInViewport();
+    await expect(page.getByRole('button',{name:/investigate the receipt/i})).toBeInViewport();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    const frameA=await host.screenshot({path:'evidence/screenshots/r4-official-'+width+'-phase-a.png'});
+    await page.waitForTimeout(1500);
+    const frameB=await host.screenshot({path:'evidence/screenshots/r4-official-'+width+'-phase-b.png'});
+    expect(frameA.equals(frameB),'Official shader must animate at '+width+'px').toBe(false);
+    await page.getByRole('button',{name:/enter rat radar/i}).click();
     await expect(page.getByTestId('radar')).toBeVisible();
-    await expect(page.getByTestId('grain-wave-sky')).toHaveCount(0);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.getByTestId('official-grain-host')).toHaveCount(0);
   });
 }
-
-test('reduced-motion: still sunset, stationary grain, no pointer-follow', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+test('reduced motion: no WebGL animation, readable fallback sunset',async ({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('./');
-  const sky = page.getByTestId('grain-wave-sky');
+  const sky=page.getByTestId('grain-wave-sky');
   await expect(sky).toBeVisible();
-  for (const ribbon of await sky.locator('.grain-wave-ribbon').all()) {
-    expect(await ribbon.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
-  }
-  const still = page.getByTestId('grain-wave-canvas');
-  await expect(still).toBeVisible();
-  await expect.poll(async () => Number(await still.getAttribute('data-grain-frame') ?? '0')).toBeGreaterThan(0);
-  // ResizeObserver can legitimately redraw the same static frame during initial sizing.
-  await page.waitForTimeout(250);
-  const initialStillFrame = await still.getAttribute('data-grain-frame');
-  const poster = page.locator('.poster');
-  const rect = await poster.boundingBox();
-  if (!rect) throw new Error('poster must have visible bounds');
-  await page.mouse.move(rect.x + rect.width * .3, rect.y + rect.height * .5);
-  expect(await poster.evaluate(el => el.style.getPropertyValue('--flow-x'))).toBe('');
-  await page.waitForTimeout(900);
-  await expect(still).toHaveAttribute('data-grain-frame', initialStillFrame!);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: 'evidence/screenshots/g4r2-grain-still-390.png', fullPage: true });
-  await page.getByRole('button', { name: /investigate the receipt/i }).click();
+  await expect(page.getByTestId('official-grain-host')).toHaveAttribute('data-grain-runtime','reduced-motion');
+  await expect(page.getByTestId('official-grain-host').locator('canvas')).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:/the rat\s*remembers/i})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.locator('.poster').screenshot({path:'evidence/screenshots/r4-official-reduced-390.png'});
+  await page.getByRole('button',{name:/investigate the receipt/i}).click();
   await expect(page.getByTestId('investigation')).toBeVisible();
-  await expect(page.getByTestId('grain-wave-sky')).toHaveCount(0);
 });

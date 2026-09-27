@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from 'svelte';
   import { demo, receipt, shortAddress, usd, type DemoWindow } from './fixture';
-  import { grainWave } from './grainWave';
+  import { mountOfficialGrainWave } from './officialGrainMount';
 
   type Scene = 'discovery' | 'radar' | 'retrieving' | 'investigation' | 'rat-trap';
 
@@ -268,34 +268,10 @@
     </header>
 
     <section class="poster" id="fresh-garbage" aria-labelledby="fresh-title">
-      <!-- Original SVG/CSS sky currents: no paid media, JS animation or pointer-follow. -->
+      <!-- Actual licensed React Bits Pro Starter Grain Wave, mounted as an isolated React island.
+           Licensed source is fetched from the registry by CI, never committed. -->
       <div class="grain-wave-sky" aria-hidden="true" data-testid="grain-wave-sky">
-        <svg class="grain-wave-currents" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" focusable="false">
-          <defs>
-            <linearGradient id="gw-violet" x1="0%" x2="78%" y1="0%" y2="100%">
-              <stop offset="0%" stop-color="#2b1f8f" stop-opacity=".1" />
-              <stop offset="48%" stop-color="#7b3db3" stop-opacity=".8" />
-              <stop offset="100%" stop-color="#c060a8" stop-opacity=".1" />
-            </linearGradient>
-            <linearGradient id="gw-rose" x1="2%" x2="98%" y1="12%" y2="88%">
-              <stop offset="0%" stop-color="#7b3db3" stop-opacity=".1" />
-              <stop offset="50%" stop-color="#c060a8" stop-opacity=".73" />
-              <stop offset="100%" stop-color="#f2ad63" stop-opacity=".12" />
-            </linearGradient>
-            <linearGradient id="gw-sunset" x1="4%" x2="92%" y1="10%" y2="100%">
-              <stop offset="0%" stop-color="#c060a8" stop-opacity=".03" />
-              <stop offset="47%" stop-color="#f2ad63" stop-opacity=".62" />
-              <stop offset="75%" stop-color="#ffd08a" stop-opacity=".77" />
-              <stop offset="100%" stop-color="#f7ecc8" stop-opacity=".1" />
-            </linearGradient>
-          </defs>
-          <path class="grain-wave-ribbon grain-wave-ribbon--violet" fill="url(#gw-violet)" d="M-110 155 C140 48 288 236 495 159 S934 108 1310 210 L1310 327 C970 228 777 317 550 280 S105 328 -110 239Z" />
-          <path class="grain-wave-ribbon grain-wave-ribbon--rose" fill="url(#gw-rose)" d="M-110 304 C150 194 298 407 534 309 S958 230 1310 371 L1310 474 C965 361 807 451 552 412 S126 457 -110 396Z" />
-          <path class="grain-wave-ribbon grain-wave-ribbon--sunset" fill="url(#gw-sunset)" d="M-110 449 C183 346 343 504 603 416 S1048 360 1310 489 L1310 597 C1014 484 818 559 564 523 S173 572 -110 525Z" />
-        </svg>
-        <canvas class="grain-wave-canvas" use:grainWave aria-hidden="true" data-testid="grain-wave-canvas"></canvas>
-        <span class="grain-wave-clouds"></span>
-        <span class="grain-wave-grain"></span>
+        <div class="official-grain-host" data-testid="official-grain-host" use:mountOfficialGrainWave></div>
         <span class="grain-wave-copy-shade"></span>
       </div>
       <div class="poster-copy">

@@ -4,7 +4,7 @@ const evidence = 'evidence/screenshots';
 
 test('capture inspected desktop and mobile states', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   await page.screenshot({ path: `${evidence}/desktop-discovery.png`, fullPage: true });
 
   await page.getByRole('button', { name: /investigate/i }).click();
