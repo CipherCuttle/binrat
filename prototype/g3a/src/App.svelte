@@ -267,8 +267,7 @@
     </header>
 
     <section class="poster" id="fresh-garbage" aria-labelledby="fresh-title">
-      <!-- Temporary, motion-free sunset. The G6 pixel-art asset pack will
-           replace this CSS backdrop; the owner's rat artwork is unchanged. -->
+      <!-- G6 static art composition; exact rat JPG remains untouched. -->
       <div class="pixel-sunset-sky" aria-hidden="true" data-testid="static-hero-sky"></div>
       <div class="poster-copy">
         <p class="eyebrow">Open-source intelligence. Closer to reality.</p>
@@ -284,30 +283,33 @@
       <figure class="rat-stage" aria-label="BINRAT's original approved artwork">
         <img src="./rat-original.jpg" alt="The original BINRAT rat looking out from a dumpster in a pixel-art cyberpunk alley" width="1536" height="1536" />
       </figure>
-      <div class="skyline skyline-near" aria-hidden="true"></div>
+      <div class="skyline skyline-near g6-occluder" aria-hidden="true"></div>
     </section>
 
     <section class="product-dock" id="product-dock" aria-label="Explore BINRAT">
       <div class="dock-title"><div><span class="eyebrow">The dumpster is open</span><h2>Pick a thread.</h2></div><p>One real historical receipt to explore. The rest is a look at where BINRAT is going.</p></div>
-      <div class="product-grid">
+      <div class="product-grid g6-products">
         <button class="product-tile available" type="button" onclick={openRadar}>
-          <span class="product-symbol" aria-hidden="true">◎</span>
+          <span class="product-art product-art--radar" aria-hidden="true"></span>
           <span class="product-name">Rat Radar <span aria-hidden="true">↗</span></span>
-          <span class="product-explain">A historical Pons receipt, with its source attached.</span>
-          <span class="mini-radar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-          <span class="product-status">Explore the prototype</span>
+          <span class="product-explain">One verified historical Pons receipt, with sources.</span>
+          <span class="product-status">Explore frozen evidence</span>
         </button>
         <article class="product-tile upcoming">
-          <span class="product-symbol" aria-hidden="true">▣</span><h3>Replay Lab</h3>
-          <p>See the sequence, not just the headline.</p><span class="product-status">Planned · no live feed</span>
+          <span class="product-art product-art--replay" aria-hidden="true"></span><h3>Replay Lab</h3>
+          <p>Follow an archived sequence rather than a headline.</p><span class="product-status">Planned · no live feed</span>
         </article>
         <article class="product-tile upcoming">
-          <span class="product-symbol" aria-hidden="true">⌁</span><h3>Ledger</h3>
-          <p>Follow on-chain evidence without inventing the rest.</p><span class="product-status">Planned</span>
+          <span class="product-art product-art--ledger" aria-hidden="true"></span><h3>Ledger</h3>
+          <p>Trace public on-chain evidence without assigning identities.</p><span class="product-status">Planned · unknowns preserved</span>
         </article>
         <article class="product-tile upcoming">
-          <span class="product-symbol" aria-hidden="true">◉</span><h3>Watch</h3>
-          <p>Keep an eye on addresses and launches that matter.</p><span class="product-status">Planned · no alerts active</span>
+          <span class="product-art product-art--creator" aria-hidden="true"></span><h3>Creator Files</h3>
+          <p>Connect documented public posts and project context.</p><span class="product-status">Concept · no identity claims</span>
+        </article>
+        <article class="product-tile upcoming">
+          <span class="product-art product-art--watch" aria-hidden="true"></span><h3>Watch</h3>
+          <p>Explore evidence-based monitoring concepts.</p><span class="product-status">Planned · no alerts active</span>
         </article>
       </div>
     </section>
@@ -339,13 +341,13 @@
       <nav aria-label="Radar navigation"><button class="nav-active" type="button" aria-current="page">Radar</button><button type="button" onclick={returnToDiscovery}>Dumpster</button></nav>
       <span class="network">Pons-first · Historical snapshot</span>
     </header>
-    <section class="radar-hero" aria-labelledby="radar-title">
+    <section class="radar-hero g6-radar-hero" aria-labelledby="radar-title">
       <div>
         <p class="eyebrow">Observe. Connect. Question. Dig deeper.</p>
         <h1 id="radar-title" bind:this={sceneHeading} tabindex="-1">Rat Radar</h1>
         <p>The same address can tell different stories. Here's one factory event we can actually verify.</p>
       </div>
-      <img src="./rat-original.jpg" alt="" width="1536" height="1536" />
+      <img class="radar-rat" src="./rat-original.jpg" alt="" width="1536" height="1536" />
     </section>
     <div class="radar-toolbar" aria-label="Radar source filters">
       <span class="radar-tab current">Observed receipts <span>1</span></span>

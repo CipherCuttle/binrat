@@ -1,0 +1,22 @@
+{
+  "phase": "g6a",
+  "status": "source_staged_binary_assets_not_in_repo",
+  "source_pack": "BINRAT_G6_pixel_sunset_art_pack.zip",
+  "asset_root": "prototype/g3a/public/g6",
+  "assets": [
+    "homepage-panorama-1536x768.png",
+    "radar-panorama-1536x480.png",
+    "environment-layer-atlas.png",
+    "rat-radar-384x256.png",
+    "replay-lab-384x256.png",
+    "ledger-384x256.png",
+    "creator-files-384x256.png",
+    "watch-384x256.png"
+  ],
+  "quarantine": [
+    "foreground-prop-atlas-needs-alpha-cleanup.png",
+    "parchment-ui-atlas-needs-alpha-cleanup.png",
+    "*-hard-alpha-candidate.png"
+  ],
+  "canonical_rat_sha256": "43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+}

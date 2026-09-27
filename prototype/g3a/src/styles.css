@@ -433,75 +433,92 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   *,*::before,*::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
 }
 
-/* G6 ART-DIRECTION BRIDGE — static sunset only.
-   Placeholder until the owner approves compositable pixel-art assets from
-   the two supplied visual references. Absolutely no Grain Wave/React/WebGL. */
-.g4-world .poster {
-  overflow:hidden;
-  background:#251542;
-}
+/* G6a — STATIC PIXEL-SUNSET. File URLs are intentional: until the eight
+   reviewed PNGs are committed, the gradients remain offline fallbacks.
+   Do not claim visual integration until the binary assets return HTTP 200. */
+.g4-world {background:#0e1120}
+.g4-world .poster {overflow:hidden;min-height:clamp(590px,48vw,735px);background:#2e174d}
+.g4-world .poster::before {display:none}
 .g4-world .pixel-sunset-sky {
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse 28% 19% at 42% 67%, #ffdd91 0%, #ffa35d 38%, transparent 94%),
-    radial-gradient(ellipse 80% 23% at 46% 64%, #ff9a88b8 0%, #ff7c99a8 38%, transparent 93%),
-    radial-gradient(ellipse 110% 30% at 54% 41%, #ba3d9b99 12%, transparent 95%),
-    linear-gradient(180deg,#21124a 0%,#422176 24%,#74318e 39%,#bb508d 57%,#ee9569 72%,#241c40 100%);
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,#17122d9e,transparent 65%),url('./g6/homepage-panorama-1536x768.png') center/cover no-repeat,linear-gradient(#311765,#b94a97 59%,#e8946c 78%,#18132d);
+  image-rendering:pixelated
 }
-.g4-world .pixel-sunset-sky::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:.12;
-  background-image:radial-gradient(#ffd39b 1px,transparent 1px),radial-gradient(#1c144f 1px,transparent 1px);
-  background-size:17px 19px,13px 17px;
-  background-position:0 0,6px 5px;
-}
-.g4-world .poster-copy {position:relative;z-index:4;isolation:isolate;}
-.g4-world .poster-copy::before {
-  content:"";
-  position:absolute;
-  inset:-16px -20px -30px -40px;
-  z-index:-1;
-  pointer-events:none;
-  background:radial-gradient(ellipse 70% 76% at 24% 48%,#1c153dc9 0%,#25194091 52%,transparent 95%);
-}
-.g4-world .rat-stage {position:relative;z-index:2;}
+.g4-world .poster-copy {position:relative;z-index:4;padding-bottom:115px;isolation:isolate}
+.g4-world .poster-copy::before {content:"";position:absolute;inset:-15px -15px -30px -60px;z-index:-1;pointer-events:none;background:linear-gradient(90deg,#1a112fc9,#1c15387a 73%,transparent)}
+.g4-world .display-title {font:950 clamp(4rem,7vw,7.6rem)/.92 "Arial Black",Impact,sans-serif;letter-spacing:-.077em;color:#fff1dc;text-shadow:3px 5px 0 #351834,0 12px 24px #140c31}
+.g4-world .hero-deck,.g4-world .hero-description {text-shadow:0 2px 8px #0c092b}
+.g4-world .enter-dumpster {border:2px solid #3c2443;box-shadow:4px 4px 0 #160e26,0 12px 20px #0b0a2473}
+.g4-world .investigate {backdrop-filter:none;background:#17162ed9;border:2px solid #e7c69b}
+.g4-world .rat-stage {position:relative;z-index:2;min-height:600px;overflow:hidden}
 .g4-world .rat-stage img {
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#0008 13%,#000 30%,#000 100%);
-  mask-image:linear-gradient(90deg,transparent 0%,#0008 13%,#000 30%,#000 100%);
+  position:absolute;width:clamp(520px,57vw,735px);height:clamp(520px,57vw,735px);max-width:none;right:-3%;bottom:-27px;
+  object-fit:cover;object-position:center;filter:none;image-rendering:pixelated;
+  -webkit-mask-image:radial-gradient(ellipse 65% 61% at 58% 58%,#000 59%,#000e 73%,transparent 98%);
+  mask-image:radial-gradient(ellipse 65% 61% at 58% 58%,#000 59%,#000e 73%,transparent 98%)
 }
+.g4-world .skyline-near.g6-occluder {
+  z-index:3;left:0;right:0;bottom:-1px;width:100%;height:clamp(78px,10vw,135px);opacity:1;clip-path:none;
+  background:url('./g6/environment-layer-atlas.png') center 69%/100% auto no-repeat,linear-gradient(0deg,#080c19,#19142c 75%,transparent);
+  pointer-events:none;image-rendering:pixelated
+}
+.g4-world .product-dock {width:min(97%,1550px);margin:-30px auto 0;padding:19px clamp(10px,1.4vw,23px) 25px;background:#101728f4;border:2px solid #8ca4a0;box-shadow:0 8px 0 #090b18,0 24px 42px #080c18a9;backdrop-filter:none;border-radius:2px}
+.g4-world .product-grid {grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.g4-world .product-tile {min-width:0;min-height:285px;padding:11px;gap:9px;background:#141e2b;border:2px solid #5a8290;border-radius:1px;box-shadow:inset 0 0 0 2px #080e1c,3px 3px 0 #070b18}
+.g4-world .product-tile.available {border-color:#d2ad64;background:#1a2b32}
+.g4-world .product-art {display:block;width:100%;aspect-ratio:3/2;flex:0 0 auto;background-color:#1d3340;background-size:cover;background-position:center;border:1px solid #4d6872;image-rendering:pixelated}
+.g4-world .product-art--radar {background-image:url('./g6/rat-radar-384x256.png')}
+.g4-world .product-art--replay {background-image:url('./g6/replay-lab-384x256.png')}
+.g4-world .product-art--ledger {background-image:url('./g6/ledger-384x256.png')}
+.g4-world .product-art--creator {background-image:url('./g6/creator-files-384x256.png')}
+.g4-world .product-art--watch {background-image:url('./g6/watch-384x256.png')}
+.g4-world .product-name,.g4-world .product-tile h3 {margin:0;font-size:clamp(.94rem,1.2vw,1.15rem);color:#ffedd0}
+.g4-world .product-tile p,.g4-world .product-explain {font-size:.77rem;line-height:1.4}
+.g4-world .product-status {font-size:.65rem;line-height:1.35;letter-spacing:.04em}
+.g4-world .product-tile.upcoming .product-status {color:#b7c6cb}
+.g4-world .world-proof {margin-top:75px}
+/* CSS dossier deliberately replaces the quarantined parchment sprite. */
+.radar {background:#090e1b}
+.g6-radar-hero {
+  min-height:285px;
+  background:linear-gradient(90deg,#100d29b7,#20112b85 43%,transparent 73%),url('./g6/radar-panorama-1536x480.png') center 51%/cover no-repeat,linear-gradient(#2e165f,#a84786 75%,#11132e);
+  image-rendering:pixelated
+}
+.g6-radar-hero > div {position:relative;z-index:2}
+.g6-radar-hero h1 {font:950 clamp(3.8rem,7vw,7rem)/1 "Arial Black",Impact,sans-serif;letter-spacing:-.07em;color:#fff0d2;text-shadow:3px 4px 0 #211137}
+.g6-radar-hero .radar-rat {width:clamp(250px,29vw,440px);height:clamp(250px,29vw,440px);right:3%;top:-10px;opacity:.92;object-position:50% 40%;image-rendering:pixelated;-webkit-mask-image:radial-gradient(ellipse 58% 61% at 51% 53%,#000 51%,transparent 100%);mask-image:radial-gradient(ellipse 58% 61% at 51% 53%,#000 51%,transparent 100%)}
+.radar-workspace {grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:15px}
+.radar-list {border:2px solid #487b84;box-shadow:4px 4px 0 #070a14;background:#111e2b}
+.radar-case {background-color:#efe0c2;background-image:repeating-linear-gradient(0deg,#b39e7a08 0 2px,transparent 2px 6px);border:4px solid #c5ab87;border-radius:2px;box-shadow:inset 0 0 0 2px #f7ebd3,4px 5px 0 #050b18,0 14px 30px #030713b0}
+@media(max-width:1120px) and (min-width:761px) {.g4-world .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.g4-world .product-tile{min-height:260px}.g4-world .rat-stage img{width:clamp(430px,57vw,630px);height:clamp(430px,57vw,630px)}}
 @media(max-width:760px) {
-  .g4-world .poster {display:grid;grid-template-columns:minmax(0,1fr);min-height:0;}
-  .g4-world .poster-copy {padding:23px 18px 5px;}
-  .g4-world .poster-copy::before {
-    inset:-10px -12px -12px;
-    background:linear-gradient(180deg,#21133bc7 0%,#26183c9c 64%,transparent 100%);
-  }
-  .g4-world .display-title {font-size:clamp(2.9rem,10.5vw,4rem);line-height:.96;margin:9px 0 14px;}
-  .g4-world .hero-deck {font-size:.94rem;line-height:1.36;margin-bottom:7px;}
-  .g4-world .hero-description {font-size:.81rem;line-height:1.4;}
-  .g4-world .primary-actions {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:17px;}
-  .g4-world .enter-dumpster,.g4-world .investigate {
-    display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:52px;
-    min-width:0;padding:10px 12px;text-align:left;font-size:.76rem;line-height:1.2;
-  }
-  .g4-world .world-label {margin:16px 0 0;}
-  .g4-world .rat-stage {min-height:300px;height:clamp(300px,87vw,390px);margin-top:-24px;}
-  .g4-world .rat-stage img {
-    position:absolute;inset:-7% 0 auto;width:100%;height:115%;max-width:none;
-    object-fit:cover;object-position:50% 35%;
-    -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000a 12%,#000 24%,#000 90%,transparent 100%);
-    mask-image:linear-gradient(180deg,transparent 0%,#000a 12%,#000 24%,#000 90%,transparent 100%);
-  }
+  .g4-world .poster {display:flex;flex-direction:column;min-height:0}
+  .g4-world .pixel-sunset-sky {background:linear-gradient(180deg,#1c103fb3,transparent 69%,#10112886),url('./g6/homepage-panorama-1536x768.png') center top/auto 100% no-repeat,linear-gradient(#32145d,#bb498e 58%,#e99161)}
+  .g4-world .poster-copy {padding:23px 17px 8px;z-index:5;align-self:stretch}
+  .g4-world .poster-copy::before {inset:-20px -9px -12px;background:linear-gradient(180deg,#100e29d4,#1c153395 69%,transparent)}
+  .g4-world .display-title {font-size:clamp(3rem,12vw,4.5rem);line-height:.93;margin:8px 0 13px}
+  .g4-world .hero-deck {font-size:.94rem;line-height:1.36;margin-bottom:7px}
+  .g4-world .hero-description {font-size:.82rem;line-height:1.43}
+  .g4-world .primary-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:17px}
+  .g4-world .enter-dumpster,.g4-world .investigate {display:flex;align-items:center;justify-content:space-between;min-width:0;min-height:53px;padding:9px 10px;gap:6px;font-size:.74rem;line-height:1.21;text-align:left}
+  .g4-world .world-label {margin:14px 0 0}
+  .g4-world .rat-stage {align-self:center;width:min(100%,450px);height:clamp(300px,96vw,420px);min-height:0;margin-top:-8px}
+  .g4-world .rat-stage img {top:-3%;bottom:auto;left:50%;right:auto;transform:translateX(-50%);width:clamp(345px,108vw,448px);height:clamp(345px,108vw,448px);object-fit:cover;object-position:50% 43%;-webkit-mask-image:radial-gradient(ellipse 59% 58% at 50% 51%,#000 46%,#000e 66%,transparent 96%);mask-image:radial-gradient(ellipse 59% 58% at 50% 51%,#000 46%,#000e 66%,transparent 96%)}
+  .g4-world .skyline-near.g6-occluder {z-index:4;height:clamp(55px,18vw,83px);background-position:center 69%,center}
+  .g4-world .product-dock {width:calc(100% - 20px);margin:-8px auto 0;padding:15px 10px}
+  .g4-world .dock-title {display:block;margin-bottom:12px}.g4-world .dock-title p{font-size:.79rem;margin-top:7px}
+  .g4-world .product-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .g4-world .product-tile {min-height:240px;padding:8px;gap:7px}
+  .g4-world .product-name,.g4-world .product-tile h3 {font-size:.97rem}
+  .g4-world .product-tile p,.g4-world .product-explain {font-size:.73rem}.g4-world .product-status{font-size:.62rem}
+  .g6-radar-hero {min-height:207px;padding:21px 17px}.g6-radar-hero h1{font-size:clamp(3rem,12vw,4.2rem)}.g6-radar-hero p:not(.eyebrow){max-width:222px;font-size:.8rem}
+  .g6-radar-hero .radar-rat {width:250px;height:250px;right:-84px;top:6px;opacity:.74;-webkit-mask-image:radial-gradient(ellipse 55% 55% at 52% 52%,#000 44%,transparent 99%);mask-image:radial-gradient(ellipse 55% 55% at 52% 52%,#000 44%,transparent 99%)}
+  .radar-workspace {grid-template-columns:minmax(0,1fr)}
 }
 @media(max-width:350px) {
-  .g4-world .poster-copy {padding:18px 14px 4px;}
-  .g4-world .display-title {font-size:2.72rem;}
-  .g4-world .enter-dumpster,.g4-world .investigate {padding:9px;font-size:.69rem;}
-  .g4-world .rat-stage {height:300px;min-height:300px;}
+  .g4-world .poster-copy {padding:18px 13px 7px}.g4-world .display-title{font-size:2.83rem}
+  .g4-world .enter-dumpster,.g4-world .investigate{padding:8px;font-size:.68rem}.g4-world .rat-stage{height:300px}.g4-world .rat-stage img{width:352px;height:352px}
+  .g4-world .product-dock {width:calc(100% - 12px);padding:12px 7px}.g4-world .product-tile{min-height:221px;padding:7px}
+  .g6-radar-hero .radar-rat {right:-108px}
 }
+@media(prefers-reduced-motion:reduce) {.g4-world .enter-dumpster:hover,.case-investigate:hover{transform:none}}
