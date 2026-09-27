@@ -481,10 +481,16 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 .radar {background:#090e1b}
 .g6-radar-hero {
   min-height:285px;
-  background:linear-gradient(90deg,#100d29b7,#20112b85 43%,transparent 73%),url('/g6/radar-panorama-1536x480.png') center 51%/cover no-repeat,linear-gradient(#2e165f,#a84786 75%,#11132e);
+  background:linear-gradient(90deg,#100c26dc 0%,#17102fa8 47%,#0c102261 100%),url('/g6/radar-panorama-1536x480.png') center 51%/cover no-repeat,linear-gradient(#22153c,#85416e 75%,#11132e);
   image-rendering:pixelated
 }
-.g6-radar-hero > div {position:relative;z-index:2}
+.g6-radar-hero > div {position:relative;z-index:2;isolation:isolate}
+.g6-radar-hero > div::before {
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:-20px -35px -22px -24px;
+  background:linear-gradient(90deg,#110f29ee,#12102ac9 70%,transparent);
+}
+.g6-radar-hero p:not(.eyebrow) {text-shadow:0 2px 6px #080a20ec}
 .g6-radar-hero h1 {font:950 clamp(3.8rem,7vw,7rem)/1 "Arial Black",Impact,sans-serif;letter-spacing:-.07em;color:#fff0d2;text-shadow:3px 4px 0 #211137}
 .g6-radar-hero .radar-rat {width:clamp(250px,29vw,440px);height:clamp(250px,29vw,440px);right:3%;top:-10px;opacity:.92;object-position:50% 40%;-webkit-mask-image:radial-gradient(ellipse 58% 61% at 51% 53%,#000 51%,transparent 100%);mask-image:radial-gradient(ellipse 58% 61% at 51% 53%,#000 51%,transparent 100%)}
 .radar-workspace {grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:15px}
