@@ -441,7 +441,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 .g4-world .poster::before {display:none}
 .g4-world .pixel-sunset-sky {
   position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(90deg,#17122d9e,transparent 65%),url('./g6/homepage-panorama-1536x768.png') center/cover no-repeat,linear-gradient(#311765,#b94a97 59%,#e8946c 78%,#18132d);
+  background:linear-gradient(90deg,#17122d9e,transparent 65%),url('/g6/homepage-panorama-1536x768.png') center/cover no-repeat,linear-gradient(#311765,#b94a97 59%,#e8946c 78%,#18132d);
   image-rendering:pixelated
 }
 .g4-world .poster-copy {position:relative;z-index:4;padding-bottom:115px;isolation:isolate}
@@ -459,7 +459,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 }
 .g4-world .skyline-near.g6-occluder {
   z-index:3;left:0;right:0;bottom:-1px;width:100%;height:clamp(78px,10vw,135px);opacity:1;clip-path:none;
-  background:url('./g6/environment-layer-atlas.png') center 69%/100% auto no-repeat,linear-gradient(0deg,#080c19,#19142c 75%,transparent);
+  background:url('/g6/environment-layer-atlas.png') center 61%/100% auto no-repeat,linear-gradient(0deg,#080c19,#19142c 75%,transparent);
   pointer-events:none;image-rendering:pixelated
 }
 .g4-world .product-dock {width:min(97%,1550px);margin:-30px auto 0;padding:19px clamp(10px,1.4vw,23px) 25px;background:#101728f4;border:2px solid #8ca4a0;box-shadow:0 8px 0 #090b18,0 24px 42px #080c18a9;backdrop-filter:none;border-radius:2px}
@@ -467,11 +467,11 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 .g4-world .product-tile {min-width:0;min-height:285px;padding:11px;gap:9px;background:#141e2b;border:2px solid #5a8290;border-radius:1px;box-shadow:inset 0 0 0 2px #080e1c,3px 3px 0 #070b18}
 .g4-world .product-tile.available {border-color:#d2ad64;background:#1a2b32}
 .g4-world .product-art {display:block;width:100%;aspect-ratio:3/2;flex:0 0 auto;background-color:#1d3340;background-size:cover;background-position:center;border:1px solid #4d6872;image-rendering:pixelated}
-.g4-world .product-art--radar {background-image:url('./g6/rat-radar-384x256.png')}
-.g4-world .product-art--replay {background-image:url('./g6/replay-lab-384x256.png')}
-.g4-world .product-art--ledger {background-image:url('./g6/ledger-384x256.png')}
-.g4-world .product-art--creator {background-image:url('./g6/creator-files-384x256.png')}
-.g4-world .product-art--watch {background-image:url('./g6/watch-384x256.png')}
+.g4-world .product-art--radar {background-image:url('/g6/rat-radar-384x256.png')}
+.g4-world .product-art--replay {background-image:url('/g6/replay-lab-384x256.png')}
+.g4-world .product-art--ledger {background-image:url('/g6/ledger-384x256.png')}
+.g4-world .product-art--creator {background-image:url('/g6/creator-files-384x256.png')}
+.g4-world .product-art--watch {background-image:url('/g6/watch-384x256.png')}
 .g4-world .product-name,.g4-world .product-tile h3 {margin:0;font-size:clamp(.94rem,1.2vw,1.15rem);color:#ffedd0}
 .g4-world .product-tile p,.g4-world .product-explain {font-size:.77rem;line-height:1.4}
 .g4-world .product-status {font-size:.65rem;line-height:1.35;letter-spacing:.04em}
@@ -481,7 +481,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 .radar {background:#090e1b}
 .g6-radar-hero {
   min-height:285px;
-  background:linear-gradient(90deg,#100d29b7,#20112b85 43%,transparent 73%),url('./g6/radar-panorama-1536x480.png') center 51%/cover no-repeat,linear-gradient(#2e165f,#a84786 75%,#11132e);
+  background:linear-gradient(90deg,#100d29b7,#20112b85 43%,transparent 73%),url('/g6/radar-panorama-1536x480.png') center 51%/cover no-repeat,linear-gradient(#2e165f,#a84786 75%,#11132e);
   image-rendering:pixelated
 }
 .g6-radar-hero > div {position:relative;z-index:2}
@@ -493,7 +493,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
 @media(max-width:1120px) and (min-width:761px) {.g4-world .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.g4-world .product-tile{min-height:260px}.g4-world .rat-stage img{width:clamp(430px,57vw,630px);height:clamp(430px,57vw,630px)}}
 @media(max-width:760px) {
   .g4-world .poster {display:flex;flex-direction:column;min-height:0}
-  .g4-world .pixel-sunset-sky {background:linear-gradient(180deg,#1c103fb3,transparent 69%,#10112886),url('./g6/homepage-panorama-1536x768.png') center top/auto 100% no-repeat,linear-gradient(#32145d,#bb498e 58%,#e99161)}
+  .g4-world .pixel-sunset-sky {background:linear-gradient(180deg,#1c103fb3,transparent 69%,#10112886),url('/g6/homepage-panorama-1536x768.png') center top/auto 100% no-repeat,linear-gradient(#32145d,#bb498e 58%,#e99161)}
   .g4-world .poster-copy {padding:23px 17px 8px;z-index:5;align-self:stretch}
   .g4-world .poster-copy::before {inset:-20px -9px -12px;background:linear-gradient(180deg,#100e29d4,#1c153395 69%,transparent)}
   .g4-world .display-title {font-size:clamp(3rem,12vw,4.5rem);line-height:.93;margin:8px 0 13px}
@@ -504,7 +504,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   .g4-world .world-label {margin:14px 0 0}
   .g4-world .rat-stage {align-self:center;width:min(100%,450px);height:clamp(300px,96vw,420px);min-height:0;margin-top:-8px}
   .g4-world .rat-stage img {top:-3%;bottom:auto;left:50%;right:auto;transform:translateX(-50%);width:clamp(345px,108vw,448px);height:clamp(345px,108vw,448px);object-fit:cover;object-position:50% 43%;-webkit-mask-image:radial-gradient(ellipse 59% 58% at 50% 51%,#000 46%,#000e 66%,transparent 96%);mask-image:radial-gradient(ellipse 59% 58% at 50% 51%,#000 46%,#000e 66%,transparent 96%)}
-  .g4-world .skyline-near.g6-occluder {z-index:4;height:clamp(55px,18vw,83px);background-position:center 69%,center}
+  .g4-world .skyline-near.g6-occluder {z-index:4;height:clamp(55px,18vw,83px);background-position:center 63%,center;background-size:auto 350px,cover}
   .g4-world .product-dock {width:calc(100% - 20px);margin:-8px auto 0;padding:15px 10px}
   .g4-world .dock-title {display:block;margin-bottom:12px}.g4-world .dock-title p{font-size:.79rem;margin-top:7px}
   .g4-world .product-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}

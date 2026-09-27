@@ -45,6 +45,27 @@ jobs:
           test -z "$(git ls-files -- src/premium-grain src/officialGrainMount.ts src/grainWave.ts)"
           test -z "$(find dist -iname '*grain*wave*' -o -iname '*three*' -o -iname '*react*')"
           ! grep -RE 'REACTBITS_LICENSE_KEY|@react-three/fiber|official-grain-host' dist
+      - name: Explicit G6 safe art readiness
+        shell: bash
+        run: |
+          expected=43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc
+          actual="$(sha256sum public/rat-original.jpg | cut -d' ' -f1)"
+          test "$actual" = "$expected"
+          missing=0
+          for art in homepage-panorama-1536x768.png radar-panorama-1536x480.png environment-layer-atlas.png rat-radar-384x256.png replay-lab-384x256.png ledger-384x256.png creator-files-384x256.png watch-384x256.png; do
+            if ! test -s "public/g6/$art"; then
+              echo "::warning title=G6a art pending::Missing reviewed art public/g6/$art; build currently uses CSS fallback"
+              missing=$((missing+1))
+            fi
+          done
+          echo "G6_SAFE_ART_FILES_MISSING=$missing" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload tested static bundle for local viewport review
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-g6a-tested-static-bundle
+          path: prototype/g3a/dist
+          if-no-files-found: error
+          retention-days: 7
       - name: Freeze only the tested public bundle and regenerated lockfile
         run: |
           git add -A dist pnpm-lock.yaml
