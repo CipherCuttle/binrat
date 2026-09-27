@@ -33,3 +33,6 @@ The actual official shader renders dynamic pixels at 1440, 390 and 320 on Chromi
 
 ### Final source-gate result
 Official component install and build passed on isolated run [36300175054](https://github.com/CipherCuttle/binrat/actions/runs/36300175054): 30/30 Chromium Playwright tests, including nonzero rendered-shader pixel changes at 1440px, 390px, 320px and static reduced motion. Built dist/ and pnpm lockfile committed at `b1cb001cc46e2d9d62ea0367c745fd483b71631e`. A source-tree comparison against draft PR #50 confirms **no licensed TSX/CSS, registry response, or license key entered git**. Software-WebGL screenshot artifacts show the actual official wave field; physical Android aesthetics/thermal behavior and exact GitHack published smoke remain owner/pre-release gates. No merge authority.
+
+### Final timing isolation
+The previously untouched `g4r.spec.ts` functional suite remained sensitive to SwiftShader contention on a single CI runner: 29/30 passed in the docs-only rerun, but one desktop Radar transition stalled. It now uses `?static-sky=1`, matching the other functional route/accessibility suites. Actual official shader motion, desktop/390/320 screenshot comparisons, reduced-motion handling and user-facing GitHack journey remain tested separately on the normal animated URL. No product behavior change.

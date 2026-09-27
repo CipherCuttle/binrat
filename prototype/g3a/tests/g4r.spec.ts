@@ -4,10 +4,14 @@ import AxeBuilder from '@axe-core/playwright';
 const widths = [1440, 390, 320] as const;
 const receiptUrl = 'https://robinscan.io/tx/0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb';
 
+// This suite checks navigation, evidence and accessibility—not GPU rendering.
+// The dedicated header-effect suite exercises actual official shader motion.
+
+
 for (const width of widths) {
   test('cinematic world → Radar → case file works at ' + width + 'px', async ({ page }) => {
     await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
-    await page.goto('./');
+    await page.goto('./?static-sky=1');
 
     await expect(page.getByTestId('discovery')).toBeVisible();
     await expect(page.getByRole('heading', { name: /the rat\s*remembers/i })).toBeVisible();
@@ -56,7 +60,7 @@ for (const width of widths) {
 
 test('mobile case file returns to the list without losing its evidence source', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   await page.getByRole('button', { name: /enter rat radar/i }).click();
   await page.locator('.launch-row').click();
   await page.getByRole('button', { name: /back to observed launches/i }).click();
@@ -72,7 +76,7 @@ test('mobile case file returns to the list without losing its evidence source', 
 
 test('world and Radar have no automatically detectable axe violations at 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('./');
+  await page.goto('./?static-sky=1');
   let result = await new AxeBuilder({ page }).analyze();
   expect(result.violations, JSON.stringify(result.violations, null, 2)).toEqual([]);
   await page.getByRole('button', { name: /enter rat radar/i }).click();
