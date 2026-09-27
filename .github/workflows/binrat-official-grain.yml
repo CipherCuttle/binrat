@@ -1,0 +1,23 @@
+name: BINRAT R4 official React Bits preflight
+on:
+  push:
+    branches:
+      - experiment/binrat-g4r4-official-grain-wave-20260927
+    paths:
+      - '.github/workflows/binrat-official-grain.yml'
+      - 'prototype/g3a/scripts/reactbits-grain-preflight.mjs'
+permissions:
+  contents: read
+jobs:
+  licensed-component-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch official Starter grain-wave-css metadata (no source output)
+        env:
+          REACTBITS_LICENSE_KEY: ${{ secrets.REACTBITS_LICENSE_KEY }}
+        run: node prototype/g3a/scripts/reactbits-grain-preflight.mjs
