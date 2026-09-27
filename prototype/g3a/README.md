@@ -1,29 +1,53 @@
-# BINRAT G3a/G3b disposable interaction prototype
+# BINRAT — approved R5 frontend integration
 
-Isolated Svelte 5 + Vite experiment implementing one frozen journey:
+This Svelte 5 + Vite prototype implements the **owner-approved R5
+discovery hero**, the archived Pons V2 receipt scanner, evidence-first
+Rat Radar, and a strictly separate fictional Rat Trap.
 
-`Fresh Garbage → optional receipt retrieval → verified Dig Deeper receipt → separate fictional Rat Trap → back`
+The homepage mounts the **official React Bits Pro Starter Grain Wave**
+as a small React island. The paid component is downloaded only into
+the ignored `src/premium-grain/` workspace from the owner's authenticated
+Starter registry. Its exact TSX/CSS hashes are pinned in
+`scripts/install-licensed-grain.mjs`; never commit raw licensed files,
+print the license secret, or publish sourcemaps.
 
-## Truth boundary
+## Run locally
 
-- Fixture: `BINRAT-G1A-PONS-4663-20260926-v3`.
-- The Pons V2 factory event is a verified historical snapshot, **not live**.
-- Funding, pricing, fee recipient, graduation and V4 status remain unknown or not reconstructed.
-- MOLD is a separate fictional DEMO and is never attached to the historical token.
-- The MOLD demo uses the frozen v3 fixture's four fictional transfers, three previous launches and fixed 6h/24h/3d/7d eligibility counts.
-- A shared fictional funding address demonstrates an address relationship, never common human ownership.
-- No wallet, trading, payment, monitoring, backend or network API is present.
+Use Node 22 and pnpm 10. Set `REACTBITS_LICENSE_KEY` as a private
+environment variable (never commit it), then from `prototype/g3a`:
 
-The rat asset is the owner-supplied 1536×1536 JPEG from the G1a package, SHA-256
-`43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc`.
-
-## Run
-
-```bash
-pnpm install
+```sh
+pnpm install --frozen-lockfile
+node scripts/install-licensed-grain.mjs
 pnpm build
 pnpm test
 pnpm dev
 ```
 
-The compiled `dist/` directory is intentionally committed so the experimental branch can be opened through GitHack without production deployment.
+The experimental `dist/` directory is intentionally committed after
+source build and browser tests for immutable GitHack previews; this is
+**not** a production deployment.
+
+## Pons evidence boundary
+
+- Fixture: `BINRAT-G1A-PONS-4663-20260926-v3`.
+- Exactly one verified *historical* Pons V2 factory event; not live.
+- Funding, price history, graduation and V4 status remain unknown/not
+  reconstructed. Never imply real-time monitoring or a trading signal.
+- MOLD is a separate **fictional DEMO**: four synthetic fund transfers
+  and three fictional previous launches; shared funding does not prove
+  common ownership, safety or performance.
+- No live backend, wallet, trading, payment, alerting, or network API.
+- The original owner-supplied `rat-original.jpg` is unchanged:
+  SHA-256 `43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc`.
+
+## Visual acceptance
+
+The owner approved R5 on Android on 2026-09-27. The standard homepage
+uses the original Grain Wave demo's motion, count and red/blue colors in
+the approved responsive layout. `?demo-isolate=1` removes all BINRAT
+composition for direct comparison with the original demo;
+`?static-sky=1` shows the low-power/static variant.
+
+See `FRONTEND_INTEGRATION.md` for acceptance checks and provenance.
+This is an isolated draft integration PR: **merge authority NONE**.

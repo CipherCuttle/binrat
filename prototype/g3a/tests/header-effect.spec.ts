@@ -51,7 +51,7 @@ for(const width of [390,320] as const){
     expect(rat!.y,'The original rat starts too far below the fold').toBeLessThan(660);
     // Mobile renders the genuine shader inside a 2:1 landscape stage,
     // not across the tall text + art column, where its waveform looked empty.
-    await expect(page.locator('.hero-wave-window')).toBeHidden();
+    await expect(page.locator('.hero-wave-window')).toHaveCount(0);
     const wave=await page.getByTestId('grain-wave-sky').boundingBox();
     const copy=await page.locator('.poster-copy').boundingBox();
     expect(wave).not.toBeNull();
@@ -97,7 +97,7 @@ for(const width of [390,1440] as const) {
     await expect(host.locator('canvas')).toBeVisible({timeout:15000});
     await expect(page.locator('.poster-copy')).toBeHidden();
     await expect(page.locator('.rat-stage')).toBeHidden();
-    await expect(page.locator('.grain-wave-copy-shade')).toBeHidden();
+    await expect(page.locator('.grain-wave-copy-shade')).toHaveCount(0);
     expect(await sky.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(51, 51, 51)');
     const bounds=await sky.boundingBox();
     expect(bounds).not.toBeNull();

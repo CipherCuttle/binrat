@@ -272,7 +272,6 @@
            Licensed source is fetched from the registry by CI, never committed. -->
       <div class="grain-wave-sky" aria-hidden="true" data-testid="grain-wave-sky">
         <div class="official-grain-host" data-testid="official-grain-host" use:mountOfficialGrainWave></div>
-        <span class="grain-wave-copy-shade"></span>
       </div>
       <div class="poster-copy">
         <p class="eyebrow">Open-source intelligence. Closer to reality.</p>
@@ -285,7 +284,6 @@
         </div>
         <p class="world-label">People <span>/</span> patterns <span>/</span> proof</p>
       </div>
-      <div class="hero-wave-window" aria-hidden="true"></div>
       <figure class="rat-stage" aria-label="BINRAT's original approved artwork">
         <img src="./rat-original.jpg" alt="The original BINRAT rat looking out from a dumpster in a pixel-art cyberpunk alley" width="1536" height="1536" />
       </figure>
