@@ -458,13 +458,14 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   pointer-events: none;
   opacity: 1;
 }
-.official-grain-host > *,
+.official-grain-host > div,
 .official-grain-host canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
   pointer-events: none !important;
 }
+.official-grain-host script { display: none !important; }
 .grain-wave-copy-shade {
   position: absolute;
   inset: 0;

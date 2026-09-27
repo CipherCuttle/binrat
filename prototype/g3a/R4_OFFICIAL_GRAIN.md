@@ -24,3 +24,6 @@ A new upstream component revision must be visually reviewed and repinned.
 
 No merge, deployment or production funding authority. Screenshots and exact
 GitHack smoke are required before owner visual approval.
+
+### First-pass verification repair
+The first official-source build succeeded; 29 of 30 existing Playwright checks passed. Its remaining desktop visual test reached a 30-second deadline while attempting a later navigation click under software WebGL. The first screenshots also exposed an unrelated ThemeProvider `script` element made visible by an overly broad integration CSS selector; that selector is now narrowed to `div` and canvas and scripts are explicitly kept hidden. Since first-pass headless screenshots were static, the Chromium test harness now explicitly enables software WebGL and captures only the official shader canvas over two times, requiring unequal PNGs on 1440, 390 and 320. The visual test's deadline accommodates GPU initialization; it is not a waiver of motion acceptance.

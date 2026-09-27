@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test('desktop: official licensed Grain Wave island is the only moving hero sky',async ({page})=>{
+  test.setTimeout(90000);
+  await page.emulateMedia({reducedMotion:'no-preference'});
   await page.setViewportSize({width:1440,height:950});
   await page.goto('./');
   const sky=page.getByTestId('grain-wave-sky');
@@ -10,9 +12,10 @@ test('desktop: official licensed Grain Wave island is the only moving hero sky',
   await expect(host).toHaveAttribute('data-grain-runtime','official-mounted');
   await expect(page.locator('.rat-stage img')).toHaveAttribute('src','./rat-original.jpg');
   await expect(host.locator('canvas')).toBeVisible({timeout:15000});
-  await page.locator('.poster').screenshot({path:'evidence/screenshots/r4-official-1440-phase-a.png'});
+  const frameA = await host.screenshot({path:'evidence/screenshots/r4-official-1440-phase-a.png'});
   await page.waitForTimeout(1600);
-  await page.locator('.poster').screenshot({path:'evidence/screenshots/r4-official-1440-phase-b.png'});
+  const frameB = await host.screenshot({path:'evidence/screenshots/r4-official-1440-phase-b.png'});
+  expect(frameA.equals(frameB),'Official shader should change actual rendered pixels within 1.6s').toBe(false);
   await expect(page.getByRole('button',{name:/enter rat radar/i})).toBeInViewport();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.getByRole('button',{name:/enter rat radar/i}).click();
@@ -24,6 +27,8 @@ test('desktop: official licensed Grain Wave island is the only moving hero sky',
 });
 for(const width of [390,320] as const){
   test('mobile: official effect rendered and primary actions usable at '+width+'px',async ({page})=>{
+    test.setTimeout(60000);
+    await page.emulateMedia({reducedMotion:'no-preference'});
     await page.setViewportSize({width,height:844});
     await page.goto('./');
     const host=page.getByTestId('official-grain-host');
@@ -34,9 +39,10 @@ for(const width of [390,320] as const){
     await expect(page.getByRole('button',{name:/enter rat radar/i})).toBeInViewport();
     await expect(page.getByRole('button',{name:/investigate the receipt/i})).toBeInViewport();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.locator('.poster').screenshot({path:'evidence/screenshots/r4-official-'+width+'-phase-a.png'});
+    const frameA=await host.screenshot({path:'evidence/screenshots/r4-official-'+width+'-phase-a.png'});
     await page.waitForTimeout(1500);
-    await page.locator('.poster').screenshot({path:'evidence/screenshots/r4-official-'+width+'-phase-b.png'});
+    const frameB=await host.screenshot({path:'evidence/screenshots/r4-official-'+width+'-phase-b.png'});
+    expect(frameA.equals(frameB),'Official shader must animate at '+width+'px').toBe(false);
     await page.getByRole('button',{name:/enter rat radar/i}).click();
     await expect(page.getByTestId('radar')).toBeVisible();
     await expect(page.getByTestId('official-grain-host')).toHaveCount(0);
