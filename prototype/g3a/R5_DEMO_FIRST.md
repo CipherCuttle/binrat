@@ -13,3 +13,6 @@ Owner's Android screenshots of R4 show a static-looking dark field, broad gray-p
 Isolated draft visual experiment based on PR #51, NOT merged or deployed.
 Tests should prove unchanged real-world Radar journey and actual moving official-canvas pixels at desktop and both Android widths; check mobile fold and both source/default and composed visual screenshots.
 No claims of aesthetic equivalence to React Bits should be made until owner compares the dedicated isolate with their demo on Android.
+
+### Portrait aspect-ratio correction
+Actual post-CI inspection found that merely extending an absolutely positioned fullscreen shader behind text/photo exposes an empty dark wedge on Android: its portrait aspect ratio changes the demo wave's shape radically. The integrated portrait homepage now presents the **official component in an uncluttered ~2:1 landscape stage** between compact copy and the original rat, overlapping the artwork by 40px for a continuous fade. Desktop still uses the full hero canvas, and `?demo-isolate=1` remains the untouched full-viewport preset for direct comparison. The visual assertion now checks the dedicated stage and original rat first-fold position rather than the old 76px decorative strip.

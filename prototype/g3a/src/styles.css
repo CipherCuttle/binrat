@@ -616,3 +616,39 @@ html.grain-demo-isolate .g4-world .grain-wave-copy-shade {display:none;}
 @media(prefers-reduced-motion:reduce) {
   .g4-world .official-grain-host {display:none;}
 }
+
+/* R5 targeted visual review: on portrait screens present the real, animated
+   demo in a landscape-proportioned, FULLY unobscured stage (rather than
+   stretching its shader behind 700px of opaque copy and artwork). The stage
+   overlaps the unchanged original rat illustration by 40px. No outlines,
+   gradients, shader reimplementation or licensed source duplication. */
+@media(max-width:760px) {
+  html:not(.grain-demo-isolate) .g4-world .poster {
+    grid-template-rows:auto 190px auto;
+    background:#151223;
+  }
+  html:not(.grain-demo-isolate) .g4-world .poster-copy {
+    grid-row:1;
+    background:#151223;
+  }
+  html:not(.grain-demo-isolate) .g4-world .poster-copy::before {display:none;}
+  html:not(.grain-demo-isolate) .g4-world .grain-wave-sky {
+    position:relative;
+    inset:auto;
+    grid-row:2;
+    width:100%;
+    height:190px;
+    z-index:1;
+    background:#333333;
+  }
+  html:not(.grain-demo-isolate) .g4-world .hero-wave-window {display:none;}
+  html:not(.grain-demo-isolate) .g4-world .rat-stage {
+    grid-row:3;
+    margin-top:-40px;
+    z-index:2;
+  }
+}
+@media(max-width:350px) {
+  html:not(.grain-demo-isolate) .g4-world .poster {grid-template-rows:auto 175px auto;}
+  html:not(.grain-demo-isolate) .g4-world .grain-wave-sky {height:175px;}
+}

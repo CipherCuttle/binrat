@@ -49,7 +49,15 @@ for(const width of [390,320] as const){
     const rat=await page.locator('.rat-stage').boundingBox();
     expect(rat,'The original rat must be part of the first Android viewport').not.toBeNull();
     expect(rat!.y,'The original rat starts too far below the fold').toBeLessThan(660);
-    await expect(page.locator('.hero-wave-window')).toBeVisible();
+    // Mobile renders the genuine shader inside a 2:1 landscape stage,
+    // not across the tall text + art column, where its waveform looked empty.
+    await expect(page.locator('.hero-wave-window')).toBeHidden();
+    const wave=await page.getByTestId('grain-wave-sky').boundingBox();
+    const copy=await page.locator('.poster-copy').boundingBox();
+    expect(wave).not.toBeNull();
+    expect(copy).not.toBeNull();
+    expect(wave!.height).toBeGreaterThanOrEqual(174);
+    expect(wave!.y).toBeGreaterThanOrEqual(copy!.y+copy!.height-3);
     await page.locator('.poster').screenshot({path:'evidence/screenshots/r5-composed-mobile-'+width+'.png'});
     const frameA=await host.screenshot({path:'evidence/screenshots/r5-official-'+width+'-phase-a.png'});
     await page.waitForTimeout(1500);
