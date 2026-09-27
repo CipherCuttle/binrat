@@ -618,8 +618,12 @@ html.grain-demo-isolate .g4-world .grain-wave-sky {inset:0;opacity:1;}
 
 /* Low-power/unsupported fallback is a deliberately static, visible treatment.
    It never runs an imitation shader or intercepts navigation. */
-.g4-world .grain-wave-sky.grain-wave-fallback {
-  background:
+/* The phone layout uses a later, more specific background shorthand.
+   Explicitly override that declaration for unsupported/reduced-motion cases. */
+.g4-world .grain-wave-sky.grain-wave-fallback,
+html:not(.grain-demo-isolate) .g4-world .grain-wave-sky.grain-wave-fallback {
+  background-color:#333333 !important;
+  background-image:
     radial-gradient(ellipse 65% 68% at 65% 45%,#e984b2a8 0%,transparent 78%),
-    linear-gradient(145deg,#ff6666 0%,#bf5eaf 50%,#6666ff 100%);
+    linear-gradient(145deg,#ff6666 0%,#bf5eaf 50%,#6666ff 100%) !important;
 }
