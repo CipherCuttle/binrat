@@ -14,6 +14,7 @@ export const receipt = {
   pair: 'native ETH',
   transaction: '0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb',
   explorer: 'https://robinscan.io/tx/0x44d2bdc412ebe6ce0c25600a16adb229b1bd5c22a41267823b0db39161c6e1cb',
+  evidenceManifest: 'https://github.com/CipherCuttle/binrat/blob/55af899617fc38af71b746e3e90a9f2de3e6e53a/evidence/pons/4663/2026-09-25/manifest.json',
   funding: 'UNKNOWN',
   pricing: 'NOT RECONSTRUCTED',
   feeRecipient: 'UNKNOWN',

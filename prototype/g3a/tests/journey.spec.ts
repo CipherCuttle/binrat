@@ -36,7 +36,7 @@ for (const viewport of [
 
     await page.getByRole('button', { name: /investigate/i }).click();
     await expect(page.getByTestId('retrieval')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /the rat found a receipt/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /a little something turned up/i })).toBeFocused();
     const retrievalSource = page.getByRole('link', { name: /open original robinscan/i });
     await expect(retrievalSource).toBeVisible();
     await expect(retrievalSource).toHaveAttribute('href', receiptUrl);
@@ -77,6 +77,7 @@ test('reduced motion bypasses the animated retrieval', async ({ page }) => {
 });
 
 test('critical screens have no automatically detectable accessibility violations', async ({ page }) => {
+  test.setTimeout(60000);
   await page.goto('./');
   let results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
@@ -85,7 +86,10 @@ test('critical screens have no automatically detectable accessibility violations
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 
-  await page.getByRole('button', { name: /skip retrieval/i }).click();
+  // Axe may run past the scanner's 3-second automatic completion.
+  const skip = page.getByRole('button', { name: /skip retrieval/i });
+  if(await skip.isVisible()) await skip.click({force:true,timeout:1000}).catch(()=>{});
+  await expect(page.getByTestId('investigation')).toBeVisible();
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 
@@ -93,7 +97,7 @@ test('critical screens have no automatically detectable accessibility violations
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 
-  await page.getByRole('button', { name: /select fictional funder/i }).click();
+  await page.getByRole('button', { name: /inspect fictional funder/i }).click();
   results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });

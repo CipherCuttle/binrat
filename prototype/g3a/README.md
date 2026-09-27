@@ -1,29 +1,35 @@
-# BINRAT G3a/G3b disposable interaction prototype
+# BINRAT — G6 static pixel-art direction, isolated frontend prototype
 
-Isolated Svelte 5 + Vite experiment implementing one frozen journey:
+The moving Grain Wave experiment was rejected by the owner and is removed
+from this draft integration branch. This Svelte 5 + Vite prototype currently
+uses a **temporary static sunset CSS backdrop** and the untouched original
+rat image while a new asset-generation lane delivers layered pixel art
+matching the owner's two supplied screenshots.
 
-`Fresh Garbage → optional receipt retrieval → verified Dig Deeper receipt → separate fictional Rat Trap → back`
+It retains the tested historical Pons V2 receipt scanner, Rat Radar case
+file and explicitly fictional separate MOLD Rat Trap. There is **no live
+launch feed, copy trading, wallet connection, buy/sell, active watch, or
+verified pricing/funding history** in this prototype.
 
-## Truth boundary
+The approved original rat JPEG is unchanged at
+`public/rat-original.jpg` (SHA-256
+`43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc`).
 
-- Fixture: `BINRAT-G1A-PONS-4663-20260926-v3`.
-- The Pons V2 factory event is a verified historical snapshot, **not live**.
-- Funding, pricing, fee recipient, graduation and V4 status remain unknown or not reconstructed.
-- MOLD is a separate fictional DEMO and is never attached to the historical token.
-- The MOLD demo uses the frozen v3 fixture's four fictional transfers, three previous launches and fixed 6h/24h/3d/7d eligibility counts.
-- A shared fictional funding address demonstrates an address relationship, never common human ownership.
-- No wallet, trading, payment, monitoring, backend or network API is present.
+## Development
+With Node 22 and pnpm 10 from `prototype/g3a`:
 
-The rat asset is the owner-supplied 1536×1536 JPEG from the G1a package, SHA-256
-`43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc`.
-
-## Run
-
-```bash
+```sh
 pnpm install
 pnpm build
 pnpm test
 pnpm dev
 ```
 
-The compiled `dist/` directory is intentionally committed so the experimental branch can be opened through GitHack without production deployment.
+No React, Three.js, licensed effect source, license key, WebGL, canvas
+or Grain Wave is required. `dist/` contains a public static GitHack
+preview frozen by CI after tests. Read `ART_DIRECTION_G6_PIXEL_SUNSET.md`
+for the next proposed layered asset pack.
+
+The historical receipt fixture is NOT LIVE; funding/pricing/graduation
+unknown. MOLD is strictly a fictional educational DEMO.
+**PR remains draft. No merge or deployment authorization.**
