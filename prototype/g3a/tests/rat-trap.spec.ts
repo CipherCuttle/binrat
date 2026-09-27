@@ -14,7 +14,7 @@ for (const viewport of [
   test(`fictional Rat Trap journey is complete and bounded at ${viewport.width}px`, async ({ page }) => {
     const fitsViewport = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
     await page.setViewportSize(viewport);
-    await page.goto('./');
+    await page.goto('./?static-sky=1');
 
     await page.getByRole('button', { name: /investigate/i }).click();
     await page.getByRole('button', { name: /skip retrieval/i }).click();
@@ -22,12 +22,12 @@ for (const viewport of [
 
     await page.getByRole('button', { name: /explore fictional rat trap demo/i }).click();
     await expect(page.getByTestId('rat-trap')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /who fed the mold/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /this wallet looks familiar/i })).toBeFocused();
     await expect(page.getByText('DEMO — FICTIONAL SCENARIO')).toBeVisible();
     await expect(page.getByText(/nothing here belongs to the historical pons receipt/i)).toBeVisible();
     expect(await fitsViewport()).toBe(true);
 
-    const funder = page.getByRole('button', { name: /select fictional funder/i });
+    const funder = page.getByRole('button', { name: /inspect fictional funder/i });
     await funder.focus();
     await page.keyboard.press('Enter');
     await expect(page.getByTestId('rat-trap-reveal')).toBeVisible();
@@ -52,7 +52,7 @@ for (const viewport of [
 
     await page.getByRole('button', { name: /unfold small relationship view/i }).click();
     await expect(page.getByTestId('relationship-map')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /shared address, not shared owner/i })).toBeFocused();
+    await expect(page.getByRole('heading', { name: /same funder. ownership unproven/i })).toBeFocused();
     expect(await fitsViewport()).toBe(true);
 
     await page.getByRole('button', { name: /back to verified receipt/i }).click();

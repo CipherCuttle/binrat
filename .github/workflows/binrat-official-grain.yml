@@ -1,0 +1,80 @@
+name: BINRAT R5 real licensed Grain Wave build
+on:
+  push:
+    branches:
+      - experiment/binrat-g4r5-demo-first-20260927
+    paths:
+      - 'prototype/g3a/**'
+      - '.github/workflows/binrat-official-grain.yml'
+  pull_request:
+    branches:
+      - experiment/binrat-g4r4-official-grain-wave-20260927
+    paths:
+      - 'prototype/g3a/**'
+      - '.github/workflows/binrat-official-grain.yml'
+permissions:
+  contents: read
+jobs:
+  build-with-owned-license:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/experiment/binrat-g4r5-demo-first-20260927'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: prototype/g3a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --no-frozen-lockfile
+      - name: Fetch pinned official licensed component into git-ignored workspace
+        env:
+          REACTBITS_LICENSE_KEY: ${{ secrets.REACTBITS_LICENSE_KEY }}
+        run: node scripts/install-licensed-grain.mjs
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - run: pnpm test
+      - name: Commit only verified bundle and dependency lockfile
+        id: dist
+        run: |
+          git add -A dist pnpm-lock.yaml
+          if ! git diff --cached --quiet -- dist pnpm-lock.yaml; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(r5): freeze verified public site output (not proprietary source)'
+            git push origin HEAD:refs/heads/experiment/binrat-g4r5-demo-first-20260927
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+          test -z "$(git ls-files --others --exclude-standard src/premium-grain)"
+          git diff --exit-code -- src/premium-grain
+      - name: Publish screenshots and traces, never source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-r5-visual-evidence
+          path: |
+            prototype/g3a/evidence/screenshots
+            prototype/g3a/test-results
+          if-no-files-found: warn
+          retention-days: 5
+  verify-public-output:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: prototype/g3a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Verify immutable published preview without exposing key or source
+        env:
+          PUBLISHED_URL: https://raw.githack.com/CipherCuttle/binrat/${{ github.event.pull_request.head.sha }}/prototype/g3a/dist/index.html
+        run: pnpm test:published
