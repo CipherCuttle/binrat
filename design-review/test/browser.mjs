@@ -24,6 +24,11 @@ try {
     assert.equal(await page.locator('#count').textContent(),'(21/21)');
     assert.equal(await page.locator('#openPreview').getAttribute('href'),'https://raw.githack.com/CipherCuttle/binrat/65e983a5ba7655f063be57a7ee12b23cfcc91e06/prototype/g3a/dist/index.html');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'No horizontal overflow at '+width);
+    if(width<=390){
+      await page.waitForFunction(()=>window.scrollY>100);
+      assert.equal(await page.locator('#current-title').textContent(),"G4a · The Rat's Field Instrument");
+    }
+    await page.screenshot({path:'/tmp/binrat-initial-'+width+'.png',fullPage:false});
     await page.locator('#r-overall').selectOption('5');
     await page.locator('#likes [data-facet="Warm paper dossier"]').click();
     await page.locator('#dislikes [data-facet="Rat/background seam"]').click();
