@@ -433,55 +433,222 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   *,*::before,*::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
 }
 
-/* R4: actual licensed React Bits Pro Grain Wave runtime, only in discovery hero.
-   No hand-built contour layer. The CSS fallback renders without JS/WebGL. */
-.g4-world .masthead { isolation: isolate; overflow: hidden; }
-.g4-world .masthead > * { position: relative; z-index: 1; }
-.poster { overflow: hidden; }
-.grain-wave-sky {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  isolation: isolate;
-  background:
-    radial-gradient(ellipse 42% 37% at 68% 65%, #f7ecc8e0, #f2ad637d 45%, transparent 80%),
-    linear-gradient(180deg, #2b1f8f, #7b3db3 39%, #c060a8 65%, #f2ad63 84%, #242047);
+/* R5: DEMO-FIRST. The exact official React Bits component supplies ALL waves,
+   grain and motion. No custom gradient or full-page veil is drawn over it. */
+.g4-world .poster {
+  overflow:hidden;
+  background:#333333;
 }
-.official-grain-host {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 1;
+.g4-world .grain-wave-sky {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  isolation:isolate;
+  overflow:hidden;
+  pointer-events:none;
+  background:#333333;
+  opacity:1;
+}
+.g4-world .official-grain-host {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  opacity:1;
 }
 .official-grain-host > div,
 .official-grain-host canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-  pointer-events: none !important;
+  display:block;
+  width:100% !important;
+  height:100% !important;
+  pointer-events:none !important;
 }
-.official-grain-host script { display: none !important; }
-.grain-wave-copy-shade {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, #101237ca 0%, #1712469c 29%, #281b6330 51%, transparent 71%),
-    linear-gradient(180deg, #19134021 0%, transparent 51%, #10152e91 100%);
+.official-grain-host script {display:none !important;}
+/* Local legibility belongs to the copy, NOT the animated canvas. */
+.g4-world .grain-wave-copy-shade {display:none;}
+.g4-world .poster-copy {
+  position:relative;
+  z-index:4;
+  isolation:isolate;
 }
-@media (max-width:760px) {
-  .grain-wave-copy-shade {
-    background:
-      linear-gradient(180deg, #171137c7 0%, #21135094 37%, #291d5762 65%, transparent 88%),
-      linear-gradient(90deg, #16113f55, transparent 85%);
+.g4-world .poster-copy::before {
+  content:"";
+  position:absolute;
+  inset:-12px -16px -24px -35px;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(ellipse 78% 76% at 28% 46%,#111021ed 0%,#111021c4 47%,#1110214c 76%,transparent 98%);
+}
+.g4-world .hero-wave-window {display:none;}
+.g4-world .rat-stage {z-index:2;overflow:hidden;}
+.g4-world .rat-stage img {
+  /* Fade the pixel artwork into the real shader instead of an image rectangle. */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#0008 13%,#000 30%,#000 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#0008 13%,#000 30%,#000 100%);
+}
+.g4-world .skyline-near {opacity:.66;}
+@media(max-width:760px) {
+  .g4-world .poster {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto 160px auto;
+    min-height:0;
+  }
+  .g4-world .poster-copy {
+    align-self:start;
+    padding:22px 18px 0;
+    max-width:550px;
+  }
+  .g4-world .poster-copy::before {
+    inset:-8px -8px -12px;
+    background:linear-gradient(180deg,#111021ee 0%,#15132bdf 40%,#14132abb 78%,transparent 100%);
+  }
+  .g4-world .poster-copy .eyebrow {
+    margin:0 0 8px;
+    max-width:none;
+    font-size:.61rem;
+    line-height:1.4;
+    letter-spacing:.12em;
+  }
+  .g4-world .display-title {
+    font-size:clamp(2.85rem,10.4vw,3.85rem);
+    line-height:.94;
+    margin:6px 0 12px;
+    letter-spacing:-.078em;
+  }
+  .g4-world .hero-deck {
+    font-size:clamp(.88rem,3.8vw,1.03rem);
+    line-height:1.3;
+    margin:0 0 6px;
+  }
+  .g4-world .hero-description {
+    max-width:380px;
+    font-size:.79rem;
+    line-height:1.35;
+    margin:0;
+  }
+  .g4-world .primary-actions {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:8px;
+    margin-top:14px;
+  }
+  .g4-world .enter-dumpster,.g4-world .investigate {
+    display:flex;
+    flex:1 1 auto;
+    justify-content:space-between;
+    gap:6px;
+    min-width:0;
+    min-height:52px;
+    padding:10px 12px;
+    text-align:left;
+    font-size:.75rem;
+    line-height:1.22;
+  }
+  .g4-world .enter-dumpster {box-shadow:0 4px 0 #603541,0 7px 22px #08071630;}
+  .g4-world .investigate {background:#171426c7;border:1px solid #ffe1bc99;}
+  .g4-world .world-label {display:none;}
+  /* A deliberately unoccluded strip of the ORIGINAL demo between text and rat. */
+  .g4-world .hero-wave-window {
+    display:block;
+    position:relative;
+    z-index:1;
+    height:160px;
+    pointer-events:none;
+  }
+  .g4-world .rat-stage {
+    position:relative;
+    z-index:2;
+    width:100%;
+    min-height:0;
+    height:clamp(300px,88vw,385px);
+    margin-top:-20px;
+    overflow:hidden;
+  }
+  .g4-world .rat-stage img {
+    position:absolute;
+    inset:-7% 0 auto;
+    width:100%;
+    height:115%;
+    max-width:none;
+    object-fit:cover;
+    object-position:50% 35%;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,#0008 9%,#000 23%,#000 90%,transparent 100%);
+    mask-image:linear-gradient(180deg,transparent 0%,#0008 9%,#000 23%,#000 90%,transparent 100%);
+  }
+  .g4-world .skyline-near {height:70px;opacity:.42;}
+}
+@media(max-width:350px) {
+  .g4-world .poster-copy {padding:18px 14px 0;}
+  .g4-world .display-title {font-size:2.75rem;}
+  .g4-world .hero-description {font-size:.73rem;}
+  .g4-world .enter-dumpster,.g4-world .investigate {padding:9px 9px;font-size:.69rem;}
+  .g4-world .hero-wave-window {height:134px;}
+  .g4-world .poster {grid-template-rows:auto 134px auto;}
+  .g4-world .rat-stage {height:300px;}
+}
+/* Direct, full-screen 1:1 settings comparison: same official component; no
+   BINRAT text, art, masking or overlay. Query: ?demo-isolate=1 */
+html.grain-demo-isolate,html.grain-demo-isolate body {margin:0;width:100%;height:100%;overflow:hidden;background:#333333;}
+html.grain-demo-isolate .g4-world {min-height:100svh;height:100svh;overflow:hidden;background:#333333;}
+html.grain-demo-isolate .g4-world .masthead,
+html.grain-demo-isolate .g4-world .poster-copy,
+html.grain-demo-isolate .g4-world .hero-wave-window,
+html.grain-demo-isolate .g4-world .rat-stage,
+html.grain-demo-isolate .g4-world .skyline-near,
+html.grain-demo-isolate .g4-world .product-dock,
+html.grain-demo-isolate .g4-world .world-proof,
+html.grain-demo-isolate .g4-world .world-footer {display:none !important;}
+html.grain-demo-isolate .g4-world .poster {
+  display:block;
+  height:100svh;
+  min-height:100svh;
+  width:100%;
+  max-width:none;
+  margin:0;
+  background:#333333;
+}
+html.grain-demo-isolate .g4-world .poster::before {display:none;}
+html.grain-demo-isolate .g4-world .grain-wave-sky {inset:0;opacity:1;}
+html.grain-demo-isolate .g4-world .grain-wave-copy-shade {display:none;}
+@media(prefers-reduced-motion:reduce) {
+  .g4-world .official-grain-host {display:none;}
+}
+
+/* R5 targeted visual review: on portrait screens present the real, animated
+   demo in a landscape-proportioned, FULLY unobscured stage (rather than
+   stretching its shader behind 700px of opaque copy and artwork). The stage
+   overlaps the unchanged original rat illustration by 40px. No outlines,
+   gradients, shader reimplementation or licensed source duplication. */
+@media(max-width:760px) {
+  html:not(.grain-demo-isolate) .g4-world .poster {
+    grid-template-rows:auto 190px auto;
+    background:#151223;
+  }
+  html:not(.grain-demo-isolate) .g4-world .poster-copy {
+    grid-row:1;
+    background:#151223;
+  }
+  html:not(.grain-demo-isolate) .g4-world .poster-copy::before {display:none;}
+  html:not(.grain-demo-isolate) .g4-world .grain-wave-sky {
+    position:relative;
+    inset:auto;
+    grid-row:2;
+    width:100%;
+    height:190px;
+    z-index:1;
+    background:#333333;
+  }
+  html:not(.grain-demo-isolate) .g4-world .hero-wave-window {display:none;}
+  html:not(.grain-demo-isolate) .g4-world .rat-stage {
+    grid-row:3;
+    margin-top:-40px;
+    z-index:2;
   }
 }
-@media (prefers-reduced-motion:reduce) {
-  .official-grain-host { display:none; }
+@media(max-width:350px) {
+  html:not(.grain-demo-isolate) .g4-world .poster {grid-template-rows:auto 175px auto;}
+  html:not(.grain-demo-isolate) .g4-world .grain-wave-sky {height:175px;}
 }

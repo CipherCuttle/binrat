@@ -21,15 +21,20 @@ const demoDefaults = {
   grainIntensity:50,
   scale:0.6,
   brightness:1,
-  // Match the demo's geometry / texture / motion; change ONLY the palette.
-  startColor:'#c060a8',
-  endColor:'#ffd08a',
-  darkBackground:'#20164e',
-  lightBackground:'#f7ecc8'
+  // R5 uses the exact displayed React Bits demo colors and neutral backgrounds.
+  // No BINRAT palette changes until the demo look itself is visually approved.
+  startColor:'#ff6666',
+  endColor:'#6666ff',
+  darkBackground:'#333333',
+  lightBackground:'#ffffff'
 };
 export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  const staticSky=new URLSearchParams(location.search).has('static-sky');
+  const params=new URLSearchParams(location.search);
+  const staticSky=params.has('static-sky');
+  const demoIsolate=params.has('demo-isolate');
+  if(demoIsolate) document.documentElement.classList.add('grain-demo-isolate');
+  host.dataset.wavePreset='reactbits-demo-defaults';
   let root:Root|undefined;
   let stopped=false;
   function unmount() {
@@ -49,7 +54,14 @@ export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
         attribute:'class',
         forcedTheme:'dark',
         enableSystem:false,
-        children:createElement(OfficialGrainWave,demoDefaults)
+        // Isolated: the demo's exact white/gray background options.
+        // Integrated: select the demo's dark-mode background in both theme paths.
+        // The React island can resolve light despite a forced dark provider.
+        // No opaque mask/filter hides the original wave shader.
+        children:createElement(OfficialGrainWave,demoIsolate?demoDefaults:{
+          ...demoDefaults,
+          lightBackground:'#333333'
+        })
       }));
     }
     host.dataset.grainRuntime='official-mounted';
@@ -60,5 +72,6 @@ export const mountOfficialGrainWave: Action<HTMLDivElement> = (host) => {
     stopped=true;
     reduced.removeEventListener('change',update);
     unmount();
+    if(demoIsolate) document.documentElement.classList.remove('grain-demo-isolate');
   }};
 };
