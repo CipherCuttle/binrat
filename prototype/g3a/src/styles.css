@@ -493,7 +493,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   .g4-world .poster {
     display:grid;
     grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto 76px auto;
+    grid-template-rows:auto 160px auto;
     min-height:0;
   }
   .g4-world .poster-copy {
@@ -555,7 +555,7 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
     display:block;
     position:relative;
     z-index:1;
-    height:76px;
+    height:160px;
     pointer-events:none;
   }
   .g4-world .rat-stage {
@@ -585,8 +585,8 @@ dt { color:#b1c3c4; font-size:.81rem; } dd { margin:0; font-weight:700; font-siz
   .g4-world .display-title {font-size:2.75rem;}
   .g4-world .hero-description {font-size:.73rem;}
   .g4-world .enter-dumpster,.g4-world .investigate {padding:9px 9px;font-size:.69rem;}
-  .g4-world .hero-wave-window {height:60px;}
-  .g4-world .poster {grid-template-rows:auto 60px auto;}
+  .g4-world .hero-wave-window {height:134px;}
+  .g4-world .poster {grid-template-rows:auto 134px auto;}
   .g4-world .rat-stage {height:300px;}
 }
 /* Direct, full-screen 1:1 settings comparison: same official component; no
