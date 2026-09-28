@@ -29,6 +29,28 @@ test('Cloudflare health is instant and fail-closed before durable runtime state 
   }
 });
 
+test('Cloudflare health exposes an optional non-secret release SHA without changing health status', async () => {
+  const db = new D1CompatDatabase();
+  try {
+    const missing = await worker.fetch(new Request('https://binrat.example/health'), { DB: db });
+    const missingBody = await missing.json() as Record<string, unknown>;
+    assert.equal(missing.status, 200);
+    assert.equal(missingBody.ok, true);
+    assert.equal(missingBody.releaseSha, null);
+
+    const stamped = await worker.fetch(
+      new Request('https://binrat.example/health'),
+      { DB: db, BINRAT_RELEASE_SHA: '9609456' }
+    );
+    const stampedBody = await stamped.json() as Record<string, unknown>;
+    assert.equal(stamped.status, 200);
+    assert.equal(stampedBody.ok, true);
+    assert.equal(stampedBody.releaseSha, '9609456');
+  } finally {
+    db.close();
+  }
+});
+
 test('Cloudflare read API projects the same durable BINRAT evidence from D1', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);

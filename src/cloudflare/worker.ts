@@ -58,6 +58,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   BINRAT_HOLDER_WALLET_AUTH_ENABLED?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
+  BINRAT_RELEASE_SHA?: string;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_WEBHOOK_SECRET?: string;
   TELEGRAM_REPLIES_ENABLED?: string;
@@ -197,6 +198,7 @@ export async function handleWorkerRequest(
       service: 'binrat-cloudflare-edge',
       capabilityStatus: manifest?.capabilities.telegramRatV0?.engineeringStatus ?? 'UNKNOWN',
       launchAuthorization: manifest?.launchAuthorization.status ?? 'UNVERIFIED_REMOTE_STATUS',
+      releaseSha: env.BINRAT_RELEASE_SHA ?? null,
       repliesEnabled,
       conversationEnabled: env.RAT_CONVERSATION_ENABLED === 'true',
       aiEnabled: ratAiActive(env, Date.now()),
