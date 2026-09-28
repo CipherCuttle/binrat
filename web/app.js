@@ -13,6 +13,13 @@ let bags = [];
 let activeFilter = "all";
 let activeMode = null;
 let available = false;
+const initialFragment = location.hash && location.hash !== "#top" ? location.hash : "";
+let initialFragmentPending = Boolean(initialFragment);
+let initialFragmentInterrupted = false;
+const initialScrollBehavior = document.documentElement.style.scrollBehavior;
+if (initialFragmentPending) document.documentElement.style.scrollBehavior = "auto";
+if (initialFragmentPending)
+  history.replaceState(history.state, "", `${location.pathname}${location.search}`);
 const modeCopy = {
   FIXTURE: {
     header: "FIXTURE MODE",
@@ -71,6 +78,67 @@ const pageSurfaces = [
     "body > header, body > main, body > footer, .skip-link",
   ),
 ];
+
+function interruptInitialFragmentRestore() {
+  initialFragmentInterrupted = true;
+  document.documentElement.style.scrollBehavior = initialScrollBehavior;
+}
+
+function restoreInitialFragmentUrl() {
+  if (location.hash) return;
+  history.replaceState(
+    history.state,
+    "",
+    `${location.pathname}${location.search}${initialFragment}`,
+  );
+}
+
+for (const eventName of ["pointerdown", "touchstart", "wheel", "keydown"]) {
+  window.addEventListener(eventName, interruptInitialFragmentRestore, {
+    once: true,
+    passive: true,
+  });
+}
+
+function restoreInitialFragment() {
+  if (!initialFragmentPending) return;
+  initialFragmentPending = false;
+  if (initialFragmentInterrupted) {
+    restoreInitialFragmentUrl();
+    return;
+  }
+  const target = document.getElementById(initialFragment.slice(1));
+  if (!target) {
+    restoreInitialFragmentUrl();
+    document.documentElement.style.scrollBehavior = initialScrollBehavior;
+    return;
+  }
+  const heroImage = document.querySelector(".mascot-stage img");
+  const layoutReady = [
+    document.fonts?.ready ?? Promise.resolve(),
+    heroImage?.decode?.().catch(() => undefined) ?? Promise.resolve(),
+  ];
+  void Promise.all(layoutReady).then(() => requestAnimationFrame(() => {
+    if (initialFragmentInterrupted) {
+      restoreInitialFragmentUrl();
+      return;
+    }
+    const root = document.documentElement;
+    const scrollPadding = Number.parseFloat(
+      getComputedStyle(root).scrollPaddingTop,
+    );
+    restoreInitialFragmentUrl();
+    window.scrollTo({
+      top: Math.max(0, target.getBoundingClientRect().top + scrollY - scrollPadding),
+    });
+    root.style.scrollBehavior = initialScrollBehavior;
+  }));
+}
+
+const sectionNav = document.querySelector(".section-nav");
+sectionNav?.addEventListener("click", (event) => {
+  if (event.target.closest("a")) sectionNav.open = false;
+});
 
 void bootstrapLedger();
 await bootstrap();
@@ -186,6 +254,7 @@ function renderUnavailable(error) {
     element.textContent = "—";
   }
   grid.innerHTML = `<div class="data-unavailable">DUMPSTER DATA UNAVAILABLE<br/>${copy().unavailable}</div>`;
+  restoreInitialFragment();
   console.error(error);
 }
 
@@ -241,6 +310,7 @@ function renderFeed() {
     image.addEventListener("error", () => image.remove(), { once: true });
   }
   window.dispatchEvent(new CustomEvent("binrat:feed-rendered"));
+  restoreInitialFragment();
 }
 
 function renderCard(bag) {

@@ -45,11 +45,13 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 85px;
+  overflow-x: clip;
 }
 body {
   margin: 0;
   min-width: 320px;
   background: var(--black);
+  overflow-x: clip;
 }
 body.drawer-open {
   overflow: hidden;
@@ -195,6 +197,66 @@ img {
 .site-header nav .nav-active {
   color: var(--bone);
   border-bottom-color: var(--good);
+}
+.section-nav {
+  display: none;
+  position: relative;
+}
+.section-nav summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  min-width: 58px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  list-style: none;
+}
+.section-nav summary::-webkit-details-marker {
+  display: none;
+}
+.section-nav summary:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+.section-nav summary:hover,
+.section-nav[open] summary {
+  border-color: var(--dumpster-hi);
+  color: var(--bone);
+}
+.section-nav[open] summary > span:last-child {
+  transform: rotate(180deg);
+}
+.section-nav nav {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 50;
+  display: grid;
+  width: min(208px, calc(100vw - 32px));
+  border: 1px solid var(--dumpster-hi);
+  background: var(--asphalt);
+  box-shadow: 0 12px 30px #0008;
+}
+.section-nav nav a {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+.section-nav nav a:last-child {
+  border-bottom: 0;
+}
+.section-nav nav a:hover,
+.section-nav nav a:focus-visible {
+  color: var(--bone);
+  background: var(--dumpster);
 }
 .network-pill {
   display: grid;
@@ -1041,7 +1103,7 @@ img {
   top: 0;
   right: 0;
   z-index: 80;
-  width: min(640px, 100%);
+  width: min(640px, 100vw);
   height: 100vh;
   height: 100dvh;
   overflow-y: auto;
@@ -2291,6 +2353,12 @@ body {
   .site-header nav {
     display: none;
   }
+  .section-nav {
+    display: block;
+  }
+  .section-nav nav {
+    display: grid;
+  }
   .hero {
     grid-template-columns: minmax(0, 1fr) minmax(330px, 0.8fr);
   }
@@ -2412,6 +2480,13 @@ body {
 @media (max-width: 520px) {
   .site-header {
     min-height: 62px;
+    gap: 8px;
+  }
+  .section-nav summary {
+    min-width: 40px;
+    padding: 0 7px;
+    gap: 5px;
+    font-size: 7px;
   }
   .brand-sub {
     font-size: 10px;
