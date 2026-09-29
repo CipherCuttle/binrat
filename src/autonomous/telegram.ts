@@ -30,7 +30,7 @@ export async function executeAutonomousCommand(
     }
     if (command.name === 'rats') {
       if (command.argument) throw new Error('RATS_USAGE');
-      return { kind:'RATS',snapshot:await discoverRats(db,now,capacity.ratsCandidates) };
+      return { kind:'RATS',snapshot:await discoverRats(db,now,capacity.ratsCandidates),candidateIndex:0 };
     }
     if (command.name === 'share') return { kind:'SHARE',receipt:await createPublicShareReceipt(db,command.argument,now) };
     if (command.name === 'start') {

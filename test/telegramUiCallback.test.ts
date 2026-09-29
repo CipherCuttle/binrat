@@ -4,6 +4,8 @@ import { encodeCallback, parseCallback, TELEGRAM_CALLBACK_MAX_BYTES } from '../s
 import { assertV2Caption, renderRatCard } from '../src/telegram/ui/cards.js';
 import { dig } from '../src/autonomous/evidence.js';
 import { autonomousFixture, CREATOR } from './support/autonomousFixture.js';
+import { discoverRats, loadRatsSnapshot } from '../src/autonomous/rats.js';
+import { addr } from './support/autonomousFixture.js';
 
 test('Telegram V2 callbacks are versioned, strict and bounded by UTF-8 bytes', async () => {
   const f=await autonomousFixture();
@@ -15,6 +17,28 @@ test('Telegram V2 callbacks are versioned, strict and bounded by UTF-8 bytes', a
     assert.equal(parseCallback('br1:a:'+receipt.shareId),null);
     assert.equal(parseCallback('br2:a:forged'),null);
     assert.equal(parseCallback('br2:a:'+receipt.shareId+'x'),null);
+  } finally { f.db.close(); }
+});
+
+test('RATS pages use a compact persisted snapshot reference with bounded next and previous cards', async () => {
+  const f=await autonomousFixture();
+  try {
+    const other=addr(43);
+    await f.launch(99,CREATOR); await f.launch(98,other); await f.launch(97,other);
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.candidates.length,2);
+    const first=renderRatCard({kind:'RATS',snapshot,candidateIndex:0});
+    const nextData=(first.keyboard[2]![2] as {callbackData:string}).callbackData;
+    assert.deepEqual(parseCallback(nextData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:1});
+    assert.ok(new TextEncoder().encode(nextData).byteLength<=TELEGRAM_CALLBACK_MAX_BYTES);
+    const loaded=await loadRatsSnapshot(f.db,snapshot.discoveryId,f.now());
+    const second=renderRatCard({kind:'RATS',snapshot:loaded,candidateIndex:1});
+    const previousData=(second.keyboard[2]![0] as {callbackData:string}).callbackData;
+    assert.deepEqual(parseCallback(previousData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:0});
+    assert.equal(parseCallback(encodeCallback({action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:9}))?.action,'RATS_PAGE');
+    await f.db.prepare('UPDATE rat_v11_pons_discovery_snapshots SET expires_at_ms=? WHERE discovery_id=?').bind(f.now()-1,snapshot.discoveryId).run();
+    await assert.rejects(loadRatsSnapshot(f.db,snapshot.discoveryId,f.now()),/DISCOVERY_UNAVAILABLE/);
+    await assert.rejects(loadRatsSnapshot(f.db,'0'.repeat(64),f.now()),/DISCOVERY_UNAVAILABLE/);
   } finally { f.db.close(); }
 });
 

@@ -22,12 +22,14 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     [callbackButton('Rats',{action:'RATS'}),callbackButton('Watches',{action:'WATCHES'})],[callbackButton('DIG — send /dig <address>',{action:'DIG_HINT'})]
   ]});
   if (outcome.kind === 'RATS') {
-    const candidate=outcome.snapshot.candidates[0];
+    const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
     if (!candidate) return card({view:'EMPTY',media:'empty-paws',caption:`🐀 Empty paws. No repeated Pons-reported deployers in current indexed coverage.\nCoverage: PARTIAL · as of block ${outcome.snapshot.sourceCheckpoint}.\nNo candidate or safety conclusion was fabricated.`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
     const id=share({shareId:candidate.caseId.slice(0,40)});
     return card({view:'RATS',media:'repeat-creator',caption:`🐀 RATS · ${candidate.rankPosition}\n${candidate.entity.entityId}\n${candidate.reasons.map(r=>`${r.epistemicClass}: ${r.text}`).join('\n')}\nCoverage: PARTIAL · indexed Pons V2 only.\nUNKNOWN: identity, intent, safety and future outcome.`,keyboard:[
       [callbackButton('Why',{action:'WHY',shareId:id}),callbackButton('Watch',{action:'WATCH',shareId:id})],
-      [copyButton('Copy address',candidate.entity.entityId)],[callbackButton('Home',{action:'HOME'})]
+      [copyButton('Copy address',candidate.entity.entityId)],
+      [callbackButton('Prev',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:Math.max(0,outcome.candidateIndex-1)}),callbackButton(`${outcome.candidateIndex+1}/${outcome.snapshot.candidates.length}`,{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex}),callbackButton('Next',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:Math.min(outcome.snapshot.candidates.length-1,outcome.candidateIndex+1)})],
+      [callbackButton('Home',{action:'HOME'})]
     ]});
   }
   if (outcome.kind === 'CASE') {

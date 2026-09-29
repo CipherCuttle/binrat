@@ -4,6 +4,9 @@ import { handleWorkerRequest } from '../src/cloudflare/worker.js';
 import { autonomousFixture } from './support/autonomousFixture.js';
 import { CREATOR } from './support/autonomousFixture.js';
 import { dig } from '../src/autonomous/evidence.js';
+import { discoverRats } from '../src/autonomous/rats.js';
+import { encodeCallback } from '../src/telegram/ui/callback.js';
+import { addr } from './support/autonomousFixture.js';
 
 function callbackRequest(updateId:number, from:number, chatId:number, type:string, data:string) {
   return new Request('https://fixture.invalid/telegram/webhook',{method:'POST',headers:{'content-type':'application/json','x-telegram-bot-api-secret-token':'fixture-secret'},body:JSON.stringify({update_id:updateId,callback_query:{id:`cb-${updateId}`,from:{id:from},data,message:{message_id:91,chat:{id:chatId,type},from:{id:77}}}})});
@@ -15,10 +18,10 @@ test('callback acknowledgement precedes card edit and controlled actor is re-aut
     Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true',BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'false',BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID:'77'});
     const api:typeof fetch=async (url) => { const method=String(url).split('/').at(-1)!; calls.push(method);
       if(method==='answerCallbackQuery') return Response.json({ok:true,result:true});
-      if(method==='editMessageMedia') return Response.json({ok:true,result:{message_id:91}});
+      if(method==='editMessageCaption') return Response.json({ok:true,result:{message_id:91}});
       throw new Error('UNEXPECTED_TELEGRAM_'+method); };
     const accepted=await handleWorkerRequest(callbackRequest(880,77,77,'private','br2:h'),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
-    assert.equal(accepted.status,200); assert.deepEqual(calls,['answerCallbackQuery','editMessageMedia']);
+    assert.equal(accepted.status,200); assert.deepEqual(calls,['answerCallbackQuery','editMessageCaption']);
     calls.length=0;
     const denied=await handleWorkerRequest(callbackRequest(881,88,77,'private','br2:h'),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
     assert.equal(denied.status,200); assert.deepEqual(calls,['answerCallbackQuery']);
@@ -34,10 +37,46 @@ test('FULL callback sends the canonical legacy receipt without truncating the ca
     Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true'});
     const receipt=await dig(f.db,{chainId:4663,entityType:'CREATOR',entityId:CREATOR},f.now());
     const api:typeof fetch=async (url) => { const method=String(url).split('/').at(-1)!; calls.push(method);
-      if(method==='answerCallbackQuery'||method==='editMessageMedia') return Response.json({ok:true,result:method==='editMessageMedia'?{message_id:91}:true});
+      if(method==='answerCallbackQuery'||method==='editMessageCaption') return Response.json({ok:true,result:method==='editMessageCaption'?{message_id:91}:true});
       if(method==='sendMessage') return Response.json({ok:true,result:{message_id:92}});
       throw new Error('UNEXPECTED_TELEGRAM_'+method); };
     const response=await handleWorkerRequest(callbackRequest(883,77,77,'private',`br2:f:${receipt.shareId}`),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
-    assert.equal(response.status,200); assert.deepEqual(calls,['answerCallbackQuery','sendMessage','editMessageMedia']);
+    assert.equal(response.status,200); assert.deepEqual(calls,['answerCallbackQuery','editMessageCaption','sendMessage']);
+  } finally { f.db.close(); }
+});
+
+test('candidate whole-bot gate overrides a different autonomous tester for callbacks', async () => {
+  const f=await autonomousFixture(); const calls:string[]=[];
+  try {
+    Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true',BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'false',BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID:'77',RAT_CANDIDATE_ALLOWED_USER_ID:'88'});
+    const api:typeof fetch=async (url) => { calls.push(String(url).split('/').at(-1)!); return Response.json({ok:true,result:true}); };
+    const response=await handleWorkerRequest(callbackRequest(884,77,77,'private','br2:r'),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
+    assert.equal(response.status,200); assert.deepEqual(calls,['answerCallbackQuery']);
+    const watches=await f.db.prepare('SELECT COUNT(*) n FROM rat_v1_watches').first<{n:number}>(); assert.equal(watches?.n,0);
+  } finally { f.db.close(); }
+});
+
+test('authorized callbacks are rate-limited before RATS discovery and acknowledge the spinner', async () => {
+  const f=await autonomousFixture(); const calls:string[]=[];
+  try {
+    Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true',TELEGRAM_MAX_MESSAGES_PER_MINUTE:'2'});
+    const api:typeof fetch=async (url) => { const method=String(url).split('/').at(-1)!; calls.push(method);
+      if(method==='answerCallbackQuery') return Response.json({ok:true,result:true});
+      if(method==='editMessageCaption') return Response.json({ok:true,result:{message_id:91}});
+      throw new Error('UNEXPECTED_'+method); };
+    for (const updateId of [885,886,887]) assert.equal((await handleWorkerRequest(callbackRequest(updateId,77,77,'private','br2:r'),f.env,{now:f.now,externalFetch:api,watchSource:f.source})).status,200);
+    assert.deepEqual(calls,['answerCallbackQuery','editMessageCaption','answerCallbackQuery','editMessageCaption','answerCallbackQuery']);
+  } finally { f.db.close(); }
+});
+
+test('RATS page callback edits the existing message from the persisted snapshot', async () => {
+  const f=await autonomousFixture(); const calls:string[]=[];
+  try {
+    Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true'});
+    const other=addr(43); await f.launch(99); await f.launch(98,other); await f.launch(97,other);
+    const snapshot=await discoverRats(f.db,f.now()); assert.equal(snapshot.candidates.length,2);
+    const api:typeof fetch=async url=>{const method=String(url).split('/').at(-1)!;calls.push(method);return Response.json({ok:true,result:method==='answerCallbackQuery'?true:{message_id:91}});};
+    const response=await handleWorkerRequest(callbackRequest(888,77,77,'private',encodeCallback({action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:1})),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
+    assert.equal(response.status,200); assert.deepEqual(calls,['answerCallbackQuery','editMessageCaption']);
   } finally { f.db.close(); }
 });
