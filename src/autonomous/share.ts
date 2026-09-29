@@ -23,6 +23,16 @@ export interface PublicShareReceipt {
 export async function createPublicShareReceipt(db: D1DatabaseLike, caseId: string, now: number): Promise<PublicShareReceipt> {
   const finding = await why(db, caseId, now);
   const table = finding.chainId === 4663 ? 'rat_v11_pons_public_receipts' : 'rat_v11_public_receipts';
+  // A button may be tapped repeatedly, and a transport retry can arrive after a
+  // successful write. Reuse only a still-valid receipt and validate it through
+  // the same reconstruction path used by public access.
+  const existing = await db.prepare(`SELECT receipt_id FROM ${table}
+    WHERE case_id=? AND expires_at_ms>? ORDER BY created_at_ms DESC,receipt_id DESC LIMIT 1`)
+    .bind(finding.caseId,now).first<{ receipt_id: string }>();
+  if (existing) {
+    try { return await openPublicShareReceipt(db,existing.receipt_id,now); }
+    catch { /* stale/tampered rows are never reused; a fresh validated case follows. */ }
+  }
   const publicReceiptBase = {
     schemaVersion: 'binrat.public-receipt/1' as const,
     caseId: finding.caseId, chainId: finding.chainId, subject: finding.subject,

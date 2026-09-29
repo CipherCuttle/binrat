@@ -54,6 +54,27 @@ export async function mutateWatch(
     .bind(p.userId, p.chatId, target.chainId, target.entityType, target.entityId).first<WatchRow>();
   let start = old?.start_block ?? 0;
   let hash = old?.start_hash ?? '';
+  // An already enabled identical watch is a state no-op.  It is still recorded
+  // against this update id (so stale updates remain ordered), but crucially it
+  // must not reserve research, re-read evidence, call RPC, or move its boundary.
+  if (action === 'WATCH' && old?.enabled === 1) {
+    const results = await db.batch([
+      db.prepare(`UPDATE rat_v1_watches SET last_update_id=?
+        WHERE user_id=? AND chat_id=? AND chain_id=? AND entity_type=? AND entity_id=?
+          AND enabled=1 AND last_update_id<?`)
+        .bind(updateId,p.userId,p.chatId,target.chainId,target.entityType,target.entityId,updateId),
+      db.prepare(`INSERT OR IGNORE INTO rat_v1_commands(update_id,user_id,chat_id,reply,created_at_ms)
+        SELECT ?,?,?,CASE WHEN (SELECT last_update_id FROM rat_v1_watches WHERE user_id=? AND chat_id=?
+          AND chain_id=? AND entity_type=? AND entity_id=?)>? THEN
+          '🐀 superseded by a newer watch command; no change.'
+        ELSE '🐀 already watching ${entityKey(target)}. Existing watch boundary preserved.' END,?`)
+        .bind(updateId,p.userId,p.chatId,p.userId,p.chatId,target.chainId,target.entityType,target.entityId,updateId,now)
+    ]);
+    if (results.some(r => !r.success)) throw new Error('WATCH_WRITE_FAILED');
+    const reply = await commandReplay(db,p,updateId);
+    if (reply === null) throw new Error('WATCH_WRITE_FAILED');
+    return reply;
+  }
   if (action === 'WATCH') {
     // WATCH performs an investigation and a bounded RPC read, so it shares the
     // neutral research budget. Unwatch and receipt access never consume it.

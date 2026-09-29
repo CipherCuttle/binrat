@@ -277,16 +277,16 @@ test('additive migration repeats on deployed schema; missing migration fails clo
   } finally {db.close();}
 });
 
-test('H1: WATCH admission bounds RPC and leaves UNWATCH available at exhaustion',async()=>{
+test('H1: identical WATCH is a no-op and leaves UNWATCH available at exhaustion',async()=>{
   const f=await autonomousFixture();
   try {
     let heads=0;
     const source={...f.source,head:async()=>{heads++;return f.source.head();}};
     for(let i=0;i<30;i++) await mutateWatch(f.db,PRINCIPAL,3000+i,subject(),'WATCH',FREE_CAPACITY,f.now(),source);
-    await assert.rejects(mutateWatch(f.db,PRINCIPAL,3030,subject(),'WATCH',FREE_CAPACITY,f.now(),source),/CAPACITY_REACHED/);
-    assert.equal(heads,30);assert.equal(await count(f.db,'rat_v1_dig_requests'),30);
+    await mutateWatch(f.db,PRINCIPAL,3030,subject(),'WATCH',FREE_CAPACITY,f.now(),source);
+    assert.equal(heads,1);assert.equal(await count(f.db,'rat_v1_dig_requests'),1);
     await remove(f,4000);assert.equal((await listWatches(f.db,PRINCIPAL)).length,0);
-    await f.send(`/watch ${CREATOR}`,{updateId:4001});assert.match(f.sent.at(-1)!.text,/research capacity reached/);
+    await f.send(`/watch ${CREATOR}`,{updateId:4001});assert.match(f.sent.at(-1)!.text,/watch armed/);
   } finally {f.db.close();}
 });
 
