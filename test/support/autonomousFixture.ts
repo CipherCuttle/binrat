@@ -95,3 +95,30 @@ export async function runAutonomousDemo() {
   f.transcript.push('REPLAY: no additional alert. UNWATCH: block 110 emitted no alert.');
   return {f,future,caseId:outbox.case_id};
 }
+
+/** S2/S3 deterministic local Telegram transcript. It never reaches Arc or Telegram. */
+export async function runRatsShareDemo() {
+  const f=await autonomousFixture();
+  await f.launch(99,CREATOR);
+  await f.send('/rats',{updateId:10});
+  const ratsReply=f.sent.at(-1)?.text ?? '';
+  const caseId=(ratsReply.match(/WHY: \/why ([0-9a-f]{64})/) ?? [])[1];
+  if (!caseId) throw new Error('DEMO_RATS_CASE_MISSING');
+  await f.send(`/why ${caseId}`,{updateId:11});
+  await f.send(`/watch 5042:CREATOR:${CREATOR}`,{updateId:12});
+  f.advance(); await f.launch(105); await f.checkpoint(105);
+  f.transcript.push('FIXTURE EVENT: canonical launch at block 105, after User A watch boundary.');
+  await f.cycle();
+  const alert=await f.db.prepare("SELECT case_id FROM rat_v1_outbox WHERE state='SENT'").first<{case_id:string}>();
+  if (!alert) throw new Error('DEMO_ALERT_MISSING');
+  await f.send(`/share ${alert.case_id}`,{updateId:13});
+  const shareReply=f.sent.at(-1)?.text ?? '';
+  const deepLink=shareReply.match(/Open: (https:\/\/t\.me\/BinratBot\?start=receipt_[0-9a-f]{32})/)?.[1];
+  if (!deepLink) throw new Error('DEMO_SHARE_LINK_MISSING');
+  const start=deepLink.slice(deepLink.indexOf('start=')+6);
+  await f.send(`/start ${start}`,{userId:88,chatId:88,updateId:14});
+  await f.send(`/why ${alert.case_id}`,{userId:88,chatId:88,updateId:15});
+  await f.send(`/watch 5042:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:16});
+  f.transcript.push('VERIFY: User A and User B have independent watches; one alert exists; no pre-watch event was alerted.');
+  return {f,caseId,alertCaseId:alert.case_id,deepLink};
+}
