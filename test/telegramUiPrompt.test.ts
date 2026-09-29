@@ -155,6 +155,38 @@ test('a prompt receipt fences a replay when callback ledger completion fails aft
   } finally {f.db.close();}
 });
 
+test('newer DIG prompt wins when an older callback is retried after its ledger write failed', async () => {
+  const f=await autonomousFixture(); const calls:Call[]=[]; const fetchImpl=telegram(calls) as typeof fetch;
+  let failLedger=true;
+  const flakyLedgerDb: D1DatabaseLike={
+    prepare(sql) {
+      if (failLedger && sql.includes("UPDATE telegram_update_receipts") && sql.includes("state = 'REPLIED'")) {
+        return {bind:()=>({run:async()=>{ throw new Error('D1_LEDGER_WRITE'); }})} as unknown as ReturnType<D1DatabaseLike['prepare']>;
+      }
+      return f.db.prepare(sql);
+    }, batch:s=>f.db.batch(s), exec:s=>f.db.exec(s)
+  };
+  try {
+    // A created prompt 800 but its terminal ledger write failed, so Telegram may retry A.
+    assert.equal((await callback(f,fetchImpl,1060,600,77,flakyLedgerDb)).status,503);
+    assert.equal((await loadActiveDigPrompt(f.db,77,77,f.now()))?.sourceUpdateId,1060);
+    failLedger=false;
+    // B legitimately replaces A with prompt 801.
+    assert.equal((await callback(f,fetchImpl,1061,600,77,flakyLedgerDb)).status,200);
+    assert.equal((await loadActiveDigPrompt(f.db,77,77,f.now()))?.promptMessageId,801);
+    assert.equal((await loadActiveDigPrompt(f.db,77,77,f.now()))?.sourceUpdateId,1061);
+    // Retry A: no third ForceReply, and B remains authoritative.
+    assert.equal((await callback(f,fetchImpl,1060,600,77,flakyLedgerDb)).status,200);
+    assert.equal(calls.filter(c=>c.method==='sendMessage').length,2);
+    assert.equal((await loadActiveDigPrompt(f.db,77,77,f.now()))?.promptMessageId,801);
+    assert.equal((await loadActiveDigPrompt(f.db,77,77,f.now()))?.sourceUpdateId,1061);
+    await reply(f,fetchImpl,1062,CREATOR,800);
+    assert.equal(await digCount(f),0);
+    await reply(f,fetchImpl,1063,CREATOR,801);
+    assert.equal(await digCount(f),1);
+  } finally {f.db.close();}
+});
+
 test('media ON edits inquisitive → digging → CASE, while final ledger failure cannot re-execute DIG', async () => {
   const f=await autonomousFixture(); const calls:Call[]=[]; const fetchImpl=telegram(calls) as typeof fetch;
   let failLedger=false;
@@ -190,7 +222,12 @@ test('prompt storage is additive, rerunnable, private, expires, and DELETE RETUR
     await db.exec(old);
     await assert.rejects(loadActiveDigPrompt(db,77,77,1_000),/no such table/);
     await db.exec(migration); await db.exec(migration);
-    await replaceDigPrompt(db,{chatId:77,userId:77,sourceUpdateId:1,cardMessageId:6,promptMessageId:7,createdAtMs:1_000});
+    assert.equal(await replaceDigPrompt(db,{chatId:77,userId:77,sourceUpdateId:101,cardMessageId:6,promptMessageId:7,createdAtMs:1_000}),'APPLIED');
+    assert.equal(await replaceDigPrompt(db,{chatId:77,userId:77,sourceUpdateId:100,cardMessageId:8,promptMessageId:8,createdAtMs:1_001}),'STALE');
+    assert.equal((await loadActiveDigPrompt(db,77,77,1_001))?.sourceUpdateId,101);
+    assert.equal(await replaceDigPrompt(db,{chatId:77,userId:77,sourceUpdateId:102,cardMessageId:9,promptMessageId:9,createdAtMs:1_002}),'APPLIED');
+    assert.equal((await loadActiveDigPrompt(db,77,77,1_002))?.sourceUpdateId,102);
+    await replaceDigPrompt(db,{chatId:77,userId:77,sourceUpdateId:103,cardMessageId:6,promptMessageId:7,createdAtMs:1_000});
     assert.equal((await consumeExactDigPrompt(db,77,77,7,1_000))?.cardMessageId,6);
     assert.equal(await consumeExactDigPrompt(db,77,77,7,1_000),null);
     await replaceDigPrompt(db,{chatId:77,userId:77,sourceUpdateId:2,cardMessageId:6,promptMessageId:8,createdAtMs:1_000});

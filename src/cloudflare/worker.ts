@@ -559,6 +559,11 @@ async function telegramWebhook(
             replyDigest:ratCardDigest(waiting),telegramMessageId:message.message_id,rendererVersion:waiting.rendererVersion},deps.now());
           return json(200,{ok:true,uiV2:true,prompt:true,replayed:true});
         }
+        if (prior && prior.sourceUpdateId > update.update_id) {
+          // This is an older Telegram retry. Do not disturb the newer card or prompt.
+          await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+          return json(200,{ok:true,uiV2:true,prompt:false,stale:true});
+        }
         await editUiCard(token,message.chat.id,message.message_id,origin,waiting,mediaEnabled,deps.externalFetch);
         let promptMessageId: number;
         try {
@@ -571,7 +576,11 @@ async function telegramWebhook(
           return json(200,{ok:true,uiV2:true,prompt:false,reason:error instanceof TelegramUiError ? error.code : 'PROMPT_SEND_FAILED'});
         }
         try {
-          await replaceDigPrompt(env.DB,{chatId:message.chat.id,userId:callback.from.id,sourceUpdateId:update.update_id,cardMessageId:message.message_id,promptMessageId,createdAtMs:deps.now()});
+          const promptWrite=await replaceDigPrompt(env.DB,{chatId:message.chat.id,userId:callback.from.id,sourceUpdateId:update.update_id,cardMessageId:message.message_id,promptMessageId,createdAtMs:deps.now()});
+          if (promptWrite === 'STALE') {
+            await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+            return json(200,{ok:true,uiV2:true,prompt:false,stale:true});
+          }
         } catch {
           // Send succeeded but its receipt did not: terminally close this update. The visible
           // prompt is deliberately inert rather than risking a replayed investigation.

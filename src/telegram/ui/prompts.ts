@@ -1,4 +1,4 @@
-import type { D1DatabaseLike } from '../../cloudflare/d1Types.js';
+import type { D1DatabaseLike, D1ResultLike } from '../../cloudflare/d1Types.js';
 
 export const DIG_PROMPT_TTL_MS = 5 * 60_000;
 
@@ -23,16 +23,19 @@ function validateTime(nowMs:number): void { if (!Number.isSafeInteger(nowMs) || 
  * text. A successful Telegram send followed by a failed write has no usable
  * prompt receipt: callers must terminally record the update and never retry it.
  */
-export async function replaceDigPrompt(db:D1DatabaseLike, prompt:Omit<DigPrompt,'expiresAtMs'>, ttlMs=DIG_PROMPT_TTL_MS):Promise<void> {
+/** Replacement is monotonic: an older Telegram update can never reclaim the prompt. */
+export async function replaceDigPrompt(db:D1DatabaseLike, prompt:Omit<DigPrompt,'expiresAtMs'>, ttlMs=DIG_PROMPT_TTL_MS):Promise<'APPLIED'|'STALE'> {
   validatePrincipal(prompt.chatId,prompt.userId); validateTime(prompt.createdAtMs);
   if (!validId(prompt.cardMessageId) || !validId(prompt.promptMessageId) || !Number.isSafeInteger(prompt.sourceUpdateId) || prompt.sourceUpdateId < 0 || !Number.isSafeInteger(ttlMs) || ttlMs < 1_000 || ttlMs > 15 * 60_000) throw new Error('DIG_PROMPT_INVALID');
   const result=await db.prepare(`INSERT INTO rat_ui_prompts
     (chat_id,user_id,action,source_update_id,card_message_id,prompt_message_id,created_at_ms,expires_at_ms)
     VALUES (?,?,'DIG',?,?,?,?,?)
     ON CONFLICT(chat_id,user_id) DO UPDATE SET action='DIG',card_message_id=excluded.card_message_id,
-      source_update_id=excluded.source_update_id,prompt_message_id=excluded.prompt_message_id,created_at_ms=excluded.created_at_ms,expires_at_ms=excluded.expires_at_ms`)
+      source_update_id=excluded.source_update_id,prompt_message_id=excluded.prompt_message_id,created_at_ms=excluded.created_at_ms,expires_at_ms=excluded.expires_at_ms
+    WHERE excluded.source_update_id > rat_ui_prompts.source_update_id`)
     .bind(prompt.chatId,prompt.userId,prompt.sourceUpdateId,prompt.cardMessageId,prompt.promptMessageId,prompt.createdAtMs,prompt.createdAtMs+ttlMs).run();
   if (!result.success) throw new Error('DIG_PROMPT_WRITE_FAILED');
+  return changes(result) === 1 ? 'APPLIED' : 'STALE';
 }
 
 /** Loads and physically removes an expired prompt; expired records never execute. */
@@ -57,3 +60,4 @@ export async function consumeExactDigPrompt(db:D1DatabaseLike,chatId:number,user
 
 interface PromptRow { chat_id:number; user_id:number; source_update_id:number; card_message_id:number; prompt_message_id:number; created_at_ms:number; expires_at_ms:number }
 function fromRow(row:PromptRow):DigPrompt { return {chatId:row.chat_id,userId:row.user_id,sourceUpdateId:row.source_update_id,cardMessageId:row.card_message_id,promptMessageId:row.prompt_message_id,createdAtMs:row.created_at_ms,expiresAtMs:row.expires_at_ms}; }
+function changes(result:D1ResultLike):number { return Number(result.meta?.changes ?? 0); }
