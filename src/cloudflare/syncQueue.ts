@@ -232,6 +232,7 @@ export async function runCloudflareSyncCycle(
   const store = new D1Store(env.DB, ARC_CHAIN_ID);
   const runtimeStore = new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID);
   let previous: D1RuntimeState | null = null;
+  let phase: SyncFailurePhase = 'RUNTIME_D1';
 
   try {
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_READ_START', cycleId: message.cycleId }));
@@ -239,23 +240,27 @@ export async function runCloudflareSyncCycle(
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_READ_DONE', cycleId: message.cycleId, previousUpdatedAtMs: previous?.updatedAtMs ?? null }));
 
     let source: LaunchSource;
+    phase = 'SOURCE_CONSTRUCTION';
     try {
       const rpcUrl = deps.launchSource ? undefined : resolveArcRpcUrl(env);
       source = deps.launchSource ?? new ArcPadLaunchSource({ rpcUrl });
     } catch (error) {
-      const code = syncErrorCode(error);
+      const code = reportSyncFailure(message.cycleId, 'SOURCE_CONSTRUCTION', error);
+      phase = 'RUNTIME_D1';
       await persistLiveFailure(runtimeStore, previous, code, deps.now);
       return { status: 'RETRY', code };
     }
 
     let bootstrapHead: bigint;
+    phase = 'SOURCE_BOOTSTRAP';
     try {
       console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'SOURCE_BOOTSTRAP_START', cycleId: message.cycleId }));
       bootstrapHead = await source.getHeadBlockNumber();
       await source.assertAuthority(bootstrapHead);
       console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'SOURCE_BOOTSTRAP_DONE', cycleId: message.cycleId, bootstrapHead: bootstrapHead.toString() }));
     } catch (error) {
-      const code = syncErrorCode(error);
+      const code = reportSyncFailure(message.cycleId, 'SOURCE_BOOTSTRAP', error);
+      phase = 'RUNTIME_D1';
       await persistLiveFailure(runtimeStore, previous, code, deps.now);
       return { status: 'RETRY', code };
     }
@@ -265,6 +270,7 @@ export async function runCloudflareSyncCycle(
     const maxBatchBlocks = BigInt(integerSetting(env.BINRAT_MAX_BATCH_BLOCKS, 1000, 1, 100_000));
     const recentStart = bootstrapHead > lookback ? bootstrapHead - lookback : 0n;
     const liveWindowStart = recentStart > ARCPAD_START_BLOCK ? recentStart : ARCPAD_START_BLOCK;
+    phase = 'RUNTIME_D1';
     const beforeCheckpoint = await store.getCheckpoint();
     const startBlock = beforeCheckpoint ? ARCPAD_START_BLOCK : liveWindowStart;
     const historyTarget =
@@ -275,6 +281,7 @@ export async function runCloudflareSyncCycle(
           : null;
 
     let liveReport;
+    phase = 'LIVE_SYNC';
     try {
       console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_SYNC_START', cycleId: message.cycleId }));
       liveReport = await syncLaunches(source, store, {
@@ -287,7 +294,8 @@ export async function runCloudflareSyncCycle(
       });
       console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_SYNC_DONE', cycleId: message.cycleId, batches: liveReport.batches, endBlock: liveReport.endBlock?.toString() ?? null }));
     } catch (error) {
-      const code = syncErrorCode(error);
+      const code = reportSyncFailure(message.cycleId, 'LIVE_SYNC', error);
+      phase = 'RUNTIME_D1';
       await persistLiveFailure(runtimeStore, previous, code, deps.now);
       return { status: 'RETRY', code };
     }
@@ -311,6 +319,7 @@ export async function runCloudflareSyncCycle(
 
     const liveUpdatedAtMs = deps.now();
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'RUNTIME_WRITE_START', cycleId: message.cycleId }));
+    phase = 'RUNTIME_D1';
     await runtimeStore.put({
       sourceVerified: true,
       liveCaughtUp,
@@ -331,6 +340,7 @@ export async function runCloudflareSyncCycle(
     // archive read must not prevent this cycle from refreshing the public live heartbeat.
     if (liveCaughtUp && historyTarget !== null && !historyBackfillComplete) {
       console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'HISTORY_SYNC_START', cycleId: message.cycleId }));
+      phase = 'HISTORY_SYNC';
       try {
         const history = await syncHistoricalLaunches(source, store, {
           startBlock: ARCPAD_START_BLOCK,
@@ -342,11 +352,12 @@ export async function runCloudflareSyncCycle(
         console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'HISTORY_SYNC_DONE', cycleId: message.cycleId, nextBlock: history.nextBlock.toString(), complete: history.complete }));
       } catch (error) {
         historyBackfillComplete = false;
-        const code = syncErrorCode(error);
-        lastHistoryError = code === 'SYNC_FAILED' ? 'HISTORY_SYNC_FAILED' : code;
+        const code = reportSyncFailure(message.cycleId, 'HISTORY_SYNC', error);
+        lastHistoryError = code;
         console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'HISTORY_SYNC_FAILED', cycleId: message.cycleId, code: lastHistoryError }));
       }
 
+      phase = 'RUNTIME_D1';
       await runtimeStore.put({
         sourceVerified: true,
         liveCaughtUp,
@@ -364,6 +375,9 @@ export async function runCloudflareSyncCycle(
     }
 
     return { status: 'SUCCESS', liveCaughtUp };
+  } catch (error) {
+    reportSyncFailure(message.cycleId, phase, error);
+    throw error;
   } finally {
     store.close();
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_RELEASE_START', cycleId: message.cycleId }));
@@ -693,12 +707,104 @@ async function persistLiveFailure(
   });
 }
 
-function syncErrorCode(error: unknown): string {
+type SyncFailurePhase = 'SOURCE_CONSTRUCTION' | 'SOURCE_BOOTSTRAP' | 'LIVE_SYNC' | 'HISTORY_SYNC' | 'RUNTIME_D1';
+
+interface SyncErrorDiagnostic {
+  code: string;
+  errorName: string;
+  httpStatus: number | null;
+  causeCode: string | null;
+}
+
+export function syncErrorCode(error: unknown): string {
+  const code = explicitSyncErrorCode(error);
+  if (code) return code;
+
+  const status = httpStatus(error);
+  if (status !== null) return `SYNC_HTTP_${status}`;
+
+  const causeCode = safeCauseCode(error);
+  if (causeCode) return `SYNC_${causeCode}`;
+
+  const errorName = safeErrorName(error);
+  return errorName === 'UNKNOWN_ERROR' ? 'SYNC_UNKNOWN_ERROR' : `SYNC_${errorName}`;
+}
+
+function explicitSyncErrorCode(error: unknown): string | null {
   const message = error instanceof Error ? error.message : '';
-  const code = message.match(
+  return message.match(
     /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|D1_[A-Z_]+|SYNC_LEASE_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
-  )?.[1];
-  return code ?? 'SYNC_FAILED';
+  )?.[1] ?? null;
+}
+
+function reportSyncFailure(cycleId: string, phase: SyncFailurePhase, error: unknown): string {
+  const diagnostic = syncErrorDiagnostic(error);
+  console.error(JSON.stringify({
+    event: 'SYNC_FAILURE',
+    cycleId,
+    phase,
+    code: diagnostic.code,
+    errorName: diagnostic.errorName,
+    httpStatus: diagnostic.httpStatus,
+    causeCode: diagnostic.causeCode
+  }));
+  return diagnostic.code;
+}
+
+function syncErrorDiagnostic(error: unknown): SyncErrorDiagnostic {
+  return {
+    code: syncErrorCode(error),
+    errorName: safeErrorName(error),
+    httpStatus: httpStatus(error),
+    causeCode: safeCauseCode(error)
+  };
+}
+
+function safeErrorName(error: unknown): string {
+  if (!(error instanceof Error)) return 'UNKNOWN_ERROR';
+  const normalized = error.name
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return new Set([
+    'ABORT_ERROR',
+    'ERROR',
+    'FETCH_ERROR',
+    'HTTP_REQUEST_ERROR',
+    'NETWORK_ERROR',
+    'RPC_ERROR',
+    'TIMEOUT_ERROR',
+    'TYPE_ERROR'
+  ]).has(normalized) ? normalized : 'UNKNOWN_ERROR';
+}
+
+function safeCauseCode(error: unknown): string | null {
+  const allowed = new Set([
+    'ABORT_ERR',
+    'ECONNABORTED',
+    'ECONNREFUSED',
+    'ECONNRESET',
+    'EHOSTUNREACH',
+    'ENETDOWN',
+    'ENETUNREACH',
+    'EPIPE',
+    'ETIMEDOUT',
+    'ERR_NETWORK',
+    'ERR_SOCKET_CLOSED',
+    'ERR_STREAM_PREMATURE_CLOSE',
+    'UND_ERR_BODY_TIMEOUT',
+    'UND_ERR_CONNECT_TIMEOUT',
+    'UND_ERR_HEADERS_TIMEOUT',
+    'UND_ERR_SOCKET'
+  ]);
+  let current: unknown = error;
+  for (let depth = 0; depth < 3 && current && typeof current === 'object'; depth += 1) {
+    const code = (current as { code?: unknown }).code;
+    if (typeof code === 'string' && allowed.has(code)) return code;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return null;
 }
 
 function ratRadarSyncErrorCode(error: unknown): string {
@@ -719,8 +825,8 @@ function ratRadarSyncErrorCode(error: unknown): string {
 }
 
 function observationSyncErrorCode(error: unknown): string {
-  const code = syncErrorCode(error);
-  if (code !== 'SYNC_FAILED') return code;
+  const code = explicitSyncErrorCode(error);
+  if (code) return code;
 
   const rawName = error instanceof Error ? error.name : '';
   const normalizedName = rawName
@@ -741,11 +847,15 @@ function observationSyncErrorCode(error: unknown): string {
 }
 
 function httpStatus(error: unknown): number | null {
-  if (!error || typeof error !== 'object') return null;
-  const status = (error as { status?: unknown }).status;
-  return Number.isInteger(status) && Number(status) >= 100 && Number(status) <= 599
-    ? Number(status)
-    : null;
+  let current: unknown = error;
+  for (let depth = 0; depth < 3 && current && typeof current === 'object'; depth += 1) {
+    const status = (current as { status?: unknown }).status;
+    if (Number.isInteger(status) && Number(status) >= 100 && Number(status) <= 599) {
+      return Number(status);
+    }
+    current = (current as { cause?: unknown }).cause;
+  }
+  return null;
 }
 
 function shouldEnqueueObservation(enqueuedAtMs: number): boolean {

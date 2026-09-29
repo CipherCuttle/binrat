@@ -21,6 +21,7 @@ import {
   runCloudflareObservationCycle,
   runCloudflareRatRadarCycle,
   runCloudflareSyncCycle,
+  syncErrorCode,
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
 import type {
@@ -118,6 +119,44 @@ test('Arc RPC resolver prefers configured authority and otherwise uses the publi
   );
   assert.equal(resolveArcRpcUrl({}), ARC_PUBLIC_RPC_FALLBACK_URL);
   assert.equal(ARC_PUBLIC_RPC_FALLBACK_URL, 'https://rpc.mainnet.arc.io');
+});
+
+test('sync diagnostics preserve explicit codes and expose only bounded safe classes', () => {
+  assert.equal(syncErrorCode(new Error('ARCPAD_AUTHORITY_TEST')), 'ARCPAD_AUTHORITY_TEST');
+
+  const rateLimited = Object.assign(new Error('https://user:secret@rpc.example'), {
+    name: 'HttpRequestError',
+    status: 429
+  });
+  assert.equal(syncErrorCode(rateLimited), 'SYNC_HTTP_429');
+
+  const unavailable = Object.assign(new Error('response body must not persist'), {
+    name: 'HttpRequestError',
+    cause: { status: 503 }
+  });
+  assert.equal(syncErrorCode(unavailable), 'SYNC_HTTP_503');
+
+  assert.equal(
+    syncErrorCode(Object.assign(new Error('timeout details'), { name: 'TimeoutError' })),
+    'SYNC_TIMEOUT_ERROR'
+  );
+  assert.equal(
+    syncErrorCode(Object.assign(new Error('abort details'), { name: 'AbortError' })),
+    'SYNC_ABORT_ERROR'
+  );
+  assert.equal(syncErrorCode(new TypeError('type details')), 'SYNC_TYPE_ERROR');
+  assert.equal(
+    syncErrorCode(Object.assign(new Error('transport details'), { cause: { code: 'ECONNRESET' } })),
+    'SYNC_ECONNRESET'
+  );
+
+  const unknown = Object.assign(new Error('https://secret.example/path?token=secret'), {
+    name: 'Unexpected error name carrying secret'
+  });
+  const code = syncErrorCode(unknown);
+  assert.equal(code, 'SYNC_UNKNOWN_ERROR');
+  assert.equal(code.includes('secret'), false);
+  assert.equal(code.includes('https'), false);
 });
 
 test('Cloudflare sync persists live authority before subordinate history reads', async () => {
@@ -444,6 +483,48 @@ test('live authority failure is persisted fail-closed and requests retry', async
     assert.equal(state?.sourceVerified, false);
     assert.equal(state?.liveCaughtUp, false);
     assert.equal(state?.lastSyncError, 'ARCPAD_AUTHORITY_TEST');
+  } finally {
+    db.close();
+  }
+});
+
+test('sanitized live failures remain fail-closed, do not advance a checkpoint, and retry', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  class TransportFailureSource extends FakeLaunchSource {
+    override async getHeadBlockNumber(): Promise<bigint> {
+      throw Object.assign(new Error('https://secret.example/rpc'), {
+        name: 'TimeoutError',
+        cause: { code: 'ETIMEDOUT' }
+      });
+    }
+  }
+  const source = new TransportFailureSource();
+  let acked = 0;
+  let retried = 0;
+  try {
+    await handleSyncQueueBatch(
+      {
+        messages: [{
+          body: message('cycle-sanitized-live-failure'),
+          ack() { acked += 1; },
+          retry() { retried += 1; }
+        }]
+      },
+      { DB: db },
+      {
+        now: () => 5_500,
+        launchSource: source
+      }
+    );
+    const state = await new D1RuntimeStateStore(db, 5042).get();
+    const checkpoint = await new D1Store(db, 5042).getCheckpoint();
+    assert.equal(acked, 0);
+    assert.equal(retried, 1);
+    assert.equal(state?.sourceVerified, false);
+    assert.equal(state?.liveCaughtUp, false);
+    assert.equal(state?.lastSyncError, 'SYNC_ETIMEDOUT');
+    assert.equal(checkpoint, null);
   } finally {
     db.close();
   }
