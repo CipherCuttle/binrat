@@ -54,10 +54,13 @@ export async function mutateWatch(
   let start = old?.start_block ?? 0;
   let hash = old?.start_hash ?? '';
   if (action === 'WATCH') {
+    // WATCH performs an investigation and a bounded RPC read, so it shares the
+    // neutral research budget. Unwatch and receipt access never consume it.
+    if (!await reserveDig(db,p,updateId,now,capacity)) throw new Error('CAPACITY_REACHED');
     // Canonical creator evidence is mandatory. This bounded shared-index read never scans RPC history.
     await dig(db, target, now);
     const tip = await authoritativeCheckpoint(db, now);
-    const head = await source.head();
+    const head = await source.head().catch(() => { throw new Error('SOURCE_UNAVAILABLE'); });
     if (head.chainId !== target.chainId || head.block < tip || head.block > BigInt(Number.MAX_SAFE_INTEGER) ||
         !/^0x[0-9a-f]{64}$/.test(head.hash) || !Number.isSafeInteger(head.timestampMs) ||
         head.timestampMs > now + 15_000 || now - head.timestampMs > 60_000) throw new Error('SOURCE_UNAVAILABLE');
