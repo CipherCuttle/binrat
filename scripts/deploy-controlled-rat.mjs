@@ -68,6 +68,12 @@ function taggedVersionFrom(list, tag) {
     return uuid(id) ? id : null;
   });
 }
+function plainBinding(version, name) {
+  return walk(version, value =>
+    value?.name === name && value?.type === 'plain_text' && typeof value?.text === 'string'
+      ? value.text.trim() : null
+  );
+}
 async function getJson(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(20_000) });
   const body = await response.json().catch(() => null);
@@ -118,9 +124,8 @@ gate(process.env.CONTROLLED_RAT_DEPLOY_APPROVED === 'true',
 gate(Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()) &&
   Boolean(process.env.CLOUDFLARE_ACCOUNT_ID?.trim()), 'CLOUDFLARE_CREDENTIALS_MISSING');
 
-const tester = (process.env.CONTROLLED_RAT_ALLOWED_USER_ID?.trim() ||
+let tester = (process.env.CONTROLLED_RAT_ALLOWED_USER_ID?.trim() ||
   process.env.CONTROLLED_RAT_ALLOWED_USER_ID_FALLBACK?.trim() || '');
-gate(/^[1-9]\d{3,16}$/.test(tester), 'CONTROLLED_RAT_TESTER_ID_MISSING_OR_INVALID');
 
 execFileSync('git', ['diff','--quiet',REVIEWED_WORKER_SHA + '..' + process.env.GITHUB_SHA,
   '--','src','cloudflare','web','package.json','pnpm-lock.yaml'], { stdio: 'inherit' });
@@ -166,6 +171,15 @@ note('D1 preflight PASS: no enabled/pending non-4663 autonomous Watch state.');
 const current = deploymentStatus();
 previousVersion = activeVersionFrom(current);
 gate(previousVersion, 'ACTIVE_VERSION_NOT_RESOLVED');
+
+if (!tester) {
+  const activeConfig = jsonFromOutput(cli([
+    'versions','view',previousVersion,'--name',WORKER,'--json'
+  ]));
+  tester = plainBinding(activeConfig, 'RAT_FEEDBACK_ADMIN_USER_ID') || '';
+}
+gate(/^[1-9]\d{3,16}$/.test(tester), 'CONTROLLED_RAT_TESTER_ID_MISSING_OR_INVALID');
+note('Controlled tester identity resolved from protected deployment configuration.');
 
 const tag = 'controlled-rat-' + process.env.GITHUB_SHA.slice(0, 12);
 cli([
