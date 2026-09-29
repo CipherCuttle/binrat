@@ -141,6 +141,10 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
     'SYNC_TIMEOUT_ERROR'
   );
   assert.equal(
+    syncErrorCode(new Error('Too many subrequests for this invocation')),
+    'PLATFORM_SUBREQUEST_LIMIT'
+  );
+  assert.equal(
     syncErrorCode(Object.assign(new Error('abort details'), { name: 'AbortError' })),
     'SYNC_ABORT_ERROR'
   );

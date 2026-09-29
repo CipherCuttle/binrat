@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { keccak256 } from 'viem';
-import { PonsLaunchSource } from '../src/pons/ponsSource.js';
+import { PonsLaunchSource, PONS_MAX_CANONICAL_LAUNCH_BLOCKS } from '../src/pons/ponsSource.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID } from '../src/pons/chain.js';
 
 const hash = (n: number) => `0x${n.toString(16).padStart(64, '0')}` as `0x${string}`;
@@ -34,6 +34,39 @@ test('Pons V2 source accepts only chain 4663 and decodes the canonical TokenLaun
   assert.equal(launches[0]!.token, address(1));
   assert.notEqual(PONS_V2_FACTORY_CODE_HASH, keccak256(code));
   assert.match(PONS_V2_FACTORY, /^0x[0-9a-f]{40}$/);
+});
+
+test('Pons critical ingestion stores canonical events without token metadata RPCs', async () => {
+  let metadataReads = 0;
+  const logs = Array.from({ length: PONS_MAX_CANONICAL_LAUNCH_BLOCKS }, (_, index) => {
+    const block = 100 + index;
+    return {
+      blockNumber: BigInt(block), blockHash: hash(block), transactionHash: hash(500 + index), logIndex: 0,
+      args: { token: address(index + 10), curve: address(index + 40), deployer: address(index + 70) }
+    };
+  });
+  const source = new PonsLaunchSource({ client: {
+    getLogs: async () => logs,
+    readContract: async () => { metadataReads += 1; return 'should-not-be-read'; }
+  } as never, now: () => 123 });
+
+  const launches = await source.catchUp(100n, 115n);
+  assert.equal(launches.length, PONS_MAX_CANONICAL_LAUNCH_BLOCKS);
+  assert.equal(metadataReads, 0);
+  assert.ok(launches.every((launch) => launch.name === '' && launch.symbol === ''));
+  assert.ok(launches.every((launch) => launch.source === 'PONS_V2' && launch.chainId === 4663));
+});
+
+test('Pons source rejects a dense launch-block range before indexing or checkpointing', async () => {
+  const logs = Array.from({ length: PONS_MAX_CANONICAL_LAUNCH_BLOCKS + 1 }, (_, index) => {
+    const block = 100 + index;
+    return {
+      blockNumber: BigInt(block), blockHash: hash(block), transactionHash: hash(800 + index), logIndex: 0,
+      args: { token: address(index + 100), curve: address(index + 130), deployer: address(index + 160) }
+    };
+  });
+  const source = new PonsLaunchSource({ client: { getLogs: async () => logs } as never });
+  await assert.rejects(() => source.catchUp(100n, 116n), /PONS_LAUNCH_BLOCK_DENSITY/);
 });
 
 test('Pons source fails closed on a wrong RPC chain', async () => {

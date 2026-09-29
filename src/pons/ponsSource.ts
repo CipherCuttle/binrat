@@ -2,7 +2,14 @@ import { createPublicClient, getAddress, http, keccak256, type Address, type Pub
 import { deriveEventId, deriveLaunchId } from '../core/identity.js';
 import type { Hex, LaunchObserved } from '../core/types.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from './chain.js';
-import { ponsErc20Abi, ponsTokenLaunchedEvent } from './ponsAbi.js';
+import { ponsTokenLaunchedEvent } from './ponsAbi.js';
+
+/**
+ * A Pons launch batch is allowed to touch no more than this many distinct
+ * canonical log blocks.  `syncLaunches` narrows a dense requested range before
+ * it writes or checkpoints anything, keeping Worker RPC work bounded.
+ */
+export const PONS_MAX_CANONICAL_LAUNCH_BLOCKS = 16;
 
 export interface PonsLaunchSourceOptions { rpcUrl?: string; client?: PublicClient; now?: () => number }
 
@@ -10,6 +17,7 @@ export class PonsLaunchSource {
   readonly factory = PONS_V2_FACTORY;
   private readonly client: PublicClient;
   private readonly now: () => number;
+  private authorityVerified = false;
 
   constructor(options: PonsLaunchSourceOptions = {}) {
     if (!options.client && !options.rpcUrl) throw new Error('ROBINHOOD_RPC_URL_REQUIRED');
@@ -26,28 +34,38 @@ export class PonsLaunchSource {
     return block.hash as Hex;
   }
   async assertAuthority(_blockNumber: bigint): Promise<void> {
+    // The factory address and its deployed code are immutable authority facts
+    // for this invocation. Reusing this verified result preserves the checks
+    // while avoiding repeated identical RPC subrequests inside one sync.
+    if (this.authorityVerified) return;
     if (await this.client.getChainId() !== ROBINHOOD_CHAIN_ID) throw new Error('PONS_CHAIN_ID_DRIFT');
     const code = await this.client.getBytecode({ address: this.factory as Address });
     if (!code || keccak256(code) !== PONS_V2_FACTORY_CODE_HASH) throw new Error('PONS_FACTORY_AUTHORITY_DRIFT');
+    this.authorityVerified = true;
   }
   async catchUp(fromBlock: bigint, toBlock: bigint): Promise<LaunchObserved[]> {
     if (toBlock < fromBlock) return [];
     const logs = await this.client.getLogs({ address: this.factory as Address, event: ponsTokenLaunchedEvent, fromBlock, toBlock, strict: true });
+    if (logs.some((log) => log.blockNumber === null)) throw new Error('PONS_INCOMPLETE_TOKEN_LAUNCHED_LOG');
+    const canonicalLogBlocks = new Set(logs.map((log) => log.blockNumber!.toString()));
+    if (canonicalLogBlocks.size > PONS_MAX_CANONICAL_LAUNCH_BLOCKS) {
+      throw new Error('PONS_LAUNCH_BLOCK_DENSITY');
+    }
     const launches: LaunchObserved[] = [];
     for (const log of logs) {
       if (log.blockNumber === null || log.blockHash === null || log.transactionHash === null || log.logIndex === null) throw new Error('PONS_INCOMPLETE_TOKEN_LAUNCHED_LOG');
       const token = log.args.token, curve = log.args.curve, deployer = log.args.deployer;
       if (!token || !curve || !deployer) throw new Error('PONS_MALFORMED_TOKEN_LAUNCHED_LOG');
-      const [name, symbol, launchId, eventId] = await Promise.all([
-        this.client.readContract({ address: token, abi: ponsErc20Abi, functionName: 'name', blockNumber: log.blockNumber }).catch(() => ''),
-        this.client.readContract({ address: token, abi: ponsErc20Abi, functionName: 'symbol', blockNumber: log.blockNumber }).catch(() => ''),
+      // Name and symbol are non-authoritative enrichment. Keep the critical
+      // transaction to canonical event facts only; empty metadata is honest.
+      const [launchId, eventId] = await Promise.all([
         deriveLaunchId({ chainId: ROBINHOOD_CHAIN_ID, launcher: this.factory, txHash: log.transactionHash as Hex, token: token as Hex, source: 'PONS_V2' }),
         deriveEventId({ chainId: ROBINHOOD_CHAIN_ID, launcher: this.factory, txHash: log.transactionHash as Hex, logIndex: log.logIndex, source: 'PONS_V2' })
       ]);
       launches.push({ chainId: ROBINHOOD_CHAIN_ID, blockNumber: log.blockNumber, blockHash: log.blockHash as Hex, observedAtMs: this.now(), launchId, eventId,
         source: 'PONS_V2', launcher: this.factory, txHash: log.transactionHash as Hex, logIndex: log.logIndex,
         token: getAddress(token).toLowerCase() as Hex, creator: getAddress(deployer).toLowerCase() as Hex, pool: getAddress(curve).toLowerCase() as Hex,
-        name, symbol, imageUri: '', website: '', twitter: '', telegram: '' });
+        name: '', symbol: '', imageUri: '', website: '', twitter: '', telegram: '' });
     }
     return launches.sort((a,b) => a.blockNumber === b.blockNumber ? a.logIndex - b.logIndex : a.blockNumber < b.blockNumber ? -1 : 1);
   }

@@ -22,6 +22,30 @@ function launch(id: string, creator: Hex, blockNumber: bigint, logIndex: number)
   };
 }
 
+function ponsLaunch(id: number, blockNumber: bigint): LaunchObserved {
+  const suffix = id.toString(16).padStart(40, '0');
+  return {
+    chainId: 4663,
+    blockNumber,
+    blockHash: hashFor(blockNumber),
+    observedAtMs: 1,
+    launchId: `pons-launch-${id}`,
+    eventId: `pons-event-${id}`,
+    source: 'PONS_V2',
+    launcher: '0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e',
+    txHash: `0x${(10_000 + id).toString(16).padStart(64, '0')}` as Hex,
+    logIndex: 0,
+    token: `0x${suffix}` as Hex,
+    creator: `0x${(20_000 + id).toString(16).padStart(40, '0')}` as Hex,
+    pool: `0x${(30_000 + id).toString(16).padStart(40, '0')}` as Hex,
+    name: '', symbol: '', imageUri: '', website: '', twitter: '', telegram: ''
+  };
+}
+
+function hashFor(blockNumber: bigint): Hex {
+  return `0x${blockNumber.toString(16).padStart(64, '0')}` as Hex;
+}
+
 class FakeSource implements LaunchSource {
   head = 15n;
   launches: LaunchObserved[] = [];
@@ -30,6 +54,34 @@ class FakeSource implements LaunchSource {
   async assertAuthority(_blockNumber: bigint) {}
   async catchUp(fromBlock: bigint, toBlock: bigint) {
     return this.launches.filter((item) => item.blockNumber >= fromBlock && item.blockNumber <= toBlock);
+  }
+}
+
+class CountingPonsSource implements LaunchSource {
+  readonly launches: LaunchObserved[];
+  readonly head = 514n;
+  externalCalls = 0;
+  catchUpCalls: Array<[bigint, bigint]> = [];
+  private authorityVerified = false;
+
+  constructor(launches: LaunchObserved[]) { this.launches = launches; }
+
+  async getHeadBlockNumber() { this.externalCalls += 1; return this.head; }
+  async getBlockHash(blockNumber: bigint) { this.externalCalls += 1; return hashFor(blockNumber); }
+  async assertAuthority(_blockNumber: bigint) {
+    if (!this.authorityVerified) {
+      this.externalCalls += 2; // chain id + immutable factory code
+      this.authorityVerified = true;
+    }
+  }
+  async catchUp(fromBlock: bigint, toBlock: bigint) {
+    this.externalCalls += 1; // eth_getLogs
+    this.catchUpCalls.push([fromBlock, toBlock]);
+    const matches = this.launches.filter((launch) => launch.blockNumber >= fromBlock && launch.blockNumber <= toBlock);
+    if (new Set(matches.map((launch) => launch.blockNumber.toString())).size > 16) {
+      throw new Error('PONS_LAUNCH_BLOCK_DENSITY');
+    }
+    return matches;
   }
 }
 
@@ -125,6 +177,56 @@ test('caught-up sync does not rewrite an unchanged provenance projection', async
     const second = await syncLaunches(source, store, options);
     assert.equal(second.batches, 0);
     assert.equal(replacements, 0);
+    store.close();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Pons live sync keeps 0, 1, and 20-launch critical batches below the external-call ceiling', async () => {
+  const cases: Array<{ label: string; launches: LaunchObserved[] }> = [
+    { label: 'zero', launches: [] },
+    { label: 'one', launches: [ponsLaunch(1, 100n)] },
+    // Twenty events across ten canonical blocks model the observed live shape.
+    { label: 'twenty', launches: Array.from({ length: 20 }, (_, index) => ponsLaunch(index + 1, 100n + BigInt(Math.floor(index / 2)))) }
+  ];
+  for (const item of cases) {
+    const dir = mkdtempSync(join(tmpdir(), `binrat-pons-${item.label}-`));
+    const db = join(dir, 'test.sqlite');
+    try {
+      const source = new CountingPonsSource(item.launches);
+      await source.getHeadBlockNumber();
+      await source.assertAuthority(source.head);
+      const store = new SqliteStore(db, 4663);
+      const report = await syncLaunches(source, store, {
+        startBlock: 1n, confirmations: 1n, maxBatchBlocks: 512n,
+        reorgLookbackBlocks: 32n, pollIntervalMs: 100, maxBatchesPerRun: 1
+      });
+      assert.equal(report.endBlock, 512n, item.label);
+      assert.ok(source.externalCalls <= 35, `${item.label}: ${source.externalCalls}`);
+      store.close();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('Pons live sync narrows a dense range before checkpointing and stays under 35 external calls', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-dense-'));
+  const db = join(dir, 'test.sqlite');
+  try {
+    const source = new CountingPonsSource(Array.from({ length: 512 }, (_, index) => ponsLaunch(index + 1, BigInt(index + 1))));
+    await source.getHeadBlockNumber();
+    await source.assertAuthority(source.head);
+    const store = new SqliteStore(db, 4663);
+    const report = await syncLaunches(source, store, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 512n,
+      reorgLookbackBlocks: 32n, pollIntervalMs: 100, maxBatchesPerRun: 1
+    });
+    assert.equal(report.endBlock, 16n);
+    assert.equal((await store.getCheckpoint())?.blockNumber, 16n);
+    assert.deepEqual(source.catchUpCalls.map(([, to]) => to), [512n, 256n, 128n, 64n, 32n, 16n]);
+    assert.ok(source.externalCalls <= 35, `dense: ${source.externalCalls}`);
     store.close();
   } finally {
     rmSync(dir, { recursive: true, force: true });

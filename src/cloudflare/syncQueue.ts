@@ -43,6 +43,8 @@ export interface CloudflareSyncEnv {
   BINRAT_LIVE_LOOKBACK_BLOCKS?: string;
   BINRAT_CONFIRMATIONS?: string;
   BINRAT_MAX_BATCH_BLOCKS?: string;
+  /** Pons-only cap; Arc keeps its existing independent batch configuration. */
+  BINRAT_PONS_MAX_BATCH_BLOCKS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
   BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
   BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE?: string;
@@ -456,7 +458,10 @@ export async function runCloudflarePonsSyncCycle(
       return { status: 'RETRY', code };
     }
     const lookback = BigInt(integerSetting(env.BINRAT_LIVE_LOOKBACK_BLOCKS, 1000, 1, 1_000_000));
-    const maxBatchBlocks = BigInt(Math.min(10_000, integerSetting(env.BINRAT_MAX_BATCH_BLOCKS, 10_000, 1, 100_000)));
+    // 512 blocks makes normal near-head Pons work compact.  The source narrows
+    // dense event windows before writing, keeping canonical block checks below
+    // the Workers Free external-subrequest ceiling without touching Arc.
+    const maxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 512, 1, 512));
     const recentStart = head > lookback ? head - lookback : 0n;
     const liveWindowStart = recentStart > PONS_V2_START_BLOCK ? recentStart : PONS_V2_START_BLOCK;
     const checkpoint = await store.getCheckpoint();
@@ -823,6 +828,9 @@ interface SyncErrorDiagnostic {
 }
 
 export function syncErrorCode(error: unknown): string {
+  if (error instanceof Error && /(?:too many|limit).*subrequests?|subrequest.*(?:limit|exceeded)/i.test(error.message)) {
+    return 'PLATFORM_SUBREQUEST_LIMIT';
+  }
   const code = explicitSyncErrorCode(error);
   if (code) return code;
 
