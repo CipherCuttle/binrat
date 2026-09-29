@@ -2,12 +2,14 @@ import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
 import { FreeEntitlements, assertPrincipal, type Principal } from './entitlements.js';
 import { dig, why } from './evidence.js';
 import { entityKey, parseTarget, renderReceipt } from './model.js';
+import { discoverRats, renderRats } from './rats.js';
+import { createPublicShareReceipt, openPublicShareReceipt, renderOpenedReceipt, renderShareArtifact } from './share.js';
 import type { WatchSource } from './source.js';
 import { commandReplay, listWatches, mutateWatch, reserveDig } from './watches.js';
 
-export interface RatCommand { name: 'dig' | 'watch' | 'unwatch' | 'watches' | 'why'; argument: string }
+export interface RatCommand { name: 'dig' | 'watch' | 'unwatch' | 'watches' | 'why' | 'rats' | 'share' | 'start'; argument: string }
 export function parseAutonomousCommand(text: string): RatCommand | null {
-  const match = text.trim().match(/^\/(dig|watch|unwatch|watches|why)(?:@BinratBot)?(?:\s+([\s\S]*))?$/i);
+  const match = text.trim().match(/^\/(dig|watch|unwatch|watches|why|rats|share|start)(?:@BinratBot)?(?:\s+([\s\S]*))?$/i);
   return match ? { name:match[1]!.toLowerCase() as RatCommand['name'],argument:match[2]?.trim() ?? '' } : null;
 }
 
@@ -27,6 +29,16 @@ export async function handleAutonomousCommand(
         `${entityKey({chainId:w.chain_id,entityType:w.entity_type,entityId:w.entity_id})} · after block ${w.start_block}`),
       rows.length ? '' : 'No active V1 watches.',
       legacy?.n ? 'Legacy watches require explicit re-arm with /watch <target>.' : ''].filter(Boolean).join('\n');
+    }
+    if (command.name === 'rats') {
+      if (command.argument) throw new Error('RATS_USAGE');
+      return renderRats(await discoverRats(db,now,capacity.ratsCandidates));
+    }
+    if (command.name === 'share') return renderShareArtifact(await createPublicShareReceipt(db,command.argument,now));
+    if (command.name === 'start') {
+      const match = command.argument.match(/^receipt_([0-9a-f]{32})$/);
+      if (!match) throw new Error('PUBLIC_RECEIPT_UNAVAILABLE');
+      return renderOpenedReceipt(await openPublicShareReceipt(db,match[1]!,now));
     }
     if (command.name === 'why') {
       const receipt = await why(db,command.argument,now);
@@ -57,7 +69,15 @@ export async function handleAutonomousCommand(
       EVIDENCE_UNAVAILABLE:'Canonical evidence is missing or incomplete for this target. No analysis or safety conclusion is available.',
       RECEIPT_UNAVAILABLE:'Receipt unavailable: missing, changed or incomplete canonical evidence. The previous claim cannot be reconstructed.',
       INDEX_UNAVAILABLE:'The live index is unavailable or stale. No new investigation or alert authority.',
-      SOURCE_UNAVAILABLE:'A fresh canonical Arc boundary could not be verified. Watch was not added.'
+      SOURCE_UNAVAILABLE:'A fresh canonical Arc boundary could not be verified. Watch was not added.',
+      RATS_USAGE:'Usage: /rats',
+      DISCOVERY_UNAVAILABLE:'Discovery receipts are unavailable. No rats invented.',
+      DISCOVERY_WRITE_FAILED:'Discovery receipts could not be saved. No rats invented.',
+      DISCOVERY_RETENTION_FAILED:'Discovery retention is unavailable. No rats invented.',
+      PUBLIC_RECEIPT_UNAVAILABLE:'That public receipt is unavailable, expired or invalid.',
+      SHARE_WRITE_FAILED:'Public receipt could not be created.',
+      SHARE_ID_UNAVAILABLE:'Public receipt ID could not be allocated.',
+      SHARE_RETENTION_FAILED:'Public receipt retention is unavailable.'
     };
     if (messages[reason]) return `🐀 ${messages[reason]}`;
     throw error;
