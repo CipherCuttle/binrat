@@ -23,6 +23,7 @@ export interface D1TelegramOperationalReplyInput {
   intent: string;
   replyDigest: string;
   telegramMessageId: number | null;
+  rendererVersion?: string;
 }
 
 export interface D1TelegramUpdateRow {
@@ -158,7 +159,7 @@ export class D1TelegramLedger {
           claim_expires_at_ms = NULL,
           chat_id = ?,
           intent = ?,
-          renderer_version = 'binrat.operational/0.1',
+          renderer_version = ?,
           voice_variant = 0,
           plan_digest = NULL,
           reply_digest = ?,
@@ -170,6 +171,7 @@ export class D1TelegramLedger {
     `).bind(
       input.chatId,
       input.intent,
+      input.rendererVersion ?? 'binrat.operational/0.1',
       input.replyDigest,
       input.telegramMessageId,
       nowMs,

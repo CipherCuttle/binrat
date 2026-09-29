@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { handleAutonomousCommand, parseAutonomousCommand } from '../autonomous/telegram.js';
+import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
+import type { AutonomousOutcome } from '../autonomous/outcome.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
@@ -55,6 +56,9 @@ import {
   type SyncQueueProducerLike
 } from './syncQueue.js';
 import { autonomousResultMedia, editRatCard, sendRatCard } from '../telegram/ratMedia.js';
+import { parseCallback, type TelegramUiAction } from '../telegram/ui/callback.js';
+import { digHintCard, renderRatCard } from '../telegram/ui/cards.js';
+import { answerCallback, editCard as editUiCard, ratCardDigest, sendCard } from '../telegram/ui/client.js';
 
 export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   DB: D1DatabaseLike;
@@ -81,6 +85,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   RAT_CANDIDATE_SMOKE_SECRET?: string;
   /** Explicit rollout gate for the approved same-origin visual card layer. */
   BINRAT_TELEGRAM_MEDIA_ENABLED?: string;
+  /** Default-off native inline-card interaction layer. */
+  BINRAT_TELEGRAM_UI_V2_ENABLED?: string;
   /** Explicit future public-mode switch. Controlled activation keeps this false. */
   BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED?: string;
   /** Controlled production activation allowlist. Store as a secret binding. */
@@ -120,7 +126,9 @@ interface TelegramMessage {
 interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
+  callback_query?: TelegramCallbackQuery;
 }
+interface TelegramCallbackQuery { id: string; from: TelegramUser; data?: string; message?: TelegramMessage; }
 
 interface TelegramApiResponse<T> {
   ok?: boolean;
@@ -507,6 +515,40 @@ async function telegramWebhook(
       return json(200, { ok: true, ignored: true, repliesEnabled: false });
     }
 
+    const callback = update.callback_query;
+    if (callback) {
+      if (env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true') {
+        // Acknowledge known Telegram callback traffic even while the rollout is off.
+        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'TELEGRAM_UI_V2_DISABLED'});
+      }
+      const message = callback.message;
+      if (!message || !autonomousRatAllowedPrincipal(callback.from,message.chat,env)) {
+        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
+      }
+      const action = typeof callback.data === 'string' ? parseCallback(callback.data) : null;
+      // Telegram explicitly requires an answer to stop its client progress state.
+      if (!action || !callback.id) {
+        if (callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'INVALID_CALLBACK'});
+      }
+      await answerCallback(token,callback.id,deps.externalFetch);
+      const outcome = await executeUiCallback(env.DB,action,{userId:callback.from.id,chatId:message.chat.id},update.update_id,deps.now(),deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      // The card is deliberately compact. FULL is the explicit, legacy-compatible
+      // escape hatch for the untruncated canonical receipt.
+      if (action.action === 'FULL') await sendMessage(token,message.chat.id,renderLegacyAutonomousOutcome(outcome),deps.externalFetch);
+      const card = action.action === 'DIG_HINT' ? digHintCard() : renderRatCard(outcome);
+      if (!Number.isSafeInteger(message.message_id) || message.message_id < 1) throw new Error('TELEGRAM_CALLBACK_MESSAGE_INVALID');
+      await editUiCard(token,message.chat.id,message.message_id,origin,card,deps.externalFetch);
+      await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:`UI_${action.action}`,
+        replyDigest:ratCardDigest(card),telegramMessageId:message.message_id,rendererVersion:card.rendererVersion},deps.now());
+      return json(200,{ok:true,uiV2:true});
+    }
+
     const message = update.message;
     if (!message?.text) {
       await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
@@ -606,7 +648,7 @@ async function telegramWebhook(
         return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
       }
       let telegramMessageId: number | null = null;
-      const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
+      const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true' && env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true';
       if (mediaEnabled) {
         const initialCaption = autonomous.name === 'start'
           ? '🐀 BINRAT\n\nYou get the receipts.'
@@ -618,9 +660,17 @@ async function telegramWebhook(
           // Artwork delivery is additive personality, never an evidence availability dependency.
         }
       }
-      const reply = await handleAutonomousCommand(env.DB,autonomous,
+      const outcome = await executeAutonomousCommand(env.DB,autonomous,
         {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
         deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      const reply = renderLegacyAutonomousOutcome(outcome);
+      if (env.BINRAT_TELEGRAM_UI_V2_ENABLED === 'true') {
+        const card = renderRatCard(outcome);
+        telegramMessageId = await sendCard(token,message.chat.id,origin,card,deps.externalFetch);
+        await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,
+          intent:`UI_${autonomous.name.toUpperCase()}`,replyDigest:ratCardDigest(card),telegramMessageId,rendererVersion:card.rendererVersion},deps.now());
+        return json(200,{ok:true,autonomous:true,uiV2:true});
+      }
       if (mediaEnabled && telegramMessageId !== null) {
         try {
           await editRatCard(token, message.chat.id, telegramMessageId, origin,
@@ -812,15 +862,44 @@ async function telegramWebhook(
 }
 
 function autonomousRatAllowed(message: TelegramMessage, env: BinratWorkerEnv): boolean {
+  return !!message.from && autonomousRatAllowedPrincipal(message.from,message.chat,env);
+}
+
+/** Principal-shaped so a callback is authorized as its actor, never its card owner. */
+function autonomousRatAllowedPrincipal(user: TelegramUser, chat: TelegramChat, env: BinratWorkerEnv): boolean {
   if (env.BINRAT_AUTONOMOUS_RAT_ENABLED !== 'true') return false;
-  if (message.chat.type !== 'private' || message.from?.is_bot ||
-      !Number.isSafeInteger(message.from?.id) || message.from!.id <= 0 ||
-      message.from!.id !== message.chat.id) return false;
+  if (chat.type !== 'private' || user.is_bot || !Number.isSafeInteger(user.id) || user.id <= 0 || user.id !== chat.id) return false;
   if (env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED === 'true') return true;
   const raw = env.BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?.trim();
   if (!raw || !/^[1-9]\d*$/.test(raw)) return false;
   const allowed = Number(raw);
-  return Number.isSafeInteger(allowed) && allowed === message.from!.id;
+  return Number.isSafeInteger(allowed) && allowed === user.id;
+}
+
+async function caseIdForShare(db: D1DatabaseLike, shareId: string): Promise<string> {
+  const row = await db.prepare('SELECT case_id FROM rat_v1_cases WHERE share_id=?').bind(shareId)
+    .first<{case_id:string}>();
+  if (!row || !/^[0-9a-f]{64}$/.test(row.case_id)) throw new Error('RECEIPT_UNAVAILABLE');
+  return row.case_id;
+}
+
+async function executeUiCallback(
+  db: D1DatabaseLike, action: TelegramUiAction, principal: {userId:number;chatId:number}, updateId:number, now:number, source: WatchSource
+): Promise<AutonomousOutcome> {
+  if (action.action === 'HOME' || action.action === 'DIG_HINT') return {kind:'HOME'};
+  const commandFor = (name: 'rats'|'watches'|'why'|'watch'|'unwatch'|'share', argument='') =>
+    executeAutonomousCommand(db,{name,argument},principal,updateId,now,source);
+  if (action.action === 'RATS') return commandFor('rats');
+  if (action.action === 'WATCHES') return commandFor('watches');
+  const caseId = await caseIdForShare(db,action.shareId);
+  if (action.action === 'CASE' || action.action === 'WHY' || action.action === 'FULL') return commandFor('why',caseId);
+  if (action.action === 'SHARE') return commandFor('share',caseId);
+  const row = await db.prepare('SELECT receipt_json FROM rat_v1_cases WHERE case_id=?').bind(caseId).first<{receipt_json:string}>();
+  if (!row) throw new Error('RECEIPT_UNAVAILABLE');
+  const receipt = JSON.parse(row.receipt_json) as {chainId:number;subject:{entityType:string;entityId:string};evidenceRefs:Array<{creator:string}>};
+  const creator = receipt.subject.entityType === 'CREATOR' ? receipt.subject.entityId : receipt.evidenceRefs[0]?.creator;
+  if (!/^0x[0-9a-f]{40}$/.test(creator ?? '')) throw new Error('WATCH_CREATOR_ONLY');
+  return commandFor(action.action === 'WATCH' ? 'watch' : 'unwatch',`${receipt.chainId}:CREATOR:${creator}`);
 }
 
 type RatWatchCommand =
