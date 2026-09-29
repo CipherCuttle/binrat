@@ -75,7 +75,7 @@ export async function why(db: D1DatabaseLike, caseId: string, now: number): Prom
     if (canonicalJson(current) !== canonicalJson(ref)) throw new Error('RECEIPT_UNAVAILABLE');
   }
   const rebuilt = await makeReceipt(receipt.subject, receipt.evidenceRefs,
-    receipt.coverage.asOfBlock, receipt.createdAt, receipt.claim);
+    receipt.coverage.asOfBlock, receipt.createdAt, receipt.claim, receipt.discovery);
   if (canonicalJson(rebuilt) !== canonicalJson(receipt) || receipt.caseId !== caseId) {
     throw new Error('RECEIPT_UNAVAILABLE');
   }
