@@ -1,5 +1,6 @@
 import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
 import { D1RuntimeStateStore } from '../cloudflare/runtimeState.js';
+import { sendRatCard } from '../telegram/ratMedia.js';
 import { authoritativeCheckpoint, evidenceForLaunch, saveCase, why } from './evidence.js';
 import { attentionDecision, makeReceipt, renderReceipt, type Receipt } from './model.js';
 import type { WatchSource } from './source.js';
@@ -55,7 +56,8 @@ export async function enqueueFindings(db: D1DatabaseLike, now: number): Promise<
 }
 
 export async function deliverFindings(
-  db: D1DatabaseLike, source: WatchSource, token: string, externalFetch: typeof fetch, now: () => number
+  db: D1DatabaseLike, source: WatchSource, token: string, externalFetch: typeof fetch, now: () => number,
+  media?: { enabled: boolean; origin: string }
 ): Promise<number> {
   const pendingChain = await db.prepare(`SELECT chain_id FROM rat_v1_outbox WHERE state='PENDING'
     ORDER BY created_at_ms,delivery_id LIMIT 1`).first<{ chain_id: number }>();
@@ -116,14 +118,19 @@ export async function deliverFindings(
     let telegramId: number | null = null;
     let state: 'SENT' | 'UNKNOWN' | 'FAILED' = 'UNKNOWN';
     try {
-      const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
-        body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
-      });
-      const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
-      if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
-        telegramId = result.result!.message_id!; state = 'SENT';
-      } else if (response.status >= 400 && response.status < 500 && result.ok === false) state = 'FAILED';
+      if (media?.enabled) {
+        telegramId = await sendRatCard(token, item.chat_id, media.origin, 'alert', text, externalFetch);
+        state = 'SENT';
+      } else {
+        const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
+          body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
+        });
+        const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
+        if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
+          telegramId = result.result!.message_id!; state = 'SENT';
+        } else if (response.status >= 400 && response.status < 500 && result.ok === false) state = 'FAILED';
+      }
     } catch { /* Network/parse ambiguity is durable and is never retried automatically. */ }
     const complete = await db.prepare(`UPDATE rat_v1_outbox SET state=?,telegram_message_id=?
       WHERE delivery_id=? AND state='SENDING'`).bind(state,telegramId,item.delivery_id).run();
