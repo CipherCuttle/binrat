@@ -123,6 +123,8 @@ test('Arc RPC resolver prefers configured authority and otherwise uses the publi
 
 test('sync diagnostics preserve explicit codes and expose only bounded safe classes', () => {
   assert.equal(syncErrorCode(new Error('ARCPAD_AUTHORITY_TEST')), 'ARCPAD_AUTHORITY_TEST');
+  assert.equal(syncErrorCode(new Error('PONS_GET_HEAD_FAILED')), 'PONS_GET_HEAD_FAILED');
+  assert.equal(syncErrorCode(new Error('PONS_FACTORY_AUTHORITY_DRIFT')), 'PONS_FACTORY_AUTHORITY_DRIFT');
 
   const rateLimited = Object.assign(new Error('https://user:secret@rpc.example'), {
     name: 'HttpRequestError',

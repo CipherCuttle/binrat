@@ -27,6 +27,7 @@ import {
   deleteRatFeedback, pruneRatFeedback, listRecentRatFeedback
 } from './ratFeedback.js';
 import { handleRatCandidateSmoke } from './ratCandidateSmoke.js';
+import { handlePonsBootstrapDiagnostic } from './ponsBootstrapDiagnostic.js';
 import {
   entityFromUnderstanding, forgetRatMemory, generateRatBanter, isRatBanterEligible,
   loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
@@ -184,6 +185,10 @@ export async function handleWorkerRequest(
 
   if (request.method === 'POST' && pathname === '/__candidate/rat-smoke') {
     return handleRatCandidateSmoke(request, env, deps.now());
+  }
+
+  if (request.method === 'POST' && pathname === '/__candidate/pons-bootstrap') {
+    return handlePonsBootstrapDiagnostic(request, env, { externalFetch: deps.externalFetch });
   }
 
   if (request.method === 'POST' && pathname === '/telegram/webhook') {

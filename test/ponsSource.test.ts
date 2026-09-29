@@ -76,3 +76,22 @@ test('Pons source fails closed on a wrong RPC chain', async () => {
   } as never });
   await assert.rejects(source.assertAuthority(1n), /PONS_CHAIN_ID_DRIFT/);
 });
+
+
+test('Pons bootstrap transport failures retain the exact operation label', async () => {
+  const head = new PonsLaunchSource({ client: {
+    getBlockNumber: async () => { throw new TypeError('secret transport detail'); }
+  } as never });
+  await assert.rejects(() => head.getHeadBlockNumber(), /PONS_GET_HEAD_FAILED/);
+
+  const chain = new PonsLaunchSource({ client: {
+    getChainId: async () => { throw new TypeError('secret chain detail'); }
+  } as never });
+  await assert.rejects(() => chain.assertAuthority(1n), /PONS_GET_CHAIN_ID_FAILED/);
+
+  const code = new PonsLaunchSource({ client: {
+    getChainId: async () => ROBINHOOD_CHAIN_ID,
+    getBytecode: async () => { throw new TypeError('secret code detail'); }
+  } as never });
+  await assert.rejects(() => code.assertAuthority(1n), /PONS_GET_FACTORY_CODE_FAILED/);
+});

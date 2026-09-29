@@ -13,6 +13,23 @@ export const PONS_MAX_CANONICAL_LAUNCH_BLOCKS = 16;
 
 export interface PonsLaunchSourceOptions { rpcUrl?: string; client?: PublicClient; now?: () => number }
 
+type PonsBootstrapOperation = 'PONS_GET_HEAD' | 'PONS_GET_CHAIN_ID' | 'PONS_GET_FACTORY_CODE';
+
+async function ponsBootstrapOperation<T>(
+  operation: PonsBootstrapOperation,
+  run: () => Promise<T>
+): Promise<T> {
+  console.error(JSON.stringify({ event: 'PONS_BOOTSTRAP_OPERATION', operation, status: 'START' }));
+  try {
+    const result = await run();
+    console.error(JSON.stringify({ event: 'PONS_BOOTSTRAP_OPERATION', operation, status: 'PASS' }));
+    return result;
+  } catch (error) {
+    console.error(JSON.stringify({ event: 'PONS_BOOTSTRAP_OPERATION', operation, status: 'FAIL' }));
+    throw new Error(`${operation}_FAILED`, { cause: error });
+  }
+}
+
 export class PonsLaunchSource {
   readonly factory = PONS_V2_FACTORY;
   private readonly client: PublicClient;
@@ -27,7 +44,9 @@ export class PonsLaunchSource {
     this.now = options.now ?? Date.now;
   }
 
-  async getHeadBlockNumber(): Promise<bigint> { return this.client.getBlockNumber(); }
+  async getHeadBlockNumber(): Promise<bigint> {
+    return ponsBootstrapOperation('PONS_GET_HEAD', () => this.client.getBlockNumber());
+  }
   async getBlockHash(blockNumber: bigint): Promise<Hex> {
     const block = await this.client.getBlock({ blockNumber });
     if (!block.hash) throw new Error(`PONS_BLOCK_HASH_MISSING:${blockNumber}`);
@@ -38,8 +57,15 @@ export class PonsLaunchSource {
     // for this invocation. Reusing this verified result preserves the checks
     // while avoiding repeated identical RPC subrequests inside one sync.
     if (this.authorityVerified) return;
-    if (await this.client.getChainId() !== ROBINHOOD_CHAIN_ID) throw new Error('PONS_CHAIN_ID_DRIFT');
-    const code = await this.client.getBytecode({ address: this.factory as Address });
+    const chainId = await ponsBootstrapOperation(
+      'PONS_GET_CHAIN_ID',
+      () => this.client.getChainId()
+    );
+    if (chainId !== ROBINHOOD_CHAIN_ID) throw new Error('PONS_CHAIN_ID_DRIFT');
+    const code = await ponsBootstrapOperation(
+      'PONS_GET_FACTORY_CODE',
+      () => this.client.getBytecode({ address: this.factory as Address })
+    );
     if (!code || keccak256(code) !== PONS_V2_FACTORY_CODE_HASH) throw new Error('PONS_FACTORY_AUTHORITY_DRIFT');
     this.authorityVerified = true;
   }

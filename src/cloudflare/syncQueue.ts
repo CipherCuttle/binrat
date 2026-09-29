@@ -847,7 +847,7 @@ export function syncErrorCode(error: unknown): string {
 function explicitSyncErrorCode(error: unknown): string | null {
   const message = error instanceof Error ? error.message : '';
   return message.match(
-    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|D1_[A-Z_]+|SYNC_LEASE_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
+    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|PONS_[A-Z0-9_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|D1_[A-Z_]+|SYNC_LEASE_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
   )?.[1] ?? null;
 }
 
