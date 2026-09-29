@@ -33,7 +33,7 @@ export async function autonomousFixture() {
     async point(block) { return {hash:replacedHashes.get(Number(block)) ?? hash(Number(block)),
       timestampMs:blockTimes.get(Number(block)) ?? now-10000}; }
   };
-  const env = {DB:db,BINRAT_AUTONOMOUS_RAT_ENABLED:'true',TELEGRAM_BOT_TOKEN:'fixture:token',
+  const env = {DB:db,BINRAT_AUTONOMOUS_RAT_ENABLED:'true',BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'true',TELEGRAM_BOT_TOKEN:'fixture:token',
     TELEGRAM_WEBHOOK_SECRET:'fixture-secret',TELEGRAM_REPLIES_ENABLED:'true',TELEGRAM_MAX_MESSAGES_PER_MINUTE:'10000'};
   const fakeFetch: typeof fetch = async (url,init) => {
     if (!String(url).startsWith('https://api.telegram.org/botfixture:token/sendMessage')) throw new Error('FIXTURE_NETWORK_FORBIDDEN');

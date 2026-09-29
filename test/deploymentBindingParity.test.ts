@@ -68,8 +68,59 @@ test('binding parity fails closed when Workers AI disappears or a target changes
   assert.ok(result.errors.includes('D1_TARGET_CHANGED:DB'));
 });
 
+test('controlled Rat activation is an explicit parity mode requiring one secret tester and public/media off', () => {
+  const active = version();
+  active.resources!.bindings!.push(
+    { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'false' }
+  );
+  const candidate = structuredClone(active);
+  candidate.resources!.bindings!.find((binding) => binding.name === 'BINRAT_AUTONOMOUS_RAT_ENABLED')!.text = 'true';
+  candidate.resources!.bindings!.push(
+    { name: 'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'RAT_CANDIDATE_ALLOWED_USER_ID', type: 'secret_text' }
+  );
+
+  const defaultResult = verifyWorkerBindingParity(active, candidate);
+  assert.equal(defaultResult.ok, false);
+  assert.ok(defaultResult.errors.includes('VARIABLE_CHANGED:BINRAT_AUTONOMOUS_RAT_ENABLED'));
+
+  assert.deepEqual(
+    verifyWorkerBindingParity(active, candidate, { controlledRatActivation: true }),
+    { ok: true, errors: [] }
+  );
+
+  const missingTester = structuredClone(candidate);
+  missingTester.resources!.bindings = missingTester.resources!.bindings!.filter(
+    (binding) => binding.name !== 'RAT_CANDIDATE_ALLOWED_USER_ID'
+  );
+  const missing = verifyWorkerBindingParity(active, missingTester, { controlledRatActivation: true });
+  assert.equal(missing.ok, false);
+  assert.ok(missing.errors.includes('CONTROLLED_RAT_TESTER_BINDING_MISSING'));
+});
+
+test('controlled Rat manifest cannot accidentally enable public mode or media', () => {
+  const base = { name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] },
+    assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'true',
+      BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
+      BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } };
+  assert.deepEqual(verifyCandidateManifest(base, { controlledRatActivation: true }), { ok: true, errors: [] });
+
+  const publicCandidate = structuredClone(base);
+  publicCandidate.vars.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED = 'true';
+  const publicResult = verifyCandidateManifest(publicCandidate, { controlledRatActivation: true });
+  assert.equal(publicResult.ok, false);
+  assert.ok(publicResult.errors.includes('AUTONOMOUS_RAT_PUBLIC_MODE_NOT_DISABLED'));
+
+  const mediaCandidate = structuredClone(base);
+  mediaCandidate.vars.BINRAT_TELEGRAM_MEDIA_ENABLED = 'true';
+  const mediaResult = verifyCandidateManifest(mediaCandidate, { controlledRatActivation: true });
+  assert.equal(mediaResult.ok, false);
+  assert.ok(mediaResult.errors.includes('TELEGRAM_MEDIA_NOT_FLAG_OFF'));
+});
+
 test('candidate manifest requires known-good bindings and flag-off Pons configuration', () => {
-  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } });
+  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } });
   assert.deepEqual(pass, { ok: true, errors: [] });
   const fail = verifyCandidateManifest({ name: 'binrat-edge-v0', triggers: { crons: [] }, assets: { directory: './web' } });
   assert.equal(fail.ok, false);

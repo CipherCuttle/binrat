@@ -19,13 +19,16 @@ export interface WorkerVersionConfiguration {
 }
 
 export interface BindingParityResult { ok: boolean; errors: string[] }
+export interface BindingParityOptions { controlledRatActivation?: boolean }
 
 const REQUIRED_BINDINGS = ['DB', 'SYNC_QUEUE', 'AI', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET'] as const;
 const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>([
   ['BINRAT_PONS_MAX_BATCH_BLOCKS', { type: 'plain_text', text: '512' }],
   ['ROBINHOOD_RPC_URL', { type: 'plain_text', text: 'https://rpc.ordofi.network' }],
   ['BINRAT_AUTONOMOUS_RAT_ENABLED', { type: 'plain_text', text: 'false' }],
+  ['BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_TELEGRAM_MEDIA_ENABLED', { type: 'plain_text', text: 'false' }],
+  ['RAT_CANDIDATE_ALLOWED_USER_ID', { type: 'secret_text' }],
   // Temporary read-only candidate diagnostic gate. It may never be promoted as
   // an arbitrary variable or a plain-text credential.
   ['RAT_CANDIDATE_SMOKE_ENABLED', { type: 'plain_text', text: 'true' }],
@@ -40,7 +43,8 @@ const ALLOWED_VALUE_CHANGES = new Set(['BINRAT_RELEASE_SHA']);
  */
 export function verifyWorkerBindingParity(
   active: WorkerVersionConfiguration,
-  candidate: WorkerVersionConfiguration
+  candidate: WorkerVersionConfiguration,
+  options: BindingParityOptions = {}
 ): BindingParityResult {
   const errors: string[] = [];
   const activeBindings = bindingMap(active, 'active', errors);
@@ -53,16 +57,30 @@ export function verifyWorkerBindingParity(
   for (const [name, before] of activeBindings) {
     const after = candidateBindings.get(name);
     if (!after) { errors.push(`CANDIDATE_BINDING_MISSING:${name}`); continue; }
-    compareBinding(before, after, errors);
+    compareBinding(before, after, errors, options);
   }
   for (const [name, binding] of candidateBindings) {
     if (!activeBindings.has(name)) {
       const allowed = ALLOWED_ADDITIONS.get(name);
-      if (!allowed || allowed.type !== binding.type ||
-          (allowed.text !== undefined && allowed.text !== binding.text)) {
+      const controlledRatAddition = options.controlledRatActivation &&
+        name === 'BINRAT_AUTONOMOUS_RAT_ENABLED' &&
+        binding.type === 'plain_text' && binding.text === 'true';
+      if (!controlledRatAddition && (!allowed || allowed.type !== binding.type ||
+          (allowed.text !== undefined && allowed.text !== binding.text))) {
         errors.push(`CANDIDATE_BINDING_UNAUTHORIZED:${name}`);
       }
     }
+  }
+
+  if (options.controlledRatActivation) {
+    const master = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_ENABLED');
+    const publicMode = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED');
+    const media = candidateBindings.get('BINRAT_TELEGRAM_MEDIA_ENABLED');
+    const tester = candidateBindings.get('RAT_CANDIDATE_ALLOWED_USER_ID');
+    if (master?.type !== 'plain_text' || master.text !== 'true') errors.push('CONTROLLED_RAT_MASTER_NOT_ENABLED');
+    if (publicMode?.type !== 'plain_text' || publicMode.text !== 'false') errors.push('CONTROLLED_RAT_PUBLIC_MODE_NOT_DISABLED');
+    if (media?.type !== 'plain_text' || media.text !== 'false') errors.push('CONTROLLED_RAT_MEDIA_NOT_DISABLED');
+    if (!tester || tester.type !== 'secret_text') errors.push('CONTROLLED_RAT_TESTER_BINDING_MISSING');
   }
 
   const beforeRuntime = active.resources?.script_runtime;
@@ -76,7 +94,7 @@ export function verifyWorkerBindingParity(
   return { ok: errors.length === 0, errors };
 }
 
-export function verifyCandidateManifest(config: unknown): BindingParityResult {
+export function verifyCandidateManifest(config: unknown, options: BindingParityOptions = {}): BindingParityResult {
   const value = config as {
     name?: unknown; ai?: { binding?: unknown }; triggers?: { crons?: unknown }; assets?: { directory?: unknown };
     vars?: Record<string, unknown>;
@@ -88,7 +106,11 @@ export function verifyCandidateManifest(config: unknown): BindingParityResult {
     errors.push('CRON_PARITY_FAILED');
   }
   if (value.assets?.directory !== './web') errors.push('STATIC_ASSET_MANIFEST_FAILED');
-  if (value.vars?.BINRAT_AUTONOMOUS_RAT_ENABLED !== 'false') errors.push('AUTONOMOUS_RAT_NOT_FLAG_OFF');
+  const expectedRat = options.controlledRatActivation ? 'true' : 'false';
+  if (value.vars?.BINRAT_AUTONOMOUS_RAT_ENABLED !== expectedRat) {
+    errors.push(options.controlledRatActivation ? 'CONTROLLED_RAT_MASTER_NOT_ENABLED' : 'AUTONOMOUS_RAT_NOT_FLAG_OFF');
+  }
+  if (value.vars?.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED !== 'false') errors.push('AUTONOMOUS_RAT_PUBLIC_MODE_NOT_DISABLED');
   if (value.vars?.BINRAT_TELEGRAM_MEDIA_ENABLED !== 'false') errors.push('TELEGRAM_MEDIA_NOT_FLAG_OFF');
   if (value.vars?.BINRAT_PONS_MAX_BATCH_BLOCKS !== '512') errors.push('PONS_BATCH_BOUND_INVALID');
   return { ok: errors.length === 0, errors };
@@ -106,7 +128,12 @@ function bindingMap(value: WorkerVersionConfiguration, label: string, errors: st
   return result;
 }
 
-function compareBinding(before: WorkerBinding, after: WorkerBinding, errors: string[]): void {
+function compareBinding(
+  before: WorkerBinding,
+  after: WorkerBinding,
+  errors: string[],
+  options: BindingParityOptions
+): void {
   if (before.type !== after.type) { errors.push(`BINDING_TYPE_CHANGED:${before.name}`); return; }
   if (before.type === 'd1' && (before.id ?? before.database_id) !== (after.id ?? after.database_id)) {
     errors.push(`D1_TARGET_CHANGED:${before.name}`);
@@ -114,7 +141,11 @@ function compareBinding(before: WorkerBinding, after: WorkerBinding, errors: str
   if (before.type === 'queue' && before.queue_name !== after.queue_name) errors.push(`QUEUE_TARGET_CHANGED:${before.name}`);
   const disablesCandidateDiagnostic = before.name === 'RAT_CANDIDATE_SMOKE_ENABLED' &&
     before.text === 'true' && after.text === 'false';
-  if (before.type === 'plain_text' && !ALLOWED_VALUE_CHANGES.has(before.name) && !disablesCandidateDiagnostic && before.text !== after.text) {
+  const controlledRatToggle = options.controlledRatActivation &&
+    before.name === 'BINRAT_AUTONOMOUS_RAT_ENABLED' &&
+    before.text === 'false' && after.text === 'true';
+  if (before.type === 'plain_text' && !ALLOWED_VALUE_CHANGES.has(before.name) &&
+      !disablesCandidateDiagnostic && !controlledRatToggle && before.text !== after.text) {
     errors.push(`VARIABLE_CHANGED:${before.name}`);
   }
 }

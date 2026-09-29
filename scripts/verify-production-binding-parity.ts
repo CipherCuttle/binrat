@@ -7,17 +7,19 @@ const worker = argument('--worker');
 const activeVersion = argument('--active-version');
 const candidateVersion = argument('--candidate-version');
 const configPath = argument('--config');
+const controlledRatActivation = args.includes('--controlled-rat-activation');
 if (!worker || !activeVersion || !candidateVersion || !configPath) {
-  throw new Error('USAGE: --worker <name> --active-version <id> --candidate-version <id> --config <path>');
+  throw new Error('USAGE: --worker <name> --active-version <id> --candidate-version <id> --config <path> [--controlled-rat-activation]');
 }
 
 const active = version(worker, activeVersion);
 const candidate = version(worker, candidateVersion);
-const manifest = verifyCandidateManifest(JSON.parse(readFile(configPath, 'utf8')));
-const parity = verifyWorkerBindingParity(active, candidate);
+const options = { controlledRatActivation };
+const manifest = verifyCandidateManifest(JSON.parse(readFile(configPath, 'utf8')), options);
+const parity = verifyWorkerBindingParity(active, candidate, options);
 const errors = [...manifest.errors, ...parity.errors];
 if (errors.length > 0) throw new Error(`BINDING_PARITY_FAILED:${errors.join(',')}`);
-console.log(JSON.stringify({ status: 'BINDING_PARITY_PASS', worker, activeVersion, candidateVersion }));
+console.log(JSON.stringify({ status: 'BINDING_PARITY_PASS', worker, activeVersion, candidateVersion, controlledRatActivation }));
 
 function version(name: string, id: string): unknown {
   const output = execFileSync('pnpm', ['dlx', 'wrangler@4.135.0', 'versions', 'view', id, '--name', name, '--json'], {

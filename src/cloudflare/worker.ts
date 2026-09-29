@@ -81,7 +81,9 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   RAT_CANDIDATE_SMOKE_SECRET?: string;
   /** Explicit rollout gate for the approved same-origin visual card layer. */
   BINRAT_TELEGRAM_MEDIA_ENABLED?: string;
-  /** Candidate-only private Telegram beta allowlist. No effect unless explicitly populated. */
+  /** Explicit future public-mode switch. Controlled activation keeps this false. */
+  BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED?: string;
+  /** Candidate-only private Telegram beta allowlist. Store as a secret binding. */
   RAT_CANDIDATE_ALLOWED_USER_ID?: string;
 }
 
@@ -509,15 +511,6 @@ async function telegramWebhook(
       return json(200, { ok: true, ignored: true });
     }
 
-    if (env.RAT_CANDIDATE_ALLOWED_USER_ID) {
-      const allowed = Number(env.RAT_CANDIDATE_ALLOWED_USER_ID);
-      if (!Number.isSafeInteger(allowed) || message.chat.type !== 'private' ||
-          message.from?.id !== allowed) {
-        await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
-        return json(200, { ok: true, ignored: true, reason: 'CANDIDATE_PRIVATE_ONLY' });
-      }
-    }
-
     const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
     if (!(await ledger.allowChat(message.chat.id, rateLimit, 60_000, deps.now()))) {
       await ledger.completeIgnored(update.update_id, 'RATE_LIMITED', deps.now());
@@ -593,8 +586,8 @@ async function telegramWebhook(
       return json(200, { ok: true, feedback: true });
     }
 
-    const autonomous = env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true'
-      ? parseAutonomousCommand(message.text) : null;
+    const autonomousAllowed = autonomousRatAllowed(message, env);
+    const autonomous = autonomousAllowed ? parseAutonomousCommand(message.text) : null;
     if (autonomous) {
       if (message.chat.type !== 'private' || !Number.isSafeInteger(message.from?.id) ||
           message.from!.id <= 0 || message.from!.id !== message.chat.id || message.from?.is_bot) {
@@ -634,7 +627,7 @@ async function telegramWebhook(
       return json(200,{ok:true,autonomous:true});
     }
 
-    const watchCommand = env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true' ? null : parseRatWatchCommand(message.text);
+    const watchCommand = autonomousAllowed ? null : parseRatWatchCommand(message.text);
     if (watchCommand) {
       const operational = await handleRatWatchCommand(
         watchCommand,
@@ -801,6 +794,18 @@ async function telegramWebhook(
     await ledger.release(update.update_id).catch(() => {});
     return json(503, { error: safeErrorCode(error) });
   }
+}
+
+function autonomousRatAllowed(message: TelegramMessage, env: BinratWorkerEnv): boolean {
+  if (env.BINRAT_AUTONOMOUS_RAT_ENABLED !== 'true') return false;
+  if (message.chat.type !== 'private' || message.from?.is_bot ||
+      !Number.isSafeInteger(message.from?.id) || message.from!.id <= 0 ||
+      message.from!.id !== message.chat.id) return false;
+  if (env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED === 'true') return true;
+  const raw = env.RAT_CANDIDATE_ALLOWED_USER_ID?.trim();
+  if (!raw || !/^[1-9]\d*$/.test(raw)) return false;
+  const allowed = Number(raw);
+  return Number.isSafeInteger(allowed) && allowed === message.from!.id;
 }
 
 type RatWatchCommand =

@@ -120,6 +120,25 @@ test('WATCH atomic quota boundary under concurrent requests; duplicates do not c
   } finally {f.db.close();}
 });
 
+test('controlled activation scopes autonomous commands to one private tester and preserves legacy bot behavior',async()=>{
+  const f=await autonomousFixture();
+  try {
+    f.env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED='false';
+    (f.env as typeof f.env & {RAT_CANDIDATE_ALLOWED_USER_ID?:string}).RAT_CANDIDATE_ALLOWED_USER_ID='77';
+
+    await f.send('/watches',{userId:77,chatId:77,updateId:7100});
+    assert.match(f.sent.at(-1)!.text,/watch list \(FREE: 25\)/);
+
+    await f.send('/watches',{userId:88,chatId:88,updateId:7101});
+    assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
+    assert.doesNotMatch(f.sent.at(-1)!.text,/FREE: 25/);
+
+    (f.env as typeof f.env & {RAT_CANDIDATE_ALLOWED_USER_ID?:string}).RAT_CANDIDATE_ALLOWED_USER_ID='invalid';
+    await f.send('/watches',{userId:77,chatId:77,updateId:7102});
+    assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
+  } finally {f.db.close();}
+});
+
 test('private owner isolation and webhook authentication reject groups, forged authority and callbacks',async()=>{
   const f=await autonomousFixture();
   try {
