@@ -19,7 +19,7 @@ function summary(receipt: { source:string; chainId:number; subject:{entityType:s
 }
 export function renderRatCard(outcome: AutonomousOutcome): RatCard {
   if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nEvidence-first Robinhood/Pons receipts. No safety, profitability or identity verdicts.',keyboard:[
-    [callbackButton('Rats',{action:'RATS'}),callbackButton('Watches',{action:'WATCHES'})],[callbackButton('DIG — send /dig <address>',{action:'DIG_HINT'})]
+    [callbackButton('Rats',{action:'RATS'}),callbackButton('Watches',{action:'WATCHES'})],[callbackButton('DIG',{action:'DIG_PROMPT'})]
   ]});
   if (outcome.kind === 'RATS') {
     const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
@@ -51,4 +51,7 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
   return card({view:'ERROR',media:'error',caption:`🐀 ${outcome.code}\nNo evidence conclusion was made.`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
 }
 
-export function digHintCard(): RatCard { return card({view:'HOME',media:'inquisitive',caption:'🐀 To investigate an address, send /dig <Robinhood address>. I will only return canonical indexed evidence.',keyboard:[[callbackButton('Home',{action:'HOME'})]]}); }
+export function digWaitingCard(): RatCard { return card({view:'DIG_WAITING',media:'inquisitive',caption:'🐀 DIG\n\ndrop a Robinhood/Pons deployer address into the reply box below.\n\ncanonical indexed evidence only.',keyboard:[[callbackButton('Home',{action:'HOME'})]]}); }
+export function diggingCard(): RatCard { return card({view:'DIGGING',media:'digging',caption:'🐀 DIGGING THROUGH THE BIN…\n\nchecking canonical Pons receipts.',keyboard:[]}); }
+export function malformedDigCard(): RatCard { return card({view:'DIG_WAITING',media:'empty-paws',caption:"🐀 that doesn't look like a Robinhood deployer address.\n\nreply to the prompt with a canonical DIG target, or start a fresh prompt.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
+export function digPromptOperationalErrorCard(): RatCard { return card({view:'ERROR',media:'error',caption:'🐀 prompt receipt unavailable. No investigation was started. Tap DIG to try again.',keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }

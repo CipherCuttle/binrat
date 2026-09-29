@@ -1,7 +1,7 @@
 import type { RatMediaState } from '../ratMedia.js';
 
 export const TELEGRAM_UI_RENDERER_VERSION = 'binrat.telegram-ui/2.0' as const;
-export type RatView = 'HOME' | 'RATS' | 'CASE' | 'WHY' | 'WATCH_STATE' | 'WATCHLIST' | 'EMPTY' | 'ERROR';
+export type RatView = 'HOME' | 'RATS' | 'CASE' | 'WHY' | 'WATCH_STATE' | 'WATCHLIST' | 'EMPTY' | 'ERROR' | 'DIG_WAITING' | 'DIGGING';
 export type RatButton =
   | { text: string; callbackData: string; style?: 'danger' | 'success' | 'primary' }
   | { text: string; copyText: string }

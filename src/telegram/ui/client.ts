@@ -57,5 +57,9 @@ export async function editCard(token:string,chatId:number,messageId:number,origi
     }
   }
 }
+export async function sendDigForceReply(token:string,chatId:number,fetchImpl:typeof fetch):Promise<number> {
+  return messageId(await call<{message_id?:number}>(token,'sendMessage',{chat_id:chatId,text:"🐀 drop the deployer address here. i'll dig.",reply_markup:{force_reply:true,input_field_placeholder:'Robinhood/Pons deployer address'},disable_web_page_preview:true},fetchImpl));
+}
+export async function deleteMessage(token:string,chatId:number,messageId:number,fetchImpl:typeof fetch):Promise<void> { await call(token,'deleteMessage',{chat_id:chatId,message_id:messageId},fetchImpl); }
 export async function sendChatAction(token:string,chatId:number,action:'typing'|'upload_photo',fetchImpl:typeof fetch):Promise<void> { await call(token,'sendChatAction',{chat_id:chatId,action},fetchImpl); }
 export function ratCardDigest(card:RatCard):string { return createHash('sha256').update(cardDigestMaterial(card)).digest('hex'); }
