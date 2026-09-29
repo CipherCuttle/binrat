@@ -119,8 +119,22 @@ export async function deliverFindings(
     let state: 'SENT' | 'UNKNOWN' | 'FAILED' = 'UNKNOWN';
     try {
       if (media?.enabled) {
-        telegramId = await sendRatCard(token, item.chat_id, media.origin, 'alert', text, externalFetch);
-        state = 'SENT';
+        try {
+          telegramId = await sendRatCard(token, item.chat_id, media.origin, 'alert', text, externalFetch);
+          state = 'SENT';
+        } catch (error) {
+          // A definitive 400/404 means no photo card exists, so textual evidence is safe.
+          // Network/5xx ambiguity remains UNKNOWN to avoid a duplicate material alert.
+          if (!(error instanceof Error) || error.message !== 'TELEGRAM_RAT_MEDIA_UNSUPPORTED') throw error;
+          const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
+            body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
+          });
+          const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
+          if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
+            telegramId = result.result!.message_id!; state = 'SENT';
+          } else if (response.status >= 400 && response.status < 500 && result.ok === false) state = 'FAILED';
+        }
       } else {
         const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),

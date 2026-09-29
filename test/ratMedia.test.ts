@@ -25,3 +25,11 @@ test('rat media changes the original card and treats message-not-modified as ide
   assert.match(requests[0]!.body, /assets\/telegram\/digging\.png/);
   assert.match(requests[1]!.body, /assets\/telegram\/evidence-found\.png/);
 });
+
+test('a definitive unsupported photo reports a safe text-fallback condition', async () => {
+  const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({ ok: false }), { status: 400 });
+  await assert.rejects(
+    sendRatCard('token', 1, 'https://binrat.example', 'alert', 'found', fetchImpl),
+    /TELEGRAM_RAT_MEDIA_UNSUPPORTED/
+  );
+});

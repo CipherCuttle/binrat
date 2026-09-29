@@ -34,6 +34,9 @@ export async function sendRatCard(
   });
   const result = await response.json().catch(() => null) as TelegramResult<{ message_id?: number }> | null;
   if (!response.ok || result?.ok !== true || !Number.isSafeInteger(result.result?.message_id)) {
+    // Telegram definitively rejected the approved image before creating a message.
+    // Callers may safely fall back to text without risking a second card.
+    if (response.status === 400 || response.status === 404) throw new Error('TELEGRAM_RAT_MEDIA_UNSUPPORTED');
     throw new Error('TELEGRAM_RAT_MEDIA_SEND_FAILED');
   }
   return result.result!.message_id!;
