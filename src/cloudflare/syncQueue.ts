@@ -169,6 +169,13 @@ export async function handleSyncQueueBatch(
         const result = await runCloudflarePonsSyncCycle(env, message.body, deps);
         if (result.status === 'RETRY') { message.retry({ delaySeconds: 30 }); continue; }
         message.ack();
+        // Continue a bounded catch-up only after this message releases the
+        // durable lease; parallel jobs merely contend and cannot add capacity.
+        if (result.status === 'SUCCESS' && !result.liveCaughtUp) {
+          await enqueuePonsSyncCycle(env, deps.now()).catch((error) => {
+            console.error(JSON.stringify({ event: 'PONS_CATCH_UP_ENQUEUE_FAILED', code: syncErrorCode(error) }));
+          });
+        }
         if (result.status === 'SUCCESS' && result.liveCaughtUp && shouldEnqueueRatWatch(message.body.enqueuedAtMs)) {
           await enqueueRatWatchCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event: 'PONS_RAT_WATCH_ENQUEUE_FAILED', code: syncErrorCode(error) }));

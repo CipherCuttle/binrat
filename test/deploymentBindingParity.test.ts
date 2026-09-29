@@ -28,8 +28,31 @@ test('binding parity preserves active resources while allowing only the approved
   candidate.resources!.bindings![6]!.text = 'new';
   candidate.resources!.bindings!.push(
     { name: 'BINRAT_PONS_MAX_BATCH_BLOCKS', type: 'plain_text', text: '512' },
-    { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'false' }
+    { name: 'ROBINHOOD_RPC_URL', type: 'plain_text', text: 'https://rpc.ordofi.network' },
+    { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'RAT_CANDIDATE_SMOKE_ENABLED', type: 'plain_text', text: 'true' },
+    { name: 'RAT_CANDIDATE_SMOKE_SECRET', type: 'secret_text' }
   );
+  assert.deepEqual(verifyWorkerBindingParity(active, candidate), { ok: true, errors: [] });
+});
+
+test('binding parity refuses an altered temporary diagnostic gate', () => {
+  const active = version();
+  const candidate = version();
+  candidate.resources!.bindings!.push(
+    { name: 'RAT_CANDIDATE_SMOKE_ENABLED', type: 'plain_text', text: 'false' }
+  );
+  const result = verifyWorkerBindingParity(active, candidate);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.includes('CANDIDATE_BINDING_UNAUTHORIZED:RAT_CANDIDATE_SMOKE_ENABLED'));
+});
+
+test('binding parity permits only disabling the temporary diagnostic gate', () => {
+  const active = version();
+  active.resources!.bindings!.push({ name: 'RAT_CANDIDATE_SMOKE_ENABLED', type: 'plain_text', text: 'true' });
+  const candidate = version();
+  candidate.resources!.bindings!.push({ name: 'RAT_CANDIDATE_SMOKE_ENABLED', type: 'plain_text', text: 'false' });
   assert.deepEqual(verifyWorkerBindingParity(active, candidate), { ok: true, errors: [] });
 });
 

@@ -24,6 +24,7 @@ import {
   syncErrorCode,
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
+import { PonsLaunchSource } from '../src/pons/ponsSource.js';
 import type {
   ObservationBlockPoint,
   ObservationSource
@@ -163,6 +164,14 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
   assert.equal(code, 'SYNC_UNKNOWN_ERROR');
   assert.equal(code.includes('secret'), false);
   assert.equal(code.includes('https'), false);
+
+  const wrapped = new PonsLaunchSource({ client: {
+    getBlockNumber: async () => { throw Object.assign(new Error('https://secret.example'), { name: 'TimeoutError' }); }
+  } as never });
+  return assert.rejects(wrapped.getHeadBlockNumber(), (error: unknown) => {
+    assert.equal(syncErrorCode(error), 'SYNC_TIMEOUT_ERROR');
+    return true;
+  });
 });
 
 test('Cloudflare sync persists live authority before subordinate history reads', async () => {

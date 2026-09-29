@@ -21,7 +21,16 @@ export interface WorkerVersionConfiguration {
 export interface BindingParityResult { ok: boolean; errors: string[] }
 
 const REQUIRED_BINDINGS = ['DB', 'SYNC_QUEUE', 'AI', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET'] as const;
-const ALLOWED_ADDITIONS = new Set(['BINRAT_PONS_MAX_BATCH_BLOCKS', 'BINRAT_TELEGRAM_MEDIA_ENABLED']);
+const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>([
+  ['BINRAT_PONS_MAX_BATCH_BLOCKS', { type: 'plain_text', text: '512' }],
+  ['ROBINHOOD_RPC_URL', { type: 'plain_text', text: 'https://rpc.ordofi.network' }],
+  ['BINRAT_AUTONOMOUS_RAT_ENABLED', { type: 'plain_text', text: 'false' }],
+  ['BINRAT_TELEGRAM_MEDIA_ENABLED', { type: 'plain_text', text: 'false' }],
+  // Temporary read-only candidate diagnostic gate. It may never be promoted as
+  // an arbitrary variable or a plain-text credential.
+  ['RAT_CANDIDATE_SMOKE_ENABLED', { type: 'plain_text', text: 'true' }],
+  ['RAT_CANDIDATE_SMOKE_SECRET', { type: 'secret_text' }]
+]);
 const ALLOWED_VALUE_CHANGES = new Set(['BINRAT_RELEASE_SHA']);
 
 /**
@@ -46,9 +55,13 @@ export function verifyWorkerBindingParity(
     if (!after) { errors.push(`CANDIDATE_BINDING_MISSING:${name}`); continue; }
     compareBinding(before, after, errors);
   }
-  for (const name of candidateBindings.keys()) {
-    if (!activeBindings.has(name) && !ALLOWED_ADDITIONS.has(name)) {
-      errors.push(`CANDIDATE_BINDING_UNAUTHORIZED:${name}`);
+  for (const [name, binding] of candidateBindings) {
+    if (!activeBindings.has(name)) {
+      const allowed = ALLOWED_ADDITIONS.get(name);
+      if (!allowed || allowed.type !== binding.type ||
+          (allowed.text !== undefined && allowed.text !== binding.text)) {
+        errors.push(`CANDIDATE_BINDING_UNAUTHORIZED:${name}`);
+      }
     }
   }
 
@@ -99,7 +112,9 @@ function compareBinding(before: WorkerBinding, after: WorkerBinding, errors: str
     errors.push(`D1_TARGET_CHANGED:${before.name}`);
   }
   if (before.type === 'queue' && before.queue_name !== after.queue_name) errors.push(`QUEUE_TARGET_CHANGED:${before.name}`);
-  if (before.type === 'plain_text' && !ALLOWED_VALUE_CHANGES.has(before.name) && before.text !== after.text) {
+  const disablesCandidateDiagnostic = before.name === 'RAT_CANDIDATE_SMOKE_ENABLED' &&
+    before.text === 'true' && after.text === 'false';
+  if (before.type === 'plain_text' && !ALLOWED_VALUE_CHANGES.has(before.name) && !disablesCandidateDiagnostic && before.text !== after.text) {
     errors.push(`VARIABLE_CHANGED:${before.name}`);
   }
 }
