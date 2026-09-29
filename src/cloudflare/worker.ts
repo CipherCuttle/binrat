@@ -1,4 +1,6 @@
 import { createHash } from 'node:crypto';
+import { handleAutonomousCommand, parseAutonomousCommand } from '../autonomous/telegram.js';
+import { arcWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
 import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
@@ -121,6 +123,7 @@ export interface WorkerDeps {
   externalFetch: typeof fetch;
   now: () => number;
   holderEligibilitySource?: HolderEligibilitySource;
+  watchSource?: WatchSource;
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -579,7 +582,25 @@ async function telegramWebhook(
       return json(200, { ok: true, feedback: true });
     }
 
-    const watchCommand = parseRatWatchCommand(message.text);
+    const autonomous = env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true'
+      ? parseAutonomousCommand(message.text) : null;
+    if (autonomous) {
+      if (message.chat.type !== 'private' || !Number.isSafeInteger(message.from?.id) ||
+          message.from!.id <= 0 || message.from!.id !== message.chat.id || message.from?.is_bot) {
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
+      }
+      const reply = await handleAutonomousCommand(env.DB,autonomous,
+        {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
+        deps.watchSource ?? arcWatchSource(env.ARC_RPC_URL?.trim() || 'https://rpc.mainnet.arc.io'));
+      const telegramMessageId = await sendMessage(token,message.chat.id,reply,deps.externalFetch);
+      await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,
+        intent:`AUTONOMOUS_${autonomous.name.toUpperCase()}`,
+        replyDigest:createHash('sha256').update(reply).digest('hex'),telegramMessageId},deps.now());
+      return json(200,{ok:true,autonomous:true});
+    }
+
+    const watchCommand = env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true' ? null : parseRatWatchCommand(message.text);
     if (watchCommand) {
       const operational = await handleRatWatchCommand(
         watchCommand,

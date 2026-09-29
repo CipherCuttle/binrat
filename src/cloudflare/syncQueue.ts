@@ -1,4 +1,6 @@
 import { ArcPadLaunchSource } from '../arc/arcpadSource.js';
+import { deliverFindings, enqueueFindings } from '../autonomous/delivery.js';
+import { arcWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from '../arc/chain.js';
 import { ArcObservationSource } from '../arc/observationSource.js';
 import { ArcRatRadarSource, type RatRadarSource } from '../arc/ratRadarSource.js';
@@ -41,6 +43,8 @@ export interface CloudflareSyncEnv {
   BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
   BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE?: string;
   TELEGRAM_BOT_TOKEN?: string;
+  /** Requires the separately applied additive V1 migration. No automatic migration. */
+  BINRAT_AUTONOMOUS_RAT_ENABLED?: string;
 }
 
 export interface BinratSyncMessage {
@@ -55,6 +59,7 @@ export interface CloudflareSyncDeps {
   observationSource?: ObservationSource;
   ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
+  watchSource?: WatchSource;
 }
 
 export type SyncCycleResult =
@@ -609,6 +614,13 @@ export async function runCloudflareRatWatchCycle(
 
   try {
     const watches = new D1RatWatchStore(env.DB);
+    if (env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true') {
+      const enqueued = await enqueueFindings(env.DB,deps.now());
+      const sent = await deliverFindings(env.DB,
+        deps.watchSource ?? arcWatchSource(resolveArcRpcUrl(env)),
+        required(env.TELEGRAM_BOT_TOKEN,'TELEGRAM_BOT_TOKEN'),deps.externalFetch ?? fetch,deps.now);
+      return {status:'SUCCESS',enqueued,sent};
+    }
     const enqueued = await watches.enqueueRecurrenceAlerts(ARC_CHAIN_ID, deps.now());
     const pending = await watches.listPending(5);
     if (pending.length === 0) return { status: 'SUCCESS', enqueued, sent: 0 };
