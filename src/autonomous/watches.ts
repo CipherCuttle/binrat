@@ -53,7 +53,7 @@ export async function mutateWatch(
     .bind(p.userId, p.chatId, target.chainId, target.entityType, target.entityId).first<WatchRow>();
   let start = old?.start_block ?? 0;
   let hash = old?.start_hash ?? '';
-  if (action === 'WATCH' && !old?.enabled) {
+  if (action === 'WATCH') {
     // Canonical creator evidence is mandatory. This bounded shared-index read never scans RPC history.
     await dig(db, target, now);
     const tip = await authoritativeCheckpoint(db, now);
