@@ -1,4 +1,6 @@
 import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
+import { D1RuntimeStateStore } from '../cloudflare/runtimeState.js';
+import { sendRatCard } from '../telegram/ratMedia.js';
 import { authoritativeCheckpoint, evidenceForLaunch, saveCase, why } from './evidence.js';
 import { attentionDecision, makeReceipt, renderReceipt, type Receipt } from './model.js';
 import type { WatchSource } from './source.js';
@@ -11,16 +13,18 @@ interface Outbox {
 }
 
 export async function enqueueFindings(db: D1DatabaseLike, now: number): Promise<number> {
-  const tip = await authoritativeCheckpoint(db, now);
+  const pons = await new D1RuntimeStateStore(db, 4663).get();
+  const chainId = pons ? 4663 : 5042;
+  const tip = await authoritativeCheckpoint(db, now, chainId);
   const candidates = await db.prepare(`SELECT w.*,l.launch_id FROM rat_v1_watches w
     JOIN launches l ON l.chain_id=w.chain_id AND l.creator=w.entity_id
-    WHERE w.enabled=1 AND w.chain_id=5042 AND w.entity_type='CREATOR'
+    WHERE w.enabled=1 AND w.chain_id=? AND w.entity_type='CREATOR'
     AND CAST(l.block_number AS INTEGER)>w.start_block AND CAST(l.block_number AS INTEGER)<=?
     AND l.observed_at_ms>w.created_at_ms
     AND NOT EXISTS(SELECT 1 FROM rat_v1_outbox o WHERE o.user_id=w.user_id AND o.chat_id=w.chat_id
       AND o.chain_id=l.chain_id AND o.observation_id=l.event_id)
     ORDER BY CAST(l.block_number AS INTEGER),l.log_index,w.user_id LIMIT 50`)
-    .bind(Number(tip)).all<Candidate>();
+    .bind(chainId, Number(tip)).all<Candidate>();
   if (!candidates.success) throw new Error('ATTENTION_READ_FAILED');
   const shared = new Map<string, Receipt>();
   let enqueued = 0;
@@ -28,10 +32,10 @@ export async function enqueueFindings(db: D1DatabaseLike, now: number): Promise<
     let receipt = shared.get(candidate.launch_id);
     if (!receipt) {
       let ref;
-      try { ref = await evidenceForLaunch(db,candidate.launch_id,tip); }
+      try { ref = await evidenceForLaunch(db,candidate.launch_id,tip,chainId); }
       catch { continue; } // Missing source evidence never creates a claim.
       receipt = await saveCase(db,await makeReceipt(
-        { chainId:5042,entityType:'CREATOR',entityId:ref.creator },[ref],ref.blockNumber,now,'CREATOR_LAUNCH_OBSERVED'));
+        { chainId,entityType:'CREATOR',entityId:ref.creator },[ref],ref.blockNumber,now,'CREATOR_LAUNCH_OBSERVED'));
       shared.set(candidate.launch_id,receipt);
     }
     if (attentionDecision(true,true) !== 'ALERT') continue;
@@ -41,10 +45,10 @@ export async function enqueueFindings(db: D1DatabaseLike, now: number): Promise<
        watch_generation,watch_start_block,watch_created_at_ms,attention,reason,state,created_at_ms)
       SELECT ?,?,?,?,?,?,?,?,?,?,?,?,'ALERT','EXPLICIT_FUTURE_CREATOR_RECURRENCE','PENDING',?
       WHERE EXISTS(SELECT 1 FROM rat_v1_watches WHERE generation=? AND enabled=1)
-      AND EXISTS(SELECT 1 FROM launches WHERE launch_id=? AND chain_id=5042 AND block_hash=?)`)
-      .bind(crypto.randomUUID(),ref.observationId,receipt.findingId,receipt.caseId,5042,ref.launchId,ref.blockHash,
+      AND EXISTS(SELECT 1 FROM launches WHERE launch_id=? AND chain_id=? AND block_hash=?)`)
+      .bind(crypto.randomUUID(),ref.observationId,receipt.findingId,receipt.caseId,chainId,ref.launchId,ref.blockHash,
         candidate.user_id,candidate.chat_id,candidate.generation,candidate.start_block,candidate.created_at_ms,now,
-        candidate.generation,ref.launchId,ref.blockHash).run();
+        candidate.generation,ref.launchId,chainId,ref.blockHash).run();
     if (!result.success) throw new Error('OUTBOX_WRITE_FAILED');
     enqueued += Number(result.meta?.changes ?? 0);
   }
@@ -52,14 +56,19 @@ export async function enqueueFindings(db: D1DatabaseLike, now: number): Promise<
 }
 
 export async function deliverFindings(
-  db: D1DatabaseLike, source: WatchSource, token: string, externalFetch: typeof fetch, now: () => number
+  db: D1DatabaseLike, source: WatchSource, token: string, externalFetch: typeof fetch, now: () => number,
+  media?: { enabled: boolean; origin: string }
 ): Promise<number> {
-  const tip = await authoritativeCheckpoint(db,now());
-  const checkpoint = await db.prepare('SELECT block_hash FROM chain_checkpoints WHERE chain_id=5042')
+  const pendingChain = await db.prepare(`SELECT chain_id FROM rat_v1_outbox WHERE state='PENDING'
+    ORDER BY created_at_ms,delivery_id LIMIT 1`).first<{ chain_id: number }>();
+  if (!pendingChain) return 0;
+  const chainId = pendingChain.chain_id;
+  const tip = await authoritativeCheckpoint(db,now(),chainId);
+  const checkpoint = await db.prepare('SELECT block_hash FROM chain_checkpoints WHERE chain_id=?').bind(chainId)
     .first<{ block_hash: string }>();
   if (!checkpoint || (await source.point(tip)).hash !== checkpoint.block_hash) throw new Error('SOURCE_REORG');
-  const pending = await db.prepare(`SELECT * FROM rat_v1_outbox WHERE state='PENDING'
-    ORDER BY created_at_ms,delivery_id LIMIT 5`).all<Outbox>();
+  const pending = await db.prepare(`SELECT * FROM rat_v1_outbox WHERE state='PENDING' AND chain_id=?
+    ORDER BY created_at_ms,delivery_id LIMIT 5`).bind(chainId).all<Outbox>();
   if (!pending.success) throw new Error('OUTBOX_READ_FAILED');
   // Shared block reads within the cycle, not one chain-history scan per user.
   const points = new Map<string,{hash:string;timestampMs:number}>();
@@ -109,14 +118,33 @@ export async function deliverFindings(
     let telegramId: number | null = null;
     let state: 'SENT' | 'UNKNOWN' | 'FAILED' = 'UNKNOWN';
     try {
-      const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
-        body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
-      });
-      const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
-      if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
-        telegramId = result.result!.message_id!; state = 'SENT';
-      } else if (response.status >= 400 && response.status < 500 && result.ok === false) state = 'FAILED';
+      if (media?.enabled) {
+        try {
+          telegramId = await sendRatCard(token, item.chat_id, media.origin, 'alert', text, externalFetch);
+          state = 'SENT';
+        } catch (error) {
+          // A definitive 400/404 means no photo card exists, so textual evidence is safe.
+          // Network/5xx ambiguity remains UNKNOWN to avoid a duplicate material alert.
+          if (!(error instanceof Error) || error.message !== 'TELEGRAM_RAT_MEDIA_UNSUPPORTED') throw error;
+          const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
+            body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
+          });
+          const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
+          if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
+            telegramId = result.result!.message_id!; state = 'SENT';
+          } else if (response.status >= 400 && response.status < 500 && result.ok === false) state = 'FAILED';
+        }
+      } else {
+        const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
+          body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
+        });
+        const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
+        if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
+          telegramId = result.result!.message_id!; state = 'SENT';
+        } else if (response.status >= 400 && response.status < 500 && result.ok === false) state = 'FAILED';
+      }
     } catch { /* Network/parse ambiguity is durable and is never retried automatically. */ }
     const complete = await db.prepare(`UPDATE rat_v1_outbox SET state=?,telegram_message_id=?
       WHERE delivery_id=? AND state='SENDING'`).bind(state,telegramId,item.delivery_id).run();

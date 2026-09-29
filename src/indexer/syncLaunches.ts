@@ -65,14 +65,30 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
   let finalBlock: bigint | null = null;
 
   while (fromBlock <= targetBlock) {
-    const toBlock = minBigInt(targetBlock, fromBlock + options.maxBatchBlocks - 1n);
-    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_BATCH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
-    await source.assertAuthority(fromBlock);
-    await source.assertAuthority(toBlock);
+    let toBlock = minBigInt(targetBlock, fromBlock + options.maxBatchBlocks - 1n);
+    let launches: LaunchObserved[];
+    let boundaryHashBefore: Hex;
+    // Pons declares a safe density boundary after its log request. Narrow the
+    // same uncommitted range until canonical per-block verification is bounded.
+    // No logs are skipped: the committed checkpoint is always the narrowed end.
+    while (true) {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_BATCH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      await source.assertAuthority(fromBlock);
+      await source.assertAuthority(toBlock);
 
-    const boundaryHashBefore = await source.getBlockHash(toBlock);
-    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
-    const launches = await source.catchUp(fromBlock, toBlock);
+      boundaryHashBefore = await source.getBlockHash(toBlock);
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      try {
+        launches = await source.catchUp(fromBlock, toBlock);
+        break;
+      } catch (error) {
+        if (!isDensityBoundError(error) || fromBlock === toBlock) throw error;
+        const narrowedTo = fromBlock + (toBlock - fromBlock) / 2n;
+        if (narrowedTo < fromBlock) throw error;
+        console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_BATCH_NARROWED', fromBlock: fromBlock.toString(), toBlock: narrowedTo.toString() }));
+        toBlock = narrowedTo;
+      }
+    }
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), launchCount: launches.length }));
     await assertLaunchBlocksStillCanonical(source, launches);
     const boundaryHashAfterRead = await source.getBlockHash(toBlock);
@@ -175,6 +191,9 @@ function emptyReport(headBlock: bigint): SyncReport {
 }
 
 function sameHex(a: Hex, b: Hex): boolean { return a.toLowerCase() === b.toLowerCase(); }
+function isDensityBoundError(error: unknown): boolean {
+  return error instanceof Error && error.message === 'PONS_LAUNCH_BLOCK_DENSITY';
+}
 function minBigInt(a: bigint, b: bigint): bigint { return a < b ? a : b; }
 function maxBigInt(a: bigint, b: bigint): bigint { return a > b ? a : b; }
 

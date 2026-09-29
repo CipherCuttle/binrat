@@ -25,7 +25,7 @@ test('DIG normalizes canonical input, rejects malformed/unsupported chain and en
   assert.equal(parseTarget(CREATOR.toUpperCase().replace('0X','0x')).entityId,CREATOR);
   assert.equal(parseTarget(`5042:token:${CREATOR}`).entityType,'TOKEN');
   assert.throws(()=>parseTarget('0x12'),/MALFORMED/);
-  assert.throws(()=>parseTarget(`4663:CREATOR:${CREATOR}`),/UNSUPPORTED_CHAIN/);
+  assert.throws(()=>parseTarget(`7777:CREATOR:${CREATOR}`),/UNSUPPORTED_CHAIN/);
   assert.throws(()=>parseTarget(`5042:HUMAN:${CREATOR}`),/UNSUPPORTED_ENTITY/);
   assert.equal(parseAutonomousCommand(`/watch@OtherBot ${CREATOR}`),null);
 });
@@ -35,7 +35,7 @@ test('DIG creator/token/launch receipts are stable, bounded, partial and determi
   try {
     const receipt=await dig(f.db,subject(),f.now());
     assert.equal((await dig(f.db,subject(),f.now()+1)).caseId,receipt.caseId);
-    for(const target of [parseTarget(`5042:TOKEN:${f.initial.token}`),parseTarget(f.initial.launchId)]) {
+    for(const target of [parseTarget(`4663:TOKEN:${f.initial.token}`),parseTarget(f.initial.launchId)]) {
       assert.equal((await dig(f.db,target,f.now())).evidenceRefs[0]!.launchId,f.initial.launchId);
     }
     const text=renderReceipt(receipt,'DIG');
@@ -44,14 +44,14 @@ test('DIG creator/token/launch receipts are stable, bounded, partial and determi
     assert.doesNotMatch(text,/\b(?:buy|sell|safe token|rug verdict|smart money|guaranteed)\b/i);
     assert.equal(receipt.timestamp.eventTime,null);
     await assert.rejects(dig(f.db,parseTarget(`5042:WALLET:${CREATOR}`),f.now()),/UNSUPPORTED_ENTITY/);
-    await assert.rejects(dig(f.db,{...subject(),chainId:4663},f.now()),/UNSUPPORTED_CHAIN/);
+    await assert.rejects(dig(f.db,{...subject(),chainId:5042},f.now()),/INDEX_UNAVAILABLE/);
   } finally {f.db.close();}
 });
 
 test('DIG incomplete evidence and cross-chain launch lookup fail closed',async()=>{
   const f=await autonomousFixture();
   try {
-    const other=await f.launch(90,CREATOR,4663);
+    const other=await f.launch(90,CREATOR,5042);
     await assert.rejects(dig(f.db,parseTarget(other.launchId),f.now()),/EVIDENCE_UNAVAILABLE/);
     await f.db.exec('DELETE FROM provenance_facts');
     await assert.rejects(dig(f.db,subject(),f.now()),/EVIDENCE_UNAVAILABLE/);
@@ -65,7 +65,7 @@ test('WHY reconstructs receipts and rejects missing evidence, unknown case and t
   try {
     const receipt=await dig(f.db,subject(),f.now());
     assert.deepEqual(await why(f.db,receipt.caseId,f.now()),receipt);
-    assert.match(renderReceipt(receipt,'WHY'),/fact: binrat-fact:5042/);
+    assert.match(renderReceipt(receipt,'WHY'),/fact: binrat-fact:4663/);
     await assert.rejects(why(f.db,'0'.repeat(64),f.now()),/RECEIPT_UNAVAILABLE/);
     await f.db.prepare('UPDATE rat_v1_cases SET receipt_json=? WHERE case_id=?')
       .bind(JSON.stringify({...receipt,epistemicClass:'DERIVED'}),receipt.caseId).run();
@@ -86,12 +86,12 @@ test('WATCH add/duplicate/list/remove/duplicate remove and webhook retry have on
     await f.send(request,{updateId:201});
     assert.equal((await listWatches(f.db,PRINCIPAL))[0]!.generation,initial.generation);
     assert.equal(initial.start_block,102); // NOT lagging confirmed checkpoint 100.
-    await f.send('/watches'); assert.match(f.sent.at(-1)!.text,/5042:CREATOR/);
+    await f.send('/watches'); assert.match(f.sent.at(-1)!.text,/4663:CREATOR/);
     await f.send(`/unwatch ${CREATOR}`,{updateId:202});
     await f.send(`/unwatch ${CREATOR}`,{updateId:203});
     assert.equal((await listWatches(f.db,PRINCIPAL)).length,0);
     assert.equal(await count(f.db,'rat_v1_watches'),1);
-    await f.send('/watch malformed'); assert.match(f.sent.at(-1)!.text,/Use an address/);
+    await f.send('/watch malformed'); assert.match(f.sent.at(-1)!.text,/Use a Robinhood address/);
   } finally {f.db.close();}
 });
 
@@ -120,6 +120,25 @@ test('WATCH atomic quota boundary under concurrent requests; duplicates do not c
   } finally {f.db.close();}
 });
 
+test('controlled activation scopes autonomous commands to one private tester and preserves legacy bot behavior',async()=>{
+  const f=await autonomousFixture();
+  try {
+    f.env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED='false';
+    (f.env as typeof f.env & {BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?:string}).BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID='77';
+
+    await f.send('/watches',{userId:77,chatId:77,updateId:7100});
+    assert.match(f.sent.at(-1)!.text,/watch list \(FREE: 25\)/);
+
+    await f.send('/watches',{userId:88,chatId:88,updateId:7101});
+    assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
+    assert.doesNotMatch(f.sent.at(-1)!.text,/FREE: 25/);
+
+    (f.env as typeof f.env & {BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?:string}).BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID='invalid';
+    await f.send('/watches',{userId:77,chatId:77,updateId:7102});
+    assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
+  } finally {f.db.close();}
+});
+
 test('private owner isolation and webhook authentication reject groups, forged authority and callbacks',async()=>{
   const f=await autonomousFixture();
   try {
@@ -137,10 +156,10 @@ test('fresh watch source rejects wrong chain, stale head and missing hash',async
   const f=await autonomousFixture();
   try {
     for(const head of [
-      {chainId:4663,block:102n,hash:hash(102),timestampMs:f.now()},
-      {chainId:5042,block:99n,hash:hash(99),timestampMs:f.now()},
-      {chainId:5042,block:102n,hash:hash(102),timestampMs:f.now()-61000},
-      {chainId:5042,block:102n,hash:'',timestampMs:f.now()}
+      {chainId:5042,block:102n,hash:hash(102),timestampMs:f.now()},
+      {chainId:4663,block:99n,hash:hash(99),timestampMs:f.now()},
+      {chainId:4663,block:102n,hash:hash(102),timestampMs:f.now()-61000},
+      {chainId:4663,block:102n,hash:'',timestampMs:f.now()}
     ]) await assert.rejects(mutateWatch(f.db,PRINCIPAL,500,subject(),'WATCH',FREE_CAPACITY,f.now(),
       {...f.source,head:async()=>head}),/SOURCE_UNAVAILABLE/);
     assert.equal(await count(f.db,'rat_v1_watches'),0);
@@ -151,7 +170,7 @@ test('historical/backfilled or other-chain events never masquerade as future ale
   const f=await autonomousFixture();
   try {
     await arm(f); f.advance();
-    await f.launch(101); await f.launch(102); await f.launch(105,CREATOR,4663);
+    await f.launch(101); await f.launch(102); await f.launch(105,CREATOR,5042);
     await f.checkpoint(105); await f.cycle();
     assert.equal(await count(f.db,'rat_v1_outbox'),0); assert.equal(f.sent.length,0);
     // Delayed ingestion alone is not evidence of event recency.

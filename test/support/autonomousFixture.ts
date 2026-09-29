@@ -8,6 +8,7 @@ import { handleSyncQueueBatch } from '../../src/cloudflare/syncQueue.js';
 import { deriveEventId, deriveLaunchId } from '../../src/core/identity.js';
 import { buildProvenanceFact } from '../../src/intelligence/provenance.js';
 import { ARCPAD_LAUNCHER } from '../../src/arc/chain.js';
+import { PONS_V2_FACTORY } from '../../src/pons/chain.js';
 import type { Hex, LaunchObserved } from '../../src/core/types.js';
 import type { WatchSource } from '../../src/autonomous/source.js';
 
@@ -19,7 +20,7 @@ export const PRINCIPAL = {userId:77,chatId:77};
 export async function autonomousFixture() {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
-  const store = new D1Store(db,5042);
+  const store = new D1Store(db,4663);
   let now = 1_790_640_000_000;
   let head = 102;
   let update = 100;
@@ -28,11 +29,11 @@ export async function autonomousFixture() {
   const replacedHashes = new Map<number,string>();
   const blockTimes = new Map<number,number>();
   const source: WatchSource = {
-    async head() { return {chainId:5042,block:BigInt(head),hash:hash(head),timestampMs:now}; },
+    async head() { return {chainId:4663,block:BigInt(head),hash:hash(head),timestampMs:now}; },
     async point(block) { return {hash:replacedHashes.get(Number(block)) ?? hash(Number(block)),
       timestampMs:blockTimes.get(Number(block)) ?? now-10000}; }
   };
-  const env = {DB:db,BINRAT_AUTONOMOUS_RAT_ENABLED:'true',TELEGRAM_BOT_TOKEN:'fixture:token',
+  const env = {DB:db,BINRAT_AUTONOMOUS_RAT_ENABLED:'true',BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'true',TELEGRAM_BOT_TOKEN:'fixture:token',
     TELEGRAM_WEBHOOK_SECRET:'fixture-secret',TELEGRAM_REPLIES_ENABLED:'true',TELEGRAM_MAX_MESSAGES_PER_MINUTE:'10000'};
   const fakeFetch: typeof fetch = async (url,init) => {
     if (!String(url).startsWith('https://api.telegram.org/botfixture:token/sendMessage')) throw new Error('FIXTURE_NETWORK_FORBIDDEN');
@@ -43,16 +44,16 @@ export async function autonomousFixture() {
   const checkpoint = async (block:number) => {
     head = Math.max(head,block+2);
     await store.commitCheckpoint({blockNumber:BigInt(block),blockHash:hash(block),guardBlockNumber:null,guardBlockHash:null});
-    await new D1RuntimeStateStore(db,5042).put({sourceVerified:true,liveCaughtUp:true,headBlock:BigInt(head),targetBlock:BigInt(block),
+    await new D1RuntimeStateStore(db,4663).put({sourceVerified:true,liveCaughtUp:true,headBlock:BigInt(head),targetBlock:BigInt(block),
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,
       lastObservationError:null,updatedAtMs:now});
   };
-  const launch = async (block:number, creator=CREATOR, chainId=5042, observedAtMs=now): Promise<LaunchObserved> => {
+  const launch = async (block:number, creator=CREATOR, chainId=4663, observedAtMs=now): Promise<LaunchObserved> => {
     blockTimes.set(block,now);
-    const token=addr(block+1000),txHash=hash(block+10000),launcher=ARCPAD_LAUNCHER;
+    const token=addr(block+1000),txHash=hash(block+10000),launcher=chainId===4663 ? PONS_V2_FACTORY : ARCPAD_LAUNCHER;
     const value: LaunchObserved = {chainId,blockNumber:BigInt(block),blockHash:hash(block),observedAtMs,
-      launchId:await deriveLaunchId({chainId,launcher,txHash,token}),
-      eventId:await deriveEventId({chainId,launcher,txHash,logIndex:0}),source:'ARCPAD',launcher,txHash,logIndex:0,
+      launchId:await deriveLaunchId({chainId,launcher,txHash,token,source:chainId===4663?'PONS_V2':'ARCPAD'}),
+      eventId:await deriveEventId({chainId,launcher,txHash,logIndex:0,source:chainId===4663?'PONS_V2':'ARCPAD'}),source:chainId===4663?'PONS_V2':'ARCPAD',launcher,txHash,logIndex:0,
       token,creator,pool:addr(block+2000),name:'SYNTHETIC FIXTURE',symbol:'FIXTURE',imageUri:'',website:'',twitter:'',telegram:''};
     const chainStore = new D1Store(db,chainId);
     await chainStore.putLaunch(value); await chainStore.putProvenanceFact(await buildProvenanceFact(value));
@@ -73,7 +74,7 @@ export async function autonomousFixture() {
     return {ack,retry};
   };
   await checkpoint(100);
-  const initial = await launch(100,CREATOR,5042,now-10000);
+  const initial = await launch(100,CREATOR,4663,now-10000);
   return {db,store,env,source,sent,transcript,replacedHashes,blockTimes,checkpoint,launch,send,cycle,fakeFetch,initial,
     now:()=>now,advance:(ms=1000)=>{now+=ms;},setHead:(n:number)=>{head=n;}};
 }
@@ -105,7 +106,7 @@ export async function runRatsShareDemo() {
   const caseId=(ratsReply.match(/WHY: \/why ([0-9a-f]{64})/) ?? [])[1];
   if (!caseId) throw new Error('DEMO_RATS_CASE_MISSING');
   await f.send(`/why ${caseId}`,{updateId:11});
-  await f.send(`/watch 5042:CREATOR:${CREATOR}`,{updateId:12});
+  await f.send(`/watch 4663:CREATOR:${CREATOR}`,{updateId:12});
   f.advance(); await f.launch(105); await f.checkpoint(105);
   f.transcript.push('FIXTURE EVENT: canonical launch at block 105, after User A watch boundary.');
   await f.cycle();
@@ -118,7 +119,7 @@ export async function runRatsShareDemo() {
   const start=deepLink.slice(deepLink.indexOf('start=')+6);
   await f.send(`/start ${start}`,{userId:88,chatId:88,updateId:14});
   await f.send(`/why ${alert.case_id}`,{userId:88,chatId:88,updateId:15});
-  await f.send(`/watch 5042:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:16});
+  await f.send(`/watch 4663:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:16});
   f.transcript.push('VERIFY: User A and User B have independent watches; one alert exists; no pre-watch event was alerted.');
   return {f,caseId,alertCaseId:alert.case_id,deepLink};
 }

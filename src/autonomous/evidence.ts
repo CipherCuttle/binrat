@@ -5,9 +5,9 @@ import { buildProvenanceFact } from '../intelligence/provenance.js';
 import { canonicalJson } from '../evidence/canonical.js';
 import { makeReceipt, type Entity, type EvidenceRef, type Receipt } from './model.js';
 
-export async function authoritativeCheckpoint(db: D1DatabaseLike, now: number): Promise<bigint> {
-  const state = await new D1RuntimeStateStore(db, 5042).get();
-  const checkpoint = await new D1Store(db, 5042).getCheckpoint();
+export async function authoritativeCheckpoint(db: D1DatabaseLike, now: number, chainId = 5042): Promise<bigint> {
+  const state = await new D1RuntimeStateStore(db, chainId).get();
+  const checkpoint = await new D1Store(db, chainId).getCheckpoint();
   if (!state?.sourceVerified || !state.liveCaughtUp || state.lastSyncError || !checkpoint ||
       state.updatedAtMs > now || now - state.updatedAtMs > 180_000 ||
       state.targetBlock === null || checkpoint.blockNumber !== state.targetBlock) {
@@ -16,14 +16,14 @@ export async function authoritativeCheckpoint(db: D1DatabaseLike, now: number): 
   return checkpoint.blockNumber;
 }
 
-export async function evidenceForLaunch(db: D1DatabaseLike, id: string, checkpoint: bigint): Promise<EvidenceRef> {
-  const launch = await new D1Store(db, 5042).getLaunch(id);
-  if (!launch || launch.chainId !== 5042 || launch.source !== 'ARCPAD' || launch.blockNumber > checkpoint) {
+export async function evidenceForLaunch(db: D1DatabaseLike, id: string, checkpoint: bigint, chainId = 5042): Promise<EvidenceRef> {
+  const launch = await new D1Store(db, chainId).getLaunch(id);
+  if (!launch || launch.chainId !== chainId || launch.blockNumber > checkpoint) {
     throw new Error('EVIDENCE_UNAVAILABLE');
   }
   const fact = await buildProvenanceFact(launch);
   const stored = await db.prepare('SELECT payload_json,evidence_digest FROM provenance_facts WHERE chain_id=? AND fact_id=? AND launch_id=?')
-    .bind(5042, fact.factId, id).first<{ payload_json: string; evidence_digest: string }>();
+    .bind(chainId, fact.factId, id).first<{ payload_json: string; evidence_digest: string }>();
   if (!stored || stored.evidence_digest !== fact.evidenceDigest || stored.payload_json !== canonicalJson(fact)) {
     throw new Error('EVIDENCE_UNAVAILABLE');
   }
@@ -48,16 +48,16 @@ export async function saveCase(db: D1DatabaseLike, receipt: Receipt): Promise<Re
 }
 
 export async function dig(db: D1DatabaseLike, subject: Entity, now: number): Promise<Receipt> {
-  if (subject.chainId !== 5042) throw new Error('UNSUPPORTED_CHAIN');
+  if (subject.chainId !== 5042 && subject.chainId !== 4663) throw new Error('UNSUPPORTED_CHAIN');
   if (subject.entityType === 'WALLET') throw new Error('UNSUPPORTED_ENTITY');
-  const tip = await authoritativeCheckpoint(db, now);
+  const tip = await authoritativeCheckpoint(db, now, subject.chainId);
   const column = subject.entityType === 'CREATOR' ? 'creator' : subject.entityType === 'TOKEN' ? 'token' : 'launch_id';
-  const rows = await db.prepare(`SELECT launch_id FROM launches WHERE chain_id=5042 AND ${column}=?
+  const rows = await db.prepare(`SELECT launch_id FROM launches WHERE chain_id=? AND ${column}=?
     AND CAST(block_number AS INTEGER)<=? ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id LIMIT 5`)
-    .bind(subject.entityId, Number(tip)).all<{ launch_id: string }>();
+    .bind(subject.chainId, subject.entityId, Number(tip)).all<{ launch_id: string }>();
   if (!rows.success || !rows.results?.length) throw new Error('EVIDENCE_UNAVAILABLE');
   const refs: EvidenceRef[] = [];
-  for (const row of rows.results) refs.push(await evidenceForLaunch(db, row.launch_id, tip));
+  for (const row of rows.results) refs.push(await evidenceForLaunch(db, row.launch_id, tip, subject.chainId));
   return saveCase(db, await makeReceipt(subject, refs, tip.toString(), now));
 }
 
@@ -67,11 +67,11 @@ export async function why(db: D1DatabaseLike, caseId: string, now: number): Prom
     .first<{ receipt_json: string }>();
   if (!row) throw new Error('RECEIPT_UNAVAILABLE');
   const receipt = JSON.parse(row.receipt_json) as Receipt;
-  if (receipt.chainId !== 5042 || !Array.isArray(receipt.evidenceRefs) ||
+  if ((receipt.chainId !== 5042 && receipt.chainId !== 4663) || !Array.isArray(receipt.evidenceRefs) ||
       !receipt.evidenceRefs.length || receipt.evidenceRefs.length > 5) throw new Error('RECEIPT_UNAVAILABLE');
-  const tip = await authoritativeCheckpoint(db, now);
+  const tip = await authoritativeCheckpoint(db, now, receipt.chainId);
   for (const ref of receipt.evidenceRefs) {
-    const current = await evidenceForLaunch(db, ref.launchId, tip);
+    const current = await evidenceForLaunch(db, ref.launchId, tip, receipt.chainId);
     if (canonicalJson(current) !== canonicalJson(ref)) throw new Error('RECEIPT_UNAVAILABLE');
   }
   const rebuilt = await makeReceipt(receipt.subject, receipt.evidenceRefs,

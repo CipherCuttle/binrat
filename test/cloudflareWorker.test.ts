@@ -11,6 +11,20 @@ import { D1CompatDatabase } from './support/d1Compat.js';
 
 const CHAIN_ID = 5042;
 
+test('Cloudflare cron queues an independent bounded Pons job', async () => {
+  const db = new D1CompatDatabase();
+  const sent: Array<{ kind: string }> = [];
+  try {
+    await worker.scheduled({}, {
+      DB: db,
+      SYNC_QUEUE: { async send(message) { sent.push(message); } }
+    });
+    assert.deepEqual(sent.map((message) => message.kind).sort(), [
+      'PONS_SYNC_CYCLE', 'SYNC_CYCLE'
+    ]);
+  } finally { db.close(); }
+});
+
 test('Cloudflare health is instant and fail-closed before durable runtime state exists', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);

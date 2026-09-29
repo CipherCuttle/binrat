@@ -30,7 +30,7 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.equal(first.candidates.length,2);
     assert.equal(first.candidates[0]!.entity.entityId,CREATOR);
     assert.equal(first.candidates[1]!.entity.entityId,other);
-    assert.ok(first.candidates.every(candidate => candidate.entity.chainId===5042 && candidate.evidenceRefs.length>=2));
+    assert.ok(first.candidates.every(candidate => candidate.entity.chainId===4663 && candidate.evidenceRefs.length>=2));
     assert.ok(first.candidates.every(candidate => candidate.reasons.every(reason => reason.evidenceRefs.length>0)));
     assert.equal(first.coverage.status,'PARTIAL');
     assert.match(renderRats(first),/Coverage: PARTIAL/);
@@ -38,7 +38,7 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.doesNotMatch(JSON.stringify(first),/profit|p.?&.?l|smart.money|score|whale|insider/i);
     const receipt=await why(f.db,first.candidates[0]!.caseId,f.now());
     assert.deepEqual(receipt.discovery?.reasons,first.candidates[0]!.reasons);
-    assert.equal(await count(f.db,'rat_v11_discovery_snapshots'),1);
+    assert.equal(await count(f.db,'rat_v11_pons_discovery_snapshots'),1);
   } finally { f.db.close(); }
 });
 
@@ -62,10 +62,10 @@ test('maximum RATS cards and five-receipt public recovery fit one Telegram messa
 test('RATS fails closed on stale/unready state and rejects malformed source evidence', async () => {
   const {f} = await recurrentFixture();
   try {
-    await new D1RuntimeStateStore(f.db,5042).put({sourceVerified:false,liveCaughtUp:true,headBlock:102n,targetBlock:100n,
+    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:false,liveCaughtUp:true,headBlock:102n,targetBlock:100n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
     await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
-    await new D1RuntimeStateStore(f.db,5042).put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:100n,
+    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:100n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
     await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
   } finally { f.db.close(); }
@@ -84,15 +84,15 @@ test('RATS uses the existing creator-only WATCH route and snapshot retention is 
   try {
     const snapshot=await discoverRats(f.db,f.now());
     const candidate=snapshot.candidates[0]!;
-    await f.send(`/watch 5042:CREATOR:${candidate.entity.entityId}`,{updateId:700});
+    await f.send(`/watch 4663:CREATOR:${candidate.entity.entityId}`,{updateId:700});
     assert.equal((await listWatches(f.db,PRINCIPAL))[0]!.entity_id,candidate.entity.entityId);
-    await f.send(`/watch 5042:TOKEN:${candidate.entity.entityId}`,{updateId:701});
-    assert.match(f.sent.at(-1)!.text,/reported creators only/);
+    await f.send(`/watch 4663:TOKEN:${candidate.entity.entityId}`,{updateId:701});
+    assert.match(f.sent.at(-1)!.text,/reported deployers only/);
     for(let i=0;i<205;i++) await f.db.prepare(`INSERT OR IGNORE INTO rat_v11_discovery_snapshots
       (discovery_id,chain_id,source_checkpoint,rule_version,coverage_status,snapshot_json,generated_at_ms,expires_at_ms)
-      VALUES (?,?,?,?,?,?,?,?)`).bind(i.toString(16).padStart(64,'0'),5042,'100','RATS_CREATOR_RECURRENCE_V1','PARTIAL',JSON.stringify(snapshot),f.now()-i, f.now()+100000).run();
+      VALUES (?,?,?,?,?,?,?,?)`).bind(i.toString(16).padStart(64,'0'),4663,'100','RATS_PONS_DEPLOYER_RECURRENCE_V1','PARTIAL',JSON.stringify(snapshot),f.now()-i, f.now()+100000).run();
     await discoverRats(f.db,f.now());
-    assert.ok(await count(f.db,'rat_v11_discovery_snapshots')<=200);
+    assert.ok(await count(f.db,'rat_v11_pons_discovery_snapshots')<=200);
   } finally { f.db.close(); }
 });
 
@@ -121,12 +121,12 @@ test('DIG, RATS and future ALERT cases create opaque public receipts without cro
     await f.send(`/start receipt_${publicReceipt.receiptId}`,{userId:88,chatId:88,updateId:802});
     const opened=f.sent.at(-1)!.text;
     assert.match(opened,/SOMEBODY LEFT YOU A RECEIPT/); assert.doesNotMatch(opened,/private attention/i);
-    assert.match(renderOpenedReceipt(publicReceipt),/WATCH: \/watch 5042:CREATOR/);
-    await f.send(`/watch 5042:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:803});
+    assert.match(renderOpenedReceipt(publicReceipt),/WATCH: \/watch 4663:CREATOR/);
+    await f.send(`/watch 4663:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:803});
     assert.equal((await listWatches(f.db,PRINCIPAL)).length,1);
     assert.equal((await listWatches(f.db,{userId:88,chatId:88})).length,1);
     assert.deepEqual(await new FreeEntitlements().resolve({userId:88,chatId:88}),FREE_CAPACITY);
-    const tokenCase=await dig(f.db,parseTarget(`5042:TOKEN:${f.initial.token}`),f.now());
+    const tokenCase=await dig(f.db,parseTarget(`4663:TOKEN:${f.initial.token}`),f.now());
     const tokenShare=await createPublicShareReceipt(f.db,tokenCase.caseId,f.now());
     assert.match(renderOpenedReceipt(tokenShare),/WATCH unavailable for this role/);
   } finally { f.db.close(); }
@@ -141,7 +141,7 @@ test('public receipt tampering, unknown/expired opening and repeated opens fail 
     await assert.rejects(openPublicShareReceipt(f.db,'f'.repeat(32),f.now()),/PUBLIC_RECEIPT_UNAVAILABLE/);
     const tampered=`${shared.receiptId[0]==='0' ? '1' : '0'}${shared.receiptId.slice(1)}`;
     await assert.rejects(openPublicShareReceipt(f.db,tampered,f.now()),/PUBLIC_RECEIPT_UNAVAILABLE/);
-    await f.db.prepare('UPDATE rat_v11_public_receipts SET expires_at_ms=? WHERE receipt_id=?').bind(f.now(),shared.receiptId).run();
+    await f.db.prepare('UPDATE rat_v11_pons_public_receipts SET expires_at_ms=? WHERE receipt_id=?').bind(f.now(),shared.receiptId).run();
     await assert.rejects(openPublicShareReceipt(f.db,shared.receiptId,f.now()),/PUBLIC_RECEIPT_UNAVAILABLE/);
     await f.db.prepare('UPDATE rat_v1_cases SET receipt_json=? WHERE case_id=?').bind(JSON.stringify({...await why(f.db,candidate.caseId,f.now()),userId:77}),candidate.caseId).run();
     await assert.rejects(createPublicShareReceipt(f.db,candidate.caseId,f.now()),/RECEIPT_UNAVAILABLE/);

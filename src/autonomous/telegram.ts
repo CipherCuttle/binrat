@@ -36,6 +36,9 @@ export async function handleAutonomousCommand(
     }
     if (command.name === 'share') return renderShareArtifact(await createPublicShareReceipt(db,command.argument,now));
     if (command.name === 'start') {
+      if (!command.argument) {
+        return '🐀 BINRAT\n\nI dig through Pons launches and reported deployers. You get the receipts.\n\n/rats — what the rat noticed\n/dig <address> — investigate\n/watches — what I\'m watching';
+      }
       const match = command.argument.match(/^receipt_([0-9a-f]{32})$/);
       if (!match) throw new Error('PUBLIC_RECEIPT_UNAVAILABLE');
       return renderOpenedReceipt(await openPublicShareReceipt(db,match[1]!,now));
@@ -62,14 +65,14 @@ export async function handleAutonomousCommand(
     const reason = error instanceof Error ? error.message : '';
     const messages: Record<string,string> = {
       CAPACITY_REACHED:'DIG/WATCH research capacity reached. Try after 00:00 UTC. Existing watches, UNWATCH and WHY remain available.',
-      MALFORMED_TARGET:'Use an address, launch ID, or 5042:CREATOR:<address> / 5042:TOKEN:<address> / 5042:LAUNCH:<id>.',
-      UNSUPPORTED_CHAIN:'Only Arc 5042 evidence is supported here. Pons 4663 intelligence is not live.',
-      UNSUPPORTED_ENTITY:'This entity is unsupported. Arbitrary wallet history is not available; a pool recipient is not a human identity.',
-      WATCH_CREATOR_ONLY:'V1 watches support reported creators only. Use the creator target shown by DIG.',
+      MALFORMED_TARGET:'Use a Robinhood address or launch ID, or 4663:CREATOR:<address> / 4663:TOKEN:<address> / 4663:LAUNCH:<id>. Arc 5042 is historical evidence only.',
+      UNSUPPORTED_CHAIN:'Only Robinhood 4663 live intelligence and stored Arc 5042 historical evidence are supported.',
+      UNSUPPORTED_ENTITY:'This entity is unsupported. Arbitrary wallet history is not available; a protocol address is not a human identity.',
+      WATCH_CREATOR_ONLY:'Live watches support exact Pons-reported deployers only. Use the deployer target shown by DIG.',
       EVIDENCE_UNAVAILABLE:'Canonical evidence is missing or incomplete for this target. No analysis or safety conclusion is available.',
       RECEIPT_UNAVAILABLE:'Receipt unavailable: missing, changed or incomplete canonical evidence. The previous claim cannot be reconstructed.',
       INDEX_UNAVAILABLE:'The live index is unavailable or stale. No new investigation or alert authority.',
-      SOURCE_UNAVAILABLE:'A fresh canonical Arc boundary could not be verified. Watch was not added.',
+      SOURCE_UNAVAILABLE:'A fresh canonical Robinhood boundary could not be verified. Watch was not added.',
       RATS_USAGE:'Usage: /rats',
       DISCOVERY_UNAVAILABLE:'Discovery receipts are unavailable. No rats invented.',
       DISCOVERY_WRITE_FAILED:'Discovery receipts could not be saved. No rats invented.',

@@ -46,7 +46,8 @@ export async function mutateWatch(
 ): Promise<string> {
   const replay = await commandReplay(db, p, updateId);
   if (replay !== null) return replay;
-  if (target.chainId !== 5042) throw new Error('UNSUPPORTED_CHAIN');
+  // Explicit historical targets remain reconstructible; bare/default targets are 4663.
+  if (target.chainId !== 4663 && target.chainId !== 5042) throw new Error('UNSUPPORTED_CHAIN');
   if (target.entityType !== 'CREATOR') throw new Error('WATCH_CREATOR_ONLY');
   const old = await db.prepare(`SELECT * FROM rat_v1_watches WHERE user_id=? AND chat_id=?
     AND chain_id=? AND entity_type=? AND entity_id=?`)
@@ -59,7 +60,7 @@ export async function mutateWatch(
     if (!await reserveDig(db,p,updateId,now,capacity)) throw new Error('CAPACITY_REACHED');
     // Canonical creator evidence is mandatory. This bounded shared-index read never scans RPC history.
     await dig(db, target, now);
-    const tip = await authoritativeCheckpoint(db, now);
+    const tip = await authoritativeCheckpoint(db, now, target.chainId);
     const head = await source.head().catch(() => { throw new Error('SOURCE_UNAVAILABLE'); });
     if (head.chainId !== target.chainId || head.block < tip || head.block > BigInt(Number.MAX_SAFE_INTEGER) ||
         !/^0x[0-9a-f]{64}$/.test(head.hash) || !Number.isSafeInteger(head.timestampMs) ||

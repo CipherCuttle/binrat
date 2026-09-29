@@ -3,7 +3,7 @@ import { sha256Hex } from '../evidence/canonical.js';
 
 export const PROVENANCE_DERIVATION_VERSION = 'BINRAT_PROVENANCE_V0' as const;
 
-export type ProvenanceFactKind = 'ARCPAD_REPORTED_CREATOR';
+export type ProvenanceFactKind = 'ARCPAD_REPORTED_CREATOR' | 'PONS_REPORTED_DEPLOYER';
 export type ProvenanceEdgeKind = 'REPORTED_CREATOR' | 'PREVIOUS_LAUNCH';
 export type EvidenceClass = 'DIRECT_ONCHAIN' | 'DERIVED_ONCHAIN';
 
@@ -40,7 +40,7 @@ export async function buildProvenanceFact(launch: LaunchObserved): Promise<Prove
   const factId = `binrat-fact:${launch.chainId}:${launch.launchId}`;
   const payload = {
     factId,
-    kind: 'ARCPAD_REPORTED_CREATOR' as const,
+    kind: (launch.source === 'PONS_V2' ? 'PONS_REPORTED_DEPLOYER' : 'ARCPAD_REPORTED_CREATOR') as ProvenanceFactKind,
     chainId: launch.chainId,
     launchId: launch.launchId,
     creator,

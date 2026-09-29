@@ -24,6 +24,7 @@ import {
   syncErrorCode,
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
+import { PonsLaunchSource } from '../src/pons/ponsSource.js';
 import type {
   ObservationBlockPoint,
   ObservationSource
@@ -123,6 +124,8 @@ test('Arc RPC resolver prefers configured authority and otherwise uses the publi
 
 test('sync diagnostics preserve explicit codes and expose only bounded safe classes', () => {
   assert.equal(syncErrorCode(new Error('ARCPAD_AUTHORITY_TEST')), 'ARCPAD_AUTHORITY_TEST');
+  assert.equal(syncErrorCode(new Error('PONS_GET_HEAD_FAILED')), 'PONS_GET_HEAD_FAILED');
+  assert.equal(syncErrorCode(new Error('PONS_FACTORY_AUTHORITY_DRIFT')), 'PONS_FACTORY_AUTHORITY_DRIFT');
 
   const rateLimited = Object.assign(new Error('https://user:secret@rpc.example'), {
     name: 'HttpRequestError',
@@ -141,6 +144,10 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
     'SYNC_TIMEOUT_ERROR'
   );
   assert.equal(
+    syncErrorCode(new Error('Too many subrequests for this invocation')),
+    'PLATFORM_SUBREQUEST_LIMIT'
+  );
+  assert.equal(
     syncErrorCode(Object.assign(new Error('abort details'), { name: 'AbortError' })),
     'SYNC_ABORT_ERROR'
   );
@@ -157,6 +164,14 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
   assert.equal(code, 'SYNC_UNKNOWN_ERROR');
   assert.equal(code.includes('secret'), false);
   assert.equal(code.includes('https'), false);
+
+  const wrapped = new PonsLaunchSource({ client: {
+    getBlockNumber: async () => { throw Object.assign(new Error('https://secret.example'), { name: 'TimeoutError' }); }
+  } as never });
+  return assert.rejects(wrapped.getHeadBlockNumber(), (error: unknown) => {
+    assert.equal(syncErrorCode(error), 'PONS_GET_HEAD_FAILED');
+    return true;
+  });
 });
 
 test('Cloudflare sync persists live authority before subordinate history reads', async () => {
