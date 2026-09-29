@@ -51,6 +51,7 @@ export interface CloudflareSyncEnv {
   TELEGRAM_BOT_TOKEN?: string;
   /** Requires the separately applied additive V1 migration. No automatic migration. */
   BINRAT_AUTONOMOUS_RAT_ENABLED?: string;
+  BINRAT_TELEGRAM_UI_V2_ENABLED?: string;
   BINRAT_TELEGRAM_MEDIA_ENABLED?: string;
   BINRAT_PUBLIC_SITE_URL?: string;
 }
@@ -750,7 +751,8 @@ export async function runCloudflareRatWatchCycle(
       const sent = await deliverFindings(env.DB,
         deps.watchSource ?? robinhoodWatchSource(resolveRobinhoodRpcUrl(env)),
         required(env.TELEGRAM_BOT_TOKEN,'TELEGRAM_BOT_TOKEN'),deps.externalFetch ?? fetch,deps.now,
-        { enabled: env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true', origin: env.BINRAT_PUBLIC_SITE_URL ?? '' });
+        { enabled: env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true', origin: env.BINRAT_PUBLIC_SITE_URL ?? '',
+          uiV2: env.BINRAT_TELEGRAM_UI_V2_ENABLED === 'true' });
       return {status:'SUCCESS',enqueued,sent};
     }
     const enqueued = await watches.enqueueRecurrenceAlerts(ARC_CHAIN_ID, deps.now());

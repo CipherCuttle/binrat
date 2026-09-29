@@ -1,5 +1,5 @@
 import type { AutonomousOutcome } from '../../autonomous/outcome.js';
-import { entityKey } from '../../autonomous/model.js';
+import { entityKey, type Receipt } from '../../autonomous/model.js';
 import { callbackButton, copyButton } from './keyboard.js';
 import { TELEGRAM_UI_RENDERER_VERSION, type RatCard } from './types.js';
 
@@ -11,6 +11,9 @@ export function assertV2Caption(caption: string): string {
 }
 function card(card: Omit<RatCard,'rendererVersion'>): RatCard { return { ...card,rendererVersion:TELEGRAM_UI_RENDERER_VERSION,caption:assertV2Caption(card.caption) }; }
 function share(receipt: { shareId:string }): string { return receipt.shareId; }
+function shortReference(value: string): string {
+  return Array.from(value).length > 20 ? `${value.slice(0,10)}…${value.slice(-8)}` : value;
+}
 function summary(receipt: { source:string; chainId:number; subject:{entityType:string;entityId:string}; evidenceRefs:unknown[]; coverage:{asOfBlock:string} }): string {
   return `${receipt.source === 'PONS_V2' ? 'Robinhood/Pons' : 'Arc'} ${receipt.chainId} · ${receipt.subject.entityType} ${receipt.subject.entityId}\n`+
     `OBSERVED: ${receipt.evidenceRefs.length} retained indexed launch receipt(s).\n`+
@@ -49,6 +52,35 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
   if (outcome.kind === 'OPEN_RECEIPT') return card({view:'CASE',media:'evidence-found',caption:`🐀 Public receipt\n${summary(outcome.receipt.finding)}\nThis receipt contains no sharer, watch-owner, entitlement or chat state.`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
   if (outcome.kind === 'REPLAY') return card({view:'WATCH_STATE',media:'inquisitive',caption:outcome.reply,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
   return card({view:'ERROR',media:'error',caption:`🐀 ${outcome.code}\nNo evidence conclusion was made.`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
+}
+
+/**
+ * Presentation only: delivery has already re-verified the watch, event and
+ * canonical evidence before it reaches this renderer. Keep the compact alert
+ * separate from the full receipt available through the existing callbacks.
+ */
+export function renderAlertCard(receipt: Receipt, watchStartBlock: number): RatCard {
+  const ref = receipt.evidenceRefs[0];
+  if (!ref || !Number.isSafeInteger(watchStartBlock) || watchStartBlock < 0) throw new Error('ALERT_CARD_INPUT_INVALID');
+  const id = share(receipt);
+  const source = receipt.source === 'PONS_V2' ? 'Robinhood / Pons' : 'Arc';
+  return card({
+    view:'ALERT', media:'alert',
+    caption:[
+      '🐀 SAME PAWS. NEW LAUNCH.',
+      `${source} ${receipt.chainId}`,
+      `${receipt.source === 'PONS_V2' ? 'PONS' : 'ARCPAD'} REPORTED DEPLOYER\n${shortReference(ref.creator)}`,
+      `NEW INDEXED LAUNCH\n${shortReference(ref.launchId)}`,
+      `YOUR WATCH\nfuture indexed launch after block ${watchStartBlock}.\nevent block: ${ref.blockNumber}.`,
+      'Evidence: explicit future creator recurrence.',
+      'UNKNOWN: identity, intent, safety and future outcome.'
+    ].join('\n\n'),
+    keyboard:[
+      [callbackButton('Investigate',{action:'CASE',shareId:id}),callbackButton('Why',{action:'WHY',shareId:id})],
+      [callbackButton('Share',{action:'SHARE',shareId:id}),callbackButton('Unwatch',{action:'UNWATCH',shareId:id},'danger')],
+      [copyButton('Copy address',ref.creator)]
+    ]
+  });
 }
 
 export function digWaitingCard(): RatCard { return card({view:'DIG_WAITING',media:'inquisitive',caption:'🐀 DIG\n\ndrop a Robinhood/Pons deployer address into the reply box below.\n\ncanonical indexed evidence only.',keyboard:[[callbackButton('Home',{action:'HOME'})]]}); }
