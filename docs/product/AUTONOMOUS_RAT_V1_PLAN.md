@@ -88,6 +88,10 @@ remain disabled so old queue work cannot revive them. Re-watch gets a new genera
 Future-only boundary: read a fresh source head after explicit opt-in; verify Arc source
 authority and record head hash. Require event block strictly greater than that head,
 event ingestion after watch creation, and canonical confirmed checkpoint coverage.
+Before delivery also require the canonical event block timestamp strictly after watch
+creation (and not more than 15 seconds ahead of server time); missing timestamps fail
+closed. This catches delayed historical ingestion above a recently stale RPC head.
+Persist verified event time and watch creation in the private delivery receipt.
 Do not use the lagging index checkpoint or ingestion timestamp alone as the boundary.
 Historical/backfilled rows at or before head cannot alert. Reorg checks verify boundary
 and event hashes before sending; changed boundary suspends the watch (re-arm required).
@@ -145,7 +149,9 @@ privacy review. Wallet authentication never publishes user-wallet linkage by def
 One neutral `EntitlementProvider.resolve(principal)` returns capacity policy:
 profile FREE / PRO / HOLDER, watchLimit, dig quota, history depth, alert policy/latency,
 filter/group/deep-dig allowances. S1 production resolver always returns FREE, 25 watches,
-30 DIGs/user/UTC day, 1000 global DIGs/day, bounded latest evidence. WHY remains free.
+30 research admissions/user/UTC day, 1000 global/day, bounded latest evidence. DIG and
+WATCH share this budget because WATCH verifies evidence and reads a fresh RPC head.
+UNWATCH and WHY remain available at exhaustion. A duplicate update is metered once.
 Atomic metering is separate from evidence generation; duplicate update cannot spend
 again. No payment, balance or wallet-session logic inside handlers. PRO/HOLDER are type
 slots only, without runtime grants or configurable activation. Existing legacy holder
@@ -217,7 +223,7 @@ No schema initialization on webhook/request. Missing migration fails closed.
 |---|---|
 | Useful without token? | complete FREE DIG/WATCH/ALERT/WHY loop |
 | Utility without changing truth? | capacity resolver never enters factual renderer |
-| Exactly one future alert? | fresh-head boundary, unique outbox, atomic send claim; ambiguity held |
+| Exactly one future alert? | fresh-head and source-time boundary, unique outbox, atomic send claim; ambiguity held |
 | Every alert answers WHY? | immutable refs + canonical reconstruction required before send |
 | Chain scoped? | entity/watch/finding/outbox identities and joins carry chain |
 | Telegram retries safe? | update effects + quota dedupe, outbox CAS before network |

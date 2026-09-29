@@ -26,9 +26,11 @@ export async function autonomousFixture() {
   const sent: Array<{chat_id:number;text:string}> = [];
   const transcript: string[] = ['SYNTHETIC LOCAL FIXTURE — not a production claim.'];
   const replacedHashes = new Map<number,string>();
+  const blockTimes = new Map<number,number>();
   const source: WatchSource = {
     async head() { return {chainId:5042,block:BigInt(head),hash:hash(head),timestampMs:now}; },
-    async hash(block) { return replacedHashes.get(Number(block)) ?? hash(Number(block)); }
+    async point(block) { return {hash:replacedHashes.get(Number(block)) ?? hash(Number(block)),
+      timestampMs:blockTimes.get(Number(block)) ?? now-10000}; }
   };
   const env = {DB:db,BINRAT_AUTONOMOUS_RAT_ENABLED:'true',TELEGRAM_BOT_TOKEN:'fixture:token',
     TELEGRAM_WEBHOOK_SECRET:'fixture-secret',TELEGRAM_REPLIES_ENABLED:'true',TELEGRAM_MAX_MESSAGES_PER_MINUTE:'10000'};
@@ -46,6 +48,7 @@ export async function autonomousFixture() {
       lastObservationError:null,updatedAtMs:now});
   };
   const launch = async (block:number, creator=CREATOR, chainId=5042, observedAtMs=now): Promise<LaunchObserved> => {
+    blockTimes.set(block,now);
     const token=addr(block+1000),txHash=hash(block+10000),launcher=ARCPAD_LAUNCHER;
     const value: LaunchObserved = {chainId,blockNumber:BigInt(block),blockHash:hash(block),observedAtMs,
       launchId:await deriveLaunchId({chainId,launcher,txHash,token}),
@@ -71,7 +74,7 @@ export async function autonomousFixture() {
   };
   await checkpoint(100);
   const initial = await launch(100,CREATOR,5042,now-10000);
-  return {db,store,env,source,sent,transcript,replacedHashes,checkpoint,launch,send,cycle,fakeFetch,initial,
+  return {db,store,env,source,sent,transcript,replacedHashes,blockTimes,checkpoint,launch,send,cycle,fakeFetch,initial,
     now:()=>now,advance:(ms=1000)=>{now+=ms;},setHead:(n:number)=>{head=n;}};
 }
 

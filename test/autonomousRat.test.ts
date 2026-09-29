@@ -10,6 +10,8 @@ import { FreeEntitlements, FREE_CAPACITY } from '../src/autonomous/entitlements.
 import { commandReplay, listWatches, mutateWatch, reserveDig } from '../src/autonomous/watches.js';
 import { deliverFindings, enqueueFindings } from '../src/autonomous/delivery.js';
 import { parseAutonomousCommand } from '../src/autonomous/telegram.js';
+import { handleWorkerRequest } from '../src/cloudflare/worker.js';
+import type { D1DatabaseLike, D1PreparedStatementLike } from '../src/cloudflare/d1Types.js';
 
 const subject = ():Entity => parseTarget(CREATOR);
 const count = async (db:D1CompatDatabase,table:string,where='1=1') =>
@@ -113,7 +115,7 @@ test('WATCH atomic quota boundary under concurrent requests; duplicates do not c
     await Promise.all(targets.map((target,i)=>arm(f,1000+i,PRINCIPAL,target)));
     assert.equal((await listWatches(f.db,PRINCIPAL)).length,25);
     assert.equal(await count(f.db,'rat_v1_watches','enabled=1'),25);
-    await Promise.all(Array.from({length:5},(_,i)=>arm(f,2000+i,PRINCIPAL,targets[0]!)));
+    await Promise.all(Array.from({length:2},(_,i)=>arm(f,2000+i,PRINCIPAL,targets[0]!)));
     assert.equal(await count(f.db,'rat_v1_watches','enabled=1'),25);
   } finally {f.db.close();}
 });
@@ -254,6 +256,99 @@ test('additive migration repeats on deployed schema; missing migration fails clo
     await db.exec(migration);await db.exec(migration);
     assert.deepEqual(await listWatches(db,PRINCIPAL),[]);
   } finally {db.close();}
+});
+
+test('H1: WATCH admission bounds RPC and leaves UNWATCH available at exhaustion',async()=>{
+  const f=await autonomousFixture();
+  try {
+    let heads=0;
+    const source={...f.source,head:async()=>{heads++;return f.source.head();}};
+    for(let i=0;i<30;i++) await mutateWatch(f.db,PRINCIPAL,3000+i,subject(),'WATCH',FREE_CAPACITY,f.now(),source);
+    await assert.rejects(mutateWatch(f.db,PRINCIPAL,3030,subject(),'WATCH',FREE_CAPACITY,f.now(),source),/CAPACITY_REACHED/);
+    assert.equal(heads,30);assert.equal(await count(f.db,'rat_v1_dig_requests'),30);
+    await remove(f,4000);assert.equal((await listWatches(f.db,PRINCIPAL)).length,0);
+    await f.send(`/watch ${CREATOR}`,{updateId:4001});assert.match(f.sent.at(-1)!.text,/research capacity reached/);
+  } finally {f.db.close();}
+});
+
+test('H1: global cap gates concurrent WATCH principals before RPC',async()=>{
+  const f=await autonomousFixture();
+  try {
+    const capacity={...FREE_CAPACITY,globalDigsPerDay:2};let heads=0;
+    const source={...f.source,head:async()=>{heads++;return f.source.head();}};
+    const results=await Promise.allSettled(Array.from({length:8},(_,i)=>mutateWatch(f.db,
+      {userId:100+i,chatId:100+i},5000+i,subject(),'WATCH',capacity,f.now(),source)));
+    assert.equal(results.filter(r=>r.status==='fulfilled').length,2);assert.equal(heads,2);
+    assert.equal(await count(f.db,'rat_v1_dig_requests'),2);
+  } finally {f.db.close();}
+});
+
+test('H2: delayed event above a stale head but before opt-in never alerts; invalid times fail closed',async()=>{
+  for(const eventTime of ['PAST','EQUAL','MALFORMED','FUTURE'] as const) {
+    const f=await autonomousFixture();
+    try {
+      const creation=f.now();await arm(f);f.advance();await f.launch(105);await f.checkpoint(110);
+      f.blockTimes.set(105,eventTime==='PAST'?creation-1000:eventTime==='EQUAL'?creation:
+        eventTime==='MALFORMED'?Number.NaN:f.now()+16000);
+      await f.cycle();assert.equal(f.sent.length,0);
+      assert.equal(await count(f.db,'rat_v1_outbox',"state='CANCELLED' AND attempt_count=0"),1);
+    } finally {f.db.close();}
+  }
+});
+
+test('H2: future event time is recorded and private watch timing is owner-only',async()=>{
+  const f=await autonomousFixture();
+  try {
+    const creation=f.now();await arm(f);f.advance();await f.launch(105);await f.checkpoint(105);await f.cycle();
+    const receipt=await f.db.prepare('SELECT case_id,event_timestamp_ms,watch_created_at_ms FROM rat_v1_outbox')
+      .first<{case_id:string;event_timestamp_ms:number;watch_created_at_ms:number}>();
+    assert.ok(receipt);assert.equal(receipt.watch_created_at_ms,creation);assert.ok(receipt.event_timestamp_ms>creation);
+    await f.send(`/why ${receipt.case_id}`);assert.match(f.sent.at(-1)!.text,/event time > watch creation/);
+    await f.send(`/why ${receipt.case_id}`,{userId:88});
+    assert.doesNotMatch(f.sent.at(-1)!.text,/private attention|watch creation|user.?77/);
+    assert.match(f.sent.at(-1)!.text,/OBSERVED:/);
+  } finally {f.db.close();}
+});
+
+test('crash after Telegram success before receipt commit stays SENDING and cannot resend',async()=>{
+  const f=await autonomousFixture();
+  try {
+    await arm(f);f.advance();await f.launch(105);await f.checkpoint(105);await enqueueFindings(f.db,f.now());
+    const failing=(s:D1PreparedStatementLike):D1PreparedStatementLike=>({
+      bind:(...values)=>failing(s.bind(...values)),run:async()=>{throw new Error('SIMULATED_D1_RECEIPT_FAILURE');},
+      first:()=>s.first(),all:()=>s.all()
+    });
+    const db:D1DatabaseLike={
+      prepare:(sql)=>sql.includes('SET state=?,telegram_message_id=?')?failing(f.db.prepare(sql)):f.db.prepare(sql),
+      batch:(statements)=>f.db.batch(statements),exec:(sql)=>f.db.exec(sql)
+    };
+    await assert.rejects(deliverFindings(db,f.source,'fixture:token',f.fakeFetch,f.now),/SIMULATED_D1/);
+    assert.equal(await count(f.db,'rat_v1_outbox',"state='SENDING' AND attempt_count=1"),1);
+    await f.cycle();assert.equal(f.sent.length,1);
+  } finally {f.db.close();}
+});
+
+test('callback updates are ignored and disabled S1 does not consume its watches',async()=>{
+  const f=await autonomousFixture();
+  try {
+    const response=await handleWorkerRequest(new Request('https://fixture.invalid/telegram/webhook',{
+      method:'POST',headers:{'content-type':'application/json','x-telegram-bot-api-secret-token':'fixture-secret'},
+      body:JSON.stringify({update_id:9090,callback_query:{id:'forged',from:{id:77},data:`watch:${CREATOR}`}})
+    }),f.env,{now:f.now,externalFetch:f.fakeFetch,watchSource:f.source});
+    assert.equal(response.status,200);assert.equal(await count(f.db,'rat_v1_watches'),0);
+    await arm(f);f.advance();await f.launch(105);await f.checkpoint(105);
+    f.env.BINRAT_AUTONOMOUS_RAT_ENABLED='false';await f.cycle();
+    assert.equal(f.sent.length,0);assert.equal(await count(f.db,'rat_v1_outbox'),0);
+  } finally {f.db.close();}
+});
+
+test('five-reference receipt rendering fits Telegram without truncating evidence',async()=>{
+  const f=await autonomousFixture();
+  try {
+    for(let block=90;block<95;block++)await f.launch(block);
+    const receipt=await dig(f.db,subject(),f.now());assert.equal(receipt.evidenceRefs.length,5);
+    for(const mode of ['DIG','WHY','ALERT'] as const) assert.ok(renderReceipt(receipt,mode).length<4096);
+  } finally {f.db.close();}
 });
 
 test('deterministic DIG → WATCH → future ALERT → WHY demo closes replay and unwatch invariants',async()=>{

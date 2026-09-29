@@ -326,6 +326,8 @@ CREATE TABLE IF NOT EXISTS rat_v1_outbox (
   chat_id INTEGER NOT NULL,
   watch_generation TEXT NOT NULL,
   watch_start_block INTEGER NOT NULL,
+  watch_created_at_ms INTEGER NOT NULL,
+  event_timestamp_ms INTEGER,
   attention TEXT NOT NULL CHECK(attention = 'ALERT'),
   reason TEXT NOT NULL CHECK(reason = 'EXPLICIT_FUTURE_CREATOR_RECURRENCE'),
   state TEXT NOT NULL CHECK(state IN ('PENDING','SENDING','SENT','UNKNOWN','FAILED','CANCELLED')),
