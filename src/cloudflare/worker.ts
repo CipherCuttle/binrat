@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { handleAutonomousCommand, parseAutonomousCommand } from '../autonomous/telegram.js';
-import { arcWatchSource, type WatchSource } from '../autonomous/source.js';
+import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
+import { ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
 import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
 import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
 import { projectBagIntelligence } from '../public/bagIntelligence.js';
@@ -46,11 +47,13 @@ import {
 import type { D1DatabaseLike } from './d1Types.js';
 import {
   enqueueSyncCycle,
+  enqueuePonsSyncCycle,
   handleSyncQueueBatch,
   type CloudflareSyncEnv,
   type SyncQueueBatchLike,
   type SyncQueueProducerLike
 } from './syncQueue.js';
+import { autonomousResultMedia, editRatCard, sendRatCard } from '../telegram/ratMedia.js';
 
 export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   DB: D1DatabaseLike;
@@ -75,6 +78,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   AI?: RatAiBinding;
   RAT_CANDIDATE_SMOKE_ENABLED?: string;
   RAT_CANDIDATE_SMOKE_SECRET?: string;
+  /** Explicit rollout gate for the approved same-origin visual card layer. */
+  BINRAT_TELEGRAM_MEDIA_ENABLED?: string;
   /** Candidate-only private Telegram beta allowlist. No effect unless explicitly populated. */
   RAT_CANDIDATE_ALLOWED_USER_ID?: string;
 }
@@ -154,7 +159,8 @@ export default {
       try { await pruneRatFeedback(env.DB, now); }
       catch { /* Feedback maintenance is best-effort. */ }
     }
-    await enqueueSyncCycle(env);
+    // Independent queue messages: legacy Arc may be stale without blocking the live Pons plane.
+    await Promise.all([enqueueSyncCycle(env), enqueuePonsSyncCycle(env)]);
   },
   queue(batch: SyncQueueBatchLike, env: BinratWorkerEnv): Promise<void> {
     return handleSyncQueueBatch(batch, env);
@@ -590,10 +596,33 @@ async function telegramWebhook(
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
       }
+      let telegramMessageId: number | null = null;
+      const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
+      if (mediaEnabled) {
+        const initialCaption = autonomous.name === 'start'
+          ? '🐀 BINRAT\n\nYou get the receipts.'
+          : '🐀 DIGGING... checking Robinhood/Pons receipts.';
+        try {
+          telegramMessageId = await sendRatCard(token, message.chat.id, origin,
+            autonomous.name === 'start' ? 'idle-neutral' : 'digging', initialCaption, deps.externalFetch);
+        } catch {
+          // Artwork delivery is additive personality, never an evidence availability dependency.
+        }
+      }
       const reply = await handleAutonomousCommand(env.DB,autonomous,
         {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
-        deps.watchSource ?? arcWatchSource(env.ARC_RPC_URL?.trim() || 'https://rpc.mainnet.arc.io'));
-      const telegramMessageId = await sendMessage(token,message.chat.id,reply,deps.externalFetch);
+        deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      if (mediaEnabled && telegramMessageId !== null) {
+        try {
+          await editRatCard(token, message.chat.id, telegramMessageId, origin,
+            autonomousResultMedia(autonomous.name, reply), reply, deps.externalFetch);
+        } catch {
+          // Preserve the digging card and send authoritative text only if the edit itself is transient.
+          await sendMessage(token, message.chat.id, reply, deps.externalFetch);
+        }
+      } else {
+        telegramMessageId = await sendMessage(token,message.chat.id,reply,deps.externalFetch);
+      }
       await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,
         intent:`AUTONOMOUS_${autonomous.name.toUpperCase()}`,
         replyDigest:createHash('sha256').update(reply).digest('hex'),telegramMessageId},deps.now());
@@ -928,8 +957,17 @@ async function sendMessage(
 }
 
 async function health(env: BinratWorkerEnv): Promise<Response> {
-  const store = new D1Store(env.DB, ARC_CHAIN_ID);
-  const runtimeStore = new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID);
+  const ponsRuntime = await new D1RuntimeStateStore(env.DB, ROBINHOOD_CHAIN_ID).get();
+  // Before the first Pons bootstrap, retain the historical health surface. Once a
+  // Pons runtime row exists, even an unhealthy one remains authoritative (no Arc masking).
+  const live = await chainHealth(env, ponsRuntime ? ROBINHOOD_CHAIN_ID : ARC_CHAIN_ID);
+  const historicalArc = await chainHealth(env, ARC_CHAIN_ID);
+  return json(200, { ...live, historicalArc: { ...historicalArc, role: 'HISTORICAL_LEGACY_EVIDENCE' } });
+}
+
+async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Record<string, unknown>> {
+  const store = new D1Store(env.DB, chainId);
+  const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
   const [checkpoint, launches, nextBlock, runtime] = await Promise.all([
     store.getCheckpoint(),
     store.listLaunches(),
@@ -947,9 +985,9 @@ async function health(env: BinratWorkerEnv): Promise<Response> {
   );
   const observationReady = Boolean(runtime?.observationReady && !runtime.lastObservationError && fresh);
 
-  return json(200, {
+  return {
     ok: indexReady,
-    chainId: ARC_CHAIN_ID,
+    chainId,
     indexReady,
     checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
     headBlock: runtime?.headBlock?.toString() ?? null,
@@ -967,7 +1005,7 @@ async function health(env: BinratWorkerEnv): Promise<Response> {
     lastSyncError: runtime?.lastSyncError ?? null,
     runtimeFresh: fresh,
     runtimeUpdatedAtMs: runtime?.updatedAtMs ?? null
-  });
+  };
 }
 
 function capabilities(env: BinratWorkerEnv): Response {
@@ -994,8 +1032,12 @@ function readManifest(env: BinratWorkerEnv) {
 }
 
 async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> {
-  const store = new D1Store(env.DB, ARC_CHAIN_ID);
-  const runtimeStore = new D1RuntimeStateStore(env.DB, ARC_CHAIN_ID);
+  // The new live surface is Robinhood-first. Arc remains a historical read fallback
+  // only while a Robinhood index has not yet been bootstrapped (not when it is stale).
+  const ponsRuntime = await new D1RuntimeStateStore(env.DB, ROBINHOOD_CHAIN_ID).get();
+  const chainId = ponsRuntime ? ROBINHOOD_CHAIN_ID : ARC_CHAIN_ID;
+  const store = new D1Store(env.DB, chainId);
+  const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
   const runtime = await runtimeStore.get();
   if (
     !runtime ||
@@ -1009,7 +1051,7 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
   if (!state) return null;
 
   const feed = await projectPublicFeed({
-    chainId: ARC_CHAIN_ID,
+    chainId,
     asOfBlock: state.checkpoint.blockNumber,
     asOfBlockHash: state.checkpoint.blockHash,
     launches: state.launches,

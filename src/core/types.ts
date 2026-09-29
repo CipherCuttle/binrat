@@ -1,6 +1,6 @@
 export type Hex = `0x${string}`;
 
-export type LaunchSourceKind = 'ARCPAD';
+export type LaunchSourceKind = 'ARCPAD' | 'PONS_V2';
 
 export interface ChainPoint {
   chainId: number;

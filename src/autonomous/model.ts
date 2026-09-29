@@ -16,7 +16,7 @@ export interface DiscoveryReason {
   evidenceRefs: string[];
 }
 export interface DiscoveryDetails {
-  ruleVersion: 'RATS_CREATOR_RECURRENCE_V1';
+  ruleVersion: 'RATS_CREATOR_RECURRENCE_V1' | 'RATS_PONS_DEPLOYER_RECURRENCE_V1';
   reasons: DiscoveryReason[];
   sourceCheckpoint: string;
 }
@@ -28,8 +28,8 @@ export interface Receipt {
   epistemicClass: 'OBSERVED' | 'DERIVED';
   claim: 'INDEXED_LAUNCH_EVIDENCE' | 'CREATOR_LAUNCH_OBSERVED';
   evidenceRefs: EvidenceRef[];
-  coverage: { status: 'PARTIAL'; scope: 'ARCPAD_INDEXED_LAUNCHES'; asOfBlock: string; limit: number };
-  source: 'ARCPAD'; createdAt: number;
+  coverage: { status: 'PARTIAL'; scope: 'ARCPAD_INDEXED_LAUNCHES' | 'PONS_V2_INDEXED_LAUNCHES'; asOfBlock: string; limit: number };
+  source: 'ARCPAD' | 'PONS_V2'; createdAt: number;
   discovery?: DiscoveryDetails;
 }
 
@@ -37,7 +37,7 @@ export function parseTarget(input: string): Entity {
   const raw = input.trim();
   if (raw.length > 160) throw new Error('MALFORMED_TARGET');
   const parts = raw.split(':');
-  let chainId = 5042;
+  let chainId = 4663;
   let entityType: EntityType;
   let entityId: string;
   if (parts.length === 1) {
@@ -52,7 +52,7 @@ export function parseTarget(input: string): Entity {
   if (!(entityType === 'LAUNCH' ? /^[0-9a-f]{64}$/ : /^0x[0-9a-f]{40}$/).test(entityId)) {
     throw new Error('MALFORMED_TARGET');
   }
-  if (chainId !== 5042) throw new Error('UNSUPPORTED_CHAIN');
+  if (chainId !== 5042 && chainId !== 4663) throw new Error('UNSUPPORTED_CHAIN');
   return { chainId, entityType, entityId };
 }
 export function entityKey(entity: Entity): string {
@@ -68,8 +68,8 @@ export async function makeReceipt(
     version: 'binrat.finding/1' as const, chainId: subject.chainId, subject,
     timestamp: { blockNumber: refs[0]!.blockNumber, eventTime: null, ingestedAtMs: refs[0]!.ingestedAtMs },
     epistemicClass: 'OBSERVED' as const, claim, evidenceRefs: refs,
-    coverage: { status: 'PARTIAL' as const, scope: 'ARCPAD_INDEXED_LAUNCHES' as const, asOfBlock, limit: 5 },
-    source: 'ARCPAD' as const,
+    coverage: { status: 'PARTIAL' as const, scope: (subject.chainId === 4663 ? 'PONS_V2_INDEXED_LAUNCHES' : 'ARCPAD_INDEXED_LAUNCHES') as Receipt['coverage']['scope'], asOfBlock, limit: 5 },
+    source: (subject.chainId === 4663 ? 'PONS_V2' : 'ARCPAD') as Receipt['source'],
     ...(discovery ? { discovery } : {})
   };
   const id = await sha256Hex(content);
@@ -87,17 +87,17 @@ export function renderReceipt(r: Receipt, mode: 'DIG' | 'WHY' | 'ALERT'): string
   ] : [];
   return [
     mode === 'ALERT' ? '🐀 FOUND SOMETHING.' : mode === 'WHY' ? '🐀 receipts, not guesses.' : '🐀 dug through it.',
-    `Arc ${r.chainId} · ${r.subject.entityType} ${r.subject.entityId}`,
-    ...r.evidenceRefs.map(e => `OBSERVED: ArcPad reported creator ${e.creator}\nlaunch ${e.launchId}\nblock ${e.blockNumber} · tx ${e.txHash} · log ${e.logIndex}`),
+    `${r.source === 'PONS_V2' ? 'Robinhood/Pons' : 'Arc'} ${r.chainId} · ${r.subject.entityType} ${r.subject.entityId}`,
+    ...r.evidenceRefs.map(e => `OBSERVED: ${r.source === 'PONS_V2' ? 'Pons reported deployer' : 'ArcPad reported creator'} ${e.creator}\nlaunch ${e.launchId}\nblock ${e.blockNumber} · tx ${e.txHash} · log ${e.logIndex}`),
     mode === 'ALERT' ? 'DERIVED: the reported creator exactly matches your explicit future watch.' :
       `DERIVED: ${r.evidenceRefs.length} referenced launch record(s) match this subject.`,
     ...discovery,
-    `Coverage: PARTIAL · indexed ArcPad launches only · up to ${r.coverage.limit} records · as of block ${r.coverage.asOfBlock}.`,
+    `Coverage: PARTIAL · ${r.source === 'PONS_V2' ? 'indexed Pons V2 launches only' : 'indexed ArcPad launches only'} · up to ${r.coverage.limit} records · as of block ${r.coverage.asOfBlock}.`,
     'UNKNOWN: human identity, intent, safety and future outcome. Same address != same human identity.',
     `caseId: ${r.caseId}`,
     `shareId: ${r.shareId}`,
     mode === 'WHY' ? r.evidenceRefs.map(e => `source: ${e.observationId}\nfact: ${e.factId}\ndigest: ${e.evidenceDigest}\nblock hash: ${e.blockHash}`).join('\n') : `/why ${r.caseId}`,
-    mode === 'DIG' ? `/watch 5042:CREATOR:${r.evidenceRefs[0]!.creator}` : '',
+    mode === 'DIG' ? `/watch ${r.chainId}:CREATOR:${r.evidenceRefs[0]!.creator}` : '',
     `/share ${r.caseId}`
   ].filter(Boolean).join('\n\n');
 }

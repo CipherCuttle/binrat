@@ -432,7 +432,7 @@ interface LaunchRow {
   chain_id: number;
   block_number: string;
   block_hash: Hex;
-  source: 'ARCPAD';
+  source: 'ARCPAD' | 'PONS_V2';
   launcher: Hex;
   tx_hash: Hex;
   log_index: number;

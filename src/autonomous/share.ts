@@ -22,6 +22,7 @@ export interface PublicShareReceipt {
 
 export async function createPublicShareReceipt(db: D1DatabaseLike, caseId: string, now: number): Promise<PublicShareReceipt> {
   const finding = await why(db, caseId, now);
+  const table = finding.chainId === 4663 ? 'rat_v11_pons_public_receipts' : 'rat_v11_public_receipts';
   const publicReceiptBase = {
     schemaVersion: 'binrat.public-receipt/1' as const,
     caseId: finding.caseId, chainId: finding.chainId, subject: finding.subject,
@@ -34,7 +35,7 @@ export async function createPublicShareReceipt(db: D1DatabaseLike, caseId: strin
   for (let tries=0; tries<3; tries++) {
     const receiptId = crypto.randomUUID().replaceAll('-', '');
     const receipt: PublicShareReceipt = { ...publicReceiptBase, receiptId };
-    const result = await db.prepare(`INSERT OR IGNORE INTO rat_v11_public_receipts
+    const result = await db.prepare(`INSERT OR IGNORE INTO ${table}
       (receipt_id,case_id,chain_id,receipt_json,created_at_ms,expires_at_ms) VALUES (?,?,?,?,?,?)`)
       .bind(receiptId,receipt.caseId,receipt.chainId,JSON.stringify(receipt),now,receipt.expiresAt).run();
     if (!result.success) throw new Error('SHARE_WRITE_FAILED');
@@ -45,9 +46,10 @@ export async function createPublicShareReceipt(db: D1DatabaseLike, caseId: strin
 
 export async function openPublicShareReceipt(db: D1DatabaseLike, receiptId: string, now: number): Promise<PublicShareReceipt> {
   if (!/^[0-9a-f]{32}$/.test(receiptId)) throw new Error('PUBLIC_RECEIPT_UNAVAILABLE');
-  await prunePublicReceipts(db, now);
-  const row = await db.prepare('SELECT receipt_json FROM rat_v11_public_receipts WHERE receipt_id=? AND expires_at_ms>?')
-    .bind(receiptId,now).first<{ receipt_json: string }>();
+  await Promise.all([prunePublicReceipts(db, now), prunePonsPublicReceipts(db, now)]);
+  const row = await db.prepare(`SELECT receipt_json FROM rat_v11_pons_public_receipts WHERE receipt_id=? AND expires_at_ms>?
+    UNION ALL SELECT receipt_json FROM rat_v11_public_receipts WHERE receipt_id=? AND expires_at_ms>? LIMIT 1`)
+    .bind(receiptId,now,receiptId,now).first<{ receipt_json: string }>();
   if (!row) throw new Error('PUBLIC_RECEIPT_UNAVAILABLE');
   let receipt: PublicShareReceipt;
   try { receipt = JSON.parse(row.receipt_json) as PublicShareReceipt; } catch { throw new Error('PUBLIC_RECEIPT_UNAVAILABLE'); }
@@ -66,7 +68,7 @@ export function telegramDeepLink(receiptId: string): string {
 export function renderShareArtifact(receipt: PublicShareReceipt): string {
   const link = telegramDeepLink(receipt.receiptId);
   const reason = receipt.finding.discovery?.reasons[0]?.text ??
-    `Indexed ArcPad evidence exists for ${receipt.subject.entityType.toLowerCase()} ${receipt.subject.entityId}.`;
+    `Indexed ${receipt.chainId === 4663 ? 'Pons' : 'ArcPad'} evidence exists for ${receipt.subject.entityType.toLowerCase()} ${receipt.subject.entityId}.`;
   const text = `🐀 BINRAT RECEIPT\n\n${reason}\n\nOpen the receipts:\n${link}`;
   const shareUrl = `https://t.me/share/url?${new URLSearchParams({ url: link, text }).toString()}`;
   return [
@@ -83,7 +85,7 @@ export function renderOpenedReceipt(receipt: PublicShareReceipt): string {
     : 'WATCH unavailable for this role in V1; WHY remains public.';
   return [
     '🐀 SOMEBODY LEFT YOU A RECEIPT.',
-    `Subject: Arc ${receipt.chainId} · ${receipt.subject.entityType} ${receipt.subject.entityId}`,
+    `Subject: ${receipt.chainId === 4663 ? 'Robinhood/Pons' : 'Arc'} ${receipt.chainId} · ${receipt.subject.entityType} ${receipt.subject.entityId}`,
     `Finding: ${receipt.findingType}`,
     renderReceipt(receipt.finding,'WHY'),
     watch,
@@ -96,10 +98,15 @@ async function prunePublicReceipts(db: D1DatabaseLike, now: number): Promise<voi
   if (!result.success) throw new Error('SHARE_RETENTION_FAILED');
 }
 
+async function prunePonsPublicReceipts(db: D1DatabaseLike, now: number): Promise<void> {
+  const result = await db.prepare('DELETE FROM rat_v11_pons_public_receipts WHERE expires_at_ms<=?').bind(now).run();
+  if (!result.success) throw new Error('SHARE_RETENTION_FAILED');
+}
+
 function isPublicShareReceipt(value: PublicShareReceipt, receiptId: string): boolean {
   const finding = value.finding;
   return value.schemaVersion === 'binrat.public-receipt/1' && value.receiptId === receiptId &&
-    value.chainId === 5042 && value.caseId === finding?.caseId && value.subject?.entityId === finding?.subject?.entityId &&
+    (value.chainId === 5042 || value.chainId === 4663) && value.caseId === finding?.caseId && value.subject?.entityId === finding?.subject?.entityId &&
     value.subject?.entityType === 'CREATOR' && Array.isArray(value.publicEvidenceRefs) &&
     value.publicEvidenceRefs.length > 0 && value.publicEvidenceRefs.length <= 5 &&
     value.publicEvidenceRefs.every(ref => /^0x[0-9a-f]{64}$/.test(ref.txHash) && /^0x[0-9a-f]{64}$/.test(ref.blockHash));

@@ -1,7 +1,9 @@
 import { ArcPadLaunchSource } from '../arc/arcpadSource.js';
 import { deliverFindings, enqueueFindings } from '../autonomous/delivery.js';
-import { arcWatchSource, type WatchSource } from '../autonomous/source.js';
+import { arcWatchSource, robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from '../arc/chain.js';
+import { PonsLaunchSource } from '../pons/ponsSource.js';
+import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
 import { ArcObservationSource } from '../arc/observationSource.js';
 import { ArcRatRadarSource, type RatRadarSource } from '../arc/ratRadarSource.js';
 import type { LaunchSource } from '../core/ports.js';
@@ -36,6 +38,8 @@ export interface CloudflareSyncEnv {
   DB: D1DatabaseLike;
   SYNC_QUEUE?: SyncQueueProducerLike;
   ARC_RPC_URL?: string;
+  /** Optional production RPC; the public Robinhood endpoint is the safe fallback. */
+  ROBINHOOD_RPC_URL?: string;
   BINRAT_LIVE_LOOKBACK_BLOCKS?: string;
   BINRAT_CONFIRMATIONS?: string;
   BINRAT_MAX_BATCH_BLOCKS?: string;
@@ -48,7 +52,7 @@ export interface CloudflareSyncEnv {
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
+  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -56,6 +60,7 @@ export interface BinratSyncMessage {
 export interface CloudflareSyncDeps {
   now: () => number;
   launchSource?: LaunchSource;
+  ponsLaunchSource?: LaunchSource;
   observationSource?: ObservationSource;
   ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
@@ -68,11 +73,13 @@ export type SyncCycleResult =
   | { status: 'RETRY'; code: string };
 
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
+const PONS_SYNC_LEASE_NAME = 'binrat:pons-sync';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
 const LIVE_SYNC_LEASE_MS = 120_000;
 export const ARC_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.mainnet.arc.io';
+export const ROBINHOOD_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.mainnet.chain.robinhood.com';
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -85,6 +92,15 @@ export async function enqueueSyncCycle(
     cycleId,
     enqueuedAtMs: nowMs
   });
+}
+
+export async function enqueuePonsSyncCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({ kind: 'PONS_SYNC_CYCLE', cycleId, enqueuedAtMs: nowMs });
 }
 
 export async function enqueueObservationCycle(
@@ -142,6 +158,18 @@ export async function handleSyncQueueBatch(
         const result = await runCloudflareObservationCycle(env, message.body, deps);
         if (result.status === 'RETRY') message.retry({ delaySeconds: 30 });
         else message.ack();
+        continue;
+      }
+
+      if (message.body.kind === 'PONS_SYNC_CYCLE') {
+        const result = await runCloudflarePonsSyncCycle(env, message.body, deps);
+        if (result.status === 'RETRY') { message.retry({ delaySeconds: 30 }); continue; }
+        message.ack();
+        if (result.status === 'SUCCESS' && result.liveCaughtUp && shouldEnqueueRatWatch(message.body.enqueuedAtMs)) {
+          await enqueueRatWatchCycle(env, deps.now()).catch((error) => {
+            console.error(JSON.stringify({ event: 'PONS_RAT_WATCH_ENQUEUE_FAILED', code: syncErrorCode(error) }));
+          });
+        }
         continue;
       }
 
@@ -383,6 +411,81 @@ export async function runCloudflareSyncCycle(
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_RELEASE_START', cycleId: message.cycleId }));
     await lease.release(SYNC_LEASE_NAME, message.cycleId);
     console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LEASE_RELEASE_DONE', cycleId: message.cycleId }));
+  }
+}
+
+/**
+ * Robinhood is a separate readiness authority.  An Arc error is neither read nor
+ * written here, so live Pons evidence keeps working while legacy Arc is stale.
+ */
+export async function runCloudflarePonsSyncCycle(
+  env: CloudflareSyncEnv,
+  message: BinratSyncMessage,
+  deps: CloudflareSyncDeps = { now: Date.now }
+): Promise<SyncCycleResult> {
+  if (!isSyncMessage(message) || message.kind !== 'PONS_SYNC_CYCLE') {
+    return { status: 'RETRY', code: 'PONS_SYNC_MESSAGE_INVALID' };
+  }
+  const nowMs = deps.now();
+  const lease = new D1SyncLeaseStore(env.DB);
+  if (!(await lease.claim(PONS_SYNC_LEASE_NAME, message.cycleId, nowMs, LIVE_SYNC_LEASE_MS))) {
+    return { status: 'BUSY' };
+  }
+  const store = new D1Store(env.DB, ROBINHOOD_CHAIN_ID);
+  const runtime = new D1RuntimeStateStore(env.DB, ROBINHOOD_CHAIN_ID);
+  let previous: D1RuntimeState | null = null;
+  try {
+    previous = await runtime.get();
+    let source: LaunchSource;
+    try {
+      source = deps.ponsLaunchSource ?? new PonsLaunchSource({ rpcUrl: resolveRobinhoodRpcUrl(env) });
+    } catch (error) {
+      const code = reportSyncFailure(message.cycleId, 'SOURCE_CONSTRUCTION', error);
+      await persistLiveFailure(runtime, previous, code, deps.now);
+      return { status: 'RETRY', code };
+    }
+    let head: bigint;
+    try {
+      head = await source.getHeadBlockNumber();
+      await source.assertAuthority(head);
+    } catch (error) {
+      const code = reportSyncFailure(message.cycleId, 'SOURCE_BOOTSTRAP', error);
+      await persistLiveFailure(runtime, previous, code, deps.now);
+      return { status: 'RETRY', code };
+    }
+    const lookback = BigInt(integerSetting(env.BINRAT_LIVE_LOOKBACK_BLOCKS, 1000, 1, 1_000_000));
+    const maxBatchBlocks = BigInt(Math.min(10_000, integerSetting(env.BINRAT_MAX_BATCH_BLOCKS, 10_000, 1, 100_000)));
+    const recentStart = head > lookback ? head - lookback : 0n;
+    const liveWindowStart = recentStart > PONS_V2_START_BLOCK ? recentStart : PONS_V2_START_BLOCK;
+    const checkpoint = await store.getCheckpoint();
+    const startBlock = checkpoint ? PONS_V2_START_BLOCK : liveWindowStart;
+    let report;
+    try {
+      report = await syncLaunches(source, store, {
+        startBlock,
+        confirmations: BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000)),
+        maxBatchBlocks, reorgLookbackBlocks: 32n, pollIntervalMs: 1000, maxBatchesPerRun: 1
+      });
+    } catch (error) {
+      const code = reportSyncFailure(message.cycleId, 'LIVE_SYNC', error);
+      await persistLiveFailure(runtime, previous, code, deps.now);
+      return { status: 'RETRY', code };
+    }
+    const after = await store.getCheckpoint();
+    const liveCaughtUp = Boolean(report.targetBlock !== null && after && after.blockNumber >= report.targetBlock);
+    await runtime.put({
+      sourceVerified: true, liveCaughtUp, headBlock: report.headBlock, targetBlock: report.targetBlock,
+      observationReady: false, historyBackfillComplete: false, historyBackfillTargetBlock: null,
+      lastSyncError: null, lastHistoryError: null, lastObservationError: null, updatedAtMs: deps.now()
+    });
+    return { status: 'SUCCESS', liveCaughtUp };
+  } catch (error) {
+    const code = reportSyncFailure(message.cycleId, 'RUNTIME_D1', error);
+    if (previous) await persistLiveFailure(runtime, previous, code, deps.now).catch(() => undefined);
+    return { status: 'RETRY', code };
+  } finally {
+    store.close();
+    await lease.release(PONS_SYNC_LEASE_NAME, message.cycleId);
   }
 }
 
@@ -631,7 +734,7 @@ export async function runCloudflareRatWatchCycle(
     if (env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true') {
       const enqueued = await enqueueFindings(env.DB,deps.now());
       const sent = await deliverFindings(env.DB,
-        deps.watchSource ?? arcWatchSource(resolveArcRpcUrl(env)),
+        deps.watchSource ?? robinhoodWatchSource(resolveRobinhoodRpcUrl(env)),
         required(env.TELEGRAM_BOT_TOKEN,'TELEGRAM_BOT_TOKEN'),deps.externalFetch ?? fetch,deps.now);
       return {status:'SUCCESS',enqueued,sent};
     }
@@ -871,6 +974,11 @@ export function resolveArcRpcUrl(env: Pick<CloudflareSyncEnv, 'ARC_RPC_URL'>): s
   return configured || ARC_PUBLIC_RPC_FALLBACK_URL;
 }
 
+export function resolveRobinhoodRpcUrl(env: Pick<CloudflareSyncEnv, 'ROBINHOOD_RPC_URL'>): string {
+  const configured = env.ROBINHOOD_RPC_URL?.trim();
+  return configured || ROBINHOOD_PUBLIC_RPC_FALLBACK_URL;
+}
+
 function integerSetting(
   value: string | undefined,
   fallback: number,
@@ -894,6 +1002,7 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
   return (
     (
       item.kind === 'SYNC_CYCLE' ||
+      item.kind === 'PONS_SYNC_CYCLE' ||
       item.kind === 'OBSERVATION_CYCLE' ||
       item.kind === 'RAT_WATCH_CYCLE' ||
       item.kind === 'RAT_RADAR_CYCLE'
