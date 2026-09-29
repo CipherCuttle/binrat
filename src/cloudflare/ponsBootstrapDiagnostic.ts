@@ -79,11 +79,19 @@ export async function handlePonsBootstrapDiagnostic(
   const failures: ProbeFailure[] = [];
 
   const rawCall = async (method: string, params: unknown[]): Promise<unknown> => {
-    const rpcResponse = await deps.externalFetch(rpcUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8_000);
+    let rpcResponse: Response;
+    try {
+      rpcResponse = await deps.externalFetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!rpcResponse.ok) {
       throw Object.assign(new Error('PONS_RAW_HTTP_ERROR'), {
         name: 'HttpRequestError',
