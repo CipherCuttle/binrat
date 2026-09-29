@@ -873,12 +873,21 @@ function reportSyncFailure(cycleId: string, phase: SyncFailurePhase, error: unkn
 }
 
 function syncErrorDiagnostic(error: unknown): SyncErrorDiagnostic {
+  const transportError = ponsTransportCause(error);
   return {
     code: syncErrorCode(error),
-    errorName: safeErrorName(error),
-    httpStatus: httpStatus(error),
-    causeCode: safeCauseCode(error)
+    errorName: safeErrorName(transportError),
+    httpStatus: httpStatus(transportError),
+    causeCode: safeCauseCode(transportError)
   };
+}
+
+/** Keep the public operation code while retaining bounded transport evidence. */
+function ponsTransportCause(error: unknown): unknown {
+  if (!(error instanceof Error) || !/^PONS_GET_(?:HEAD|CHAIN_ID|FACTORY_CODE)_FAILED$/.test(error.message)) {
+    return error;
+  }
+  return error.cause ?? error;
 }
 
 function safeErrorName(error: unknown): string {

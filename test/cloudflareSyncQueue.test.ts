@@ -169,7 +169,7 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
     getBlockNumber: async () => { throw Object.assign(new Error('https://secret.example'), { name: 'TimeoutError' }); }
   } as never });
   return assert.rejects(wrapped.getHeadBlockNumber(), (error: unknown) => {
-    assert.equal(syncErrorCode(error), 'SYNC_TIMEOUT_ERROR');
+    assert.equal(syncErrorCode(error), 'PONS_GET_HEAD_FAILED');
     return true;
   });
 });
