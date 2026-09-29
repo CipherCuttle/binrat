@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "binrat.official-identity/1.0",
+  "canonicalControl": "docs/launch/BINRAT_LAUNCH_CONTROL_V1.json",
+  "derivation": "This file is a machine-readable public-identity view. The control file wins on any discrepancy.",
+  "projectName": "BINRAT",
+  "symbol": "BINRAT",
+  "description": null,
+  "logo": null,
+  "website": { "value": "https://binrat.tech", "status": "OWNER_REPORTED" },
+  "telegramBot": { "value": "https://t.me/BinratBot", "status": "OWNER_REPORTED" },
+  "telegramCommunity": { "value": null, "status": "UNSET" },
+  "x": { "value": null, "status": "UNSET" },
+  "github": { "value": "https://github.com/CipherCuttle/binrat", "status": "CONTROL_VERIFIED" },
+  "discord": { "value": null, "status": "UNSET" },
+  "farcaster": { "value": null, "status": "UNSET" },
+  "tokenStatus": { "state": "NOT_LAUNCHED", "canonicalContractAddress": null, "requiredPrelaunchCopy": "$BINRAT IS NOT LIVE. NO OFFICIAL CONTRACT HAS BEEN PUBLISHED." }
+}

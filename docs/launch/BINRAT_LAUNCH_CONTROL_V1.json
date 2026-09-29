@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "binrat.launch-control/1.0",
+  "controlVersion": "BINRAT_LAUNCH_CONTROL_V1",
+  "status": "PREFLIGHT_BLOCKED",
+  "preparedAt": "2026-09-29",
+  "authorityBoundary": {
+    "planning": true,
+    "readOnlyVerification": true,
+    "launchExecution": false,
+    "marketingPublication": false,
+    "holderActivation": false,
+    "personalWalletSpend": false,
+    "productionDeployment": false
+  },
+  "rail": {
+    "tokenChain": { "name": "Robinhood Chain", "chainId": 4663 },
+    "researchChain": { "name": "Arc", "chainId": 5042, "status": "SEPARATE_RESEARCH_AUTHORITY" },
+    "provider": "Pons V2 direct factory",
+    "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "factoryRuntimeCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+    "launchConfigId": "0",
+    "pairToken": "0x0000000000000000000000000000000000000000",
+    "historicalArcRecord": {
+      "path": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+      "digest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+      "status": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
+    }
+  },
+  "token": {
+    "projectName": "BINRAT",
+    "symbol": "BINRAT",
+    "state": "NOT_LAUNCHED",
+    "canonicalContractAddress": null,
+    "launchTransaction": null,
+    "publicationState": "NOT_ELIGIBLE",
+    "launchPolicy": {
+      "privatePresale": "NONE",
+      "discountedInsiderRound": "NONE",
+      "hiddenTeamAllocation": "NONE",
+      "founderOpeningBuy": "NONE",
+      "launchAndBuy": "NONE_UNLESS_SEPARATELY_AUTHORIZED"
+    }
+  },
+  "identity": {
+    "description": null,
+    "logo": null,
+    "website": { "value": "https://binrat.tech", "status": "OWNER_REPORTED" },
+    "telegramBot": { "value": "https://t.me/BinratBot", "status": "OWNER_REPORTED" },
+    "telegramCommunity": { "value": null, "status": "UNSET" },
+    "x": { "value": null, "status": "UNSET" },
+    "github": { "value": "https://github.com/CipherCuttle/binrat", "status": "CONTROL_VERIFIED" },
+    "discord": { "value": null, "status": "UNSET" },
+    "farcaster": { "value": null, "status": "UNSET" }
+  },
+  "walletRoles": {
+    "deployer": { "chainId": 4663, "publicAddress": null, "purpose": "sign one exact Pons creation transaction", "controlProofStatus": "UNVERIFIED", "approved": false, "notes": "Minimum ETH only; never used automatically for a personal buy." },
+    "treasury": { "chainId": 4663, "publicAddress": null, "purpose": "project treasury", "controlProofStatus": "UNVERIFIED", "approved": false, "notes": "Kept logically separate from deployer where practical." },
+    "creatorFeeRecipient": { "chainId": 4663, "publicAddress": null, "purpose": "receive verified Pons creator/project fee flow", "controlProofStatus": "UNVERIFIED", "approved": false, "notes": "Must be confirmed against final Pons configuration." },
+    "personalBuyer": { "chainId": 4663, "publicAddress": null, "purpose": "ordinary post-verification public purchase and holder test", "controlProofStatus": "UNVERIFIED", "approved": false, "notes": "No allocation, exemption, fact privilege, or automatic purchase." }
+  },
+  "preflightExpected": {
+    "memeHook": "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044",
+    "memeHookRuntimeCodeHash": "0xc21b1e6c1b45403e81a581f22ed6d9c747997af1cfdac1b1dc9f4b1d346a10db",
+    "launchDeployer": "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42",
+    "launchDeployerRuntimeCodeHash": "0xeade22566c766377f6adfb99534f2772251efad9568642c0704a7051418e624c",
+    "supplyRaw": "1000000000000000000000000000",
+    "decimals": 18,
+    "launchFeeWei": "500000000000000",
+    "creatorTaxBps": 0,
+    "buybackEnabled": false,
+    "openingTax": { "startBps": 9900, "seconds": 3 },
+    "historicalObservation": "2026-09-25 evidence is a donor only; every field is reread at the pinned launch-day block."
+  },
+  "holderUtility": {
+    "doctrine": "$BINRAT = capacity in the BINRAT intelligence network",
+    "status": "DISABLED_PRELAUNCH",
+    "canonicalToken": null,
+    "thresholdRaw": null,
+    "finalityPolicy": "UNSET",
+    "tiers": ["FREE", "PRO", "HOLDER_TIER_1", "HOLDER_TIER_2", "HOLDER_TIER_3"],
+    "capabilityCategories": ["watchLimit", "digQuota", "historyDepth", "ratsFilters", "alertCapacity", "groupCapacity", "deepDigAllowance", "customDetectorAllowance"],
+    "factsInvariant": "DIG and WHY factual output is identical for FREE and HOLDER."
+  },
+  "legal": {
+    "status": "NOT_REVIEWED",
+    "reviewingProfessional": null,
+    "jurisdiction": null,
+    "classification": null,
+    "requiredDocumentation": null,
+    "notificationPublicationRequirements": null,
+    "marketingOrderRequirements": null,
+    "taxFeeTreatment": null,
+    "restrictions": null,
+    "decisionDate": null,
+    "documentReferenceOrHash": null,
+    "marketingAuthorized": false,
+    "launchAuthorized": false
+  },
+  "freshPonsObservation": {
+    "observedAt": "2026-09-29",
+    "primary": { "provider": "rpc.mainnet.chain.robinhood.com", "block": "75674390", "blockHash": "0x0f7fb12fce877d9aed7182193c7de0688cb9337d367faf26972b037944cf9e74", "economicsDigest": "0xa9fc75d4203a33fe660e8fa32c74c3aa41c1fda4bf23d3a39b6bc22a1f8b1ca7" },
+    "independentFactoryCheck": { "provider": "rpc.solidrpc.io", "block": "75674498", "blockHash": "0x56785575a48291ece1edd94fe3ac35fa2c91ae8da7f537e522e73210ec6bc3e9" },
+    "status": "READ_ONLY_CURRENT_OBSERVATION_NOT_EXECUTION_PREFLIGHT"
+  },
+  "manifest": {
+    "template": "docs/launch/BINRAT_LAUNCH_TRANSACTION_MANIFEST_V1.template.json",
+    "status": "UNFROZEN",
+    "digest": null,
+    "validUntil": null
+  }
+}

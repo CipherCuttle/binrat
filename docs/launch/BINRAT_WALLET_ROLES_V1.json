@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "binrat.wallet-roles/1.0",
+  "canonicalControl": "docs/launch/BINRAT_LAUNCH_CONTROL_V1.json",
+  "chainId": 4663,
+  "roles": {
+    "deployer": { "publicAddress": null, "purpose": "Sign one exact authorized Pons creation transaction.", "controlProofStatus": "UNVERIFIED", "approved": false, "constraints": ["minimum necessary ETH", "no private keys in repository or logs", "not automatically used for personal buying"] },
+    "treasury": { "publicAddress": null, "purpose": "Project treasury.", "controlProofStatus": "UNVERIFIED", "approved": false },
+    "creatorFeeRecipient": { "publicAddress": null, "purpose": "Receive the final verified Pons creator/project fee flow, if supported.", "controlProofStatus": "UNVERIFIED", "approved": false },
+    "personalBuyer": { "publicAddress": null, "purpose": "Owner's normal wallet for a separately authorized post-verification public buy and holder test.", "controlProofStatus": "UNVERIFIED", "approved": false, "constraints": ["no hidden allocation", "no fake volume", "no founder exemption", "no privileged fact source", "no holder bypass"] }
+  }
+}
