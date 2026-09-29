@@ -96,6 +96,25 @@ function parseJsonc(path) {
       .replace(/,\s*([}\]])/g, '$1')
   );
 }
+function testerFromFeedbackMarker(config) {
+  const sql = [
+    "SELECT CASE WHEN COUNT(*) = 1 THEN MAX(user_id) ELSE NULL END AS user_id, COUNT(*) AS matches",
+    "FROM rat_feedback",
+    "WHERE body = 'binrat-controlled-rat-id-0929';"
+  ].join(' ');
+  const output = jsonFromOutput(cli([
+    'd1','execute','DB','--remote','--yes','--json','--command',sql,'--config',config
+  ]));
+  const row = walk(output, value =>
+    Number.isFinite(Number(value.matches)) && Object.hasOwn(value, 'user_id') ? value : null
+  );
+  gate(row, 'CONTROLLED_RAT_TESTER_MARKER_RESULT_MISSING');
+  gate(Number(row.matches) === 1, 'CONTROLLED_RAT_TESTER_MARKER_NOT_UNIQUE');
+  const id = String(row.user_id ?? '').trim();
+  gate(/^[1-9]\d{3,16}$/.test(id), 'CONTROLLED_RAT_TESTER_MARKER_ID_INVALID');
+  return id;
+}
+
 function d1Preflight(config) {
   const sql = [
     "SELECT",
@@ -176,9 +195,6 @@ cfg.vars = {
 };
 cfg.keep_vars = true;
 writeFileSync(CONFIG, JSON.stringify(cfg, null, 2));
-writeFileSync(SECRETS, JSON.stringify({
-  BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: tester
-}));
 d1Preflight(CONFIG);
 note('D1 preflight PASS: no enabled/pending non-4663 autonomous Watch state.');
 
@@ -192,8 +208,12 @@ if (!tester) {
   ]));
   tester = plainBinding(activeConfig, 'RAT_FEEDBACK_ADMIN_USER_ID') || '';
 }
+if (!tester) tester = testerFromFeedbackMarker(CONFIG);
 gate(/^[1-9]\d{3,16}$/.test(tester), 'CONTROLLED_RAT_TESTER_ID_MISSING_OR_INVALID');
-note('Controlled tester identity resolved from protected deployment configuration.');
+writeFileSync(SECRETS, JSON.stringify({
+  BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: tester
+}));
+note('Controlled tester identity resolved from protected configuration or exact D1 marker.');
 
 const tag = 'controlled-rat-' + process.env.GITHUB_SHA.slice(0, 12);
 cli([
