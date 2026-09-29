@@ -28,7 +28,7 @@ const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>(
   ['BINRAT_AUTONOMOUS_RAT_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_TELEGRAM_MEDIA_ENABLED', { type: 'plain_text', text: 'false' }],
-  ['RAT_CANDIDATE_ALLOWED_USER_ID', { type: 'secret_text' }],
+  ['BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID', { type: 'secret_text' }],
   // Temporary read-only candidate diagnostic gate. It may never be promoted as
   // an arbitrary variable or a plain-text credential.
   ['RAT_CANDIDATE_SMOKE_ENABLED', { type: 'plain_text', text: 'true' }],
@@ -76,7 +76,7 @@ export function verifyWorkerBindingParity(
     const master = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_ENABLED');
     const publicMode = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED');
     const media = candidateBindings.get('BINRAT_TELEGRAM_MEDIA_ENABLED');
-    const tester = candidateBindings.get('RAT_CANDIDATE_ALLOWED_USER_ID');
+    const tester = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID');
     if (master?.type !== 'plain_text' || master.text !== 'true') errors.push('CONTROLLED_RAT_MASTER_NOT_ENABLED');
     if (publicMode?.type !== 'plain_text' || publicMode.text !== 'false') errors.push('CONTROLLED_RAT_PUBLIC_MODE_NOT_DISABLED');
     if (media?.type !== 'plain_text' || media.text !== 'false') errors.push('CONTROLLED_RAT_MEDIA_NOT_DISABLED');

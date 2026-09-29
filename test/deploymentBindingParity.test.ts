@@ -78,7 +78,7 @@ test('controlled Rat activation is an explicit parity mode requiring one secret 
   candidate.resources!.bindings!.find((binding) => binding.name === 'BINRAT_AUTONOMOUS_RAT_ENABLED')!.text = 'true';
   candidate.resources!.bindings!.push(
     { name: 'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', type: 'plain_text', text: 'false' },
-    { name: 'RAT_CANDIDATE_ALLOWED_USER_ID', type: 'secret_text' }
+    { name: 'BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID', type: 'secret_text' }
   );
 
   const defaultResult = verifyWorkerBindingParity(active, candidate);
@@ -92,7 +92,7 @@ test('controlled Rat activation is an explicit parity mode requiring one secret 
 
   const missingTester = structuredClone(candidate);
   missingTester.resources!.bindings = missingTester.resources!.bindings!.filter(
-    (binding) => binding.name !== 'RAT_CANDIDATE_ALLOWED_USER_ID'
+    (binding) => binding.name !== 'BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID'
   );
   const missing = verifyWorkerBindingParity(active, missingTester, { controlledRatActivation: true });
   assert.equal(missing.ok, false);

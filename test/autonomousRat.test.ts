@@ -124,7 +124,7 @@ test('controlled activation scopes autonomous commands to one private tester and
   const f=await autonomousFixture();
   try {
     f.env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED='false';
-    (f.env as typeof f.env & {RAT_CANDIDATE_ALLOWED_USER_ID?:string}).RAT_CANDIDATE_ALLOWED_USER_ID='77';
+    (f.env as typeof f.env & {BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?:string}).BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID='77';
 
     await f.send('/watches',{userId:77,chatId:77,updateId:7100});
     assert.match(f.sent.at(-1)!.text,/watch list \(FREE: 25\)/);
@@ -133,7 +133,7 @@ test('controlled activation scopes autonomous commands to one private tester and
     assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
     assert.doesNotMatch(f.sent.at(-1)!.text,/FREE: 25/);
 
-    (f.env as typeof f.env & {RAT_CANDIDATE_ALLOWED_USER_ID?:string}).RAT_CANDIDATE_ALLOWED_USER_ID='invalid';
+    (f.env as typeof f.env & {BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?:string}).BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID='invalid';
     await f.send('/watches',{userId:77,chatId:77,updateId:7102});
     assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
   } finally {f.db.close();}

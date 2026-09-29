@@ -83,7 +83,9 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   BINRAT_TELEGRAM_MEDIA_ENABLED?: string;
   /** Explicit future public-mode switch. Controlled activation keeps this false. */
   BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED?: string;
-  /** Candidate-only private Telegram beta allowlist. Store as a secret binding. */
+  /** Controlled production activation allowlist. Store as a secret binding. */
+  BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?: string;
+  /** Existing isolated-candidate bot allowlist. This gates the entire candidate bot. */
   RAT_CANDIDATE_ALLOWED_USER_ID?: string;
 }
 
@@ -511,6 +513,15 @@ async function telegramWebhook(
       return json(200, { ok: true, ignored: true });
     }
 
+    if (env.RAT_CANDIDATE_ALLOWED_USER_ID) {
+      const allowed = Number(env.RAT_CANDIDATE_ALLOWED_USER_ID);
+      if (!Number.isSafeInteger(allowed) || message.chat.type !== 'private' ||
+          message.from?.id !== allowed) {
+        await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
+        return json(200, { ok: true, ignored: true, reason: 'CANDIDATE_PRIVATE_ONLY' });
+      }
+    }
+
     const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
     if (!(await ledger.allowChat(message.chat.id, rateLimit, 60_000, deps.now()))) {
       await ledger.completeIgnored(update.update_id, 'RATE_LIMITED', deps.now());
@@ -627,7 +638,11 @@ async function telegramWebhook(
       return json(200,{ok:true,autonomous:true});
     }
 
-    const watchCommand = autonomousAllowed ? null : parseRatWatchCommand(message.text);
+    const controlledAutonomous = env.BINRAT_AUTONOMOUS_RAT_ENABLED === 'true' &&
+      env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED !== 'true';
+    const watchCommand = env.BINRAT_AUTONOMOUS_RAT_ENABLED !== 'true' ||
+      (controlledAutonomous && !autonomousAllowed)
+      ? parseRatWatchCommand(message.text) : null;
     if (watchCommand) {
       const operational = await handleRatWatchCommand(
         watchCommand,
@@ -802,7 +817,7 @@ function autonomousRatAllowed(message: TelegramMessage, env: BinratWorkerEnv): b
       !Number.isSafeInteger(message.from?.id) || message.from!.id <= 0 ||
       message.from!.id !== message.chat.id) return false;
   if (env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED === 'true') return true;
-  const raw = env.RAT_CANDIDATE_ALLOWED_USER_ID?.trim();
+  const raw = env.BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?.trim();
   if (!raw || !/^[1-9]\d*$/.test(raw)) return false;
   const allowed = Number(raw);
   return Number.isSafeInteger(allowed) && allowed === message.from!.id;
