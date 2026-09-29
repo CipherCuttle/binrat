@@ -141,6 +141,20 @@ const beforeHealth = await getJson(WORKER_URL + '/health');
 gate(beforeHealth.ok === true && beforeHealth.service === 'binrat-cloudflare-edge',
   'LIVE_WORKER_HEALTH_FAILED');
 const beforePons = await getJson(WORKER_URL + '/api/health');
+note('Pons preflight ' + JSON.stringify({
+  ok: beforePons.ok,
+  chainId: beforePons.chainId,
+  indexReady: beforePons.indexReady,
+  checkpointBlock: beforePons.checkpointBlock,
+  headBlock: beforePons.headBlock,
+  targetBlock: beforePons.targetBlock,
+  liveCaughtUp: beforePons.liveCaughtUp,
+  launchCount: beforePons.launchCount,
+  historyBackfillComplete: beforePons.historyBackfillComplete,
+  lastSyncError: beforePons.lastSyncError,
+  runtimeFresh: beforePons.runtimeFresh,
+  runtimeUpdatedAtMs: beforePons.runtimeUpdatedAtMs
+}));
 gate(beforePons.ok === true && beforePons.chainId === 4663 &&
   beforePons.indexReady === true && beforePons.liveCaughtUp === true &&
   beforePons.lastSyncError === null, 'PONS_PREFLIGHT_NOT_HEALTHY');
