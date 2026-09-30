@@ -28,6 +28,7 @@ const ALLOWED_DIFF = new Set([
   'test/d1StoreParity.test.ts',
   'test/deploymentBindingParity.test.ts',
   'test/ponsRecoveryVerdict.test.ts',
+  'test/ponsSource.test.ts',
   'test/sync.test.ts'
 ]);
 let previousVersion = null;
