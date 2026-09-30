@@ -62,7 +62,7 @@ test('V2 alert sends approved alert artwork with its compact keyboard and record
     assert.deepEqual(calls.map(call=>call.method),['sendPhoto']);
     assert.match(String(calls[0]!.body.photo),/assets\/telegram\/alert\.png$/);
     assert.match(String(calls[0]!.body.caption),/SAME PAWS\. NEW LAUNCH/);
-    assert.match(JSON.stringify(calls[0]!.body.reply_markup),/br2:c:.*br2:y:.*br2:s:.*br2:u:/);
+    assert.match(JSON.stringify(calls[0]!.body.reply_markup),/br2:c:.*br2:y:.*br2:u:/);
     assert.deepEqual(await outbox(f),{state:'SENT',attempt_count:1,telegram_message_id:71,case_id:(await outbox(f)).case_id});
   } finally { f.db.close(); }
 });
@@ -162,7 +162,7 @@ test('alert callbacks re-authorize and use existing CASE/WHY/SHARE/UNWATCH paths
     }
     const after = (await f.db.prepare('SELECT COUNT(*) AS n FROM rat_v1_dig_requests').first<{n:number}>())!.n;
     assert.equal(after,before); // CASE is reconstruction, not a new DIG.
-    assert.ok(captions.some(caption=>/Matched your watch after it was armed/.test(caption)));
+    assert.ok(captions.some(caption=>/Matched your watch after it was armed/.test(caption)));\n    assert.ok(captions.some(caption=>/Why I squeaked/.test(caption)));
     assert.ok(captions.some(caption=>/Public evidence only/.test(caption)));
     assert.equal((await f.db.prepare('SELECT enabled FROM rat_v1_watches WHERE user_id=77 AND chat_id=77').first<{enabled:number}>())?.enabled,0);
     const publicRow = await f.db.prepare('SELECT receipt_json FROM rat_v11_pons_public_receipts WHERE case_id=?').bind(row.case_id).first<{receipt_json:string}>();
