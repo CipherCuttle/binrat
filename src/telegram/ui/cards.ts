@@ -42,6 +42,10 @@ function sourceLabel(receipt: Receipt): string {
   return receipt.source === 'PONS_V2' ? 'Pons' : 'ArcPad';
 }
 
+function reportedRole(receipt: Receipt): string {
+  return receipt.source === 'PONS_V2' ? 'deployer' : 'creator';
+}
+
 function caseHeadline(receipt: Receipt, privateAttention: string | null): string {
   const count = receipt.evidenceRefs.length;
   if (privateAttention) return '🐀 Same paws. New launch.';
@@ -53,7 +57,7 @@ function caseCaption(receipt: Receipt, privateAttention: string | null): string 
   const creator = receipt.evidenceRefs[0]?.creator ?? receipt.subject.entityId;
   const lines = [
     caseHeadline(receipt,privateAttention),
-    `${sourceLabel(receipt)} reported deployer ${shortReference(creator)}.`
+    `${sourceLabel(receipt)} reported ${reportedRole(receipt)} ${shortReference(creator)}.`
   ];
   if (privateAttention) lines.push('Matched your watch after it was armed.');
   return lines.join('\n');
@@ -97,7 +101,7 @@ function watchCaption(reply: string): string {
 }
 
 function errorCaption(code: string): string {
-  if (/capacity reached/i.test(code)) return "🐀 Rat's done digging for today.\nWatches and receipts still work.";
+  if (/capacity reached/i.test(code)) return "🐀 Rat's done digging for today.\nExisting watches and receipts still work.";
   if (/Use a Robinhood address|unsupported entity|watch.*deployers only/i.test(code)) {
     return '🐀 Wrong scent.\nSend a Robinhood/Pons deployer address.';
   }
