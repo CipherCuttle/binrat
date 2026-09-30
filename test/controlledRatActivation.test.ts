@@ -42,6 +42,14 @@ test('activation modes generate only their explicit private flag sets', () => {
   );
 });
 
+test('candidate version lookup accepts the Wrangler annotation tag but no untagged or malformed version', () => {
+  const tag='controlled-rat-aaaaaaaaaaaa';
+  const candidate={id:'89d74e01-ce7f-44cb-a777-c2a5fa283747',annotations:{'workers/tag':tag}};
+  assert.equal(evaluate(`h.taggedVersionIdFromList(${JSON.stringify([candidate])},'${tag}')`),candidate.id);
+  assert.equal(evaluate(`h.taggedVersionIdFromList(${JSON.stringify([{id:candidate.id,annotations:{}}])},'${tag}')`),null);
+  assert.equal(evaluate(`h.taggedVersionIdFromList(${JSON.stringify([{id:'not-a-version',annotations:{'workers/tag':tag}}])},'${tag}')`),null);
+});
+
 test('committed example defaults retain all autonomous Telegram flags off', () => {
   const example=readFileSync(new URL('../cloudflare/wrangler.example.jsonc',import.meta.url),'utf8');
   for (const flag of [

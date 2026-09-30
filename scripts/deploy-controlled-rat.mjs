@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 
 import {
   ACTIVATION_MODE, PROMPT_MIGRATION,
   activationGateError, candidateVars,
-  parseActivationMode, promptSchemaDecision, promptSchemaPlan, rollbackSchemaNotice
+  parseActivationMode, promptSchemaDecision, promptSchemaPlan, rollbackSchemaNotice, taggedVersionIdFromList
 } from './controlled-rat-activation.mjs';
 
 const WORKER = 'binrat-edge-v0';
@@ -63,13 +63,6 @@ function activeVersionFrom(status) {
     const pct = value.percentage ?? value.percent ?? value.traffic;
     const hundred = pct === 100 || pct === '100' || pct === 1 || pct === '1';
     return uuid(id) && hundred ? id : null;
-  });
-}
-function taggedVersionFrom(list, tag) {
-  return walk(list, value => {
-    if (value.tag !== tag) return null;
-    const id = value.version_id ?? value.versionId ?? value.id;
-    return uuid(id) ? id : null;
   });
 }
 function plainBinding(version, name) {
@@ -283,7 +276,7 @@ try {
   rmSync(SECRETS, { force: true });
 
   const versions = jsonFromOutput(cli(['versions','list','--name',WORKER,'--json']));
-  const candidateVersion = taggedVersionFrom(versions, tag);
+  const candidateVersion = taggedVersionIdFromList(versions, tag);
   gate(candidateVersion, 'CANDIDATE_VERSION_NOT_RESOLVED');
   gate(candidateVersion !== previousVersion, 'CANDIDATE_VERSION_EQUALS_ACTIVE');
 

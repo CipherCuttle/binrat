@@ -51,6 +51,20 @@ export function candidateVars(mode, releaseSha) {
   };
 }
 
+/** Wrangler versions list returns upload tags in worker annotations. */
+export function taggedVersionIdFromList(versions, tag) {
+  if (!Array.isArray(versions) || typeof tag !== 'string') return null;
+  for (const version of versions) {
+    if (!version || typeof version !== 'object') continue;
+    const value = version;
+    const versionTag = value.tag ?? value.annotations?.['workers/tag'];
+    const id = value.version_id ?? value.versionId ?? value.id;
+    if (versionTag === tag && typeof id === 'string' &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return id;
+  }
+  return null;
+}
+
 /** The remote query serializes pragma_table_info in this deterministic shape. */
 export function promptSchemaDecision(snapshot) {
   if (!snapshot?.tableSql) return 'MISSING';
