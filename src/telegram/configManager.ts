@@ -25,9 +25,111 @@ interface ActualTelegramConfig {
   description: string;
   shortDescription: string;
   commands: BotCommand[][];
-  menuButton: Record<string, unknown>;
+  menuButton: NormalizedMenuButton;
   webhook: WebhookInfo;
   profilePhotoPresent: boolean;
+}
+
+export type NormalizedMenuButton =
+  | { type: 'default' }
+  | { type: 'commands' }
+  | { type: 'web_app'; text: string; url: string };
+
+export type MenuSleep = (ms: number) => Promise<void>;
+const defaultMenuSleep: MenuSleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const menuReadbackDelaysMs = [0, 2_000, 3_000, 5_000, 10_000] as const;
+
+function record(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+/** Accept only documented MenuButton authority fields; reject unknown shapes. */
+export function normalizeMenuButton(value: unknown): NormalizedMenuButton {
+  const button = record(value);
+  if (!button || typeof button.type !== 'string') throw new Error('TELEGRAM_MENU_BUTTON_MALFORMED');
+  if (button.type === 'default' || button.type === 'commands') return { type: button.type };
+  if (button.type === 'web_app') {
+    const webApp = record(button.web_app);
+    if (!webApp || typeof button.text !== 'string' || typeof webApp.url !== 'string') {
+      throw new Error('TELEGRAM_MENU_BUTTON_MALFORMED');
+    }
+    return { type: 'web_app', text: button.text, url: webApp.url };
+  }
+  throw new Error('TELEGRAM_MENU_BUTTON_MALFORMED');
+}
+
+function menuButtonPayload(button: NormalizedMenuButton): Record<string, unknown> {
+  if (button.type === 'web_app') return { type: button.type, text: button.text, web_app: { url: button.url } };
+  return { type: button.type };
+}
+
+function sameMenuButton(a: NormalizedMenuButton, b: NormalizedMenuButton): boolean {
+  return a.type === b.type && (a.type !== 'web_app' ||
+    (b.type === 'web_app' && a.text === b.text && a.url === b.url));
+}
+
+export async function readMenuButton(api: TelegramConfigApi, chatId?: string): Promise<NormalizedMenuButton> {
+  const body = chatId ? { chat_id: chatId } : undefined;
+  return normalizeMenuButton(await api.call<unknown>('getChatMenuButton', body));
+}
+
+export async function setMenuButton(api: TelegramConfigApi, menu: NormalizedMenuButton, chatId?: string): Promise<void> {
+  await api.call('setChatMenuButton', {
+    ...(chatId ? { chat_id: chatId } : {}),
+    menu_button: menuButtonPayload(menu)
+  });
+}
+
+export async function verifyMenuButton(
+  api: TelegramConfigApi, expected: NormalizedMenuButton, chatId?: string,
+  sleep: MenuSleep = defaultMenuSleep, delays: readonly number[] = menuReadbackDelaysMs
+): Promise<NormalizedMenuButton> {
+  let actual: NormalizedMenuButton | null = null;
+  for (const delayMs of delays) {
+    if (delayMs) await sleep(delayMs);
+    actual = await readMenuButton(api, chatId);
+    if (sameMenuButton(expected, actual)) return actual;
+  }
+  throw new Error('TELEGRAM_MENU_BUTTON_VERIFY_FAILED');
+}
+
+export interface PrivateTesterMenuSnapshot { testerChatId: string; menuButton: NormalizedMenuButton }
+
+export async function snapshotPrivateTesterMenu(
+  api: TelegramConfigApi, testerChatId: string
+): Promise<PrivateTesterMenuSnapshot> {
+  return { testerChatId, menuButton: await readMenuButton(api, testerChatId) };
+}
+
+export async function activatePrivateTesterMenu(
+  api: TelegramConfigApi, testerChatId: string, config = telegramProductConfig,
+  sleep: MenuSleep = defaultMenuSleep, delays: readonly number[] = menuReadbackDelaysMs,
+  suppliedSnapshot?: PrivateTesterMenuSnapshot
+): Promise<PrivateTesterMenuSnapshot> {
+  // A prior failed private rollout could only have left this exact global Web App
+  // shape. Restore the documented pre-run commands menu, never arbitrary global state.
+  const global = await readMenuButton(api);
+  const expectedGlobal = normalizeMenuButton(config.globalMenuButton);
+  if (!sameMenuButton(global, expectedGlobal)) {
+    const failedRunDrift = sameMenuButton(global, normalizeMenuButton(config.privateTesterMenuButton));
+    if (!failedRunDrift) throw new Error('TELEGRAM_GLOBAL_MENU_UNEXPECTED');
+    await setMenuButton(api, expectedGlobal);
+    await verifyMenuButton(api, expectedGlobal, undefined, sleep, delays);
+  }
+  const snapshot = suppliedSnapshot ?? await snapshotPrivateTesterMenu(api, testerChatId);
+  if (snapshot.testerChatId !== testerChatId) throw new Error('TELEGRAM_MENU_SNAPSHOT_TESTER_MISMATCH');
+  const expectedTester = normalizeMenuButton(config.privateTesterMenuButton);
+  await setMenuButton(api, expectedTester, testerChatId);
+  await verifyMenuButton(api, expectedTester, testerChatId, sleep, delays);
+  return snapshot;
+}
+
+export async function restorePrivateTesterMenu(
+  api: TelegramConfigApi, snapshot: PrivateTesterMenuSnapshot,
+  sleep: MenuSleep = defaultMenuSleep, delays: readonly number[] = menuReadbackDelaysMs
+): Promise<void> {
+  await setMenuButton(api, snapshot.menuButton, snapshot.testerChatId);
+  await verifyMenuButton(api, snapshot.menuButton, snapshot.testerChatId, sleep, delays);
 }
 
 export interface TelegramConfigApi {
@@ -59,7 +161,7 @@ export async function readTelegramConfig(api: TelegramConfigApi, config = telegr
     api.call<BotName>('getMyName'),
     api.call<BotDescription>('getMyDescription'),
     api.call<BotShortDescription>('getMyShortDescription'),
-    api.call<Record<string, unknown>>('getChatMenuButton'),
+    readMenuButton(api),
     api.call<WebhookInfo>('getWebhookInfo'),
     api.call<ProfilePhotos>('getUserProfilePhotos', { user_id: me.id, offset: 0, limit: 1 }),
     ...config.commandScopes.map(entry => api.call<BotCommand[]>('getMyCommands', { scope: entry.scope }))
@@ -86,7 +188,11 @@ export function diffTelegramConfig(actual: ActualTelegramConfig, config = telegr
   config.commandScopes.forEach((entry, index) => {
     rows.push(item(`COMMANDS ${entry.scope.type}`, entry.commands, actual.commands[index] ?? [], 'setMyCommands'));
   });
-  rows.push(item('MENU BUTTON', config.menuButton, actual.menuButton, 'setChatMenuButton'));
+  const expectedGlobalMenu = normalizeMenuButton(config.globalMenuButton);
+  rows.push({
+    key: 'GLOBAL MENU BUTTON', expected: display(expectedGlobalMenu), actual: display(actual.menuButton),
+    status: sameMenuButton(expectedGlobalMenu, actual.menuButton) ? 'unchanged' : 'blocked'
+  });
   rows.push({
     key: 'WEBHOOK', expected: config.webhook.url, actual: actual.webhook.url || '(empty)',
     status: actual.webhook.url === config.webhook.url ? 'unchanged' : 'blocked'
@@ -122,7 +228,7 @@ export async function applyTelegramConfig(api: TelegramConfigApi, config = teleg
     else if (row.key.startsWith('COMMANDS ')) {
       const scope = config.commandScopes.find(entry => `COMMANDS ${entry.scope.type}` === row.key)!;
       await api.call('setMyCommands', { scope: scope.scope, commands: scope.commands });
-    } else if (row.key === 'MENU BUTTON') await api.call('setChatMenuButton', { menu_button: config.menuButton });
+    }
     else if (row.key === 'PROFILE PHOTO') await api.setProfilePhoto(config.profilePhoto.assetPath);
     else throw new Error(`TELEGRAM_CONFIG_UNKNOWN_CHANGE:${row.key}`);
   }

@@ -30,7 +30,12 @@ export const telegramProductConfig = Object.freeze({
       ]
     }
   ],
-  menuButton: {
+  // The default menu remains the command list throughout the private beta.
+  // The Mini App button is intentionally scoped to the selected tester below.
+  globalMenuButton: {
+    type: 'commands' as const
+  },
+  privateTesterMenuButton: {
     type: 'web_app' as const,
     text: 'OPEN BINRAT',
     web_app: { url: TELEGRAM_MINI_APP_URL }

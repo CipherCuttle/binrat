@@ -16,10 +16,12 @@ const DB_ID = '46814564-1a41-449a-88e5-c1349eed3a27';
 const WORKER_URL = 'https://binrat-edge-v0.pettevik.workers.dev';
 const CONFIG = 'wrangler.controlled-rat.generated.jsonc';
 const SECRETS = '/tmp/binrat-controlled-rat-secrets.json';
+const TELEGRAM_MENU_STATE = '/tmp/binrat-private-menu-state.json';
 const WRANGLER = ['dlx', 'wrangler@4.135.0'];
 const summary = process.env.GITHUB_STEP_SUMMARY;
 let promotionAttempted = false;
 let previousVersion = null;
+let privateMenuSnapshotCreated = false;
 
 function note(line) {
   console.log(line);
@@ -334,6 +336,14 @@ try {
       (deployedCandidateGate?.type === 'secret_text' ||
         (deployedCandidateGate?.type === 'plain_text' && deployedCandidateGate.text === tester)),
     'POSTDEPLOY_TESTER_BINDING_MISSING');
+    // The default menu is commands. The Mini App is an explicitly tester-scoped
+    // side effect and is snapshotted so a later postdeploy failure can restore it.
+    execFileSync('pnpm',['telegram:private-menu-activate'],{
+      stdio:'inherit', timeout:180_000,
+      env:{...process.env,CONTROLLED_RAT_PRIVATE_TESTER_ID:tester,BINRAT_TELEGRAM_MENU_STATE_PATH:TELEGRAM_MENU_STATE}
+    });
+    privateMenuSnapshotCreated = existsSync(TELEGRAM_MENU_STATE);
+    gate(privateMenuSnapshotCreated, 'TELEGRAM_PRIVATE_MENU_SNAPSHOT_MISSING');
     execFileSync('pnpm',['telegram:apply'],{stdio:'inherit',env:process.env,timeout:180_000});
     execFileSync('pnpm',['telegram:verify'],{stdio:'inherit',env:process.env,timeout:120_000});
     execFileSync('pnpm',['telegram:smoke'],{
@@ -346,6 +356,17 @@ try {
     note('Public autonomous mode OFF. Telegram UI V2 OFF. Telegram media OFF. No merge performed.');
   }
 } catch (error) {
+  if (privateMenuSnapshotCreated || existsSync(TELEGRAM_MENU_STATE)) {
+    try {
+      execFileSync('pnpm',['telegram:private-menu-restore'],{
+        stdio:'inherit',timeout:180_000,
+        env:{...process.env,CONTROLLED_RAT_PRIVATE_TESTER_ID:tester,BINRAT_TELEGRAM_MENU_STATE_PATH:TELEGRAM_MENU_STATE}
+      });
+      note('TELEGRAM_PRIVATE_MENU_ROLLBACK_PASS: tester menu restored from pre-rollout snapshot.');
+    } catch {
+      note('TELEGRAM_PRIVATE_MENU_ROLLBACK_FAILED: tester menu requires immediate manual restoration.');
+    }
+  }
   if (promotionAttempted && previousVersion) {
     try {
       cli([
@@ -362,4 +383,5 @@ try {
   throw error;
 } finally {
   rmSync(SECRETS, { force: true });
+  rmSync(TELEGRAM_MENU_STATE, { force: true });
 }

@@ -26,6 +26,8 @@
     "telegram:plan": "tsx src/telegram/configCli.ts plan",
     "telegram:apply": "tsx src/telegram/configCli.ts apply",
     "telegram:verify": "tsx src/telegram/configCli.ts verify",
+    "telegram:private-menu-activate": "tsx src/telegram/configCli.ts private-menu-activate",
+    "telegram:private-menu-restore": "tsx src/telegram/configCli.ts private-menu-restore",
     "telegram:smoke": "tsx src/telegram/configCli.ts smoke"
   },
   "dependencies": {

@@ -1,9 +1,11 @@
 #!/usr/bin/env node
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { telegramProductConfig } from './config.js';
 import {
-  applyTelegramConfig, formatTelegramPlan, planTelegramConfig, productionTelegramApi,
+  activatePrivateTesterMenu, applyTelegramConfig, formatTelegramPlan, planTelegramConfig, productionTelegramApi,
+  snapshotPrivateTesterMenu,
+  restorePrivateTesterMenu, type PrivateTesterMenuSnapshot,
   telegramConfigHash, telegramProfileAssetHash
 } from './configManager.js';
 
@@ -11,6 +13,19 @@ const command = process.argv[2] ?? 'plan';
 const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
 if (!token) throw new Error('TELEGRAM_BOT_TOKEN_MISSING');
 const api = productionTelegramApi(token);
+
+function privateTesterId(): string {
+  const value = process.env.CONTROLLED_RAT_PRIVATE_TESTER_ID?.trim() ?? '';
+  if (!/^[1-9]\d{3,16}$/.test(value)) throw new Error('CONTROLLED_RAT_PRIVATE_TESTER_ID_MISSING_OR_INVALID');
+  return value;
+}
+function menuStatePath(): string {
+  const value = process.env.BINRAT_TELEGRAM_MENU_STATE_PATH?.trim() ?? '';
+  if (!value.startsWith('/tmp/binrat-private-menu-') || !value.endsWith('.json')) {
+    throw new Error('TELEGRAM_MENU_STATE_PATH_INVALID');
+  }
+  return value;
+}
 
 async function verify(): Promise<void> {
   const result = await planTelegramConfig(api);
@@ -68,5 +83,20 @@ if (command === 'plan') {
   console.log(formatTelegramPlan(diffs));
   console.log('TELEGRAM_CONFIG_APPLY_PASS');
 } else if (command === 'verify') await verify();
+else if (command === 'private-menu-activate') {
+  const path = menuStatePath();
+  const testerChatId = privateTesterId();
+  const snapshot = await snapshotPrivateTesterMenu(api, testerChatId);
+  // The snapshot is intentionally local to the ephemeral runner and mode 0600.
+  // It contains no token or user content and permits exact rollback after postdeploy failure.
+  await writeFile(path, JSON.stringify(snapshot), { mode: 0o600 });
+  await activatePrivateTesterMenu(api, testerChatId, telegramProductConfig, undefined, undefined, snapshot);
+  console.log('TELEGRAM_PRIVATE_MENU_APPLY_PASS');
+} else if (command === 'private-menu-restore') {
+  const snapshot = JSON.parse(await readFile(menuStatePath(), 'utf8')) as PrivateTesterMenuSnapshot;
+  if (snapshot.testerChatId !== privateTesterId()) throw new Error('TELEGRAM_MENU_SNAPSHOT_TESTER_MISMATCH');
+  await restorePrivateTesterMenu(api, snapshot);
+  console.log('TELEGRAM_PRIVATE_MENU_RESTORE_PASS');
+}
 else if (command === 'smoke') await smoke();
-else throw new Error('USAGE: configCli.ts plan|apply|verify|smoke');
+else throw new Error('USAGE: configCli.ts plan|apply|verify|private-menu-activate|private-menu-restore|smoke');
