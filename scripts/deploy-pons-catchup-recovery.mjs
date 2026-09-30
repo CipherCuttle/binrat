@@ -172,7 +172,7 @@ cfg.vars = Object.fromEntries(
     .map(binding => [binding.name, binding.text])
 );
 cfg.vars.BINRAT_RELEASE_SHA = reviewedSha;
-cfg.vars.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS = '8192';
+cfg.vars.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS = '4096';
 cfg.vars.BINRAT_PONS_CATCHUP_MAX_BATCHES = '16';
 cfg.vars.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS = '60000';
 cfg.vars.BINRAT_PONS_NEAR_HEAD_BLOCKS = '2048';

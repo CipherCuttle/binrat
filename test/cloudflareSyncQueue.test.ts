@@ -489,7 +489,7 @@ test('Pons backlog uses one lease writer, a bounded multi-batch slice, and exact
       SYNC_QUEUE: { async send(body) { sent.push(body); } },
       BINRAT_LIVE_LOOKBACK_BLOCKS: '200000',
       BINRAT_PONS_CATCHUP_MAX_BATCHES: '1',
-      BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '8192',
+      BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
       BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000'
     }, { now: () => 120_000, ponsLaunchSource: source });
     assert.equal(acked, 1);
