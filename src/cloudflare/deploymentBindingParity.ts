@@ -29,6 +29,11 @@ export interface BindingParityOptions {
 const REQUIRED_BINDINGS = ['DB', 'SYNC_QUEUE', 'AI', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET'] as const;
 const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>([
   ['BINRAT_PONS_MAX_BATCH_BLOCKS', { type: 'plain_text', text: '512' }],
+  ['BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS', { type: 'plain_text', text: '4096' }],
+  ['BINRAT_PONS_CATCHUP_MAX_BATCHES', { type: 'plain_text', text: '4' }],
+  ['BINRAT_PONS_CATCHUP_WORK_BUDGET_MS', { type: 'plain_text', text: '60000' }],
+  ['BINRAT_PONS_NEAR_HEAD_BLOCKS', { type: 'plain_text', text: '2048' }],
+  ['BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS', { type: 'plain_text', text: '128' }],
   ['ROBINHOOD_RPC_URL', { type: 'plain_text', text: 'https://rpc.ordofi.network' }],
   ['BINRAT_AUTONOMOUS_RAT_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', { type: 'plain_text', text: 'false' }],
@@ -149,6 +154,11 @@ export function verifyCandidateManifest(config: unknown, options: BindingParityO
   if (value.vars?.BINRAT_TELEGRAM_UI_V2_ENABLED !== uiExpected) errors.push(mode === 'UI_V2' ? 'CONTROLLED_RAT_UI_V2_NOT_ENABLED' : 'TELEGRAM_UI_V2_NOT_FLAG_OFF');
   if (value.vars?.BINRAT_TELEGRAM_MEDIA_ENABLED !== uiExpected) errors.push(mode === 'UI_V2' ? 'CONTROLLED_RAT_MEDIA_NOT_ENABLED' : 'TELEGRAM_MEDIA_NOT_FLAG_OFF');
   if (value.vars?.BINRAT_PONS_MAX_BATCH_BLOCKS !== '512') errors.push('PONS_BATCH_BOUND_INVALID');
+  if (value.vars?.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS !== '4096') errors.push('PONS_CATCHUP_BATCH_BOUND_INVALID');
+  if (value.vars?.BINRAT_PONS_CATCHUP_MAX_BATCHES !== '4') errors.push('PONS_CATCHUP_BATCH_COUNT_INVALID');
+  if (value.vars?.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS !== '60000') errors.push('PONS_CATCHUP_WORK_BUDGET_INVALID');
+  if (value.vars?.BINRAT_PONS_NEAR_HEAD_BLOCKS !== '2048') errors.push('PONS_NEAR_HEAD_BOUND_INVALID');
+  if (value.vars?.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS !== '128') errors.push('PONS_CANONICAL_DENSITY_BOUND_INVALID');
   return { ok: errors.length === 0, errors };
 }
 

@@ -17,7 +17,10 @@ import type {
 import {
   handleSyncQueueBatch,
   ARC_PUBLIC_RPC_FALLBACK_URL,
+  calculatePonsVelocity,
+  PONS_SYNC_LEASE_MS,
   resolveArcRpcUrl,
+  runCloudflarePonsSyncCycle,
   runCloudflareObservationCycle,
   runCloudflareRatRadarCycle,
   runCloudflareSyncCycle,
@@ -25,6 +28,7 @@ import {
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
 import { PonsLaunchSource } from '../src/pons/ponsSource.js';
+import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../src/pons/chain.js';
 import type {
   ObservationBlockPoint,
   ObservationSource
@@ -40,6 +44,18 @@ class FakeLaunchSource implements LaunchSource {
   head = ARCPAD_START_BLOCK + 5_000n;
   catchUpCalls: Array<[bigint, bigint]> = [];
 
+  async getHeadBlockNumber() { return this.head; }
+  async getBlockHash(blockNumber: bigint) { return hash(blockNumber); }
+  async assertAuthority(_blockNumber: bigint) {}
+  async catchUp(fromBlock: bigint, toBlock: bigint): Promise<LaunchObserved[]> {
+    this.catchUpCalls.push([fromBlock, toBlock]);
+    return [];
+  }
+}
+
+class FakePonsSource implements LaunchSource {
+  head = PONS_V2_START_BLOCK + 100_002n;
+  catchUpCalls: Array<[bigint, bigint]> = [];
   async getHeadBlockNumber() { return this.head; }
   async getBlockHash(blockNumber: bigint) { return hash(blockNumber); }
   async assertAuthority(_blockNumber: bigint) {}
@@ -169,7 +185,7 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
     getBlockNumber: async () => { throw Object.assign(new Error('https://secret.example'), { name: 'TimeoutError' }); }
   } as never });
   return assert.rejects(wrapped.getHeadBlockNumber(), (error: unknown) => {
-    assert.equal(syncErrorCode(error), 'PONS_GET_HEAD_FAILED');
+    assert.equal(syncErrorCode(error), 'SYNC_TIMEOUT_ERROR');
     return true;
   });
 });
@@ -457,6 +473,117 @@ test('live queue skips observation scheduling on the alternate minute', async ()
   } finally {
     db.close();
   }
+});
+
+test('Pons backlog uses one lease writer, a bounded multi-batch slice, and exactly one continuation', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakePonsSource();
+  const sent: BinratSyncMessage[] = [];
+  let acked = 0;
+  try {
+    await handleSyncQueueBatch({ messages: [{
+      body: { kind: 'PONS_SYNC_CYCLE', cycleId: 'pons-backlog', enqueuedAtMs: 60_000 },
+      ack() { acked += 1; }, retry() { throw new Error('unexpected retry'); }
+    }] }, {
+      DB: db,
+      SYNC_QUEUE: { async send(body) { sent.push(body); } },
+      BINRAT_LIVE_LOOKBACK_BLOCKS: '200000',
+      BINRAT_PONS_CATCHUP_MAX_BATCHES: '1',
+      BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
+      BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000'
+    }, { now: () => 120_000, ponsLaunchSource: source });
+    assert.equal(acked, 1);
+    assert.equal(source.catchUpCalls.length, 1);
+    assert.equal(source.catchUpCalls[0]?.[1] - source.catchUpCalls[0]?.[0] + 1n, 4_096n);
+    assert.deepEqual(sent.map((item) => item.kind), ['PONS_SYNC_CYCLE']);
+
+    const lease = new D1SyncLeaseStore(db);
+    assert.equal(await lease.claim('binrat:pons-sync', 'other-owner', 130_000, 120_000), true);
+    const busy = await runCloudflarePonsSyncCycle(
+      { DB: db },
+      { kind: 'PONS_SYNC_CYCLE', cycleId: 'contending-owner', enqueuedAtMs: 130_000 },
+      { now: () => 130_001, ponsLaunchSource: source }
+    );
+    assert.deepEqual(busy, { status: 'BUSY' });
+  } finally { db.close(); }
+});
+
+test('Pons timeout stays fail-closed, retries once through Queue, and clears only after a later advancing slice', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  class TimeoutThenRecoveryPonsSource extends FakePonsSource {
+    attempts = 0;
+    override async catchUp(fromBlock: bigint, toBlock: bigint): Promise<LaunchObserved[]> {
+      this.catchUpCalls.push([fromBlock, toBlock]);
+      this.attempts += 1;
+      if (this.attempts === 3) {
+        throw Object.assign(new Error('bounded timeout'), { name: 'TimeoutError' });
+      }
+      return [];
+    }
+  }
+  const source = new TimeoutThenRecoveryPonsSource();
+  let nowMs = 1_000;
+  const env = {
+    DB: db,
+    BINRAT_LIVE_LOOKBACK_BLOCKS: '200000',
+    BINRAT_PONS_CATCHUP_MAX_BATCHES: '1',
+    BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
+    BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000'
+  };
+  const deliver = async (cycleId: string) => {
+    let acked = 0;
+    const retries: Array<{ delaySeconds?: number } | undefined> = [];
+    await handleSyncQueueBatch({ messages: [{
+      body: { kind: 'PONS_SYNC_CYCLE', cycleId, enqueuedAtMs: nowMs },
+      ack() { acked += 1; }, retry(options) { retries.push(options); }
+    }] }, env, { now: () => nowMs, ponsLaunchSource: source });
+    nowMs += 30_000;
+    return { acked, retries };
+  };
+  try {
+    assert.deepEqual(await deliver('pons-success-1'), { acked: 1, retries: [] });
+    const store = new D1Store(db, ROBINHOOD_CHAIN_ID);
+    const checkpointAfterFirst = await store.getCheckpoint();
+    assert.ok(checkpointAfterFirst);
+
+    assert.deepEqual(await deliver('pons-success-2'), { acked: 1, retries: [] });
+    const checkpointAfterProgress = await store.getCheckpoint();
+    assert.ok(checkpointAfterProgress!.blockNumber > checkpointAfterFirst!.blockNumber);
+
+    const timeout = await deliver('pons-timeout');
+    assert.equal(timeout.acked, 0);
+    assert.deepEqual(timeout.retries, [{ delaySeconds: 30 }]);
+    const runtimeAfterTimeout = await new D1RuntimeStateStore(db, ROBINHOOD_CHAIN_ID).get();
+    const checkpointAfterTimeout = await store.getCheckpoint();
+    assert.equal(runtimeAfterTimeout?.sourceVerified, false);
+    assert.equal(runtimeAfterTimeout?.liveCaughtUp, false);
+    assert.equal(runtimeAfterTimeout?.lastSyncError, 'SYNC_TIMEOUT_ERROR');
+    assert.deepEqual(checkpointAfterTimeout, checkpointAfterProgress);
+
+    assert.deepEqual(await deliver('pons-retry-recovered'), { acked: 1, retries: [] });
+    const runtimeAfterRecovery = await new D1RuntimeStateStore(db, ROBINHOOD_CHAIN_ID).get();
+    const checkpointAfterRecovery = await store.getCheckpoint();
+    assert.ok(checkpointAfterRecovery!.blockNumber > checkpointAfterTimeout!.blockNumber);
+    assert.equal(runtimeAfterRecovery?.sourceVerified, true);
+    assert.equal(runtimeAfterRecovery?.lastSyncError, null);
+  } finally {
+    db.close();
+  }
+});
+
+test('Pons velocity receipt is bounded and compares backlog to head growth', () => {
+  assert.equal(PONS_SYNC_LEASE_MS, 180_000);
+  const receipt = calculatePonsVelocity(
+    { headBlock: 100n, updatedAtMs: 1_000 },
+    { headBlock: 110n, blocksAdvanced: 40n, elapsedMs: 2_000, backlogBefore: 80n, backlogAfter: 40n },
+    3_000
+  );
+  assert.equal(receipt.catchupBlocksPerSecond, 20);
+  assert.equal(receipt.headBlocksPerSecond, 5);
+  assert.equal(receipt.catchupHeadRatio, 4);
+  assert.equal(receipt.backlogDelta, -40n);
 });
 
 test('Cloudflare sync lease is fenced so an old owner cannot release a replacement lease', async () => {

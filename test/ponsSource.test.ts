@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { keccak256 } from 'viem';
-import { PonsLaunchSource, PONS_MAX_CANONICAL_LAUNCH_BLOCKS } from '../src/pons/ponsSource.js';
+import {
+  PonsLaunchSource,
+  PONS_MAX_CANONICAL_LAUNCH_BLOCKS,
+  PONS_RPC_RETRY_COUNT,
+  PONS_RPC_RETRY_DELAY_MS,
+  PONS_RPC_TIMEOUT_MS
+} from '../src/pons/ponsSource.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID } from '../src/pons/chain.js';
 
 const hash = (n: number) => `0x${n.toString(16).padStart(64, '0')}` as `0x${string}`;
@@ -94,4 +100,10 @@ test('Pons bootstrap transport failures retain the exact operation label', async
     getBytecode: async () => { throw new TypeError('secret code detail'); }
   } as never });
   await assert.rejects(() => code.assertAuthority(1n), /PONS_GET_FACTORY_CODE_FAILED/);
+});
+
+test('Pons RPC transport uses a bounded timeout and one short retry', () => {
+  assert.equal(PONS_RPC_TIMEOUT_MS, 15_000);
+  assert.equal(PONS_RPC_RETRY_COUNT, 1);
+  assert.equal(PONS_RPC_RETRY_DELAY_MS, 250);
 });

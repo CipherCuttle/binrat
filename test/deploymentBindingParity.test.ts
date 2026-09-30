@@ -22,12 +22,26 @@ function version(): WorkerVersionConfiguration {
   };
 }
 
+const provenPonsVars: Record<string, string> = {
+  BINRAT_PONS_MAX_BATCH_BLOCKS: '512',
+  BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
+  BINRAT_PONS_CATCHUP_MAX_BATCHES: '4',
+  BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000',
+  BINRAT_PONS_NEAR_HEAD_BLOCKS: '2048',
+  BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS: '128'
+} as const;
+
 test('binding parity preserves active resources while allowing only the approved release additions', () => {
   const active = version();
   const candidate = version();
   candidate.resources!.bindings![6]!.text = 'new';
   candidate.resources!.bindings!.push(
     { name: 'BINRAT_PONS_MAX_BATCH_BLOCKS', type: 'plain_text', text: '512' },
+    { name: 'BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS', type: 'plain_text', text: '4096' },
+    { name: 'BINRAT_PONS_CATCHUP_MAX_BATCHES', type: 'plain_text', text: '4' },
+    { name: 'BINRAT_PONS_CATCHUP_WORK_BUDGET_MS', type: 'plain_text', text: '60000' },
+    { name: 'BINRAT_PONS_NEAR_HEAD_BLOCKS', type: 'plain_text', text: '2048' },
+    { name: 'BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS', type: 'plain_text', text: '128' },
     { name: 'ROBINHOOD_RPC_URL', type: 'plain_text', text: 'https://rpc.ordofi.network' },
     { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'false' },
     { name: 'BINRAT_TELEGRAM_UI_V2_ENABLED', type: 'plain_text', text: 'false' },
@@ -105,7 +119,7 @@ test('controlled text Rat manifest cannot accidentally enable public mode, UI V2
   const base = { name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] },
     assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'true',
       BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
-      BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } };
+      ...provenPonsVars } };
   assert.deepEqual(verifyCandidateManifest(base, { controlledRatActivation: true }), { ok: true, errors: [] });
 
   const publicCandidate = structuredClone(base);
@@ -166,12 +180,14 @@ test('controlled UI V2 parity permits only the exact private false-to-true activ
 test('controlled UI V2 manifest requires private UI/media on while default mode rejects either flag', () => {
   const manifest={name:'binrat-edge-v0',ai:{binding:'AI'},triggers:{crons:['* * * * *']},assets:{directory:'./web'},vars:{
     BINRAT_AUTONOMOUS_RAT_ENABLED:'true',BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'false',
-    BINRAT_TELEGRAM_UI_V2_ENABLED:'true',BINRAT_TELEGRAM_MEDIA_ENABLED:'true',BINRAT_PONS_MAX_BATCH_BLOCKS:'512'
+    BINRAT_TELEGRAM_UI_V2_ENABLED:'true',BINRAT_TELEGRAM_MEDIA_ENABLED:'true',...provenPonsVars
   }};
   assert.deepEqual(verifyCandidateManifest(manifest,{controlledTelegramUiV2Activation:true}),{ok:true,errors:[]});
   assert.ok(verifyCandidateManifest(manifest).errors.includes('AUTONOMOUS_RAT_NOT_FLAG_OFF'));
   const publicManifest=structuredClone(manifest); publicManifest.vars.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED='true';
   assert.ok(verifyCandidateManifest(publicManifest,{controlledTelegramUiV2Activation:true}).errors.includes('AUTONOMOUS_RAT_PUBLIC_MODE_NOT_DISABLED'));
+  const oldCatchupManifest=structuredClone(manifest) as typeof manifest & { vars: Record<string,string> }; oldCatchupManifest.vars.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS='512';
+  assert.ok(verifyCandidateManifest(oldCatchupManifest,{controlledTelegramUiV2Activation:true}).errors.includes('PONS_CATCHUP_BATCH_BOUND_INVALID'));
 });
 
 test('visible candidate whole-bot gate must match the exact selected tester', () => {
@@ -182,7 +198,7 @@ test('visible candidate whole-bot gate must match the exact selected tester', ()
 });
 
 test('candidate manifest requires known-good bindings and flag-off Pons configuration', () => {
-  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } });
+  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', ...provenPonsVars } });
   assert.deepEqual(pass, { ok: true, errors: [] });
   const fail = verifyCandidateManifest({ name: 'binrat-edge-v0', triggers: { crons: [] }, assets: { directory: './web' } });
   assert.equal(fail.ok, false);

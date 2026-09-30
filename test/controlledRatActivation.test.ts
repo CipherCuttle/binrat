@@ -36,6 +36,10 @@ test('activation modes generate only their explicit private flag sets', () => {
   const ui=evaluate<Record<string,string>>(`h.candidateVars(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,'${sha}')`);
   assert.deepEqual([text.BINRAT_AUTONOMOUS_RAT_ENABLED,text.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED,text.BINRAT_TELEGRAM_UI_V2_ENABLED,text.BINRAT_TELEGRAM_MEDIA_ENABLED],['true','false','false','false']);
   assert.deepEqual([ui.BINRAT_AUTONOMOUS_RAT_ENABLED,ui.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED,ui.BINRAT_TELEGRAM_UI_V2_ENABLED,ui.BINRAT_TELEGRAM_MEDIA_ENABLED],['true','false','true','true']);
+  assert.deepEqual(
+    [ui.BINRAT_PONS_MAX_BATCH_BLOCKS,ui.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS,ui.BINRAT_PONS_CATCHUP_MAX_BATCHES,ui.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS,ui.BINRAT_PONS_NEAR_HEAD_BLOCKS,ui.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS],
+    ['512','4096','4','60000','2048','128']
+  );
 });
 
 test('committed example defaults retain all autonomous Telegram flags off', () => {
