@@ -101,6 +101,17 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
   return snapshot;
 }
 
+/** Navigation reuses this exact persisted discovery receipt; it never trusts callback candidate data. */
+export async function loadRatsSnapshot(db: D1DatabaseLike, discoveryId: string, now: number): Promise<RatsSnapshot> {
+  if (!/^[0-9a-f]{64}$/.test(discoveryId)) throw new Error('DISCOVERY_UNAVAILABLE');
+  const row = await db.prepare(`SELECT snapshot_json FROM rat_v11_pons_discovery_snapshots
+    WHERE discovery_id=? AND expires_at_ms>?`).bind(discoveryId,now).first<{snapshot_json:string}>();
+  if (!row) throw new Error('DISCOVERY_UNAVAILABLE');
+  const snapshot = parseSnapshot(row.snapshot_json);
+  if (snapshot.discoveryId !== discoveryId) throw new Error('DISCOVERY_UNAVAILABLE');
+  return snapshot;
+}
+
 export function renderRats(snapshot: RatsSnapshot): string {
   if (snapshot.candidates.length === 0) return [
     '🐀 empty paws. No repeated Pons-reported deployers in the current indexed coverage.',

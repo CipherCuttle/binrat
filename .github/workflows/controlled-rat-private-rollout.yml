@@ -5,6 +5,19 @@ on:
     branches:
       - feat/binrat-robinhood-live-rat-v1
   workflow_dispatch:
+    inputs:
+      activation_mode:
+        description: Private rollout mode. UI V2 can be dispatched only from its reviewed branch.
+        required: true
+        default: autonomous-text-private
+        type: choice
+        options:
+          - autonomous-text-private
+          - telegram-ui-v2-private
+      confirmation:
+        description: 'Required exactly for telegram-ui-v2-private: ENABLE_PRIVATE_TELEGRAM_UI_V2'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -25,6 +38,8 @@ jobs:
       CONTROLLED_RAT_ALLOWED_USER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID }}
       CONTROLLED_RAT_ALLOWED_USER_ID_FALLBACK: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
       CONTROLLED_RAT_DEPLOY_APPROVED: 'true'
+      CONTROLLED_RAT_ACTIVATION_MODE: ${{ github.event_name == 'push' && 'autonomous-text-private' || inputs.activation_mode }}
+      CONTROLLED_RAT_UI_V2_CONFIRMATION: ${{ inputs.confirmation }}
 
     steps:
       - uses: actions/checkout@v4

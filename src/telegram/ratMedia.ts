@@ -25,12 +25,20 @@ export function ratCaption(value: string): string {
   return normalized.length <= MAX_CAPTION ? normalized : `${normalized.slice(0, MAX_CAPTION - 1)}…`;
 }
 
+/** V2 cards fail closed instead of inheriting legacy caption truncation. */
+export function assertV2RatCaption(value: string): string {
+  const normalized = value.trim();
+  if (Array.from(normalized).length > MAX_CAPTION) throw new Error('TELEGRAM_UI_CAPTION_TOO_LARGE');
+  return normalized;
+}
+
 export async function sendRatCard(
-  token: string, chatId: number, origin: string, state: RatMediaState, caption: string, fetchImpl: typeof fetch
+  token: string, chatId: number, origin: string, state: RatMediaState, caption: string, fetchImpl: typeof fetch,
+  replyMarkup?: Record<string,unknown>
 ): Promise<number> {
   const response = await fetchImpl(`https://api.telegram.org/bot${token}/sendPhoto`, {
     method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, photo: ratMediaUrl(origin, state), caption: ratCaption(caption) })
+    body: JSON.stringify({ chat_id: chatId, photo: ratMediaUrl(origin, state), caption: ratCaption(caption), ...(replyMarkup ? {reply_markup:replyMarkup}: {}) })
   });
   const result = await response.json().catch(() => null) as TelegramResult<{ message_id?: number }> | null;
   if (!response.ok || result?.ok !== true || !Number.isSafeInteger(result.result?.message_id)) {
@@ -44,13 +52,14 @@ export async function sendRatCard(
 
 /** Edit exactly the original card. A 400 "not modified" is replay-safe success. */
 export async function editRatCard(
-  token: string, chatId: number, messageId: number, origin: string, state: RatMediaState, caption: string, fetchImpl: typeof fetch
+  token: string, chatId: number, messageId: number, origin: string, state: RatMediaState, caption: string, fetchImpl: typeof fetch,
+  replyMarkup?: Record<string,unknown>
 ): Promise<void> {
   if (!Number.isSafeInteger(messageId) || messageId < 1) throw new Error('TELEGRAM_RAT_MEDIA_ID_INVALID');
   const response = await fetchImpl(`https://api.telegram.org/bot${token}/editMessageMedia`, {
     method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, message_id: messageId,
-      media: { type: 'photo', media: ratMediaUrl(origin, state), caption: ratCaption(caption) } })
+      media: { type: 'photo', media: ratMediaUrl(origin, state), caption: ratCaption(caption) }, ...(replyMarkup ? {reply_markup:replyMarkup}: {}) })
   });
   const result = await response.json().catch(() => null) as TelegramResult<unknown> | null;
   if ((response.ok && result?.ok === true) || alreadyApplied(response.status, result)) return;
@@ -58,7 +67,7 @@ export async function editRatCard(
   if (response.status !== 400 && response.status !== 404) throw new Error('TELEGRAM_RAT_MEDIA_EDIT_FAILED');
   const fallback = await fetchImpl(`https://api.telegram.org/bot${token}/editMessageCaption`, {
     method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, message_id: messageId, caption: ratCaption(caption) })
+    body: JSON.stringify({ chat_id: chatId, message_id: messageId, caption: ratCaption(caption), ...(replyMarkup ? {reply_markup:replyMarkup}: {}) })
   });
   const fallbackResult = await fallback.json().catch(() => null) as TelegramResult<unknown> | null;
   if ((!fallback.ok || fallbackResult?.ok !== true) && !alreadyApplied(fallback.status, fallbackResult)) {

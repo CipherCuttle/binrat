@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
-import { handleAutonomousCommand, parseAutonomousCommand } from '../autonomous/telegram.js';
+import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
+import type { AutonomousOutcome } from '../autonomous/outcome.js';
+import { loadRatsSnapshot } from '../autonomous/rats.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
@@ -55,6 +57,11 @@ import {
   type SyncQueueProducerLike
 } from './syncQueue.js';
 import { autonomousResultMedia, editRatCard, sendRatCard } from '../telegram/ratMedia.js';
+import { parseCallback, type TelegramUiAction } from '../telegram/ui/callback.js';
+import { digPromptOperationalErrorCard, diggingCard, digWaitingCard, malformedDigCard, renderRatCard } from '../telegram/ui/cards.js';
+import { answerCallback, deleteMessage as deleteUiMessage, editCard as editUiCard, ratCardDigest, sendCard, sendDigForceReply, TelegramUiError } from '../telegram/ui/client.js';
+import { consumeExactDigPrompt, loadActiveDigPrompt, replaceDigPrompt } from '../telegram/ui/prompts.js';
+import { parseTarget } from '../autonomous/model.js';
 
 export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   DB: D1DatabaseLike;
@@ -81,6 +88,8 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   RAT_CANDIDATE_SMOKE_SECRET?: string;
   /** Explicit rollout gate for the approved same-origin visual card layer. */
   BINRAT_TELEGRAM_MEDIA_ENABLED?: string;
+  /** Default-off native inline-card interaction layer. */
+  BINRAT_TELEGRAM_UI_V2_ENABLED?: string;
   /** Explicit future public-mode switch. Controlled activation keeps this false. */
   BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED?: string;
   /** Controlled production activation allowlist. Store as a secret binding. */
@@ -120,7 +129,9 @@ interface TelegramMessage {
 interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
+  callback_query?: TelegramCallbackQuery;
 }
+interface TelegramCallbackQuery { id: string; from: TelegramUser; data?: string; message?: TelegramMessage; }
 
 interface TelegramApiResponse<T> {
   ok?: boolean;
@@ -507,19 +518,100 @@ async function telegramWebhook(
       return json(200, { ok: true, ignored: true, repliesEnabled: false });
     }
 
+    const callback = update.callback_query;
+    if (callback) {
+      if (env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true') {
+        // Acknowledge known Telegram callback traffic even while the rollout is off.
+        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'TELEGRAM_UI_V2_DISABLED'});
+      }
+      const message = callback.message;
+      if (!message || !candidateRatAllowedPrincipal(callback.from,message.chat,env) ||
+          !autonomousRatAllowedPrincipal(callback.from,message.chat,env)) {
+        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
+      }
+      const action = typeof callback.data === 'string' ? parseCallback(callback.data) : null;
+      // Telegram explicitly requires an answer to stop its client progress state.
+      if (!action || !callback.id) {
+        if (callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+        return json(200,{ok:true,ignored:true,reason:'INVALID_CALLBACK'});
+      }
+      const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
+      if (!(await ledger.allowChat(message.chat.id,rateLimit,60_000,deps.now()))) {
+        await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
+        await ledger.completeIgnored(update.update_id,'RATE_LIMITED',deps.now());
+        return json(200,{ok:true,rateLimited:true});
+      }
+      await answerCallback(token,callback.id,deps.externalFetch);
+      if (!Number.isSafeInteger(message.message_id) || message.message_id < 1) throw new Error('TELEGRAM_CALLBACK_MESSAGE_INVALID');
+      const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
+      if (action.action === 'DIG_PROMPT') {
+        const waiting = digWaitingCard();
+        const prior = await loadActiveDigPrompt(env.DB,message.chat.id,callback.from.id,deps.now());
+        // The prompt receipt survived but its update-ledger completion did not. Replaying
+        // this callback must complete the ledger, never ask Telegram to create another prompt.
+        if (prior?.sourceUpdateId === update.update_id) {
+          await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:'UI_DIG_PROMPT',
+            replyDigest:ratCardDigest(waiting),telegramMessageId:message.message_id,rendererVersion:waiting.rendererVersion},deps.now());
+          return json(200,{ok:true,uiV2:true,prompt:true,replayed:true});
+        }
+        if (prior && prior.sourceUpdateId > update.update_id) {
+          // This is an older Telegram retry. Do not disturb the newer card or prompt.
+          await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+          return json(200,{ok:true,uiV2:true,prompt:false,stale:true});
+        }
+        await editUiCard(token,message.chat.id,message.message_id,origin,waiting,mediaEnabled,deps.externalFetch);
+        let promptMessageId: number;
+        try {
+          promptMessageId = await sendDigForceReply(token,message.chat.id,deps.externalFetch);
+        } catch (error) {
+          // A timeout/5xx may have created a prompt. Never send a second one for this update.
+          const operational = digPromptOperationalErrorCard();
+          await editUiCard(token,message.chat.id,message.message_id,origin,operational,mediaEnabled,deps.externalFetch).catch(()=>{});
+          await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+          return json(200,{ok:true,uiV2:true,prompt:false,reason:error instanceof TelegramUiError ? error.code : 'PROMPT_SEND_FAILED'});
+        }
+        try {
+          const promptWrite=await replaceDigPrompt(env.DB,{chatId:message.chat.id,userId:callback.from.id,sourceUpdateId:update.update_id,cardMessageId:message.message_id,promptMessageId,createdAtMs:deps.now()});
+          if (promptWrite === 'STALE') {
+            await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+            return json(200,{ok:true,uiV2:true,prompt:false,stale:true});
+          }
+        } catch {
+          // Send succeeded but its receipt did not: terminally close this update. The visible
+          // prompt is deliberately inert rather than risking a replayed investigation.
+          const operational = digPromptOperationalErrorCard();
+          await editUiCard(token,message.chat.id,message.message_id,origin,operational,mediaEnabled,deps.externalFetch).catch(()=>{});
+          await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
+          return json(200,{ok:true,uiV2:true,prompt:false,reason:'PROMPT_RECEIPT_FAILED'});
+        }
+        await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:'UI_DIG_PROMPT',
+          replyDigest:ratCardDigest(waiting),telegramMessageId:message.message_id,rendererVersion:waiting.rendererVersion},deps.now());
+        return json(200,{ok:true,uiV2:true,prompt:true});
+      }
+      const outcome = await executeUiCallback(env.DB,action,{userId:callback.from.id,chatId:message.chat.id},update.update_id,deps.now(),deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      const card = renderRatCard(outcome);
+      await editUiCard(token,message.chat.id,message.message_id,origin,card,mediaEnabled,deps.externalFetch);
+      // The compact card remains the surface; FULL is the explicit canonical expansion.
+      if (action.action === 'FULL') await sendMessage(token,message.chat.id,renderLegacyAutonomousOutcome(outcome),deps.externalFetch);
+      await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:`UI_${action.action}`,
+        replyDigest:ratCardDigest(card),telegramMessageId:message.message_id,rendererVersion:card.rendererVersion},deps.now());
+      return json(200,{ok:true,uiV2:true});
+    }
+
     const message = update.message;
     if (!message?.text) {
       await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
       return json(200, { ok: true, ignored: true });
     }
 
-    if (env.RAT_CANDIDATE_ALLOWED_USER_ID) {
-      const allowed = Number(env.RAT_CANDIDATE_ALLOWED_USER_ID);
-      if (!Number.isSafeInteger(allowed) || message.chat.type !== 'private' ||
-          message.from?.id !== allowed) {
-        await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
-        return json(200, { ok: true, ignored: true, reason: 'CANDIDATE_PRIVATE_ONLY' });
-      }
+    if (!candidateRatAllowedPrincipal(message.from,message.chat,env)) {
+      await ledger.completeIgnored(update.update_id, 'IGNORED', deps.now());
+      return json(200, { ok: true, ignored: true, reason: 'CANDIDATE_PRIVATE_ONLY' });
     }
 
     const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
@@ -597,6 +689,42 @@ async function telegramWebhook(
       return json(200, { ok: true, feedback: true });
     }
 
+    const exactPromptReply = env.BINRAT_TELEGRAM_UI_V2_ENABLED === 'true' &&
+      autonomousRatAllowed(message,env) &&
+      message.chat.type === 'private' && !message.from?.is_bot &&
+      Number.isSafeInteger(message.reply_to_message?.message_id) &&
+      !/^\//.test(message.text.trim());
+    if (exactPromptReply) {
+      const prompt = await loadActiveDigPrompt(env.DB,message.chat.id,message.from!.id,deps.now());
+      if (prompt && prompt.promptMessageId === message.reply_to_message!.message_id) {
+        try {
+          // The same parser as legacy /dig: malformed input spends neither a DIG slot nor RPC.
+          parseTarget(message.text.trim());
+        } catch {
+          const malformed=malformedDigCard();
+          await editUiCard(token,message.chat.id,prompt.cardMessageId,origin,malformed,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
+          await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:'UI_DIG_MALFORMED',
+            replyDigest:ratCardDigest(malformed),telegramMessageId:prompt.cardMessageId,rendererVersion:malformed.rendererVersion},deps.now());
+          return json(200,{ok:true,uiV2:true,dig:false,malformed:true});
+        }
+        const consumed=await consumeExactDigPrompt(env.DB,message.chat.id,message.from!.id,prompt.promptMessageId,deps.now());
+        if (consumed) {
+          const digging=diggingCard();
+          await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,digging,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
+          const outcome=await executeAutonomousCommand(env.DB,{name:'dig',argument:message.text.trim()},
+            {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
+            deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+          const result=renderRatCard(outcome);
+          // If this final edit or ledger receipt fails, the prompt remains consumed: replay cannot DIG again.
+          await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,result,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
+          await deleteUiMessage(token,message.chat.id,consumed.promptMessageId,deps.externalFetch).catch(()=>{});
+          await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:'UI_DIG_RESULT',
+            replyDigest:ratCardDigest(result),telegramMessageId:consumed.cardMessageId,rendererVersion:result.rendererVersion},deps.now());
+          return json(200,{ok:true,uiV2:true,dig:true});
+        }
+      }
+    }
+
     const autonomousAllowed = autonomousRatAllowed(message, env);
     const autonomous = autonomousAllowed ? parseAutonomousCommand(message.text) : null;
     if (autonomous) {
@@ -606,7 +734,7 @@ async function telegramWebhook(
         return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
       }
       let telegramMessageId: number | null = null;
-      const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
+      const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true' && env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true';
       if (mediaEnabled) {
         const initialCaption = autonomous.name === 'start'
           ? '🐀 BINRAT\n\nYou get the receipts.'
@@ -618,9 +746,17 @@ async function telegramWebhook(
           // Artwork delivery is additive personality, never an evidence availability dependency.
         }
       }
-      const reply = await handleAutonomousCommand(env.DB,autonomous,
+      const outcome = await executeAutonomousCommand(env.DB,autonomous,
         {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
         deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      const reply = renderLegacyAutonomousOutcome(outcome);
+      if (env.BINRAT_TELEGRAM_UI_V2_ENABLED === 'true') {
+        const card = renderRatCard(outcome);
+        telegramMessageId = await sendCard(token,message.chat.id,origin,card,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
+        await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,
+          intent:`UI_${autonomous.name.toUpperCase()}`,replyDigest:ratCardDigest(card),telegramMessageId,rendererVersion:card.rendererVersion},deps.now());
+        return json(200,{ok:true,autonomous:true,uiV2:true});
+      }
       if (mediaEnabled && telegramMessageId !== null) {
         try {
           await editRatCard(token, message.chat.id, telegramMessageId, origin,
@@ -812,15 +948,61 @@ async function telegramWebhook(
 }
 
 function autonomousRatAllowed(message: TelegramMessage, env: BinratWorkerEnv): boolean {
+  return !!message.from && autonomousRatAllowedPrincipal(message.from,message.chat,env);
+}
+
+/** Whole-bot candidate isolation is independent of Autonomous Rat's tester allowlist. */
+function candidateRatAllowedPrincipal(user: TelegramUser | undefined, chat: TelegramChat, env: BinratWorkerEnv): boolean {
+  const raw=env.RAT_CANDIDATE_ALLOWED_USER_ID?.trim();
+  if (!raw) return true;
+  if (!user || !/^[1-9]\d*$/.test(raw) || chat.type !== 'private' || user.is_bot ||
+      !Number.isSafeInteger(user.id)) return false;
+  const allowed=Number(raw);
+  return Number.isSafeInteger(allowed) && user.id===allowed;
+}
+
+/** Principal-shaped so a callback is authorized as its actor, never its card owner. */
+function autonomousRatAllowedPrincipal(user: TelegramUser, chat: TelegramChat, env: BinratWorkerEnv): boolean {
   if (env.BINRAT_AUTONOMOUS_RAT_ENABLED !== 'true') return false;
-  if (message.chat.type !== 'private' || message.from?.is_bot ||
-      !Number.isSafeInteger(message.from?.id) || message.from!.id <= 0 ||
-      message.from!.id !== message.chat.id) return false;
+  if (chat.type !== 'private' || user.is_bot || !Number.isSafeInteger(user.id) || user.id <= 0 || user.id !== chat.id) return false;
   if (env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED === 'true') return true;
   const raw = env.BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?.trim();
   if (!raw || !/^[1-9]\d*$/.test(raw)) return false;
   const allowed = Number(raw);
-  return Number.isSafeInteger(allowed) && allowed === message.from!.id;
+  return Number.isSafeInteger(allowed) && allowed === user.id;
+}
+
+async function caseIdForShare(db: D1DatabaseLike, shareId: string): Promise<string> {
+  const row = await db.prepare('SELECT case_id FROM rat_v1_cases WHERE share_id=?').bind(shareId)
+    .first<{case_id:string}>();
+  if (!row || !/^[0-9a-f]{64}$/.test(row.case_id)) throw new Error('RECEIPT_UNAVAILABLE');
+  return row.case_id;
+}
+
+async function executeUiCallback(
+  db: D1DatabaseLike, action: TelegramUiAction, principal: {userId:number;chatId:number}, updateId:number, now:number, source: WatchSource
+): Promise<AutonomousOutcome> {
+  if (action.action === 'HOME' || action.action === 'DIG_PROMPT') return {kind:'HOME'};
+  const commandFor = (name: 'rats'|'watches'|'why'|'watch'|'unwatch'|'share', argument='') =>
+    executeAutonomousCommand(db,{name,argument},principal,updateId,now,source);
+  if (action.action === 'RATS') return commandFor('rats');
+  if (action.action === 'RATS_PAGE') {
+    try {
+      const snapshot=await loadRatsSnapshot(db,action.discoveryId,now);
+      if (action.index >= snapshot.candidates.length) return {kind:'ERROR',code:'That Rat snapshot is unavailable or its page is out of bounds.'};
+      return {kind:'RATS',snapshot,candidateIndex:action.index};
+    } catch { return {kind:'ERROR',code:'That Rat snapshot is unavailable or expired.'}; }
+  }
+  if (action.action === 'WATCHES') return commandFor('watches');
+  const caseId = await caseIdForShare(db,action.shareId);
+  if (action.action === 'CASE' || action.action === 'WHY' || action.action === 'FULL') return commandFor('why',caseId);
+  if (action.action === 'SHARE') return commandFor('share',caseId);
+  const row = await db.prepare('SELECT receipt_json FROM rat_v1_cases WHERE case_id=?').bind(caseId).first<{receipt_json:string}>();
+  if (!row) throw new Error('RECEIPT_UNAVAILABLE');
+  const receipt = JSON.parse(row.receipt_json) as {chainId:number;subject:{entityType:string;entityId:string};evidenceRefs:Array<{creator:string}>};
+  const creator = receipt.subject.entityType === 'CREATOR' ? receipt.subject.entityId : receipt.evidenceRefs[0]?.creator;
+  if (!/^0x[0-9a-f]{40}$/.test(creator ?? '')) throw new Error('WATCH_CREATOR_ONLY');
+  return commandFor(action.action === 'WATCH' ? 'watch' : 'unwatch',`${receipt.chainId}:CREATOR:${creator}`);
 }
 
 type RatWatchCommand =

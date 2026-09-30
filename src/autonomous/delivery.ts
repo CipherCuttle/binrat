@@ -1,6 +1,8 @@
 import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
 import { D1RuntimeStateStore } from '../cloudflare/runtimeState.js';
 import { sendRatCard } from '../telegram/ratMedia.js';
+import { renderAlertCard } from '../telegram/ui/cards.js';
+import { sendCard, TelegramUiError } from '../telegram/ui/client.js';
 import { authoritativeCheckpoint, evidenceForLaunch, saveCase, why } from './evidence.js';
 import { attentionDecision, makeReceipt, renderReceipt, type Receipt } from './model.js';
 import type { WatchSource } from './source.js';
@@ -57,7 +59,7 @@ export async function enqueueFindings(db: D1DatabaseLike, now: number): Promise<
 
 export async function deliverFindings(
   db: D1DatabaseLike, source: WatchSource, token: string, externalFetch: typeof fetch, now: () => number,
-  media?: { enabled: boolean; origin: string }
+  presentation?: { enabled: boolean; origin: string; uiV2?: boolean }
 ): Promise<number> {
   const pendingChain = await db.prepare(`SELECT chain_id FROM rat_v1_outbox WHERE state='PENDING'
     ORDER BY created_at_ms,delivery_id LIMIT 1`).first<{ chain_id: number }>();
@@ -101,8 +103,11 @@ export async function deliverFindings(
         eventPoint.timestampMs <= watch.created_at_ms || eventPoint.timestampMs > now()+15_000) {
       await cancel(db,item.delivery_id); continue;
     }
-    const text = renderReceipt(receipt,'ALERT');
-    if (text.length > 4096) throw new Error('ALERT_TOO_LONG');
+    // V2 owns only presentation. Legacy rendering remains byte-for-byte on its
+    // existing rollback path, while V2 fails closed at the caption bound.
+    const alertCard = presentation?.uiV2 ? renderAlertCard(receipt,item.watch_start_block) : null;
+    const text = alertCard ? null : renderReceipt(receipt,'ALERT');
+    if (text !== null && text.length > 4096) throw new Error('ALERT_TOO_LONG');
     // Linearization point: both replays and concurrent consumers lose this CAS.
     // Once claimed we never auto-resend, including crash-after-send-before-SENT.
     const claim = await db.prepare(`UPDATE rat_v1_outbox SET state='SENDING',attempt_count=attempt_count+1,last_attempt_ms=?,event_timestamp_ms=?
@@ -118,9 +123,18 @@ export async function deliverFindings(
     let telegramId: number | null = null;
     let state: 'SENT' | 'UNKNOWN' | 'FAILED' = 'UNKNOWN';
     try {
-      if (media?.enabled) {
+      if (alertCard) {
         try {
-          telegramId = await sendRatCard(token, item.chat_id, media.origin, 'alert', text, externalFetch);
+          telegramId = await sendCard(token,item.chat_id,presentation!.origin,alertCard,presentation!.enabled,externalFetch);
+          state = 'SENT';
+        } catch (error) {
+          // sendCard performs one text fallback only after a definitive media
+          // rejection. Its AMBIGUOUS result means a material alert may exist.
+          if (error instanceof TelegramUiError && error.code === 'REJECTED') state = 'FAILED';
+        }
+      } else if (presentation?.enabled) {
+        try {
+          telegramId = await sendRatCard(token, item.chat_id, presentation.origin, 'alert', text!, externalFetch);
           state = 'SENT';
         } catch (error) {
           // A definitive 400/404 means no photo card exists, so textual evidence is safe.
@@ -128,7 +142,7 @@ export async function deliverFindings(
           if (!(error instanceof Error) || error.message !== 'TELEGRAM_RAT_MEDIA_UNSUPPORTED') throw error;
           const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
             method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
-            body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
+            body:JSON.stringify({chat_id:item.chat_id,text:text!,disable_web_page_preview:true})
           });
           const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
           if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
@@ -138,7 +152,7 @@ export async function deliverFindings(
       } else {
         const response = await externalFetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(8000),
-          body:JSON.stringify({chat_id:item.chat_id,text,disable_web_page_preview:true})
+          body:JSON.stringify({chat_id:item.chat_id,text:text!,disable_web_page_preview:true})
         });
         const result = await response.json() as { ok?: boolean; result?: { message_id?: number } };
         if (response.ok && result.ok === true && Number.isSafeInteger(result.result?.message_id)) {
