@@ -1,6 +1,13 @@
 name: telegram-menu-forensics
 
 on:
+  # One-shot bootstrap for this branch's read-only forensic receipt. Remove this
+  # narrow trigger after it runs; normal use is manual dispatch.
+  push:
+    branches:
+      - codex/telegram-as-code-private-v2
+    paths:
+      - .github/workflows/telegram-menu-forensics.yml
   workflow_dispatch:
 
 permissions:
