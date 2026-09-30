@@ -49,6 +49,7 @@ test('V2 card captions fail closed instead of truncating canonical evidence', as
     const receipt=await dig(f.db,{chainId:4663,entityType:'CREATOR',entityId:CREATOR},f.now());
     const card=renderRatCard({kind:'CASE',receipt,mode:'DIG',privateAttention:null});
     assert.ok(Array.from(card.caption).length<=1024);
-    assert.match(card.caption,/Dug it up/);\n    assert.doesNotMatch(card.caption,/OBSERVED:|DERIVED:|UNKNOWN:|sourceVerified|runtimeFresh/i);
+    assert.match(card.caption,/Dug it up/);
+    assert.doesNotMatch(card.caption,/OBSERVED:|DERIVED:|UNKNOWN:|sourceVerified|runtimeFresh/i);
   } finally { f.db.close(); }
 });
