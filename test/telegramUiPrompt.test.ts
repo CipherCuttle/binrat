@@ -72,7 +72,7 @@ test('only a same-principal exact reply executes DIG once; ordinary text and mal
     assert.equal(await loadActiveDigPrompt(f.db,77,77,f.now()),null);
     await reply(f,fetchImpl,1014,CREATOR,800);
     assert.equal(await digCount(f),1);
-    assert.equal(calls.filter(c=>c.method==='editMessageText' && /DIGGING/.test(String(c.body.text))).length,1);
+    assert.equal(calls.filter(c=>c.method==='editMessageText' && /Digging through the bin/.test(String(c.body.text))).length,1);
   } finally {f.db.close();}
 });
 
