@@ -10,6 +10,10 @@ import { ponsTokenLaunchedEvent } from './ponsAbi.js';
  * it writes or checkpoints anything, keeping Worker RPC work bounded.
  */
 export const PONS_MAX_CANONICAL_LAUNCH_BLOCKS = 128;
+/** Pons-only RPC bounds: one short retry fits safely inside the queue lease. */
+export const PONS_RPC_TIMEOUT_MS = 15_000;
+export const PONS_RPC_RETRY_COUNT = 1;
+export const PONS_RPC_RETRY_DELAY_MS = 250;
 
 export interface PonsLaunchSourceOptions {
   rpcUrl?: string;
@@ -45,7 +49,12 @@ export class PonsLaunchSource {
   constructor(options: PonsLaunchSourceOptions = {}) {
     if (!options.client && !options.rpcUrl) throw new Error('ROBINHOOD_RPC_URL_REQUIRED');
     this.client = options.client ?? createPublicClient({
-      chain: robinhoodMainnet(options.rpcUrl!), transport: http(options.rpcUrl!, { timeout: 8_000, retryCount: 0 })
+      chain: robinhoodMainnet(options.rpcUrl!),
+      transport: http(options.rpcUrl!, {
+        timeout: PONS_RPC_TIMEOUT_MS,
+        retryCount: PONS_RPC_RETRY_COUNT,
+        retryDelay: PONS_RPC_RETRY_DELAY_MS
+      })
     });
     this.now = options.now ?? Date.now;
     this.maxCanonicalLaunchBlocks = options.maxCanonicalLaunchBlocks ?? PONS_MAX_CANONICAL_LAUNCH_BLOCKS;

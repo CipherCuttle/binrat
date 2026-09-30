@@ -87,6 +87,9 @@ const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
 const LIVE_SYNC_LEASE_MS = 120_000;
+// Covers bounded Pons bootstrap transport plus at most two 30.25s retrying
+// reads inside its unchanged 60s work budget; Arc keeps its existing lease.
+export const PONS_SYNC_LEASE_MS = 180_000;
 const PONS_CATCHUP_INITIAL_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCHES = 4;
@@ -477,7 +480,7 @@ export async function runCloudflarePonsSyncCycle(
   }
   const nowMs = deps.now();
   const lease = new D1SyncLeaseStore(env.DB);
-  if (!(await lease.claim(PONS_SYNC_LEASE_NAME, message.cycleId, nowMs, LIVE_SYNC_LEASE_MS))) {
+  if (!(await lease.claim(PONS_SYNC_LEASE_NAME, message.cycleId, nowMs, PONS_SYNC_LEASE_MS))) {
     return { status: 'BUSY' };
   }
   const store = new D1Store(env.DB, ROBINHOOD_CHAIN_ID);
@@ -531,7 +534,7 @@ export async function runCloudflarePonsSyncCycle(
     const backlogMode = backlogAtBootstrap > nearHeadBlocks;
     const fenceLease = async (): Promise<void> => {
       const fencedAtMs = deps.now();
-      if (!(await lease.claim(PONS_SYNC_LEASE_NAME, message.cycleId, fencedAtMs, LIVE_SYNC_LEASE_MS))) {
+      if (!(await lease.claim(PONS_SYNC_LEASE_NAME, message.cycleId, fencedAtMs, PONS_SYNC_LEASE_MS))) {
         throw new Error('PONS_LEASE_FENCED');
       }
     };
@@ -932,6 +935,8 @@ export function syncErrorCode(error: unknown): string {
   if (error instanceof Error && /(?:too many|limit).*subrequests?|subrequest.*(?:limit|exceeded)/i.test(error.message)) {
     return 'PLATFORM_SUBREQUEST_LIMIT';
   }
+  const ponsTransportCode = ponsBootstrapTransportErrorCode(error);
+  if (ponsTransportCode) return ponsTransportCode;
   const code = explicitSyncErrorCode(error);
   if (code) return code;
 
@@ -943,6 +948,21 @@ export function syncErrorCode(error: unknown): string {
 
   const errorName = safeErrorName(error);
   return errorName === 'UNKNOWN_ERROR' ? 'SYNC_UNKNOWN_ERROR' : `SYNC_${errorName}`;
+}
+
+/**
+ * Pons bootstrap operations retain their operation label for diagnostics, but
+ * expose only a known transport cause to the recovery controller.  Authority
+ * and integrity errors never enter this path and therefore remain fail-closed.
+ */
+function ponsBootstrapTransportErrorCode(error: unknown): string | null {
+  const transportError = ponsTransportCause(error);
+  if (transportError === error) return null;
+  const status = httpStatus(transportError);
+  if (status !== null) return `SYNC_HTTP_${status}`;
+  const causeCode = safeCauseCode(transportError);
+  if (causeCode) return `SYNC_${causeCode}`;
+  return safeErrorName(transportError) === 'TIMEOUT_ERROR' ? 'SYNC_TIMEOUT_ERROR' : null;
 }
 
 function explicitSyncErrorCode(error: unknown): string | null {

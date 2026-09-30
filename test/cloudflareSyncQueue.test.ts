@@ -18,6 +18,7 @@ import {
   handleSyncQueueBatch,
   ARC_PUBLIC_RPC_FALLBACK_URL,
   calculatePonsVelocity,
+  PONS_SYNC_LEASE_MS,
   resolveArcRpcUrl,
   runCloudflarePonsSyncCycle,
   runCloudflareObservationCycle,
@@ -27,7 +28,7 @@ import {
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
 import { PonsLaunchSource } from '../src/pons/ponsSource.js';
-import { PONS_V2_START_BLOCK } from '../src/pons/chain.js';
+import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../src/pons/chain.js';
 import type {
   ObservationBlockPoint,
   ObservationSource
@@ -184,7 +185,7 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
     getBlockNumber: async () => { throw Object.assign(new Error('https://secret.example'), { name: 'TimeoutError' }); }
   } as never });
   return assert.rejects(wrapped.getHeadBlockNumber(), (error: unknown) => {
-    assert.equal(syncErrorCode(error), 'PONS_GET_HEAD_FAILED');
+    assert.equal(syncErrorCode(error), 'SYNC_TIMEOUT_ERROR');
     return true;
   });
 });
@@ -508,7 +509,72 @@ test('Pons backlog uses one lease writer, a bounded multi-batch slice, and exact
   } finally { db.close(); }
 });
 
+test('Pons timeout stays fail-closed, retries once through Queue, and clears only after a later advancing slice', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  class TimeoutThenRecoveryPonsSource extends FakePonsSource {
+    attempts = 0;
+    override async catchUp(fromBlock: bigint, toBlock: bigint): Promise<LaunchObserved[]> {
+      this.catchUpCalls.push([fromBlock, toBlock]);
+      this.attempts += 1;
+      if (this.attempts === 3) {
+        throw Object.assign(new Error('bounded timeout'), { name: 'TimeoutError' });
+      }
+      return [];
+    }
+  }
+  const source = new TimeoutThenRecoveryPonsSource();
+  let nowMs = 1_000;
+  const env = {
+    DB: db,
+    BINRAT_LIVE_LOOKBACK_BLOCKS: '200000',
+    BINRAT_PONS_CATCHUP_MAX_BATCHES: '1',
+    BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
+    BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000'
+  };
+  const deliver = async (cycleId: string) => {
+    let acked = 0;
+    const retries: Array<{ delaySeconds?: number } | undefined> = [];
+    await handleSyncQueueBatch({ messages: [{
+      body: { kind: 'PONS_SYNC_CYCLE', cycleId, enqueuedAtMs: nowMs },
+      ack() { acked += 1; }, retry(options) { retries.push(options); }
+    }] }, env, { now: () => nowMs, ponsLaunchSource: source });
+    nowMs += 30_000;
+    return { acked, retries };
+  };
+  try {
+    assert.deepEqual(await deliver('pons-success-1'), { acked: 1, retries: [] });
+    const store = new D1Store(db, ROBINHOOD_CHAIN_ID);
+    const checkpointAfterFirst = await store.getCheckpoint();
+    assert.ok(checkpointAfterFirst);
+
+    assert.deepEqual(await deliver('pons-success-2'), { acked: 1, retries: [] });
+    const checkpointAfterProgress = await store.getCheckpoint();
+    assert.ok(checkpointAfterProgress!.blockNumber > checkpointAfterFirst!.blockNumber);
+
+    const timeout = await deliver('pons-timeout');
+    assert.equal(timeout.acked, 0);
+    assert.deepEqual(timeout.retries, [{ delaySeconds: 30 }]);
+    const runtimeAfterTimeout = await new D1RuntimeStateStore(db, ROBINHOOD_CHAIN_ID).get();
+    const checkpointAfterTimeout = await store.getCheckpoint();
+    assert.equal(runtimeAfterTimeout?.sourceVerified, false);
+    assert.equal(runtimeAfterTimeout?.liveCaughtUp, false);
+    assert.equal(runtimeAfterTimeout?.lastSyncError, 'SYNC_TIMEOUT_ERROR');
+    assert.deepEqual(checkpointAfterTimeout, checkpointAfterProgress);
+
+    assert.deepEqual(await deliver('pons-retry-recovered'), { acked: 1, retries: [] });
+    const runtimeAfterRecovery = await new D1RuntimeStateStore(db, ROBINHOOD_CHAIN_ID).get();
+    const checkpointAfterRecovery = await store.getCheckpoint();
+    assert.ok(checkpointAfterRecovery!.blockNumber > checkpointAfterTimeout!.blockNumber);
+    assert.equal(runtimeAfterRecovery?.sourceVerified, true);
+    assert.equal(runtimeAfterRecovery?.lastSyncError, null);
+  } finally {
+    db.close();
+  }
+});
+
 test('Pons velocity receipt is bounded and compares backlog to head growth', () => {
+  assert.equal(PONS_SYNC_LEASE_MS, 180_000);
   const receipt = calculatePonsVelocity(
     { headBlock: 100n, updatedAtMs: 1_000 },
     { headBlock: 110n, blocksAdvanced: 40n, elapsedMs: 2_000, backlogBefore: 80n, backlogAfter: 40n },

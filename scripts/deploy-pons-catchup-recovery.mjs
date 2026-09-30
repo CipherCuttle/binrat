@@ -244,7 +244,8 @@ try {
       backlog: BigInt(snapshot.targetBlock) - BigInt(snapshot.checkpointBlock),
       chainId: snapshot.chainId, sourceVerified: runtime.sourceVerified,
       runtimeFresh: snapshot.runtimeFresh, lastSyncError: runtime.lastSyncError,
-      indexReady: snapshot.indexReady, liveCaughtUp: runtime.liveCaughtUp
+      indexReady: snapshot.indexReady, liveCaughtUp: runtime.liveCaughtUp,
+      candidateActive: activeVersion(deploymentStatus()) === candidateVersion
     };
     const previousSample = samples.at(-1);
     const elapsedMs = previousSample ? sample.atMs - previousSample.atMs : 0;
@@ -265,12 +266,13 @@ try {
     });
     gate(snapshot.chainId === 4663, 'POSTDEPLOY_WRONG_CHAIN');
     gate(BigInt(snapshot.checkpointBlock) >= STALLED_CHECKPOINT, 'CHECKPOINT_REGRESSED');
-    if (classifyPonsRecovery(samples) === 'PASS') break;
+    const observedVerdict = classifyPonsRecovery(samples);
+    if (observedVerdict === 'PASS' || observedVerdict === 'FAIL') break;
     await sleep(15_000);
   }
   const recoveryVerdict = classifyPonsRecovery(samples);
-  if (recoveryVerdict === 'RECOVERY_PROGRESSING') {
-    note('PONS_RECOVERY_PROGRESSING', {
+  if (recoveryVerdict === 'RECOVERY_PROGRESSING' || recoveryVerdict === 'RECOVERY_RETRYING') {
+    note(`PONS_${recoveryVerdict}`, {
       reviewedSha, candidateVersion,
       checkpointBefore: samples[0].checkpoint.toString(), checkpointAfter: samples.at(-1).checkpoint.toString(),
       backlogBefore: samples[0].backlog.toString(), backlogAfter: samples.at(-1).backlog.toString()
