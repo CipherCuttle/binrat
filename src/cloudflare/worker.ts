@@ -1084,7 +1084,13 @@ async function executeUiCallback(
   }
   if (action.action === 'WATCHES') return commandFor('watches');
   const caseId = await caseIdForShare(db,action.shareId);
-  if (action.action === 'CASE' || action.action === 'WHY' || action.action === 'FULL') return commandFor('why',caseId);
+  if (action.action === 'CASE') {
+    const reconstructed = await commandFor('why',caseId);
+    return reconstructed.kind === 'CASE'
+      ? { ...reconstructed, mode: reconstructed.privateAttention ? 'ALERT' : 'DIG' }
+      : reconstructed;
+  }
+  if (action.action === 'WHY' || action.action === 'FULL') return commandFor('why',caseId);
   if (action.action === 'SHARE') return commandFor('share',caseId);
   const row = await db.prepare('SELECT receipt_json FROM rat_v1_cases WHERE case_id=?').bind(caseId).first<{receipt_json:string}>();
   if (!row) throw new Error('RECEIPT_UNAVAILABLE');
