@@ -162,7 +162,8 @@ test('alert callbacks re-authorize and use existing CASE/WHY/SHARE/UNWATCH paths
     }
     const after = (await f.db.prepare('SELECT COUNT(*) AS n FROM rat_v1_dig_requests').first<{n:number}>())!.n;
     assert.equal(after,before); // CASE is reconstruction, not a new DIG.
-    assert.ok(captions.some(caption=>/Matched your watch after it was armed/.test(caption)));\n    assert.ok(captions.some(caption=>/Why I squeaked/.test(caption)));
+    assert.ok(captions.some(caption=>/Matched your watch after it was armed/.test(caption)));
+    assert.ok(captions.some(caption=>/Why I squeaked/.test(caption)));
     assert.ok(captions.some(caption=>/Public evidence only/.test(caption)));
     assert.equal((await f.db.prepare('SELECT enabled FROM rat_v1_watches WHERE user_id=77 AND chat_id=77').first<{enabled:number}>())?.enabled,0);
     const publicRow = await f.db.prepare('SELECT receipt_json FROM rat_v11_pons_public_receipts WHERE case_id=?').bind(row.case_id).first<{receipt_json:string}>();
