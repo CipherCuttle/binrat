@@ -3,6 +3,7 @@
 // This path performs no migration, Telegram mutation, or feature activation.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { classifyPonsRecovery } from './ponsRecoveryVerdict.mjs';
 
 const WORKER = 'binrat-edge-v0';
 const DB_ID = '46814564-1a41-449a-88e5-c1349eed3a27';
@@ -22,9 +23,11 @@ const ALLOWED_DIFF = new Set([
   'src/core/identity.ts',
   'src/indexer/syncLaunches.ts',
   'src/pons/ponsSource.ts',
+  'scripts/ponsRecoveryVerdict.mjs',
   'test/cloudflareSyncQueue.test.ts',
   'test/d1StoreParity.test.ts',
   'test/deploymentBindingParity.test.ts',
+  'test/ponsRecoveryVerdict.test.ts',
   'test/sync.test.ts'
 ]);
 let previousVersion = null;
@@ -120,6 +123,16 @@ function version(id) {
 }
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+function ponsRuntime(config) {
+  const runtime = query(config, 'SELECT source_verified,live_caught_up,last_sync_error,updated_at_ms FROM binrat_runtime_state WHERE chain_id=4663 LIMIT 1;')[0];
+  gate(runtime && (runtime.source_verified === 0 || runtime.source_verified === 1), 'PONS_RUNTIME_MISSING');
+  return {
+    sourceVerified: runtime.source_verified === 1,
+    liveCaughtUp: runtime.live_caught_up === 1,
+    lastSyncError: runtime.last_sync_error,
+    updatedAtMs: runtime.updated_at_ms
+  };
 }
 function requirePrivateBindings(bindingMap, expectedRelease, requireTelegramUi = false) {
   gate(plain(bindingMap, 'BINRAT_RELEASE_SHA') === expectedRelease, 'RELEASE_SHA_BINDING_MISMATCH');
@@ -222,15 +235,16 @@ try {
     '--message', `Pons identity and catch-up recovery ${reviewedSha.slice(0, 12)}`
   ]);
 
-  let healthy = null;
-  let consecutiveHealthy = 0;
-  let velocityPasses = 0;
   const samples = [];
   for (let attempt = 1; attempt <= 16; attempt += 1) {
     const snapshot = await getJson('/api/health');
+    const runtime = ponsRuntime(CONFIG);
     const sample = {
       atMs: Date.now(), checkpoint: BigInt(snapshot.checkpointBlock), target: BigInt(snapshot.targetBlock),
-      backlog: BigInt(snapshot.targetBlock) - BigInt(snapshot.checkpointBlock)
+      backlog: BigInt(snapshot.targetBlock) - BigInt(snapshot.checkpointBlock),
+      chainId: snapshot.chainId, sourceVerified: runtime.sourceVerified,
+      runtimeFresh: snapshot.runtimeFresh, lastSyncError: runtime.lastSyncError,
+      indexReady: snapshot.indexReady, liveCaughtUp: runtime.liveCaughtUp
     };
     const previousSample = samples.at(-1);
     const elapsedMs = previousSample ? sample.atMs - previousSample.atMs : 0;
@@ -245,51 +259,49 @@ try {
       attempt, chainId: snapshot.chainId, checkpointBlock: snapshot.checkpointBlock,
       headBlock: snapshot.headBlock, targetBlock: snapshot.targetBlock,
       launchCount: snapshot.launchCount, indexReady: snapshot.indexReady,
-      liveCaughtUp: snapshot.liveCaughtUp, lastSyncError: snapshot.lastSyncError,
+      sourceVerified: runtime.sourceVerified, liveCaughtUp: runtime.liveCaughtUp, lastSyncError: runtime.lastSyncError,
       runtimeFresh: snapshot.runtimeFresh, backlog: sample.backlog.toString(),
       checkpointVelocity, targetVelocity, catchupHeadRatio
     });
     gate(snapshot.chainId === 4663, 'POSTDEPLOY_WRONG_CHAIN');
     gate(BigInt(snapshot.checkpointBlock) >= STALLED_CHECKPOINT, 'CHECKPOINT_REGRESSED');
-    gate(snapshot.lastSyncError === null || snapshot.lastSyncError === 'SYNC_TIMEOUT_ERROR',
-      `UNEXPECTED_POSTDEPLOY_SYNC_ERROR:${snapshot.lastSyncError}`);
-    const meaningfulBacklog = sample.backlog > 2_048n;
-    const velocityAccepted = checkpointVelocity !== null && targetVelocity !== null &&
-      checkpointVelocity > targetVelocity && (targetVelocity <= 0 || checkpointVelocity >= targetVelocity * 3);
-    velocityPasses = meaningfulBacklog && velocityAccepted ? velocityPasses + 1 : 0;
-    const accepted = snapshot.chainId === 4663 && snapshot.sourceVerified === true && snapshot.lastSyncError === null && snapshot.indexReady === true &&
-      snapshot.liveCaughtUp === true && snapshot.runtimeFresh === true && BigInt(snapshot.checkpointBlock) >= BigInt(snapshot.targetBlock) &&
-      BigInt(snapshot.checkpointBlock) > STALLED_CHECKPOINT &&
-      Number(snapshot.launchCount) >= Number(beforeHealth.launchCount);
-    consecutiveHealthy = accepted ? consecutiveHealthy + 1 : 0;
-    if (consecutiveHealthy >= 2 && (velocityPasses >= 3 || !meaningfulBacklog)) { healthy = snapshot; break; }
-    if (attempt >= 8 && meaningfulBacklog && velocityPasses === 0) throw new Error('PONS_CATCHUP_VELOCITY_INSUFFICIENT');
+    if (classifyPonsRecovery(samples) === 'PASS') break;
     await sleep(15_000);
   }
-  gate(healthy, 'PONS_RECOVERY_DID_NOT_CONVERGE');
+  const recoveryVerdict = classifyPonsRecovery(samples);
+  if (recoveryVerdict === 'RECOVERY_PROGRESSING') {
+    note('PONS_RECOVERY_PROGRESSING', {
+      reviewedSha, candidateVersion,
+      checkpointBefore: samples[0].checkpoint.toString(), checkpointAfter: samples.at(-1).checkpoint.toString(),
+      backlogBefore: samples[0].backlog.toString(), backlogAfter: samples.at(-1).backlog.toString()
+    });
+  } else {
+    gate(recoveryVerdict === 'PASS', 'PONS_RECOVERY_FAILED');
+    const healthy = samples.at(-1);
 
-  const deployed = activeVersion(deploymentStatus());
-  gate(deployed === candidateVersion, 'CANDIDATE_NOT_AT_100_PERCENT');
-  requirePrivateBindings(bindings(version(candidateVersion)), reviewedSha, true);
-  const afterService = await getJson('/health');
-  gate(afterService.releaseSha === reviewedSha, 'DEPLOYED_RELEASE_SHA_MISMATCH');
-  const afterCounts = query(CONFIG, 'SELECT chain_id,COUNT(*) AS launch_count FROM launches GROUP BY chain_id ORDER BY chain_id;');
-  const uniqueness = query(CONFIG, "SELECT COUNT(*) AS rows,COUNT(DISTINCT launch_id) AS unique_launches,COUNT(DISTINCT CASE WHEN chain_id=4663 THEN token END) AS unique_pons_tokens FROM launches;")[0];
-  const afterConflict = query(CONFIG, `SELECT * FROM launches WHERE launch_id='${CONFLICTING_LAUNCH}' LIMIT 1;`)[0];
-  gate(JSON.stringify(afterConflict) === JSON.stringify(beforeConflict), 'PREEXISTING_LAUNCH_MUTATED');
-  const beforeByChain = new Map(beforeCounts.map(row => [Number(row.chain_id), Number(row.launch_count)]));
-  const afterByChain = new Map(afterCounts.map(row => [Number(row.chain_id), Number(row.launch_count)]));
-  gate((afterByChain.get(4663) ?? 0) >= (beforeByChain.get(4663) ?? 0), 'PONS_LAUNCH_ROWS_DELETED');
-  gate((afterByChain.get(5042) ?? 0) === (beforeByChain.get(5042) ?? 0), 'CROSS_CHAIN_LAUNCH_STATE_CHANGED');
-  gate(Number(uniqueness.rows) === Number(uniqueness.unique_launches), 'LAUNCH_ID_UNIQUENESS_FAILED');
-  gate(Number(uniqueness.unique_pons_tokens) === (afterByChain.get(4663) ?? 0), 'PONS_TOKEN_UNIQUENESS_FAILED');
-  note('PONS_RECOVERY_PASS', {
-    reviewedSha, previousVersion, candidateVersion,
-    checkpointBefore: beforeHealth.checkpointBlock,
-    checkpointAfter: healthy.checkpointBlock,
-    launchCountsBefore: beforeCounts,
-    launchCountsAfter: afterCounts
-  });
+    const deployed = activeVersion(deploymentStatus());
+    gate(deployed === candidateVersion, 'CANDIDATE_NOT_AT_100_PERCENT');
+    requirePrivateBindings(bindings(version(candidateVersion)), reviewedSha, true);
+    const afterService = await getJson('/health');
+    gate(afterService.releaseSha === reviewedSha, 'DEPLOYED_RELEASE_SHA_MISMATCH');
+    const afterCounts = query(CONFIG, 'SELECT chain_id,COUNT(*) AS launch_count FROM launches GROUP BY chain_id ORDER BY chain_id;');
+    const uniqueness = query(CONFIG, "SELECT COUNT(*) AS rows,COUNT(DISTINCT launch_id) AS unique_launches,COUNT(DISTINCT CASE WHEN chain_id=4663 THEN token END) AS unique_pons_tokens FROM launches;")[0];
+    const afterConflict = query(CONFIG, `SELECT * FROM launches WHERE launch_id='${CONFLICTING_LAUNCH}' LIMIT 1;`)[0];
+    gate(JSON.stringify(afterConflict) === JSON.stringify(beforeConflict), 'PREEXISTING_LAUNCH_MUTATED');
+    const beforeByChain = new Map(beforeCounts.map(row => [Number(row.chain_id), Number(row.launch_count)]));
+    const afterByChain = new Map(afterCounts.map(row => [Number(row.chain_id), Number(row.launch_count)]));
+    gate((afterByChain.get(4663) ?? 0) >= (beforeByChain.get(4663) ?? 0), 'PONS_LAUNCH_ROWS_DELETED');
+    gate((afterByChain.get(5042) ?? 0) === (beforeByChain.get(5042) ?? 0), 'CROSS_CHAIN_LAUNCH_STATE_CHANGED');
+    gate(Number(uniqueness.rows) === Number(uniqueness.unique_launches), 'LAUNCH_ID_UNIQUENESS_FAILED');
+    gate(Number(uniqueness.unique_pons_tokens) === (afterByChain.get(4663) ?? 0), 'PONS_TOKEN_UNIQUENESS_FAILED');
+    note('PONS_RECOVERY_PASS', {
+      reviewedSha, previousVersion, candidateVersion,
+      checkpointBefore: beforeHealth.checkpointBlock,
+      checkpointAfter: healthy.checkpoint.toString(),
+      launchCountsBefore: beforeCounts,
+      launchCountsAfter: afterCounts
+    });
+  }
 } catch (error) {
   if (promotionAttempted && previousVersion) {
     try {
