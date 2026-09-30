@@ -25,6 +25,81 @@ This public product state does **not** authorize token launch or token marketing
 
 A capability may be `ENGINEERING_PASS` without being `DEPLOYED` or `PUBLIC_LIVE`.
 
+
+## NEXT PRODUCT PHASE — TELEGRAM SCOUT / WEB FORENSICS (2026-10-01)
+
+**Decision:** stop expanding Telegram into a forensic terminal. Telegram remains a
+complete fast product for discovery, DIG, bounded WHY, WATCH/WATCHES, recurrence
+alerts, SHARE and exact handoff. The Web App becomes the primary deep-forensics
+surface for case history, chronology, Replay, receipts, relationships, compare,
+Radar depth and larger Watch management.
+
+Comprehensive implementation contract:
+[`docs/product/TELEGRAM_WEB_FORENSICS_SPLIT_V1_CODE_PLAN.md`](./product/TELEGRAM_WEB_FORENSICS_SPLIT_V1_CODE_PLAN.md).
+
+Product doctrine:
+
+> **Telegram tells you when to care. Web BINRAT shows you everything worth knowing.**
+
+The Telegram Mini App is the same forensic Web App in a Telegram-aware shell,
+not a third product. Both surfaces consume one canonical intelligence/state
+layer, one case identity, one Watch authority and one receipt/evidence system.
+
+### Information-depth contract
+
+1. **Telegram Card:** what happened — headline plus 1–2 valuable facts.
+2. **Telegram WHY:** why BINRAT surfaced it — 2–4 bounded observations.
+3. **OPEN CASE:** deep Web investigation.
+4. **FULL RECEIPT:** canonical proof.
+
+Primary Telegram cards must follow:
+
+`identity/context → strongest factual signal → recency/scale → actions`
+
+and must not default to database fields, internal runtime terms, hashes,
+methodology walls or repeated disclaimers. Evidence remains available one tap
+deeper; presentation compression never weakens the claim boundary.
+
+### Immediate execution order
+
+- **W0 — Messaging / hierarchy:** rewrite HOME, RATS, CASE, WHY, WATCH,
+  WATCHLIST, ALERT, EMPTY, ERROR and DIG prompt. Enforce copy/action budgets and
+  jargon-leakage tests. Ten-second value proposition: repeat launchers + memory
+  + Watch alerts.
+- **W1 — Exact OPEN CASE handoff:** stable case identity and deep-link routing
+  from Telegram RATS/CASE/ALERT into the exact Web investigation.
+- **W2 — Forensic Case V1:** one excellent Web Case surface before broad
+  expansion: strongest finding, complete launch history, What BINRAT Noticed,
+  receipts/sources, coverage and shared Watch state.
+- **W3 — Replay:** embed the frozen LAUNCH → 5m → 1h → 24h timeline and
+  no-lookahead evidence.
+- **W4 — Radar depth:** recurrence/cadence browsing, deterministic filters and
+  selection → Case; no opaque BUY/risk score.
+- **W5 — shared Watch center:** richer Web management over the same durable
+  Watch state used by Telegram.
+- **W6 — compare/relations:** only if supported by evidence and still useful;
+  no decorative graph theater.
+- **W7 — release acceptance:** browser + Telegram Mini App + real Android owner
+  flow, deep-link reload, Back behavior, accessibility, stale/error states,
+  forged-initData rejection and cross-surface evidence parity.
+
+After W0/W1, planned product effort biases approximately **25% Telegram /
+15% shared handoff+state / 60% Web forensic experience**. This is a prioritization
+guide, not a staffing promise.
+
+### Supersession rule
+
+Where older Product Surface V1 / mobile-first roadmap entries imply that the
+phone/Web surface and Telegram should independently grow into overlapping
+products, **this section wins**. Preserve useful visual, accessibility and
+evidence-boundary work from those plans; do not preserve duplicated product
+responsibilities.
+
+Do not use this decision to reopen Pons/RPC/Queue architecture, token/Holder
+work, trading/copy-trading, or a frontend redesign from zero. No merge,
+production change, token action or public-Rat authority is granted by this
+roadmap update.
+
 ## PRODUCT SURFACE V1 — MAKE THE RAT LEGIBLE
 
 This is a bounded presentation lane over existing public evidence capabilities. It does not rewrite the backend, authorize token launch/marketing, activate Holder Gate, or block the parallel legal/compliance authorization lane. The current `web/` frontend remains the production surface until a separately accepted migration.
