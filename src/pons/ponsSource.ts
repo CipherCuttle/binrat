@@ -9,9 +9,14 @@ import { ponsTokenLaunchedEvent } from './ponsAbi.js';
  * canonical log blocks.  `syncLaunches` narrows a dense requested range before
  * it writes or checkpoints anything, keeping Worker RPC work bounded.
  */
-export const PONS_MAX_CANONICAL_LAUNCH_BLOCKS = 16;
+export const PONS_MAX_CANONICAL_LAUNCH_BLOCKS = 128;
 
-export interface PonsLaunchSourceOptions { rpcUrl?: string; client?: PublicClient; now?: () => number }
+export interface PonsLaunchSourceOptions {
+  rpcUrl?: string;
+  client?: PublicClient;
+  now?: () => number;
+  maxCanonicalLaunchBlocks?: number;
+}
 
 type PonsBootstrapOperation = 'PONS_GET_HEAD' | 'PONS_GET_CHAIN_ID' | 'PONS_GET_FACTORY_CODE';
 
@@ -34,6 +39,7 @@ export class PonsLaunchSource {
   readonly factory = PONS_V2_FACTORY;
   private readonly client: PublicClient;
   private readonly now: () => number;
+  private readonly maxCanonicalLaunchBlocks: number;
   private authorityVerified = false;
 
   constructor(options: PonsLaunchSourceOptions = {}) {
@@ -42,6 +48,10 @@ export class PonsLaunchSource {
       chain: robinhoodMainnet(options.rpcUrl!), transport: http(options.rpcUrl!, { timeout: 8_000, retryCount: 0 })
     });
     this.now = options.now ?? Date.now;
+    this.maxCanonicalLaunchBlocks = options.maxCanonicalLaunchBlocks ?? PONS_MAX_CANONICAL_LAUNCH_BLOCKS;
+    if (!Number.isSafeInteger(this.maxCanonicalLaunchBlocks) || this.maxCanonicalLaunchBlocks < 1 || this.maxCanonicalLaunchBlocks > 256) {
+      throw new Error('PONS_CANONICAL_LAUNCH_BLOCK_LIMIT_INVALID');
+    }
   }
 
   async getHeadBlockNumber(): Promise<bigint> {
@@ -74,7 +84,7 @@ export class PonsLaunchSource {
     const logs = await this.client.getLogs({ address: this.factory as Address, event: ponsTokenLaunchedEvent, fromBlock, toBlock, strict: true });
     if (logs.some((log) => log.blockNumber === null)) throw new Error('PONS_INCOMPLETE_TOKEN_LAUNCHED_LOG');
     const canonicalLogBlocks = new Set(logs.map((log) => log.blockNumber!.toString()));
-    if (canonicalLogBlocks.size > PONS_MAX_CANONICAL_LAUNCH_BLOCKS) {
+    if (canonicalLogBlocks.size > this.maxCanonicalLaunchBlocks) {
       throw new Error('PONS_LAUNCH_BLOCK_DENSITY');
     }
     const launches: LaunchObserved[] = [];

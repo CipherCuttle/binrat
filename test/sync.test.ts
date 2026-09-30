@@ -85,6 +85,40 @@ class CountingPonsSource implements LaunchSource {
   }
 }
 
+class AdaptivePonsSource implements LaunchSource {
+  readonly head: bigint;
+  readonly launches: LaunchObserved[];
+  readonly densityLimit: number;
+  readonly catchUpCalls: Array<[bigint, bigint]> = [];
+  maxCanonicalReads = 0;
+  private activeCanonicalReads = 0;
+  badBlock: bigint | null = null;
+
+  constructor(head: bigint, launches: LaunchObserved[] = [], densityLimit = 128) {
+    this.head = head;
+    this.launches = launches;
+    this.densityLimit = densityLimit;
+  }
+
+  async getHeadBlockNumber() { return this.head; }
+  async getBlockHash(blockNumber: bigint) {
+    this.activeCanonicalReads += 1;
+    this.maxCanonicalReads = Math.max(this.maxCanonicalReads, this.activeCanonicalReads);
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    this.activeCanonicalReads -= 1;
+    return this.badBlock === blockNumber ? hashFor(blockNumber + 1n) : hashFor(blockNumber);
+  }
+  async assertAuthority(_blockNumber: bigint) {}
+  async catchUp(fromBlock: bigint, toBlock: bigint) {
+    this.catchUpCalls.push([fromBlock, toBlock]);
+    const matches = this.launches.filter((launch) => launch.blockNumber >= fromBlock && launch.blockNumber <= toBlock);
+    if (new Set(matches.map((launch) => launch.blockNumber.toString())).size > this.densityLimit) {
+      throw new Error('PONS_LAUNCH_BLOCK_DENSITY');
+    }
+    return matches;
+  }
+}
+
 test('sync is idempotent and repairs shallow reorg from guard', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'binrat-'));
   const db = join(dir, 'test.sqlite');
@@ -231,4 +265,138 @@ test('Pons live sync narrows a dense range before checkpointing and stays under 
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('Pons catch-up commits multiple canonical batches in one bounded work slice', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-multi-'));
+  try {
+    const source = new AdaptivePonsSource(32n);
+    const store = new SqliteStore(join(dir, 'test.sqlite'), 4663);
+    const report = await syncLaunches(source, store, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 4n, maxAdaptiveBatchBlocks: 8n,
+      reorgLookbackBlocks: 4n, pollIntervalMs: 100, maxBatchesPerRun: 3,
+      provenanceProjection: 'END_OF_RUN', canonicalVerificationConcurrency: 6
+    });
+    assert.equal(report.batches, 3);
+    assert.equal(report.checkpointAfter, 20n);
+    assert.equal(report.blocksAdvanced, 20n);
+    assert.equal(report.logReads, 3);
+    store.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('Pons catch-up stops only between committed batches when its work budget is exhausted', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-budget-'));
+  try {
+    let nowMs = 0;
+    const source = new AdaptivePonsSource(100n);
+    const store = new SqliteStore(join(dir, 'test.sqlite'), 4663);
+    const report = await syncLaunches(source, store, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 4n, reorgLookbackBlocks: 4n, pollIntervalMs: 100,
+      maxBatchesPerRun: 32, workBudgetMs: 60_000, provenanceProjection: 'END_OF_RUN', now: () => {
+        const current = nowMs;
+        nowMs += 30_000;
+        return current;
+      }
+    });
+    assert.equal(report.batches, 2);
+    assert.equal(report.checkpointAfter, 8n);
+    assert.equal(report.workBudgetExhausted, true);
+    store.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('adaptive density narrowing covers dense ranges without gaps and bounds canonical reads at six', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-adaptive-dense-'));
+  try {
+    const launches = Array.from({ length: 300 }, (_, index) => ponsLaunch(index + 1, BigInt(index + 1)));
+    const source = new AdaptivePonsSource(302n, launches, 128);
+    const store = new SqliteStore(join(dir, 'test.sqlite'), 4663);
+    const report = await syncLaunches(source, store, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 256n, maxAdaptiveBatchBlocks: 512n,
+      reorgLookbackBlocks: 16n, pollIntervalMs: 100, maxBatchesPerRun: 32,
+      provenanceProjection: 'END_OF_RUN', canonicalVerificationConcurrency: 6
+    });
+    assert.equal(report.checkpointAfter, 301n);
+    assert.equal((await store.listLaunches()).length, 300);
+    assert.ok(report.densityNarrows > 0);
+    assert.ok(source.maxCanonicalReads <= 6);
+    store.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('canonical mutation fails before checkpoint and deferred projection equals full-per-batch projection', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-canonical-provenance-'));
+  try {
+    const launches = [ponsLaunch(1, 1n), ponsLaunch(2, 2n), ponsLaunch(3, 3n)];
+    const source = new AdaptivePonsSource(5n, launches);
+    source.badBlock = 2n;
+    const failed = new SqliteStore(join(dir, 'failed.sqlite'), 4663);
+    await assert.rejects(() => syncLaunches(source, failed, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 4n, reorgLookbackBlocks: 2n, pollIntervalMs: 100,
+      provenanceProjection: 'END_OF_RUN', canonicalVerificationConcurrency: 6
+    }), /REORG_DURING_SYNC:block=2/);
+    assert.equal(await failed.getCheckpoint(), null);
+    failed.close();
+
+    const baseline = new SqliteStore(join(dir, 'baseline.sqlite'), 4663);
+    const deferred = new SqliteStore(join(dir, 'deferred.sqlite'), 4663);
+    const clean = new AdaptivePonsSource(5n, launches);
+    const options = { startBlock: 1n, confirmations: 1n, maxBatchBlocks: 1n, reorgLookbackBlocks: 2n, pollIntervalMs: 100, maxBatchesPerRun: 8 };
+    await syncLaunches(clean, baseline, { ...options, provenanceProjection: 'PER_BATCH' });
+    await syncLaunches(new AdaptivePonsSource(5n, launches), deferred, { ...options, provenanceProjection: 'END_OF_RUN' });
+    assert.deepEqual(await deferred.listProvenanceFacts(), await baseline.listProvenanceFacts());
+    assert.deepEqual(await deferred.listProvenanceEdges(), await baseline.listProvenanceEdges());
+    baseline.close();
+    deferred.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('a lost queue lease fences Pons before any batch persistence or checkpoint mutation', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-lease-fence-'));
+  try {
+    const store = new SqliteStore(join(dir, 'test.sqlite'), 4663);
+    await assert.rejects(() => syncLaunches(new AdaptivePonsSource(3n, [ponsLaunch(1, 1n)]), store, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 4n, reorgLookbackBlocks: 2n, pollIntervalMs: 100,
+      provenanceProjection: 'END_OF_RUN', beforePersist: async () => { throw new Error('PONS_LEASE_FENCED'); }
+    }), /PONS_LEASE_FENCED/);
+    assert.equal(await store.getCheckpoint(), null);
+    assert.equal((await store.listLaunches()).length, 0);
+    store.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('deterministic 100k Pons simulation materially reduces work slices without changing evidence', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'binrat-pons-100k-'));
+  try {
+    const target = 100_000n;
+    const oldStore = new SqliteStore(join(dir, 'old.sqlite'), 4663);
+    const newStore = new SqliteStore(join(dir, 'new.sqlite'), 4663);
+    let oldLogReads = 0;
+    const oldStartedAt = performance.now();
+    for ((await oldStore.getCheckpoint()); (await oldStore.getCheckpoint())?.blockNumber !== target; ) {
+      const report = await syncLaunches(new AdaptivePonsSource(target + 1n), oldStore, {
+        startBlock: 1n, confirmations: 1n, maxBatchBlocks: 512n, reorgLookbackBlocks: 32n, pollIntervalMs: 100,
+        maxBatchesPerRun: 1, provenanceProjection: 'PER_BATCH'
+      });
+      oldLogReads += report.logReads;
+    }
+    const oldElapsedMs = performance.now() - oldStartedAt;
+    const newStartedAt = performance.now();
+    const recovery = await syncLaunches(new AdaptivePonsSource(target + 1n), newStore, {
+      startBlock: 1n, confirmations: 1n, maxBatchBlocks: 4_096n, maxAdaptiveBatchBlocks: 8_192n,
+      reorgLookbackBlocks: 32n, pollIntervalMs: 100, maxBatchesPerRun: 16,
+      provenanceProjection: 'END_OF_RUN', canonicalVerificationConcurrency: 6
+    });
+    const newElapsedMs = performance.now() - newStartedAt;
+    console.log(JSON.stringify({ event: 'PONS_SIM_RECEIPT', backlogBlocks: Number(target),
+      old: { logReads: oldLogReads, elapsedMs: Number(oldElapsedMs.toFixed(2)), blocksPerSecond: Number((Number(target) / oldElapsedMs * 1_000).toFixed(2)) },
+      next: { logReads: recovery.logReads, elapsedMs: Number(newElapsedMs.toFixed(2)), blocksPerSecond: Number((Number(target) / newElapsedMs * 1_000).toFixed(2)) }
+    }));
+    assert.equal((await newStore.getCheckpoint())?.blockNumber, target);
+    assert.equal((await newStore.listLaunches()).length, (await oldStore.listLaunches()).length);
+    assert.ok(recovery.logReads < oldLogReads / 10, `old=${oldLogReads} new=${recovery.logReads}`);
+    oldStore.close();
+    newStore.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

@@ -28,9 +28,16 @@ test('binding parity preserves active resources while allowing only the approved
   candidate.resources!.bindings![6]!.text = 'new';
   candidate.resources!.bindings!.push(
     { name: 'BINRAT_PONS_MAX_BATCH_BLOCKS', type: 'plain_text', text: '512' },
+    { name: 'BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS', type: 'plain_text', text: '8192' },
+    { name: 'BINRAT_PONS_CATCHUP_MAX_BATCHES', type: 'plain_text', text: '16' },
+    { name: 'BINRAT_PONS_CATCHUP_WORK_BUDGET_MS', type: 'plain_text', text: '60000' },
+    { name: 'BINRAT_PONS_NEAR_HEAD_BLOCKS', type: 'plain_text', text: '2048' },
+    { name: 'BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS', type: 'plain_text', text: '128' },
     { name: 'ROBINHOOD_RPC_URL', type: 'plain_text', text: 'https://rpc.ordofi.network' },
     { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', type: 'plain_text', text: 'false' },
     { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'BINRAT_TELEGRAM_UI_V2_ENABLED', type: 'plain_text', text: 'false' },
     { name: 'RAT_CANDIDATE_SMOKE_ENABLED', type: 'plain_text', text: 'true' },
     { name: 'RAT_CANDIDATE_SMOKE_SECRET', type: 'secret_text' }
   );
@@ -69,7 +76,12 @@ test('binding parity fails closed when Workers AI disappears or a target changes
 });
 
 test('candidate manifest requires known-good bindings and flag-off Pons configuration', () => {
-  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } });
+  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: {
+    BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false',
+    BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512',
+    BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '8192', BINRAT_PONS_CATCHUP_MAX_BATCHES: '16',
+    BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000', BINRAT_PONS_NEAR_HEAD_BLOCKS: '2048', BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS: '128'
+  } });
   assert.deepEqual(pass, { ok: true, errors: [] });
   const fail = verifyCandidateManifest({ name: 'binrat-edge-v0', triggers: { crons: [] }, assets: { directory: './web' } });
   assert.equal(fail.ok, false);

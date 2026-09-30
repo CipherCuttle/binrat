@@ -17,7 +17,9 @@ import type {
 import {
   handleSyncQueueBatch,
   ARC_PUBLIC_RPC_FALLBACK_URL,
+  calculatePonsVelocity,
   resolveArcRpcUrl,
+  runCloudflarePonsSyncCycle,
   runCloudflareObservationCycle,
   runCloudflareRatRadarCycle,
   runCloudflareSyncCycle,
@@ -25,6 +27,7 @@ import {
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
 import { PonsLaunchSource } from '../src/pons/ponsSource.js';
+import { PONS_V2_START_BLOCK } from '../src/pons/chain.js';
 import type {
   ObservationBlockPoint,
   ObservationSource
@@ -40,6 +43,18 @@ class FakeLaunchSource implements LaunchSource {
   head = ARCPAD_START_BLOCK + 5_000n;
   catchUpCalls: Array<[bigint, bigint]> = [];
 
+  async getHeadBlockNumber() { return this.head; }
+  async getBlockHash(blockNumber: bigint) { return hash(blockNumber); }
+  async assertAuthority(_blockNumber: bigint) {}
+  async catchUp(fromBlock: bigint, toBlock: bigint): Promise<LaunchObserved[]> {
+    this.catchUpCalls.push([fromBlock, toBlock]);
+    return [];
+  }
+}
+
+class FakePonsSource implements LaunchSource {
+  head = PONS_V2_START_BLOCK + 100_002n;
+  catchUpCalls: Array<[bigint, bigint]> = [];
   async getHeadBlockNumber() { return this.head; }
   async getBlockHash(blockNumber: bigint) { return hash(blockNumber); }
   async assertAuthority(_blockNumber: bigint) {}
@@ -457,6 +472,52 @@ test('live queue skips observation scheduling on the alternate minute', async ()
   } finally {
     db.close();
   }
+});
+
+test('Pons backlog uses one lease writer, a bounded multi-batch slice, and exactly one continuation', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakePonsSource();
+  const sent: BinratSyncMessage[] = [];
+  let acked = 0;
+  try {
+    await handleSyncQueueBatch({ messages: [{
+      body: { kind: 'PONS_SYNC_CYCLE', cycleId: 'pons-backlog', enqueuedAtMs: 60_000 },
+      ack() { acked += 1; }, retry() { throw new Error('unexpected retry'); }
+    }] }, {
+      DB: db,
+      SYNC_QUEUE: { async send(body) { sent.push(body); } },
+      BINRAT_LIVE_LOOKBACK_BLOCKS: '200000',
+      BINRAT_PONS_CATCHUP_MAX_BATCHES: '1',
+      BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '8192',
+      BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000'
+    }, { now: () => 120_000, ponsLaunchSource: source });
+    assert.equal(acked, 1);
+    assert.equal(source.catchUpCalls.length, 1);
+    assert.equal(source.catchUpCalls[0]?.[1] - source.catchUpCalls[0]?.[0] + 1n, 4_096n);
+    assert.deepEqual(sent.map((item) => item.kind), ['PONS_SYNC_CYCLE']);
+
+    const lease = new D1SyncLeaseStore(db);
+    assert.equal(await lease.claim('binrat:pons-sync', 'other-owner', 130_000, 120_000), true);
+    const busy = await runCloudflarePonsSyncCycle(
+      { DB: db },
+      { kind: 'PONS_SYNC_CYCLE', cycleId: 'contending-owner', enqueuedAtMs: 130_000 },
+      { now: () => 130_001, ponsLaunchSource: source }
+    );
+    assert.deepEqual(busy, { status: 'BUSY' });
+  } finally { db.close(); }
+});
+
+test('Pons velocity receipt is bounded and compares backlog to head growth', () => {
+  const receipt = calculatePonsVelocity(
+    { headBlock: 100n, updatedAtMs: 1_000 },
+    { headBlock: 110n, blocksAdvanced: 40n, elapsedMs: 2_000, backlogBefore: 80n, backlogAfter: 40n },
+    3_000
+  );
+  assert.equal(receipt.catchupBlocksPerSecond, 20);
+  assert.equal(receipt.headBlocksPerSecond, 5);
+  assert.equal(receipt.catchupHeadRatio, 4);
+  assert.equal(receipt.backlogDelta, -40n);
 });
 
 test('Cloudflare sync lease is fenced so an old owner cannot release a replacement lease', async () => {

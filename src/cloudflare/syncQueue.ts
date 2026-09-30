@@ -45,6 +45,11 @@ export interface CloudflareSyncEnv {
   BINRAT_MAX_BATCH_BLOCKS?: string;
   /** Pons-only cap; Arc keeps its existing independent batch configuration. */
   BINRAT_PONS_MAX_BATCH_BLOCKS?: string;
+  BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS?: string;
+  BINRAT_PONS_CATCHUP_MAX_BATCHES?: string;
+  BINRAT_PONS_CATCHUP_WORK_BUDGET_MS?: string;
+  BINRAT_PONS_NEAR_HEAD_BLOCKS?: string;
+  BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
   BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
   BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE?: string;
@@ -82,8 +87,41 @@ const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
 const LIVE_SYNC_LEASE_MS = 120_000;
+const PONS_CATCHUP_INITIAL_BATCH_BLOCKS = 4_096;
+const PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS = 8_192;
+const PONS_CATCHUP_DEFAULT_MAX_BATCHES = 16;
+const PONS_CATCHUP_DEFAULT_WORK_BUDGET_MS = 60_000;
+const PONS_NEAR_HEAD_DEFAULT_BLOCKS = 2_048;
 export const ARC_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.mainnet.arc.io';
 export const ROBINHOOD_PUBLIC_RPC_FALLBACK_URL = 'https://rpc.mainnet.chain.robinhood.com';
+
+export interface PonsVelocityReceipt {
+  catchupBlocksPerSecond: number | null;
+  headBlocksPerSecond: number | null;
+  catchupHeadRatio: number | null;
+  backlogDelta: bigint | null;
+}
+
+/** Bounded receipt data only; no external metrics or high-cardinality storage. */
+export function calculatePonsVelocity(
+  previous: Pick<D1RuntimeState, 'headBlock' | 'updatedAtMs'> | null,
+  report: { blocksAdvanced: bigint; elapsedMs: number; backlogBefore: bigint | null; backlogAfter: bigint | null; headBlock: bigint },
+  nowMs: number
+): PonsVelocityReceipt {
+  const catchupBlocksPerSecond = report.elapsedMs > 0 ? Number(report.blocksAdvanced) / report.elapsedMs * 1_000 : null;
+  const headElapsedMs = previous ? nowMs - previous.updatedAtMs : 0;
+  const headBlocksPerSecond = previous && previous.headBlock !== null && headElapsedMs > 0
+    ? Number(report.headBlock - previous.headBlock) / headElapsedMs * 1_000
+    : null;
+  return {
+    catchupBlocksPerSecond,
+    headBlocksPerSecond,
+    catchupHeadRatio: catchupBlocksPerSecond !== null && headBlocksPerSecond !== null && headBlocksPerSecond > 0
+      ? catchupBlocksPerSecond / headBlocksPerSecond
+      : null,
+    backlogDelta: report.backlogBefore === null || report.backlogAfter === null ? null : report.backlogAfter - report.backlogBefore
+  };
+}
 
 export async function enqueueSyncCycle(
   env: CloudflareSyncEnv,
@@ -449,7 +487,10 @@ export async function runCloudflarePonsSyncCycle(
     previous = await runtime.get();
     let source: LaunchSource;
     try {
-      source = deps.ponsLaunchSource ?? new PonsLaunchSource({ rpcUrl: resolveRobinhoodRpcUrl(env) });
+      source = deps.ponsLaunchSource ?? new PonsLaunchSource({
+        rpcUrl: resolveRobinhoodRpcUrl(env),
+        maxCanonicalLaunchBlocks: integerSetting(env.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS, 128, 1, 256)
+      });
     } catch (error) {
       const code = reportSyncFailure(message.cycleId, 'SOURCE_CONSTRUCTION', error);
       await persistLiveFailure(runtime, previous, code, deps.now);
@@ -465,20 +506,51 @@ export async function runCloudflarePonsSyncCycle(
       return { status: 'RETRY', code };
     }
     const lookback = BigInt(integerSetting(env.BINRAT_LIVE_LOOKBACK_BLOCKS, 1000, 1, 1_000_000));
-    // 512 blocks makes normal near-head Pons work compact.  The source narrows
-    // dense event windows before writing, keeping canonical block checks below
-    // the Workers Free external-subrequest ceiling without touching Arc.
-    const maxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 512, 1, 512));
+    // Near head remains deliberately compact.  Backlog slices use an adaptive
+    // Pons-only range, always narrowed before a checkpoint when event density
+    // requires it.  The queue/lease remains a single checkpoint authority.
+    const steadyMaxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 512, 1, 4_096));
+    const catchupMaxBatchBlocks = BigInt(integerSetting(
+      env.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS, PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS, PONS_CATCHUP_INITIAL_BATCH_BLOCKS, 8_192
+    ));
+    const catchupInitialBatchBlocks = minBigInt(BigInt(PONS_CATCHUP_INITIAL_BATCH_BLOCKS), catchupMaxBatchBlocks);
+    const catchupMaxBatches = integerSetting(env.BINRAT_PONS_CATCHUP_MAX_BATCHES, PONS_CATCHUP_DEFAULT_MAX_BATCHES, 1, 32);
+    const catchupWorkBudgetMs = integerSetting(env.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS, PONS_CATCHUP_DEFAULT_WORK_BUDGET_MS, 10_000, 75_000);
+    const nearHeadBlocks = BigInt(integerSetting(env.BINRAT_PONS_NEAR_HEAD_BLOCKS, PONS_NEAR_HEAD_DEFAULT_BLOCKS, 1, 100_000));
     const recentStart = head > lookback ? head - lookback : 0n;
     const liveWindowStart = recentStart > PONS_V2_START_BLOCK ? recentStart : PONS_V2_START_BLOCK;
     const checkpoint = await store.getCheckpoint();
     const startBlock = checkpoint ? PONS_V2_START_BLOCK : liveWindowStart;
+    const targetAtBootstrap = head >= BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000))
+      ? head - BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000))
+      : null;
+    const nextBlock = checkpoint ? checkpoint.blockNumber + 1n : startBlock;
+    const backlogAtBootstrap = targetAtBootstrap !== null && nextBlock <= targetAtBootstrap
+      ? targetAtBootstrap - nextBlock + 1n
+      : 0n;
+    const backlogMode = backlogAtBootstrap > nearHeadBlocks;
+    const fenceLease = async (): Promise<void> => {
+      const fencedAtMs = deps.now();
+      if (!(await lease.claim(PONS_SYNC_LEASE_NAME, message.cycleId, fencedAtMs, LIVE_SYNC_LEASE_MS))) {
+        throw new Error('PONS_LEASE_FENCED');
+      }
+    };
     let report;
     try {
       report = await syncLaunches(source, store, {
         startBlock,
         confirmations: BigInt(integerSetting(env.BINRAT_CONFIRMATIONS, 2, 0, 10_000)),
-        maxBatchBlocks, reorgLookbackBlocks: 32n, pollIntervalMs: 1000, maxBatchesPerRun: 1
+        maxBatchBlocks: backlogMode ? catchupInitialBatchBlocks : steadyMaxBatchBlocks,
+        maxAdaptiveBatchBlocks: backlogMode ? catchupMaxBatchBlocks : undefined,
+        reorgLookbackBlocks: 32n,
+        pollIntervalMs: 1000,
+        maxBatchesPerRun: backlogMode ? catchupMaxBatches : 1,
+        workBudgetMs: backlogMode ? catchupWorkBudgetMs : undefined,
+        provenanceProjection: 'END_OF_RUN',
+        canonicalVerificationConcurrency: 6,
+        beforeBatch: fenceLease,
+        beforePersist: fenceLease,
+        beforeProjection: fenceLease
       });
     } catch (error) {
       const code = reportSyncFailure(message.cycleId, 'LIVE_SYNC', error);
@@ -487,10 +559,32 @@ export async function runCloudflarePonsSyncCycle(
     }
     const after = await store.getCheckpoint();
     const liveCaughtUp = Boolean(report.targetBlock !== null && after && after.blockNumber >= report.targetBlock);
+    const updatedAtMs = deps.now();
+    const velocity = calculatePonsVelocity(previous, report, updatedAtMs);
+    console.error(JSON.stringify({
+      event: 'PONS_CATCHUP_RECEIPT', cycleId: message.cycleId,
+      mode: backlogMode ? 'BACKLOG' : 'NEAR_HEAD',
+      checkpointBefore: report.checkpointBefore?.toString() ?? null,
+      target: report.targetBlock?.toString() ?? null,
+      backlogBefore: report.backlogBefore?.toString() ?? null,
+      checkpointAfter: report.checkpointAfter?.toString() ?? null,
+      backlogAfter: report.backlogAfter?.toString() ?? null,
+      blocksAdvanced: report.blocksAdvanced.toString(),
+      elapsedMs: report.elapsedMs, launchesInserted: report.inserted,
+      duplicates: report.duplicates, internalBatches: report.batches,
+      rpcLogReads: report.logReads, densityNarrows: report.densityNarrows,
+      provenanceRefreshElapsedMs: report.provenanceRefreshElapsedMs,
+      totalCycleElapsedMs: report.elapsedMs,
+      workBudgetExhausted: report.workBudgetExhausted,
+      catchupBlocksPerSecond: velocity.catchupBlocksPerSecond,
+      headBlocksPerSecond: velocity.headBlocksPerSecond,
+      backlogDelta: velocity.backlogDelta?.toString() ?? null,
+      catchupHeadRatio: velocity.catchupHeadRatio
+    }));
     await runtime.put({
       sourceVerified: true, liveCaughtUp, headBlock: report.headBlock, targetBlock: report.targetBlock,
       observationReady: false, historyBackfillComplete: false, historyBackfillTargetBlock: null,
-      lastSyncError: null, lastHistoryError: null, lastObservationError: null, updatedAtMs: deps.now()
+      lastSyncError: null, lastHistoryError: null, lastObservationError: null, updatedAtMs
     });
     return { status: 'SUCCESS', liveCaughtUp };
   } catch (error) {
@@ -1015,6 +1109,10 @@ function integerSetting(
   const parsed = Number(value ?? fallback);
   if (!Number.isSafeInteger(parsed) || parsed < minimum || parsed > maximum) return fallback;
   return parsed;
+}
+
+function minBigInt(left: bigint, right: bigint): bigint {
+  return left < right ? left : right;
 }
 
 function required(value: string | undefined, name: string): string {
