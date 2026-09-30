@@ -268,7 +268,16 @@ try {
     gate(snapshot.chainId === 4663, 'POSTDEPLOY_WRONG_CHAIN');
     gate(BigInt(snapshot.checkpointBlock) >= STALLED_CHECKPOINT, 'CHECKPOINT_REGRESSED');
     const observedVerdict = classifyPonsRecovery(samples);
-    if (observedVerdict === 'PASS' || observedVerdict === 'FAIL') break;
+    // An incomplete first sample is expected immediately after promotion.  Only
+    // error-bearing failure (including a timeout without demonstrated progress)
+    // or a candidate-version drift is terminal before the observation loop ends.
+    if (
+      observedVerdict === 'PASS' ||
+      (observedVerdict === 'FAIL' && (
+        sample.candidateActive !== true ||
+        sample.lastSyncError !== null
+      ))
+    ) break;
     await sleep(15_000);
   }
   const recoveryVerdict = classifyPonsRecovery(samples);
