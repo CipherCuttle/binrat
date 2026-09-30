@@ -28,12 +28,24 @@ test('RATS pages use a compact persisted snapshot reference with bounded next an
     const snapshot=await discoverRats(f.db,f.now());
     assert.equal(snapshot.candidates.length,2);
     const first=renderRatCard({kind:'RATS',snapshot,candidateIndex:0});
-    const nextData=(first.keyboard[2]![2] as {callbackData:string}).callbackData;
+    const nextButton=first.keyboard.flat().find(button => {
+      if (!('callbackData' in button)) return false;
+      const parsed=parseCallback(button.callbackData);
+      return parsed?.action === 'RATS_PAGE' && parsed.index === 1;
+    });
+    assert.ok(nextButton && 'callbackData' in nextButton);
+    const nextData=nextButton.callbackData;
     assert.deepEqual(parseCallback(nextData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:1});
     assert.ok(new TextEncoder().encode(nextData).byteLength<=TELEGRAM_CALLBACK_MAX_BYTES);
     const loaded=await loadRatsSnapshot(f.db,snapshot.discoveryId,f.now());
     const second=renderRatCard({kind:'RATS',snapshot:loaded,candidateIndex:1});
-    const previousData=(second.keyboard[2]![0] as {callbackData:string}).callbackData;
+    const previousButton=second.keyboard.flat().find(button => {
+      if (!('callbackData' in button)) return false;
+      const parsed=parseCallback(button.callbackData);
+      return parsed?.action === 'RATS_PAGE' && parsed.index === 0;
+    });
+    assert.ok(previousButton && 'callbackData' in previousButton);
+    const previousData=previousButton.callbackData;
     assert.deepEqual(parseCallback(previousData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:0});
     assert.equal(parseCallback(encodeCallback({action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:9}))?.action,'RATS_PAGE');
     await f.db.prepare('UPDATE rat_v11_pons_discovery_snapshots SET expires_at_ms=? WHERE discovery_id=?').bind(f.now()-1,snapshot.discoveryId).run();
@@ -49,6 +61,7 @@ test('V2 card captions fail closed instead of truncating canonical evidence', as
     const receipt=await dig(f.db,{chainId:4663,entityType:'CREATOR',entityId:CREATOR},f.now());
     const card=renderRatCard({kind:'CASE',receipt,mode:'DIG',privateAttention:null});
     assert.ok(Array.from(card.caption).length<=1024);
-    assert.match(card.caption,/UNKNOWN: identity, intent, safety and future outcome/);
+    assert.match(card.caption,/Dug it up/);
+    assert.doesNotMatch(card.caption,/OBSERVED:|DERIVED:|UNKNOWN:|sourceVerified|runtimeFresh/i);
   } finally { f.db.close(); }
 });
