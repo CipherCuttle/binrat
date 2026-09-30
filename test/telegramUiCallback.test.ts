@@ -28,18 +28,22 @@ test('RATS pages use a compact persisted snapshot reference with bounded next an
     const snapshot=await discoverRats(f.db,f.now());
     assert.equal(snapshot.candidates.length,2);
     const first=renderRatCard({kind:'RATS',snapshot,candidateIndex:0});
-    const nextButton=first.keyboard.flat().find(button =>
-      'callbackData' in button && parseCallback(button.callbackData)?.action === 'RATS_PAGE' &&
-      parseCallback(button.callbackData)?.index === 1);
+    const nextButton=first.keyboard.flat().find(button => {
+      if (!('callbackData' in button)) return false;
+      const parsed=parseCallback(button.callbackData);
+      return parsed?.action === 'RATS_PAGE' && parsed.index === 1;
+    });
     assert.ok(nextButton && 'callbackData' in nextButton);
     const nextData=nextButton.callbackData;
     assert.deepEqual(parseCallback(nextData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:1});
     assert.ok(new TextEncoder().encode(nextData).byteLength<=TELEGRAM_CALLBACK_MAX_BYTES);
     const loaded=await loadRatsSnapshot(f.db,snapshot.discoveryId,f.now());
     const second=renderRatCard({kind:'RATS',snapshot:loaded,candidateIndex:1});
-    const previousButton=second.keyboard.flat().find(button =>
-      'callbackData' in button && parseCallback(button.callbackData)?.action === 'RATS_PAGE' &&
-      parseCallback(button.callbackData)?.index === 0);
+    const previousButton=second.keyboard.flat().find(button => {
+      if (!('callbackData' in button)) return false;
+      const parsed=parseCallback(button.callbackData);
+      return parsed?.action === 'RATS_PAGE' && parsed.index === 0;
+    });
     assert.ok(previousButton && 'callbackData' in previousButton);
     const previousData=previousButton.callbackData;
     assert.deepEqual(parseCallback(previousData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:0});
