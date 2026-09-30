@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 
 import {
   ACTIVATION_MODE, PROMPT_MIGRATION,
   activationGateError, candidateVars,
-  parseActivationMode, promptSchemaDecision, promptSchemaPlan, rollbackSchemaNotice, taggedVersionIdFromList
+  isExactPostdeployRelease, parseActivationMode, promptSchemaDecision, promptSchemaPlan, rollbackSchemaNotice, taggedVersionIdFromList
 } from './controlled-rat-activation.mjs';
 
 const WORKER = 'binrat-edge-v0';
@@ -79,6 +79,16 @@ async function getJson(url) {
   const body = await response.json().catch(() => null);
   gate(response.ok && body && typeof body === 'object', 'HTTP_PREFLIGHT_FAILED');
   return body;
+}
+function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+async function waitForExactPostdeployRelease(reviewedSha) {
+  let health = null;
+  for (let attempt = 0; attempt < 7; attempt += 1) {
+    health = await getJson(WORKER_URL + '/health');
+    if (isExactPostdeployRelease(health, reviewedSha)) return health;
+    if (attempt < 6) await delay(5_000);
+  }
+  throw new Error('POSTDEPLOY_RELEASE_SHA_MISMATCH');
 }
 async function webhookUrl(token) {
   if (!token) return null;
@@ -297,9 +307,7 @@ try {
     'versions','deploy',candidateVersion + '@100%','--name',WORKER,'--yes',
     '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
   ], { timeout: 180_000 });
-  const afterHealth = await getJson(WORKER_URL + '/health');
-  gate(afterHealth.ok === true && afterHealth.releaseSha === process.env.GITHUB_SHA,
-    'POSTDEPLOY_RELEASE_SHA_MISMATCH');
+  await waitForExactPostdeployRelease(process.env.GITHUB_SHA);
   const afterPons = await getJson(WORKER_URL + '/api/health');
   gate(afterPons.ok === true && afterPons.chainId === 4663 &&
     afterPons.indexReady === true && afterPons.liveCaughtUp === true &&

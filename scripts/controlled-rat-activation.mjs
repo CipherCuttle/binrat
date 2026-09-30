@@ -65,6 +65,10 @@ export function taggedVersionIdFromList(versions, tag) {
   return null;
 }
 
+export function isExactPostdeployRelease(health, reviewedSha) {
+  return health?.ok === true && health.releaseSha === reviewedSha;
+}
+
 /** The remote query serializes pragma_table_info in this deterministic shape. */
 export function promptSchemaDecision(snapshot) {
   if (!snapshot?.tableSql) return 'MISSING';

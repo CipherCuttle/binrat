@@ -50,6 +50,13 @@ test('candidate version lookup accepts the Wrangler annotation tag but no untagg
   assert.equal(evaluate(`h.taggedVersionIdFromList(${JSON.stringify([{id:'not-a-version',annotations:{'workers/tag':tag}}])},'${tag}')`),null);
 });
 
+test('postdeploy acceptance requires the exact reviewed release SHA', () => {
+  const sha='c'.repeat(40);
+  assert.equal(evaluate(`h.isExactPostdeployRelease({ok:true,releaseSha:'${sha}'},'${sha}')`),true);
+  assert.equal(evaluate(`h.isExactPostdeployRelease({ok:true,releaseSha:'${'d'.repeat(40)}'},'${sha}')`),false);
+  assert.equal(evaluate(`h.isExactPostdeployRelease({ok:false,releaseSha:'${sha}'},'${sha}')`),false);
+});
+
 test('committed example defaults retain all autonomous Telegram flags off', () => {
   const example=readFileSync(new URL('../cloudflare/wrangler.example.jsonc',import.meta.url),'utf8');
   for (const flag of [
