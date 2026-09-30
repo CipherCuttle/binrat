@@ -69,15 +69,21 @@ function sameMenuButton(a: NormalizedMenuButton, b: NormalizedMenuButton): boole
 }
 
 export async function readMenuButton(api: TelegramConfigApi, chatId?: string): Promise<NormalizedMenuButton> {
-  const body = chatId ? { chat_id: chatId } : undefined;
+  const body = chatId ? { chat_id: telegramChatId(chatId) } : undefined;
   return normalizeMenuButton(await api.call<unknown>('getChatMenuButton', body));
 }
 
 export async function setMenuButton(api: TelegramConfigApi, menu: NormalizedMenuButton, chatId?: string): Promise<void> {
   await api.call('setChatMenuButton', {
-    ...(chatId ? { chat_id: chatId } : {}),
+    ...(chatId ? { chat_id: telegramChatId(chatId) } : {}),
     menu_button: menuButtonPayload(menu)
   });
+}
+
+function telegramChatId(chatId: string): number {
+  const value = Number(chatId);
+  if (!Number.isSafeInteger(value) || value <= 0) throw new Error('TELEGRAM_CHAT_ID_INVALID');
+  return value;
 }
 
 export async function verifyMenuButton(

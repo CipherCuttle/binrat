@@ -58,7 +58,7 @@ test('private activation mutates only the controlled tester scope and preserves 
   const snapshot = await snapshotPrivateTesterMenu(api, tester);
   await activatePrivateTesterMenu(api, tester, telegramProductConfig, noWait, [0], snapshot);
   const menuSets = api.calls.filter(call=>call.method==='setChatMenuButton');
-  assert.deepEqual(menuSets, [{ method:'setChatMenuButton', body:{chat_id:tester,menu_button:webApp} }]);
+  assert.deepEqual(menuSets, [{ method:'setChatMenuButton', body:{chat_id:Number(tester),menu_button:webApp} }]);
   assert.deepEqual(api.state.globalMenu,commands);
   assert.deepEqual(api.state.testerMenu,webApp);
 });
