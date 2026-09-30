@@ -26,7 +26,7 @@ export interface PublicTrashTrailItem {
 
 export interface PublicBag {
   id: string;
-  source: 'ARCPAD';
+  source: 'ARCPAD' | 'PONS_V2';
   token: Hex;
   symbol: string;
   name: string;

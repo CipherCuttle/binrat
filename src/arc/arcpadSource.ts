@@ -46,7 +46,10 @@ export class ArcPadLaunchSource {
     if (this.launcher.toLowerCase() !== ARCPAD_LAUNCHER.toLowerCase()) {
       throw new Error(`ARCPAD_LAUNCHER_DRIFT:expected=${ARCPAD_LAUNCHER}:actual=${this.launcher}`);
     }
-    const code = await this.client.getBytecode({ address: this.launcher as Address, blockNumber });
+    // Historical authority is established by canonical block hashes plus logs from the frozen launcher address.
+    // Code existence is a current source-identity sanity check; pinning it to an old block adds an unnecessary
+    // archive-state dependency and can stall historical backfill even when historical blocks/logs are available.
+    const code = await this.client.getBytecode({ address: this.launcher as Address });
     if (!code || code === '0x') throw new Error(`ARCPAD_LAUNCHER_CODE_MISSING:block=${blockNumber}`);
   }
 

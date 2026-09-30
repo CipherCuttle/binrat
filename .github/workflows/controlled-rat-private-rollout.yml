@@ -18,6 +18,10 @@ on:
         description: 'Required exactly for telegram-ui-v2-private: ENABLE_PRIVATE_TELEGRAM_UI_V2'
         required: false
         type: string
+      reviewed_sha:
+        description: 'Exact 40-character commit SHA reviewed for this deployment'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -40,6 +44,7 @@ jobs:
       CONTROLLED_RAT_DEPLOY_APPROVED: 'true'
       CONTROLLED_RAT_ACTIVATION_MODE: ${{ github.event_name == 'push' && 'autonomous-text-private' || inputs.activation_mode }}
       CONTROLLED_RAT_UI_V2_CONFIRMATION: ${{ inputs.confirmation }}
+      CONTROLLED_RAT_REVIEWED_SHA: ${{ inputs.reviewed_sha }}
 
     steps:
       - uses: actions/checkout@v4
@@ -61,5 +66,17 @@ jobs:
       - name: Full regression gate
         run: pnpm check
 
+      - name: Telegram configuration plan (read only)
+        run: pnpm telegram:plan
+
       - name: Controlled private Autonomous Rat rollout
         run: node scripts/deploy-controlled-rat.mjs
+
+      - name: Upload replayable private rollout receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-private-telegram-rollout-receipt
+          path: .artifacts/telegram-smoke-receipt.json
+          retention-days: 30
+          if-no-files-found: warn

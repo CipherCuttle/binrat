@@ -8,6 +8,7 @@ export interface SyncOptions {
   maxBatchBlocks: bigint;
   reorgLookbackBlocks: bigint;
   pollIntervalMs: number;
+  maxBatchesPerRun?: number;
 }
 
 export interface SyncReport {
@@ -50,7 +51,9 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     }
   }
 
+  console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'PROVENANCE_REFRESH_START', fromBlock: fromBlock.toString(), targetBlock: targetBlock.toString() }));
   await ensureProvenanceProjection(store);
+  console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'PROVENANCE_REFRESH_DONE', fromBlock: fromBlock.toString(), targetBlock: targetBlock.toString() }));
   if (fromBlock > targetBlock) {
     return { headBlock, targetBlock, startBlock: null, endBlock: null, inserted: 0, duplicates: 0, batches: 0, reorgRewindFrom };
   }
@@ -62,12 +65,31 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
   let finalBlock: bigint | null = null;
 
   while (fromBlock <= targetBlock) {
-    const toBlock = minBigInt(targetBlock, fromBlock + options.maxBatchBlocks - 1n);
-    await source.assertAuthority(fromBlock);
-    await source.assertAuthority(toBlock);
+    let toBlock = minBigInt(targetBlock, fromBlock + options.maxBatchBlocks - 1n);
+    let launches: LaunchObserved[];
+    let boundaryHashBefore: Hex;
+    // Pons declares a safe density boundary after its log request. Narrow the
+    // same uncommitted range until canonical per-block verification is bounded.
+    // No logs are skipped: the committed checkpoint is always the narrowed end.
+    while (true) {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_BATCH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      await source.assertAuthority(fromBlock);
+      await source.assertAuthority(toBlock);
 
-    const boundaryHashBefore = await source.getBlockHash(toBlock);
-    const launches = await source.catchUp(fromBlock, toBlock);
+      boundaryHashBefore = await source.getBlockHash(toBlock);
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      try {
+        launches = await source.catchUp(fromBlock, toBlock);
+        break;
+      } catch (error) {
+        if (!isDensityBoundError(error) || fromBlock === toBlock) throw error;
+        const narrowedTo = fromBlock + (toBlock - fromBlock) / 2n;
+        if (narrowedTo < fromBlock) throw error;
+        console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_BATCH_NARROWED', fromBlock: fromBlock.toString(), toBlock: narrowedTo.toString() }));
+        toBlock = narrowedTo;
+      }
+    }
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'LIVE_LOG_READ_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), launchCount: launches.length }));
     await assertLaunchBlocksStillCanonical(source, launches);
     const boundaryHashAfterRead = await source.getBlockHash(toBlock);
     if (!sameHex(boundaryHashBefore, boundaryHashAfterRead)) throw new Error(`REORG_DURING_READ:block=${toBlock}`);
@@ -78,8 +100,12 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
       else duplicates += 1;
       await store.putProvenanceFact(await buildProvenanceFact(launch));
     }
-    const provenanceFacts = await store.listProvenanceFacts();
-    await store.replaceProvenanceEdges(await projectProvenanceEdges(provenanceFacts));
+    if (launches.length > 0) {
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_START', fromBlock: fromBlock.toString(), toBlock: toBlock.toString() }));
+      const provenanceFacts = await store.listProvenanceFacts();
+      await store.replaceProvenanceEdges(await projectProvenanceEdges(provenanceFacts));
+      console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'BATCH_PROVENANCE_REFRESH_DONE', fromBlock: fromBlock.toString(), toBlock: toBlock.toString(), factCount: provenanceFacts.length }));
+    }
 
     const guardBlockNumber = toBlock > options.reorgLookbackBlocks ? toBlock - options.reorgLookbackBlocks : 0n;
     const guardBlockHash = await source.getBlockHash(guardBlockNumber);
@@ -92,15 +118,18 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     try { await source.assertAuthority(targetBlock); }
     catch (error) { await store.rewindFromBlock(fromBlock); throw error; }
 
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'CHECKPOINT_COMMIT_START', blockNumber: toBlock.toString() }));
     await store.commitCheckpoint({
       blockNumber: toBlock,
       blockHash: boundaryHashBeforeCommit,
       guardBlockNumber,
       guardBlockHash
     });
+    console.error(JSON.stringify({ event: 'SYNC_PHASE', phase: 'CHECKPOINT_COMMIT_DONE', blockNumber: toBlock.toString() }));
     finalBlock = toBlock;
     batches += 1;
     fromBlock = toBlock + 1n;
+    if (options.maxBatchesPerRun !== undefined && batches >= options.maxBatchesPerRun) break;
   }
 
   return { headBlock, targetBlock, startBlock: initialFrom, endBlock: finalBlock, inserted, duplicates, batches, reorgRewindFrom };
@@ -124,7 +153,13 @@ async function ensureProvenanceProjection(store: LaunchStore): Promise<void> {
   const missing = await store.listLaunchesMissingProvenance();
   for (const launch of missing) await store.putProvenanceFact(await buildProvenanceFact(launch));
   const facts = await store.listProvenanceFacts();
-  await store.replaceProvenanceEdges(await projectProvenanceEdges(facts));
+  const projected = await projectProvenanceEdges(facts);
+  const existing = await store.listProvenanceEdges();
+  const existingDigests = new Map(existing.map((edge) => [edge.edgeId, edge.evidenceDigest]));
+  const unchanged = existing.length === projected.length && projected.every(
+    (edge) => existingDigests.get(edge.edgeId) === edge.evidenceDigest
+  );
+  if (!unchanged) await store.replaceProvenanceEdges(projected);
 }
 
 async function assertLaunchBlocksStillCanonical(source: LaunchSource, launches: LaunchObserved[]): Promise<void> {
@@ -145,6 +180,10 @@ function validateOptions(options: SyncOptions): void {
   if (options.maxBatchBlocks < 1n) throw new Error('maxBatchBlocks must be >= 1');
   if (options.reorgLookbackBlocks < 1n) throw new Error('reorgLookbackBlocks must be >= 1');
   if (!Number.isFinite(options.pollIntervalMs) || options.pollIntervalMs < 100) throw new Error('pollIntervalMs must be >= 100');
+  if (
+    options.maxBatchesPerRun !== undefined &&
+    (!Number.isSafeInteger(options.maxBatchesPerRun) || options.maxBatchesPerRun < 1)
+  ) throw new Error('maxBatchesPerRun must be a positive safe integer');
 }
 
 function emptyReport(headBlock: bigint): SyncReport {
@@ -152,6 +191,9 @@ function emptyReport(headBlock: bigint): SyncReport {
 }
 
 function sameHex(a: Hex, b: Hex): boolean { return a.toLowerCase() === b.toLowerCase(); }
+function isDensityBoundError(error: unknown): boolean {
+  return error instanceof Error && error.message === 'PONS_LAUNCH_BLOCK_DENSITY';
+}
 function minBigInt(a: bigint, b: bigint): bigint { return a < b ? a : b; }
 function maxBigInt(a: bigint, b: bigint): bigint { return a > b ? a : b; }
 
