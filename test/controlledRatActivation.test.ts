@@ -100,3 +100,12 @@ test('activation harness never includes a prompt-table drop and retains additive
   assert.match(script,/if \(promotionAttempted && previousVersion\)/);
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
 });
+
+test('private rollout snapshots and restores only the tester menu around postdeploy failure', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/telegram:private-menu-activate/);
+  assert.match(script,/CONTROLLED_RAT_PRIVATE_TESTER_ID:tester/);
+  assert.match(script,/TELEGRAM_PRIVATE_MENU_ROLLBACK_PASS/);
+  assert.match(script,/telegram:private-menu-restore/);
+  assert.doesNotMatch(script,/setChatMenuButton/);
+});
