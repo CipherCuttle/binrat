@@ -24,7 +24,7 @@ const REQUIRED_BINDINGS = ['DB', 'SYNC_QUEUE', 'AI', 'TELEGRAM_BOT_TOKEN', 'TELE
 const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>([
   ['BINRAT_PONS_MAX_BATCH_BLOCKS', { type: 'plain_text', text: '512' }],
   ['BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS', { type: 'plain_text', text: '4096' }],
-  ['BINRAT_PONS_CATCHUP_MAX_BATCHES', { type: 'plain_text', text: '16' }],
+  ['BINRAT_PONS_CATCHUP_MAX_BATCHES', { type: 'plain_text', text: '4' }],
   ['BINRAT_PONS_CATCHUP_WORK_BUDGET_MS', { type: 'plain_text', text: '60000' }],
   ['BINRAT_PONS_NEAR_HEAD_BLOCKS', { type: 'plain_text', text: '2048' }],
   ['BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS', { type: 'plain_text', text: '128' }],
@@ -99,7 +99,7 @@ export function verifyCandidateManifest(config: unknown): BindingParityResult {
   if (value.vars?.BINRAT_TELEGRAM_MEDIA_ENABLED !== 'false') errors.push('TELEGRAM_MEDIA_NOT_FLAG_OFF');
   if (value.vars?.BINRAT_PONS_MAX_BATCH_BLOCKS !== '512') errors.push('PONS_BATCH_BOUND_INVALID');
   if (value.vars?.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS !== '4096') errors.push('PONS_CATCHUP_BATCH_BOUND_INVALID');
-  if (value.vars?.BINRAT_PONS_CATCHUP_MAX_BATCHES !== '16') errors.push('PONS_CATCHUP_BATCH_COUNT_INVALID');
+  if (value.vars?.BINRAT_PONS_CATCHUP_MAX_BATCHES !== '4') errors.push('PONS_CATCHUP_BATCH_COUNT_INVALID');
   if (value.vars?.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS !== '60000') errors.push('PONS_CATCHUP_WORK_BUDGET_INVALID');
   if (value.vars?.BINRAT_PONS_NEAR_HEAD_BLOCKS !== '2048') errors.push('PONS_NEAR_HEAD_BOUND_INVALID');
   if (value.vars?.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS !== '128') errors.push('PONS_CANONICAL_DENSITY_BOUND_INVALID');
