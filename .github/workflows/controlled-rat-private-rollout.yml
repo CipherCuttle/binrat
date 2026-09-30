@@ -15,7 +15,7 @@ on:
           - autonomous-text-private
           - telegram-ui-v2-private
       confirmation:
-        description: Required exactly for telegram-ui-v2-private: ENABLE_PRIVATE_TELEGRAM_UI_V2
+        description: 'Required exactly for telegram-ui-v2-private: ENABLE_PRIVATE_TELEGRAM_UI_V2'
         required: false
         type: string
 
