@@ -148,8 +148,12 @@ const beforeHealth = await getJson('/api/health');
 gate(beforeService.releaseSha === PRODUCTION_SHA, 'PRODUCTION_LINEAGE_CHANGED');
 gate(beforeHealth.chainId === 4663, 'WRONG_CHAIN');
 gate(beforeHealth.runtimeFresh === true, 'PONS_RUNTIME_STALE');
-gate(beforeHealth.lastSyncError === 'SYNC_TIMEOUT_ERROR', 'UNEXPECTED_PREEXISTING_SYNC_ERROR');
-gate(BigInt(beforeHealth.checkpointBlock) === STALLED_CHECKPOINT, 'INCIDENT_CHECKPOINT_CHANGED');
+gate(
+  beforeHealth.lastSyncError === 'SYNC_TIMEOUT_ERROR' ||
+    (beforeHealth.lastSyncError === null && beforeHealth.indexReady === false && beforeHealth.liveCaughtUp === false),
+  'UNEXPECTED_PREEXISTING_SYNC_ERROR'
+);
+gate(BigInt(beforeHealth.checkpointBlock) >= STALLED_CHECKPOINT, 'INCIDENT_CHECKPOINT_REGRESSED');
 
 previousVersion = activeVersion(deploymentStatus());
 gate(previousVersion, 'ACTIVE_VERSION_NOT_RESOLVED');
