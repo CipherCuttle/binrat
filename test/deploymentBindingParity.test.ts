@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { verifyCandidateManifest, verifyWorkerBindingParity, type WorkerVersionConfiguration } from '../src/cloudflare/deploymentBindingParity.js';
+import { verifyCandidateManifest, verifyPrivateTesterGate, verifyWorkerBindingParity, type WorkerVersionConfiguration } from '../src/cloudflare/deploymentBindingParity.js';
 
 function version(): WorkerVersionConfiguration {
   return {
@@ -30,6 +30,7 @@ test('binding parity preserves active resources while allowing only the approved
     { name: 'BINRAT_PONS_MAX_BATCH_BLOCKS', type: 'plain_text', text: '512' },
     { name: 'ROBINHOOD_RPC_URL', type: 'plain_text', text: 'https://rpc.ordofi.network' },
     { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'BINRAT_TELEGRAM_UI_V2_ENABLED', type: 'plain_text', text: 'false' },
     { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'false' },
     { name: 'RAT_CANDIDATE_SMOKE_ENABLED', type: 'plain_text', text: 'true' },
     { name: 'RAT_CANDIDATE_SMOKE_SECRET', type: 'secret_text' }
@@ -68,10 +69,11 @@ test('binding parity fails closed when Workers AI disappears or a target changes
   assert.ok(result.errors.includes('D1_TARGET_CHANGED:DB'));
 });
 
-test('controlled Rat activation is an explicit parity mode requiring one secret tester and public/media off', () => {
+test('controlled text Rat activation remains explicit and requires one secret tester with UI/media off', () => {
   const active = version();
   active.resources!.bindings!.push(
     { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'false' },
+    { name: 'BINRAT_TELEGRAM_UI_V2_ENABLED', type: 'plain_text', text: 'false' },
     { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'false' }
   );
   const candidate = structuredClone(active);
@@ -99,10 +101,10 @@ test('controlled Rat activation is an explicit parity mode requiring one secret 
   assert.ok(missing.errors.includes('CONTROLLED_RAT_TESTER_BINDING_MISSING'));
 });
 
-test('controlled Rat manifest cannot accidentally enable public mode or media', () => {
+test('controlled text Rat manifest cannot accidentally enable public mode, UI V2 or media', () => {
   const base = { name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] },
     assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'true',
-      BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
+      BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
       BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } };
   assert.deepEqual(verifyCandidateManifest(base, { controlledRatActivation: true }), { ok: true, errors: [] });
 
@@ -117,10 +119,70 @@ test('controlled Rat manifest cannot accidentally enable public mode or media', 
   const mediaResult = verifyCandidateManifest(mediaCandidate, { controlledRatActivation: true });
   assert.equal(mediaResult.ok, false);
   assert.ok(mediaResult.errors.includes('TELEGRAM_MEDIA_NOT_FLAG_OFF'));
+
+  const uiCandidate = structuredClone(base);
+  uiCandidate.vars.BINRAT_TELEGRAM_UI_V2_ENABLED = 'true';
+  const uiResult = verifyCandidateManifest(uiCandidate, { controlledRatActivation: true });
+  assert.equal(uiResult.ok, false);
+  assert.ok(uiResult.errors.includes('TELEGRAM_UI_V2_NOT_FLAG_OFF'));
+});
+
+test('controlled UI V2 parity permits only the exact private false-to-true activation set', () => {
+  const active = version();
+  active.resources!.bindings!.push(
+    { name:'BINRAT_AUTONOMOUS_RAT_ENABLED',type:'plain_text',text:'false' },
+    { name:'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED',type:'plain_text',text:'false' },
+    { name:'BINRAT_TELEGRAM_UI_V2_ENABLED',type:'plain_text',text:'false' },
+    { name:'BINRAT_TELEGRAM_MEDIA_ENABLED',type:'plain_text',text:'false' }
+  );
+  const candidate = structuredClone(active);
+  for (const name of ['BINRAT_AUTONOMOUS_RAT_ENABLED','BINRAT_TELEGRAM_UI_V2_ENABLED','BINRAT_TELEGRAM_MEDIA_ENABLED']) {
+    candidate.resources!.bindings!.find(binding=>binding.name===name)!.text='true';
+  }
+  candidate.resources!.bindings!.push(
+    { name:'BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID',type:'secret_text' },
+    { name:'RAT_CANDIDATE_ALLOWED_USER_ID',type:'secret_text' }
+  );
+  assert.deepEqual(verifyWorkerBindingParity(active,candidate,{controlledTelegramUiV2Activation:true}),{ok:true,errors:[]});
+  const defaultMode = verifyWorkerBindingParity(active,candidate);
+  assert.equal(defaultMode.ok,false);
+  assert.ok(defaultMode.errors.includes('VARIABLE_CHANGED:BINRAT_TELEGRAM_UI_V2_ENABLED'));
+
+  const alreadyEnabled = structuredClone(candidate);
+  assert.ok(verifyWorkerBindingParity(candidate,alreadyEnabled,{controlledTelegramUiV2Activation:true}).errors.includes('CONTROLLED_RAT_UI_V2_SOURCE_NOT_DISABLED'));
+
+  const publicCandidate = structuredClone(candidate);
+  publicCandidate.resources!.bindings!.find(binding=>binding.name==='BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED')!.text='true';
+  const publicResult=verifyWorkerBindingParity(active,publicCandidate,{controlledTelegramUiV2Activation:true});
+  assert.equal(publicResult.ok,false);
+  assert.ok(publicResult.errors.includes('VARIABLE_CHANGED:BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED'));
+  assert.ok(publicResult.errors.includes('CONTROLLED_RAT_PUBLIC_MODE_NOT_DISABLED'));
+
+  const unexpected = structuredClone(candidate);
+  unexpected.resources!.bindings!.push({name:'UNRELATED_ACTIVATION_BINDING',type:'plain_text',text:'true'});
+  assert.ok(verifyWorkerBindingParity(active,unexpected,{controlledTelegramUiV2Activation:true}).errors.includes('CANDIDATE_BINDING_UNAUTHORIZED:UNRELATED_ACTIVATION_BINDING'));
+});
+
+test('controlled UI V2 manifest requires private UI/media on while default mode rejects either flag', () => {
+  const manifest={name:'binrat-edge-v0',ai:{binding:'AI'},triggers:{crons:['* * * * *']},assets:{directory:'./web'},vars:{
+    BINRAT_AUTONOMOUS_RAT_ENABLED:'true',BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'false',
+    BINRAT_TELEGRAM_UI_V2_ENABLED:'true',BINRAT_TELEGRAM_MEDIA_ENABLED:'true',BINRAT_PONS_MAX_BATCH_BLOCKS:'512'
+  }};
+  assert.deepEqual(verifyCandidateManifest(manifest,{controlledTelegramUiV2Activation:true}),{ok:true,errors:[]});
+  assert.ok(verifyCandidateManifest(manifest).errors.includes('AUTONOMOUS_RAT_NOT_FLAG_OFF'));
+  const publicManifest=structuredClone(manifest); publicManifest.vars.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED='true';
+  assert.ok(verifyCandidateManifest(publicManifest,{controlledTelegramUiV2Activation:true}).errors.includes('AUTONOMOUS_RAT_PUBLIC_MODE_NOT_DISABLED'));
+});
+
+test('visible candidate whole-bot gate must match the exact selected tester', () => {
+  assert.deepEqual(verifyPrivateTesterGate('7777',{name:'RAT_CANDIDATE_ALLOWED_USER_ID',type:'plain_text',text:'7777'}),{ok:true,errors:[]});
+  const mismatch=verifyPrivateTesterGate('7777',{name:'RAT_CANDIDATE_ALLOWED_USER_ID',type:'plain_text',text:'8888'});
+  assert.equal(mismatch.ok,false); assert.ok(mismatch.errors.includes('CANDIDATE_GATE_TESTER_MISMATCH'));
+  assert.ok(verifyPrivateTesterGate('7777',undefined).errors.includes('CONTROLLED_UI_V2_CANDIDATE_GATE_MISSING'));
 });
 
 test('candidate manifest requires known-good bindings and flag-off Pons configuration', () => {
-  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } });
+  const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', BINRAT_PONS_MAX_BATCH_BLOCKS: '512' } });
   assert.deepEqual(pass, { ok: true, errors: [] });
   const fail = verifyCandidateManifest({ name: 'binrat-edge-v0', triggers: { crons: [] }, assets: { directory: './web' } });
   assert.equal(fail.ok, false);

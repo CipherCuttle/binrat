@@ -1,20 +1,24 @@
 #!/usr/bin/env node
-// One-shot controlled Autonomous Rat rollout.
-// Uploads a candidate version first, verifies exact binding parity, then promotes.
-// No merge, no token/Holder changes, no webhook mutation, no D1 writes.
+// One-shot controlled private Autonomous Rat rollout. Uploads a candidate first,
+// verifies parity, then promotes. It never merges, changes token/Holder authority,
+// or mutates the Telegram webhook. UI V2 may add only its exact prompt schema.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, rmSync, appendFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs';
+import {
+  ACTIVATION_MODE, PRODUCT_RUNTIME_PATHS, PROMPT_MIGRATION,
+  REVIEWED_TELEGRAM_UI_V2_PRODUCT_SHA, activationGateError, candidateVars,
+  parseActivationMode, promptSchemaDecision, promptSchemaPlan, rollbackSchemaNotice
+} from './controlled-rat-activation.mjs';
 
 const WORKER = 'binrat-edge-v0';
 const DB = 'binrat-v0';
 const DB_ID = '46814564-1a41-449a-88e5-c1349eed3a27';
 const WORKER_URL = 'https://binrat-edge-v0.pettevik.workers.dev';
-const REVIEWED_WORKER_SHA = 'a385a21b9e8400b6b4201aeb76a536eff845cdb8';
 const CONFIG = 'wrangler.controlled-rat.generated.jsonc';
 const SECRETS = '/tmp/binrat-controlled-rat-secrets.json';
 const WRANGLER = ['dlx', 'wrangler@4.135.0'];
 const summary = process.env.GITHUB_STEP_SUMMARY;
-let promoted = false;
+let promotionAttempted = false;
 let previousVersion = null;
 
 function note(line) {
@@ -74,6 +78,9 @@ function plainBinding(version, name) {
       ? value.text.trim() : null
   );
 }
+function binding(version, name) {
+  return walk(version, value => value?.name === name && typeof value?.type === 'string' ? value : null);
+}
 async function getJson(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(20_000) });
   const body = await response.json().catch(() => null);
@@ -132,12 +139,50 @@ function d1Preflight(config) {
   gate(Number(row.stale_outbox) === 0, 'STALE_CROSS_CHAIN_OUTBOX');
   gate(Number(row.stale_watches) === 0, 'STALE_CROSS_CHAIN_WATCH');
 }
+function promptSchemaSnapshot(config) {
+  const sql = [
+    "SELECT",
+    "  (SELECT sql FROM sqlite_master WHERE type='table' AND name='rat_ui_prompts') AS table_sql,",
+    "  (SELECT sql FROM sqlite_master WHERE type='index' AND name='idx_rat_ui_prompts_expiry') AS expiry_index_sql,",
+    "  COALESCE((SELECT group_concat(shape, '|') FROM (",
+    "    SELECT name || ':' || upper(type) || ':' || \"notnull\" || ':' || pk AS shape",
+    "    FROM pragma_table_info('rat_ui_prompts') ORDER BY cid",
+    "  )), '') AS column_shape;"
+  ].join(' ');
+  const output = jsonFromOutput(cli([
+    'd1','execute','DB','--remote','--yes','--json','--command',sql,'--config',config
+  ]));
+  const row = walk(output, value => Object.hasOwn(value ?? {}, 'table_sql') &&
+    Object.hasOwn(value ?? {}, 'expiry_index_sql') && Object.hasOwn(value ?? {}, 'column_shape') ? value : null);
+  gate(row, 'TELEGRAM_UI_PROMPT_SCHEMA_RESULT_MISSING');
+  return { tableSql: row.table_sql, expiryIndexSql: row.expiry_index_sql, columnShape: String(row.column_shape ?? '') };
+}
+function ensurePromptSchema(config) {
+  const initial = promptSchemaPlan(promptSchemaDecision(promptSchemaSnapshot(config)));
+  if (initial.action === 'SAFE_STOP') throw new Error('TELEGRAM_UI_PROMPT_SCHEMA_INCOMPATIBLE');
+  if (initial.action === 'ALREADY_PRESENT') {
+    note('TELEGRAM_UI_PROMPT_SCHEMA_ALREADY_PRESENT');
+    return false;
+  }
+  gate(initial.migration === PROMPT_MIGRATION && existsSync(initial.migration), 'TELEGRAM_UI_PROMPT_MIGRATION_MISSING');
+  // This is the sole D1 mutation for UI V2 activation. Never run a broad migration set.
+  cli(['d1','execute','DB','--remote','--yes','--file',initial.migration,'--config',config], { timeout:180_000 });
+  gate(promptSchemaDecision(promptSchemaSnapshot(config)) === 'COMPATIBLE', 'TELEGRAM_UI_PROMPT_SCHEMA_VERIFY_FAILED');
+  note('TELEGRAM_UI_PROMPT_SCHEMA_APPLIED');
+  return true;
+}
 function deploymentStatus() {
   return jsonFromOutput(cli(['deployments','status','--name',WORKER,'--json']));
 }
 
-gate(process.env.GITHUB_REF === 'refs/heads/feat/binrat-robinhood-live-rat-v1',
-  'REF_NOT_CONTROLLED_RAT_BRANCH');
+const mode = parseActivationMode(process.env.CONTROLLED_RAT_ACTIVATION_MODE);
+gate(mode, 'ACTIVATION_MODE_INVALID');
+const activationError = activationGateError(mode, {
+  ref: process.env.GITHUB_REF,
+  eventName: process.env.GITHUB_EVENT_NAME,
+  confirmation: process.env.CONTROLLED_RAT_UI_V2_CONFIRMATION
+});
+gate(activationError === null, activationError ?? 'ACTIVATION_GATE_FAILED');
 gate(process.env.CONTROLLED_RAT_DEPLOY_APPROVED === 'true',
   'CONTROLLED_RAT_DEPLOY_APPROVAL_CLOSED');
 gate(Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()) &&
@@ -146,9 +191,9 @@ gate(Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()) &&
 let tester = (process.env.CONTROLLED_RAT_ALLOWED_USER_ID?.trim() ||
   process.env.CONTROLLED_RAT_ALLOWED_USER_ID_FALLBACK?.trim() || '');
 
-execFileSync('git', ['diff','--quiet',REVIEWED_WORKER_SHA + '..' + process.env.GITHUB_SHA,
-  '--','src','cloudflare','web','package.json','pnpm-lock.yaml'], { stdio: 'inherit' });
-note('Reviewed Worker code unchanged since ' + REVIEWED_WORKER_SHA + '.');
+execFileSync('git', ['diff','--quiet',REVIEWED_TELEGRAM_UI_V2_PRODUCT_SHA + '..' + process.env.GITHUB_SHA,
+  '--',...PRODUCT_RUNTIME_PATHS], { stdio: 'inherit' });
+note('Reviewed runtime product paths unchanged since ' + REVIEWED_TELEGRAM_UI_V2_PRODUCT_SHA + '.');
 
 const plan = execFileSync('node', ['scripts/check-rat-ai-plan.mjs'], {
   encoding: 'utf8', stdio: ['ignore','pipe','pipe'], env: process.env, timeout: 30_000
@@ -186,13 +231,7 @@ if (beforeWebhook !== null) {
 
 const cfg = parseJsonc('cloudflare/wrangler.example.jsonc');
 cfg.d1_databases[0].database_id = DB_ID;
-cfg.vars = {
-  BINRAT_PONS_MAX_BATCH_BLOCKS: '512',
-  BINRAT_AUTONOMOUS_RAT_ENABLED: 'true',
-  BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false',
-  BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
-  BINRAT_RELEASE_SHA: process.env.GITHUB_SHA
-};
+cfg.vars = candidateVars(mode, process.env.GITHUB_SHA);
 cfg.keep_vars = true;
 writeFileSync(CONFIG, JSON.stringify(cfg, null, 2));
 d1Preflight(CONFIG);
@@ -201,50 +240,64 @@ note('D1 preflight PASS: no enabled/pending non-4663 autonomous Watch state.');
 const current = deploymentStatus();
 previousVersion = activeVersionFrom(current);
 gate(previousVersion, 'ACTIVE_VERSION_NOT_RESOLVED');
+const activeConfig = jsonFromOutput(cli([
+  'versions','view',previousVersion,'--name',WORKER,'--json'
+]));
 
 if (!tester) {
-  const activeConfig = jsonFromOutput(cli([
-    'versions','view',previousVersion,'--name',WORKER,'--json'
-  ]));
   tester = plainBinding(activeConfig, 'RAT_FEEDBACK_ADMIN_USER_ID') || '';
 }
 if (!tester) tester = testerFromFeedbackMarker(CONFIG);
 gate(/^[1-9]\d{3,16}$/.test(tester), 'CONTROLLED_RAT_TESTER_ID_MISSING_OR_INVALID');
-writeFileSync(SECRETS, JSON.stringify({
-  BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: tester
-}));
+const secrets = { BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: tester };
+if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  const existingCandidateGate = binding(activeConfig, 'RAT_CANDIDATE_ALLOWED_USER_ID');
+  if (existingCandidateGate?.type === 'plain_text') {
+    gate(existingCandidateGate.text === tester, 'CANDIDATE_GATE_TESTER_MISMATCH');
+  } else {
+    gate(!existingCandidateGate || existingCandidateGate.type === 'secret_text', 'CONTROLLED_UI_V2_CANDIDATE_GATE_INVALID');
+    // A secret candidate gate cannot be read. Supply the same selected tester to
+    // the candidate explicitly so both ingress gates resolve to one principal.
+    secrets.RAT_CANDIDATE_ALLOWED_USER_ID = tester;
+  }
+}
+writeFileSync(SECRETS, JSON.stringify(secrets));
 note('Controlled tester identity resolved from protected configuration or exact D1 marker.');
-
-const tag = 'controlled-rat-' + process.env.GITHUB_SHA.slice(0, 12);
-cli([
-  'versions','upload','--config',CONFIG,'--keep-vars','--strict',
-  '--secrets-file',SECRETS,'--tag',tag,
-  '--message','BINRAT controlled private Autonomous Rat'
-], { timeout: 180_000 });
-rmSync(SECRETS, { force: true });
-
-const versions = jsonFromOutput(cli(['versions','list','--name',WORKER,'--json']));
-const candidateVersion = taggedVersionFrom(versions, tag);
-gate(candidateVersion, 'CANDIDATE_VERSION_NOT_RESOLVED');
-gate(candidateVersion !== previousVersion, 'CANDIDATE_VERSION_EQUALS_ACTIVE');
-
-execFileSync('pnpm', [
-  'verify:production-binding-parity','--',
-  '--worker',WORKER,
-  '--active-version',previousVersion,
-  '--candidate-version',candidateVersion,
-  '--config',CONFIG,
-  '--controlled-rat-activation'
-], { stdio: 'inherit', env: process.env, timeout: 180_000 });
-note('Candidate binding parity PASS; candidate remained non-live until this point.');
-
+let promptSchemaApplied = false;
 try {
+  // The read-only schema probe and its one exact additive migration happen
+  // before candidate upload, but inside cleanup/rollback handling.
+  promptSchemaApplied = mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE && ensurePromptSchema(CONFIG);
+  const tag = 'controlled-rat-' + process.env.GITHUB_SHA.slice(0, 12);
+  cli([
+    'versions','upload','--config',CONFIG,'--keep-vars','--strict',
+    '--secrets-file',SECRETS,'--tag',tag,
+    '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
+  ], { timeout: 180_000 });
+  rmSync(SECRETS, { force: true });
+
+  const versions = jsonFromOutput(cli(['versions','list','--name',WORKER,'--json']));
+  const candidateVersion = taggedVersionFrom(versions, tag);
+  gate(candidateVersion, 'CANDIDATE_VERSION_NOT_RESOLVED');
+  gate(candidateVersion !== previousVersion, 'CANDIDATE_VERSION_EQUALS_ACTIVE');
+
+  execFileSync('pnpm', [
+    'verify:production-binding-parity','--',
+    '--worker',WORKER,
+    '--active-version',previousVersion,
+    '--candidate-version',candidateVersion,
+    '--config',CONFIG,
+    mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? '--controlled-telegram-ui-v2-activation' : '--controlled-rat-activation'
+  ], { stdio: 'inherit', env: process.env, timeout: 180_000 });
+  note('Candidate binding parity PASS; candidate remained non-live until this point.');
+
+  // Treat a transport-ambiguous promotion result as potentially live. A
+  // best-effort code rollback is safer than assuming the candidate stayed dark.
+  promotionAttempted = true;
   cli([
     'versions','deploy',candidateVersion + '@100%','--name',WORKER,'--yes',
-    '--message','BINRAT controlled private Autonomous Rat'
+    '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
   ], { timeout: 180_000 });
-  promoted = true;
-
   const afterHealth = await getJson(WORKER_URL + '/health');
   gate(afterHealth.ok === true && afterHealth.releaseSha === process.env.GITHUB_SHA,
     'POSTDEPLOY_RELEASE_SHA_MISMATCH');
@@ -263,10 +316,24 @@ try {
 
   const deployed = activeVersionFrom(deploymentStatus());
   gate(deployed === candidateVersion, 'CANDIDATE_NOT_AT_100_PERCENT');
-  note('CONTROLLED_RAT_DEPLOYMENT_PASS: candidate is live at 100%; autonomous scope remains one private tester.');
-  note('Public autonomous mode OFF. Telegram media OFF. No merge performed.');
+  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+    const deployedConfig = jsonFromOutput(cli(['versions','view',candidateVersion,'--name',WORKER,'--json']));
+    for (const [name, value] of Object.entries(candidateVars(mode, process.env.GITHUB_SHA))) {
+      if (name === 'BINRAT_RELEASE_SHA') continue;
+      gate(plainBinding(deployedConfig,name) === value, 'POSTDEPLOY_BINDING_MISMATCH:' + name);
+    }
+    const deployedCandidateGate = binding(deployedConfig,'RAT_CANDIDATE_ALLOWED_USER_ID');
+    gate(binding(deployedConfig,'BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID')?.type === 'secret_text' &&
+      (deployedCandidateGate?.type === 'secret_text' ||
+        (deployedCandidateGate?.type === 'plain_text' && deployedCandidateGate.text === tester)),
+    'POSTDEPLOY_TESTER_BINDING_MISSING');
+    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook unchanged; no merge performed.');
+  } else {
+    note('CONTROLLED_RAT_DEPLOYMENT_PASS: candidate is live at 100%; autonomous scope remains one private tester.');
+    note('Public autonomous mode OFF. Telegram UI V2 OFF. Telegram media OFF. No merge performed.');
+  }
 } catch (error) {
-  if (promoted && previousVersion) {
+  if (promotionAttempted && previousVersion) {
     try {
       cli([
         'versions','deploy',previousVersion + '@100%','--name',WORKER,'--yes',
@@ -277,6 +344,8 @@ try {
       note('ROLLBACK_FAILED: manual Cloudflare rollback required immediately.');
     }
   }
+  const schemaNotice = rollbackSchemaNotice(promptSchemaApplied);
+  if (schemaNotice) note(schemaNotice);
   throw error;
 } finally {
   rmSync(SECRETS, { force: true });
