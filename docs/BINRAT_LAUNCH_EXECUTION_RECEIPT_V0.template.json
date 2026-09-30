@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "binrat.launch-execution-receipt/0.1",
+  "executionStatus": "NOT_EXECUTED",
+  "validationStatus": "INCOMPLETE",
+  "chainId": 5042,
+  "tokenAddress": null,
+  "launchTransaction": null,
+  "launchBlock": null,
+  "launchBlockHash": null,
+  "tokenSupply": {
+    "raw": null,
+    "decimals": null
+  },
+  "pool": {
+    "address": null
+  },
+  "liquidityPosition": {
+    "positionId": null,
+    "mintTransaction": null
+  },
+  "lockerAddress": null,
+  "authorities": {
+    "treasury": {
+      "role": "TREASURY",
+      "address": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D"
+    },
+    "projectFeeRecipient": {
+      "role": "PROJECT_FEE_RECIPIENT",
+      "address": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866"
+    }
+  },
+  "launchConfigDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+  "launchMechanicsReceiptDigest": "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
+  "allocationVerification": {
+    "status": null,
+    "evidenceClass": "POST_LAUNCH_ON_CHAIN_VERIFICATION",
+    "launchTransactionMatches": null,
+    "ownerPolicyMatched": null,
+    "privilegedCreatorFirstBuyObserved": null,
+    "receiptDigest": null,
+    "verifiedAt": null
+  },
+  "founderProjectPublicPurchase": {
+    "policy": "NOT_PLANNED_FOR_LAUNCH",
+    "observedStatus": null,
+    "transaction": null,
+    "verificationReceiptDigest": null
+  },
+  "deploymentExecutedAt": null,
+  "receiptDigest": null
+}

@@ -10,9 +10,10 @@ export async function deriveLaunchId(input: {
   launcher: Hex;
   txHash: Hex;
   token: Hex;
+  source?: 'ARCPAD' | 'PONS_V2';
 }): Promise<string> {
   return sha256Hex({
-    kind: 'BINRAT_ARCPAD_LAUNCH_V0',
+    kind: input.source === 'PONS_V2' ? 'BINRAT_PONS_V2_LAUNCH_V1' : 'BINRAT_ARCPAD_LAUNCH_V0',
     chainId: input.chainId,
     launcher: normHex(input.launcher),
     txHash: normHex(input.txHash),
@@ -25,9 +26,10 @@ export async function deriveEventId(input: {
   launcher: Hex;
   txHash: Hex;
   logIndex: number;
+  source?: 'ARCPAD' | 'PONS_V2';
 }): Promise<string> {
   return sha256Hex({
-    kind: 'BINRAT_ARCPAD_EVENT_V0',
+    kind: input.source === 'PONS_V2' ? 'BINRAT_PONS_V2_EVENT_V1' : 'BINRAT_ARCPAD_EVENT_V0',
     chainId: input.chainId,
     launcher: normHex(input.launcher),
     txHash: normHex(input.txHash),
@@ -48,7 +50,11 @@ export function normalizeLaunchHex(launch: LaunchObserved): LaunchObserved {
 }
 
 export function sameLaunchAuthority(a: LaunchObserved, b: LaunchObserved): boolean {
-  return canonicalJson(launchAuthority(a)) === canonicalJson(launchAuthority(b));
+  return launchAuthorityJson(a) === launchAuthorityJson(b);
+}
+
+export function launchAuthorityJson(launch: LaunchObserved): string {
+  return canonicalJson(launchAuthority(launch));
 }
 
 function launchAuthority(launch: LaunchObserved) {

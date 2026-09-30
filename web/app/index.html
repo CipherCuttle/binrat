@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10130f">
+  <title>BINRAT · Rat Radar</title>
+  <link rel="icon" href="/assets/favicon.png">
+  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  <link rel="stylesheet" href="/app/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <img src="/assets/telegram/profile.png" alt="" width="42" height="42">
+    <div><p class="eyebrow">BINRAT / PRIVATE TEST</p><h1>RAT RADAR</h1></div>
+    <span id="source-badge" class="badge">CHECKING</span>
+  </header>
+  <main id="main" aria-live="polite">
+    <section id="home" class="view active"><p class="eyebrow">EVIDENCE FIRST</p><h2>Receipts, not guesses.</h2><p class="lede">Repeated deployers and canonical launch evidence from the indexed Robinhood/Pons source.</p><div id="health" class="panel">Checking source health…</div><button class="primary" data-view="rats">OPEN RADAR</button></section>
+    <section id="rats" class="view"><p class="eyebrow">CURRENT DISCOVERY</p><h2>RATS</h2><div id="rat-list" class="stack"></div></section>
+    <section id="case" class="view"><p class="eyebrow">CANONICAL EVIDENCE</p><h2>CASE FILE</h2><div id="case-file" class="stack"><p>Select a Rat to inspect its retained receipts.</p></div></section>
+    <section id="watches" class="view"><p class="eyebrow">PRIVATE ATTENTION</p><h2>WATCHES</h2><div id="watch-list" class="stack"></div><p class="note">Watch changes remain in native Telegram during this read-only release.</p></section>
+    <section id="about" class="view"><p class="eyebrow">SETTINGS / ABOUT</p><h2>What BINRAT knows</h2><div class="panel"><p><strong>Observed:</strong> canonical indexed launch receipts.</p><p><strong>Derived:</strong> exact-address recurrence within stated coverage.</p><p><strong>Unknown:</strong> human identity, intent, safety, profitability, and future outcome.</p></div><div id="feature-state" class="panel"></div></section>
+  </main>
+  <nav aria-label="Mini App sections">
+    <button data-view="home" class="selected">HOME</button><button data-view="rats">RATS</button><button data-view="watches">WATCHES</button><button data-view="about">ABOUT</button>
+  </nav>
+  <script type="module" src="/app/app.js"></script>
+</body>
+</html>
