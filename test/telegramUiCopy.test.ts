@@ -64,6 +64,12 @@ test('W0 CASE stays terse while WHY preserves bounded explanation and FULL recei
     assert.ok(Array.from(whyCard.caption).length<=TELEGRAM_WHY_COPY_LIMIT);
     assert.deepEqual(actionLabels(whyCard),['Open Case','Full receipt','Back']);
     assert.ok(callbackActions(whyCard).includes('FULL'));
+    const arcReceipt={...receipt,chainId:5042,source:'ARCPAD' as const,
+      subject:{...receipt.subject,chainId:5042},
+      coverage:{...receipt.coverage,scope:'ARCPAD_INDEXED_LAUNCHES' as const}};
+    const arcCard=renderRatCard({kind:'CASE',receipt:arcReceipt,mode:'DIG',privateAttention:null});
+    assert.match(arcCard.caption,/ArcPad reported creator/);
+    assert.doesNotMatch(arcCard.caption,/ArcPad reported deployer/);
   } finally { f.db.close(); }
 });
 
@@ -73,6 +79,9 @@ test('W0 Watch and error states translate internal state into Rat language', () 
   const error=renderRatCard({kind:'ERROR',code:'The live index is unavailable or stale. No new investigation or alert authority.'});
   assert.match(error.caption,/Pipe smells wrong/);
   assert.doesNotMatch(error.caption,/live index|authority|INDEX_|SYNC_/i);
+  const capacity=renderRatCard({kind:'ERROR',code:'DIG/WATCH research capacity reached. Try after 00:00 UTC. Existing watches, UNWATCH and WHY remain available.'});
+  assert.match(capacity.caption,/Existing watches and receipts still work/);
+  assert.doesNotMatch(capacity.caption,/^.*Watches and receipts still work/m);
 });
 
 test('W0 ALERT carries one event and at most three visible actions', async () => {
