@@ -50,7 +50,11 @@ export function normalizeLaunchHex(launch: LaunchObserved): LaunchObserved {
 }
 
 export function sameLaunchAuthority(a: LaunchObserved, b: LaunchObserved): boolean {
-  return canonicalJson(launchAuthority(a)) === canonicalJson(launchAuthority(b));
+  return launchAuthorityJson(a) === launchAuthorityJson(b);
+}
+
+export function launchAuthorityJson(launch: LaunchObserved): string {
+  return canonicalJson(launchAuthority(launch));
 }
 
 function launchAuthority(launch: LaunchObserved) {

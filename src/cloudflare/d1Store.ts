@@ -1,5 +1,5 @@
 import { canonicalJson } from '../evidence/canonical.js';
-import { normalizeLaunchHex, sameLaunchAuthority } from '../core/identity.js';
+import { launchAuthorityJson, normalizeLaunchHex, sameLaunchAuthority } from '../core/identity.js';
 import type { ChainCheckpoint, Hex, LaunchObserved } from '../core/types.js';
 import type { LaunchStore } from '../core/ports.js';
 import type { ProvenanceEdge, ProvenanceFact } from '../intelligence/provenance.js';
@@ -18,10 +18,10 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
 
   async putLaunch(value: LaunchObserved): Promise<'INSERTED' | 'DUPLICATE'> {
     const launch = this.normalizeLaunch(value);
-    const payload = canonicalJson(launch);
+    const payload = launchAuthorityJson(launch);
     const result = await this.db.prepare(INSERT_LAUNCH_SQL).bind(...launchParams(launch, payload)).run();
     if (changes(result) === 1) return 'INSERTED';
-    await this.assertLaunchIdentity(launch, payload);
+    await this.assertLaunchIdentity(launch);
     return 'DUPLICATE';
   }
 
@@ -174,7 +174,7 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
 
     for (const value of launches) {
       const launch = this.normalizeLaunch(value);
-      const payload = canonicalJson(launch);
+      const payload = launchAuthorityJson(launch);
       launchInsertIndexes.push(statements.length);
       statements.push(this.db.prepare(INSERT_LAUNCH_SQL).bind(...launchParams(launch, payload)));
       statements.push(this.launchGuard(launch, payload));
@@ -316,7 +316,7 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
     if (actual !== this.chainId) throw new Error(error);
   }
 
-  private async assertLaunchIdentity(launch: LaunchObserved, payload: string): Promise<void> {
+  private async assertLaunchIdentity(launch: LaunchObserved): Promise<void> {
     const row = await this.db.prepare(`
       SELECT * FROM launches
       WHERE launch_id = ?
@@ -326,7 +326,7 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
     `).bind(
       launch.launchId, launch.chainId, launch.txHash, launch.token, launch.chainId, launch.token
     ).first<LaunchRow>();
-    if (!row || row.authority_json !== payload || !sameLaunchAuthority(fromLaunchRow(row), launch)) {
+    if (!row || !sameLaunchAuthority(fromLaunchRow(row), launch)) {
       throw new Error(`LAUNCH_IDENTITY_CONFLICT:${launch.launchId}`);
     }
   }
@@ -341,7 +341,10 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
         OR (chain_id = ? AND tx_hash = ? AND token = ?)
         OR (chain_id = ? AND token = ?)
       )
-      AND authority_json <> ?
+      -- Legacy rows serialized the full launch, including observedAtMs. New rows
+      -- store only canonical authority. Removing the legacy observation field
+      -- makes both representations comparable without rewriting production.
+      AND json_remove(authority_json, '$.observedAtMs') <> ?
       LIMIT 1
     `).bind(
       launch.launchId, launch.chainId, launch.txHash, launch.token,

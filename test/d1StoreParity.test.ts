@@ -26,6 +26,10 @@ test('D1Store matches SqliteStore for canonical BINRAT persistence semantics', a
     assert.equal(await sqlite.putLaunch(first), 'DUPLICATE');
     assert.equal(await d1.putLaunch(first), 'DUPLICATE');
 
+    const laterObservation = { ...first, observedAtMs: first.observedAtMs + 60_000 };
+    assert.equal(await sqlite.putLaunch(laterObservation), 'DUPLICATE');
+    assert.equal(await d1.putLaunch(laterObservation), 'DUPLICATE');
+
     await assert.rejects(
       () => sqlite.putLaunch({ ...first, symbol: 'CONFLICT' }),
       /LAUNCH_IDENTITY_CONFLICT/
@@ -108,6 +112,36 @@ test('D1Store matches SqliteStore for canonical BINRAT persistence semantics', a
     assert.deepEqual(await d1.listProvenanceFacts(), await sqlite.listProvenanceFacts());
     assert.deepEqual(await d1.getCheckpoint(), await sqlite.getCheckpoint());
     assert.equal(await d1.getHistoricalBackfillNextBlock(), await sqlite.getHistoricalBackfillNextBlock());
+  } finally {
+    sqlite.close();
+    d1.close();
+    d1db.close();
+  }
+});
+
+test('D1 historical batch matches SQLite when only launch observation time changes', async () => {
+  const sqlite = new SqliteStore(':memory:', CHAIN_ID);
+  const d1db = new D1CompatDatabase();
+  await d1db.exec(D1_SCHEMA_SQL);
+  const d1 = new D1Store(d1db, CHAIN_ID);
+  try {
+    const firstObservation = await makeLaunch(100n, 1, 31);
+    const laterObservation = {
+      ...firstObservation,
+      observedAtMs: firstObservation.observedAtMs + 60_000
+    };
+    assert.equal(await sqlite.putLaunch(firstObservation), 'INSERTED');
+    assert.equal(await d1.putLaunch(firstObservation), 'INSERTED');
+    await sqlite.setHistoricalBackfillNextBlock(50n);
+    await d1.setHistoricalBackfillNextBlock(50n);
+
+    const fact = await buildProvenanceFact(laterObservation);
+    assert.deepEqual(
+      await d1.commitHistoricalBackfillBatch([laterObservation], [fact], null, 101n),
+      await sqlite.commitHistoricalBackfillBatch([laterObservation], [fact], null, 101n)
+    );
+    assert.equal(await d1.getHistoricalBackfillNextBlock(), 101n);
+    assert.equal(await sqlite.getHistoricalBackfillNextBlock(), 101n);
   } finally {
     sqlite.close();
     d1.close();
