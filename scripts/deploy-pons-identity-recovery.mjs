@@ -72,7 +72,8 @@ function activeVersion(status) {
 function taggedVersion(versions, tag) {
   return walk(versions, value => {
     const id = value.version_id ?? value.versionId ?? value.id;
-    return value.tag === tag && uuid(id) ? id : null;
+    const versionTag = value.tag ?? value.annotations?.['workers/tag'];
+    return versionTag === tag && uuid(id) ? id : null;
   });
 }
 function bindings(version) {
