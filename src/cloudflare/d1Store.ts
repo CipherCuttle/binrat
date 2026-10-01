@@ -45,6 +45,17 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
     return rows.map(fromLaunchRow);
   }
 
+  async countLaunchesThroughBlock(blockNumber: bigint): Promise<number> {
+    if (blockNumber < 0n) throw new Error('LAUNCH_COUNT_BLOCK_INVALID');
+    const row = await this.db.prepare(`
+      SELECT COUNT(*) AS n FROM launches
+      WHERE chain_id = ? AND CAST(block_number AS INTEGER) <= CAST(? AS INTEGER)
+    `).bind(this.chainId, blockNumber.toString()).first<{ n: number }>();
+    const count = Number(row?.n ?? 0);
+    if (!Number.isSafeInteger(count) || count < 0) throw new Error('LAUNCH_COUNT_INVALID');
+    return count;
+  }
+
   async listLaunchesMissingProvenance(): Promise<LaunchObserved[]> {
     const rows = await all<LaunchRow>(this.db.prepare(`
       SELECT l.* FROM launches l
