@@ -25,11 +25,13 @@ export class D1PonsTokenIdentityStore implements PonsTokenIdentityStore {
       ),
       fresh_repeaters AS (
         SELECT l.creator
-        FROM launches l,checkpoint c
+        FROM launches l
         WHERE l.chain_id=4663 AND l.source='PONS_V2'
         GROUP BY l.creator
         HAVING COUNT(DISTINCT l.launch_id)>=2
-           AND MAX(CAST(l.block_number AS INTEGER))>=MAX(0,c.tip-200000)
+           AND MAX(CAST(l.block_number AS INTEGER))>=(
+             SELECT CASE WHEN tip>200000 THEN tip-200000 ELSE 0 END FROM checkpoint
+           )
       )
       SELECT l.launch_id,l.token
       FROM launches l
