@@ -273,7 +273,10 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
   }
 
   async rewindFromBlock(blockNumber: bigint): Promise<void> {
-    const statements = [
+    const hasPonsOutcomeTable=await this.db.prepare(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='pons_outcome_receipts' LIMIT 1"
+    ).first<{name:string}>();
+    const statements:D1PreparedStatementLike[] = [
       this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').bind(this.chainId),
       this.db.prepare(`
         DELETE FROM rat_watch_alerts
@@ -301,11 +304,15 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
       this.db.prepare(`
         DELETE FROM launch_observations
         WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
-      `).bind(this.chainId, blockNumber.toString()),
-      this.db.prepare(`
+      `).bind(this.chainId, blockNumber.toString())
+    ];
+    if (hasPonsOutcomeTable) {
+      statements.push(this.db.prepare(`
         DELETE FROM pons_outcome_receipts
         WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
-      `).bind(this.chainId, blockNumber.toString()),
+      `).bind(this.chainId, blockNumber.toString()));
+    }
+    statements.push(
       this.db.prepare(`
         DELETE FROM launches
         WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
@@ -318,7 +325,7 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
         DELETE FROM chain_checkpoints
         WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
       `).bind(this.chainId, blockNumber.toString())
-    ];
+    );
     await requireBatchSuccess(this.db.batch(statements));
   }
 
