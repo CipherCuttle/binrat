@@ -1,6 +1,7 @@
-import { createPublicClient, http, type Address } from 'viem';
-import { PONS_V2_FACTORY, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from '../src/pons/chain.js';
-import { ponsV2FactoryOutcomeReadAbi } from '../src/pons/ponsAbi.js';
+import { createPublicClient, http, zeroAddress, type Address, type PublicClient } from 'viem';
+import { PONS_V2_FACTORY, PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from '../src/pons/chain.js';
+import { ponsTokenLaunchedEvent, ponsV2FactoryOutcomeReadAbi } from '../src/pons/ponsAbi.js';
+import { deriveLaunchId } from '../src/core/identity.js';
 import {
   RpcPonsCurveOutcomeSource,
   readPonsCurveOutcomeCapability
@@ -45,6 +46,81 @@ function printable(receipt:Awaited<ReturnType<typeof readPonsCurveOutcomeCapabil
     missing:receipt.missing,
     evidenceDigest:receipt.evidenceDigest
   };
+}
+
+
+const MINUTE_MS=60_000;
+const HOUR_MS=60*MINUTE_MS;
+const DAY_MS=24*HOUR_MS;
+const HISTORICAL_SCAN_CHUNK_BLOCKS=4_096n;
+
+async function observedBlockTimestampMs(client:PublicClient,block:bigint):Promise<number> {
+  const value=await client.getBlock({blockNumber:block});
+  const timestampMs=Number(value.timestamp*1000n);
+  gate(Number.isSafeInteger(timestampMs),'PROBE_BLOCK_TIMESTAMP_INVALID');
+  return timestampMs;
+}
+
+async function firstBlockAtOrAfterTimestamp(
+  client:PublicClient,
+  lower:bigint,
+  upper:bigint,
+  targetTimestampMs:number
+):Promise<bigint> {
+  gate(lower<=upper,'PROBE_TIMESTAMP_SEARCH_RANGE_INVALID');
+  const upperTimestampMs=await observedBlockTimestampMs(client,upper);
+  gate(upperTimestampMs>=targetTimestampMs,'PROBE_TIMESTAMP_TARGET_AFTER_CHECKPOINT');
+  let lo=lower;
+  let hi=upper;
+  while (lo<hi) {
+    const mid=lo+(hi-lo)/2n;
+    const timestampMs=await observedBlockTimestampMs(client,mid);
+    if (timestampMs>=targetTimestampMs) hi=mid;
+    else lo=mid+1n;
+  }
+  return lo;
+}
+
+async function findHistoricalNativeLaunch(
+  client:PublicClient,
+  fromBlock:bigint,
+  throughBlock:bigint
+):Promise<{launchId:string;token:`0x${string}`;curve:`0x${string}`;blockNumber:bigint;timestampMs:number}> {
+  for (let from=fromBlock;from<=throughBlock;) {
+    const to=from+HISTORICAL_SCAN_CHUNK_BLOCKS-1n>throughBlock
+      ? throughBlock
+      : from+HISTORICAL_SCAN_CHUNK_BLOCKS-1n;
+    const logs=await client.getLogs({
+      address:PONS_V2_FACTORY as Address,
+      event:ponsTokenLaunchedEvent,
+      fromBlock:from,
+      toBlock:to,
+      strict:true
+    });
+    for (const log of logs) {
+      if (log.blockNumber===null || log.transactionHash===null) continue;
+      if (!log.args.token || !log.args.curve || !log.args.pairToken) continue;
+      if (log.args.pairToken.toLowerCase()!==zeroAddress) continue;
+      const token=address(log.args.token,'PROBE_HISTORICAL_TOKEN_INVALID');
+      const curve=address(log.args.curve,'PROBE_HISTORICAL_CURVE_INVALID');
+      const id=await deriveLaunchId({
+        chainId:ROBINHOOD_CHAIN_ID,
+        launcher:PONS_V2_FACTORY,
+        txHash:log.transactionHash,
+        token,
+        source:'PONS_V2'
+      });
+      return {
+        launchId:id,
+        token,
+        curve,
+        blockNumber:log.blockNumber,
+        timestampMs:await observedBlockTimestampMs(client,log.blockNumber)
+      };
+    }
+    from=to+1n;
+  }
+  throw new Error('PROBE_NO_AGED_NATIVE_LAUNCH');
 }
 
 const latestResponse=await fetch(`${apiBase}/api/launches/latest`,{signal:AbortSignal.timeout(20_000)});
@@ -101,10 +177,73 @@ gate(
   'PROBE_CHECKPOINT_STATE_INVALID'
 );
 
+
+const checkpointTimestampMs=await observedBlockTimestampMs(client,checkpoint);
+const archiveSearchStartTimestampMs=checkpointTimestampMs-30*HOUR_MS;
+const archiveSearchEndTimestampMs=checkpointTimestampMs-24*HOUR_MS-10*MINUTE_MS;
+const archiveSearchStartBlock=await firstBlockAtOrAfterTimestamp(
+  client,
+  PONS_V2_START_BLOCK,
+  checkpoint,
+  archiveSearchStartTimestampMs
+);
+const archiveSearchEndBlock=await firstBlockAtOrAfterTimestamp(
+  client,
+  archiveSearchStartBlock,
+  checkpoint,
+  archiveSearchEndTimestampMs
+);
+const agedLaunch=await findHistoricalNativeLaunch(client,archiveSearchStartBlock,archiveSearchEndBlock);
+gate(
+  checkpointTimestampMs-agedLaunch.timestampMs>=24*HOUR_MS+10*MINUTE_MS,
+  'PROBE_AGED_LAUNCH_TOO_RECENT'
+);
+
+const maturityWindows=[
+  {label:'5m',offsetMs:5*MINUTE_MS},
+  {label:'1h',offsetMs:HOUR_MS},
+  {label:'24h',offsetMs:DAY_MS}
+] as const;
+const historicalMaturityReceipts=[] as Array<{
+  window:'5m'|'1h'|'24h';
+  targetTimestampMs:number;
+  targetBlock:string;
+  receipt:ReturnType<typeof printable>;
+}>;
+for (const window of maturityWindows) {
+  const targetTimestampMs=agedLaunch.timestampMs+window.offsetMs;
+  const targetBlock=await firstBlockAtOrAfterTimestamp(
+    client,
+    agedLaunch.blockNumber,
+    checkpoint,
+    targetTimestampMs
+  );
+  const receipt=await readPonsCurveOutcomeCapability(
+    source,
+    {launchId:agedLaunch.launchId,token:agedLaunch.token,curve:agedLaunch.curve},
+    targetBlock
+  );
+  gate(receipt.observedTimestampMs>=targetTimestampMs,`PROBE_${window.label.toUpperCase()}_BEFORE_MATURITY`);
+  historicalMaturityReceipts.push({
+    window:window.label,
+    targetTimestampMs,
+    targetBlock:targetBlock.toString(),
+    receipt:printable(receipt)
+  });
+}
+
 console.log(JSON.stringify({
   kind:'PONS_OUTCOME_CAPABILITY_PROBE_PASS',
   publicSourceCheckpoint:checkpoint.toString(),
   launchBlock:launchBlock.toString(),
+  agedLaunch:{
+    launchId:agedLaunch.launchId,
+    token:agedLaunch.token,
+    curve:agedLaunch.curve,
+    blockNumber:agedLaunch.blockNumber.toString(),
+    timestampMs:agedLaunch.timestampMs
+  },
+  historicalMaturityReceipts,
   atLaunch:printable(atLaunch),
   atCheckpoint:printable(atCheckpoint)
 },null,2));
