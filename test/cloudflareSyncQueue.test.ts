@@ -1117,3 +1117,201 @@ async function makeRadarReceipt(
 function address(seed: number): Hex {
   return `0x${seed.toString(16).padStart(40, '0').slice(-40)}` as Hex;
 }
+
+
+const outcomeAddress = (seed: number): Hex => `0x${seed.toString(16).padStart(40,'0')}`;
+
+async function outcomeLaunch(blockNumber=10n): Promise<LaunchObserved> {
+  const token=outcomeAddress(1001);
+  const curve=outcomeAddress(2001);
+  const txHash=hash(10_001n);
+  return {
+    launchId:await deriveLaunchId({
+      chainId:ROBINHOOD_CHAIN_ID,
+      launcher:PONS_V2_FACTORY,
+      txHash,
+      token,
+      source:'PONS_V2'
+    }),
+    eventId:await deriveEventId({
+      chainId:ROBINHOOD_CHAIN_ID,
+      launcher:PONS_V2_FACTORY,
+      txHash,
+      logIndex:0,
+      source:'PONS_V2'
+    }),
+    chainId:ROBINHOOD_CHAIN_ID,
+    blockNumber,
+    blockHash:hash(blockNumber),
+    observedAtMs:1,
+    source:'PONS_V2',
+    launcher:PONS_V2_FACTORY,
+    txHash,
+    logIndex:0,
+    token,
+    creator:outcomeAddress(42),
+    pool:curve,
+    name:'',
+    symbol:'',
+    imageUri:'',
+    website:'',
+    twitter:'',
+    telegram:''
+  };
+}
+
+class FakePonsOutcomeSource implements PonsOutcomeObservationSource {
+  authorityCalls=0;
+  outcomeReads:bigint[]=[];
+  async assertAuthority(){ this.authorityCalls+=1; }
+  async getBlockPoint(blockNumber:bigint) {
+    return {
+      blockNumber,
+      blockHash:hash(blockNumber),
+      timestampMs:Number(blockNumber)*60_000
+    };
+  }
+  async readOutcomeAt(launch:{launchId:string;token:Hex;curve:Hex},blockNumber:bigint) {
+    this.outcomeReads.push(blockNumber);
+    return buildPonsCurveOutcomeCapabilityReceipt({
+      launch,
+      observedBlock:blockNumber,
+      observedBlockHash:hash(blockNumber),
+      observedTimestampMs:Number(blockNumber)*60_000,
+      pairToken:'0x0000000000000000000000000000000000000000',
+      quoteDecimals:18,
+      totalSupply:1_000_000n*10n**18n,
+      graduated:false,
+      quoteReserve:10n*10n**18n,
+      tokenReserve:500_000n*10n**18n
+    });
+  }
+}
+
+test('Robinhood archive resolver accepts a raw Alchemy key or exact Robinhood endpoint only', () => {
+  assert.equal(
+    resolveRobinhoodArchiveRpcUrl({BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:'abcdefgh'}),
+    'https://robinhood-mainnet.g.alchemy.com/v2/abcdefgh'
+  );
+  assert.equal(
+    resolveRobinhoodArchiveRpcUrl({
+      BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:'https://robinhood-mainnet.g.alchemy.com/v2/abcdefgh'
+    }),
+    'https://robinhood-mainnet.g.alchemy.com/v2/abcdefgh'
+  );
+  assert.throws(
+    () => resolveRobinhoodArchiveRpcUrl({BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:'https://evil.example/v2/abcdefgh'}),
+    /PONS_OUTCOME_ARCHIVE_RPC_INVALID/
+  );
+  assert.throws(
+    () => resolveRobinhoodArchiveRpcUrl({}),
+    /MISSING_CONFIG:BINRAT_ROBINHOOD_ARCHIVE_RPC_URL/
+  );
+});
+
+test('Pons outcome cycle is inert by default and does not require archive credentials', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source=new FakePonsOutcomeSource();
+  try {
+    const result=await runCloudflarePonsOutcomeCycle(
+      {DB:db},
+      {kind:'PONS_OUTCOME_CYCLE',cycleId:'outcome-disabled',enqueuedAtMs:1_000},
+      {now:()=>1_000,ponsOutcomeSource:source}
+    );
+    assert.deepEqual(result,{
+      status:'SUCCESS',
+      inserted:0,
+      duplicates:0,
+      pendingMaturity:0,
+      alreadyPresent:0,
+      launchesVisited:0
+    });
+    assert.equal(source.authorityCalls,0);
+    assert.equal(source.outcomeReads.length,0);
+  } finally { db.close(); }
+});
+
+test('healthy enabled Pons outcome cycle writes one bounded matured receipt to D1', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,ROBINHOOD_CHAIN_ID);
+  const runtime=new D1RuntimeStateStore(db,ROBINHOOD_CHAIN_ID);
+  const source=new FakePonsOutcomeSource();
+  try {
+    const launch=await outcomeLaunch();
+    await store.putLaunch(launch);
+    await store.commitCheckpoint({
+      blockNumber:20n,
+      blockHash:hash(20n),
+      guardBlockNumber:null,
+      guardBlockHash:null
+    });
+    await runtime.put({
+      sourceVerified:true,
+      liveCaughtUp:true,
+      headBlock:22n,
+      targetBlock:20n,
+      observationReady:false,
+      historyBackfillComplete:false,
+      historyBackfillTargetBlock:null,
+      lastSyncError:null,
+      lastHistoryError:null,
+      lastObservationError:null,
+      updatedAtMs:1_000
+    });
+
+    const result=await runCloudflarePonsOutcomeCycle(
+      {
+        DB:db,
+        BINRAT_PONS_OUTCOME_ENABLED:'true',
+        BINRAT_PONS_OUTCOME_MAX_PER_CYCLE:'1'
+      },
+      {kind:'PONS_OUTCOME_CYCLE',cycleId:'outcome-enabled',enqueuedAtMs:1_000},
+      {now:()=>1_000,ponsOutcomeSource:source}
+    );
+    assert.equal(result.status,'SUCCESS');
+    if (result.status!=='SUCCESS') throw new Error('OUTCOME_TEST_RESULT_INVALID');
+    assert.equal(result.inserted,1);
+    assert.deepEqual(source.outcomeReads,[15n]);
+
+    const row=await db.prepare(`
+      SELECT horizon_ms,observed_block,status,estimated_fdv_quote_raw
+      FROM pons_outcome_receipts
+      WHERE launch_id=?
+    `).bind(launch.launchId).first<{
+      horizon_ms:number;
+      observed_block:string;
+      status:string;
+      estimated_fdv_quote_raw:string|null;
+    }>();
+    assert.equal(row?.horizon_ms,300_000);
+    assert.equal(row?.observed_block,'15');
+    assert.equal(row?.status,'COMPLETE');
+    assert.equal(row?.estimated_fdv_quote_raw,(20n*10n**18n).toString());
+  } finally { store.close(); db.close(); }
+});
+
+test('caught-up Pons sync enqueues O2 only when the outcome gate is enabled', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source=new FakePonsSource();
+  const sent:BinratSyncMessage[]=[];
+  let acked=0;
+  try {
+    await handleSyncQueueBatch({messages:[{
+      body:{kind:'PONS_SYNC_CYCLE',cycleId:'pons-outcome-trigger',enqueuedAtMs:61_000},
+      ack(){acked+=1;},
+      retry(){throw new Error('unexpected retry');}
+    }]},{
+      DB:db,
+      BINRAT_PONS_OUTCOME_ENABLED:'true',
+      SYNC_QUEUE:{async send(body){sent.push(body);}}
+    },{
+      now:()=>61_500,
+      ponsLaunchSource:source
+    });
+    assert.equal(acked,1);
+    assert.deepEqual(sent.map((item)=>item.kind),['PONS_OUTCOME_CYCLE']);
+  } finally { db.close(); }
+});
