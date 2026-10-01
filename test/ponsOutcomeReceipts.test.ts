@@ -260,3 +260,18 @@ test('D1 rewind removes reorged Pons outcome receipts without deleting an earlie
     assert.ok(await f.baseStore.getLaunch(f.launch.launchId));
   } finally { f.db.close(); }
 });
+
+
+test('candidate selection reserves capacity for both oldest recovery gaps and newest launches', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const baseStore=new D1Store(db,ROBINHOOD_CHAIN_ID);
+  try {
+    for (const block of [10n,11n,12n,13n]) {
+      await baseStore.putLaunch(await launchAt(block));
+    }
+    const store=new D1PonsOutcomeObservationStore(db);
+    const selected=await store.listCandidates(2);
+    assert.deepEqual(selected.map((item)=>item.blockNumber),[10n,13n]);
+  } finally { db.close(); }
+});
