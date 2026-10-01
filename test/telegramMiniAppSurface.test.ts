@@ -28,10 +28,13 @@ test('Mini App progressively discloses Trash Trail before raw receipts and keeps
   assert.match(app,/TRASH TRAIL/);
   assert.match(app,/OPEN RECEIPTS/);
   assert.match(app,/RAT TRAP/);
-  assert.match(app,/Historical outcome context is not available on this surface yet/);
+  assert.match(app,/Outcome context is not shown here yet/);
   assert.match(app,/No market-cap, ATH, lifespan or profitability claim is being made/);
   assert.match(app,/Not a verdict\. Human identity, intent, safety and future outcome stay unknown/);
   assert.doesNotMatch(app,/PONS 4663 · READY · block/);
+  assert.match(app,/PROOF \/ HISTORICAL EVIDENCE/);
+  assert.match(app,/I can't verify this receipt right now/);
+  assert.doesNotMatch(app,/Receipt unavailable: \$\{error\.message\}/);
 });
 
 test('Mini App Rat Watch presents recognizable trail context before protocol identifiers', () => {
