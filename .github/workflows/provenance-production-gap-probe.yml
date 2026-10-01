@@ -1,0 +1,44 @@
+name: provenance-production-gap-probe
+
+on:
+  push:
+    branches:
+      - ops/binrat-o2-production-rollout-v1
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - name: Query provenance gap read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/wrangler.jsonc" <<'JSON'
+          {
+            "name":"binrat-edge-v0",
+            "main":"src/cloudflare/worker.ts",
+            "compatibility_date":"2026-09-18",
+            "compatibility_flags":["nodejs_compat"],
+            "d1_databases":[{"binding":"DB","database_name":"binrat-v0","database_id":"46814564-1a41-449a-88e5-c1349eed3a27"}]
+          }
+          JSON
+          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --json             --config "$RUNNER_TEMP/wrangler.jsonc"             --command "SELECT COUNT(*) AS fact_count FROM provenance_facts WHERE chain_id=4663; SELECT COUNT(*) AS edge_count FROM provenance_edges WHERE chain_id=4663; SELECT COUNT(*) AS missing_direct FROM provenance_facts p LEFT JOIN provenance_edges e ON e.edge_id=('reported-creator:' || p.fact_id) WHERE p.chain_id=4663 AND e.edge_id IS NULL; SELECT MIN(CAST(p.observed_block AS INTEGER)) AS first_missing_block, MAX(CAST(p.observed_block AS INTEGER)) AS last_missing_block FROM provenance_facts p LEFT JOIN provenance_edges e ON e.edge_id=('reported-creator:' || p.fact_id) WHERE p.chain_id=4663 AND e.edge_id IS NULL;"             | tee "$RUNNER_TEMP/provenance-gap.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: provenance-production-gap
+          path: ${{ runner.temp }}/provenance-gap.json
+          retention-days: 3
+          if-no-files-found: warn
