@@ -262,11 +262,11 @@ test('candidate manifest keeps O2 explicitly disabled and bounded before migrati
   };
   assert.deepEqual(verifyCandidateManifest(base),{ok:true,errors:[]});
 
-  const enabled=structuredClone(base);
+  const enabled=structuredClone(base) as typeof base & {vars:Record<string,string>};
   enabled.vars.BINRAT_PONS_OUTCOME_ENABLED='true';
   assert.ok(verifyCandidateManifest(enabled).errors.includes('PONS_OUTCOME_NOT_FLAG_OFF'));
 
-  const widened=structuredClone(base);
+  const widened=structuredClone(base) as typeof base & {vars:Record<string,string>};
   widened.vars.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE='12';
   assert.ok(verifyCandidateManifest(widened).errors.includes('PONS_OUTCOME_CYCLE_BOUND_INVALID'));
 });
