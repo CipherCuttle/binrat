@@ -80,14 +80,14 @@ async function reducedMotion(browser, width, height) {
     await centerStage(page, "sniff");
     const motion = await page.evaluate(() => {
       const signal = document.querySelector(".roadmap-spine__signal");
-      const sweep = document.querySelector(".roadmap-radar i");
+      const node = document.querySelector('[data-stage="sniff"] .roadmap-stage__node span');
       return {
         signalDisplay: signal ? getComputedStyle(signal).display : "missing",
-        sweepAnimation: sweep ? getComputedStyle(sweep).animationName : "missing",
+        nodeAnimation: node ? getComputedStyle(node).animationName : "missing",
       };
     });
     assert.equal(motion.signalDisplay, "none", "reduced motion hides travelling signal");
-    assert.equal(motion.sweepAnimation, "none", "reduced motion stops radar sweep");
+    assert.equal(motion.nodeAnimation, "none", "reduced motion stops node animation");
     await noOverflow(page, width, "roadmap reduced motion");
     process.stdout.write("PASS ROADMAP REDUCED MOTION " + width + "px\n");
   } finally {
