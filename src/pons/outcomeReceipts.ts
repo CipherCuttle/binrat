@@ -3,6 +3,7 @@ import type { Hex } from '../core/types.js';
 import { OBSERVATION_HORIZONS } from '../observations/horizons.js';
 import { ROBINHOOD_CHAIN_ID } from './chain.js';
 import {
+  PONS_CURVE_OUTCOME_CAPABILITY_VERSION,
   readPonsCurveOutcomeCapability,
   verifyPonsCurveOutcomeCapabilityReceipt,
   type PonsCurveOutcomeCapabilityReceipt,
@@ -182,13 +183,13 @@ export async function verifyPonsOutcomeObservationReceipt(
   }
   const capability: PonsCurveOutcomeCapabilityReceipt = {
     outcomeId: await sha256Hex({
-      kind: 'BINRAT_PONS_CURVE_OUTCOME_CAPABILITY_V1',
+      kind: PONS_CURVE_OUTCOME_CAPABILITY_VERSION,
       chainId: ROBINHOOD_CHAIN_ID,
       launchId: receipt.launchId,
       observedBlock: receipt.observedBlock.toString(),
       observedBlockHash: receipt.observedBlockHash.toLowerCase()
     }),
-    outcomeVersion: 'BINRAT_PONS_CURVE_OUTCOME_CAPABILITY_V1',
+    outcomeVersion: PONS_CURVE_OUTCOME_CAPABILITY_VERSION,
     chainId: ROBINHOOD_CHAIN_ID,
     launchId: receipt.launchId,
     token: receipt.token,
@@ -458,7 +459,8 @@ function validateOptions(options: PonsOutcomeObservationSyncOptions): void {
 }
 
 function validateHorizon(horizonMs: number): void {
-  if (!Number.isSafeInteger(horizonMs) || horizonMs <= 0) {
+  const allowed=new Set<number>(OBSERVATION_HORIZONS.map((horizon)=>horizon.ms));
+  if (!Number.isSafeInteger(horizonMs) || !allowed.has(horizonMs)) {
     throw new Error('PONS_OUTCOME_HORIZON_INVALID');
   }
 }
