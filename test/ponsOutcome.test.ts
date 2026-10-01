@@ -18,7 +18,8 @@ import { addr, hash } from './support/autonomousFixture.js';
 const launch:PonsOutcomeLaunch={
   launchId:'a'.repeat(64),
   token:addr(100),
-  curve:addr(200)
+  curve:addr(200),
+  launchBlock:100n
 };
 
 function source(
@@ -147,6 +148,13 @@ test('outcome observation rejects token/factory binding drift', async () => {
   await assert.rejects(
     observePonsOutcome(source(curveState({factory:addr(998)})),launch,127n),
     /PONS_OUTCOME_FACTORY_BINDING_MISMATCH/
+  );
+});
+
+test('outcome observation cannot sample before the canonical launch block', async () => {
+  await assert.rejects(
+    observePonsOutcome(source(curveState()),launch,99n),
+    /PONS_OUTCOME_BEFORE_LAUNCH/
   );
 });
 
