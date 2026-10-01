@@ -146,7 +146,13 @@ test('DIG, RATS and future ALERT cases create opaque public receipts without cro
     const opened=f.sent.at(-1)!.text;
     assert.match(opened,/SOMEBODY LEFT YOU A RECEIPT/); assert.doesNotMatch(opened,/private attention/i);
     assert.match(renderOpenedReceipt(publicReceipt),/WATCH: \/watch 4663:CREATOR/);
-    await f.send(`/watch 4663:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:803});
+    const historicalReceipt={...publicReceipt,chainId:5042,finding:{...publicReceipt.finding,chainId:5042}};
+    assert.match(renderOpenedReceipt(historicalReceipt),/WATCH unavailable for Arc 5042 historical receipts/);
+    const historicalWatch=await f.send(`/watch 5042:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:803});
+    assert.equal(historicalWatch.status,200);
+    assert.match(f.sent.at(-1)!.text,/Live watches are available only on Robinhood\/Pons 4663/);
+    assert.equal((await listWatches(f.db,{userId:88,chatId:88})).length,0);
+    await f.send(`/watch 4663:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:804});
     assert.equal((await listWatches(f.db,PRINCIPAL)).length,1);
     assert.equal((await listWatches(f.db,{userId:88,chatId:88})).length,1);
     assert.deepEqual(await new FreeEntitlements().resolve({userId:88,chatId:88}),FREE_CAPACITY);
