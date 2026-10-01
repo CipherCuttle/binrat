@@ -85,7 +85,6 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
   }
 
   let provenanceRefreshElapsedMs = 0;
-  let provenanceDirty = reorgRewindFrom !== null;
   if (!deferProvenanceProjection) {
     await options.beforeProjection?.();
     provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, fromBlock, targetBlock);
@@ -161,7 +160,6 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
       else duplicates += 1;
       await store.putProvenanceFact(await buildProvenanceFact(launch));
     }
-    if (launches.length > 0) provenanceDirty = true;
     if (!deferProvenanceProjection && launches.length > 0) {
       await options.beforeProjection?.();
       provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, fromBlock, toBlock);
@@ -201,7 +199,7 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     // Each committed batch already has facts.  Before this work slice returns
     // (including an error after an earlier committed batch), make the graph
     // equivalent to a full rebuild without repeating it in the hot loop.
-    if (deferProvenanceProjection && provenanceDirty) {
+    if (deferProvenanceProjection) {
       await options.beforeProjection?.();
       provenanceRefreshElapsedMs += await repairProvenanceProjection(store, now, initialFrom, targetBlock);
     }
