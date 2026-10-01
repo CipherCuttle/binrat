@@ -2,7 +2,7 @@ import { createPublicClient, http, keccak256, type Address, type PublicClient } 
 import type { Hex } from '../core/types.js';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from './chain.js';
-import { ponsErc20Abi, ponsV2BondingCurveReadAbi } from './ponsAbi.js';
+import { ponsErc20Abi, ponsV2BondingCurveReadAbi, ponsV2FactoryOutcomeReadAbi } from './ponsAbi.js';
 import { PONS_RPC_RETRY_COUNT, PONS_RPC_RETRY_DELAY_MS, PONS_RPC_TIMEOUT_MS } from './ponsSource.js';
 
 export const PONS_CURVE_OUTCOME_CAPABILITY_VERSION = 'BINRAT_PONS_CURVE_OUTCOME_CAPABILITY_V1' as const;
@@ -95,18 +95,34 @@ export class RpcPonsCurveOutcomeSource implements PonsCurveOutcomeSource {
     const timestampMs=Number(block.timestamp*1000n);
     if (!Number.isSafeInteger(timestampMs)) throw new Error('PONS_OUTCOME_BLOCK_TIMESTAMP_INVALID');
 
-    const [curveTokenRaw,pairTokenRaw,graduated,totalSupply]=await Promise.all([
+    const [registry,curveTokenRaw,pairTokenRaw,graduated,totalSupply]=await Promise.all([
+      this.client.readContract({
+        address:PONS_V2_FACTORY as Address,
+        abi:ponsV2FactoryOutcomeReadAbi,
+        functionName:'getLaunchedToken',
+        args:[token as Address],
+        blockNumber
+      }),
       this.client.readContract({address:curve as Address,abi:ponsV2BondingCurveReadAbi,functionName:'token',blockNumber}),
       this.client.readContract({address:curve as Address,abi:ponsV2BondingCurveReadAbi,functionName:'pairToken',blockNumber}),
       this.client.readContract({address:curve as Address,abi:ponsV2BondingCurveReadAbi,functionName:'graduated',blockNumber}),
       this.client.readContract({address:token as Address,abi:ponsErc20Abi,functionName:'totalSupply',blockNumber})
     ]);
+    if (!registry.exists) throw new Error('PONS_OUTCOME_FACTORY_LAUNCH_MISSING');
+    const registryToken=normalizedAddress(String(registry.token),'PONS_OUTCOME_FACTORY_TOKEN_INVALID');
+    const registryCurve=normalizedAddress(String(registry.curve),'PONS_OUTCOME_FACTORY_CURVE_INVALID');
+    const registryPairToken=normalizedAddress(String(registry.pairToken),'PONS_OUTCOME_FACTORY_PAIR_INVALID');
+    if (registryToken!==token || registryCurve!==curve) throw new Error('PONS_OUTCOME_FACTORY_LAUNCH_MISMATCH');
+
     const curveToken=normalizedAddress(String(curveTokenRaw),'PONS_OUTCOME_CURVE_TOKEN_INVALID');
     if (curveToken!==token) throw new Error('PONS_OUTCOME_CURVE_TOKEN_MISMATCH');
     const pairToken=normalizedAddress(String(pairTokenRaw),'PONS_OUTCOME_PAIR_TOKEN_INVALID');
+    if (registryPairToken!==pairToken) throw new Error('PONS_OUTCOME_PAIR_TOKEN_MISMATCH');
     if (typeof graduated!=='boolean' || typeof totalSupply!=='bigint' || totalSupply<0n) {
       throw new Error('PONS_OUTCOME_CORE_STATE_INVALID');
     }
+    const registryGraduated=Number(registry.phase)!==0;
+    if (registryGraduated!==graduated) throw new Error('PONS_OUTCOME_GRADUATION_STATE_MISMATCH');
 
     const quoteDecimals=pairToken===NATIVE_QUOTE
       ? 18
