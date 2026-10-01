@@ -272,6 +272,24 @@
 }
 
 .roadmap-footer {
+  min-height: 45vh;
+  padding: 80px 0 140px;
+  border-top: 1px solid rgba(228,221,204,.06);
+}
+
+.roadmap-footer p {
+  margin: 0 0 9px;
+  font: 21px var(--condensed);
+}
+
+.roadmap-footer span {
+  color: var(--roadmap-muted);
+  font: 10px var(--mono);
+}
+
+@media (max-width: 760px) {
+  .roadmap-intro,
+  .roadmap-footer {
     width: min(100% - 32px, 620px);
   }
 
