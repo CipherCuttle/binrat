@@ -4,6 +4,11 @@ import { arcWatchSource, robinhoodWatchSource, type WatchSource } from '../auton
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from '../arc/chain.js';
 import { PonsLaunchSource } from '../pons/ponsSource.js';
 import { RpcPonsTokenIdentitySource, syncPonsTokenIdentities, type PonsTokenIdentitySource } from '../pons/tokenIdentity.js';
+import {
+  RpcPonsOutcomeObservationSource,
+  syncPonsOutcomeObservations,
+  type PonsOutcomeObservationSource
+} from '../pons/outcomeReceipts.js';
 import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
 import { ArcObservationSource } from '../arc/observationSource.js';
 import { ArcRatRadarSource, type RatRadarSource } from '../arc/ratRadarSource.js';
@@ -18,6 +23,7 @@ import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from 
 import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1PonsTokenIdentityStore } from './ponsTokenIdentityStore.js';
+import { D1PonsOutcomeObservationStore } from './ponsOutcomeStore.js';
 import { D1Store } from './d1Store.js';
 import { D1SyncLeaseStore } from './syncLease.js';
 import type { D1DatabaseLike } from './d1Types.js';
