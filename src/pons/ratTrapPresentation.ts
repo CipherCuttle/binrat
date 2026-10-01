@@ -34,6 +34,7 @@ export interface RatTrapPresentationSummary {
   launchesPendingMemory:number;
   launchesStillImmature:number;
   coverageText:string;
+  canOfferRatWatch:boolean;
 }
 
 export interface RatTrapPresentation {
@@ -70,7 +71,8 @@ export function buildRatTrapPresentation(
         launchesWithFullMemory,
         launchesPendingMemory,
         launchesStillImmature
-      })
+      }),
+      canOfferRatWatch:projection.launches.some((launch)=>launch.observations.some((item)=>item.state==='COMPLETE'))
     },
     launches,
     footer:'Observed history, not a prediction. Different quote assets are not compared.'
@@ -119,7 +121,7 @@ function memoryText(
     const present=launch.observations.filter((item)=>item.state==='COMPLETE'||item.state==='PARTIAL').length;
     return `${present}/3 receipt${present===1?'':'s'} in memory. Trail is still incomplete.`;
   }
-  if(state==='PENDING') return 'This trail is old enough, but BINRAT has not stored its outcome receipts yet.';
+  if(state==='PENDING') return "This trail is old enough, but I haven't got its outcome trail yet.";
   return 'This trail is still too fresh for all outcome windows.';
 }
 
@@ -136,10 +138,10 @@ function coverageText(summary:{
 }):string {
   if(summary.previousLaunches===0) return 'No previous launches from these reported paws.';
   const parts=[
-    `${summary.launchesWithAnyMemory}/${summary.previousLaunches} prior launch${summary.previousLaunches===1?'':'es'} with outcome receipts`,
+    `I know what happened next for ${summary.launchesWithAnyMemory} of ${summary.previousLaunches} prior launch${summary.previousLaunches===1?'':'es'}`,
     `${summary.launchesWithFullMemory} complete through 24h`
   ];
-  if(summary.launchesPendingMemory>0) parts.push(`${summary.launchesPendingMemory} still pending memory`);
+  if(summary.launchesPendingMemory>0) parts.push(`${summary.launchesPendingMemory} trail${summary.launchesPendingMemory===1?' is':'s are'} still filling in`);
   if(summary.launchesStillImmature>0) parts.push(`${summary.launchesStillImmature} still immature`);
   return parts.join(' · ')+'.';
 }
@@ -154,7 +156,7 @@ function launchLabel(launch:PonsRatTrapLaunchProjection):string {
 
 function quoteLabel(asset:PonsRatTrapQuoteAsset):string {
   if(asset.kind==='NATIVE_ETH') return 'ETH est. FDV';
-  return `quote-token est. FDV (${shortAddress(asset.address)})`;
+  return `quote tokens (${shortAddress(asset.address)}) est. FDV`;
 }
 
 function formatRawUnits(value:bigint,decimals:number):string {
