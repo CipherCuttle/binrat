@@ -289,6 +289,29 @@ function block(value) {
 }
 
 
+export async function loadPublicBag(bagId) {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  if (typeof bagId !== "string" || !/^[0-9a-f]{64}$/.test(bagId)) throw new Error("PUBLIC_BAG_ID_INVALID");
+  const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}`, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("PUBLIC_BAG_NOT_AVAILABLE");
+  const value = await response.json();
+  if (value?.bag?.id !== bagId || typeof value?.receipt?.asOfBlockHash !== "string") {
+    throw new Error("PUBLIC_BAG_INVALID");
+  }
+  const adapted = adaptPublicFeed({
+    ...value,
+    asOfBlockHash: value.receipt.asOfBlockHash,
+    bags: [value.bag],
+  });
+  const bag = adapted.bags[0];
+  if (!bag || bag.id !== bagId) throw new Error("PUBLIC_BAG_INVALID");
+  return bag;
+}
+
 export async function loadBagIntelligence(bagId) {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`, {

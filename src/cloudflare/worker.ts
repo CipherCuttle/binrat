@@ -655,15 +655,16 @@ async function telegramWebhook(
         return json(200,{ok:true,ignored:true,reason:'INVALID_CALLBACK'});
       }
       console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'RECEIVED',updateId:update.update_id,action:action.action}));
-      const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
-      if (!(await ledger.allowChat(message.chat.id,rateLimit,60_000,deps.now()))) {
-        await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
-        await ledger.completeIgnored(update.update_id,'RATE_LIMITED',deps.now());
-        return json(200,{ok:true,rateLimited:true});
-      }
+      // Stop Telegram's client spinner before any D1-backed rate gate or evidence work.
+      // The callback has already passed auth, private-DM and payload validation.
       await answerCallback(token,callback.id,deps.externalFetch);
       console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACKED',updateId:update.update_id,action:action.action,
         elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
+      const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
+      if (!(await ledger.allowChat(message.chat.id,rateLimit,60_000,deps.now()))) {
+        await ledger.completeIgnored(update.update_id,'RATE_LIMITED',deps.now());
+        return json(200,{ok:true,rateLimited:true});
+      }
       if (!Number.isSafeInteger(message.message_id) || message.message_id < 1) throw new Error('TELEGRAM_CALLBACK_MESSAGE_INVALID');
       const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
       if (action.action === 'DIG_PROMPT') {

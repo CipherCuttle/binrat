@@ -1,4 +1,4 @@
-import { loadDumpsterFeed, loadDumpsterLedger, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
 const grid = document.querySelector("#garbage-grid");
@@ -449,8 +449,10 @@ if (
   });
 }
 
-function openBag(id, origin = document.activeElement) {
-  const bag = bags.find((item) => item.id === id);
+function openBag(idOrBag, origin = document.activeElement) {
+  const bag = typeof idOrBag === "string"
+    ? bags.find((item) => item.id === idOrBag)
+    : idOrBag;
   if (!bag) return;
   activeDrawerBagId = bag.id;
   returnFocus = origin instanceof HTMLElement ? origin : null;
@@ -476,7 +478,7 @@ function openBag(id, origin = document.activeElement) {
 
   drawerContent.innerHTML = `
     <p class="drawer-kicker">TRASH TRAIL // ${copy().report}</p>
-    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${String(bags.indexOf(bag) + 1).padStart(3, "0")}</b></div></div>
+    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${(() => { const index=bags.findIndex((item)=>item.id===bag.id); return index>=0 ? String(index+1).padStart(3,"0") : "HIST"; })()}</b></div></div>
     <div class="address creator-address"><span>Pons-reported deployer address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
     <div class="address"><span>${copy().token}</span><code>${escapeHtml(bag.token)}</code></div>
     ${activeMode === "LIVE" ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ""}
@@ -615,9 +617,21 @@ async function hydrateCreatorFile(bag) {
       image.addEventListener("error", () => image.remove(), { once: true });
     }
     for (const button of panel.querySelectorAll("[data-open-creator-launch]")) {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
         const launchId = button.dataset.openCreatorLaunch;
-        if (launchId && bags.some((item) => item.id === launchId)) openBag(launchId, button);
+        if (!launchId) return;
+        const current = bags.find((item) => item.id === launchId);
+        if (current) { openBag(current, button); return; }
+        button.disabled = true;
+        button.textContent = "OPENING…";
+        try {
+          const historical = await loadPublicBag(launchId);
+          if (!historical) throw new Error("PUBLIC_BAG_NOT_AVAILABLE");
+          openBag(historical, button);
+        } catch {
+          button.disabled = false;
+          button.textContent = "OPEN UNAVAILABLE";
+        }
       });
     }
     window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "creator" } }));

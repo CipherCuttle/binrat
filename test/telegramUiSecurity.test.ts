@@ -6,6 +6,7 @@ import { CREATOR } from './support/autonomousFixture.js';
 import { dig } from '../src/autonomous/evidence.js';
 import { discoverRats } from '../src/autonomous/rats.js';
 import { encodeCallback } from '../src/telegram/ui/callback.js';
+import type { D1DatabaseLike } from '../src/cloudflare/d1Types.js';
 import { addr } from './support/autonomousFixture.js';
 
 function callbackRequest(updateId:number, from:number, chatId:number, type:string, data:string, secret='fixture-secret') {
@@ -68,6 +69,31 @@ test('candidate whole-bot gate overrides a different autonomous tester for callb
     const response=await handleWorkerRequest(callbackRequest(884,77,77,'private','br2:r'),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
     assert.equal(response.status,200); assert.deepEqual(calls,['answerCallbackQuery']);
     const watches=await f.db.prepare('SELECT COUNT(*) n FROM rat_v1_watches').first<{n:number}>(); assert.equal(watches?.n,0);
+  } finally { f.db.close(); }
+});
+
+test('callback acknowledgement happens before the D1 rate gate can fail', async () => {
+  const f=await autonomousFixture(); const calls:string[]=[];
+  const failingDb:D1DatabaseLike={
+    prepare(sql) {
+      if (sql.includes('INSERT INTO telegram_rate_windows')) {
+        return {bind:()=>({run:async()=>{ throw new Error('RATE_GATE_FAILED'); }})} as unknown as ReturnType<D1DatabaseLike['prepare']>;
+      }
+      return f.db.prepare(sql);
+    },
+    batch:statements=>f.db.batch(statements),
+    exec:sql=>f.db.exec(sql)
+  };
+  try {
+    Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true'});
+    const api:typeof fetch=async (url) => {
+      const method=String(url).split('/').at(-1)!; calls.push(method);
+      if(method==='answerCallbackQuery') return Response.json({ok:true,result:true});
+      throw new Error('UNEXPECTED_'+method);
+    };
+    const response=await handleWorkerRequest(callbackRequest(8850,77,77,'private','br2:r'),{...f.env,DB:failingDb},{now:f.now,externalFetch:api,watchSource:f.source});
+    assert.equal(response.status,503);
+    assert.deepEqual(calls,['answerCallbackQuery']);
   } finally { f.db.close(); }
 });
 
