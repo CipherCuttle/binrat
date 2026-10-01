@@ -48,8 +48,28 @@ async function capture(browser, width, height) {
     await centerStage(page, "sniff");
     assert.equal(await page.locator('[data-active="true"][data-stage]').count(), 1, "one active stage at SNIFF");
     await page.screenshot({
-      path: path.join(output, "sniff-" + width + ".png"),
+      path: path.join(output, "sniff-active-" + width + ".png"),
       fullPage: false,
+      animations: "disabled",
+    });
+
+    await page.locator('[data-stage="sniff"]').evaluate((node) => {
+      node.setAttribute("data-active", "false");
+    });
+    await page.screenshot({
+      path: path.join(output, "sniff-inactive-" + width + ".png"),
+      fullPage: false,
+      animations: "disabled",
+    });
+    await page.locator('[data-stage="sniff"]').evaluate((node) => {
+      node.setAttribute("data-active", "true");
+    });
+
+    await page.addStyleTag({
+      content: ".roadmap-spine, .roadmap-stage__node, .roadmap-stage__copy { visibility: hidden !important; }",
+    });
+    await page.locator('[data-stage="sniff"] .roadmap-scene--sniff').screenshot({
+      path: path.join(output, "sniff-art-only-" + width + ".png"),
       animations: "disabled",
     });
 
@@ -89,6 +109,11 @@ async function reducedMotion(browser, width, height) {
     assert.equal(motion.signalDisplay, "none", "reduced motion hides travelling signal");
     assert.equal(motion.nodeAnimation, "none", "reduced motion stops node animation");
     await noOverflow(page, width, "roadmap reduced motion");
+    await page.screenshot({
+      path: path.join(output, "sniff-reduced-motion-" + width + ".png"),
+      fullPage: false,
+      animations: "disabled",
+    });
     process.stdout.write("PASS ROADMAP REDUCED MOTION " + width + "px\n");
   } finally {
     await context.close();
@@ -99,8 +124,7 @@ async function reducedMotion(browser, width, height) {
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   try {
     for (const [width, height] of sizes) await capture(browser, width, height);
-    await reducedMotion(browser, 390, 844);
-    await reducedMotion(browser, 1440, 900);
+    for (const [width, height] of sizes) await reducedMotion(browser, width, height);
     process.stdout.write("BINRAT ROADMAP V1 PREVIEW: ALL PASS\n");
   } finally {
     await browser.close();

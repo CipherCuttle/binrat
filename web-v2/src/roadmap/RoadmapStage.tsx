@@ -1,4 +1,5 @@
 import type { CSSProperties, RefCallback } from "react";
+import { SniffScene } from "./SniffScene";
 import type { RoadmapStage as RoadmapStageModel } from "./roadmapData";
 
 export function RoadmapStage({
@@ -20,7 +21,11 @@ export function RoadmapStage({
       style={{ "--roadmap-active-accent": stage.accent } as CSSProperties}
     >
       <div className="roadmap-stage__scene">
-        <div className="roadmap-scene" data-scene-art="empty" aria-hidden="true" />
+        {stage.id === "sniff" ? (
+          <SniffScene />
+        ) : (
+          <div className="roadmap-scene" data-scene-art="empty" aria-hidden="true" />
+        )}
       </div>
 
       <div className="roadmap-stage__node" aria-hidden="true">
