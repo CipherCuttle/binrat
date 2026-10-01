@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+// @ts-expect-error Browser data-source module is plain JS by design; this test exercises its runtime contract.
 import { loadPublicBag } from '../web/data-source.js';
 
 const id='1'.repeat(64);
