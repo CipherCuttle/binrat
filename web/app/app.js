@@ -1,13 +1,29 @@
 const tg = window.Telegram?.WebApp;
-const state = { initData: tg?.initData || '', data: null };
+const state = { initData: tg?.initData || '', data: null, view: 'home', viewStack: [] };
 const byId = id => document.getElementById(id);
 const el = (tag, className, text) => { const node=document.createElement(tag); if(className) node.className=className; if(text!==undefined) node.textContent=text; return node; };
 
-function show(id) {
+function syncTelegramBackButton() {
+  const back=tg?.BackButton;
+  if(!back) return;
+  if(state.view==='home') back.hide();
+  else back.show();
+}
+function show(id,{remember=true}={}) {
+  const previous=state.view;
+  if(id==='home') state.viewStack=[];
+  else if(remember && previous && previous!==id) state.viewStack.push(previous);
+  state.view=id;
   document.querySelectorAll('.view').forEach(node => node.classList.toggle('active',node.id===id));
   document.querySelectorAll('nav button').forEach(node => node.classList.toggle('selected',node.dataset.view===id));
+  syncTelegramBackButton();
   window.scrollTo({top:0,behavior:'instant'});
 }
+function backView() {
+  const prior=state.viewStack.pop() || 'home';
+  show(prior,{remember:false});
+}
+tg?.BackButton?.onClick?.(backView);
 document.addEventListener('click', event => {
   const target=event.target.closest('[data-view]'); if(target) show(target.dataset.view);
 });
@@ -147,7 +163,7 @@ function renderTrail(candidate) {
   receipts.addEventListener('click',()=>loadCase(candidate.caseId));
   const back=el('button','inspect','BACK TO FRESH GARBAGE');
   back.type='button';
-  back.addEventListener('click',()=>show('rats'));
+  back.addEventListener('click',backView);
   root.append(receipts,back);
 }
 
@@ -193,9 +209,9 @@ async function loadCase(caseId) {
       el('p','eyebrow','CLAIM BOUNDARY'),
       el('p','unknown','Human identity, intent, safety, profitability and future outcome remain unknown. Same address does not establish the same human identity.')
     );
-    const back=el('button','inspect','BACK TO FRESH GARBAGE');
+    const back=el('button','inspect','BACK');
     back.type='button';
-    back.addEventListener('click',()=>show('rats'));
+    back.addEventListener('click',backView);
     root.append(boundary,back);
   } catch(error) {
     root.replaceChildren(el('div','panel error',"Lost the trail. I can't verify this receipt right now."));
@@ -203,7 +219,7 @@ async function loadCase(caseId) {
 }
 
 async function start() {
-  tg?.ready(); tg?.expand();
+  tg?.ready(); tg?.expand(); syncTelegramBackButton();
   if(location.hostname.endsWith('.workers.dev')) fetch('/health').then(r=>r.json()).then(h=>{if(!state.data) byId('health').textContent=`Service ${h.ok?'online':'unavailable'} · release ${h.releaseSha||'unknown'}`;}).catch(()=>{});
   if(!state.initData) {
     byId('health').textContent='Telegram context unavailable. Open @BinratBot to access private Rat data.';
