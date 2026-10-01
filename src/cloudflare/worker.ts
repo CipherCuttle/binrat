@@ -1292,12 +1292,12 @@ async function health(env: BinratWorkerEnv): Promise<Response> {
 async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Record<string, unknown>> {
   const store = new D1Store(env.DB, chainId);
   const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
-  const [checkpoint, launches, nextBlock, runtime] = await Promise.all([
+  const [checkpoint, nextBlock, runtime] = await Promise.all([
     store.getCheckpoint(),
-    store.listLaunches(),
     store.getHistoricalBackfillNextBlock(),
     runtimeStore.get()
   ]);
+  const launchCount = checkpoint ? await store.countLaunchesThroughBlock(checkpoint.blockNumber) : 0;
 
   const fresh = runtime ? runtimeFresh(runtime, maxStatusAgeMs(env)) : false;
   const indexReady = Boolean(
@@ -1319,9 +1319,7 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
     headBlock: runtime?.headBlock?.toString() ?? null,
     targetBlock: runtime?.targetBlock?.toString() ?? null,
     liveCaughtUp: runtime?.liveCaughtUp ?? false,
-    launchCount: checkpoint
-      ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length
-      : 0,
+    launchCount,
     historyBackfillComplete: runtime?.historyBackfillComplete ?? false,
     historyBackfillTargetBlock: runtime?.historyBackfillTargetBlock?.toString() ?? null,
     historyBackfillNextBlock: nextBlock?.toString() ?? null,
