@@ -16,7 +16,7 @@ function shortReference(value: string): string {
 }
 function launches(count: number): string { return `${count} launch${count === 1 ? '' : 'es'}`; }
 function launchLabel(launch: {symbol:string;name:string;token:string}): string {
-  const raw=launch.symbol.trim() ? `${launch.symbol.trim()}` : (launch.name.trim() || shortReference(launch.token));
+  const raw=launch.symbol.trim() ? String.fromCharCode(36) + launch.symbol.trim() : (launch.name.trim() || shortReference(launch.token));
   return Array.from(raw).length > 24 ? `${Array.from(raw).slice(0,23).join('')}…` : raw;
 }
 function caseFact(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
