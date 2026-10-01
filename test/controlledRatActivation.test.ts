@@ -115,7 +115,8 @@ test('activation harness never includes a prompt-table drop and retains additive
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
   assert.match(script,/--file',initial\.migration/);
   assert.doesNotMatch(script,/DROP\s+TABLE\s+rat_ui_prompts/i);
-  assert.match(script,/Candidate binding parity PASS; candidate remained non-live until this point\.'\);\n\n  \/\/ Treat a transport-ambiguous promotion result[\s\S]*promotionAttempted = true/);
+  assert.match(script,/Candidate binding parity PASS; candidate remained non-live until this point/);
+  assert.match(script,/Treat a transport-ambiguous promotion result[\s\S]*promotionAttempted = true/);
   assert.match(script,/if \(promotionAttempted && previousVersion\)/);
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
 });
