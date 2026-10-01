@@ -150,6 +150,55 @@ function firstRow(result,index=0){ return result?.[index]?.results?.[0]??null; }
 function outcomeCount(){
   return Number(firstRow(d1Query('SELECT COUNT(*) AS n FROM pons_outcome_receipts;'))?.n??-1);
 }
+
+function provenanceGap(){
+  const result=d1Query(`
+    WITH contextual AS (
+      SELECT p.fact_id,p.chain_id,p.launch_id,p.creator,p.observed_block,p.log_index,
+        (
+          SELECT prior.fact_id
+          FROM provenance_facts prior
+          WHERE prior.chain_id=p.chain_id
+            AND prior.creator=p.creator
+            AND (
+              CAST(prior.observed_block AS INTEGER)<CAST(p.observed_block AS INTEGER)
+              OR (CAST(prior.observed_block AS INTEGER)=CAST(p.observed_block AS INTEGER) AND prior.log_index<p.log_index)
+              OR (
+                CAST(prior.observed_block AS INTEGER)=CAST(p.observed_block AS INTEGER)
+                AND prior.log_index=p.log_index
+                AND prior.fact_id<p.fact_id
+              )
+            )
+          ORDER BY CAST(prior.observed_block AS INTEGER) DESC,prior.log_index DESC,prior.fact_id DESC
+          LIMIT 1
+        ) AS previous_fact_id
+      FROM provenance_facts p
+      WHERE p.chain_id=4663
+    )
+    SELECT
+      COUNT(*) AS fact_count,
+      SUM(CASE WHEN direct.edge_id IS NULL THEN 1 ELSE 0 END) AS missing_direct,
+      SUM(CASE WHEN c.previous_fact_id IS NOT NULL AND previous.edge_id IS NULL THEN 1 ELSE 0 END) AS missing_previous,
+      SUM(CASE WHEN direct.edge_id IS NULL OR (c.previous_fact_id IS NOT NULL AND previous.edge_id IS NULL) THEN 1 ELSE 0 END) AS missing_any
+    FROM contextual c
+    LEFT JOIN provenance_edges direct
+      ON direct.edge_id=('reported-creator:' || c.fact_id)
+    LEFT JOIN provenance_edges previous
+      ON previous.edge_id=CASE
+        WHEN c.previous_fact_id IS NULL THEN NULL
+        ELSE ('previous-launch:' || c.fact_id || ':' || c.previous_fact_id)
+      END;
+    SELECT COUNT(*) AS edge_count FROM provenance_edges WHERE chain_id=4663;
+  `);
+  const row=firstRow(result,0)??{};
+  return {
+    factCount:Number(row.fact_count??0),
+    missingDirect:Number(row.missing_direct??0),
+    missingPrevious:Number(row.missing_previous??0),
+    missingAny:Number(row.missing_any??0),
+    edgeCount:Number(firstRow(result,1)?.edge_count??0)
+  };
+}
 async function getJson(path){
   const response=await fetch(WORKER_URL+path,{signal:AbortSignal.timeout(20_000)});
   const body=await response.json().catch(()=>null);
