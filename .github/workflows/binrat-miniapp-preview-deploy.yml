@@ -22,7 +22,6 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
-      PREVIEW_TESTER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID || vars.RAT_FEEDBACK_ADMIN_USER_ID }}
       PREVIEW_WORKER: binrat-miniapp-preview-v1
       PREVIEW_URL: https://binrat-miniapp-preview-v1.pettevik.workers.dev
       PREVIEW_DB_ID: 46814564-1a41-449a-88e5-c1349eed3a27
@@ -53,7 +52,6 @@ jobs:
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
           test -n "${TELEGRAM_BOT_TOKEN:-}"
           test -n "${BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:-}"
-          [[ "${PREVIEW_TESTER_ID:-}" =~ ^[1-9][0-9]{3,16}$ ]]
 
       - name: Prepare isolated preview config
         shell: bash
@@ -86,6 +84,31 @@ jobs:
           }
           JSON
           node -e "const c=require('fs').readFileSync('wrangler.preview.jsonc','utf8'); const j=JSON.parse(c); if(j.triggers||j.queues||j.routes) process.exit(2);"
+
+      - name: Resolve private tester from exact existing marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --json             --config wrangler.preview.jsonc             --command "SELECT CASE WHEN COUNT(*) = 1 THEN MAX(user_id) ELSE NULL END AS user_id, COUNT(*) AS matches FROM rat_feedback WHERE body = 'binrat-controlled-rat-id-0929';"             >/tmp/preview-tester.json
+          tester="$(node <<'NODE'
+          const fs=require('fs');
+          const raw=fs.readFileSync('/tmp/preview-tester.json','utf8');
+          const starts=[raw.indexOf('['),raw.indexOf('{')].filter(v=>v>=0);
+          if(!starts.length) process.exit(2);
+          const parsed=JSON.parse(raw.slice(Math.min(...starts)));
+          let hit=null;
+          const walk=v=>{
+            if(!v||typeof v!=='object'||hit) return;
+            if(Object.hasOwn(v,'matches')&&Object.hasOwn(v,'user_id')) { hit=v; return; }
+            for(const child of Array.isArray(v)?v:Object.values(v)) walk(child);
+          };
+          walk(parsed);
+          if(Number(hit?.matches)!==1 || !/^[1-9]\d{3,16}$/.test(String(hit?.user_id??''))) process.exit(3);
+          process.stdout.write(String(hit.user_id));
+          NODE
+          )"
+          echo "::add-mask::$tester"
+          echo "PREVIEW_TESTER_ID=$tester" >> "$GITHUB_ENV"
 
       - name: Bundle preview without deploy
         run: pnpm dlx wrangler@4.135.0 deploy --config wrangler.preview.jsonc --dry-run --outdir .preview-dry-run
