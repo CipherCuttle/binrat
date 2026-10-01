@@ -93,7 +93,7 @@ export function renderLegacyAutonomousOutcome(outcome: AutonomousOutcome): strin
     case 'RATS': return renderRats(outcome.snapshot);
     case 'CASE': return renderReceipt(outcome.receipt,outcome.mode) + (outcome.privateAttention ? `\n\n${outcome.privateAttention}` : '');
     case 'WATCH': case 'REPLAY': return outcome.reply;
-    case 'WATCHLIST': return ['🐀 watch list (FREE: 25).',...outcome.watches.map(w=>`${entityKey({chainId:w.chain_id,entityType:w.entity_type,entityId:w.entity_id})} · after block ${w.start_block}`),outcome.watches.length?'':'No active V1 watches.',outcome.legacyWatchCount?'Legacy watches require explicit re-arm with /watch <target>.':''].filter(Boolean).join('\n');
+    case 'WATCHLIST': return ['🐀 RAT WATCH',...outcome.watches.map(w=>`${entityKey({chainId:w.chain_id,entityType:w.entity_type,entityId:w.entity_id})}`),outcome.watches.length?'':'Nothing on Rat Watch yet.',outcome.legacyWatchCount?'Older watches need to be re-armed on Pons 4663.':''].filter(Boolean).join('\n');
     case 'SHARE': return renderShareArtifact(outcome.receipt);
     case 'OPEN_RECEIPT': return renderOpenedReceipt(outcome.receipt);
     case 'ERROR': return `🐀 ${outcome.code}`;
