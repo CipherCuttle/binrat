@@ -67,6 +67,7 @@ export async function executeAutonomousCommand(
       UNSUPPORTED_CHAIN:'Only Robinhood 4663 live intelligence and stored Arc 5042 historical evidence are supported.',
       UNSUPPORTED_ENTITY:'This entity is unsupported. Arbitrary wallet history is not available; a protocol address is not a human identity.',
       WATCH_CREATOR_ONLY:'Live watches support exact Pons-reported deployers only. Use the deployer target shown by DIG.',
+      WATCH_LIVE_CHAIN_ONLY:'Live watches are available only on Robinhood/Pons 4663. Arc 5042 remains historical evidence only.',
       EVIDENCE_UNAVAILABLE:'Canonical evidence is missing or incomplete for this target. No analysis or safety conclusion is available.',
       RECEIPT_UNAVAILABLE:'Receipt unavailable: missing, changed or incomplete canonical evidence. The previous claim cannot be reconstructed.',
       INDEX_UNAVAILABLE:'The live index is unavailable or stale. No new investigation or alert authority.',
