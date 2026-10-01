@@ -65,7 +65,7 @@ class ReadOnlyStatement implements D1PreparedStatementLike {
     private readonly onWrite:()=>never
   ) {}
   bind(...values:unknown[]):D1PreparedStatementLike { return new ReadOnlyStatement(this.inner.bind(...values),this.onWrite); }
-  run<T=Record<string,unknown>>():Promise<D1ResultLike<T>> { this.onWrite(); }
+  run<T=Record<string,unknown>>():Promise<D1ResultLike<T>> { return this.onWrite(); }
   first<T=Record<string,unknown>>():Promise<T|null> { return this.inner.first<T>(); }
   all<T=Record<string,unknown>>():Promise<D1ResultLike<T>> { return this.inner.all<T>(); }
 }
@@ -75,8 +75,8 @@ class StrictReadOnlyDb implements D1DatabaseLike {
   constructor(private readonly inner:D1DatabaseLike) {}
   private readonly denyWrite=():never=>{ this.writeAttempts+=1; throw new Error('READ_MODEL_WRITE_ATTEMPT'); };
   prepare(sql:string):D1PreparedStatementLike { return new ReadOnlyStatement(this.inner.prepare(sql),this.denyWrite); }
-  batch(_statements:D1PreparedStatementLike[]):Promise<D1ResultLike[]> { this.denyWrite(); }
-  exec(_sql:string):Promise<unknown> { this.denyWrite(); }
+  batch(_statements:D1PreparedStatementLike[]):Promise<D1ResultLike[]> { return this.denyWrite(); }
+  exec(_sql:string):Promise<unknown> { return this.denyWrite(); }
 }
 
 test('read-only Rat Trap adapter joins cohort + receipts with canonical block time and performs zero writes', async () => {
