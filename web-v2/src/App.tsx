@@ -58,6 +58,10 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
+  if (
+    (path === "/" || path === "/index.html") &&
+    import.meta.env.VITE_ROADMAP_MOTION_LAB_PREVIEW === "1"
+  ) return { page: "roadmapMotionLab" };
   if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/saved") return { page: "saved" };
   if (path === "/more") return { page: "more" };
