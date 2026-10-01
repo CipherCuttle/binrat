@@ -75,10 +75,20 @@ const active=jsonFromOutput(cli(['versions','view',activeVersion,'--name',WORKER
 const d1=jsonFromOutput(cli(['d1','info',DB,'--json','--config',CONFIG]));
 gate(findUuid(d1)===EXPECTED_DB_ID,'PRODUCTION_D1_ID_MISMATCH');
 
-const d1Probe=jsonFromOutput(cli([
+const tableProbe=jsonFromOutput(cli([
   'd1','execute',DB,'--remote','--yes','--json','--config',CONFIG,'--command',
-  "SELECT COUNT(*) AS table_count FROM sqlite_master WHERE type='table' AND name='pons_outcome_receipts'; SELECT CASE WHEN EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='pons_outcome_receipts') THEN (SELECT COUNT(*) FROM pons_outcome_receipts) ELSE -1 END AS outcome_rows;"
+  "SELECT COUNT(*) AS table_count FROM sqlite_master WHERE type='table' AND name='pons_outcome_receipts';"
 ]));
+const tableCount=Number(tableProbe?.[0]?.results?.[0]?.table_count ?? 0);
+let outcomeRows=-1;
+if(tableCount===1){
+  const countProbe=jsonFromOutput(cli([
+    'd1','execute',DB,'--remote','--yes','--json','--config',CONFIG,'--command',
+    "SELECT COUNT(*) AS outcome_rows FROM pons_outcome_receipts;"
+  ]));
+  outcomeRows=Number(countProbe?.[0]?.results?.[0]?.outcome_rows ?? -1);
+}
+const d1Probe={tableCount,outcomeRows};
 const health=await getJson(WORKER_URL+'/health');
 const apiHealth=await getJson(WORKER_URL+'/api/health');
 
