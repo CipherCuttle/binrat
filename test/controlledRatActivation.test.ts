@@ -102,13 +102,15 @@ test('activation harness never includes a prompt-table drop and retains additive
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
 });
 
-test('postdeploy Pons readiness is retried and logged before rollback', () => {
+test('predeploy and postdeploy Pons readiness are bounded-retry and logged before mutation or rollback', () => {
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
-  assert.match(script,/async function waitForHealthyPostdeployPons\(\)/);
+  assert.match(script,/async function waitForHealthyPons\(label, failureCode\)/);
   assert.match(script,/for \(let attempt = 0; attempt < 7; attempt \+= 1\)/);
-  assert.match(script,/Postdeploy Pons probe/);
+  assert.match(script,/label \+ ' Pons probe '/);
   assert.match(script,/if \(ponsHealthy\(health\)\) return health/);
-  assert.match(script,/throw new Error\('POSTDEPLOY_PONS_NOT_HEALTHY'\)/);
+  assert.match(script,/throw new Error\(failureCode\)/);
+  assert.match(script,/waitForHealthyPons\('Predeploy','PONS_PREFLIGHT_NOT_HEALTHY'\)/);
+  assert.match(script,/waitForHealthyPons\('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY'\)/);
 });
 
 test('private rollout preflights Robinhood Rat schema and proves a valid Mini App bootstrap', () => {
