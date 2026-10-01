@@ -7,13 +7,13 @@ const base = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace
 const output = path.resolve(__dirname, "../browser-artifacts/roadmap-motion-lab");
 fs.mkdirSync(output, { recursive: true });
 
-async function scrollToProgress(page, progress) {
+async function scrollToProgress(page, progress, settleMs = 900) {
   await page.locator("[data-motion-lab] .motion-lab__runway").evaluate((node, value) => {
     const top = window.scrollY + node.getBoundingClientRect().top;
     const range = node.scrollHeight - window.innerHeight;
     window.scrollTo({ top: top + range * value, behavior: "auto" });
   }, progress);
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(settleMs);
 }
 
 async function capture(browser, width, height) {
@@ -81,8 +81,7 @@ async function record(browser, width, height) {
     await page.goto(base + "/roadmap-motion-lab", { waitUntil: "domcontentloaded" });
     await page.locator("[data-motion-lab]").waitFor();
     for (let step = 0; step <= 50; step += 1) {
-      await scrollToProgress(page, step / 50);
-      await page.waitForTimeout(35);
+      await scrollToProgress(page, step / 50, 70);
     }
     const video = page.video();
     await page.close();
