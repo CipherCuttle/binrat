@@ -141,7 +141,7 @@ test('controlled text Rat manifest cannot accidentally enable public mode, UI V2
   assert.ok(uiResult.errors.includes('TELEGRAM_UI_V2_NOT_FLAG_OFF'));
 });
 
-test('controlled UI V2 parity permits only the exact private false-to-true activation set', () => {
+test('controlled UI V2 parity permits first activation and exact private-to-private upgrades', () => {
   const active = version();
   active.resources!.bindings!.push(
     { name:'BINRAT_AUTONOMOUS_RAT_ENABLED',type:'plain_text',text:'false' },
@@ -163,7 +163,11 @@ test('controlled UI V2 parity permits only the exact private false-to-true activ
   assert.ok(defaultMode.errors.includes('VARIABLE_CHANGED:BINRAT_TELEGRAM_UI_V2_ENABLED'));
 
   const alreadyEnabled = structuredClone(candidate);
-  assert.ok(verifyWorkerBindingParity(candidate,alreadyEnabled,{controlledTelegramUiV2Activation:true}).errors.includes('CONTROLLED_RAT_UI_V2_SOURCE_NOT_DISABLED'));
+  assert.deepEqual(verifyWorkerBindingParity(candidate,alreadyEnabled,{controlledTelegramUiV2Activation:true}),{ok:true,errors:[]});
+
+  const partialSource = structuredClone(candidate);
+  partialSource.resources!.bindings!.find(binding=>binding.name==='BINRAT_TELEGRAM_MEDIA_ENABLED')!.text='false';
+  assert.ok(verifyWorkerBindingParity(partialSource,alreadyEnabled,{controlledTelegramUiV2Activation:true}).errors.includes('CONTROLLED_UI_V2_SOURCE_STATE_INVALID'));
 
   const publicCandidate = structuredClone(candidate);
   publicCandidate.resources!.bindings!.find(binding=>binding.name==='BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED')!.text='true';
