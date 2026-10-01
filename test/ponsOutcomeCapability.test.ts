@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   NATIVE_QUOTE,
   buildPonsCurveOutcomeCapabilityReceipt,
+  RpcPonsCurveOutcomeSource,
   readPonsCurveOutcomeCapability,
   verifyPonsCurveOutcomeCapabilityReceipt,
   type PonsCurveOutcomeSource,
@@ -100,4 +101,51 @@ test('read capability preserves the requested historical block boundary', async 
   assert.equal(receipt.observedBlock,123n);
   assert.equal(receipt.observedBlockHash,hash(123));
   assert.equal(receipt.status,'COMPLETE');
+});
+
+
+test('RPC source fails closed if the observed block hash changes during same-block state reads', async () => {
+  let blockReads=0;
+  const mockClient={
+    async getBlock() {
+      blockReads+=1;
+      return {
+        hash:blockReads===1 ? hash(123) : hash(124),
+        timestamp:1_700_000_000n
+      };
+    },
+    async readContract({functionName}:{functionName:string}) {
+      if (functionName==='getLaunchedToken') {
+        return {
+          token:launch.token,
+          curve:launch.curve,
+          deployer:'0x'+'3'.repeat(40),
+          creatorFeeRecipient:'0x'+'4'.repeat(40),
+          pairToken:NATIVE_QUOTE,
+          graduationThreshold:0n,
+          poolFee:0,
+          tickSpacing:0,
+          creatorTaxBps:0,
+          buybackEnabled:false,
+          phase:0,
+          sweptQuote:0n,
+          sweptTokens:0n,
+          sweptAt:0n,
+          exists:true
+        };
+      }
+      if (functionName==='token') return launch.token;
+      if (functionName==='pairToken') return NATIVE_QUOTE;
+      if (functionName==='graduated') return false;
+      if (functionName==='totalSupply') return 1_000_000n*10n**18n;
+      if (functionName==='getReserves') return [10n*10n**18n,500_000n*10n**18n] as const;
+      throw new Error('UNEXPECTED_READ');
+    }
+  };
+  const rpcSource=new RpcPonsCurveOutcomeSource({client:mockClient as never});
+  Object.assign(rpcSource,{authorityVerified:true});
+  await assert.rejects(
+    rpcSource.readStateAt(launch,123n),
+    /PONS_OUTCOME_BLOCK_REORG_DURING_READ/
+  );
 });
