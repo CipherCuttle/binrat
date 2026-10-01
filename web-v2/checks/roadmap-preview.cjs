@@ -123,11 +123,46 @@ async function reducedMotion(browser, width, height) {
   }
 }
 
+async function motionPreview(browser, width, height) {
+  const videoDir = path.join(output, ".video-" + width);
+  fs.mkdirSync(videoDir, { recursive: true });
+  const context = await browser.newContext({
+    viewport: { width, height },
+    deviceScaleFactor: 1,
+    recordVideo: { dir: videoDir, size: { width, height } },
+  });
+  const page = await context.newPage();
+  const target = path.join(output, "sniff-live-" + width + ".webm");
+  try {
+    await page.goto(base + "/roadmap", { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "DOWN THE RAT HOLE." }).waitFor();
+    await centerStage(page, "sniff");
+
+    const stage = page.locator('[data-stage="sniff"]');
+    await stage.evaluate((node) => node.setAttribute("data-active", "false"));
+    await page.waitForTimeout(900);
+    await stage.evaluate((node) => node.setAttribute("data-active", "true"));
+    await page.waitForTimeout(6200);
+
+    const video = page.video();
+    await page.close();
+    if (video) await video.saveAs(target);
+    assert.ok(fs.existsSync(target), "SNIFF motion preview must be recorded at " + width + "px");
+    process.stdout.write("PASS ROADMAP MOTION PREVIEW " + width + "px\n");
+  } finally {
+    if (!page.isClosed()) await page.close();
+    await context.close();
+    fs.rmSync(videoDir, { recursive: true, force: true });
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   try {
     for (const [width, height] of sizes) await capture(browser, width, height);
     for (const [width, height] of sizes) await reducedMotion(browser, width, height);
+    await motionPreview(browser, 1440, 900);
+    await motionPreview(browser, 390, 844);
     process.stdout.write("BINRAT ROADMAP V1 PREVIEW: ALL PASS\n");
   } finally {
     await browser.close();
