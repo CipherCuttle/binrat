@@ -25,8 +25,10 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
+          set +e
           timeout 85s pnpm dlx wrangler@4.135.0 tail binrat-edge-v0 --format json > "$RUNNER_TEMP/binrat-prod-tail.jsonl" 2>&1
           code=$?
+          set -e
           if [ "$code" -ne 0 ] && [ "$code" -ne 124 ]; then
             cat "$RUNNER_TEMP/binrat-prod-tail.jsonl"
             exit "$code"
