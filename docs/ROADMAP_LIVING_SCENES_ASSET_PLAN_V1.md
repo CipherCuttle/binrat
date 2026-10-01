@@ -1,3 +1,7 @@
+> **SUPERSEDED AS ACTIVE PLANNING AUTHORITY — HISTORICAL IMPLEMENTATION REFERENCE ONLY.**  
+> Canonical roadmap intent is `docs/ROADMAP.md`. Current language is `docs/PRODUCT_LANGUAGE.md`. The current Motion implementation and tests are stronger implementation truth than this plan.  
+> Frozen after the 2026-10-01 roadmap canonicalization.
+
 # BINRAT — Living Roadmap Asset Plan V1
 
 Status: asset-production contract for `feat/binrat-roadmap-living-scenes-v1`

@@ -1,3 +1,7 @@
+> **SUPERSEDED — DO NOT USE AS CURRENT ROADMAP AUTHORITY.**  
+> Canonical future intent moved to `docs/ROADMAP.md` on 2026-10-01. Current state lives in `docs/CAPABILITY_MANIFEST_V0.json`; language lives in `docs/PRODUCT_LANGUAGE.md`.  
+> This file is frozen historical planning context.
+
 # BINRAT ROADMAP V0
 
 Status: planning document  
