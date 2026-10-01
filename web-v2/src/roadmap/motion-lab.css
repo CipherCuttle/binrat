@@ -1,0 +1,340 @@
+.motion-lab-page {
+  min-height: 100vh;
+  color: #ded8ca;
+  background: #030403;
+  overflow: clip;
+}
+
+.motion-lab__back {
+  position: fixed;
+  z-index: 50;
+  top: 26px;
+  left: 30px;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  color: rgba(222, 216, 202, .64);
+  background: transparent;
+  font: 10px var(--mono);
+  letter-spacing: .16em;
+  cursor: pointer;
+}
+
+.motion-lab__back:hover,
+.motion-lab__back:focus-visible { color: #ded8ca; }
+
+.motion-lab__sr-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.motion-lab__runway {
+  position: relative;
+  height: 650svh;
+}
+
+.motion-lab__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: #030403;
+}
+
+.motion-lab__rail-frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.motion-lab__rail {
+  position: relative;
+  width: min(760px, 92vw);
+  height: 112svh;
+  flex: 0 0 auto;
+  will-change: transform;
+}
+
+.motion-lab__spine-base,
+.motion-lab__spine-signal {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: 50% 0%;
+}
+
+.motion-lab__spine-base {
+  width: 1px;
+  background: rgba(211, 220, 213, .13);
+}
+
+.motion-lab__spine-signal {
+  z-index: 2;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(126, 226, 168, .18),
+    rgba(211, 220, 213, .92) 72%,
+    rgba(239, 173, 92, .78)
+  );
+  box-shadow: 0 0 12px rgba(181, 210, 191, .28);
+}
+
+.motion-lab__pulse {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #edf1e9;
+  box-shadow:
+    0 0 0 6px rgba(211, 220, 213, .05),
+    0 0 18px rgba(211, 220, 213, .72),
+    0 0 40px rgba(126, 226, 168, .22);
+  transform: translate(-50%, -50%);
+}
+
+.motion-lab__milestone {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.motion-lab__node-wrap {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  top: 0;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+}
+
+.motion-lab__node-halo,
+.motion-lab__node-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transform-origin: center;
+}
+
+.motion-lab__node-halo {
+  border: 1px solid color-mix(in srgb, var(--motion-accent) 44%, transparent);
+  background: color-mix(in srgb, var(--motion-accent) 5%, #030403);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--motion-accent) 32%, transparent),
+    inset 0 0 14px rgba(255,255,255,.025);
+}
+
+.motion-lab__node-core {
+  inset: 8px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--motion-accent) 68%, #fff 12%);
+  background: #060806;
+  color: color-mix(in srgb, var(--motion-accent) 78%, #fff 22%);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--motion-accent) 24%, transparent);
+  font: 8px var(--mono);
+  letter-spacing: .04em;
+}
+
+.motion-lab__label {
+  position: absolute;
+  top: 0;
+  width: min(300px, 34vw);
+  display: grid;
+  gap: 5px;
+  transform: translateY(-50%);
+  will-change: transform, opacity;
+}
+
+.motion-lab__milestone--left .motion-lab__label {
+  right: calc(50% + 54px);
+  text-align: right;
+}
+
+.motion-lab__milestone--right .motion-lab__label {
+  left: calc(50% + 54px);
+  text-align: left;
+}
+
+.motion-lab__label > span {
+  color: color-mix(in srgb, var(--motion-accent) 60%, #838983);
+  font: 9px var(--mono);
+  letter-spacing: .14em;
+}
+
+.motion-lab__label strong {
+  color: #ded8ca;
+  font: clamp(22px, 3vw, 36px)/.92 var(--condensed);
+  letter-spacing: .015em;
+}
+
+.motion-lab__label small {
+  color: #777f79;
+  font: 10px/1.45 var(--mono);
+}
+
+.motion-lab__center-mark {
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  width: 84px;
+  height: 1px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.motion-lab__center-mark::before,
+.motion-lab__center-mark::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 18px;
+  height: 1px;
+  background: rgba(222,216,202,.09);
+}
+
+.motion-lab__center-mark::before { left: 0; }
+.motion-lab__center-mark::after { right: 0; }
+
+.motion-lab__center-mark span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid rgba(222,216,202,.025);
+  transform: translate(-50%, -50%);
+}
+
+.motion-lab__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 25px;
+  margin: 0;
+  color: rgba(222,216,202,.28);
+  font: 8px var(--mono);
+  letter-spacing: .18em;
+  transform: translateX(-50%);
+}
+
+.motion-lab-page--reduced {
+  min-height: 100svh;
+  padding: 110px 24px 90px;
+}
+
+.motion-lab__reduced-list {
+  position: relative;
+  width: min(640px, 100%);
+  margin: 0 auto;
+}
+
+.motion-lab__reduced-list::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 50%;
+  width: 1px;
+  background: rgba(222,216,202,.16);
+}
+
+.motion-lab__reduced-row {
+  min-height: 140px;
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  align-items: center;
+}
+
+.motion-lab__reduced-row > span {
+  justify-self: end;
+  margin-right: 18px;
+  color: #737b75;
+  font: 9px var(--mono);
+}
+
+.motion-lab__reduced-row > i {
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  place-self: center;
+  border: 1px solid rgba(222,216,202,.4);
+  border-radius: 50%;
+  background: #050605;
+}
+
+.motion-lab__reduced-row > div {
+  display: grid;
+  gap: 5px;
+  margin-left: 18px;
+}
+
+.motion-lab__reduced-row strong {
+  font: 25px/.95 var(--condensed);
+}
+
+.motion-lab__reduced-row small {
+  color: #777f79;
+  font: 9px/1.4 var(--mono);
+}
+
+@media (max-width: 640px) {
+  .motion-lab__back {
+    top: 18px;
+    left: 18px;
+  }
+
+  .motion-lab__rail {
+    width: 100vw;
+    height: 112svh;
+  }
+
+  .motion-lab__node-wrap {
+    width: 38px;
+    height: 38px;
+  }
+
+  .motion-lab__node-core { inset: 7px; }
+
+  .motion-lab__label {
+    width: calc(50vw - 45px);
+    gap: 4px;
+  }
+
+  .motion-lab__milestone--left .motion-lab__label {
+    right: calc(50% + 39px);
+  }
+
+  .motion-lab__milestone--right .motion-lab__label {
+    left: calc(50% + 39px);
+  }
+
+  .motion-lab__label strong {
+    font-size: clamp(18px, 6vw, 26px);
+  }
+
+  .motion-lab__label small {
+    font-size: 8px;
+  }
+
+  .motion-lab__center-mark { width: 58px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-lab__hint { display: none; }
+}

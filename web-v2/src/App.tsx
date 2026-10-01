@@ -6,6 +6,7 @@ import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import { RoadmapPage } from "./roadmap/RoadmapPage";
+import { MotionLabPage } from "./roadmap/MotionLabPage";
 import type {
   Bag,
   EvidenceState,
@@ -39,6 +40,7 @@ type Route =
   | { page: "ledger" }
   | { page: "binrat" }
   | { page: "roadmap" }
+  | { page: "roadmapMotionLab" }
   | { page: "bag"; id: string }
   | { page: "placeholder"; name: string };
 const primaryNav = [
@@ -71,6 +73,7 @@ function readRoute(): Route {
   if (path === "/ledger") return { page: "ledger" };
   if (path === "/binrat") return { page: "binrat" };
   if (path === "/roadmap") return { page: "roadmap" };
+  if (path === "/roadmap-motion-lab") return { page: "roadmapMotionLab" };
   if (path.startsWith("/bag/"))
     return { page: "bag", id: bagIdFromPath(path) };
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
@@ -136,6 +139,13 @@ export default function App() {
           <RoadmapPage navigate={navigate} />
         </main>
       </div>
+    );
+  }
+  if (route.page === "roadmapMotionLab") {
+    return (
+      <main id="content" tabIndex={-1}>
+        <MotionLabPage navigate={navigate} />
+      </main>
     );
   }
 

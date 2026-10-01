@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "motion": "13.4.6"
   },
   "devDependencies": {
     "@types/react": "latest",

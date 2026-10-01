@@ -194,6 +194,9 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
             BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
             node web-v2/checks/roadmap-preview.cjs
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_PREVIEW_URL="http://127.0.0.1:4174" \
+            node web-v2/checks/roadmap-motion-lab.cjs
       - name: Read-only LIVE candidate against the existing public API
         if: ${{ github.head_ref == 'feat/binrat-frontend-live-integration-pr3' }}
         shell: bash
