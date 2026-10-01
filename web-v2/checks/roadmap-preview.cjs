@@ -28,7 +28,11 @@ async function centerStage(page, id) {
   await page.locator('[data-stage="' + id + '"]').evaluate((node) => {
     const rect = node.getBoundingClientRect();
     const top = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
     window.scrollTo({ top, behavior: "auto" });
+    root.style.scrollBehavior = previous;
   });
   await page.locator('[data-stage="' + id + '"][data-active="true"]').waitFor();
 }
