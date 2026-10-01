@@ -1392,10 +1392,16 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
   const store = new D1Store(env.DB, chainId);
   const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
   const runtime = await runtimeStore.get();
-  if (!runtime) return null;
+  if (
+    !runtime ||
+    !runtime.sourceVerified ||
+    !runtime.liveCaughtUp ||
+    runtime.lastSyncError ||
+    !runtimeFresh(runtime, maxStatusAgeMs(env))
+  ) return null;
 
   const state = await store.readPublicProjectionState();
-  if (!state || verifiedRuntimeTarget(runtime, state.checkpoint.blockNumber, Date.now(), maxStatusAgeMs(env)) === null) return null;
+  if (!state) return null;
 
   const feed = await projectPublicFeed({
     chainId,
@@ -1415,7 +1421,10 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
     after.blockHash !== state.checkpoint.blockHash ||
     !afterRuntime ||
     afterRuntime.updatedAtMs !== runtime.updatedAtMs ||
-    verifiedRuntimeTarget(afterRuntime, after.blockNumber, Date.now(), maxStatusAgeMs(env)) === null
+    !afterRuntime.sourceVerified ||
+    !afterRuntime.liveCaughtUp ||
+    afterRuntime.lastSyncError ||
+    !runtimeFresh(afterRuntime, maxStatusAgeMs(env))
   ) return null;
 
   return { store, runtime: afterRuntime, feed };
