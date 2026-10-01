@@ -170,6 +170,34 @@ try {
   const checkpoint={blockNumber:BigInt(checkpointRows[0]!.block_number),blockHash:checkpointRows[0]!.block_hash.toLowerCase() as Hex};
   const receiptCountRows=selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_outcome_receipts WHERE chain_id=4663");
   const receiptCount=Number(receiptCountRows[0]?.n??0);
+  const identityTablePresentRows=selectRows<{n:number}>("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name='pons_token_identity_receipts'");
+  const identityTablePresent=Number(identityTablePresentRows[0]?.n??0)===1;
+  const identityCandidateRows=selectRows<{creator_count:number;launch_count:number}>(`
+    WITH checkpoint AS (
+      SELECT CAST(block_number AS INTEGER) AS tip
+      FROM chain_checkpoints WHERE chain_id=4663 LIMIT 1
+    ),
+    fresh_repeaters AS (
+      SELECT l.creator
+      FROM launches l
+      WHERE l.chain_id=4663 AND l.source='PONS_V2'
+      GROUP BY l.creator
+      HAVING COUNT(DISTINCT l.launch_id)>=2
+         AND MAX(CAST(l.block_number AS INTEGER))>=(
+           SELECT CASE WHEN tip>200000 THEN tip-200000 ELSE 0 END FROM checkpoint
+         )
+    )
+    SELECT
+      COUNT(DISTINCT r.creator) AS creator_count,
+      COUNT(l.launch_id) AS launch_count
+    FROM fresh_repeaters r
+    JOIN launches l ON l.creator=r.creator
+    WHERE l.chain_id=4663 AND l.source='PONS_V2'
+  `);
+  const identityCandidates={
+    creatorCount:Number(identityCandidateRows[0]?.creator_count??0),
+    launchCount:Number(identityCandidateRows[0]?.launch_count??0)
+  };
 
   const source=new RpcPonsOutcomeObservationSource({discoveryRpcUrl:archiveRpcUrl,archiveRpcUrl});
   const identityClient=createPublicClient({chain:robinhoodMainnet(archiveRpcUrl),transport:http(archiveRpcUrl)});
@@ -253,7 +281,8 @@ try {
   const report={
     kind:'BINRAT_PONS_RAT_TRAP_PRODUCTION_INSPECTION_V1',productionMutation:false,
     checkpoint:{blockNumber:checkpoint.blockNumber.toString(),blockHash:checkpoint.blockHash,timestampMs:checkpointPoint.timestampMs},
-    receiptCount,d1ReadCalls,creatorCandidates:creatorRows.length,selectedCohorts:cohorts.length,skipped,cohorts
+    receiptCount,identityTablePresent,identityCandidates,
+    d1ReadCalls,creatorCandidates:creatorRows.length,selectedCohorts:cohorts.length,skipped,cohorts
   };
   console.log(JSON.stringify(report,null,2));
 } finally {
