@@ -145,6 +145,41 @@ export async function verifyPonsTokenIdentityReceipt(receipt:PonsTokenIdentityRe
   if (canonicalJson(rebuilt)!==canonicalJson(receipt)) throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID');
 }
 
+export async function parsePonsTokenIdentityReceipt(payload:string):Promise<PonsTokenIdentityReceipt> {
+  let raw:Record<string,unknown>;
+  try { raw=JSON.parse(payload) as Record<string,unknown>; }
+  catch { throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID'); }
+  if (
+    typeof raw.identityId!=='string' || typeof raw.identityVersion!=='string' ||
+    raw.chainId!==ROBINHOOD_CHAIN_ID || typeof raw.launchId!=='string' ||
+    typeof raw.token!=='string' || typeof raw.observedBlock!=='string' ||
+    typeof raw.observedBlockHash!=='string' || typeof raw.name!=='string' ||
+    typeof raw.symbol!=='string' || !Number.isInteger(raw.decimals) ||
+    typeof raw.totalSupply!=='string' || typeof raw.evidenceDigest!=='string'
+  ) throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID');
+  let receipt:PonsTokenIdentityReceipt;
+  try {
+    receipt={
+      identityId:raw.identityId,
+      identityVersion:raw.identityVersion as typeof PONS_TOKEN_IDENTITY_VERSION,
+      chainId:ROBINHOOD_CHAIN_ID,
+      launchId:raw.launchId,
+      token:raw.token.toLowerCase() as Hex,
+      observedBlock:BigInt(raw.observedBlock),
+      observedBlockHash:raw.observedBlockHash.toLowerCase() as Hex,
+      name:raw.name,
+      symbol:raw.symbol,
+      decimals:Number(raw.decimals),
+      totalSupply:BigInt(raw.totalSupply),
+      evidenceDigest:raw.evidenceDigest
+    };
+  } catch {
+    throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID');
+  }
+  await verifyPonsTokenIdentityReceipt(receipt);
+  return receipt;
+}
+
 export async function syncPonsTokenIdentities(
   source:PonsTokenIdentitySource,
   store:PonsTokenIdentityStore,
