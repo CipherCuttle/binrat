@@ -1,6 +1,6 @@
 import { createPublicClient, getAddress, http, keccak256, type Address, type PublicClient } from 'viem';
 import type { Hex } from '../core/types.js';
-import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
+import { sha256Hex } from '../evidence/canonical.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from './chain.js';
 import { ponsErc20Abi, ponsV2BondingCurveReadAbi } from './ponsAbi.js';
 import { PONS_RPC_RETRY_COUNT, PONS_RPC_RETRY_DELAY_MS, PONS_RPC_TIMEOUT_MS } from './ponsSource.js';
@@ -188,6 +188,7 @@ export function estimateFdvQuoteRaw(
 }
 
 export async function verifyPonsOutcomeObservation(receipt:PonsOutcomeObservation):Promise<void> {
+  assertLaunchShape({launchId:receipt.launchId,token:receipt.token,curve:receipt.curve});
   const core:Omit<PonsOutcomeObservation,'outcomeId'|'evidenceDigest'>={
     observationVersion:receipt.observationVersion,
     chainId:receipt.chainId,
@@ -219,7 +220,26 @@ export async function verifyPonsOutcomeObservation(receipt:PonsOutcomeObservatio
       receipt.evidenceDigest!==await sha256Hex(core)) {
     throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
   }
-  if (canonicalJson(core)!==canonicalJson(core)) throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
+
+  if (receipt.phase==='GRADUATED') {
+    if (receipt.estimatedFdvQuoteRaw!==null || receipt.quoteReserve!==null || receipt.tokenReserve!==null ||
+        !receipt.missing.includes('POST_GRADUATION_PRICE_AUTHORITY')) {
+      throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
+    }
+    return;
+  }
+
+  if (receipt.phase!=='CURVE') throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
+  if (receipt.estimatedFdvQuoteRaw!==null) {
+    if (receipt.quoteReserve===null || receipt.tokenReserve===null || receipt.totalSupply===null ||
+        receipt.quoteReserve<=0n || receipt.tokenReserve<=0n || receipt.totalSupply<0n ||
+        receipt.estimatedFdvQuoteRaw!==estimateFdvQuoteRaw(receipt.quoteReserve,receipt.tokenReserve,receipt.totalSupply) ||
+        receipt.status!=='COMPLETE' || receipt.missing.length!==0) {
+      throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
+    }
+  } else if (receipt.status==='COMPLETE') {
+    throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
+  }
 }
 
 function assertLaunchShape(launch:PonsOutcomeLaunch):void {
