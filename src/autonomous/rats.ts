@@ -23,6 +23,15 @@ export interface RatsCandidate {
     name: string;
     blockNumber: string;
   };
+  /** New snapshots retain up to three immediately prior launches for user-facing context.
+   * Older persisted snapshots may not have this field and remain readable. */
+  previousLaunches?: Array<{
+    launchId: string;
+    token: string;
+    symbol: string;
+    name: string;
+    blockNumber: string;
+  }>;
 }
 export interface RatsSnapshot {
   discoveryId: string;
@@ -180,21 +189,28 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
       };
       const receipt = await saveCase(db, await makeReceipt(subject, evidenceRefs, tip.toString(), now,
         'INDEXED_LAUNCH_EVIDENCE', discovery));
+      const previousLaunches=(refsRows.results ?? []).slice(1,4).flatMap(item =>
+        /^[0-9a-f]{64}$/.test(item.launch_id) && /^0x[0-9a-f]{40}$/.test(item.token) &&
+        typeof item.symbol === 'string' && typeof item.name === 'string' && /^\d+$/.test(item.block_number)
+          ? [{launchId:item.launch_id,token:item.token,symbol:item.symbol,name:item.name,blockNumber:item.block_number}]
+          : []
+      );
       candidates.push({
         entity: subject, reasons: discovery.reasons, evidenceRefs, caseId: receipt.caseId,
         rankPosition: candidates.length + 1, recurrenceCount,
         latestLaunch: {
           launchId: latest.launch_id, token: latest.token, symbol: latest.symbol,
           name: latest.name, blockNumber: latest.block_number
-        }
+        },
+        previousLaunches
       });
     } catch {
       // An incomplete/malformed candidate is not substituted with a weaker claim.
     }
   }
   const core = { chainId: 4663 as const, sourceCheckpoint: tip.toString(), ruleVersion: RATS_RULE_VERSION,
-    candidates: candidates.map(({ entity, reasons, evidenceRefs, caseId, rankPosition, recurrenceCount, latestLaunch }) =>
-      ({ entity, reasons, evidenceRefs, caseId, rankPosition, recurrenceCount, latestLaunch })) };
+    candidates: candidates.map(({ entity, reasons, evidenceRefs, caseId, rankPosition, recurrenceCount, latestLaunch, previousLaunches }) =>
+      ({ entity, reasons, evidenceRefs, caseId, rankPosition, recurrenceCount, latestLaunch, previousLaunches })) };
   const discoveryId = await sha256Hex(core);
   const existing = await db.prepare('SELECT snapshot_json FROM rat_v11_pons_discovery_snapshots WHERE discovery_id=? AND expires_at_ms>?')
     .bind(discoveryId, now).first<{ snapshot_json: string }>();
@@ -234,12 +250,14 @@ export function renderRats(snapshot: RatsSnapshot): string {
     snapshot.candidates.map(candidate => {
       const prior=Math.max(1,candidate.recurrenceCount-1);
       const latest=candidate.latestLaunch.symbol ? `${candidate.latestLaunch.symbol}` : (candidate.latestLaunch.name || 'unnamed launch');
+      const previous=(candidate.previousLaunches ?? []).map(item => item.symbol ? `${item.symbol}` : (item.name || item.token));
       return [
         `${candidate.rankPosition}. ${latest} · block ${candidate.latestLaunch.blockNumber}`,
         `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
+        previous.length ? `Previous: ${previous.join(' · ')}` : '',
         `WATCH NEXT LAUNCH: /watch 4663:CREATOR:${candidate.entity.entityId}`,
         `OPEN CASE: /why ${candidate.caseId}`
-      ].join('\n');
+      ].filter(Boolean).join('\n');
     }).join('\n\n'),
     'Newest repeat activity first. Same address does not establish human identity.'
   ].join('\n\n');
@@ -258,6 +276,12 @@ function parseSnapshot(input: string): RatsSnapshot {
   if (value.chainId !== 4663 || value.ruleVersion !== RATS_RULE_VERSION || !Array.isArray(value.candidates) ||
       value.candidates.length > MAX_CANDIDATES ||
       value.candidates.some(candidate => !Number.isSafeInteger(candidate.recurrenceCount) || candidate.recurrenceCount < 2 ||
-        !candidate.latestLaunch || !/^\d+$/.test(candidate.latestLaunch.blockNumber))) throw new Error('DISCOVERY_UNAVAILABLE');
+        !candidate.latestLaunch || !/^\d+$/.test(candidate.latestLaunch.blockNumber) ||
+        (candidate.previousLaunches !== undefined && (!Array.isArray(candidate.previousLaunches) ||
+          candidate.previousLaunches.length > 3 || candidate.previousLaunches.some(item =>
+            !/^[0-9a-f]{64}$/.test(item.launchId) || !/^0x[0-9a-f]{40}$/.test(item.token) ||
+            typeof item.symbol !== 'string' || typeof item.name !== 'string' || !/^\d+$/.test(item.blockNumber)))))) {
+    throw new Error('DISCOVERY_UNAVAILABLE');
+  }
   return value;
 }
