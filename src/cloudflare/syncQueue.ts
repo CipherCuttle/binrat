@@ -727,6 +727,69 @@ export async function runCloudflarePonsTokenIdentityCycle(
   }
 }
 
+export async function runCloudflarePonsOutcomeCycle(
+  env:CloudflareSyncEnv,
+  message:BinratSyncMessage,
+  deps:CloudflareSyncDeps={now:Date.now}
+):Promise<
+  | {status:'SUCCESS';inserted:number;duplicates:number;pendingMaturity:number;alreadyPresent:number;launchesVisited:number}
+  | {status:'BUSY'}
+  | {status:'RETRY';code:string}
+> {
+  if (!isSyncMessage(message) || message.kind!=='PONS_OUTCOME_CYCLE') {
+    return {status:'RETRY',code:'PONS_OUTCOME_MESSAGE_INVALID'};
+  }
+  if (env.BINRAT_PONS_OUTCOME_ENABLED!=='true') {
+    return {status:'SUCCESS',inserted:0,duplicates:0,pendingMaturity:0,alreadyPresent:0,launchesVisited:0};
+  }
+
+  const lease=new D1SyncLeaseStore(env.DB);
+  if (!(await lease.claim(PONS_OUTCOME_LEASE_NAME,message.cycleId,deps.now(),PONS_OUTCOME_LEASE_MS))) {
+    return {status:'BUSY'};
+  }
+
+  try {
+    const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
+    if (!runtime || !runtime.sourceVerified || !runtime.liveCaughtUp || runtime.lastSyncError) {
+      return {status:'SUCCESS',inserted:0,duplicates:0,pendingMaturity:0,alreadyPresent:0,launchesVisited:0};
+    }
+
+    const source=deps.ponsOutcomeSource ?? new RpcPonsOutcomeObservationSource({
+      discoveryRpcUrl:resolveRobinhoodRpcUrl(env),
+      archiveRpcUrl:resolveRobinhoodArchiveRpcUrl(env)
+    });
+    const report=await syncPonsOutcomeObservations(
+      source,
+      new D1PonsOutcomeObservationStore(env.DB),
+      {maxReceiptsPerSync:integerSetting(env.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE,3,1,12)}
+    );
+    console.error(JSON.stringify({
+      event:'PONS_OUTCOME_RECEIPT',
+      cycleId:message.cycleId,
+      checkpointBlock:report.checkpointBlock?.toString() ?? null,
+      inserted:report.inserted,
+      duplicates:report.duplicates,
+      pendingMaturity:report.pendingMaturity,
+      alreadyPresent:report.alreadyPresent,
+      launchesVisited:report.launchesVisited
+    }));
+    return {
+      status:'SUCCESS',
+      inserted:report.inserted,
+      duplicates:report.duplicates,
+      pendingMaturity:report.pendingMaturity,
+      alreadyPresent:report.alreadyPresent,
+      launchesVisited:report.launchesVisited
+    };
+  } catch(error) {
+    const code=syncErrorCode(error);
+    console.error(JSON.stringify({event:'PONS_OUTCOME_FAILED',cycleId:message.cycleId,code}));
+    return {status:'RETRY',code};
+  } finally {
+    await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
+  }
+}
+
 export async function runCloudflareObservationCycle(
   env: CloudflareSyncEnv,
   message: BinratSyncMessage,
