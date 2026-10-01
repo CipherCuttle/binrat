@@ -110,10 +110,35 @@ export class SqliteStore implements LaunchStore {
     const newestLimit=Math.floor(limit/2);
     const rows=this.db.prepare(`
       WITH missing AS (
-        SELECT p.fact_id,p.chain_id,p.creator,p.observed_block,p.log_index,p.payload_json
+        SELECT p.fact_id,p.chain_id,p.launch_id,p.creator,p.observed_block,p.log_index,p.payload_json
         FROM provenance_facts p
-        LEFT JOIN provenance_edges e ON e.edge_id=('reported-creator:' || p.fact_id)
-        WHERE p.chain_id=? AND e.edge_id IS NULL
+        LEFT JOIN provenance_edges direct ON direct.edge_id=('reported-creator:' || p.fact_id)
+        LEFT JOIN provenance_edges previous
+          ON previous.chain_id=p.chain_id
+         AND previous.kind='PREVIOUS_LAUNCH'
+         AND previous.from_id=('launch:' || p.chain_id || ':' || p.launch_id)
+        WHERE p.chain_id=?
+          AND (
+            direct.edge_id IS NULL
+            OR (
+              previous.edge_id IS NULL
+              AND EXISTS (
+                SELECT 1 FROM provenance_facts prior
+                WHERE prior.chain_id=p.chain_id
+                  AND prior.creator=p.creator
+                  AND (
+                    CAST(prior.observed_block AS INTEGER)<CAST(p.observed_block AS INTEGER)
+                    OR (CAST(prior.observed_block AS INTEGER)=CAST(p.observed_block AS INTEGER) AND prior.log_index<p.log_index)
+                    OR (
+                      CAST(prior.observed_block AS INTEGER)=CAST(p.observed_block AS INTEGER)
+                      AND prior.log_index=p.log_index
+                      AND prior.fact_id<p.fact_id
+                    )
+                  )
+                LIMIT 1
+              )
+            )
+          )
       ),
       oldest AS (
         SELECT * FROM missing
