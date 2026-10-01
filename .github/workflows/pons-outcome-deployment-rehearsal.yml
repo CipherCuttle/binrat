@@ -34,11 +34,49 @@ jobs:
           set -euo pipefail
           pnpm rehearse:pons-outcome-deployment | tee "$RUNNER_TEMP/pons-outcome-deployment-rehearsal.txt"
 
+      - name: Rehearse migration through Wrangler local D1
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp cloudflare/wrangler.example.jsonc "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc"
+          sed -i 's/REPLACE_WITH_D1_DATABASE_ID/00000000-0000-0000-0000-000000000000/g' "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc"
+          sed -i 's#https://REPLACE_WITH_PUBLIC_SITE#https://example.invalid#g' "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc"
+          python3 - "$RUNNER_TEMP/pre-o2.sql" <<'PY'
+          from pathlib import Path
+          import sys
+          schema = Path("cloudflare/schema.sql").read_text()
+          migration = Path("cloudflare/migrations/20261001_pons_outcome_v1.sql").read_text().strip()
+          assert schema.count(migration) == 1
+          Path(sys.argv[1]).write_text(schema.replace(migration, ""))
+          PY
+          state="$RUNNER_TEMP/wrangler-o2-d1"
+          pnpm dlx wrangler@4.135.0 d1 execute DB --local --yes \
+            --persist-to "$state" \
+            --config "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc" \
+            --file "$RUNNER_TEMP/pre-o2.sql"
+          pnpm dlx wrangler@4.135.0 d1 execute DB --local --yes \
+            --persist-to "$state" \
+            --config "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc" \
+            --file cloudflare/migrations/20261001_pons_outcome_v1.sql
+          pnpm dlx wrangler@4.135.0 d1 execute DB --local --yes \
+            --persist-to "$state" \
+            --config "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc" \
+            --file cloudflare/migrations/20261001_pons_outcome_v1.sql
+          pnpm dlx wrangler@4.135.0 d1 execute DB --local --yes --json \
+            --persist-to "$state" \
+            --config "$RUNNER_TEMP/wrangler.o2-rehearsal.jsonc" \
+            --command "SELECT name FROM sqlite_master WHERE type='table' AND name='pons_outcome_receipts'; SELECT COUNT(*) AS outcome_rows FROM pons_outcome_receipts;" \
+            | tee "$RUNNER_TEMP/pons-outcome-wrangler-local.json"
+          grep -q '"pons_outcome_receipts"' "$RUNNER_TEMP/pons-outcome-wrangler-local.json"
+          grep -q '"outcome_rows": 0' "$RUNNER_TEMP/pons-outcome-wrangler-local.json"
+
       - name: Preserve rehearsal receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pons-outcome-deployment-rehearsal
-          path: ${{ runner.temp }}/pons-outcome-deployment-rehearsal.txt
+          path: |
+            ${{ runner.temp }}/pons-outcome-deployment-rehearsal.txt
+            ${{ runner.temp }}/pons-outcome-wrangler-local.json
           retention-days: 7
           if-no-files-found: warn
