@@ -3,6 +3,11 @@ import { deliverFindings, enqueueFindings } from '../autonomous/delivery.js';
 import { arcWatchSource, robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARCPAD_START_BLOCK, ARC_CHAIN_ID } from '../arc/chain.js';
 import { PonsLaunchSource } from '../pons/ponsSource.js';
+import {
+  RpcPonsOutcomeObservationSource,
+  syncPonsOutcomeObservations,
+  type PonsOutcomeObservationSource
+} from '../pons/outcomeReceipts.js';
 import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
 import { ArcObservationSource } from '../arc/observationSource.js';
 import { ArcRatRadarSource, type RatRadarSource } from '../arc/ratRadarSource.js';
@@ -16,6 +21,7 @@ import {
 import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
+import { D1PonsOutcomeObservationStore } from './ponsOutcomeStore.js';
 import { D1Store } from './d1Store.js';
 import { D1SyncLeaseStore } from './syncLease.js';
 import type { D1DatabaseLike } from './d1Types.js';
@@ -50,6 +56,9 @@ export interface CloudflareSyncEnv {
   BINRAT_PONS_CATCHUP_WORK_BUDGET_MS?: string;
   BINRAT_PONS_NEAR_HEAD_BLOCKS?: string;
   BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
+  BINRAT_PONS_OUTCOME_ENABLED?: string;
+  BINRAT_PONS_OUTCOME_MAX_PER_CYCLE?: string;
+  BINRAT_ROBINHOOD_ARCHIVE_RPC_URL?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
   BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
@@ -63,7 +72,7 @@ export interface CloudflareSyncEnv {
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
+  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -72,6 +81,7 @@ export interface CloudflareSyncDeps {
   now: () => number;
   launchSource?: LaunchSource;
   ponsLaunchSource?: LaunchSource;
+  ponsOutcomeSource?: PonsOutcomeObservationSource;
   observationSource?: ObservationSource;
   ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
@@ -85,6 +95,7 @@ export type SyncCycleResult =
 
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const PONS_SYNC_LEASE_NAME = 'binrat:pons-sync';
+const PONS_OUTCOME_LEASE_NAME = 'binrat:pons-outcome';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
@@ -92,6 +103,7 @@ const LIVE_SYNC_LEASE_MS = 120_000;
 // Covers bounded Pons bootstrap transport plus at most two 30.25s retrying
 // reads inside its unchanged 60s work budget; Arc keeps its existing lease.
 export const PONS_SYNC_LEASE_MS = 180_000;
+export const PONS_OUTCOME_LEASE_MS = 180_000;
 const PONS_CATCHUP_INITIAL_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCHES = 4;
@@ -148,6 +160,15 @@ export async function enqueuePonsSyncCycle(
 ): Promise<void> {
   if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
   await env.SYNC_QUEUE.send({ kind: 'PONS_SYNC_CYCLE', cycleId, enqueuedAtMs: nowMs });
+}
+
+export async function enqueuePonsOutcomeCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({ kind:'PONS_OUTCOME_CYCLE', cycleId, enqueuedAtMs:nowMs });
 }
 
 export async function enqueueObservationCycle(
@@ -219,11 +240,23 @@ export async function handleSyncQueueBatch(
             console.error(JSON.stringify({ event: 'PONS_CATCH_UP_ENQUEUE_FAILED', code: syncErrorCode(error) }));
           });
         }
+        if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_OUTCOME_ENABLED === 'true') {
+          await enqueuePonsOutcomeCycle(env, deps.now()).catch((error) => {
+            console.error(JSON.stringify({ event:'PONS_OUTCOME_ENQUEUE_FAILED', code:syncErrorCode(error) }));
+          });
+        }
         if (result.status === 'SUCCESS' && result.liveCaughtUp && shouldEnqueueRatWatch(message.body.enqueuedAtMs)) {
           await enqueueRatWatchCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event: 'PONS_RAT_WATCH_ENQUEUE_FAILED', code: syncErrorCode(error) }));
           });
         }
+        continue;
+      }
+
+      if (message.body.kind === 'PONS_OUTCOME_CYCLE') {
+        const result=await runCloudflarePonsOutcomeCycle(env,message.body,deps);
+        if (result.status === 'RETRY') message.retry({delaySeconds:30});
+        else message.ack();
         continue;
       }
 
@@ -615,6 +648,76 @@ export async function runCloudflarePonsSyncCycle(
   } finally {
     store.close();
     await lease.release(PONS_SYNC_LEASE_NAME, message.cycleId);
+  }
+}
+
+export async function runCloudflarePonsOutcomeCycle(
+  env:CloudflareSyncEnv,
+  message:BinratSyncMessage,
+  deps:CloudflareSyncDeps={now:Date.now}
+):Promise<
+  | {status:'SUCCESS';inserted:number;duplicates:number;pendingMaturity:number;alreadyPresent:number;launchesVisited:number}
+  | {status:'BUSY'}
+  | {status:'RETRY';code:string}
+> {
+  if (!isSyncMessage(message) || message.kind!=='PONS_OUTCOME_CYCLE') {
+    return {status:'RETRY',code:'PONS_OUTCOME_MESSAGE_INVALID'};
+  }
+  if (env.BINRAT_PONS_OUTCOME_ENABLED!=='true') {
+    return {status:'SUCCESS',inserted:0,duplicates:0,pendingMaturity:0,alreadyPresent:0,launchesVisited:0};
+  }
+
+  const lease=new D1SyncLeaseStore(env.DB);
+  if (!(await lease.claim(PONS_OUTCOME_LEASE_NAME,message.cycleId,deps.now(),PONS_OUTCOME_LEASE_MS))) {
+    return {status:'BUSY'};
+  }
+  let ponsWriterClaimed=false;
+  if (!(await lease.claim(PONS_SYNC_LEASE_NAME,message.cycleId,deps.now(),PONS_SYNC_LEASE_MS))) {
+    await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
+    return {status:'BUSY'};
+  }
+  ponsWriterClaimed=true;
+
+  try {
+    const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
+    if (!runtime || !runtime.sourceVerified || !runtime.liveCaughtUp || runtime.lastSyncError) {
+      return {status:'SUCCESS',inserted:0,duplicates:0,pendingMaturity:0,alreadyPresent:0,launchesVisited:0};
+    }
+
+    const source=deps.ponsOutcomeSource ?? new RpcPonsOutcomeObservationSource({
+      discoveryRpcUrl:resolveRobinhoodRpcUrl(env),
+      archiveRpcUrl:resolveRobinhoodArchiveRpcUrl(env)
+    });
+    const report=await syncPonsOutcomeObservations(
+      source,
+      new D1PonsOutcomeObservationStore(env.DB),
+      {maxReceiptsPerSync:integerSetting(env.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE,1,1,12)}
+    );
+    console.error(JSON.stringify({
+      event:'PONS_OUTCOME_RECEIPT',
+      cycleId:message.cycleId,
+      checkpointBlock:report.checkpointBlock?.toString() ?? null,
+      inserted:report.inserted,
+      duplicates:report.duplicates,
+      pendingMaturity:report.pendingMaturity,
+      alreadyPresent:report.alreadyPresent,
+      launchesVisited:report.launchesVisited
+    }));
+    return {
+      status:'SUCCESS',
+      inserted:report.inserted,
+      duplicates:report.duplicates,
+      pendingMaturity:report.pendingMaturity,
+      alreadyPresent:report.alreadyPresent,
+      launchesVisited:report.launchesVisited
+    };
+  } catch(error) {
+    const code=syncErrorCode(error);
+    console.error(JSON.stringify({event:'PONS_OUTCOME_FAILED',cycleId:message.cycleId,code}));
+    return {status:'RETRY',code};
+  } finally {
+    if (ponsWriterClaimed) await lease.release(PONS_SYNC_LEASE_NAME,message.cycleId);
+    await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
   }
 }
 
@@ -1139,6 +1242,32 @@ export function resolveRobinhoodRpcUrl(env: Pick<CloudflareSyncEnv, 'ROBINHOOD_R
   return configured || ROBINHOOD_PUBLIC_RPC_FALLBACK_URL;
 }
 
+export function resolveRobinhoodArchiveRpcUrl(
+  env: Pick<CloudflareSyncEnv,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'>
+): string {
+  const raw=env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL?.trim();
+  if (!raw) throw new Error('MISSING_CONFIG:BINRAT_ROBINHOOD_ARCHIVE_RPC_URL');
+  if (/^[A-Za-z0-9_-]{8,128}$/.test(raw)) {
+    return `https://robinhood-mainnet.g.alchemy.com/v2/${raw}`;
+  }
+  let url:URL;
+  try { url=new URL(raw); }
+  catch { throw new Error('PONS_OUTCOME_ARCHIVE_RPC_INVALID'); }
+  if (
+    url.protocol!=='https:' ||
+    url.hostname!=='robinhood-mainnet.g.alchemy.com' ||
+    url.port!=='' ||
+    url.username!=='' ||
+    url.password!=='' ||
+    url.search!=='' ||
+    url.hash!=='' ||
+    !/^\/v2\/[A-Za-z0-9_-]{8,128}$/.test(url.pathname)
+  ) {
+    throw new Error('PONS_OUTCOME_ARCHIVE_RPC_INVALID');
+  }
+  return url.toString();
+}
+
 function integerSetting(
   value: string | undefined,
   fallback: number,
@@ -1167,6 +1296,7 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
     (
       item.kind === 'SYNC_CYCLE' ||
       item.kind === 'PONS_SYNC_CYCLE' ||
+      item.kind === 'PONS_OUTCOME_CYCLE' ||
       item.kind === 'OBSERVATION_CYCLE' ||
       item.kind === 'RAT_WATCH_CYCLE' ||
       item.kind === 'RAT_RADAR_CYCLE'

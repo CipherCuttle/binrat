@@ -1,0 +1,44 @@
+name: pons-production-readonly-tail
+
+on:
+  push:
+    branches:
+      - ops/binrat-o2-production-rollout-v1
+
+permissions:
+  contents: read
+
+jobs:
+  tail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - name: Capture one minute of production logs read-only
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          timeout 85s pnpm dlx wrangler@4.135.0 tail binrat-edge-v0 --format json > "$RUNNER_TEMP/binrat-prod-tail.jsonl" 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ] && [ "$code" -ne 124 ]; then
+            cat "$RUNNER_TEMP/binrat-prod-tail.jsonl"
+            exit "$code"
+          fi
+          grep -E 'SYNC_PHASE|SYNC_FAILURE|PONS_|D1_|REORG_|exception|outcome' "$RUNNER_TEMP/binrat-prod-tail.jsonl" | tail -n 300 || true
+      - name: Preserve read-only tail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-production-readonly-tail
+          path: ${{ runner.temp }}/binrat-prod-tail.jsonl
+          retention-days: 3
+          if-no-files-found: warn

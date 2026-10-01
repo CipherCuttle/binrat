@@ -1,0 +1,49 @@
+name: pons-outcome-narrow-live-probe
+
+on:
+  push:
+    branches:
+      - ops/binrat-o2-production-rollout-v1
+
+permissions:
+  contents: read
+
+jobs:
+  live-read-local-d1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Probe narrow O2 runtime through public RPC + Alchemy into ephemeral local D1
+        shell: bash
+        env:
+          BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+        run: |
+          set -euo pipefail
+          test -n "${BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:-}" || {
+            echo "::error::BINRAT_ROBINHOOD_ARCHIVE_RPC_URL is not configured"
+            exit 2
+          }
+          pnpm exec tsx scripts/probe-pons-outcome-runtime.ts | tee "$RUNNER_TEMP/pons-outcome-narrow-live-probe.txt"
+
+      - name: Preserve probe receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-outcome-narrow-live-probe
+          path: ${{ runner.temp }}/pons-outcome-narrow-live-probe.txt
+          retention-days: 7
+          if-no-files-found: warn
