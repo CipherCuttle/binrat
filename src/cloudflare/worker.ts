@@ -611,6 +611,30 @@ async function telegramWebhook(
     return json(400, { error: 'INVALID_JSON' });
   }
 
+  const receivedCallback = update.callback_query;
+  const callbackStartedAt = receivedCallback ? deps.now() : null;
+  const receivedAction = receivedCallback && typeof receivedCallback.data === 'string'
+    ? parseCallback(receivedCallback.data)
+    : null;
+  if (receivedCallback && typeof receivedCallback.id === 'string' && receivedCallback.id) {
+    if (receivedAction) {
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'RECEIVED',updateId:update.update_id,action:receivedAction.action}));
+    }
+    try {
+      // Telegram's progress state is transport-level UX. Attempt the ACK before
+      // any D1 claim/rate/evidence work so storage latency cannot strand it.
+      await answerCallback(token,receivedCallback.id,deps.externalFetch);
+      if (receivedAction) {
+        console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACKED',updateId:update.update_id,action:receivedAction.action,
+          elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
+      }
+    } catch {
+      if (receivedAction) {
+        console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACK_FAILED',updateId:update.update_id,action:receivedAction.action}));
+      }
+    }
+  }
+
   const ledger = new D1TelegramLedger(env.DB);
   let claim: 'CLAIMED' | 'BUSY' | 'SEEN';
   try {
@@ -633,33 +657,21 @@ async function telegramWebhook(
 
     const callback = update.callback_query;
     if (callback) {
-      const callbackStartedAt = deps.now();
       if (env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true') {
-        // Acknowledge known Telegram callback traffic even while the rollout is off.
-        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'TELEGRAM_UI_V2_DISABLED'});
       }
       const message = callback.message;
       if (!message || !candidateRatAllowedPrincipal(callback.from,message.chat,env) ||
           !autonomousRatAllowedPrincipal(callback.from,message.chat,env)) {
-        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
       }
-      const action = typeof callback.data === 'string' ? parseCallback(callback.data) : null;
-      // Telegram explicitly requires an answer to stop its client progress state.
+      const action = receivedAction;
       if (!action || !callback.id) {
-        if (callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'INVALID_CALLBACK'});
       }
-      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'RECEIVED',updateId:update.update_id,action:action.action}));
-      // Stop Telegram's client spinner before any D1-backed rate gate or evidence work.
-      // The callback has already passed auth, private-DM and payload validation.
-      await answerCallback(token,callback.id,deps.externalFetch);
-      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACKED',updateId:update.update_id,action:action.action,
-        elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
       const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
       if (!(await ledger.allowChat(message.chat.id,rateLimit,60_000,deps.now()))) {
         await ledger.completeIgnored(update.update_id,'RATE_LIMITED',deps.now());
@@ -713,11 +725,11 @@ async function telegramWebhook(
       }
       const outcome = await executeUiCallback(env.DB,action,{userId:callback.from.id,chatId:message.chat.id},update.update_id,deps.now(),deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
       console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'OUTCOME',updateId:update.update_id,action:action.action,
-        outcome:outcome.kind,elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
+        outcome:outcome.kind,elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
       const card = renderRatCard(outcome);
       await editUiCard(token,message.chat.id,message.message_id,origin,card,mediaEnabled,deps.externalFetch);
       console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'EDITED',updateId:update.update_id,action:action.action,
-        view:card.view,elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
+        view:card.view,elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
       // The compact card remains the surface; FULL is the explicit canonical expansion.
       if (action.action === 'FULL') await sendMessage(token,message.chat.id,renderLegacyAutonomousOutcome(outcome),deps.externalFetch);
       await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:`UI_${action.action}`,

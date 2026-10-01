@@ -72,6 +72,26 @@ test('candidate whole-bot gate overrides a different autonomous tester for callb
   } finally { f.db.close(); }
 });
 
+test('callback acknowledgement is attempted before the update ledger claim can fail', async () => {
+  const f=await autonomousFixture(); const calls:string[]=[];
+  const failingDb:D1DatabaseLike={
+    prepare:sql=>f.db.prepare(sql),
+    batch:async()=>{ throw new Error('CLAIM_FAILED'); },
+    exec:sql=>f.db.exec(sql)
+  };
+  try {
+    Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true'});
+    const api:typeof fetch=async (url) => {
+      const method=String(url).split('/').at(-1)!; calls.push(method);
+      if(method==='answerCallbackQuery') return Response.json({ok:true,result:true});
+      throw new Error('UNEXPECTED_'+method);
+    };
+    const response=await handleWorkerRequest(callbackRequest(8849,77,77,'private','br2:r'),{...f.env,DB:failingDb},{now:f.now,externalFetch:api,watchSource:f.source});
+    assert.equal(response.status,503);
+    assert.deepEqual(calls,['answerCallbackQuery']);
+  } finally { f.db.close(); }
+});
+
 test('callback acknowledgement happens before the D1 rate gate can fail', async () => {
   const f=await autonomousFixture(); const calls:string[]=[];
   const failingDb:D1DatabaseLike={
