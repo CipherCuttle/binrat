@@ -154,7 +154,7 @@ export async function parsePonsTokenIdentityReceipt(payload:string):Promise<Pons
     raw.chainId!==ROBINHOOD_CHAIN_ID || typeof raw.launchId!=='string' ||
     typeof raw.token!=='string' || typeof raw.observedBlock!=='string' ||
     typeof raw.observedBlockHash!=='string' || typeof raw.name!=='string' ||
-    typeof raw.symbol!=='string' || !Number.isInteger(raw.decimals) ||
+    typeof raw.symbol!=='string' || typeof raw.decimals!=='number' || !Number.isInteger(raw.decimals) ||
     typeof raw.totalSupply!=='string' || typeof raw.evidenceDigest!=='string'
   ) throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID');
   let receipt:PonsTokenIdentityReceipt;
