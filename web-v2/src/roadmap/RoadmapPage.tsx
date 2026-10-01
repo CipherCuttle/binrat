@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { RoadmapSpine } from "./RoadmapSpine";
 import { RoadmapStage } from "./RoadmapStage";
 import { roadmapStages, type RoadmapStageId } from "./roadmapData";
@@ -45,7 +45,7 @@ export function RoadmapPage({ navigate }: { navigate: (path: string) => void }) 
         className="roadmap-stages"
         style={{
           "--roadmap-stage-count": roadmapStages.length,
-        } as React.CSSProperties}
+        } as CSSProperties}
       >
         <RoadmapSpine active={activeStage} />
         {roadmapStages.map((stage) => (
