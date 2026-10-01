@@ -257,6 +257,48 @@ test('Mini App bootstrap exposes the same verified 4663 latest launches and recu
   }
 });
 
+test('bounded latest-launch API exposes the newest canonical 4663 launches without the full feed projection', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const runtime=new D1RuntimeStateStore(db,4663);
+  const now=Date.now();
+  try {
+    for (let i=0;i<21;i++) {
+      const blockNumber=100n+BigInt(i);
+      const launcher=address(100+i),txHash=hex64(200+i),token=address(300+i);
+      const launch: LaunchObserved={
+        launchId:await deriveLaunchId({chainId:4663,launcher,txHash,token,source:'PONS_V2'}),
+        eventId:await deriveEventId({chainId:4663,launcher,txHash,logIndex:0,source:'PONS_V2'}),
+        chainId:4663,blockNumber,blockHash:hex64(400+i),observedAtMs:now,source:'PONS_V2',
+        launcher,txHash,logIndex:0,token,creator:address(500+(i%3)),pool:address(600+i),
+        name:`Launch ${i}`,symbol:`L${i}`,imageUri:'',website:'',twitter:'',telegram:''
+      };
+      await store.putLaunch(launch);
+      await store.putProvenanceFact(await buildProvenanceFact(launch));
+    }
+    await store.commitCheckpoint({blockNumber:120n,blockHash:hex64(420),guardBlockNumber:null,guardBlockHash:null});
+    await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:122n,targetBlock:120n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,
+      lastHistoryError:null,lastObservationError:null,updatedAtMs:now});
+
+    const response=await worker.fetch(new Request('https://binrat.example/api/launches/latest'),{DB:db});
+    assert.equal(response.status,200);
+    const body=await response.json() as {
+      schemaVersion:string;chainId:number;sourceCheckpoint:string;historyCoverage:string;
+      launches:Array<{symbol:string;blockNumber:string;factId:string;priorLaunchCount:number}>
+    };
+    assert.equal(body.schemaVersion,'binrat.latest-launches/0.1');
+    assert.equal(body.chainId,4663);
+    assert.equal(body.sourceCheckpoint,'120');
+    assert.equal(body.historyCoverage,'PARTIAL');
+    assert.equal(body.launches.length,20);
+    assert.equal(body.launches[0]?.symbol,'L20');
+    assert.equal(body.launches[0]?.blockNumber,'120');
+    assert.ok(body.launches.every(item=>item.factId.length>0 && Number.isSafeInteger(item.priorLaunchCount)));
+  } finally { store.close(); db.close(); }
+});
+
 test('active Robinhood authority retires every legacy Arc Rat Radar route instead of mixing chains', async () => {
   const db=new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
