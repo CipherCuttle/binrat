@@ -321,36 +321,70 @@ try{
 
   const publicHealth=await getJson('/health');
   gate(publicHealth.releaseSha===EXPECTED_LIVE_SHA,'PUBLIC_RELEASE_SHA_DRIFT');
-  await requireHealthy('PRE_DEPLOY_HEALTH');
+  const preHealth=await requireHealthy('PRE_DEPLOY_HEALTH');
   const beforeRows=outcomeCount();
+  const beforeGap=provenanceGap();
   gate(beforeRows>=1,'O2_RECEIPT_TABLE_EMPTY');
-  note('PRE_DEPLOY_RECEIPTS '+beforeRows);
+  gate(beforeGap.missingAny>0,'PROVENANCE_GAP_ALREADY_EMPTY');
+  note('PROVENANCE_REPAIR_PRESTATE '+JSON.stringify({
+    beforeRows,beforeGap,checkpoint:preHealth.checkpointBlock
+  }));
 
   cli(['deploy','--dry-run','--config',CONFIG],{timeout:180_000});
-  note('PROVIDER_FIX_DRY_RUN_PASS');
+  note('PROVENANCE_REPAIR_DRY_RUN_PASS');
 
-  const tag='provider-head-fix-'+REVIEWED_RELEASE_SHA.slice(0,12);
-  candidateVersion=uploadVersion(tag,'BINRAT provider-head regression hardening');
+  const tag='provenance-repair-'+REVIEWED_RELEASE_SHA.slice(0,12);
+  candidateVersion=uploadVersion(tag,'BINRAT bounded provenance repair');
   const candidateConfig=viewVersion(candidateVersion);
   assertOnlyReleaseShaChanged(originalConfig,candidateConfig);
   gate(secretPresent(candidateConfig,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'),'CANDIDATE_ARCHIVE_SECRET_MISSING');
   gate(secretPresent(candidateConfig,'TELEGRAM_BOT_TOKEN'),'CANDIDATE_TELEGRAM_BOT_SECRET_MISSING');
   gate(secretPresent(candidateConfig,'TELEGRAM_WEBHOOK_SECRET'),'CANDIDATE_TELEGRAM_WEBHOOK_SECRET_MISSING');
-  note('PROVIDER_FIX_CANDIDATE_PARITY_PASS '+candidateVersion);
+  note('PROVENANCE_REPAIR_CANDIDATE_PARITY_PASS '+candidateVersion);
 
-  deployVersion(candidateVersion,'BINRAT provider-head regression hardening');
+  deployVersion(candidateVersion,'BINRAT bounded provenance repair');
   deployed=true;
-
   await waitForReleaseSha(REVIEWED_RELEASE_SHA,'POST_DEPLOY_RELEASE');
-  const health1=await requireHealthy('POST_DEPLOY_HEALTH_1');
-  const rows1=outcomeCount();
-  gate(rows1>=beforeRows,'O2_RECEIPT_COUNT_REGRESSED');
 
-  await new Promise(resolve=>setTimeout(resolve,35_000));
+  const samples=[];
+  for(let index=0;index<6;index+=1){
+    const health=await getJson('/api/health');
+    const gap=provenanceGap();
+    const rows=outcomeCount();
+    samples.push({health,gap,rows});
+    note('PROVENANCE_REPAIR_SAMPLE '+JSON.stringify({
+      sample:index+1,
+      ok:health.ok,
+      liveCaughtUp:health.liveCaughtUp,
+      checkpointBlock:health.checkpointBlock,
+      headBlock:health.headBlock,
+      targetBlock:health.targetBlock,
+      lastSyncError:health.lastSyncError,
+      runtimeFresh:health.runtimeFresh,
+      gap,
+      outcomeRows:rows
+    }));
+    if(index<5) await new Promise(resolve=>setTimeout(resolve,30_000));
+  }
 
-  const health2=await requireHealthy('POST_DEPLOY_HEALTH_2');
-  const rows2=outcomeCount();
-  gate(rows2>=rows1,'O2_RECEIPT_COUNT_REGRESSED_AFTER_DEPLOY');
+  const final=samples.at(-1);
+  gate(final,'PROVENANCE_REPAIR_SAMPLE_MISSING');
+  const healthySamples=samples.filter(({health})=>
+    health.ok===true&&health.chainId===4663&&health.indexReady===true&&health.liveCaughtUp===true&&
+    health.lastSyncError===null&&health.runtimeFresh===true
+  ).length;
+  const d1ErrorSamples=samples.filter(({health})=>health.lastSyncError==='D1_ERROR').length;
+  const reduction=beforeGap.missingAny-final.gap.missingAny;
+  const requiredReduction=Math.min(32,beforeGap.missingAny);
+
+  gate(final.health.ok===true&&final.health.liveCaughtUp===true&&final.health.lastSyncError===null&&
+    final.health.runtimeFresh===true,'PROVENANCE_REPAIR_FINAL_HEALTH_FAILED');
+  gate(healthySamples>=4,'PROVENANCE_REPAIR_HEALTH_NOT_STABLE');
+  gate(d1ErrorSamples<=1,'PROVENANCE_REPAIR_D1_ERROR_PERSISTED');
+  gate(reduction>=requiredReduction,'PROVENANCE_REPAIR_GAP_DID_NOT_DRAIN');
+  gate(final.rows>=beforeRows,'O2_RECEIPT_COUNT_REGRESSED');
+  gate(BigInt(final.health.checkpointBlock??'0')>=BigInt(preHealth.checkpointBlock??'0'),
+    'PONS_CHECKPOINT_REGRESSED');
 
   const active=viewVersion(candidateVersion);
   gate(plain(active,'BINRAT_RELEASE_SHA')===REVIEWED_RELEASE_SHA,'ACTIVE_RELEASE_SHA_INVALID');
@@ -361,25 +395,36 @@ try{
   gate(plain(active,'BINRAT_TELEGRAM_UI_V2_ENABLED')==='true','ACTIVE_TELEGRAM_UI_CHANGED');
   gate(plain(active,'BINRAT_TELEGRAM_MEDIA_ENABLED')==='true','ACTIVE_TELEGRAM_MEDIA_CHANGED');
 
-  note('PROVIDER_HEAD_REGRESSION_PRODUCTION_PROMOTION_PASS '+JSON.stringify({
+  note('PROVENANCE_REPAIR_PRODUCTION_PROMOTION_PASS '+JSON.stringify({
     originalVersion,candidateVersion,releaseSha:REVIEWED_RELEASE_SHA,
-    beforeRows,rowsAfterDeploy:rows1,rowsAfterObservation:rows2,
-    checkpoint1:health1.checkpointBlock,head1:health1.headBlock,target1:health1.targetBlock,
-    checkpoint2:health2.checkpointBlock,head2:health2.headBlock,target2:health2.targetBlock,
-    lastSyncError:health2.lastSyncError,runtimeFresh:health2.runtimeFresh
+    gapBefore:beforeGap.missingAny,
+    gapAfter:final.gap.missingAny,
+    reduction,
+    directBefore:beforeGap.missingDirect,
+    directAfter:final.gap.missingDirect,
+    previousBefore:beforeGap.missingPrevious,
+    previousAfter:final.gap.missingPrevious,
+    edgeCountBefore:beforeGap.edgeCount,
+    edgeCountAfter:final.gap.edgeCount,
+    outcomeRowsBefore:beforeRows,
+    outcomeRowsAfter:final.rows,
+    checkpointBefore:preHealth.checkpointBlock,
+    checkpointAfter:final.health.checkpointBlock,
+    healthySamples,
+    d1ErrorSamples
   }));
 }catch(error){
-  note('PROVIDER_HEAD_REGRESSION_PRODUCTION_PROMOTION_FAILED '+JSON.stringify({
+  note('PROVENANCE_REPAIR_PRODUCTION_PROMOTION_FAILED '+JSON.stringify({
     deployed,
     code:error instanceof Error?error.message:'UNKNOWN'
   }));
   if(deployed&&originalVersion){
     try{
-      deployVersion(originalVersion,'Automatic rollback: provider-head regression hardening');
+      deployVersion(originalVersion,'Automatic rollback: bounded provenance repair');
       await requireHealthy('ROLLBACK_HEALTH');
-      note('PROVIDER_FIX_ROLLBACK_PASS '+originalVersion);
+      note('PROVENANCE_REPAIR_ROLLBACK_PASS '+originalVersion);
     }catch{
-      note('PROVIDER_FIX_ROLLBACK_FAILED manual Cloudflare rollback required');
+      note('PROVENANCE_REPAIR_ROLLBACK_FAILED manual Cloudflare rollback required');
     }
   }
   throw error;
