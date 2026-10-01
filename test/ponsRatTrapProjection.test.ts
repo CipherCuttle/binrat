@@ -160,7 +160,7 @@ test('Rat Trap preserves the live-canary flat 5m/1h/24h shape as a three-way tie
   assert.equal(projection.coverage.find((item)=>item.horizonMs===86_400_000)?.complete,1);
 });
 
-test('Rat Trap keeps PARTIAL, MISSING and IMMATURE rows visible instead of filtering them out', async () => {
+test('Rat Trap keeps PARTIAL, PENDING and IMMATURE rows visible instead of filtering them out', async () => {
   const old=launch({
     launchId:'a'.repeat(64),block:100,timestampMs:1_000_000,token:10,curve:11,symbol:'OLD'
   });
@@ -190,15 +190,15 @@ test('Rat Trap keeps PARTIAL, MISSING and IMMATURE rows visible instead of filte
   assert.deepEqual(projection.launches.map((item)=>item.symbol),['RECENT','OLD']);
   const recentRow=projection.launches[0]!;
   const oldRow=projection.launches[1]!;
-  assert.deepEqual(recentRow.observations.map((item)=>item.state),['MISSING','MISSING','IMMATURE']);
-  assert.deepEqual(oldRow.observations.map((item)=>item.state),['PARTIAL','MISSING','MISSING']);
+  assert.deepEqual(recentRow.observations.map((item)=>item.state),['PENDING','PENDING','IMMATURE']);
+  assert.deepEqual(oldRow.observations.map((item)=>item.state),['PARTIAL','PENDING','PENDING']);
   assert.equal(oldRow.highestObserved,null);
   assert.deepEqual(oldRow.observations[0]!.missing,['V4_POOL_STATE']);
 
   const day=projection.coverage.find((item)=>item.horizonMs===86_400_000)!;
   assert.equal(day.totalLaunches,2);
   assert.equal(day.immature,1);
-  assert.equal(day.missing,1);
+  assert.equal(day.pending,1);
 });
 
 test('Rat Trap is point-in-time safe and excludes future launches and future receipts', async () => {
@@ -234,7 +234,7 @@ test('Rat Trap is point-in-time safe and excludes future launches and future rec
   });
 
   assert.deepEqual(projection.launches.map((item)=>item.symbol),['PRIOR']);
-  assert.equal(projection.launches[0]!.observations[0]!.state,'MISSING');
+  assert.equal(projection.launches[0]!.observations[0]!.state,'PENDING');
   assert.equal(projection.launches[0]!.launchTimestampMs,1_000_000);
   assert.equal(projection.launches[0]!.highestObserved,null);
 });
