@@ -78,6 +78,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   BINRAT_RELEASE_SHA?: string;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_WEBHOOK_SECRET?: string;
+  TELEGRAM_WEBHOOK_SECRET_NEXT?: string;
   TELEGRAM_REPLIES_ENABLED?: string;
   TELEGRAM_MAX_MESSAGES_PER_MINUTE?: string;
   /** Both flags must be explicitly 'true'; inference is default-off. */
@@ -561,7 +562,10 @@ async function telegramWebhook(
 ): Promise<Response> {
   const token = required(env.TELEGRAM_BOT_TOKEN, 'TELEGRAM_BOT_TOKEN');
   const webhookSecret = required(env.TELEGRAM_WEBHOOK_SECRET, 'TELEGRAM_WEBHOOK_SECRET');
-  if (request.headers.get('x-telegram-bot-api-secret-token') !== webhookSecret) {
+  const webhookSecretNext = env.TELEGRAM_WEBHOOK_SECRET_NEXT?.trim() ?? '';
+  const suppliedWebhookSecret = request.headers.get('x-telegram-bot-api-secret-token') ?? '';
+  if (suppliedWebhookSecret !== webhookSecret &&
+      (!webhookSecretNext || suppliedWebhookSecret !== webhookSecretNext)) {
     return json(401, { error: 'INVALID_WEBHOOK_SECRET' });
   }
 
