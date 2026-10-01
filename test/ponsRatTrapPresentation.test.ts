@@ -9,6 +9,7 @@ const B='0x00000000000000000000000000000000000000bb' as Hex;
 const C='0x00000000000000000000000000000000000000cc' as Hex;
 
 function projection(input:Partial<PonsRatTrapProjection>&Pick<PonsRatTrapProjection,'launches'>):PonsRatTrapProjection {
+  const {launches,coverage,...rest}=input;
   return {
     projectionVersion:'BINRAT_PONS_RAT_TRAP_PROJECTION_V1',
     chainId:4663,
@@ -16,10 +17,10 @@ function projection(input:Partial<PonsRatTrapProjection>&Pick<PonsRatTrapProject
     deployer:A,
     asOfBlock:77753046n,
     asOfTimestampMs:1790895755000,
-    previousLaunchCount:input.launches.length,
-    launches:input.launches,
-    coverage:input.coverage??[],
-    ...input
+    previousLaunchCount:launches.length,
+    launches,
+    coverage:coverage??[],
+    ...rest
   };
 }
 
