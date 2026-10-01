@@ -1090,7 +1090,7 @@ function ponsBootstrapTransportErrorCode(error: unknown): string | null {
 function explicitSyncErrorCode(error: unknown): string | null {
   const message = error instanceof Error ? error.message : '';
   return message.match(
-    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|PONS_[A-Z0-9_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|D1_[A-Z_]+|SYNC_LEASE_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
+    /^(ARC_[A-Z_]+|ARCPAD_[A-Z_]+|PONS_[A-Z0-9_]+|PROVIDER_[A-Z_]+|REORG_[A-Z_]+|LAUNCH_[A-Z_]+|PROVENANCE_[A-Z_]+|OBSERVATION_[A-Z_]+|HISTORY_[A-Z_]+|D1_[A-Z_]+|SYNC_LEASE_[A-Z_]+|MISSING_CONFIG)(?=:|$)/
   )?.[1] ?? null;
 }
 
@@ -1103,7 +1103,8 @@ function reportSyncFailure(cycleId: string, phase: SyncFailurePhase, error: unkn
     code: diagnostic.code,
     errorName: diagnostic.errorName,
     httpStatus: diagnostic.httpStatus,
-    causeCode: diagnostic.causeCode
+    causeCode: diagnostic.causeCode,
+    detail: boundedSyncErrorDetail(error)
   }));
   return diagnostic.code;
 }
@@ -1116,6 +1117,14 @@ function syncErrorDiagnostic(error: unknown): SyncErrorDiagnostic {
     httpStatus: httpStatus(transportError),
     causeCode: safeCauseCode(transportError)
   };
+}
+
+function boundedSyncErrorDetail(error: unknown): Record<string,string> | null {
+  const message=error instanceof Error ? error.message : '';
+  const match=message.match(
+    /^PROVIDER_HEAD_BEHIND_CHECKPOINT:head=(\d+):target=(\d+):checkpoint=(\d+)$/
+  );
+  return match ? {head:match[1]!,target:match[2]!,checkpoint:match[3]!} : null;
 }
 
 /** Keep the public operation code while retaining bounded transport evidence. */

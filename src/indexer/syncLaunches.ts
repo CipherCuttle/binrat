@@ -63,6 +63,11 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
   let reorgRewindFrom: bigint | null = null;
 
   if (checkpoint) {
+    if (checkpoint.blockNumber > targetBlock) {
+      throw new Error(
+        `PROVIDER_HEAD_BEHIND_CHECKPOINT:head=${headBlock}:target=${targetBlock}:checkpoint=${checkpoint.blockNumber}`
+      );
+    }
     const canonicalHash = await source.getBlockHash(checkpoint.blockNumber);
     if (!sameHex(canonicalHash, checkpoint.blockHash)) {
       if (checkpoint.guardBlockNumber === null || checkpoint.guardBlockHash === null) {

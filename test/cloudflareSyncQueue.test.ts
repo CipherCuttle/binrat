@@ -142,6 +142,10 @@ test('sync diagnostics preserve explicit codes and expose only bounded safe clas
   assert.equal(syncErrorCode(new Error('ARCPAD_AUTHORITY_TEST')), 'ARCPAD_AUTHORITY_TEST');
   assert.equal(syncErrorCode(new Error('PONS_GET_HEAD_FAILED')), 'PONS_GET_HEAD_FAILED');
   assert.equal(syncErrorCode(new Error('PONS_FACTORY_AUTHORITY_DRIFT')), 'PONS_FACTORY_AUTHORITY_DRIFT');
+  assert.equal(
+    syncErrorCode(new Error('PROVIDER_HEAD_BEHIND_CHECKPOINT:head=100:target=98:checkpoint=120')),
+    'PROVIDER_HEAD_BEHIND_CHECKPOINT'
+  );
 
   const rateLimited = Object.assign(new Error('https://user:secret@rpc.example'), {
     name: 'HttpRequestError',
@@ -588,6 +592,81 @@ test('Pons backlog uses one lease writer, a bounded multi-batch slice, and exact
     );
     assert.deepEqual(busy, { status: 'BUSY' });
   } finally { db.close(); }
+});
+
+test('Pons provider head regression is explicit, preserves the checkpoint, and recovers when the source catches up', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+
+  class LaggingPonsSource extends FakePonsSource {
+    hashCalls=new Array<bigint>();
+    override async getBlockHash(blockNumber:bigint) {
+      this.hashCalls.push(blockNumber);
+      if (blockNumber>this.head) throw new Error('TEST_FUTURE_BLOCK_READ');
+      return hash(blockNumber);
+    }
+  }
+
+  const source=new LaggingPonsSource();
+  const store=new D1Store(db,ROBINHOOD_CHAIN_ID);
+  const runtime=new D1RuntimeStateStore(db,ROBINHOOD_CHAIN_ID);
+  const checkpointBlock=PONS_V2_START_BLOCK+100_500n;
+  let nowMs=100_000;
+  try {
+    await store.commitCheckpoint({
+      blockNumber:checkpointBlock,
+      blockHash:hash(checkpointBlock),
+      guardBlockNumber:checkpointBlock-32n,
+      guardBlockHash:hash(checkpointBlock-32n)
+    });
+    await runtime.put({
+      sourceVerified:true,
+      liveCaughtUp:true,
+      headBlock:checkpointBlock+2n,
+      targetBlock:checkpointBlock,
+      observationReady:false,
+      historyBackfillComplete:false,
+      historyBackfillTargetBlock:null,
+      lastSyncError:null,
+      lastHistoryError:null,
+      lastObservationError:null,
+      updatedAtMs:90_000
+    });
+
+    source.head=checkpointBlock-100n;
+    const lagged=await runCloudflarePonsSyncCycle(
+      {DB:db},
+      {kind:'PONS_SYNC_CYCLE',cycleId:'pons-provider-regressed',enqueuedAtMs:nowMs},
+      {now:()=>nowMs,ponsLaunchSource:source}
+    );
+    assert.deepEqual(lagged,{status:'RETRY',code:'PROVIDER_HEAD_BEHIND_CHECKPOINT'});
+    assert.deepEqual(source.hashCalls,[]);
+    assert.equal((await store.getCheckpoint())?.blockNumber,checkpointBlock);
+    const failed=await runtime.get();
+    assert.equal(failed?.sourceVerified,false);
+    assert.equal(failed?.liveCaughtUp,false);
+    assert.equal(failed?.lastSyncError,'PROVIDER_HEAD_BEHIND_CHECKPOINT');
+    assert.equal(failed?.headBlock,checkpointBlock+2n);
+    assert.equal(failed?.targetBlock,checkpointBlock);
+
+    nowMs+=30_000;
+    source.head=checkpointBlock+100n;
+    const recovered=await runCloudflarePonsSyncCycle(
+      {DB:db},
+      {kind:'PONS_SYNC_CYCLE',cycleId:'pons-provider-recovered',enqueuedAtMs:nowMs},
+      {now:()=>nowMs,ponsLaunchSource:source}
+    );
+    assert.deepEqual(recovered,{status:'SUCCESS',liveCaughtUp:true});
+    assert.equal(source.hashCalls[0],checkpointBlock);
+    assert.ok((await store.getCheckpoint())!.blockNumber>checkpointBlock);
+    const healthy=await runtime.get();
+    assert.equal(healthy?.sourceVerified,true);
+    assert.equal(healthy?.liveCaughtUp,true);
+    assert.equal(healthy?.lastSyncError,null);
+  } finally {
+    store.close();
+    db.close();
+  }
 });
 
 test('Pons timeout stays fail-closed, retries once through Queue, and clears only after a later advancing slice', async () => {
