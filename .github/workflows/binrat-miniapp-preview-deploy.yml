@@ -1,0 +1,252 @@
+name: binrat-miniapp-preview-deploy
+
+on:
+  push:
+    branches:
+      - ops/binrat-miniapp-preview-v1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-miniapp-preview-v1
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    if: ${{ contains(github.event.head_commit.message, '[deploy-miniapp-preview]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+      PREVIEW_TESTER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID || vars.RAT_FEEDBACK_ADMIN_USER_ID }}
+      PREVIEW_WORKER: binrat-miniapp-preview-v1
+      PREVIEW_URL: https://binrat-miniapp-preview-v1.pettevik.workers.dev
+      PREVIEW_DB_ID: 46814564-1a41-449a-88e5-c1349eed3a27
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Full regression gate
+        run: pnpm check
+
+      - name: Require isolated preview credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          test -n "${TELEGRAM_BOT_TOKEN:-}"
+          test -n "${BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:-}"
+          [[ "${PREVIEW_TESTER_ID:-}" =~ ^[1-9][0-9]{3,16}$ ]]
+
+      - name: Prepare isolated preview config
+        shell: bash
+        run: |
+          cat > wrangler.preview.jsonc <<JSON
+          {
+            "name": "${PREVIEW_WORKER}",
+            "main": "src/cloudflare/worker.ts",
+            "compatibility_date": "2026-09-18",
+            "compatibility_flags": ["nodejs_compat"],
+            "assets": { "directory": "./web" },
+            "d1_databases": [{
+              "binding": "DB",
+              "database_name": "binrat-v0",
+              "database_id": "${PREVIEW_DB_ID}"
+            }],
+            "vars": {
+              "BINRAT_MAX_STATUS_AGE_MS": "180000",
+              "BINRAT_PUBLIC_SITE_URL": "${PREVIEW_URL}",
+              "TELEGRAM_REPLIES_ENABLED": "false",
+              "RAT_CONVERSATION_ENABLED": "false",
+              "RAT_FEEDBACK_ENABLED": "false",
+              "RAT_AI_ENABLED": "false",
+              "BINRAT_AUTONOMOUS_RAT_ENABLED": "true",
+              "BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED": "false",
+              "BINRAT_TELEGRAM_UI_V2_ENABLED": "true",
+              "BINRAT_TELEGRAM_MEDIA_ENABLED": "true",
+              "BINRAT_RELEASE_SHA": "${GITHUB_SHA}"
+            }
+          }
+          JSON
+          node -e "const c=require('fs').readFileSync('wrangler.preview.jsonc','utf8'); const j=JSON.parse(c); if(j.triggers||j.queues||j.routes) process.exit(2);"
+
+      - name: Bundle preview without deploy
+        run: pnpm dlx wrangler@4.135.0 deploy --config wrangler.preview.jsonc --dry-run --outdir .preview-dry-run
+
+      - name: Deploy isolated preview Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm dlx wrangler@4.135.0 deploy --config wrangler.preview.jsonc 2>&1 | tee /tmp/preview-deploy.log
+          grep -F "${PREVIEW_URL}" /tmp/preview-deploy.log >/dev/null || true
+
+      - name: Install preview-only secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE' >/tmp/preview-secrets.json
+          const value = {
+            TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+            BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL,
+            BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: process.env.PREVIEW_TESTER_ID,
+            RAT_CANDIDATE_ALLOWED_USER_ID: process.env.PREVIEW_TESTER_ID
+          };
+          process.stdout.write(JSON.stringify(value));
+          NODE
+          pnpm dlx wrangler@4.135.0 secret bulk --config wrangler.preview.jsonc < /tmp/preview-secrets.json
+          rm -f /tmp/preview-secrets.json
+
+      - name: Smoke isolated preview and real Rat Trap
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 8); do
+            if curl -fsS --max-time 20 "${PREVIEW_URL}/health" >/tmp/preview-health.json; then break; fi
+            [ "$attempt" -lt 8 ] || exit 1
+            sleep 4
+          done
+          node <<'NODE'
+          const fs=require('fs');
+          const h=JSON.parse(fs.readFileSync('/tmp/preview-health.json','utf8'));
+          if(h.ok!==true || h.service!=='binrat-cloudflare-edge' || h.releaseSha!==process.env.GITHUB_SHA) {
+            console.error(h); process.exit(2);
+          }
+          NODE
+
+          node <<'NODE' >/tmp/preview-bootstrap-body.json
+          const crypto=require('crypto');
+          const fields={
+            auth_date:String(Math.floor(Date.now()/1000)),
+            query_id:'binrat-miniapp-preview-smoke',
+            user:JSON.stringify({id:Number(process.env.PREVIEW_TESTER_ID),first_name:'BINRAT preview'})
+          };
+          const check=Object.entries(fields).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>k+'='+v).join('\n');
+          const secret=crypto.createHmac('sha256','WebAppData').update(process.env.TELEGRAM_BOT_TOKEN).digest();
+          const hash=crypto.createHmac('sha256',secret).update(check).digest('hex');
+          process.stdout.write(JSON.stringify({initData:new URLSearchParams({...fields,hash}).toString()}));
+          NODE
+
+          curl -fsS --max-time 30 -H 'content-type: application/json'             --data @/tmp/preview-bootstrap-body.json             "${PREVIEW_URL}/api/miniapp/bootstrap" >/tmp/preview-bootstrap.json
+
+          node <<'NODE' >/tmp/preview-rat-trap-body.json
+          const fs=require('fs');
+          const boot=JSON.parse(fs.readFileSync('/tmp/preview-bootstrap.json','utf8'));
+          if(boot?.rats?.chainId!==4663 || !Array.isArray(boot?.rats?.candidates) || !Array.isArray(boot?.latestLaunches)) {
+            console.error(boot); process.exit(2);
+          }
+          const candidate=boot.rats.candidates.find(x=>/^[0-9a-f]{64}$/i.test(String(x?.latestLaunch?.launchId||'')));
+          const launchId=candidate?.latestLaunch?.launchId || boot.latestLaunches.find(x=>/^[0-9a-f]{64}$/i.test(String(x?.launchId||'')))?.launchId;
+          if(!launchId) process.exit(3);
+          const original=JSON.parse(fs.readFileSync('/tmp/preview-bootstrap-body.json','utf8'));
+          process.stdout.write(JSON.stringify({initData:original.initData,launchId}));
+          NODE
+
+          curl -fsS --max-time 45 -H 'content-type: application/json'             --data @/tmp/preview-rat-trap-body.json             "${PREVIEW_URL}/api/miniapp/rat-trap" >/tmp/preview-rat-trap.json
+
+          node <<'NODE'
+          const fs=require('fs');
+          const body=JSON.parse(fs.readFileSync('/tmp/preview-rat-trap.json','utf8'));
+          if(body?.ratTrap?.heading!=='RAT TRAP' || !body?.ratTrap?.summary || !Array.isArray(body?.ratTrap?.launches)) {
+            console.error(body); process.exit(2);
+          }
+          console.log(JSON.stringify({
+            ratTrap:body.ratTrap.heading,
+            previousLaunches:body.ratTrap.summary.previousLaunches,
+            remembered:body.ratTrap.summary.launchesWithAnyMemory,
+            canOfferRatWatch:body.ratTrap.summary.canOfferRatWatch
+          }));
+          NODE
+
+      - name: Point only the tester menu at preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}"
+
+          curl -fsS --max-time 20 -X POST             --data-urlencode "chat_id=${PREVIEW_TESTER_ID}"             "$api/getChatMenuButton" >/tmp/menu-before.json
+
+          node <<'NODE' >/tmp/menu-set.json
+          process.stdout.write(JSON.stringify({
+            chat_id:Number(process.env.PREVIEW_TESTER_ID),
+            menu_button:{
+              type:'web_app',
+              text:'BINRAT PREVIEW',
+              web_app:{url:process.env.PREVIEW_URL}
+            }
+          }));
+          NODE
+
+          set +e
+          curl -fsS --max-time 20 -H 'content-type: application/json'             --data @/tmp/menu-set.json "$api/setChatMenuButton" >/tmp/menu-set-result.json
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            cat /tmp/menu-set-result.json 2>/dev/null || true
+            exit "$rc"
+          fi
+
+          curl -fsS --max-time 20 -X POST             --data-urlencode "chat_id=${PREVIEW_TESTER_ID}"             "$api/getChatMenuButton" >/tmp/menu-after.json
+
+          node <<'NODE'
+          const fs=require('fs');
+          const body=JSON.parse(fs.readFileSync('/tmp/menu-after.json','utf8'));
+          const button=body?.result;
+          if(body?.ok!==true || button?.type!=='web_app' || button?.web_app?.url!==process.env.PREVIEW_URL) {
+            console.error(body); process.exit(2);
+          }
+          NODE
+
+      - name: Write preview receipt
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE' > preview-deploy-receipt.json
+          const fs=require('fs');
+          function read(path){try{return JSON.parse(fs.readFileSync(path,'utf8'))}catch{return null}}
+          const trap=read('/tmp/preview-rat-trap.json');
+          process.stdout.write(JSON.stringify({
+            kind:'BINRAT_MINIAPP_PREVIEW_V1',
+            worker:process.env.PREVIEW_WORKER,
+            url:process.env.PREVIEW_URL,
+            releaseSha:process.env.GITHUB_SHA,
+            productionWorkerModified:false,
+            cronConfigured:false,
+            queueConfigured:false,
+            schemaApplied:false,
+            telegramWebhookModified:false,
+            testerMenuTargeted:Boolean(read('/tmp/menu-after.json')?.ok),
+            ratTrapSmoke:trap?.ratTrap ? {
+              heading:trap.ratTrap.heading,
+              previousLaunches:trap.ratTrap.summary?.previousLaunches ?? null,
+              launchesWithAnyMemory:trap.ratTrap.summary?.launchesWithAnyMemory ?? null,
+              canOfferRatWatch:trap.ratTrap.summary?.canOfferRatWatch ?? null
+            } : null,
+            previousTesterMenu:read('/tmp/menu-before.json')?.result ?? null
+          },null,2));
+          NODE
+          cat preview-deploy-receipt.json >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: binrat-miniapp-preview-receipt
+          path: preview-deploy-receipt.json
+          retention-days: 7
+          if-no-files-found: warn
