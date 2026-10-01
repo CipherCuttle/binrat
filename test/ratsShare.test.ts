@@ -45,6 +45,7 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.doesNotMatch(JSON.stringify(first),/profit|p.?&.?l|smart.money|score|whale|insider/i);
     const receipt=await why(f.db,first.candidates[0]!.caseId,f.now());
     assert.deepEqual(receipt.discovery?.reasons,first.candidates[0]!.reasons);
+    assert.deepEqual(receipt.discovery?.previousLaunches?.map(item=>item.blockNumber),['99','96','95']);
     assert.equal(await count(f.db,'rat_v11_pons_discovery_snapshots'),1);
   } finally { f.db.close(); }
 });
