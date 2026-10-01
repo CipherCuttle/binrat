@@ -3,6 +3,7 @@
 // verifies parity, then promotes. It never merges, changes token/Holder authority,
 // or mutates the Telegram webhook. UI V2 may add only its exact prompt schema.
 import { execFileSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
 import { readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs';
 import {
   ACTIVATION_MODE, PROMPT_MIGRATION,
@@ -14,6 +15,7 @@ const WORKER = 'binrat-edge-v0';
 const DB = 'binrat-v0';
 const DB_ID = '46814564-1a41-449a-88e5-c1349eed3a27';
 const WORKER_URL = 'https://binrat-edge-v0.pettevik.workers.dev';
+const ROBINHOOD_RAT_MIGRATION = 'cloudflare/migrations/20260929_robinhood_live_rat_v1.sql';
 const CONFIG = 'wrangler.controlled-rat.generated.jsonc';
 const SECRETS = '/tmp/binrat-controlled-rat-secrets.json';
 const TELEGRAM_MENU_STATE = '/tmp/binrat-private-menu-state.json';
@@ -176,6 +178,69 @@ function ensurePromptSchema(config) {
   note('TELEGRAM_UI_PROMPT_SCHEMA_APPLIED');
   return true;
 }
+
+function robinhoodRatSchemaSnapshot(config) {
+  const sql = [
+    "SELECT",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='rat_v11_pons_discovery_snapshots') AS discovery_table,",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_rat_v11_pons_discovery_expiry') AS discovery_index,",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='rat_v11_pons_public_receipts') AS receipt_table,",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_rat_v11_pons_public_receipts_expiry') AS receipt_index;"
+  ].join(' ');
+  const output = jsonFromOutput(cli([
+    'd1','execute','DB','--remote','--yes','--json','--command',sql,'--config',config
+  ]));
+  const row = walk(output, value => ['discovery_table','discovery_index','receipt_table','receipt_index']
+    .every(key => Object.hasOwn(value ?? {}, key)) ? value : null);
+  gate(row, 'ROBINHOOD_RAT_SCHEMA_RESULT_MISSING');
+  return ['discovery_table','discovery_index','receipt_table','receipt_index'].map(key => Number(row[key]));
+}
+
+function ensureRobinhoodRatSchema(config) {
+  const before = robinhoodRatSchemaSnapshot(config);
+  const present = before.reduce((sum, value) => sum + (value === 1 ? 1 : 0), 0);
+  if (present !== 0 && present !== 4) throw new Error('ROBINHOOD_RAT_SCHEMA_PARTIAL');
+  if (present === 0) {
+    gate(existsSync(ROBINHOOD_RAT_MIGRATION), 'ROBINHOOD_RAT_MIGRATION_MISSING');
+    cli(['d1','execute','DB','--remote','--yes','--file',ROBINHOOD_RAT_MIGRATION,'--config',config], { timeout:180_000 });
+  }
+  gate(robinhoodRatSchemaSnapshot(config).every(value => value === 1), 'ROBINHOOD_RAT_SCHEMA_VERIFY_FAILED');
+  // Column probes fail closed if a same-named table has an incompatible shape.
+  cli(['d1','execute','DB','--remote','--yes','--command',[
+    'SELECT discovery_id,chain_id,source_checkpoint,rule_version,coverage_status,snapshot_json,generated_at_ms,expires_at_ms',
+    'FROM rat_v11_pons_discovery_snapshots LIMIT 0;',
+    'SELECT receipt_id,case_id,chain_id,receipt_json,created_at_ms,expires_at_ms',
+    'FROM rat_v11_pons_public_receipts LIMIT 0;'
+  ].join(' '),'--config',config], { timeout:120_000 });
+  note(present === 0 ? 'ROBINHOOD_RAT_SCHEMA_APPLIED' : 'ROBINHOOD_RAT_SCHEMA_ALREADY_PRESENT');
+  return present === 0;
+}
+
+function signedMiniAppInitData(token, tester, nowMs = Date.now()) {
+  const fields = {
+    auth_date: String(Math.floor(nowMs / 1000)),
+    query_id: 'binrat-private-rollout-smoke',
+    user: JSON.stringify({ id: Number(tester), first_name: 'BINRAT private smoke' })
+  };
+  const check = Object.entries(fields).sort(([a],[b]) => a.localeCompare(b))
+    .map(([key,value]) => key + '=' + value).join('\n');
+  const secret = createHmac('sha256','WebAppData').update(token).digest();
+  const hash = createHmac('sha256',secret).update(check).digest('hex');
+  return new URLSearchParams({ ...fields, hash }).toString();
+}
+
+async function smokePrivateMiniApp(token, tester) {
+  const response = await fetch(WORKER_URL + '/api/miniapp/bootstrap', {
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({ initData:signedMiniAppInitData(token,tester) }),
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.ok && body && body.rats?.chainId === 4663 && Array.isArray(body.rats?.candidates) &&
+    Array.isArray(body.watches) && body.sourceHealth?.chainId === 4663, 'MINI_APP_VALID_BOOTSTRAP_FAILED');
+  note('MINI_APP_VALID_BOOTSTRAP_PASS');
+}
 function deploymentStatus() {
   return jsonFromOutput(cli(['deployments','status','--name',WORKER,'--json']));
 }
@@ -279,6 +344,7 @@ try {
   // The read-only schema probe and its one exact additive migration happen
   // before candidate upload, but inside cleanup/rollback handling.
   promptSchemaApplied = mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE && ensurePromptSchema(CONFIG);
+  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) ensureRobinhoodRatSchema(CONFIG);
   const tag = 'controlled-rat-' + process.env.GITHUB_SHA.slice(0, 12);
   cli([
     'versions','upload','--config',CONFIG,'--keep-vars','--strict',
@@ -336,6 +402,7 @@ try {
       (deployedCandidateGate?.type === 'secret_text' ||
         (deployedCandidateGate?.type === 'plain_text' && deployedCandidateGate.text === tester)),
     'POSTDEPLOY_TESTER_BINDING_MISSING');
+    await smokePrivateMiniApp(botToken, tester);
     // The default menu is commands. The Mini App is an explicitly tester-scoped
     // side effect and is snapshotted so a later postdeploy failure can restore it.
     execFileSync('pnpm',['telegram:private-menu-activate'],{
