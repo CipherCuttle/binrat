@@ -89,7 +89,6 @@ const removedFromActiveDocs = [
   "docs/PRODUCT_SURFACE_V1_VISUAL_REVIEW.md",
   "docs/FRONTEND_V2_AUDIT.md",
   "docs/DUMPSTER_OS_VISUAL_SYSTEM_V1.md",
-  "docs/ROADMAP_V0.md",
   "docs/ROADMAP_LIVING_SCENES_V1.md",
   "docs/ROADMAP_LIVING_SCENES_ASSET_PLAN_V1.md",
   "docs/ROADMAP_LIVING_SCENES_IMPLEMENTATION_PLAN_V1.md",
@@ -128,6 +127,7 @@ for (const archived of [
 ]) assert.ok(fs.existsSync(path.join(root, archived)), archived + " archive artifact must remain");
 
 for (const pointer of [
+  "docs/ROADMAP_V0.md",
   "docs/DUMPSTER_LEDGER_V0.md",
   "docs/REPLAY_LAB_V1.md",
   "docs/RAT_WATCH_V0_LIVE_SUBSCRIPTION_ACCEPTANCE_2026_09_19.md",
