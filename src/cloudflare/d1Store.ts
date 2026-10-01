@@ -98,6 +98,88 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
     return rows.map((row) => reviveFact(row.payload_json));
   }
 
+  async listProvenanceEdgeRepairCandidates(limit: number): Promise<Array<{
+    fact: ProvenanceFact;
+    previous: ProvenanceFact | null;
+  }>> {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 256) {
+      throw new Error('PROVENANCE_REPAIR_LIMIT_INVALID');
+    }
+    const oldestLimit = Math.ceil(limit / 2);
+    const newestLimit = Math.floor(limit / 2);
+    const rows = await all<{ payload_json: string; previous_payload_json: string | null }>(
+      this.db.prepare(`
+        WITH missing AS (
+          SELECT p.fact_id,p.chain_id,p.creator,p.observed_block,p.log_index,p.payload_json
+          FROM provenance_facts p
+          LEFT JOIN provenance_edges e
+            ON e.edge_id = ('reported-creator:' || p.fact_id)
+          WHERE p.chain_id = ? AND e.edge_id IS NULL
+        ),
+        oldest AS (
+          SELECT * FROM missing
+          ORDER BY CAST(observed_block AS INTEGER),log_index,fact_id
+          LIMIT ?
+        ),
+        newest AS (
+          SELECT * FROM missing
+          ORDER BY CAST(observed_block AS INTEGER) DESC,log_index DESC,fact_id DESC
+          LIMIT ?
+        ),
+        selected AS (
+          SELECT * FROM oldest
+          UNION
+          SELECT * FROM newest
+        )
+        SELECT s.payload_json,
+          (
+            SELECT prev.payload_json
+            FROM provenance_facts prev
+            WHERE prev.chain_id = s.chain_id
+              AND prev.creator = s.creator
+              AND (
+                CAST(prev.observed_block AS INTEGER) < CAST(s.observed_block AS INTEGER)
+                OR (
+                  CAST(prev.observed_block AS INTEGER) = CAST(s.observed_block AS INTEGER)
+                  AND prev.log_index < s.log_index
+                )
+                OR (
+                  CAST(prev.observed_block AS INTEGER) = CAST(s.observed_block AS INTEGER)
+                  AND prev.log_index = s.log_index
+                  AND prev.fact_id < s.fact_id
+                )
+              )
+            ORDER BY CAST(prev.observed_block AS INTEGER) DESC,prev.log_index DESC,prev.fact_id DESC
+            LIMIT 1
+          ) AS previous_payload_json
+        FROM selected s
+        ORDER BY CAST(s.observed_block AS INTEGER),s.log_index,s.fact_id
+        LIMIT ?
+      `).bind(this.chainId, oldestLimit, newestLimit, limit)
+    );
+    return rows.map((row) => ({
+      fact: reviveFact(row.payload_json),
+      previous: row.previous_payload_json ? reviveFact(row.previous_payload_json) : null
+    }));
+  }
+
+  async putProvenanceEdges(edges: readonly ProvenanceEdge[]): Promise<void> {
+    const accepted = edges.filter((edge) => {
+      this.assertChain(edge.chainId, `PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
+      return true;
+    });
+    const chunkSize = 16;
+    for (let offset = 0; offset < accepted.length; offset += chunkSize) {
+      const statements: D1PreparedStatementLike[] = [];
+      for (const edge of accepted.slice(offset, offset + chunkSize)) {
+        const payload = canonicalJson(edge);
+        statements.push(this.edgeInsertIgnore(edge));
+        statements.push(this.edgeGuard(edge, payload));
+      }
+      if (statements.length > 0) await requireBatchSuccess(this.db.batch(statements));
+    }
+  }
+
   async replaceProvenanceEdges(edges: ProvenanceEdge[]): Promise<void> {
     const statements: D1PreparedStatementLike[] = [
       this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').bind(this.chainId)
@@ -277,7 +359,10 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
       "SELECT name FROM sqlite_master WHERE type='table' AND name='pons_outcome_receipts' LIMIT 1"
     ).first<{name:string}>();
     const statements:D1PreparedStatementLike[] = [
-      this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').bind(this.chainId),
+      this.db.prepare(`
+        DELETE FROM provenance_edges
+        WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
+      `).bind(this.chainId, blockNumber.toString()),
       this.db.prepare(`
         DELETE FROM rat_watch_alerts
         WHERE state = 'PENDING'
@@ -383,6 +468,30 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
         AND (fact_id <> ? OR evidence_digest <> ? OR payload_json <> ?)
       LIMIT 1
     `).bind(fact.factId, fact.launchId, fact.factId, fact.evidenceDigest, payload);
+  }
+
+  private edgeInsertIgnore(edge: ProvenanceEdge): D1PreparedStatementLike {
+    return this.db.prepare(`
+      INSERT OR IGNORE INTO provenance_edges (
+        edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
+        source_fact_ids_json,derivation_version,evidence_digest,payload_json
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+    `).bind(
+      edge.edgeId, edge.chainId, edge.kind, edge.from, edge.to, edge.evidenceClass,
+      edge.observedBlock.toString(), edge.observedBlockHash.toLowerCase(), canonicalJson(edge.sourceFactIds),
+      edge.derivationVersion, edge.evidenceDigest, canonicalJson(edge)
+    );
+  }
+
+  private edgeGuard(edge: ProvenanceEdge, payload: string): D1PreparedStatementLike {
+    return this.db.prepare(`
+      INSERT INTO binrat_invariant_guard (must_be_zero)
+      SELECT 1
+      FROM provenance_edges
+      WHERE edge_id = ?
+        AND (chain_id <> ? OR evidence_digest <> ? OR payload_json <> ?)
+      LIMIT 1
+    `).bind(edge.edgeId, edge.chainId, edge.evidenceDigest, payload);
   }
 
   private edgeInsert(edge: ProvenanceEdge): D1PreparedStatementLike {
