@@ -47,7 +47,7 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
       ]
     : ['🐀 NOTHING IN THE BIN.','No active V1 watches.'];
   if (outcome.legacyWatchCount > 0) {
-    lines.push(`${outcome.legacyWatchCount} legacy watch${outcome.legacyWatchCount === 1 ? '' : 'es'} are not active here; re-arm explicitly on Pons 4663.`);
+    lines.push(`${outcome.legacyWatchCount} legacy watch${outcome.legacyWatchCount === 1 ? '' : 'es'} ${outcome.legacyWatchCount === 1 ? 'is' : 'are'} not active here; re-arm explicitly on Pons 4663.`);
   }
   return lines.filter(Boolean).join('\n');
 }
