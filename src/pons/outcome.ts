@@ -15,6 +15,7 @@ export interface PonsOutcomeLaunch {
   launchId:string;
   token:Hex;
   curve:Hex;
+  launchBlock:bigint;
 }
 
 export interface PonsOutcomeObservation {
@@ -124,7 +125,7 @@ export async function observePonsOutcome(
   observedBlock:bigint
 ):Promise<PonsOutcomeObservation> {
   assertLaunchShape(launch);
-  if (observedBlock<0n) throw new Error('PONS_OUTCOME_BLOCK_INVALID');
+  if (observedBlock<launch.launchBlock) throw new Error('PONS_OUTCOME_BEFORE_LAUNCH');
   await source.assertAuthority();
   const before=(await source.getBlockHash(observedBlock)).toLowerCase() as Hex;
   const state=await source.readCurveState(launch,observedBlock);
@@ -162,8 +163,8 @@ export async function observePonsOutcome(
     observedBlockHash:before,
     phase,
     quoteAsset:state.pairToken,
-    quoteDecimals:Number.isInteger(state.quoteDecimals) ? state.quoteDecimals : null,
-    tokenDecimals:Number.isInteger(state.tokenDecimals) ? state.tokenDecimals : null,
+    quoteDecimals:validDecimals(state.quoteDecimals) ? state.quoteDecimals : null,
+    tokenDecimals:validDecimals(state.tokenDecimals) ? state.tokenDecimals : null,
     quoteReserve:phase==='CURVE' ? state.quoteReserve : null,
     tokenReserve:phase==='CURVE' ? state.tokenReserve : null,
     totalSupply:state.totalSupply>=0n ? state.totalSupply : null,
@@ -188,7 +189,16 @@ export function estimateFdvQuoteRaw(
 }
 
 export async function verifyPonsOutcomeObservation(receipt:PonsOutcomeObservation):Promise<void> {
-  assertLaunchShape({launchId:receipt.launchId,token:receipt.token,curve:receipt.curve});
+  if (!/^[0-9a-f]{64}$/.test(receipt.launchId) ||
+      !/^0x[0-9a-f]{40}$/.test(receipt.token) ||
+      !/^0x[0-9a-f]{40}$/.test(receipt.curve) ||
+      !/^0x[0-9a-f]{40}$/.test(receipt.quoteAsset) ||
+      !/^0x[0-9a-f]{64}$/.test(receipt.observedBlockHash) ||
+      receipt.observedBlock<0n ||
+      (receipt.quoteDecimals!==null && !validDecimals(receipt.quoteDecimals)) ||
+      (receipt.tokenDecimals!==null && !validDecimals(receipt.tokenDecimals))) {
+    throw new Error('PONS_OUTCOME_RECEIPT_INVALID');
+  }
   const core:Omit<PonsOutcomeObservation,'outcomeId'|'evidenceDigest'>={
     observationVersion:receipt.observationVersion,
     chainId:receipt.chainId,
@@ -245,7 +255,12 @@ export async function verifyPonsOutcomeObservation(receipt:PonsOutcomeObservatio
 function assertLaunchShape(launch:PonsOutcomeLaunch):void {
   if (!/^[0-9a-f]{64}$/.test(launch.launchId) ||
       !/^0x[0-9a-f]{40}$/.test(launch.token) ||
-      !/^0x[0-9a-f]{40}$/.test(launch.curve)) {
+      !/^0x[0-9a-f]{40}$/.test(launch.curve) ||
+      launch.launchBlock<0n) {
     throw new Error('PONS_OUTCOME_LAUNCH_INVALID');
   }
+}
+
+function validDecimals(value:number):boolean {
+  return Number.isInteger(value) && value>=0 && value<=255;
 }
