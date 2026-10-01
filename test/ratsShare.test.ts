@@ -46,6 +46,25 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
   } finally { f.db.close(); }
 });
 
+test('RATS ranks the freshest repeat activity ahead of older high-volume deployers', async () => {
+  const {f}=await recurrentFixture();
+  const fresher=addr(8);
+  try {
+    await f.launch(101,fresher);
+    await f.launch(102,fresher);
+    await f.checkpoint(102);
+    await f.launch(96,CREATOR);
+    await f.launch(95,CREATOR);
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.candidates[0]!.entity.entityId,fresher);
+    assert.equal(snapshot.candidates[0]!.latestLaunch.blockNumber,'102');
+    assert.equal(snapshot.candidates[0]!.recurrenceCount,2);
+    const olderHeavy=snapshot.candidates.find(candidate=>candidate.entity.entityId===CREATOR);
+    assert.equal(olderHeavy?.recurrenceCount,4);
+    assert.equal(olderHeavy?.latestLaunch.blockNumber,'100');
+  } finally { f.db.close(); }
+});
+
 test('maximum RATS cards and five-receipt public recovery fit one Telegram message without omitting evidence', async () => {
   const f=await autonomousFixture();
   try {
