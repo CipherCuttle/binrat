@@ -92,11 +92,18 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
       assert.doesNotMatch(card.caption,JARGON,card.view);
       assert.ok(primaryActions(card)<=2,`${card.view} primary actions`);
     }
-    assert.match(cards[0]!.caption,/Catch repeat launchers early/);
-    assert.match(cards[1]!.caption,/SAME PAWS/);
-    assert.match(cards[1]!.caption,/2 LAUNCHES INDEXED/);
-    assert.match(cards[1]!.caption,/Latest: \$FIXTURE · block 100/);
-    assert.match(cards[1]!.caption,/2 retained receipts/);
+    assert.match(cards[0]!.caption,/Fresh Rats/);
+    assert.match(cards[1]!.caption,/REPEAT DEPLOYER ACTIVE/);
+    assert.match(cards[1]!.caption,/Latest repeat launch: \$FIXTURE · block 100/);
+    assert.match(cards[1]!.caption,/1 earlier indexed launch/);
+    assert.match(cards[1]!.caption,/BINRAT will ping you if these paws launch again/);
+    assert.doesNotMatch(cards[1]!.caption,/retained receipt|LAUNCHES INDEXED/i);
+    const ratLabels=cards[1]!.keyboard.flat().map(button=>button.text);
+    assert.ok(ratLabels.includes('Open case'));
+    assert.ok(ratLabels.includes('Watch deployer'));
+    assert.ok(ratLabels.includes('Why flagged'));
+    assert.equal(ratLabels.includes('Open Radar'),false);
+    assert.equal(cards[1]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
     assert.match(cards[2]!.caption,/found .* launches from this reported deployer/i);
     assert.match(cards[3]!.caption,/WHY I NOTICED/);
     assert.match(cards[4]!.caption,/WATCHING THESE PAWS/);
