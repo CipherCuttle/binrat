@@ -227,12 +227,14 @@ function snapshotCoreState(){
   const result=d1Query([
     "SELECT chain_id,block_number,block_hash,guard_block_number,guard_block_hash FROM chain_checkpoints WHERE chain_id=4663",
     "SELECT chain_id,source_verified,live_caught_up,head_block,target_block,last_sync_error,updated_at_ms FROM binrat_runtime_state WHERE chain_id=4663",
-    "SELECT COUNT(*) AS launch_count FROM launches WHERE chain_id=4663"
+    "SELECT COUNT(*) AS launch_count FROM launches WHERE chain_id=4663",
+    "SELECT launch_id,event_id,chain_id,block_number,block_hash,source,launcher,tx_hash,log_index,token,creator,pool,authority_json FROM launches WHERE chain_id=4663 ORDER BY CAST(block_number AS INTEGER),log_index,launch_id LIMIT 1"
   ].join('; '));
   return {
     checkpoint:firstRow(result,0),
     runtime:firstRow(result,1),
-    launchCount:firstRow(result,2)?.launch_count??null
+    launchCount:Number(firstRow(result,2)?.launch_count??0),
+    anchorLaunch:firstRow(result,3)
   };
 }
 function outcomeTableState(){
@@ -332,8 +334,22 @@ try{
   const afterMigration=snapshotCoreState();
   const afterTable=outcomeTableState();
   gate(afterTable.tableCount===1&&afterTable.rows===0,'O2_MIGRATION_VERIFY_FAILED');
-  gate(JSON.stringify(afterMigration)===JSON.stringify(beforeMigration),'O2_MIGRATION_MUTATED_EXISTING_STATE');
-  note('O2_REMOTE_D1_MIGRATION_PASS '+JSON.stringify({beforeTable,afterTable}));
+  gate(JSON.stringify(afterMigration.anchorLaunch)===JSON.stringify(beforeMigration.anchorLaunch),
+    'O2_MIGRATION_MUTATED_ANCHOR_LAUNCH');
+  gate(afterMigration.launchCount>=beforeMigration.launchCount,'O2_MIGRATION_LAUNCH_COUNT_REGRESSED');
+  gate(
+    BigInt(afterMigration.checkpoint?.block_number??'0')>=BigInt(beforeMigration.checkpoint?.block_number??'0'),
+    'O2_MIGRATION_CHECKPOINT_REGRESSED'
+  );
+  gate(afterMigration.runtime?.source_verified===1&&afterMigration.runtime?.last_sync_error===null,
+    'O2_MIGRATION_RUNTIME_AUTHORITY_REGRESSED');
+  note('O2_REMOTE_D1_MIGRATION_PASS '+JSON.stringify({
+    beforeTable,afterTable,
+    launchCountBefore:beforeMigration.launchCount,
+    launchCountAfter:afterMigration.launchCount,
+    checkpointBefore:beforeMigration.checkpoint?.block_number??null,
+    checkpointAfter:afterMigration.checkpoint?.block_number??null
+  }));
 
   const disabledTag='o2-disabled-'+process.env.GITHUB_SHA.slice(0,12);
   disabledVersion=uploadVersion(disabledTag,'BINRAT O2 disabled production candidate');
@@ -350,6 +366,7 @@ try{
   gate(secretPresent(disabledConfig,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'),'DISABLED_ARCHIVE_SECRET_MISSING');
   note('O2_DISABLED_VERSION_PARITY_PASS '+disabledVersion);
 
+  deployedStage='DISABLED_ATTEMPT';
   deployVersion(disabledVersion,'BINRAT O2 disabled production rollout');
   deployedStage='DISABLED';
   const disabledLive=viewVersion(disabledVersion);
@@ -379,6 +396,7 @@ try{
   gate(secretPresent(activationConfig,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'),'ACTIVATION_ARCHIVE_SECRET_MISSING');
   note('O2_ACTIVATION_VERSION_PARITY_PASS '+activationVersion);
 
+  deployedStage='ACTIVE_ATTEMPT';
   deployVersion(activationVersion,'BINRAT O2 true/1 controlled activation');
   deployedStage='ACTIVE';
   await healthyPons('Post-activation Pons probe');
@@ -410,11 +428,11 @@ try{
     code:error instanceof Error?error.message:'UNKNOWN'
   }));
   try{
-    if(deployedStage==='ACTIVE'&&disabledVersion){
+    if((deployedStage==='ACTIVE'||deployedStage==='ACTIVE_ATTEMPT')&&disabledVersion){
       deployVersion(disabledVersion,'Automatic O2 rollback to disabled candidate');
       await healthyPons('O2 activation rollback Pons probe');
       note('O2_ROLLBACK_PASS target=DISABLED');
-    }else if(deployedStage==='DISABLED'&&originalVersion){
+    }else if((deployedStage==='DISABLED'||deployedStage==='DISABLED_ATTEMPT')&&originalVersion){
       deployVersion(originalVersion,'Automatic O2 rollback to pre-rollout production');
       await healthyPons('O2 disabled-candidate rollback Pons probe');
       note('O2_ROLLBACK_PASS target=ORIGINAL');
