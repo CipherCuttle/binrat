@@ -48,6 +48,21 @@ test('RATS pages use a compact persisted snapshot reference with bounded next an
   } finally { f.db.close(); }
 });
 
+test('persisted pre-context RATS snapshots remain readable during the retention window', async () => {
+  const f=await autonomousFixture();
+  try {
+    await f.launch(99,CREATOR);
+    const snapshot=await discoverRats(f.db,f.now());
+    const legacy=structuredClone(snapshot);
+    for (const candidate of legacy.candidates) delete candidate.previousLaunches;
+    await f.db.prepare('UPDATE rat_v11_pons_discovery_snapshots SET snapshot_json=? WHERE discovery_id=?')
+      .bind(JSON.stringify(legacy),snapshot.discoveryId).run();
+    const loaded=await loadRatsSnapshot(f.db,snapshot.discoveryId,f.now());
+    assert.equal(loaded.candidates[0]?.previousLaunches,undefined);
+    assert.doesNotThrow(()=>renderRatCard({kind:'RATS',snapshot:loaded,candidateIndex:0}));
+  } finally { f.db.close(); }
+});
+
 test('V2 card captions fail closed instead of truncating canonical evidence', async () => {
   assert.throws(()=>assertV2Caption('🐀'.repeat(1025)),/CAPTION_TOO_LARGE/);
   const f=await autonomousFixture();
