@@ -5,6 +5,9 @@ import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { parsePonsOutcomeObservationReceipt, RpcPonsOutcomeObservationSource, type PonsOutcomeObservationReceipt } from '../src/pons/outcomeReceipts.js';
 import { buildPonsRatTrapProjection, type PonsRatTrapProjection } from '../src/pons/ratTrapProjection.js';
 import { resolveRobinhoodArchiveRpcUrl } from '../src/cloudflare/syncQueue.js';
+import { ponsErc20Abi } from '../src/pons/ponsAbi.js';
+import { robinhoodMainnet } from '../src/pons/chain.js';
+import { createPublicClient, http, type Address } from 'viem';
 
 const DB='binrat-v0';
 const DB_ID='46814564-1a41-449a-88e5-c1349eed3a27';
@@ -107,6 +110,24 @@ function short(value:string):string { return value.length>20?`${value.slice(0,10
 function label(launch:LaunchObserved):string { return launch.symbol.trim()?`$${launch.symbol.trim()}`:launch.name.trim()||short(launch.token); }
 function horizonLabel(ms:number):string { if(ms===300_000)return '5m';if(ms===3_600_000)return '1h';if(ms===86_400_000)return '24h';return `${ms}ms`; }
 
+async function readTokenIdentity(
+  client:ReturnType<typeof createPublicClient>,
+  token:Hex,
+  blockNumber:bigint
+):Promise<{name:string;symbol:string;decimals:number}|null> {
+  try {
+    const [name,symbol,decimals]=await Promise.all([
+      client.readContract({address:token as Address,abi:ponsErc20Abi,functionName:'name',blockNumber}),
+      client.readContract({address:token as Address,abi:ponsErc20Abi,functionName:'symbol',blockNumber}),
+      client.readContract({address:token as Address,abi:ponsErc20Abi,functionName:'decimals',blockNumber})
+    ]);
+    if(typeof name!=='string'||typeof symbol!=='string'||!Number.isInteger(decimals)) return null;
+    return {name,symbol,decimals:Number(decimals)};
+  } catch {
+    return null;
+  }
+}
+
 function summarizeProjection(projection:PonsRatTrapProjection) {
   return {
     currentLaunchId:projection.currentLaunchId,
@@ -151,6 +172,7 @@ try {
   const receiptCount=Number(receiptCountRows[0]?.n??0);
 
   const source=new RpcPonsOutcomeObservationSource({discoveryRpcUrl:archiveRpcUrl,archiveRpcUrl});
+  const identityClient=createPublicClient({chain:robinhoodMainnet(archiveRpcUrl),transport:http(archiveRpcUrl)});
   await source.assertAuthority();
   const checkpointPoint=await source.getBlockPoint(checkpoint.blockNumber);
   gate(checkpointPoint.blockHash.toLowerCase()===checkpoint.blockHash,'RAT_TRAP_INSPECT_CHECKPOINT_REORG');
@@ -165,6 +187,14 @@ try {
 
   const cohorts:unknown[]=[];
   const skipped:unknown[]=[];
+  const identityCache=new Map<string,{name:string;symbol:string;decimals:number}|null>();
+  async function identity(token:Hex){
+    const key=token.toLowerCase();
+    if(identityCache.has(key)) return identityCache.get(key)??null;
+    const value=await readTokenIdentity(identityClient,key as Hex,checkpoint.blockNumber);
+    identityCache.set(key,value);
+    return value;
+  }
   for(const creatorRow of creatorRows){
     if(cohorts.length>=MAX_COHORTS) break;
     const creator=creatorRow.creator.toLowerCase();
@@ -204,9 +234,19 @@ try {
       currentLaunch:current,launches:[current,...previous],receiptsByLaunch,canonicalLaunchTimestampMsByLaunch,
       asOfBlock:checkpoint.blockNumber,asOfTimestampMs:checkpointPoint.timestampMs
     });
+    const identityByToken:Record<string,unknown>={};
+    const tokens=new Set<Hex>([current.token,...previous.map((item)=>item.token)]);
+    for(const launch of projection.launches){
+      for(const observation of launch.observations){
+        if(observation.quoteAsset?.kind==='ERC20') tokens.add(observation.quoteAsset.address);
+      }
+    }
+    for(const token of tokens) identityByToken[token]=await identity(token);
     cohorts.push({
       current:{label:label(current),launchId:current.launchId,token:current.token,deployer:current.creator,block:current.blockNumber.toString()},
-      receiptedPriorRows:receiptRows.length,projection:summarizeProjection(projection)
+      receiptedPriorRows:receiptRows.length,
+      identityByToken,
+      projection:summarizeProjection(projection)
     });
   }
 
