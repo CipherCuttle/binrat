@@ -23,17 +23,62 @@ async function capture(browser, width, height) {
     await page.goto(base + "/roadmap-motion-lab", { waitUntil: "domcontentloaded" });
     await page.locator("[data-motion-lab]").waitFor();
     assert.equal(await page.locator("[data-motion-milestone]").count(), 6, "motion lab exposes six milestones");
+    assert.deepEqual(
+      await page.locator("[data-motion-milestone] .motion-lab__label strong").allTextContents(),
+      ["SNIFF", "REMEMBER", "WATCH", "HUNT", "ORGANIZE", "AUTONOMOUS RAT"],
+      "motion lab chapter order matches canonical roadmap",
+    );
     assert.equal(await page.locator("[data-motion-lab] img, [data-motion-lab] svg, [data-motion-lab] canvas").count(), 0,
       "motion lab must contain no scene/image/vector/canvas art");
 
     await scrollToProgress(page, 0);
     assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-active-index"), "0");
+    assert.equal(
+      await page.locator('[data-motion-milestone="0"] [data-roadmap-feature="pons_live_intelligence"] [data-roadmap-status]').textContent(),
+      "BUILDING",
+      "current Pons intelligence status projects from canonical manifest",
+    );
+    assert.equal(
+      await page.locator('[data-motion-milestone="0"] [data-roadmap-feature="rat_radar"] [data-roadmap-status]').textContent(),
+      "BUILDING",
+      "Rat Radar current-rail replacement stays BUILDING",
+    );
+    assert.equal(
+      await page.locator('[data-motion-milestone="1"] [data-roadmap-feature="replay_lab"] [data-roadmap-status]').textContent(),
+      "LIVE",
+      "Replay Lab public beta projects as LIVE",
+    );
     await page.screenshot({ path: path.join(output, "motion-start-" + width + ".png"), animations: "disabled" });
 
     await scrollToProgress(page, 0.4);
     assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-active-index"), "2");
     assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-docked"), "false");
+    assert.equal(
+      await page.locator('[data-motion-milestone="2"] [data-roadmap-feature="rat_watch"] [data-roadmap-status]').textContent(),
+      "BUILDING",
+      "Rat Watch current-rail revalidation prevents a stale LIVE badge",
+    );
     await page.screenshot({ path: path.join(output, "motion-middle-" + width + ".png"), animations: "disabled" });
+
+    await scrollToProgress(page, 0.6);
+    assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-active-index"), "3");
+    assert.equal(await page.locator('[data-motion-milestone="3"] [data-roadmap-feature]').count(), 7,
+      "HUNT exposes all seven canonical future capabilities");
+    assert.equal(
+      await page.locator('[data-motion-milestone="3"] [data-roadmap-feature="dumpster_raids"] [data-roadmap-status]').textContent(),
+      "EXPERIMENT",
+      "Dumpster Raids projects manifest EXPERIMENTAL as EXPERIMENT",
+    );
+    assert.equal(
+      (await page.locator('[data-motion-milestone="3"] .motion-lab__rat-line').textContent()).trim(),
+      "DEGEN DECIDES ATTENTION. RECEIPTS DECIDE TRUTH.",
+      "HUNT retains the canonical attention/truth contract",
+    );
+    assert.equal(
+      await page.locator('[data-motion-milestone="4"] [data-roadmap-feature="rat_den"] [data-roadmap-status]').textContent(),
+      "PLANNED",
+      "Rat Den projects manifest PLANNED state",
+    );
 
     await scrollToProgress(page, 1);
     const root = page.locator("[data-motion-lab]");
@@ -71,6 +116,8 @@ async function reduced(browser, width, height) {
     await root.waitFor();
     assert.equal(await root.getAttribute("data-reduced-motion"), "true");
     assert.equal(await page.locator(".motion-lab__reduced-row").count(), 6);
+    assert.equal(await page.locator(".motion-lab__reduced-row [data-roadmap-feature]").count(), 30,
+      "reduced motion exposes all roadmap capabilities without animation");
     assert.equal(await page.locator(".motion-lab__rail").count(), 0, "reduced motion removes moving rail");
     process.stdout.write("PASS ROADMAP MOTION LAB REDUCED " + width + "px\n");
   } finally {

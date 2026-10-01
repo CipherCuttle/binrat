@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   motion,
   useMotionValueEvent,
@@ -8,18 +8,10 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { roadmapStages, type RoadmapStage } from "./roadmapData";
 import "./motion-lab.css";
 
-const milestones = [
-  { title: "SNIFF", kicker: "The rat catches the launch.", accent: "var(--green)" },
-  { title: "REMEMBER", kicker: "Sites vanish. The trail doesn't.", accent: "var(--orange)" },
-  { title: "WATCH", kicker: "Leave a tripwire in the trash.", accent: "var(--bone)" },
-  { title: "HUNT", kicker: "Point the rats at something worth digging.", accent: "var(--orange)" },
-  { title: "ORGANIZE", kicker: "Useful work earns a receipt.", accent: "var(--purple)" },
-  { title: "AUTONOMOUS RAT", kicker: "Give it a case. It comes back with receipts.", accent: "var(--red)" },
-] as const;
-
-type Milestone = (typeof milestones)[number];
+const milestones = roadmapStages;
 
 function rangesFor(index: number) {
   const target = index / (milestones.length - 1);
@@ -47,13 +39,34 @@ function rangesFor(index: number) {
   };
 }
 
+function ChapterDetails({ milestone }: { milestone: RoadmapStage }) {
+  return (
+    <div className="motion-lab__details">
+      <p className="motion-lab__literal">{milestone.literal}</p>
+      <ul className="motion-lab__features" aria-label={milestone.title + " capabilities"}>
+        {milestone.features.map((feature) => (
+          <li key={feature.id} data-roadmap-feature={feature.id}>
+            <span>{feature.label}</span>
+            {feature.status ? (
+              <b data-roadmap-status={feature.status}>{feature.status}</b>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+      {milestone.ratLine ? (
+        <p className="motion-lab__rat-line">{milestone.ratLine}</p>
+      ) : null}
+    </div>
+  );
+}
+
 function MotionMilestone({
   milestone,
   index,
   progress,
   active,
 }: {
-  milestone: Milestone;
+  milestone: RoadmapStage;
   index: number;
   progress: MotionValue<number>;
   active: boolean;
@@ -65,16 +78,21 @@ function MotionMilestone({
 
   return (
     <div
-      className={`motion-lab__milestone motion-lab__milestone--${index % 2 ? "right" : "left"}`}
+      className={"motion-lab__milestone motion-lab__milestone--" + (index % 2 ? "right" : "left")}
       data-motion-milestone={index}
+      data-roadmap-stage={milestone.id}
       data-active={active}
       aria-current={active ? "step" : undefined}
-      style={{ top: `${index * 20}%`, "--motion-accent": milestone.accent } as React.CSSProperties}
+      style={{
+        top: String(index * 20) + "%",
+        "--motion-accent": milestone.accent,
+      } as CSSProperties}
     >
       <motion.div className="motion-lab__label" style={{ opacity, y }}>
         <span>{String(index + 1).padStart(2, "0")}</span>
         <strong>{milestone.title}</strong>
-        <small>{milestone.kicker}</small>
+        <small>{milestone.headline}</small>
+        <ChapterDetails milestone={milestone} />
       </motion.div>
 
       <div className="motion-lab__node-wrap" aria-hidden="true">
@@ -93,15 +111,16 @@ function ReducedTimeline({ navigate }: { navigate: (path: string) => void }) {
       <button className="motion-lab__back" type="button" onClick={() => navigate("/roadmap")}>
         ROADMAP ↗
       </button>
-      <h1 className="motion-lab__sr-title">ROADMAP MOTION LAB</h1>
+      <h1 className="motion-lab__sr-title">BINRAT ROADMAP</h1>
       <div className="motion-lab__reduced-list">
         {milestones.map((milestone, index) => (
-          <div className="motion-lab__reduced-row" key={milestone.title}>
+          <div className="motion-lab__reduced-row" key={milestone.id} data-roadmap-stage={milestone.id}>
             <span>{String(index + 1).padStart(2, "0")}</span>
             <i aria-hidden="true" />
             <div>
               <strong>{milestone.title}</strong>
-              <small>{milestone.kicker}</small>
+              <small>{milestone.headline}</small>
+              <ChapterDetails milestone={milestone} />
             </div>
           </div>
         ))}
@@ -146,6 +165,8 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
 
   if (reducedMotion) return <ReducedTimeline navigate={navigate} />;
 
+  const activeMilestone = milestones[activeIndex];
+
   return (
     <div
       className="motion-lab-page"
@@ -154,14 +175,14 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
       data-active-index={activeIndex}
       data-moving={moving}
       data-docked={docked}
-      style={{ "--motion-live-accent": milestones[activeIndex].accent } as React.CSSProperties}
+      style={{ "--motion-live-accent": activeMilestone.accent } as CSSProperties}
     >
       <button className="motion-lab__back" type="button" onClick={() => navigate("/roadmap")}>
         ROADMAP ↗
       </button>
-      <h1 className="motion-lab__sr-title">ROADMAP MOTION LAB</h1>
+      <h1 className="motion-lab__sr-title">BINRAT ROADMAP</h1>
 
-      <section ref={runwayRef} className="motion-lab__runway" aria-label="BINRAT roadmap motion prototype">
+      <section ref={runwayRef} className="motion-lab__runway" aria-label="BINRAT roadmap">
         <div className="motion-lab__sticky">
           <div className="motion-lab__rail-frame">
             <motion.div className="motion-lab__rail" style={{ y: railY }}>
@@ -180,7 +201,7 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
 
               {milestones.map((milestone, index) => (
                 <MotionMilestone
-                  key={milestone.title}
+                  key={milestone.id}
                   milestone={milestone}
                   index={index}
                   progress={progress}
@@ -189,6 +210,15 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
               ))}
             </motion.div>
           </div>
+
+          <aside
+            className="motion-lab__mobile-card"
+            data-active-chapter={activeMilestone.id}
+          >
+            <span>{String(activeMilestone.index).padStart(2, "0")} / {activeMilestone.title}</span>
+            <strong>{activeMilestone.headline}</strong>
+            <ChapterDetails milestone={activeMilestone} />
+          </aside>
 
           <div className="motion-lab__center-mark" aria-hidden="true">
             <span />

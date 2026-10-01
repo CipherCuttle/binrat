@@ -7,9 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "check:evidence": "node checks/check-evidence.mjs",
-    "check": "pnpm check:evidence && pnpm check:roadmap-purity && pnpm build",
+    "check": "pnpm check:evidence && pnpm check:roadmap-purity && pnpm check:roadmap-content && pnpm build",
     "preview": "vite preview",
-    "check:roadmap-purity": "node checks/roadmap-scene-purity.cjs"
+    "check:roadmap-purity": "node checks/roadmap-scene-purity.cjs",
+    "check:roadmap-content": "node checks/roadmap-content-authority.cjs"
   },
   "dependencies": {
     "react": "latest",

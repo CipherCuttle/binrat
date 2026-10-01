@@ -395,3 +395,208 @@
 @media (prefers-reduced-motion: reduce) {
   .motion-lab__hint { display: none; }
 }
+
+
+/* Roadmap V1 content pass: keep the rail physics; expand only the active chapter. */
+.motion-lab__label {
+  width: min(430px, 38vw);
+}
+
+.motion-lab__details {
+  display: grid;
+  gap: 10px;
+  max-height: 310px;
+  margin-top: 13px;
+  overflow: hidden;
+  text-align: left;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    max-height 260ms ease,
+    margin-top 260ms ease,
+    opacity 180ms ease,
+    transform 220ms ease;
+}
+
+.motion-lab__milestone[data-active="false"] .motion-lab__details {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.motion-lab__literal {
+  margin: 0;
+  color: color-mix(in srgb, var(--bone) 78%, var(--muted));
+  font: 10px/1.5 var(--mono);
+}
+
+.motion-lab__features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.motion-lab__features li {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 5px;
+  border-top: 1px solid color-mix(in srgb, var(--line-hi) 30%, transparent);
+  color: color-mix(in srgb, var(--bone) 78%, var(--muted));
+  font: 8px/1.35 var(--mono);
+  letter-spacing: .045em;
+}
+
+.motion-lab__features li > span {
+  min-width: 0;
+}
+
+.motion-lab__features li > b {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font: 7px/1 var(--mono);
+  letter-spacing: .08em;
+}
+
+.motion-lab__rat-line {
+  margin: 0;
+  color: var(--bone);
+  font: 10px/1.35 var(--condensed);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.motion-lab__mobile-card {
+  display: none;
+}
+
+.motion-lab__reduced-list::before {
+  left: 57px;
+}
+
+.motion-lab__reduced-row {
+  min-height: 0;
+  grid-template-columns: 38px 38px minmax(0, 1fr);
+  align-items: start;
+  padding: 34px 0;
+}
+
+.motion-lab__reduced-row > span {
+  justify-self: start;
+  margin: 5px 0 0;
+}
+
+.motion-lab__reduced-row > i {
+  margin-top: 1px;
+}
+
+.motion-lab__reduced-row > div {
+  width: min(560px, calc(100vw - 140px));
+  margin-left: 15px;
+}
+
+.motion-lab__reduced-row .motion-lab__details {
+  max-height: none;
+  margin-top: 12px;
+  overflow: visible;
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .motion-lab__label {
+    width: calc(50vw - 45px);
+  }
+
+  .motion-lab__label .motion-lab__details {
+    display: none;
+  }
+
+  .motion-lab__mobile-card {
+    position: absolute;
+    z-index: 32;
+    right: 12px;
+    bottom: 48px;
+    left: 12px;
+    display: grid;
+    gap: 7px;
+    max-height: 42svh;
+    padding: 11px 12px 12px;
+    overflow: auto;
+    border-top: 1px solid color-mix(in srgb, var(--line-hi) 38%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 42%, transparent);
+    background:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--black) 96%, transparent),
+        color-mix(in srgb, var(--black) 90%, transparent)
+      );
+  }
+
+  .motion-lab__mobile-card > span {
+    color: var(--muted);
+    font: 7px var(--mono);
+    letter-spacing: .13em;
+  }
+
+  .motion-lab__mobile-card > strong {
+    color: var(--bone);
+    font: 18px/.98 var(--condensed);
+    letter-spacing: -.01em;
+    text-transform: uppercase;
+  }
+
+  .motion-lab__mobile-card .motion-lab__details {
+    max-height: none;
+    margin-top: 2px;
+    overflow: visible;
+    opacity: 1;
+    transform: none;
+  }
+
+  .motion-lab__mobile-card .motion-lab__literal {
+    font-size: 9px;
+  }
+
+  .motion-lab__features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap-column: 9px;
+  }
+
+  .motion-lab__features li {
+    font-size: 7px;
+  }
+
+  .motion-lab__features li > b {
+    font-size: 6px;
+  }
+
+  .motion-lab__hint {
+    bottom: 19px;
+  }
+
+  .motion-lab__reduced-list::before {
+    left: 45px;
+  }
+
+  .motion-lab__reduced-row {
+    grid-template-columns: 30px 30px minmax(0, 1fr);
+    padding: 27px 0;
+  }
+
+  .motion-lab__reduced-row > div {
+    width: auto;
+    margin-left: 10px;
+  }
+
+  .motion-lab__reduced-row .motion-lab__features {
+    grid-template-columns: 1fr;
+  }
+}

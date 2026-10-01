@@ -87,7 +87,7 @@ export function RoadmapPage({ navigate }: { navigate: (path: string) => void }) 
       </div>
 
       <footer className="roadmap-footer">
-        <p>Prototype gate: SNIFF → REMEMBER.</p>
+        <p>Six chapters. No promise calendar.</p>
         <span>Receipts still decide truth.</span>
       </footer>
     </div>
