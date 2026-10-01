@@ -87,7 +87,7 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     ];
     return card({view:'RATS',media:'repeat-creator',caption:[
       '🐀 REPEAT DEPLOYER ACTIVE.',
-      `${latestName} just launched · block ${latest.blockNumber}`,
+      `Recent repeat launch: ${latestName}`,
       previous.length ? `Previous from same deployer: ${previous.join(' · ')}` : '',
       `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'} total.`,
       'Watch this deployer and BINRAT will ping you if these paws launch again.',
