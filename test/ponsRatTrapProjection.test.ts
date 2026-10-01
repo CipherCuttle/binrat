@@ -142,6 +142,10 @@ test('Rat Trap preserves the live-canary flat 5m/1h/24h shape as a three-way tie
     currentLaunch:current,
     launches:[prior,current],
     receiptsByLaunch:new Map([[prior.launchId,receipts]]),
+    canonicalLaunchTimestampMsByLaunch:new Map([
+      [prior.launchId,1_790_791_851_000],
+      [current.launchId,1_790_900_000_000]
+    ]),
     asOfBlock:77_710_289n,
     asOfTimestampMs:1_790_910_000_000
   });
@@ -174,6 +178,11 @@ test('Rat Trap keeps PARTIAL, MISSING and IMMATURE rows visible instead of filte
     currentLaunch:current,
     launches:[old,recent,current],
     receiptsByLaunch:new Map([[old.launchId,[old5m]]]),
+    canonicalLaunchTimestampMsByLaunch:new Map([
+      [old.launchId,1_000_000],
+      [recent.launchId,90_000_000],
+      [current.launchId,100_000_000]
+    ]),
     asOfBlock:300n,
     asOfTimestampMs:100_000_000
   });
@@ -194,16 +203,16 @@ test('Rat Trap keeps PARTIAL, MISSING and IMMATURE rows visible instead of filte
 
 test('Rat Trap is point-in-time safe and excludes future launches and future receipts', async () => {
   const prior=launch({
-    launchId:'1'.repeat(64),block:100,timestampMs:1_000_000,token:20,curve:21,symbol:'PRIOR'
+    launchId:'1'.repeat(64),block:100,timestampMs:999_000_000,token:20,curve:21,symbol:'PRIOR'
   });
   const current=launch({
-    launchId:'2'.repeat(64),block:200,timestampMs:2_000_000,token:22,curve:23,symbol:'CURRENT'
+    launchId:'2'.repeat(64),block:200,timestampMs:999_000_001,token:22,curve:23,symbol:'CURRENT'
   });
   const futureSamePaws=launch({
-    launchId:'3'.repeat(64),block:250,timestampMs:3_000_000,token:24,curve:25,symbol:'FUTURE'
+    launchId:'3'.repeat(64),block:250,timestampMs:999_000_002,token:24,curve:25,symbol:'FUTURE'
   });
   const otherPaws=launch({
-    launchId:'4'.repeat(64),block:90,timestampMs:900_000,token:26,curve:27,symbol:'OTHER',deployer:addr(777)
+    launchId:'4'.repeat(64),block:90,timestampMs:999_000_003,token:26,curve:27,symbol:'OTHER',deployer:addr(777)
   });
   const receiptAfterAsOf=await completeReceipt({
     launch:prior,horizonMs:300_000,targetTimestampMs:1_300_000,
@@ -214,12 +223,19 @@ test('Rat Trap is point-in-time safe and excludes future launches and future rec
     currentLaunch:current,
     launches:[prior,current,futureSamePaws,otherPaws],
     receiptsByLaunch:new Map([[prior.launchId,[receiptAfterAsOf]]]),
+    canonicalLaunchTimestampMsByLaunch:new Map([
+      [prior.launchId,1_000_000],
+      [current.launchId,2_000_000],
+      [futureSamePaws.launchId,3_000_000],
+      [otherPaws.launchId,900_000]
+    ]),
     asOfBlock:205n,
     asOfTimestampMs:2_050_000
   });
 
   assert.deepEqual(projection.launches.map((item)=>item.symbol),['PRIOR']);
   assert.equal(projection.launches[0]!.observations[0]!.state,'MISSING');
+  assert.equal(projection.launches[0]!.launchTimestampMs,1_000_000);
   assert.equal(projection.launches[0]!.highestObserved,null);
 });
 
