@@ -47,6 +47,7 @@ export interface PonsTokenIdentitySyncReport {
   attempted: number;
   inserted: number;
   duplicates: number;
+  failed: number;
   remaining: number;
 }
 
@@ -151,7 +152,7 @@ export async function syncPonsTokenIdentities(
 ):Promise<PonsTokenIdentitySyncReport> {
   if (!Number.isSafeInteger(limit) || limit<1 || limit>100) throw new Error('PONS_TOKEN_IDENTITY_LIMIT_INVALID');
   const checkpoint=await store.getCheckpoint();
-  if (!checkpoint) return {observedBlock:null,attempted:0,inserted:0,duplicates:0,remaining:0};
+  if (!checkpoint) return {observedBlock:null,attempted:0,inserted:0,duplicates:0,failed:0,remaining:0};
 
   await source.assertAuthority();
   const before=await source.getBlockHash(checkpoint.blockNumber);
@@ -159,14 +160,21 @@ export async function syncPonsTokenIdentities(
 
   const launches=await store.listMissing(limit);
   const pending:PonsTokenIdentityReceipt[]=[];
+  let failed=0;
   for (const launch of launches) {
-    const facts=await source.readIdentity(launch,checkpoint.blockNumber);
-    pending.push(await buildPonsTokenIdentityReceipt({
-      launch,
-      observedBlock:checkpoint.blockNumber,
-      observedBlockHash:before,
-      ...facts
-    }));
+    try {
+      const facts=await source.readIdentity(launch,checkpoint.blockNumber);
+      pending.push(await buildPonsTokenIdentityReceipt({
+        launch,
+        observedBlock:checkpoint.blockNumber,
+        observedBlockHash:before,
+        ...facts
+      }));
+    } catch {
+      // Identity enrichment is presentation-only. A malformed or unreadable
+      // token must not stall canonical launch indexing or other identities.
+      failed+=1;
+    }
   }
 
   const after=await source.getBlockHash(checkpoint.blockNumber);
@@ -185,6 +193,7 @@ export async function syncPonsTokenIdentities(
     attempted:launches.length,
     inserted,
     duplicates,
+    failed,
     remaining
   };
 }
