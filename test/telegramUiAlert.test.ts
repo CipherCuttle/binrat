@@ -40,7 +40,7 @@ test('ALERT card is compact, factual and maps every action to an existing server
     const card = renderAlertCard(receipt,102);
     assert.equal(card.view,'ALERT'); assert.equal(card.media,'alert');
     assert.ok(Array.from(card.caption).length <= 1024);
-    assert.match(card.caption,/SAME PAWS\. NEW LAUNCH\./);
+    assert.match(card.caption,/TRAP SPRUNG\./);
     assert.match(card.caption,/watched reported deployer showed up again/i);
     assert.match(card.caption,/fresh indexed launch/i);
     assert.doesNotMatch(card.caption,/PONS REPORTED DEPLOYER|future indexed launch after block|UNKNOWN:/);
@@ -61,7 +61,7 @@ test('V2 alert sends approved alert artwork with its compact keyboard and record
     assert.equal(await deliverFindings(f.db,f.source,'fixture:token',api,f.now,{uiV2:true,enabled:true,origin:'https://binrat.example'}),1);
     assert.deepEqual(calls.map(call=>call.method),['sendPhoto']);
     assert.match(String(calls[0]!.body.photo),/assets\/telegram\/alert\.png$/);
-    assert.match(String(calls[0]!.body.caption),/SAME PAWS\. NEW LAUNCH/);
+    assert.match(String(calls[0]!.body.caption),/TRAP SPRUNG/);
     assert.match(JSON.stringify(calls[0]!.body.reply_markup),/br2:c:.*br2:y:.*br2:s:.*br2:u:/);
     assert.deepEqual(await outbox(f),{state:'SENT',attempt_count:1,telegram_message_id:71,case_id:(await outbox(f)).case_id});
   } finally { f.db.close(); }
@@ -77,7 +77,7 @@ test('V2 alert media-off sends a text card with no artwork request, and preserve
     assert.equal(await deliverFindings(f.db,f.source,'fixture:token',api,f.now,{uiV2:true,enabled:false,origin:'not-used'}),1);
     assert.deepEqual(calls.map(call=>call.method),['sendMessage']);
     assert.doesNotMatch(JSON.stringify(calls),/assets\/telegram/);
-    assert.match(String(calls[0]!.body.caption ?? calls[0]!.body.text),/SAME PAWS\. NEW LAUNCH/);
+    assert.match(String(calls[0]!.body.caption ?? calls[0]!.body.text),/TRAP SPRUNG/);
     assert.ok(calls[0]!.body.reply_markup);
   } finally { f.db.close(); }
 
