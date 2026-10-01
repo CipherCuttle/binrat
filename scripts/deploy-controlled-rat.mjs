@@ -306,6 +306,20 @@ function signedMiniAppInitData(token, tester, nowMs = Date.now()) {
   return new URLSearchParams({ ...fields, hash }).toString();
 }
 
+async function smokePublicLatestLaunches() {
+  const response = await fetch(WORKER_URL + '/api/launches/latest', {
+    headers:{accept:'application/json'},
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.ok && body?.schemaVersion === 'binrat.latest-launches/0.1' && body?.chainId === 4663 &&
+    typeof body?.sourceCheckpoint === 'string' && Array.isArray(body?.launches) && body.launches.length <= 20 &&
+    body.launches.every(launch => launch && typeof launch.launchId === 'string' &&
+      typeof launch.blockNumber === 'string' && typeof launch.factId === 'string'),
+    'PUBLIC_LATEST_LAUNCHES_SMOKE_FAILED');
+  note('PUBLIC_LATEST_LAUNCHES_SMOKE_PASS');
+}
+
 async function smokePrivateMiniApp(token, tester) {
   for (let attempt=0; attempt<7; attempt+=1) {
     const response = await fetch(WORKER_URL + '/api/miniapp/bootstrap', {
@@ -479,6 +493,7 @@ try {
         (deployedCandidateGate?.type === 'plain_text' && deployedCandidateGate.text === tester)),
     'POSTDEPLOY_TESTER_BINDING_MISSING');
     await smokePrivateMiniApp(botToken, tester);
+    await smokePublicLatestLaunches();
     // The default menu is commands. The Mini App is an explicitly tester-scoped
     // side effect and is snapshotted so a later postdeploy failure can restore it.
     execFileSync('pnpm',['telegram:private-menu-activate'],{
