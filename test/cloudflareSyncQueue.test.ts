@@ -475,6 +475,32 @@ test('live queue skips observation scheduling on the alternate minute', async ()
   }
 });
 
+test('Pons steady slice stays ahead of observed roughly 600 block-per-minute head growth', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source = new FakePonsSource();
+  const store = new D1Store(db, ROBINHOOD_CHAIN_ID);
+  try {
+    const target=source.head-2n;
+    await store.commitCheckpoint({
+      blockNumber:target-600n,
+      blockHash:hash(target-600n),
+      guardBlockNumber:null,
+      guardBlockHash:null
+    });
+    const result=await runCloudflarePonsSyncCycle(
+      {DB:db},
+      {kind:'PONS_SYNC_CYCLE',cycleId:'pons-steady-600',enqueuedAtMs:60_000},
+      {now:()=>120_000,ponsLaunchSource:source}
+    );
+    assert.deepEqual(result,{status:'SUCCESS',liveCaughtUp:true});
+    assert.equal(source.catchUpCalls.length,1);
+    assert.equal(source.catchUpCalls[0]![1]-source.catchUpCalls[0]![0]+1n,600n);
+    const checkpoint=await store.getCheckpoint();
+    assert.equal(checkpoint?.blockNumber,target);
+  } finally { store.close(); db.close(); }
+});
+
 test('Pons backlog uses one lease writer, a bounded multi-batch slice, and exactly one continuation', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
