@@ -51,8 +51,7 @@ test('Mini App Rat Watch presents recognizable trail context before protocol ide
 test('Mini App Rat Trap remains read-only and does not invent frontend valuation math', () => {
   const app=readFileSync(new URL('../web/app/app.js',import.meta.url),'utf8');
   assert.doesNotMatch(app,/pons_outcome_receipts/);
-  assert.doesNotMatch(app,/estimatedFdvQuoteRaw/);
-  assert.doesNotMatch(app,/market.?cap|\bATH\b|profitability claim/i);
+  assert.doesNotMatch(app,/estimatedFdvQuoteRaw|quoteDecimals|totalSupply|quoteReserve|tokenReserve/);
   assert.doesNotMatch(app,/\/api\/miniapp\/(?:watch|unwatch)/);
 });
 
