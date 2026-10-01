@@ -37,7 +37,7 @@ export function candidateVars(mode, releaseSha) {
   if (!/^[0-9a-f]{40}$/.test(releaseSha ?? '')) throw new Error('RELEASE_SHA_INVALID');
   const uiV2 = mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE;
   return {
-    BINRAT_PONS_MAX_BATCH_BLOCKS: '512',
+    BINRAT_PONS_MAX_BATCH_BLOCKS: '1024',
     BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
     BINRAT_PONS_CATCHUP_MAX_BATCHES: '4',
     BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000',
