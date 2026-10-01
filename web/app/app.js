@@ -72,7 +72,15 @@ async function start() {
   tg?.ready(); tg?.expand();
   if(location.hostname.endsWith('.workers.dev')) fetch('/health').then(r=>r.json()).then(h=>{if(!state.data) byId('health').textContent=`Service ${h.ok?'online':'unavailable'} · release ${h.releaseSha||'unknown'}`;}).catch(()=>{});
   if(!state.initData) { byId('health').textContent='Telegram context unavailable. Open @BinratBot to access private Rat data.'; byId('source-badge').textContent='TELEGRAM ONLY'; byId('launch-list').append(el('div','panel','Private launch data is available inside the authenticated Telegram Mini App.')); byId('rat-list').append(el('div','panel','Private Rat data is not exposed outside an authenticated Telegram Mini App session.')); byId('watch-list').append(el('div','panel','Authentication required.')); return; }
-  try { const data=await api('/api/miniapp/bootstrap',{}); renderBootstrap(data); const requested=new URL(location.href).searchParams.get('case'); if(requested) await loadCase(requested); }
+  try {
+    const data=await api('/api/miniapp/bootstrap',{});
+    renderBootstrap(data);
+    const params=new URL(location.href).searchParams;
+    const requestedCase=params.get('case');
+    const requestedView=params.get('view');
+    if(requestedCase) await loadCase(requestedCase);
+    else if(['home','launches','rats','watches','about'].includes(requestedView)) show(requestedView);
+  }
   catch(error) { byId('health').classList.add('error'); byId('health').textContent=`Private access unavailable: ${error.message}`; byId('source-badge').textContent='LOCKED'; }
 }
 start();
