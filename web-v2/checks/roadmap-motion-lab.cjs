@@ -32,10 +32,15 @@ async function capture(browser, width, height) {
 
     await scrollToProgress(page, 0.4);
     assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-active-index"), "2");
+    assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-docked"), "false");
     await page.screenshot({ path: path.join(output, "motion-middle-" + width + ".png"), animations: "disabled" });
 
     await scrollToProgress(page, 1);
-    assert.equal(await page.locator("[data-motion-lab]").getAttribute("data-active-index"), "5");
+    const root = page.locator("[data-motion-lab]");
+    assert.equal(await root.getAttribute("data-active-index"), "5");
+    assert.equal(await root.getAttribute("data-docked"), "true", "signal head docks at the final milestone");
+    const pulseOpacity = await page.locator(".motion-lab__pulse").evaluate((node) => Number(getComputedStyle(node).opacity));
+    assert.ok(pulseOpacity < 0.08, "docked signal head disappears, opacity=" + pulseOpacity);
     await page.screenshot({ path: path.join(output, "motion-end-" + width + ".png"), animations: "disabled" });
 
     const overflow = await page.evaluate(() => ({
