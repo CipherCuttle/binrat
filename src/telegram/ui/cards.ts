@@ -53,6 +53,11 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
 }
 function errorCopy(code: string): string {
   if (/capacity|limit reached/i.test(code)) return '🐀 BIN IS FULL FOR NOW.\nTry again after 00:00 UTC.';
+  if (/live index is unavailable or stale/i.test(code)) return '🐀 INDEX WENT COLD.\nFresh Pons 4663 state is not verified right now. No new claim was made; try again shortly.';
+  if (/fresh canonical Robinhood boundary could not be verified/i.test(code)) return '🐀 PONS HEAD NOT VERIFIED.\nThe live boundary could not be checked, so no Watch was added.';
+  if (/snapshot is unavailable|snapshot.*expired/i.test(code)) return '🐀 THAT RAT PAGE EXPIRED.\nOpen RATS again for a fresh discovery snapshot.';
+  if (/discovery receipts are unavailable/i.test(code)) return '🐀 RAT RECEIPTS UNAVAILABLE.\nI could not reconstruct a verified discovery snapshot.';
+  if (/discovery receipts could not be saved|discovery retention is unavailable/i.test(code)) return '🐀 RAT SNAPSHOT NOT SAVED.\nDiscovery evidence could not be persisted safely. No Rat card was invented.';
   if (/receipt/i.test(code)) return "🐀 THAT RECEIPT ISN'T HERE.\nIt may have expired or failed verification.";
   if (/live watches|historical evidence/i.test(code)) return '🐀 OLD TRAIL ONLY.\nArc 5042 stays historical. Live watches run on Pons 4663.';
   if (/malformed|unsupported/i.test(code)) return '🐀 WRONG KIND OF SCRAP.\nPaste a deployer address and I\'ll check it.';
