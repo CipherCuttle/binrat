@@ -25,19 +25,41 @@ export class D1PonsOutcomeObservationStore implements PonsOutcomeObservationStor
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
       throw new Error('PONS_OUTCOME_CANDIDATE_LIMIT_INVALID');
     }
+    const oldestLimit=Math.ceil(limit/2);
+    const newestLimit=Math.floor(limit/2);
     const result = await this.db.prepare(`
-      SELECT l.launch_id,l.token,l.pool,l.block_number,l.block_hash
-      FROM launches l
-      LEFT JOIN pons_outcome_receipts r
-        ON r.launch_id=l.launch_id
-       AND r.observation_version=?
-       AND r.horizon_ms IN (300000,3600000,86400000)
-      WHERE l.chain_id=4663 AND l.source='PONS_V2'
-      GROUP BY l.launch_id,l.token,l.pool,l.block_number,l.block_hash
-      HAVING COUNT(DISTINCT r.horizon_ms)<3
-      ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC
+      WITH incomplete AS (
+        SELECT l.launch_id,l.token,l.pool,l.block_number,l.block_hash,l.log_index,
+               CAST(l.block_number AS INTEGER) AS block_sort
+        FROM launches l
+        LEFT JOIN pons_outcome_receipts r
+          ON r.launch_id=l.launch_id
+         AND r.observation_version=?
+         AND r.horizon_ms IN (300000,3600000,86400000)
+        WHERE l.chain_id=4663 AND l.source='PONS_V2'
+        GROUP BY l.launch_id,l.token,l.pool,l.block_number,l.block_hash,l.log_index
+        HAVING COUNT(DISTINCT r.horizon_ms)<3
+      ),
+      oldest AS (
+        SELECT * FROM incomplete
+        ORDER BY block_sort ASC,log_index ASC,launch_id ASC
+        LIMIT ?
+      ),
+      newest AS (
+        SELECT * FROM incomplete
+        ORDER BY block_sort DESC,log_index DESC,launch_id DESC
+        LIMIT ?
+      ),
+      selected AS (
+        SELECT * FROM oldest
+        UNION
+        SELECT * FROM newest
+      )
+      SELECT launch_id,token,pool,block_number,block_hash
+      FROM selected
+      ORDER BY block_sort ASC,log_index ASC,launch_id ASC
       LIMIT ?
-    `).bind(PONS_OUTCOME_OBSERVATION_VERSION, limit)
+    `).bind(PONS_OUTCOME_OBSERVATION_VERSION, oldestLimit, newestLimit, limit)
       .all<{
         launch_id: string;
         token: Hex;
