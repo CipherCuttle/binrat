@@ -468,7 +468,9 @@ function openBag(id, origin = document.activeElement) {
       `,
         )
         .join("")
-    : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
+    : bag.priorLaunches > 0
+      ? `<div class="empty-trail">${escapeHtml(bag.priorLaunches)} earlier indexed launch${bag.priorLaunches===1?"":"es"} exist for this reported deployer. The fast homepage view does not inline the full trail; Creator File loads it on demand.</div>`
+      : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
 
   const share = buildShareCardModel(bag);
 
@@ -508,11 +510,11 @@ function openBag(id, origin = document.activeElement) {
     <div class="receipt-box">
       <div class="receipt-head"><h3>06 / RECEIPT</h3><span>BINRAT / PONS 4663</span></div>
       <dl class="receipt-grid">
-        <dt>receipt</dt><dd>${escapeHtml(bag.receipt)}</dd>
+        <dt>evidence ref</dt><dd>${escapeHtml(bag.receipt)}</dd>
         <dt>coverage</dt><dd>${escapeHtml(normalizeCoverage(bag.coverage))}</dd>
         <dt>source class</dt><dd>${copy().source}</dd>
         <dt>launch block</dt><dd>${escapeHtml(bag.block)}</dd>
-        ${activeMode === "LIVE" ? `<dt>as-of block</dt><dd>${escapeHtml(bag.asOfBlock)}</dd><dt>as-of hash</dt><dd>${escapeHtml(bag.asOfBlockHash)}</dd>` : ""}
+        ${activeMode === "LIVE" ? `<dt>as-of block</dt><dd>${escapeHtml(bag.asOfBlock)}</dd>${bag.asOfBlockHash ? `<dt>as-of hash</dt><dd>${escapeHtml(bag.asOfBlockHash)}</dd>` : ""}` : ""}
       </dl>
       <span class="fixture-stamp">${copy().stamp}</span><span class="receipt-bars" aria-hidden="true"></span>
     </div>
