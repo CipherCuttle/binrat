@@ -58,36 +58,55 @@ export async function projectProvenanceEdges(facts: readonly ProvenanceFact[]): 
   const edges: ProvenanceEdge[] = [];
 
   for (const fact of ordered) {
-    const launchNode = launchNodeId(fact);
-    const creatorNode = creatorAddressNodeId(fact.chainId, fact.creator);
-    edges.push(await buildEdge({
+    const creatorKey = `${fact.chainId}:${fact.creator.toLowerCase()}`;
+    const previous = previousByCreator.get(creatorKey) ?? null;
+    edges.push(...await projectProvenanceEdgesForFact(fact, previous));
+    previousByCreator.set(creatorKey, fact);
+  }
+
+  return edges.sort(compareEdges);
+}
+
+export async function projectProvenanceEdgesForFact(
+  fact: ProvenanceFact,
+  previous: ProvenanceFact | null
+): Promise<ProvenanceEdge[]> {
+  if (previous) {
+    if (previous.chainId !== fact.chainId || previous.creator.toLowerCase() !== fact.creator.toLowerCase()) {
+      throw new Error(`PROVENANCE_PREVIOUS_FACT_SCOPE_MISMATCH:${fact.factId}`);
+    }
+    if (compareFacts(previous, fact) >= 0) {
+      throw new Error(`PROVENANCE_PREVIOUS_FACT_ORDER_INVALID:${fact.factId}`);
+    }
+  }
+
+  const launchNode = launchNodeId(fact);
+  const edges: ProvenanceEdge[] = [
+    await buildEdge({
       edgeId: `reported-creator:${fact.factId}`,
       kind: 'REPORTED_CREATOR',
       chainId: fact.chainId,
       from: launchNode,
-      to: creatorNode,
+      to: creatorAddressNodeId(fact.chainId, fact.creator),
       evidenceClass: 'DIRECT_ONCHAIN',
       observedBlock: fact.observedBlock,
       observedBlockHash: fact.observedBlockHash,
       sourceFactIds: [fact.factId]
-    }));
+    })
+  ];
 
-    const creatorKey = `${fact.chainId}:${fact.creator.toLowerCase()}`;
-    const previous = previousByCreator.get(creatorKey);
-    if (previous) {
-      edges.push(await buildEdge({
-        edgeId: `previous-launch:${fact.factId}:${previous.factId}`,
-        kind: 'PREVIOUS_LAUNCH',
-        chainId: fact.chainId,
-        from: launchNode,
-        to: launchNodeId(previous),
-        evidenceClass: 'DERIVED_ONCHAIN',
-        observedBlock: fact.observedBlock,
-        observedBlockHash: fact.observedBlockHash,
-        sourceFactIds: [fact.factId, previous.factId]
-      }));
-    }
-    previousByCreator.set(creatorKey, fact);
+  if (previous) {
+    edges.push(await buildEdge({
+      edgeId: `previous-launch:${fact.factId}:${previous.factId}`,
+      kind: 'PREVIOUS_LAUNCH',
+      chainId: fact.chainId,
+      from: launchNode,
+      to: launchNodeId(previous),
+      evidenceClass: 'DERIVED_ONCHAIN',
+      observedBlock: fact.observedBlock,
+      observedBlockHash: fact.observedBlockHash,
+      sourceFactIds: [fact.factId, previous.factId]
+    }));
   }
 
   return edges.sort(compareEdges);

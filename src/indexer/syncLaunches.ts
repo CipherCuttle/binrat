@@ -1,6 +1,11 @@
 import type { Hex, LaunchObserved } from '../core/types.js';
 import type { LaunchSource, LaunchStore } from '../core/ports.js';
-import { buildProvenanceFact, projectProvenanceEdges } from '../intelligence/provenance.js';
+import {
+  buildProvenanceFact,
+  projectProvenanceEdges,
+  projectProvenanceEdgesForFact,
+  type ProvenanceEdge
+} from '../intelligence/provenance.js';
 
 export interface SyncOptions {
   startBlock: bigint;
@@ -80,15 +85,14 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
   }
 
   let provenanceRefreshElapsedMs = 0;
-  let provenanceDirty = reorgRewindFrom !== null;
   if (!deferProvenanceProjection) {
     await options.beforeProjection?.();
     provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, fromBlock, targetBlock);
   }
   if (fromBlock > targetBlock) {
-    if (deferProvenanceProjection && provenanceDirty) {
+    if (deferProvenanceProjection) {
       await options.beforeProjection?.();
-      provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, fromBlock, targetBlock);
+      provenanceRefreshElapsedMs += await repairProvenanceProjection(store, now, fromBlock, targetBlock);
     }
     const checkpointAfter = (await store.getCheckpoint())?.blockNumber ?? null;
     return completedReport({ headBlock, targetBlock, startBlock: null, endBlock: null, inserted: 0, duplicates: 0, batches: 0,
@@ -156,7 +160,6 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
       else duplicates += 1;
       await store.putProvenanceFact(await buildProvenanceFact(launch));
     }
-    if (launches.length > 0) provenanceDirty = true;
     if (!deferProvenanceProjection && launches.length > 0) {
       await options.beforeProjection?.();
       provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, fromBlock, toBlock);
@@ -196,9 +199,9 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
     // Each committed batch already has facts.  Before this work slice returns
     // (including an error after an earlier committed batch), make the graph
     // equivalent to a full rebuild without repeating it in the hot loop.
-    if (deferProvenanceProjection && provenanceDirty) {
+    if (deferProvenanceProjection) {
       await options.beforeProjection?.();
-      provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, initialFrom, targetBlock);
+      provenanceRefreshElapsedMs += await repairProvenanceProjection(store, now, initialFrom, targetBlock);
     }
   }
 
@@ -233,6 +236,42 @@ async function ensureProvenanceProjection(store: LaunchStore): Promise<void> {
     (edge) => existingDigests.get(edge.edgeId) === edge.evidenceDigest
   );
   if (!unchanged) await store.replaceProvenanceEdges(projected);
+}
+
+const PROVENANCE_REPAIR_FACTS_PER_SLICE = 96;
+
+async function repairProvenanceProjection(
+  store: LaunchStore,
+  now: () => number,
+  fromBlock: bigint,
+  targetBlock: bigint
+): Promise<number> {
+  const startedAtMs=now();
+  console.error(JSON.stringify({
+    event:'SYNC_PHASE',
+    phase:'PROVENANCE_REPAIR_START',
+    fromBlock:fromBlock.toString(),
+    targetBlock:targetBlock.toString()
+  }));
+  const candidates=await store.listProvenanceEdgeRepairCandidates(PROVENANCE_REPAIR_FACTS_PER_SLICE+1);
+  const selected=candidates.slice(0,PROVENANCE_REPAIR_FACTS_PER_SLICE);
+  const edges: ProvenanceEdge[]=[];
+  for(const candidate of selected){
+    edges.push(...await projectProvenanceEdgesForFact(candidate.fact,candidate.previous));
+  }
+  await store.putProvenanceEdges(edges);
+  const elapsedMs=now()-startedAtMs;
+  console.error(JSON.stringify({
+    event:'SYNC_PHASE',
+    phase:'PROVENANCE_REPAIR_DONE',
+    fromBlock:fromBlock.toString(),
+    targetBlock:targetBlock.toString(),
+    repairedFacts:selected.length,
+    insertedEdges:edges.length,
+    more:candidates.length>PROVENANCE_REPAIR_FACTS_PER_SLICE,
+    elapsedMs
+  }));
+  return elapsedMs;
 }
 
 async function refreshProvenanceProjection(store: LaunchStore, now: () => number, fromBlock: bigint, targetBlock: bigint): Promise<number> {

@@ -16,6 +16,11 @@ export interface LaunchStore {
   listLaunchesMissingProvenance(): Promise<LaunchObserved[]>;
   putProvenanceFact(fact: ProvenanceFact): Promise<'INSERTED' | 'DUPLICATE'>;
   listProvenanceFacts(): Promise<ProvenanceFact[]>;
+  listProvenanceEdgeRepairCandidates(limit: number): Promise<Array<{
+    fact: ProvenanceFact;
+    previous: ProvenanceFact | null;
+  }>>;
+  putProvenanceEdges(edges: readonly ProvenanceEdge[]): Promise<void>;
   replaceProvenanceEdges(edges: ProvenanceEdge[]): Promise<void>;
   listProvenanceEdges(): Promise<ProvenanceEdge[]>;
   getCheckpoint(): Promise<ChainCheckpoint | null>;

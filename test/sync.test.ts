@@ -6,6 +6,7 @@ import test from 'node:test';
 import type { LaunchSource } from '../src/core/ports.js';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { syncLaunches } from '../src/indexer/syncLaunches.js';
+import { buildProvenanceFact, projectProvenanceEdges } from '../src/intelligence/provenance.js';
 import { SqliteStore } from '../src/store/sqliteStore.js';
 
 const chainId = 5042;
@@ -399,4 +400,110 @@ test('Pons live sync narrows a dense range before checkpointing and stays under 
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+
+test('bounded Pons provenance repair drains a >96 fact gap to the canonical graph', async () => {
+  const dir=mkdtempSync(join(tmpdir(),'binrat-provenance-repair-backlog-'));
+  try {
+    const store=new SqliteStore(join(dir,'test.sqlite'),4663);
+    const facts=[];
+    for(let index=1;index<=150;index+=1){
+      const value=ponsLaunch(index,BigInt(index));
+      value.creator=`0x${(40_000+(index%5)).toString(16).padStart(40,'0')}` as Hex;
+      await store.putLaunch(value);
+      const fact=await buildProvenanceFact(value);
+      facts.push(fact);
+      await store.putProvenanceFact(fact);
+    }
+    await store.commitCheckpoint({
+      blockNumber:151n,
+      blockHash:hashFor(151n),
+      guardBlockNumber:119n,
+      guardBlockHash:hashFor(119n)
+    });
+
+    const source=new AdaptivePonsSource(152n);
+    const options={
+      startBlock:1n,
+      confirmations:1n,
+      maxBatchBlocks:4n,
+      reorgLookbackBlocks:32n,
+      pollIntervalMs:100,
+      provenanceProjection:'END_OF_RUN' as const
+    };
+
+    await syncLaunches(source,store,options);
+    const firstEdges=await store.listProvenanceEdges();
+    assert.ok(firstEdges.length>0);
+    assert.ok(firstEdges.length<await projectProvenanceEdges(facts).then((edges)=>edges.length));
+
+    await syncLaunches(source,store,options);
+    const repaired=await store.listProvenanceEdges();
+    const expected=await projectProvenanceEdges(facts);
+    assert.deepEqual(repaired,expected);
+
+    await syncLaunches(source,store,options);
+    assert.deepEqual(await store.listProvenanceEdges(),expected);
+    store.close();
+  } finally { rmSync(dir,{recursive:true,force:true}); }
+});
+
+test('Pons rewind preserves pre-rewind provenance and repairs only affected edges', async () => {
+  const dir=mkdtempSync(join(tmpdir(),'binrat-provenance-reorg-repair-'));
+  try {
+    const store=new SqliteStore(join(dir,'test.sqlite'),4663);
+    const creator='0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as Hex;
+    const original=[];
+    for(let index=1;index<=4;index+=1){
+      const value=ponsLaunch(index,BigInt(index));
+      value.creator=creator;
+      await store.putLaunch(value);
+      const fact=await buildProvenanceFact(value);
+      original.push(fact);
+      await store.putProvenanceFact(fact);
+    }
+    const originalEdges=await projectProvenanceEdges(original);
+    await store.putProvenanceEdges(originalEdges);
+    await store.commitCheckpoint({
+      blockNumber:4n,
+      blockHash:hashFor(4n),
+      guardBlockNumber:2n,
+      guardBlockHash:hashFor(2n)
+    });
+
+    const preservedBefore=originalEdges.filter((edge)=>edge.observedBlock<3n);
+    await store.rewindFromBlock(3n);
+    assert.deepEqual(await store.listProvenanceEdges(),preservedBefore);
+
+    const replacementFacts=[...original.slice(0,2)];
+    for(let index=3;index<=4;index+=1){
+      const value=ponsLaunch(index+100,BigInt(index));
+      value.creator=creator;
+      await store.putLaunch(value);
+      const fact=await buildProvenanceFact(value);
+      replacementFacts.push(fact);
+      await store.putProvenanceFact(fact);
+    }
+    await store.commitCheckpoint({
+      blockNumber:4n,
+      blockHash:hashFor(4n),
+      guardBlockNumber:2n,
+      guardBlockHash:hashFor(2n)
+    });
+
+    const source=new AdaptivePonsSource(5n);
+    await syncLaunches(source,store,{
+      startBlock:1n,
+      confirmations:1n,
+      maxBatchBlocks:4n,
+      reorgLookbackBlocks:2n,
+      pollIntervalMs:100,
+      provenanceProjection:'END_OF_RUN'
+    });
+
+    const expected=await projectProvenanceEdges(replacementFacts);
+    assert.deepEqual(await store.listProvenanceEdges(),expected);
+    store.close();
+  } finally { rmSync(dir,{recursive:true,force:true}); }
 });
