@@ -103,7 +103,7 @@ export async function runRatsShareDemo() {
   await f.launch(99,CREATOR);
   await f.send('/rats',{updateId:10});
   const ratsReply=f.sent.at(-1)?.text ?? '';
-  const caseId=(ratsReply.match(/OPEN CASE: \/why ([0-9a-f]{64})/) ?? [])[1];
+  const caseId=(ratsReply.match(/DIG DEEPER: \/why ([0-9a-f]{64})/) ?? [])[1];
   if (!caseId) throw new Error('DEMO_RATS_CASE_MISSING');
   await f.send(`/why ${caseId}`,{updateId:11});
   await f.send(`/watch 4663:CREATOR:${CREATOR}`,{updateId:12});
