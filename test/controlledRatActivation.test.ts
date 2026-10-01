@@ -102,6 +102,15 @@ test('activation harness never includes a prompt-table drop and retains additive
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
 });
 
+test('postdeploy Pons readiness is retried and logged before rollback', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/async function waitForHealthyPostdeployPons\(\)/);
+  assert.match(script,/for \(let attempt = 0; attempt < 7; attempt \+= 1\)/);
+  assert.match(script,/Postdeploy Pons probe/);
+  assert.match(script,/if \(ponsHealthy\(health\)\) return health/);
+  assert.match(script,/throw new Error\('POSTDEPLOY_PONS_NOT_HEALTHY'\)/);
+});
+
 test('private rollout preflights Robinhood Rat schema and proves a valid Mini App bootstrap', () => {
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
   assert.match(script,/20260929_robinhood_live_rat_v1\.sql/);
