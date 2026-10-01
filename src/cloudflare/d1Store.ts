@@ -303,6 +303,10 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
         WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
       `).bind(this.chainId, blockNumber.toString()),
       this.db.prepare(`
+        DELETE FROM pons_outcome_receipts
+        WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)
+      `).bind(this.chainId, blockNumber.toString()),
+      this.db.prepare(`
         DELETE FROM launches
         WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)
       `).bind(this.chainId, blockNumber.toString()),
