@@ -141,6 +141,17 @@ test('Fresh Garbage falls back safely when identity schema is absent', async () 
   } finally { f.db.close(); }
 });
 
+test('Fresh Garbage falls back on an incompatible partial identity schema', async () => {
+  const f=await autonomousFixture();
+  try {
+    await f.launch(99,CREATOR);
+    await f.checkpoint(100);
+    await f.db.exec('DROP TABLE pons_token_identity_receipts; CREATE TABLE pons_token_identity_receipts (launch_id TEXT PRIMARY KEY);');
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.candidates[0]?.latestLaunch.symbol,'FIXTURE');
+  } finally { f.db.close(); }
+});
+
 test('identity queue cycle never mutates Pons runtime readiness', async () => {
   const f=await autonomousFixture();
   try {
