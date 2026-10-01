@@ -307,16 +307,26 @@ function signedMiniAppInitData(token, tester, nowMs = Date.now()) {
 }
 
 async function smokePrivateMiniApp(token, tester) {
-  const response = await fetch(WORKER_URL + '/api/miniapp/bootstrap', {
-    method:'POST',
-    headers:{'content-type':'application/json'},
-    body:JSON.stringify({ initData:signedMiniAppInitData(token,tester) }),
-    signal:AbortSignal.timeout(20_000)
-  });
-  const body = await response.json().catch(() => null);
-  gate(response.ok && body && body.rats?.chainId === 4663 && Array.isArray(body.rats?.candidates) &&
-    Array.isArray(body.watches) && body.sourceHealth?.chainId === 4663, 'MINI_APP_VALID_BOOTSTRAP_FAILED');
-  note('MINI_APP_VALID_BOOTSTRAP_PASS');
+  for (let attempt=0; attempt<7; attempt+=1) {
+    const response = await fetch(WORKER_URL + '/api/miniapp/bootstrap', {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({ initData:signedMiniAppInitData(token,tester) }),
+      signal:AbortSignal.timeout(20_000)
+    });
+    const body = await response.json().catch(() => null);
+    const ok = response.ok && body && body.rats?.chainId === 4663 && Array.isArray(body.rats?.candidates) &&
+      Array.isArray(body.watches) && body.sourceHealth?.chainId === 4663 && body.sourceHealth?.indexReady === true;
+    note('Mini App bootstrap probe ' + JSON.stringify({
+      attempt:attempt+1,status:response.status,error:typeof body?.error==='string'?body.error:null,
+      ratsChainId:body?.rats?.chainId ?? null,candidateCount:Array.isArray(body?.rats?.candidates)?body.rats.candidates.length:null,
+      watches:Array.isArray(body?.watches),sourceChainId:body?.sourceHealth?.chainId ?? null,
+      sourceIndexReady:body?.sourceHealth?.indexReady ?? null,sourceCheckpoint:body?.rats?.sourceCheckpoint ?? null
+    }));
+    if (ok) { note('MINI_APP_VALID_BOOTSTRAP_PASS'); return; }
+    if (attempt<6) await delay(5_000);
+  }
+  throw new Error('MINI_APP_VALID_BOOTSTRAP_FAILED');
 }
 function deploymentStatus() {
   return jsonFromOutput(cli(['deployments','status','--name',WORKER,'--json']));
