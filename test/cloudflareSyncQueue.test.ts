@@ -1261,6 +1261,7 @@ test('healthy enabled Pons outcome cycle writes one bounded matured receipt to D
       updatedAtMs:1_000
     });
 
+    const runtimeBefore=await runtime.get();
     const result=await runCloudflarePonsOutcomeCycle(
       {
         DB:db,
@@ -1289,6 +1290,7 @@ test('healthy enabled Pons outcome cycle writes one bounded matured receipt to D
     assert.equal(row?.observed_block,'15');
     assert.equal(row?.status,'COMPLETE');
     assert.equal(row?.estimated_fdv_quote_raw,(20n*10n**18n).toString());
+    assert.deepEqual(await runtime.get(),runtimeBefore);
   } finally { store.close(); db.close(); }
 });
 
@@ -1313,5 +1315,24 @@ test('caught-up Pons sync enqueues O2 only when the outcome gate is enabled', as
     });
     assert.equal(acked,1);
     assert.deepEqual(sent.map((item)=>item.kind),['PONS_OUTCOME_CYCLE']);
+  } finally { db.close(); }
+});
+
+
+test('Pons outcome cycle cannot overlap the canonical Pons writer lease', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source=new FakePonsOutcomeSource();
+  const leases=new D1SyncLeaseStore(db);
+  try {
+    assert.equal(await leases.claim('binrat:pons-sync','live-writer',1_000,180_000),true);
+    const result=await runCloudflarePonsOutcomeCycle(
+      {DB:db,BINRAT_PONS_OUTCOME_ENABLED:'true'},
+      {kind:'PONS_OUTCOME_CYCLE',cycleId:'outcome-contender',enqueuedAtMs:1_001},
+      {now:()=>1_001,ponsOutcomeSource:source}
+    );
+    assert.deepEqual(result,{status:'BUSY'});
+    assert.equal(source.authorityCalls,0);
+    assert.equal(source.outcomeReads.length,0);
   } finally { db.close(); }
 });
