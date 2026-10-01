@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { dig } from '../src/autonomous/evidence.js';
+import { dig, why } from '../src/autonomous/evidence.js';
 import { discoverRats } from '../src/autonomous/rats.js';
 import { createPublicShareReceipt } from '../src/autonomous/share.js';
 import { parseCallback } from '../src/telegram/ui/callback.js';
@@ -77,8 +77,9 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
   const f=await autonomousFixture();
   try {
     await f.launch(99,CREATOR); await f.checkpoint(100);
-    const receipt=await dig(f.db,{chainId:4663,entityType:'CREATOR',entityId:CREATOR},f.now());
+    await dig(f.db,{chainId:4663,entityType:'CREATOR',entityId:CREATOR},f.now());
     const snapshot=await discoverRats(f.db,f.now());
+    const receipt=await why(f.db,snapshot.candidates[0]!.caseId,f.now());
     const cards=[
       renderRatCard({kind:'HOME'}),
       renderRatCard({kind:'RATS',snapshot,candidateIndex:0}),
