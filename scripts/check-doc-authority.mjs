@@ -68,18 +68,42 @@ assert.doesNotMatch(doctrine, /Preferred current launch rail: ArcPad standard la
 assert.match(doctrine, /does \*\*not\*\* select or freeze the current token-launch rail/);
 assert.match(doctrine, /Pons V2 on Robinhood Chain `4663`/);
 
-for (const file of [
+const removedFromActiveDocs = [
+  "docs/PRD.md",
+  "docs/CODEPLAN.md",
+  "docs/ASTRA_FRONTEND_SPRINT.md",
+  "docs/INTELLIGENCE_V1.md",
+  "docs/WEB_V0.md",
+  "docs/LAUNCH_PRESENTATION_V0.md",
+  "docs/PRODUCT_SURFACE_V1.md",
+  "docs/PRODUCT_SURFACE_V1_HOSTILE_REVIEW.md",
+  "docs/PRODUCT_SURFACE_V1_VISUAL_HOSTILE_REVIEW.md",
+  "docs/PRODUCT_SURFACE_V1_VISUAL_REVIEW.md",
+  "docs/FRONTEND_V2_AUDIT.md",
+  "docs/DUMPSTER_OS_VISUAL_SYSTEM_V1.md",
   "docs/ROADMAP_V0.md",
   "docs/ROADMAP_LIVING_SCENES_V1.md",
   "docs/ROADMAP_LIVING_SCENES_ASSET_PLAN_V1.md",
   "docs/ROADMAP_LIVING_SCENES_IMPLEMENTATION_PLAN_V1.md",
   "docs/ROADMAP_LIVING_SCENES_REDTEAM_V1.md",
-]) assert.match(read(file).slice(0, 900), /SUPERSEDED/);
-
-for (const receipt of [
   "docs/ROADMAP_GATE1_VERIFY_2026_10_01.md",
   "docs/ROADMAP_G6_RECOVERY_GATE0.md",
   "docs/ROADMAP_G6_RECOVERY_RECEIPT_2026_10_01.md",
-]) assert.ok(fs.existsSync(path.join(root, receipt)), receipt + " historical receipt must remain");
+];
+for (const file of removedFromActiveDocs) {
+  assert.equal(fs.existsSync(path.join(root, file)), false, file + " must not remain in active docs");
+}
+
+for (const archived of [
+  "docs/archive/README.md",
+  "docs/archive/legacy-arc-product/PRD.md",
+  "docs/archive/legacy-arc-product/CODEPLAN.md",
+  "docs/archive/legacy-arc-product/INTELLIGENCE_V1.md",
+  "docs/archive/legacy-arc-product/PRODUCT_SURFACE_V1.md",
+  "docs/archive/legacy-arc-product/LAUNCH_PRESENTATION_V0.md",
+  "docs/archive/roadmap-precanonical/ROADMAP_V0.md",
+  "docs/archive/roadmap-precanonical/ROADMAP_LIVING_SCENES_V1.md",
+  "docs/archive/roadmap-precanonical/ROADMAP_GATE1_VERIFY_2026_10_01.md",
+]) assert.ok(fs.existsSync(path.join(root, archived)), archived + " archive artifact must remain");
 
 process.stdout.write("BINRAT DOC AUTHORITY: PASS\n");

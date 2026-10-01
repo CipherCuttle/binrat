@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../web/launch-presentation.css', import.meta.url), 'utf8');
-const launchDoc = readFileSync(new URL('../docs/LAUNCH_PRESENTATION_V0.md', import.meta.url), 'utf8');
+const launchDoc = readFileSync(new URL('../docs/archive/legacy-arc-product/LAUNCH_PRESENTATION_V0.md', import.meta.url), 'utf8');
 
 const requiredHtml = [
   '$BINRAT IS NOT LIVE.',

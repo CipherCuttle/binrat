@@ -13,7 +13,7 @@ Read this file first. Load only the authority needed for the task.
 | Why does BINRAT behave this way? | `docs/PHILOSOPHY.md` |
 | What words, role names and voice should surfaces use? | `docs/PRODUCT_LANGUAGE.md` |
 | What is the current live intelligence rail? | `docs/product/ROBINHOOD_LIVE_INTELLIGENCE_V1.md` |
-| How does the current V2 product surface behave? | `docs/PRODUCT_SURFACE_V1.md` |
+| How does the current Pons/4663 product surface behave? | current implementation + `docs/product/ROBINHOOD_LIVE_INTELLIGENCE_V1.md` |
 | What is the token/fair-launch doctrine? | `docs/TOKEN_LAUNCH_DOCTRINE.md` |
 
 ## Precedence
@@ -43,7 +43,6 @@ See the capability manifest for current authority state.
 
 Always prefer the canonical global authorities above. Load these scoped contracts only when the task touches them:
 
-- `docs/PRODUCT_SURFACE_V1.md` — current V2 product-surface contract;
 - `docs/product/ROBINHOOD_LIVE_INTELLIGENCE_V1.md` — current Pons/4663 source semantics;
 - `docs/RAT_PERSONALITY_V0_5.md` — Telegram-specific renderer/parser behavior;
 - `docs/product/AUTONOMOUS_RAT_V1_PLAN.md` — Autonomous Rat implementation contract while that capability is active work.
@@ -58,14 +57,16 @@ Do not preload these for normal implementation work:
 
 ### HISTORY / receipts / superseded plans
 
-Do not use these as current authority:
+Historical contradictory planning material has been moved under `docs/archive/`.
 
-- `docs/ROADMAP_V0.md`;
-- the superseded `ROADMAP_LIVING_SCENES_*` planning set;
-- dated Gate / recovery / verification receipts;
-- completed handoffs and reviews once their durable decisions have been extracted.
+Do not use archive material as current authority. It includes:
 
-Keep them in Git for provenance. “Discard” means **discard from active context**, not erase history.
+- the ArcPad-era PRD/codeplan/intelligence/frontend documents;
+- Product Surface V1 and its audits/reviews;
+- the old launch-presentation copy;
+- the pre-canonical roadmap / Living Scenes planning set and its dated visual receipts.
+
+The archive exists for provenance only. “Discard” means **discard from active context**, not erase history.
 
 ## Context-budget rule
 
