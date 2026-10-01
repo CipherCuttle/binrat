@@ -99,9 +99,100 @@ export class SqliteStore implements LaunchStore {
     return rows.map((row) => reviveFact(row.payload_json));
   }
 
+  async listProvenanceEdgeRepairCandidates(limit: number): Promise<Array<{
+    fact: ProvenanceFact;
+    previous: ProvenanceFact | null;
+  }>> {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 256) {
+      throw new Error('PROVENANCE_REPAIR_LIMIT_INVALID');
+    }
+    const oldestLimit=Math.ceil(limit/2);
+    const newestLimit=Math.floor(limit/2);
+    const rows=this.db.prepare(`
+      WITH missing AS (
+        SELECT p.fact_id,p.chain_id,p.creator,p.observed_block,p.log_index,p.payload_json
+        FROM provenance_facts p
+        LEFT JOIN provenance_edges e ON e.edge_id=('reported-creator:' || p.fact_id)
+        WHERE p.chain_id=? AND e.edge_id IS NULL
+      ),
+      oldest AS (
+        SELECT * FROM missing
+        ORDER BY CAST(observed_block AS INTEGER),log_index,fact_id
+        LIMIT ?
+      ),
+      newest AS (
+        SELECT * FROM missing
+        ORDER BY CAST(observed_block AS INTEGER) DESC,log_index DESC,fact_id DESC
+        LIMIT ?
+      ),
+      selected AS (
+        SELECT * FROM oldest
+        UNION
+        SELECT * FROM newest
+      )
+      SELECT s.payload_json,
+        (
+          SELECT prev.payload_json
+          FROM provenance_facts prev
+          WHERE prev.chain_id=s.chain_id
+            AND prev.creator=s.creator
+            AND (
+              CAST(prev.observed_block AS INTEGER) < CAST(s.observed_block AS INTEGER)
+              OR (CAST(prev.observed_block AS INTEGER)=CAST(s.observed_block AS INTEGER) AND prev.log_index<s.log_index)
+              OR (
+                CAST(prev.observed_block AS INTEGER)=CAST(s.observed_block AS INTEGER)
+                AND prev.log_index=s.log_index
+                AND prev.fact_id<s.fact_id
+              )
+            )
+          ORDER BY CAST(prev.observed_block AS INTEGER) DESC,prev.log_index DESC,prev.fact_id DESC
+          LIMIT 1
+        ) AS previous_payload_json
+      FROM selected s
+      ORDER BY CAST(s.observed_block AS INTEGER),s.log_index,s.fact_id
+      LIMIT ?
+    `).all(this.chainId,oldestLimit,newestLimit,limit) as Array<{
+      payload_json:string;
+      previous_payload_json:string|null;
+    }>;
+    return rows.map((row)=>({
+      fact:reviveFact(row.payload_json),
+      previous:row.previous_payload_json ? reviveFact(row.previous_payload_json) : null
+    }));
+  }
+
+  async putProvenanceEdges(edges: readonly ProvenanceEdge[]): Promise<void> {
+    const tx=this.db.transaction(()=>{
+      const insert=this.db.prepare(`
+        INSERT OR IGNORE INTO provenance_edges (
+          edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
+          source_fact_ids_json,derivation_version,evidence_digest,payload_json
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+      `);
+      for(const edge of edges){
+        if(edge.chainId!==this.chainId) throw new Error(`PROVENANCE_CHAIN_MISMATCH:${edge.edgeId}`);
+        const payload=canonicalJson(edge);
+        insert.run(
+          edge.edgeId,edge.chainId,edge.kind,edge.from,edge.to,edge.evidenceClass,
+          edge.observedBlock.toString(),edge.observedBlockHash.toLowerCase(),canonicalJson(edge.sourceFactIds),
+          edge.derivationVersion,edge.evidenceDigest,payload
+        );
+        const existing=this.db.prepare(
+          'SELECT chain_id,evidence_digest,payload_json FROM provenance_edges WHERE edge_id=? LIMIT 1'
+        ).get(edge.edgeId) as {chain_id:number;evidence_digest:string;payload_json:string}|undefined;
+        if(!existing || existing.chain_id!==edge.chainId || existing.evidence_digest!==edge.evidenceDigest || existing.payload_json!==payload){
+          throw new Error(`PROVENANCE_EDGE_IDENTITY_CONFLICT:${edge.edgeId}`);
+        }
+      }
+    });
+    tx();
+  }
+
   async replaceProvenanceEdges(edges: ProvenanceEdge[]): Promise<void> {
     const tx = this.db.transaction(() => {
-      this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
+      this.db.prepare(
+        'DELETE FROM provenance_edges WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)'
+      ).run(this.chainId,blockNumber.toString());
       const insert = this.db.prepare(`
         INSERT INTO provenance_edges (
           edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
