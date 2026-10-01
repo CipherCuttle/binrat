@@ -13,6 +13,33 @@ function primaryActions(card: ReturnType<typeof renderRatCard>): number {
   return card.keyboard[0]?.filter(button=>'callbackData' in button || 'webAppUrl' in button).length ?? 0;
 }
 
+function watchRows(count:number) {
+  return Array.from({length:count},(_,index)=>({
+    user_id:77,chat_id:77,chain_id:4663,entity_type:'CREATOR' as const,
+    entity_id:`0x${(index+1).toString(16).padStart(40,'0')}`,
+    generation:`generation-${index}`,enabled:1,start_block:100+index,
+    start_hash:`0x${(index+1).toString(16).padStart(64,'0')}`,
+    created_at_ms:1_700_000_000_000+index,last_update_id:1000+index,
+    policy:'CREATOR_RECURRENCE_V1' as const
+  }));
+}
+
+test('WATCHES card discloses truncation and legacy migration state, with a direct full-list handoff', () => {
+  const card=renderRatCard({kind:'WATCHLIST',watches:watchRows(7),legacyWatchCount:2});
+  assert.equal(card.view,'WATCHLIST');
+  assert.match(card.caption,/WATCHING 7 SETS OF PAWS/);
+  assert.equal((card.caption.match(/^• /gm) ?? []).length,5);
+  assert.match(card.caption,/\+ 2 more active watches in the full list/);
+  assert.match(card.caption,/2 legacy watches are not active here; re-arm explicitly on Pons 4663/);
+  const full=(card.keyboard[0]![0] as {webAppUrl:string}).webAppUrl;
+  assert.match(full,/\?view=watches$/);
+
+  const legacyOnly=renderRatCard({kind:'WATCHLIST',watches:[],legacyWatchCount:1});
+  assert.equal(legacyOnly.view,'WATCHLIST');
+  assert.match(legacyOnly.caption,/No active V1 watches/);
+  assert.match(legacyOnly.caption,/1 legacy watch is not active here/);
+});
+
 test('V2 scout cards lead with one factual finding and keep infrastructure vocabulary out of level one', async () => {
   const f=await autonomousFixture();
   try {
