@@ -1,3 +1,5 @@
+.roadmap-route-frame { min-height: 100vh; }
+
 .roadmap-page {
   --roadmap-black: #050706;
   --roadmap-panel: #0b0f0d;
