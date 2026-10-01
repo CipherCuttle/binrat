@@ -1,0 +1,89 @@
+# PR #75 only: read-only live capability proof; no deploy or writes.
+name: pons-outcome-capability-probe
+
+on:
+  push:
+    branches:
+      - feat/binrat-pons-outcome-capability-v1
+
+permissions:
+  contents: read
+
+jobs:
+  live-read-only-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install probe dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Validate Alchemy Robinhood archive credential
+        shell: bash
+        env:
+          BINRAT_ALCHEMY_SECRET: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+        run: |
+          set -euo pipefail
+          test -n "${BINRAT_ALCHEMY_SECRET:-}" || {
+            echo "::error::BINRAT_ROBINHOOD_ARCHIVE_RPC_URL is not configured"
+            exit 2
+          }
+          node <<'NODE'
+          const raw = process.env.BINRAT_ALCHEMY_SECRET;
+          const keyPattern = /^[A-Za-z0-9_-]{8,128}$/;
+          if (keyPattern.test(raw)) {
+            console.log('Alchemy Robinhood credential shape: PASS (raw API key)');
+            process.exit(0);
+          }
+          let url;
+          try {
+            url = new URL(raw);
+          } catch {
+            throw new Error('BINRAT_ROBINHOOD_ARCHIVE_RPC_URL must be an Alchemy API key or Robinhood Mainnet Alchemy HTTPS endpoint');
+          }
+          if (url.protocol !== 'https:' ||
+              url.hostname !== 'robinhood-mainnet.g.alchemy.com' ||
+              url.port !== '' ||
+              url.username !== '' ||
+              url.password !== '' ||
+              url.search !== '' ||
+              url.hash !== '' ||
+              !/^\/v2\/[A-Za-z0-9_-]{8,128}$/.test(url.pathname)) {
+            throw new Error('BINRAT_ROBINHOOD_ARCHIVE_RPC_URL must be an Alchemy API key or Robinhood Mainnet Alchemy HTTPS endpoint');
+          }
+          console.log('Alchemy Robinhood credential shape: PASS (full endpoint)');
+          NODE
+
+      - name: Probe real Pons historical outcome capability
+        shell: bash
+        env:
+          BINRAT_PUBLIC_BASE_URL: https://binrat-edge-v0.pettevik.workers.dev
+          BINRAT_ALCHEMY_SECRET: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+        run: |
+          set -euo pipefail
+          if [[ "$BINRAT_ALCHEMY_SECRET" == https://* ]]; then
+            export ROBINHOOD_RPC_URL="$BINRAT_ALCHEMY_SECRET"
+          else
+            export ROBINHOOD_RPC_URL="https://robinhood-mainnet.g.alchemy.com/v2/$BINRAT_ALCHEMY_SECRET"
+          fi
+          pnpm probe:pons-outcome | tee "$RUNNER_TEMP/pons-outcome-capability-probe.txt"
+
+      - name: Preserve replayable probe receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-outcome-capability-probe
+          path: ${{ runner.temp }}/pons-outcome-capability-probe.txt
+          retention-days: 7
+          if-no-files-found: warn

@@ -20,6 +20,7 @@
     "watch": "tsx src/cli.ts watch",
     "inspect": "tsx src/cli.ts inspect",
     "probe:observations": "tsx src/observationProbeCli.ts",
+    "probe:pons-outcome": "tsx scripts/probe-pons-outcome-capability.ts",
     "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts",
     "telegram:serve": "tsx src/telegram/server.ts",
     "verify:production-binding-parity": "tsx scripts/verify-production-binding-parity.ts",
