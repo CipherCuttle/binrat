@@ -46,6 +46,7 @@ export const telegramProductConfig = Object.freeze({
   },
   webhook: {
     url: `${TELEGRAM_PRODUCTION_ORIGIN}/telegram/webhook`,
+    allowedUpdates: ['message', 'callback_query'] as const,
     mode: 'verify_only' as const
   },
   profilePhoto: {

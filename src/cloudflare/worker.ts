@@ -78,6 +78,7 @@ export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   BINRAT_RELEASE_SHA?: string;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_WEBHOOK_SECRET?: string;
+  TELEGRAM_WEBHOOK_SECRET_NEXT?: string;
   TELEGRAM_REPLIES_ENABLED?: string;
   TELEGRAM_MAX_MESSAGES_PER_MINUTE?: string;
   /** Both flags must be explicitly 'true'; inference is default-off. */
@@ -561,7 +562,10 @@ async function telegramWebhook(
 ): Promise<Response> {
   const token = required(env.TELEGRAM_BOT_TOKEN, 'TELEGRAM_BOT_TOKEN');
   const webhookSecret = required(env.TELEGRAM_WEBHOOK_SECRET, 'TELEGRAM_WEBHOOK_SECRET');
-  if (request.headers.get('x-telegram-bot-api-secret-token') !== webhookSecret) {
+  const webhookSecretNext = env.TELEGRAM_WEBHOOK_SECRET_NEXT?.trim() ?? '';
+  const suppliedWebhookSecret = request.headers.get('x-telegram-bot-api-secret-token') ?? '';
+  if (suppliedWebhookSecret !== webhookSecret &&
+      (!webhookSecretNext || suppliedWebhookSecret !== webhookSecretNext)) {
     return json(401, { error: 'INVALID_WEBHOOK_SECRET' });
   }
 
@@ -1084,7 +1088,13 @@ async function executeUiCallback(
   }
   if (action.action === 'WATCHES') return commandFor('watches');
   const caseId = await caseIdForShare(db,action.shareId);
-  if (action.action === 'CASE' || action.action === 'WHY' || action.action === 'FULL') return commandFor('why',caseId);
+  if (action.action === 'CASE') {
+    // CASE and WHY rehydrate the same canonical receipt; only their compact
+    // presentation differs. FULL remains the unchanged canonical expansion.
+    const outcome=await commandFor('why',caseId);
+    return outcome.kind === 'CASE' ? { ...outcome,mode:'DIG' } : outcome;
+  }
+  if (action.action === 'WHY' || action.action === 'FULL') return commandFor('why',caseId);
   if (action.action === 'SHARE') return commandFor('share',caseId);
   const row = await db.prepare('SELECT receipt_json FROM rat_v1_cases WHERE case_id=?').bind(caseId).first<{receipt_json:string}>();
   if (!row) throw new Error('RECEIPT_UNAVAILABLE');
@@ -1277,7 +1287,9 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
     runtime?.sourceVerified &&
     runtime.liveCaughtUp &&
     !runtime.lastSyncError &&
-    fresh
+    fresh &&
+    runtime.targetBlock !== null &&
+    checkpoint.blockNumber >= runtime.targetBlock
   );
   const observationReady = Boolean(runtime?.observationReady && !runtime.lastObservationError && fresh);
 

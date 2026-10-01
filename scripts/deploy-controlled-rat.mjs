@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // One-shot controlled private Autonomous Rat rollout. Uploads a candidate first,
-// verifies parity, then promotes. It never merges, changes token/Holder authority,
-// or mutates the Telegram webhook. UI V2 may add only its exact prompt schema.
+// verifies parity, then promotes. It never merges or changes token/Holder authority.
+// UI V2 may repair only the exact Telegram webhook update subscription while preserving
+// the verified webhook URL and secret, plus its exact additive prompt schema.
 import { execFileSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
 import { readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs';
 import {
   ACTIVATION_MODE, PROMPT_MIGRATION,
@@ -14,6 +16,7 @@ const WORKER = 'binrat-edge-v0';
 const DB = 'binrat-v0';
 const DB_ID = '46814564-1a41-449a-88e5-c1349eed3a27';
 const WORKER_URL = 'https://binrat-edge-v0.pettevik.workers.dev';
+const ROBINHOOD_RAT_MIGRATION = 'cloudflare/migrations/20260929_robinhood_live_rat_v1.sql';
 const CONFIG = 'wrangler.controlled-rat.generated.jsonc';
 const SECRETS = '/tmp/binrat-controlled-rat-secrets.json';
 const TELEGRAM_MENU_STATE = '/tmp/binrat-private-menu-state.json';
@@ -22,6 +25,8 @@ const summary = process.env.GITHUB_STEP_SUMMARY;
 let promotionAttempted = false;
 let previousVersion = null;
 let privateMenuSnapshotCreated = false;
+let webhookRotationCommitted = false;
+let previousWebhookAllowedUpdates = null;
 
 function note(line) {
   console.log(line);
@@ -92,14 +97,88 @@ async function waitForExactPostdeployRelease(reviewedSha) {
   }
   throw new Error('POSTDEPLOY_RELEASE_SHA_MISMATCH');
 }
-async function webhookUrl(token) {
+
+function ponsHealthy(health) {
+  return health?.ok === true && health?.chainId === 4663 &&
+    health?.indexReady === true && health?.liveCaughtUp === true &&
+    health?.lastSyncError === null;
+}
+
+async function waitForHealthyPons(label, failureCode) {
+  let health = null;
+  for (let attempt = 0; attempt < 7; attempt += 1) {
+    health = await getJson(WORKER_URL + '/api/health');
+    note(label + ' Pons probe ' + JSON.stringify({
+      attempt: attempt + 1,
+      ok: health.ok,
+      chainId: health.chainId,
+      indexReady: health.indexReady,
+      checkpointBlock: health.checkpointBlock,
+      headBlock: health.headBlock,
+      targetBlock: health.targetBlock,
+      liveCaughtUp: health.liveCaughtUp,
+      launchCount: health.launchCount,
+      lastSyncError: health.lastSyncError,
+      runtimeFresh: health.runtimeFresh,
+      runtimeUpdatedAtMs: health.runtimeUpdatedAtMs
+    }));
+    if (ponsHealthy(health)) return health;
+    if (attempt < 6) await delay(5_000);
+  }
+  throw new Error(failureCode);
+}
+const REQUIRED_TELEGRAM_UPDATES = Object.freeze(['message','callback_query']);
+
+function sameStrings(left, right) {
+  return JSON.stringify([...(left ?? [])].sort()) === JSON.stringify([...(right ?? [])].sort());
+}
+
+async function telegramWebhookInfo(token) {
   if (!token) return null;
   const response = await fetch('https://api.telegram.org/bot' + token + '/getWebhookInfo', {
     signal: AbortSignal.timeout(20_000)
   });
   const body = await response.json().catch(() => null);
-  gate(response.ok && body?.ok === true, 'TELEGRAM_WEBHOOK_READBACK_FAILED');
-  return String(body.result?.url ?? '');
+  gate(response.ok && body?.ok === true && body.result, 'TELEGRAM_WEBHOOK_READBACK_FAILED');
+  return {
+    url: String(body.result.url ?? ''),
+    allowedUpdates: Array.isArray(body.result.allowed_updates) ? body.result.allowed_updates.map(String) : null
+  };
+}
+
+async function verifyWebhookSecretAtLiveWorker(secret) {
+  const response = await fetch(WORKER_URL + '/telegram/webhook', {
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-telegram-bot-api-secret-token':secret
+    },
+    body:JSON.stringify({ update_id:null }),
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.status === 400 && body?.error === 'INVALID_UPDATE_ID', 'TELEGRAM_WEBHOOK_SECRET_MISMATCH');
+  note('TELEGRAM_WEBHOOK_SECRET_PRECHECK_PASS');
+}
+
+async function setTelegramWebhookUpdates(token, secret, allowedUpdates) {
+  const response = await fetch('https://api.telegram.org/bot' + token + '/setWebhook', {
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({
+      url: WORKER_URL + '/telegram/webhook',
+      secret_token: secret,
+      allowed_updates: allowedUpdates,
+      drop_pending_updates:false
+    }),
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.ok && body?.ok === true && body.result === true, 'TELEGRAM_WEBHOOK_UPDATE_FAILED');
+  const verified = await telegramWebhookInfo(token);
+  gate(verified?.url === WORKER_URL + '/telegram/webhook', 'TELEGRAM_WEBHOOK_URL_MISMATCH');
+  gate(sameStrings(verified?.allowedUpdates, allowedUpdates), 'TELEGRAM_WEBHOOK_UPDATES_MISMATCH');
+  return verified;
 }
 function parseJsonc(path) {
   return JSON.parse(
@@ -176,6 +255,79 @@ function ensurePromptSchema(config) {
   note('TELEGRAM_UI_PROMPT_SCHEMA_APPLIED');
   return true;
 }
+
+function robinhoodRatSchemaSnapshot(config) {
+  const sql = [
+    "SELECT",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='rat_v11_pons_discovery_snapshots') AS discovery_table,",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_rat_v11_pons_discovery_expiry') AS discovery_index,",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='rat_v11_pons_public_receipts') AS receipt_table,",
+    "  EXISTS(SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_rat_v11_pons_public_receipts_expiry') AS receipt_index;"
+  ].join(' ');
+  const output = jsonFromOutput(cli([
+    'd1','execute','DB','--remote','--yes','--json','--command',sql,'--config',config
+  ]));
+  const row = walk(output, value => ['discovery_table','discovery_index','receipt_table','receipt_index']
+    .every(key => Object.hasOwn(value ?? {}, key)) ? value : null);
+  gate(row, 'ROBINHOOD_RAT_SCHEMA_RESULT_MISSING');
+  return ['discovery_table','discovery_index','receipt_table','receipt_index'].map(key => Number(row[key]));
+}
+
+function ensureRobinhoodRatSchema(config) {
+  const before = robinhoodRatSchemaSnapshot(config);
+  const present = before.reduce((sum, value) => sum + (value === 1 ? 1 : 0), 0);
+  if (present !== 0 && present !== 4) throw new Error('ROBINHOOD_RAT_SCHEMA_PARTIAL');
+  if (present === 0) {
+    gate(existsSync(ROBINHOOD_RAT_MIGRATION), 'ROBINHOOD_RAT_MIGRATION_MISSING');
+    cli(['d1','execute','DB','--remote','--yes','--file',ROBINHOOD_RAT_MIGRATION,'--config',config], { timeout:180_000 });
+  }
+  gate(robinhoodRatSchemaSnapshot(config).every(value => value === 1), 'ROBINHOOD_RAT_SCHEMA_VERIFY_FAILED');
+  // Column probes fail closed if a same-named table has an incompatible shape.
+  cli(['d1','execute','DB','--remote','--yes','--command',[
+    'SELECT discovery_id,chain_id,source_checkpoint,rule_version,coverage_status,snapshot_json,generated_at_ms,expires_at_ms',
+    'FROM rat_v11_pons_discovery_snapshots LIMIT 0;',
+    'SELECT receipt_id,case_id,chain_id,receipt_json,created_at_ms,expires_at_ms',
+    'FROM rat_v11_pons_public_receipts LIMIT 0;'
+  ].join(' '),'--config',config], { timeout:120_000 });
+  note(present === 0 ? 'ROBINHOOD_RAT_SCHEMA_APPLIED' : 'ROBINHOOD_RAT_SCHEMA_ALREADY_PRESENT');
+  return present === 0;
+}
+
+function signedMiniAppInitData(token, tester, nowMs = Date.now()) {
+  const fields = {
+    auth_date: String(Math.floor(nowMs / 1000)),
+    query_id: 'binrat-private-rollout-smoke',
+    user: JSON.stringify({ id: Number(tester), first_name: 'BINRAT private smoke' })
+  };
+  const check = Object.entries(fields).sort(([a],[b]) => a.localeCompare(b))
+    .map(([key,value]) => key + '=' + value).join('\n');
+  const secret = createHmac('sha256','WebAppData').update(token).digest();
+  const hash = createHmac('sha256',secret).update(check).digest('hex');
+  return new URLSearchParams({ ...fields, hash }).toString();
+}
+
+async function smokePrivateMiniApp(token, tester) {
+  for (let attempt=0; attempt<7; attempt+=1) {
+    const response = await fetch(WORKER_URL + '/api/miniapp/bootstrap', {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({ initData:signedMiniAppInitData(token,tester) }),
+      signal:AbortSignal.timeout(20_000)
+    });
+    const body = await response.json().catch(() => null);
+    const ok = response.ok && body && body.rats?.chainId === 4663 && Array.isArray(body.rats?.candidates) &&
+      Array.isArray(body.watches) && body.sourceHealth?.chainId === 4663 && body.sourceHealth?.indexReady === true;
+    note('Mini App bootstrap probe ' + JSON.stringify({
+      attempt:attempt+1,status:response.status,error:typeof body?.error==='string'?body.error:null,
+      ratsChainId:body?.rats?.chainId ?? null,candidateCount:Array.isArray(body?.rats?.candidates)?body.rats.candidates.length:null,
+      watches:Array.isArray(body?.watches),sourceChainId:body?.sourceHealth?.chainId ?? null,
+      sourceIndexReady:body?.sourceHealth?.indexReady ?? null,sourceCheckpoint:body?.rats?.sourceCheckpoint ?? null
+    }));
+    if (ok) { note('MINI_APP_VALID_BOOTSTRAP_PASS'); return; }
+    if (attempt<6) await delay(5_000);
+  }
+  throw new Error('MINI_APP_VALID_BOOTSTRAP_FAILED');
+}
 function deploymentStatus() {
   return jsonFromOutput(cli(['deployments','status','--name',WORKER,'--json']));
 }
@@ -195,6 +347,10 @@ gate(process.env.CONTROLLED_RAT_DEPLOY_APPROVED === 'true',
 gate(Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()) &&
   Boolean(process.env.CLOUDFLARE_ACCOUNT_ID?.trim()), 'CLOUDFLARE_CREDENTIALS_MISSING');
 gate(Boolean(process.env.TELEGRAM_BOT_TOKEN?.trim()), 'TELEGRAM_BOT_TOKEN_MISSING');
+const webhookNextSecret = process.env.TELEGRAM_WEBHOOK_SECRET_NEXT?.trim() ?? '';
+if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  gate(/^[A-Za-z0-9_-]{1,256}$/.test(webhookNextSecret), 'TELEGRAM_WEBHOOK_SECRET_NEXT_MISSING_OR_INVALID');
+}
 
 let tester = (process.env.CONTROLLED_RAT_ALLOWED_USER_ID?.trim() ||
   process.env.CONTROLLED_RAT_ALLOWED_USER_ID_FALLBACK?.trim() || '');
@@ -215,29 +371,16 @@ note('Cloudflare Workers Paid verified by read-only account subscription check.'
 const beforeHealth = await getJson(WORKER_URL + '/health');
 gate(beforeHealth.ok === true && beforeHealth.service === 'binrat-cloudflare-edge',
   'LIVE_WORKER_HEALTH_FAILED');
-const beforePons = await getJson(WORKER_URL + '/api/health');
-note('Pons preflight ' + JSON.stringify({
-  ok: beforePons.ok,
-  chainId: beforePons.chainId,
-  indexReady: beforePons.indexReady,
-  checkpointBlock: beforePons.checkpointBlock,
-  headBlock: beforePons.headBlock,
-  targetBlock: beforePons.targetBlock,
-  liveCaughtUp: beforePons.liveCaughtUp,
-  launchCount: beforePons.launchCount,
-  historyBackfillComplete: beforePons.historyBackfillComplete,
-  lastSyncError: beforePons.lastSyncError,
-  runtimeFresh: beforePons.runtimeFresh,
-  runtimeUpdatedAtMs: beforePons.runtimeUpdatedAtMs
-}));
-gate(beforePons.ok === true && beforePons.chainId === 4663 &&
-  beforePons.indexReady === true && beforePons.liveCaughtUp === true &&
-  beforePons.lastSyncError === null, 'PONS_PREFLIGHT_NOT_HEALTHY');
+await waitForHealthyPons('Predeploy','PONS_PREFLIGHT_NOT_HEALTHY');
 
 const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? '';
-const beforeWebhook = await webhookUrl(botToken);
+const beforeWebhook = await telegramWebhookInfo(botToken);
 if (beforeWebhook !== null) {
-  gate(beforeWebhook === WORKER_URL + '/telegram/webhook', 'TELEGRAM_WEBHOOK_PREDEPLOY_MISMATCH');
+  gate(beforeWebhook.url === WORKER_URL + '/telegram/webhook', 'TELEGRAM_WEBHOOK_PREDEPLOY_MISMATCH');
+}
+if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  gate(Array.isArray(beforeWebhook?.allowedUpdates), 'TELEGRAM_WEBHOOK_ALLOWED_UPDATES_UNRESOLVED');
+  previousWebhookAllowedUpdates = [...beforeWebhook.allowedUpdates];
 }
 
 const cfg = parseJsonc('cloudflare/wrangler.example.jsonc');
@@ -262,6 +405,7 @@ if (!tester) tester = testerFromFeedbackMarker(CONFIG);
 gate(/^[1-9]\d{3,16}$/.test(tester), 'CONTROLLED_RAT_TESTER_ID_MISSING_OR_INVALID');
 const secrets = { BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: tester };
 if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  secrets.TELEGRAM_WEBHOOK_SECRET_NEXT = webhookNextSecret;
   const existingCandidateGate = binding(activeConfig, 'RAT_CANDIDATE_ALLOWED_USER_ID');
   if (existingCandidateGate?.type === 'plain_text') {
     gate(existingCandidateGate.text === tester, 'CANDIDATE_GATE_TESTER_MISMATCH');
@@ -279,6 +423,7 @@ try {
   // The read-only schema probe and its one exact additive migration happen
   // before candidate upload, but inside cleanup/rollback handling.
   promptSchemaApplied = mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE && ensurePromptSchema(CONFIG);
+  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) ensureRobinhoodRatSchema(CONFIG);
   const tag = 'controlled-rat-' + process.env.GITHUB_SHA.slice(0, 12);
   cli([
     'versions','upload','--config',CONFIG,'--keep-vars','--strict',
@@ -310,18 +455,12 @@ try {
     '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
   ], { timeout: 180_000 });
   await waitForExactPostdeployRelease(process.env.GITHUB_SHA);
-  const afterPons = await getJson(WORKER_URL + '/api/health');
-  gate(afterPons.ok === true && afterPons.chainId === 4663 &&
-    afterPons.indexReady === true && afterPons.liveCaughtUp === true &&
-    afterPons.lastSyncError === null, 'POSTDEPLOY_PONS_NOT_HEALTHY');
+  await waitForHealthyPons('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY');
 
   const diagnostic = await fetch(WORKER_URL + '/__candidate/pons-bootstrap', {
     signal: AbortSignal.timeout(20_000)
   });
   gate(diagnostic.status === 404, 'CANDIDATE_DIAGNOSTIC_STILL_EXPOSED');
-
-  const afterWebhook = await webhookUrl(botToken);
-  if (beforeWebhook !== null) gate(afterWebhook === beforeWebhook, 'TELEGRAM_WEBHOOK_CHANGED');
 
   const deployed = activeVersionFrom(deploymentStatus());
   gate(deployed === candidateVersion, 'CANDIDATE_NOT_AT_100_PERCENT');
@@ -336,6 +475,7 @@ try {
       (deployedCandidateGate?.type === 'secret_text' ||
         (deployedCandidateGate?.type === 'plain_text' && deployedCandidateGate.text === tester)),
     'POSTDEPLOY_TESTER_BINDING_MISSING');
+    await smokePrivateMiniApp(botToken, tester);
     // The default menu is commands. The Mini App is an explicitly tester-scoped
     // side effect and is snapshotted so a later postdeploy failure can restore it.
     execFileSync('pnpm',['telegram:private-menu-activate'],{
@@ -344,18 +484,44 @@ try {
     });
     privateMenuSnapshotCreated = existsSync(TELEGRAM_MENU_STATE);
     gate(privateMenuSnapshotCreated, 'TELEGRAM_PRIVATE_MENU_SNAPSHOT_MISSING');
+
+    const deployedNextSecret = binding(deployedConfig,'TELEGRAM_WEBHOOK_SECRET_NEXT');
+    gate(deployedNextSecret?.type === 'secret_text', 'POSTDEPLOY_WEBHOOK_NEXT_SECRET_MISSING');
+    await verifyWebhookSecretAtLiveWorker(webhookNextSecret);
+    note('TELEGRAM_WEBHOOK_NEXT_SECRET_PRECHECK_PASS');
+
+    if (!sameStrings(previousWebhookAllowedUpdates, REQUIRED_TELEGRAM_UPDATES)) {
+      await setTelegramWebhookUpdates(botToken, webhookNextSecret, REQUIRED_TELEGRAM_UPDATES);
+      webhookRotationCommitted = true;
+      note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_APPLY_PASS');
+    } else {
+      // Even if the update filter is already correct, rotate to the staged secret so
+      // future controlled rollouts have a recoverable protected authority.
+      await setTelegramWebhookUpdates(botToken, webhookNextSecret, REQUIRED_TELEGRAM_UPDATES);
+      webhookRotationCommitted = true;
+      note('TELEGRAM_WEBHOOK_SECRET_ROTATION_APPLY_PASS');
+    }
+    const afterWebhook = await telegramWebhookInfo(botToken);
+    if (beforeWebhook !== null) gate(afterWebhook?.url === beforeWebhook.url, 'TELEGRAM_WEBHOOK_CHANGED');
+    gate(sameStrings(afterWebhook?.allowedUpdates, REQUIRED_TELEGRAM_UPDATES), 'TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_MISSING');
+    note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_VERIFY_PASS');
+
     execFileSync('pnpm',['telegram:apply'],{stdio:'inherit',env:process.env,timeout:180_000});
     execFileSync('pnpm',['telegram:verify'],{stdio:'inherit',env:process.env,timeout:120_000});
     execFileSync('pnpm',['telegram:smoke'],{
       stdio:'inherit',timeout:180_000,
       env:{...process.env,BINRAT_CLOUDFLARE_VERSION_ID:candidateVersion,BINRAT_MIGRATION_STATE:'telegram-ui-v2-prompt-schema-compatible'}
     });
-    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook unchanged; no merge performed.');
+    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook URL preserved; secret rotated through staged dual-secret window; message+callback_query delivery verified; no merge performed.');
   } else {
     note('CONTROLLED_RAT_DEPLOYMENT_PASS: candidate is live at 100%; autonomous scope remains one private tester.');
     note('Public autonomous mode OFF. Telegram UI V2 OFF. Telegram media OFF. No merge performed.');
   }
 } catch (error) {
+  if (webhookRotationCommitted) {
+    note('TELEGRAM_WEBHOOK_ROTATION_COMMITTED: candidate retained; rollback to the old Worker is intentionally disabled because Telegram now uses the staged next secret.');
+    throw error;
+  }
   if (privateMenuSnapshotCreated || existsSync(TELEGRAM_MENU_STATE)) {
     try {
       execFileSync('pnpm',['telegram:private-menu-restore'],{

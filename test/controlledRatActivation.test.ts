@@ -14,6 +14,7 @@ function evaluate<T>(expression:string): T {
 test('UI V2 activation is dispatch-only, exact-branch and exact-confirmation gated', () => {
   const sha='a'.repeat(40);
   assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/codex/telegram-as-code-private-v2',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
+  assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-messaging-v1',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-ux-v2',eventName:'push',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),'TELEGRAM_UI_V2_DISPATCH_ONLY');
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/other',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),'REF_NOT_CONTROLLED_RAT_BRANCH');
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-ux-v2',eventName:'workflow_dispatch',confirmation:'wrong',reviewedSha:'${sha}',githubSha:'${sha}'})`),'TELEGRAM_UI_V2_CONFIRMATION_REQUIRED');
@@ -28,6 +29,7 @@ test('workflow keeps UI V2 off the push trigger and exposes only explicit dispat
   assert.match(workflow,/confirmation:[\s\S]*ENABLE_PRIVATE_TELEGRAM_UI_V2/);
   assert.match(workflow,/reviewed_sha:[\s\S]*Exact 40-character commit SHA/);
   assert.match(workflow,/CONTROLLED_RAT_ACTIVATION_MODE/);
+  assert.match(workflow,/TELEGRAM_WEBHOOK_SECRET_NEXT:\s*\$\{\{ secrets\.TELEGRAM_WEBHOOK_SECRET_NEXT \}\}/);
 });
 
 test('activation modes generate only their explicit private flag sets', () => {
@@ -99,6 +101,40 @@ test('activation harness never includes a prompt-table drop and retains additive
   assert.match(script,/Candidate binding parity PASS; candidate remained non-live until this point\.'\);\n\n  \/\/ Treat a transport-ambiguous promotion result[\s\S]*promotionAttempted = true/);
   assert.match(script,/if \(promotionAttempted && previousVersion\)/);
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
+});
+
+test('predeploy and postdeploy Pons readiness are bounded-retry and logged before mutation or rollback', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/async function waitForHealthyPons\(label, failureCode\)/);
+  assert.match(script,/for \(let attempt = 0; attempt < 7; attempt \+= 1\)/);
+  assert.match(script,/label \+ ' Pons probe '/);
+  assert.match(script,/if \(ponsHealthy\(health\)\) return health/);
+  assert.match(script,/throw new Error\(failureCode\)/);
+  assert.match(script,/waitForHealthyPons\('Predeploy','PONS_PREFLIGHT_NOT_HEALTHY'\)/);
+  assert.match(script,/waitForHealthyPons\('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY'\)/);
+});
+
+test('private rollout preflights Robinhood Rat schema and proves a valid Mini App bootstrap', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/20260929_robinhood_live_rat_v1\.sql/);
+  assert.match(script,/ROBINHOOD_RAT_SCHEMA_(?:APPLIED|ALREADY_PRESENT)/);
+  assert.match(script,/MINI_APP_VALID_BOOTSTRAP_PASS/);
+  assert.match(script,/signedMiniAppInitData/);
+  assert.match(script,/\/api\/miniapp\/bootstrap/);
+});
+
+test('private UI rollout stages a next webhook secret, subscribes callback_query, and defines a no-rollback commit point', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/TELEGRAM_WEBHOOK_SECRET_NEXT_MISSING_OR_INVALID/);
+  assert.match(script,/secrets\.TELEGRAM_WEBHOOK_SECRET_NEXT = webhookNextSecret/);
+  assert.match(script,/REQUIRED_TELEGRAM_UPDATES = Object\.freeze\(\['message','callback_query'\]\)/);
+  assert.match(script,/secret_token: secret/);
+  assert.match(script,/TELEGRAM_WEBHOOK_NEXT_SECRET_PRECHECK_PASS/);
+  assert.match(script,/TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_APPLY_PASS/);
+  assert.match(script,/TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_VERIFY_PASS/);
+  assert.match(script,/webhookRotationCommitted = true/);
+  assert.match(script,/TELEGRAM_WEBHOOK_ROTATION_COMMITTED: candidate retained/);
+  assert.doesNotMatch(script,/TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_PASS/);
 });
 
 test('private rollout snapshots and restores only the tester menu around postdeploy failure', () => {

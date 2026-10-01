@@ -41,9 +41,9 @@ test('ALERT card is compact, factual and maps every action to an existing server
     assert.equal(card.view,'ALERT'); assert.equal(card.media,'alert');
     assert.ok(Array.from(card.caption).length <= 1024);
     assert.match(card.caption,/SAME PAWS\. NEW LAUNCH\./);
-    assert.match(card.caption,/PONS REPORTED DEPLOYER/);
-    assert.match(card.caption,/Evidence: explicit future creator recurrence/);
-    assert.match(card.caption,/UNKNOWN: identity, intent, safety and future outcome/);
+    assert.match(card.caption,/watched reported deployer showed up again/i);
+    assert.match(card.caption,/fresh indexed launch/i);
+    assert.doesNotMatch(card.caption,/PONS REPORTED DEPLOYER|future indexed launch after block|UNKNOWN:/);
     assert.doesNotMatch(card.caption,/\b(?:rug|scam|safe|buy|profitable|same human|malicious)\b/i);
     const actions = card.keyboard.flatMap(row => row.flatMap(button => 'callbackData' in button ? [parseCallback(button.callbackData)?.action] : []));
     assert.deepEqual(actions,['CASE','WHY','SHARE','UNWATCH']);
@@ -162,8 +162,9 @@ test('alert callbacks re-authorize and use existing CASE/WHY/SHARE/UNWATCH paths
     }
     const after = (await f.db.prepare('SELECT COUNT(*) AS n FROM rat_v1_dig_requests').first<{n:number}>())!.n;
     assert.equal(after,before); // CASE is reconstruction, not a new DIG.
-    assert.ok(captions.some(caption=>/Private watch evidence is available/.test(caption)));
-    assert.ok(captions.some(caption=>/Public evidence only/.test(caption)));
+    assert.ok(captions.some(caption=>/CASE FILE/.test(caption)));
+    assert.ok(captions.some(caption=>/WHY I NOTICED/.test(caption)));
+    assert.ok(captions.some(caption=>/RECEIPT PACKED/.test(caption)));
     assert.equal((await f.db.prepare('SELECT enabled FROM rat_v1_watches WHERE user_id=77 AND chat_id=77').first<{enabled:number}>())?.enabled,0);
     const publicRow = await f.db.prepare('SELECT receipt_json FROM rat_v11_pons_public_receipts WHERE case_id=?').bind(row.case_id).first<{receipt_json:string}>();
     assert.ok(publicRow); assert.doesNotMatch(publicRow.receipt_json,/watch_start_block|watch_created_at_ms|event_timestamp_ms|"user_id"|"chat_id"/);

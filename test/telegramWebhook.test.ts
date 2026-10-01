@@ -10,7 +10,7 @@ test('webhook URL must be HTTPS', () => {
   );
 });
 
-test('webhook registration posts secret-authenticated message-only webhook', async () => {
+test('webhook registration posts secret-authenticated message and callback webhook', async () => {
   let calledUrl = '';
   let body: Record<string, unknown> = {};
   const fakeFetch: typeof fetch = async (input, init) => {
@@ -32,7 +32,7 @@ test('webhook registration posts secret-authenticated message-only webhook', asy
   assert.equal(calledUrl, 'https://api.telegram.org/bot123:secret/setWebhook');
   assert.equal(body.url, 'https://binrat.example.test/telegram/webhook');
   assert.equal(body.secret_token, 'webhook-secret');
-  assert.deepEqual(body.allowed_updates, ['message']);
+  assert.deepEqual(body.allowed_updates, ['message', 'callback_query']);
   assert.equal(body.drop_pending_updates, false);
 });
 

@@ -43,6 +43,27 @@ test('Cloudflare health is instant and fail-closed before durable runtime state 
   }
 });
 
+test('Cloudflare health requires checkpoint at or beyond the verified runtime target', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const runtime=new D1RuntimeStateStore(db,4663);
+  try {
+    await store.commitCheckpoint({blockNumber:100n,blockHash:hex64(100),guardBlockNumber:null,guardBlockHash:null});
+    await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:102n,targetBlock:99n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:Date.now()});
+    let response=await worker.fetch(new Request('https://binrat.example/api/health'),{DB:db});
+    let body=await response.json() as Record<string,unknown>;
+    assert.equal(body.indexReady,true);
+
+    await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:102n,targetBlock:101n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:Date.now()});
+    response=await worker.fetch(new Request('https://binrat.example/api/health'),{DB:db});
+    body=await response.json() as Record<string,unknown>;
+    assert.equal(body.indexReady,false);
+  } finally { db.close(); }
+});
+
 test('Cloudflare health exposes an optional non-secret release SHA without changing health status', async () => {
   const db = new D1CompatDatabase();
   try {

@@ -10,10 +10,13 @@ export async function authoritativeCheckpoint(db: D1DatabaseLike, now: number, c
   const checkpoint = await new D1Store(db, chainId).getCheckpoint();
   if (!state?.sourceVerified || !state.liveCaughtUp || state.lastSyncError || !checkpoint ||
       state.updatedAtMs > now || now - state.updatedAtMs > 180_000 ||
-      state.targetBlock === null || checkpoint.blockNumber !== state.targetBlock) {
+      state.targetBlock === null || checkpoint.blockNumber < state.targetBlock) {
     throw new Error('INDEX_UNAVAILABLE');
   }
-  return checkpoint.blockNumber;
+  // Runtime target is the bounded verified snapshot. The durable checkpoint may
+  // legitimately advance beyond it between reads; never treat that as unhealthy
+  // and never expose evidence newer than the verified runtime target.
+  return state.targetBlock;
 }
 
 export async function evidenceForLaunch(db: D1DatabaseLike, id: string, checkpoint: bigint, chainId = 5042): Promise<EvidenceRef> {

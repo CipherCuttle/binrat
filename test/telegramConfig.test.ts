@@ -14,7 +14,7 @@ const webApp = { type: 'web_app', text: 'OPEN BINRAT', web_app: { url: 'https://
 class FakeApi implements TelegramConfigApi {
   calls: Array<{method:string;body:Record<string,unknown>}> = [];
   photo = true;
-  state = { name:'old', description:'old', shortDescription:'old', globalMenu:commands, testerMenu:{type:'default'} as Record<string,unknown>, commands:[[],[]] as unknown[][], webhook:telegramProductConfig.webhook.url };
+  state = { name:'old', description:'old', shortDescription:'old', globalMenu:commands, testerMenu:{type:'default'} as Record<string,unknown>, commands:[[],[]] as unknown[][], webhook:telegramProductConfig.webhook.url, webhookUpdates:[...telegramProductConfig.webhook.allowedUpdates] as string[] };
   testerReadbacks: Record<string, unknown>[] = [];
   async call<T>(method:string, body:Record<string,unknown>={}):Promise<T> {
     this.calls.push({method,body});
@@ -23,7 +23,7 @@ class FakeApi implements TelegramConfigApi {
     if(method==='getMyDescription') return {description:this.state.description} as T;
     if(method==='getMyShortDescription') return {short_description:this.state.shortDescription} as T;
     if(method==='getChatMenuButton') return (body.chat_id ? this.testerReadbacks.shift() ?? this.state.testerMenu : this.state.globalMenu) as T;
-    if(method==='getWebhookInfo') return {url:this.state.webhook} as T;
+    if(method==='getWebhookInfo') return {url:this.state.webhook,allowed_updates:this.state.webhookUpdates} as T;
     if(method==='getUserProfilePhotos') return {total_count:this.photo?1:0,photos:this.photo?[[{file_id:'x',file_unique_id:'y'}]]:[]} as T;
     if(method==='getMyCommands') { const type=(body.scope as {type:string}).type; return this.state.commands[type==='default'?0:1] as T; }
     if(method==='setMyName') this.state.name=String(body.name);
@@ -108,8 +108,17 @@ test('unexpected webhook drift blocks every global config mutation', async () =>
   assert.equal(api.calls.some(call=>call.method.startsWith('set')),false);
 });
 
+test('missing callback_query subscription is blocking configuration drift', async () => {
+  const api=new FakeApi(); api.state.webhookUpdates=['message'];
+  const plan=await planTelegramConfig(api);
+  const row=plan.diffs.find(item=>item.key==='WEBHOOK UPDATES');
+  assert.equal(row?.status,'blocked');
+  await assert.rejects(()=>applyTelegramConfig(api),/TELEGRAM_CONFIG_BLOCKED:WEBHOOK UPDATES/);
+  assert.equal(api.calls.some(call=>call.method==='setWebhook'),false);
+});
+
 test('BotFather-only username drift is blocking, never presented as an API update', () => {
-  const actual={me:{id:1,is_bot:true,first_name:'BINRAT',username:'WrongBot'},name:'BINRAT',description:telegramProductConfig.description,shortDescription:telegramProductConfig.shortDescription,commands:telegramProductConfig.commandScopes.map(x=>[...x.commands]),menuButton:{type:'commands'} as const,webhook:{url:telegramProductConfig.webhook.url},profilePhotoPresent:true};
+  const actual={me:{id:1,is_bot:true,first_name:'BINRAT',username:'WrongBot'},name:'BINRAT',description:telegramProductConfig.description,shortDescription:telegramProductConfig.shortDescription,commands:telegramProductConfig.commandScopes.map(x=>[...x.commands]),menuButton:{type:'commands'} as const,webhook:{url:telegramProductConfig.webhook.url,allowed_updates:[...telegramProductConfig.webhook.allowedUpdates]},profilePhotoPresent:true};
   const row=diffTelegramConfig(actual).find(item=>item.key==='BOT USERNAME');
   assert.equal(row?.status,'blocked');
   assert.equal(row?.method,undefined);
