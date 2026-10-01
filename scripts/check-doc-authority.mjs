@@ -52,6 +52,12 @@ for (const heading of [
 ]) assert.ok(roadmap.includes(heading), heading + " missing");
 assert.doesNotMatch(roadmap, /ArcPad|chain ID 5042|Arc 5042/i);
 
+const motionLab = read("web-v2/src/roadmap/MotionLabPage.tsx");
+for (const title of ["SNIFF", "REMEMBER", "WATCH", "HUNT", "ORGANIZE", "AUTONOMOUS RAT"]) {
+  assert.match(motionLab, new RegExp('title: "' + title + '"'));
+}
+assert.doesNotMatch(motionLab, /title: "INVESTIGATE"|title: "CONNECT"/);
+
 const language = read("docs/PRODUCT_LANGUAGE.md");
 assert.match(language, /DEPLOYER/);
 assert.match(language, /Degen decides attention\. Receipts decide truth\./i);
