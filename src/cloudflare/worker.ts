@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
 import type { AutonomousOutcome } from '../autonomous/outcome.js';
-import { discoverRats, latestPonsLaunches, loadRatsSnapshot } from '../autonomous/rats.js';
+import { discoverRats, latestPonsLaunches, latestPonsLaunchSnapshot, loadRatsSnapshot } from '../autonomous/rats.js';
 import { why } from '../autonomous/evidence.js';
 import { listWatches } from '../autonomous/watches.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
@@ -356,15 +356,13 @@ export async function handleBinratApiRequest(
     if (pathname === '/api/health') return health(env);
     if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
     if (pathname === '/api/launches/latest') {
-      const launches = await latestPonsLaunches(env.DB,deps.now(),20);
-      const sourceHealth = await chainHealth(env,ROBINHOOD_CHAIN_ID);
-      if (sourceHealth.indexReady !== true) return json(503,{ready:false,reason:'INDEX_NOT_READY'});
+      const snapshot = await latestPonsLaunchSnapshot(env.DB,deps.now(),20);
       return json(200,{
         schemaVersion:'binrat.latest-launches/0.1',
         chainId:ROBINHOOD_CHAIN_ID,
-        sourceCheckpoint:sourceHealth.targetBlock,
+        sourceCheckpoint:snapshot.sourceCheckpoint,
         historyCoverage:'PARTIAL',
-        launches
+        launches:snapshot.launches
       });
     }
 
