@@ -179,9 +179,16 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
       if (!latest || !/^[0-9a-f]{64}$/.test(latest.launch_id) || !/^0x[0-9a-f]{40}$/.test(latest.token) ||
           typeof latest.symbol !== 'string' || typeof latest.name !== 'string' || !/^\d+$/.test(latest.block_number)) continue;
       const subject: Entity = { chainId, entityType: 'CREATOR', entityId: row.creator };
+      const previousLaunches=(refsRows.results ?? []).slice(1,4).flatMap(item =>
+        /^[0-9a-f]{64}$/.test(item.launch_id) && /^0x[0-9a-f]{40}$/.test(item.token) &&
+        typeof item.symbol === 'string' && typeof item.name === 'string' && /^\d+$/.test(item.block_number)
+          ? [{launchId:item.launch_id,token:item.token,symbol:item.symbol,name:item.name,blockNumber:item.block_number}]
+          : []
+      );
       const discovery = {
         ruleVersion: RATS_RULE_VERSION,
         sourceCheckpoint: tip.toString(),
+        previousLaunches,
         reasons: [
           { kind: 'RECURRENCE' as const, epistemicClass: 'DERIVED' as const,
             text: `Exact Pons-reported deployer appears across ${recurrenceCount} indexed launches; this card retains ${observedCount} receipts.`,
@@ -193,12 +200,6 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
       };
       const receipt = await saveCase(db, await makeReceipt(subject, evidenceRefs, tip.toString(), now,
         'INDEXED_LAUNCH_EVIDENCE', discovery));
-      const previousLaunches=(refsRows.results ?? []).slice(1,4).flatMap(item =>
-        /^[0-9a-f]{64}$/.test(item.launch_id) && /^0x[0-9a-f]{40}$/.test(item.token) &&
-        typeof item.symbol === 'string' && typeof item.name === 'string' && /^\d+$/.test(item.block_number)
-          ? [{launchId:item.launch_id,token:item.token,symbol:item.symbol,name:item.name,blockNumber:item.block_number}]
-          : []
-      );
       candidates.push({
         entity: subject, reasons: discovery.reasons, evidenceRefs, caseId: receipt.caseId,
         rankPosition: candidates.length + 1, recurrenceCount,
