@@ -20,6 +20,8 @@ import {
   calculatePonsVelocity,
   PONS_SYNC_LEASE_MS,
   resolveArcRpcUrl,
+  resolveRobinhoodArchiveRpcUrl,
+  runCloudflarePonsOutcomeCycle,
   runCloudflarePonsSyncCycle,
   runCloudflareObservationCycle,
   runCloudflareRatRadarCycle,
@@ -28,7 +30,9 @@ import {
   type BinratSyncMessage
 } from '../src/cloudflare/syncQueue.js';
 import { PonsLaunchSource } from '../src/pons/ponsSource.js';
-import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../src/pons/chain.js';
+import { PONS_V2_FACTORY, PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../src/pons/chain.js';
+import { buildPonsCurveOutcomeCapabilityReceipt } from '../src/pons/outcomeCapability.js';
+import type { PonsOutcomeObservationSource } from '../src/pons/outcomeReceipts.js';
 import type {
   ObservationBlockPoint,
   ObservationSource
