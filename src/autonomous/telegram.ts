@@ -89,7 +89,7 @@ export async function executeAutonomousCommand(
 /** Legacy commands retain their established full-text rendering. */
 export function renderLegacyAutonomousOutcome(outcome: AutonomousOutcome): string {
   switch (outcome.kind) {
-    case 'HOME': return '🐀 BINRAT\n\nI dig through Pons launches and reported deployers. You get the receipts.\n\n/rats — what the rat noticed\n/dig <address> — investigate\n/watches — what I\'m watching';
+    case 'HOME': return '🐀 BINRAT\n\nI dig through Pons garbage. When something smells worth keeping, I bring back the receipts.\n\n/rats — Fresh Garbage\n/dig <address> — Dig Deeper\n/watches — Rat Watch';
     case 'RATS': return renderRats(outcome.snapshot);
     case 'CASE': return renderReceipt(outcome.receipt,outcome.mode) + (outcome.privateAttention ? `\n\n${outcome.privateAttention}` : '');
     case 'WATCH': case 'REPLAY': return outcome.reply;
