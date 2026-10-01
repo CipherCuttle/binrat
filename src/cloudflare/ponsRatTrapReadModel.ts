@@ -48,13 +48,13 @@ export async function readPonsRatTrapProjection(
   }
 
   const currentRow = await readLaunchRow(
-    db.prepare(\`
+    db.prepare(`
       SELECT launch_id,event_id,chain_id,block_number,block_hash,source,launcher,tx_hash,log_index,
              token,creator,pool,name,symbol,image_uri,website,twitter,telegram,observed_at_ms
       FROM launches
       WHERE chain_id=? AND source='PONS_V2' AND launch_id=?
       LIMIT 1
-    \`).bind(ROBINHOOD_CHAIN_ID, options.currentLaunchId)
+    `).bind(ROBINHOOD_CHAIN_ID, options.currentLaunchId)
   );
   if (!currentRow) throw new Error('PONS_RAT_TRAP_CURRENT_LAUNCH_MISSING');
   const currentLaunch = fromLaunchRow(currentRow);
@@ -62,7 +62,7 @@ export async function readPonsRatTrapProjection(
     throw new Error('PONS_RAT_TRAP_CURRENT_LAUNCH_AFTER_AS_OF');
   }
 
-  const previousCountRow = await db.prepare(\`
+  const previousCountRow = await db.prepare(`
     SELECT COUNT(*) AS n
     FROM launches
     WHERE chain_id=?
@@ -79,7 +79,7 @@ export async function readPonsRatTrapProjection(
         )
       )
       AND CAST(block_number AS INTEGER) <= CAST(? AS INTEGER)
-  \`).bind(
+  `).bind(
     ROBINHOOD_CHAIN_ID,
     currentLaunch.creator.toLowerCase(),
     currentLaunch.blockNumber.toString(),
@@ -94,10 +94,10 @@ export async function readPonsRatTrapProjection(
     throw new Error('PONS_RAT_TRAP_COHORT_COUNT_INVALID');
   }
   if (previousCount > maxPreviousLaunches) {
-    throw new Error(\`PONS_RAT_TRAP_COHORT_LIMIT_EXCEEDED:\${previousCount}\`);
+    throw new Error(`PONS_RAT_TRAP_COHORT_LIMIT_EXCEEDED:${previousCount}`);
   }
 
-  const previousResult = await db.prepare(\`
+  const previousResult = await db.prepare(`
     SELECT launch_id,event_id,chain_id,block_number,block_hash,source,launcher,tx_hash,log_index,
            token,creator,pool,name,symbol,image_uri,website,twitter,telegram,observed_at_ms
     FROM launches
@@ -116,7 +116,7 @@ export async function readPonsRatTrapProjection(
       )
       AND CAST(block_number AS INTEGER) <= CAST(? AS INTEGER)
     ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC
-  \`).bind(
+  `).bind(
     ROBINHOOD_CHAIN_ID,
     currentLaunch.creator.toLowerCase(),
     currentLaunch.blockNumber.toString(),
@@ -141,12 +141,12 @@ export async function readPonsRatTrapProjection(
     if (!point) {
       point = await blockSource.getBlockPoint(launch.blockNumber);
       if (point.blockNumber !== launch.blockNumber) {
-        throw new Error(\`PONS_RAT_TRAP_BLOCK_NUMBER_DRIFT:\${launch.launchId}\`);
+        throw new Error(`PONS_RAT_TRAP_BLOCK_NUMBER_DRIFT:${launch.launchId}`);
       }
       blockPoints.set(key, point);
     }
     if (point.blockHash.toLowerCase() !== launch.blockHash.toLowerCase()) {
-      throw new Error(\`PONS_RAT_TRAP_LAUNCH_REORG:\${launch.launchId}\`);
+      throw new Error(`PONS_RAT_TRAP_LAUNCH_REORG:${launch.launchId}`);
     }
     canonicalLaunchTimestampMsByLaunch.set(launch.launchId, point.timestampMs);
   }
@@ -185,13 +185,13 @@ async function readReceiptsForLaunches(
   if (!launchIds.length) return result;
 
   const placeholders = launchIds.map(() => '?').join(',');
-  const rows = await db.prepare(\`
+  const rows = await db.prepare(`
     SELECT launch_id,payload_json
     FROM pons_outcome_receipts
     WHERE chain_id=?
-      AND launch_id IN (\${placeholders})
+      AND launch_id IN (${placeholders})
     ORDER BY launch_id,horizon_ms,observation_version,observation_id
-  \`).bind(ROBINHOOD_CHAIN_ID, ...launchIds).all<{launch_id:string;payload_json:string}>();
+  `).bind(ROBINHOOD_CHAIN_ID, ...launchIds).all<{launch_id:string;payload_json:string}>();
   if (!rows.success) throw new Error('PONS_RAT_TRAP_RECEIPT_QUERY_FAILED');
 
   for (const row of rows.results ?? []) {
