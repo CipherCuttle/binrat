@@ -169,6 +169,16 @@ async function requireHealthy(label){
   }
   throw new Error('PONS_HEALTH_GATE_FAILED:'+label);
 }
+
+async function waitForReleaseSha(expected,label){
+  for(let attempt=0;attempt<12;attempt+=1){
+    const health=await getJson('/health');
+    note(label+' '+JSON.stringify({attempt:attempt+1,releaseSha:health.releaseSha??null}));
+    if(health.releaseSha===expected) return health;
+    if(attempt<11) await new Promise(resolve=>setTimeout(resolve,5_000));
+  }
+  throw new Error('PUBLIC_RELEASE_SHA_PROPAGATION_TIMEOUT');
+}
 function runtimeShape(version){ return version?.resources?.script_runtime??null; }
 function assertOnlyReleaseShaChanged(beforeVersion,afterVersion){
   const before=bindingList(beforeVersion);
@@ -278,9 +288,8 @@ try{
   deployVersion(candidateVersion,'BINRAT provider-head regression hardening');
   deployed=true;
 
+  await waitForReleaseSha(REVIEWED_RELEASE_SHA,'POST_DEPLOY_RELEASE');
   const health1=await requireHealthy('POST_DEPLOY_HEALTH_1');
-  const live1=await getJson('/health');
-  gate(live1.releaseSha===REVIEWED_RELEASE_SHA,'POST_DEPLOY_RELEASE_SHA_INVALID');
   const rows1=outcomeCount();
   gate(rows1>=beforeRows,'O2_RECEIPT_COUNT_REGRESSED');
 
