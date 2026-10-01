@@ -1,0 +1,47 @@
+name: pons-outcome-capability-probe
+
+on:
+  push:
+    branches:
+      - feat/binrat-pons-outcome-capability-v1
+
+permissions:
+  contents: read
+
+jobs:
+  live-read-only-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install probe dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Probe real Pons historical outcome capability
+        shell: bash
+        env:
+          BINRAT_PUBLIC_BASE_URL: https://binrat-edge-v0.pettevik.workers.dev
+          ROBINHOOD_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+        run: |
+          set -euo pipefail
+          pnpm probe:pons-outcome | tee "$RUNNER_TEMP/pons-outcome-capability-probe.txt"
+
+      - name: Preserve replayable probe receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-outcome-capability-probe
+          path: ${{ runner.temp }}/pons-outcome-capability-probe.txt
+          retention-days: 7
+          if-no-files-found: warn
