@@ -4,3 +4,5 @@ O3_PR=80
 INSPECTOR_PR=82
 RETRY=2
 RPC_RESOLVER=production
+RETRY=3
+IDENTITY_PROBE=onchain-readonly
