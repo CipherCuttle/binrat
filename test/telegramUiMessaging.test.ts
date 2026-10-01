@@ -24,15 +24,14 @@ function watchRows(count:number) {
   }));
 }
 
-test('WATCHES card discloses truncation and legacy migration state, with a direct full-list handoff', () => {
+test('WATCHES card stays fully native and discloses legacy migration state', () => {
   const card=renderRatCard({kind:'WATCHLIST',watches:watchRows(7),legacyWatchCount:2});
   assert.equal(card.view,'WATCHLIST');
   assert.match(card.caption,/WATCHING 7 SETS OF PAWS/);
-  assert.equal((card.caption.match(/^• /gm) ?? []).length,5);
-  assert.match(card.caption,/\+ 2 more active watches in the full list/);
+  assert.equal((card.caption.match(/^• /gm) ?? []).length,7);
+  assert.doesNotMatch(card.caption,/more active watches/);
   assert.match(card.caption,/2 legacy watches are not active here; re-arm explicitly on Pons 4663/);
-  const full=(card.keyboard[0]![0] as {webAppUrl:string}).webAppUrl;
-  assert.match(full,/\?view=watches$/);
+  assert.equal(card.keyboard.flat().some(button=>'webAppUrl' in button),false);
 
   const legacyOnly=renderRatCard({kind:'WATCHLIST',watches:[],legacyWatchCount:1});
   assert.equal(legacyOnly.view,'WATCHLIST');
@@ -49,6 +48,7 @@ test('historical Arc CASE cards expose evidence but never a dead Watch action', 
     const actions=card.keyboard.flatMap(row=>row.flatMap(button=>'callbackData' in button ? [parseCallback(button.callbackData)?.action] : []));
     assert.ok(actions.includes('WHY'));
     assert.equal(actions.includes('WATCH'),false);
+    assert.equal(card.keyboard.flat().some(button=>'webAppUrl' in button),false);
 
     const error=renderRatCard({kind:'ERROR',code:'Live watches are available only on Robinhood/Pons 4663. Arc 5042 remains historical evidence only.'});
     assert.match(error.caption,/OLD TRAIL ONLY/);
@@ -94,8 +94,9 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
     }
     assert.match(cards[0]!.caption,/freshest deployers that just came back/i);
     assert.match(cards[1]!.caption,/REPEAT DEPLOYER ACTIVE/);
-    assert.match(cards[1]!.caption,/Latest repeat launch: \$FIXTURE · block 100/);
-    assert.match(cards[1]!.caption,/1 earlier indexed launch/);
+    assert.match(cards[1]!.caption,/\$FIXTURE just launched · block 100/);
+    assert.match(cards[1]!.caption,/Previous from same deployer: \$FIXTURE/);
+    assert.match(cards[1]!.caption,/1 earlier indexed launch total/);
     assert.match(cards[1]!.caption,/BINRAT will ping you if these paws launch again/);
     assert.doesNotMatch(cards[1]!.caption,/retained receipt|LAUNCHES INDEXED/i);
     const ratLabels=cards[1]!.keyboard.flat().map(button=>button.text);
@@ -104,6 +105,8 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
     assert.ok(ratLabels.includes('Why flagged'));
     assert.equal(ratLabels.includes('Open Radar'),false);
     assert.equal(cards[1]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
+    assert.equal(cards[2]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
+    assert.equal(cards[5]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
     assert.match(cards[2]!.caption,/found .* launches from this reported deployer/i);
     assert.match(cards[3]!.caption,/WHY I NOTICED/);
     assert.match(cards[4]!.caption,/WATCHING THESE PAWS/);
