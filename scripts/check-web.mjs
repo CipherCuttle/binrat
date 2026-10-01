@@ -66,7 +66,7 @@ if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/replay`')
 if (!app.includes('REPLAY LAB')) throw new Error('WEB_REPLAY_LAB_MISSING');
 if (!app.includes('nothing is simulated')) throw new Error('WEB_REPLAY_BOUNDARY_MISSING');
 if (!app.includes('Raw pool liquidity is not USD liquidity')) throw new Error('WEB_RAW_LIQUIDITY_BOUNDARY_MISSING');
-if (!app.includes('Same ArcPad-reported address only')) throw new Error('WEB_CREATOR_IDENTITY_BOUNDARY_MISSING');
+if (!app.includes('Same Pons-reported deployer address only')) throw new Error('WEB_CREATOR_IDENTITY_BOUNDARY_MISSING');
 if (!reactBitsIsland.includes('React Bits')) throw new Error('WEB_REACT_BITS_DONOR_MARKER_MISSING');
 if (!reactBitsIsland.includes('prefers-reduced-motion')) throw new Error('WEB_REDUCED_MOTION_GUARD_MISSING');
 
