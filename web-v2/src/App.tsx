@@ -58,6 +58,10 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
+  const previewMotionLab = new URLSearchParams(window.location.search).get("motionlab") === "1";
+  if ((path === "/" || path === "/index.html") && previewMotionLab) {
+    return { page: "roadmapMotionLab" };
+  }
   if (
     (path === "/" || path === "/index.html") &&
     import.meta.env.VITE_ROADMAP_MOTION_LAB_PREVIEW === "1"
