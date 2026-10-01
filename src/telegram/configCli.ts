@@ -36,16 +36,26 @@ async function verify(): Promise<void> {
 
 async function smoke(): Promise<void> {
   await verify();
-  const [serviceResponse, ponsResponse, assetHash] = await Promise.all([
-    fetch(`${new URL(telegramProductConfig.miniApp.url).origin}/health`, { signal: AbortSignal.timeout(20_000) }),
-    fetch(`${new URL(telegramProductConfig.miniApp.url).origin}/api/health`, { signal: AbortSignal.timeout(20_000) }),
+  const origin=new URL(telegramProductConfig.miniApp.url).origin;
+  const [serviceResponse, assetHash] = await Promise.all([
+    fetch(`${origin}/health`, { signal: AbortSignal.timeout(20_000) }),
     telegramProfileAssetHash()
   ]);
   const service = await serviceResponse.json() as Record<string, unknown>;
-  const pons = await ponsResponse.json() as Record<string, unknown>;
   if (!serviceResponse.ok || service.ok !== true || service.service !== 'binrat-cloudflare-edge') throw new Error('SMOKE_SERVICE_UNHEALTHY');
-  if (!ponsResponse.ok || pons.ok !== true || pons.chainId !== 4663 || pons.indexReady !== true ||
-      pons.liveCaughtUp !== true || pons.lastSyncError !== null) throw new Error('SMOKE_PONS_UNHEALTHY');
+
+  let pons: Record<string, unknown> | null = null;
+  let ponsHealthy=false;
+  for (let attempt=0;attempt<7;attempt+=1) {
+    const ponsResponse=await fetch(`${origin}/api/health`, { signal: AbortSignal.timeout(20_000) });
+    pons=await ponsResponse.json().catch(()=>null) as Record<string, unknown> | null;
+    ponsHealthy=Boolean(ponsResponse.ok && pons?.ok === true && pons.chainId === 4663 &&
+      pons.indexReady === true && pons.liveCaughtUp === true && pons.lastSyncError === null);
+    console.log(`TELEGRAM_SMOKE_PONS_PROBE attempt=${attempt+1} healthy=${ponsHealthy}`);
+    if (ponsHealthy) break;
+    if (attempt<6) await new Promise(resolve=>setTimeout(resolve,5_000));
+  }
+  if (!ponsHealthy) throw new Error('SMOKE_PONS_UNHEALTHY');
   if (service.autonomousRatPublicEnabled !== false || service.autonomousRatEnabled !== true ||
       service.telegramUiV2Enabled !== true || service.telegramMediaEnabled !== true) {
     throw new Error('SMOKE_PRIVATE_FEATURE_STATE_INVALID');
