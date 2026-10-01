@@ -9,23 +9,44 @@ export function RoadmapPage({ navigate }: { navigate: (path: string) => void }) 
   const stageNodes = useRef(new Map<RoadmapStageId, HTMLElement>());
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const centered = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    let frame = 0;
 
-        const id = centered?.target.getAttribute("data-stage") as RoadmapStageId | null;
-        if (id) setActiveStage(id);
-      },
-      {
-        rootMargin: "-38% 0px -38% 0px",
-        threshold: [0, 0.01, 0.1, 0.25],
-      },
-    );
+    const selectClosestStage = () => {
+      frame = 0;
+      const viewportCenter = window.innerHeight / 2;
+      let closest: { id: RoadmapStageId; distance: number } | null = null;
+
+      stageNodes.current.forEach((node, id) => {
+        const rect = node.getBoundingClientRect();
+        const center = rect.top + rect.height / 2;
+        const distance = Math.abs(center - viewportCenter);
+        if (!closest || distance < closest.distance) closest = { id, distance };
+      });
+
+      if (closest) setActiveStage(closest.id);
+    };
+
+    const scheduleSelection = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(selectClosestStage);
+    };
+
+    const observer = new IntersectionObserver(scheduleSelection, {
+      rootMargin: "-42% 0px -42% 0px",
+      threshold: 0,
+    });
 
     stageNodes.current.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+    window.addEventListener("scroll", scheduleSelection, { passive: true });
+    window.addEventListener("resize", scheduleSelection);
+    scheduleSelection();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", scheduleSelection);
+      window.removeEventListener("resize", scheduleSelection);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   return (
