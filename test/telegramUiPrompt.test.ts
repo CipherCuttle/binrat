@@ -31,7 +31,7 @@ function telegram(calls:Call[], options:{rejectPrompt?:boolean; ambiguousPrompt?
     // MEDIA OFF cards in this fixture are text messages, so Telegram definitively
     // rejects a caption edit before the client falls back to editMessageText.
     if (method === 'editMessageCaption') return Response.json({ok:false,description:'Bad Request: message is not a photo'},{status:400});
-    if (method === 'editMessageText' && options.failFinalEdit && /CASE/.test(String(body.text))) return Response.json({ok:false},{status:500});
+    if (method === 'editMessageText' && options.failFinalEdit && /DUG IT UP/.test(String(body.text))) return Response.json({ok:false},{status:500});
     return Response.json({ok:true,result:{message_id:method === 'sendMessage' && body.reply_markup ? promptId++ : 700}});
   };
 }
@@ -236,7 +236,7 @@ test('media ON edits inquisitive → digging → CASE, while final ledger failur
     const mediaEdits=calls.filter(c=>c.method==='editMessageMedia').map(c=>String((c.body.media as {caption?:string}|undefined)?.caption));
     assert.ok(mediaEdits.some(text=>text.includes('DROP THE ADDRESS')));
     assert.ok(mediaEdits.some(text=>text.includes('RUMMAGING')));
-    assert.ok(mediaEdits.some(text=>text.includes('CASE')));
+    assert.ok(mediaEdits.some(text=>text.includes('DUG IT UP')));
   } finally {f.db.close();}
 });
 
