@@ -54,6 +54,7 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
 function errorCopy(code: string): string {
   if (/capacity|limit reached/i.test(code)) return '🐀 BIN IS FULL FOR NOW.\nTry again after 00:00 UTC.';
   if (/receipt/i.test(code)) return "🐀 THAT RECEIPT ISN'T HERE.\nIt may have expired or failed verification.";
+  if (/live watches|historical evidence/i.test(code)) return '🐀 OLD TRAIL ONLY.\nArc 5042 stays historical. Live watches run on Pons 4663.';
   if (/malformed|unsupported/i.test(code)) return '🐀 WRONG KIND OF SCRAP.\nPaste a deployer address and I\'ll check it.';
   return "🐀 PIPE SMELLS WRONG.\nCan't verify fresh chain data right now.";
 }
@@ -85,10 +86,14 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
   if (outcome.kind === 'CASE') {
     const id=share(outcome.receipt); const creator=outcome.receipt.evidenceRefs[0]?.creator;
     const isWhy=outcome.mode === 'WHY';
+    const caseActions=creator
+      ? [callbackButton(isWhy ? 'Investigate' : 'Why',{action:isWhy ? 'CASE' : 'WHY',shareId:id}),
+          ...(outcome.receipt.chainId === 4663 ? [callbackButton('Watch',{action:'WATCH',shareId:id})] : [])]
+      : [];
     return card({view:isWhy?'WHY':'CASE',media:outcome.receipt.discovery?'repeat-creator':'evidence-found',caption:isWhy
       ? `🐀 WHY I NOTICED\n${whyFacts(outcome.receipt)}`
       : `🐀 CASE FILE\n${caseFact(outcome.receipt)}`,keyboard:[
-      creator ? [callbackButton(isWhy ? 'Investigate' : 'Why',{action:isWhy ? 'CASE' : 'WHY',shareId:id}),callbackButton('Watch',{action:'WATCH',shareId:id})] : [],
+      caseActions,
       [webAppButton('Open Case',`${TELEGRAM_MINI_APP_URL}?case=${outcome.receipt.caseId}`)],
       [callbackButton('Full receipt',{action:'FULL',shareId:id}),callbackButton('Share',{action:'SHARE',shareId:id})],
       creator ? [copyButton('Copy address',creator)] : [],
