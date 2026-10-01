@@ -56,7 +56,7 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
       ]
     : ['🐀 RAT WATCH.','Nothing on Rat Watch yet.'];
   if (outcome.legacyWatchCount > 0) {
-    lines.push(`${outcome.legacyWatchCount} legacy watch${outcome.legacyWatchCount === 1 ? '' : 'es'} ${outcome.legacyWatchCount === 1 ? 'is' : 'are'} not active here; re-arm explicitly on Pons 4663.`);
+    lines.push(`${outcome.legacyWatchCount} older watch${outcome.legacyWatchCount === 1 ? '' : 'es'} ${outcome.legacyWatchCount === 1 ? 'is' : 'are'} outside Rat Watch; re-arm on Pons 4663.`);
   }
   return lines.filter(Boolean).join('\n');
 }
@@ -65,8 +65,8 @@ function errorCopy(code: string): string {
   if (/live index is unavailable or stale/i.test(code)) return '🐀 LOST THE TRAIL.\nFresh Pons receipts are not verified right now. No new claim made.';
   if (/fresh canonical Robinhood boundary could not be verified/i.test(code)) return '🐀 STUCK IN A PIPE.\nCould not verify the live Pons boundary. Nothing invented.';
   if (/snapshot is unavailable|snapshot.*expired/i.test(code)) return '🐀 TRAIL WENT COLD.\nOpen Fresh Garbage again and I’ll sniff out a current trail.';
-  if (/discovery receipts are unavailable/i.test(code)) return '🐀 RAT RECEIPTS UNAVAILABLE.\nI could not reconstruct a verified discovery snapshot.';
-  if (/discovery receipts could not be saved|discovery retention is unavailable/i.test(code)) return '🐀 RAT SNAPSHOT NOT SAVED.\nDiscovery evidence could not be persisted safely. No Rat card was invented.';
+  if (/discovery receipts are unavailable/i.test(code)) return '🐀 CAME BACK EMPTY.\nI could not rebuild the receipts for this trail.';
+  if (/discovery receipts could not be saved|discovery retention is unavailable/i.test(code)) return '🐀 DROPPED THE RECEIPT.\nCould not keep this trail safely. Nothing invented.';
   if (/receipt/i.test(code)) return "🐀 THAT RECEIPT ISN'T HERE.\nIt may have expired or failed verification.";
   if (/live watches|historical evidence/i.test(code)) return '🐀 OLD TRAIL ONLY.\nArc 5042 stays historical. Live watches run on Pons 4663.';
   if (/malformed|unsupported/i.test(code)) return '🐀 WRONG KIND OF SCRAP.\nPaste a deployer address and I\'ll check it.';
@@ -150,10 +150,10 @@ export function renderAlertCard(receipt: Receipt, watchStartBlock: number): RatC
   return card({
     view:'ALERT', media:'alert',
     caption:[
-      '🐀 SAME PAWS. NEW LAUNCH.',
-      'A watched reported deployer showed up again.',
-      'Trap sprung. Familiar paws are back.'
-    ].join('\n\n'),
+      '🐀 TRAP SPRUNG.',
+      'Familiar paws launched again.',
+      'You kept this trail on Rat Watch.'
+    ].join('\n'),
     keyboard:[
       [callbackButton('Dig Deeper',{action:'CASE',shareId:id}),callbackButton('Receipts',{action:'WHY',shareId:id})],
       [callbackButton('Share',{action:'SHARE',shareId:id}),callbackButton('Unwatch',{action:'UNWATCH',shareId:id},'danger')],
@@ -162,8 +162,8 @@ export function renderAlertCard(receipt: Receipt, watchStartBlock: number): RatC
   });
 }
 
-export function digWaitingCard(): RatCard { return card({view:'DIG_WAITING',media:'inquisitive',caption:"🐀 GIVE ME A DEPLOYER ADDRESS.\nI'll check what BINRAT remembers.",keyboard:[[callbackButton('Home',{action:'HOME'})]]}); }
-export function diggingCard(): RatCard { return card({view:'DIGGING',media:'digging',caption:'🐀 RUMMAGING THROUGH OLD LAUNCHES…\nChecking what BINRAT remembers.',keyboard:[]}); }
-export function malformedDigCard(): RatCard { return card({view:'DIG_WAITING',media:'empty-paws',caption:"🐀 THAT ISN'T A DEPLOYER ADDRESS I CAN CHECK.\nTry another set of paws.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
+export function digWaitingCard(): RatCard { return card({view:'DIG_WAITING',media:'inquisitive',caption:"🐀 DROP THE ADDRESS.\nGive me a Pons deployer and I'll rummage through its Trash Trail.",keyboard:[[callbackButton('Home',{action:'HOME'})]]}); }
+export function diggingCard(): RatCard { return card({view:'DIGGING',media:'digging',caption:'🐀 RUMMAGING THROUGH THE TRASH…\nPulling the receipts.',keyboard:[]}); }
+export function malformedDigCard(): RatCard { return card({view:'DIG_WAITING',media:'empty-paws',caption:"🐀 WRONG SCRAP.\nGive me a Pons deployer address.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
 export function digPromptOperationalErrorCard(): RatCard { return card({view:'ERROR',media:'error',caption:"🐀 PIPE SMELLS WRONG.\nI didn't start a dig. Try again.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
 export function digOperationalErrorCard(): RatCard { return card({view:'ERROR',media:'error',caption:"🐀 DIG STOPPED.\nI couldn't verify the receipts. Try again.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
