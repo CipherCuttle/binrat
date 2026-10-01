@@ -7,6 +7,7 @@ export function RoadmapSpine({ active }: { active: RoadmapStageId }) {
     "--roadmap-active-index": activeIndex,
     "--roadmap-stage-count": roadmapStages.length,
     "--roadmap-active-accent": roadmapStages[activeIndex]?.accent ?? "#8fc7a5",
+    "--roadmap-active-position": `${((activeIndex + 0.5) / roadmapStages.length) * 100}%`,
   } as CSSProperties;
 
   return (
