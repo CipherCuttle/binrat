@@ -298,7 +298,8 @@ export async function syncPonsOutcomeObservations(
   assertHash('PONS_OUTCOME_CHECKPOINT_REORG', checkpoint.blockNumber, checkpoint.blockHash, checkpointPoint.blockHash);
 
   const horizons = [...(options.horizons ?? OBSERVATION_HORIZONS)].sort((a,b) => a.ms-b.ms);
-  const launches = await store.listCandidates(options.maxReceiptsPerSync);
+  const candidateLimit=Math.min(100,Math.max(2,options.maxReceiptsPerSync*2));
+  const launches = await store.listCandidates(candidateLimit);
   let remaining = options.maxReceiptsPerSync;
   let inserted = 0;
   let duplicates = 0;
