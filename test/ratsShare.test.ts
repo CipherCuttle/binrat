@@ -7,9 +7,8 @@ import { discoverRats, renderRats } from '../src/autonomous/rats.js';
 import { createPublicShareReceipt, openPublicShareReceipt, renderOpenedReceipt, renderShareArtifact, telegramDeepLink } from '../src/autonomous/share.js';
 import { FreeEntitlements, FREE_CAPACITY } from '../src/autonomous/entitlements.js';
 import { listWatches } from '../src/autonomous/watches.js';
-import { CREATOR, PRINCIPAL, addr, autonomousFixture, runRatsShareDemo } from './support/autonomousFixture.js';
+import { CREATOR, PRINCIPAL, addr, hash, autonomousFixture, runRatsShareDemo } from './support/autonomousFixture.js';
 
-const hashForTest=(n:number)=>`0x${n.toString(16).padStart(64,'0')}`;
 const count = async (db: Awaited<ReturnType<typeof autonomousFixture>>['db'], table: string) =>
   (await db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first<{n:number}>())!.n;
 
@@ -64,7 +63,7 @@ test('RATS accepts a durable checkpoint ahead of the verified runtime target and
   const {f}=await recurrentFixture();
   try {
     await f.launch(101,CREATOR);
-    await f.store.commitCheckpoint({blockNumber:101n,blockHash:hashForTest(101),guardBlockNumber:null,guardBlockHash:null});
+    await f.store.commitCheckpoint({blockNumber:101n,blockHash:hash(101),guardBlockNumber:null,guardBlockHash:null});
     const snapshot=await discoverRats(f.db,f.now());
     assert.equal(snapshot.sourceCheckpoint,'100');
     assert.ok(snapshot.candidates.every(candidate=>candidate.evidenceRefs.every(ref=>BigInt(ref.blockNumber)<=100n)));
