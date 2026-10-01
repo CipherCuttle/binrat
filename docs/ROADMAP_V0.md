@@ -3,6 +3,54 @@
 Status: planning document  
 Rule: roadmap items are not promises, launch dates, or claims of future token value.
 
+## RELIABILITY FREEZE — PONS / DELIVERY / RELEASE PLANE (2026-09-30)
+
+**Decision:** freeze the currently proven Pons catch-up parameters while recovery is making net progress and no integrity invariant is violated. Do not keep retuning batching, leases, density limits or transport timeouts merely because backlog still exists.
+
+Detailed contract: [PRODUCTION_RELIABILITY_AND_OPSEC_PLAN_V1.md](./product/PRODUCTION_RELIABILITY_AND_OPSEC_PLAN_V1.md).
+
+### Frozen invariants
+
+- exactly one Pons checkpoint writer;
+- canonical chain evidence precedes derived product state;
+- integrity failures fail closed immediately;
+- transport/availability failures use bounded retry/degraded behavior and never silently become trusted data;
+- Queue delivery is treated as at-least-once and all critical mutations/deliveries remain idempotent;
+- checkpoints advance only across fully verified ranges;
+- one RPC authority is used for a committed canonical batch; provider switching requires a fresh uncommitted attempt;
+- stale Pons evidence must never be presented as current;
+- recovery/deployment tooling may not enable public Rat, Holder/token/payment/trading authority or token launch;
+- deployment remains exact-reviewed-SHA → dark candidate → verify → promote/rollback.
+
+### Two finish lines
+
+**Private product finish line — do not let later infrastructure hardening block this:**
+
+1. **F0 Recovery:** current Pons recovery reaches full health with two consecutive accepted samples.
+2. **F1 Consolidate:** port only the proven permanent #64/#65 identity/reliability changes onto PR #63; keep incident-only recovery machinery out of the release candidate.
+3. **F2 Private product:** full #63 regression/dry-run, update exact reviewed SHA, deploy Telegram UX V2 privately.
+4. **F3 Owner acceptance:** real phone test of HOME → RATS → DIG/WHY → WATCH → SHARE, Rat media cards and Mini App.
+
+**Public reliability finish line — complete before broad public beta:**
+
+5. **F4 RPC authority:** managed archive-capable primary plus independent witness/secondary; batch-scoped authority and bounded failover.
+6. **F5 Queue isolation:** separate Pons canonical indexing, derived intelligence and user-facing delivery scheduling while retaining one Pons writer.
+7. **F6 Delivery reliability:** dead-letter queue, explicit retry taxonomy, attempt-aware backoff/jitter and idempotency audit.
+8. **F7 Observability:** queue age/depth, Pons backlog/velocity, release SHA, retry state and service-state diagnostics using platform-native telemetry.
+9. **F8 D1 disaster recovery:** pre-mutation Time Travel bookmark receipts and tested restore runbook; no automatic destructive restore.
+10. **F9 CI/CD OPSEC:** full-SHA pin GitHub Actions, least-privilege Cloudflare credentials, retire interactive/device-login production paths, retain exact-SHA candidate/promotion gates.
+11. **F10 Resilience gate:** permanent deterministic failure-injection suite covering duplicate delivery, timeout/429, provider disagreement, reorg, lease expiry, failed D1 write and DLQ behavior.
+12. **F11 Public canary:** bounded cohort with telemetry and delivery acceptance.
+13. **F12 Public beta:** only after the reliability gate has no open Critical/High finding.
+
+### Release-stack rule
+
+PR #64 and PR #65 are **incident evidence branches**, not sequential release merges. PR #63 is the intended integration surface. Extract/port the verified permanent diffs from #64/#65 onto #63, rerun the complete release gate, and later close the incident PRs as superseded when authorized. Do not merge #64 → #65 → #63 as a history-management shortcut.
+
+### Explicit non-goals
+
+Do not introduce self-hosted archive nodes, Kafka, Kubernetes, Redis clusters, parallel Pons checkpoint writers, automatic D1 restore, a custom observability platform or distributed-consensus machinery absent new evidence that the bounded Cloudflare architecture cannot meet the product requirement.
+
 ## CURRENT PRODUCT STATE — PUBLIC LIVE BETA / TOKEN LAUNCH BLOCKED
 
 Status semantics are canonicalized in `docs/CAPABILITY_MANIFEST_V0.json`.
