@@ -1287,7 +1287,9 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
     runtime?.sourceVerified &&
     runtime.liveCaughtUp &&
     !runtime.lastSyncError &&
-    fresh
+    fresh &&
+    runtime.targetBlock !== null &&
+    checkpoint.blockNumber >= runtime.targetBlock
   );
   const observationReady = Boolean(runtime?.observationReady && !runtime.lastObservationError && fresh);
 
