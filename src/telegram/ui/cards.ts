@@ -50,8 +50,15 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
     if (!candidate) return card({view:'EMPTY',media:'empty-paws',caption:'🐀 NOTHING IN THE BIN.\nNo repeat launchers in BINRAT\'s current memory.',keyboard:[[callbackButton('DIG',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]});
     const id=share({shareId:candidate.caseId.slice(0,40)});
-    const count=candidate.evidenceRefs.length;
-    return card({view:'RATS',media:'repeat-creator',caption:`🐀 SAME PAWS. ${launches(count).toUpperCase()} FOUND.\nBINRAT found ${launches(count)} from this reported deployer.`,keyboard:[
+    const count=candidate.recurrenceCount;
+    const latest=candidate.latestLaunch;
+    const retained=candidate.evidenceRefs.length;
+    const latestName=latest.symbol ? `${latest.symbol}` : (latest.name || 'latest launch');
+    return card({view:'RATS',media:'repeat-creator',caption:[
+      `🐀 SAME PAWS. ${launches(count).toUpperCase()} INDEXED.`,
+      `Latest: ${latestName} · block ${latest.blockNumber}`,
+      `${retained} retained receipt${retained===1?'':'s'} back this card.`
+    ].join('\n'),keyboard:[
       [callbackButton('Investigate',{action:'CASE',shareId:id}),callbackButton('Watch',{action:'WATCH',shareId:id})],
       [callbackButton('Why',{action:'WHY',shareId:id}),copyButton('Copy address',candidate.entity.entityId)],
       [callbackButton('Prev',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:Math.max(0,outcome.candidateIndex-1)}),callbackButton(`${outcome.candidateIndex+1}/${outcome.snapshot.candidates.length}`,{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex}),callbackButton('Next',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:Math.min(outcome.snapshot.candidates.length-1,outcome.candidateIndex+1)})],
