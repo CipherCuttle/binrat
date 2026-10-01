@@ -9,6 +9,7 @@ import {
 
 const apiBase=(process.env.BINRAT_PUBLIC_BASE_URL ?? 'https://binrat-edge-v0.pettevik.workers.dev').replace(/\/$/,'');
 const rpcUrl=process.env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com';
+const discoveryRpcUrl=process.env.ROBINHOOD_DISCOVERY_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com';
 
 function gate(condition:unknown,code:string):asserts condition {
   if (!condition) throw new Error(code);
@@ -147,6 +148,10 @@ const client=createPublicClient({
   chain:robinhoodMainnet(rpcUrl),
   transport:http(rpcUrl,{timeout:20_000,retryCount:2,retryDelay:500})
 });
+const discoveryClient=createPublicClient({
+  chain:robinhoodMainnet(discoveryRpcUrl),
+  transport:http(discoveryRpcUrl,{timeout:20_000,retryCount:2,retryDelay:500})
+});
 const registry=await client.readContract({
   address:PONS_V2_FACTORY as Address,
   abi:ponsV2FactoryOutcomeReadAbi,
@@ -179,22 +184,22 @@ gate(
 );
 
 
-const checkpointTimestampMs=await observedBlockTimestampMs(client,checkpoint);
+const checkpointTimestampMs=await observedBlockTimestampMs(discoveryClient,checkpoint);
 const archiveSearchStartTimestampMs=checkpointTimestampMs-30*HOUR_MS;
 const archiveSearchEndTimestampMs=checkpointTimestampMs-24*HOUR_MS-10*MINUTE_MS;
 const archiveSearchStartBlock=await firstBlockAtOrAfterTimestamp(
-  client,
+  discoveryClient,
   PONS_V2_START_BLOCK,
   checkpoint,
   archiveSearchStartTimestampMs
 );
 const archiveSearchEndBlock=await firstBlockAtOrAfterTimestamp(
-  client,
+  discoveryClient,
   archiveSearchStartBlock,
   checkpoint,
   archiveSearchEndTimestampMs
 );
-const agedLaunch=await findHistoricalNativeLaunch(client,archiveSearchStartBlock,archiveSearchEndBlock);
+const agedLaunch=await findHistoricalNativeLaunch(discoveryClient,archiveSearchStartBlock,archiveSearchEndBlock);
 gate(
   checkpointTimestampMs-agedLaunch.timestampMs>=24*HOUR_MS+10*MINUTE_MS,
   'PROBE_AGED_LAUNCH_TOO_RECENT'
@@ -216,7 +221,7 @@ const historicalMaturityReceipts=[] as Array<{
 for (const window of maturityWindows) {
   const targetTimestampMs=agedLaunch.timestampMs+window.offsetMs;
   const targetBlock=await firstBlockAtOrAfterTimestamp(
-    client,
+    discoveryClient,
     agedLaunch.blockNumber,
     checkpoint,
     targetTimestampMs
