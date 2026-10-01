@@ -190,9 +190,7 @@ export class SqliteStore implements LaunchStore {
 
   async replaceProvenanceEdges(edges: ProvenanceEdge[]): Promise<void> {
     const tx = this.db.transaction(() => {
-      this.db.prepare(
-        'DELETE FROM provenance_edges WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)'
-      ).run(this.chainId,blockNumber.toString());
+      this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
       const insert = this.db.prepare(`
         INSERT INTO provenance_edges (
           edge_id,chain_id,kind,from_id,to_id,evidence_class,observed_block,observed_block_hash,
@@ -431,7 +429,9 @@ export class SqliteStore implements LaunchStore {
 
   async rewindFromBlock(blockNumber: bigint): Promise<void> {
     const tx = this.db.transaction(() => {
-      this.db.prepare('DELETE FROM provenance_edges WHERE chain_id = ?').run(this.chainId);
+      this.db.prepare(
+        'DELETE FROM provenance_edges WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)'
+      ).run(this.chainId, blockNumber.toString());
       this.db.prepare('DELETE FROM launch_observations WHERE chain_id = ? AND CAST(observed_block AS INTEGER) >= CAST(? AS INTEGER)')
         .run(this.chainId, blockNumber.toString());
       this.db.prepare('DELETE FROM launches WHERE chain_id = ? AND CAST(block_number AS INTEGER) >= CAST(? AS INTEGER)')
