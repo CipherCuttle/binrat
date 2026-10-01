@@ -82,6 +82,19 @@ interface LatestLaunchRow {
   prior_launch_count: number;
 }
 
+async function hasPonsTokenIdentitySchema(db:D1DatabaseLike):Promise<boolean> {
+  const row=await db.prepare(
+    "SELECT 1 AS present FROM sqlite_master WHERE type='table' AND name='pons_token_identity_receipts' LIMIT 1"
+  ).first<{present:number}>();
+  return row?.present===1;
+}
+
+function identityLaunchSelect(identitySchema:boolean):string {
+  return identitySchema
+    ? "l.launch_id,l.token,COALESCE(NULLIF(i.symbol,''),l.symbol) AS symbol,COALESCE(NULLIF(i.name,''),l.name) AS name,l.block_number"
+    : "l.launch_id,l.token,l.symbol,l.name,l.block_number";
+}
+
 export async function latestPonsLaunchSnapshot(
   db: D1DatabaseLike,
   now: number,
@@ -90,7 +103,9 @@ export async function latestPonsLaunchSnapshot(
   const chainId = 4663;
   const tip = await authoritativeCheckpoint(db, now, chainId);
   const limit = Math.max(1, Math.min(20, requestedLimit));
-  const result = await db.prepare(`SELECT l.launch_id,l.token,l.symbol,l.name,l.block_number,l.tx_hash,l.creator,
+  const identitySchema=await hasPonsTokenIdentitySchema(db);
+  const identityJoin=identitySchema ? ' LEFT JOIN pons_token_identity_receipts i ON i.launch_id=l.launch_id' : '';
+  const result = await db.prepare(`SELECT ${identityLaunchSelect(identitySchema)},l.tx_hash,l.creator,
       l.image_uri,l.website,l.twitter,l.telegram,
       (SELECT COUNT(DISTINCT p.launch_id)
        FROM launches p JOIN provenance_facts pf ON pf.launch_id=p.launch_id AND pf.chain_id=p.chain_id
@@ -101,7 +116,7 @@ export async function latestPonsLaunchSnapshot(
            OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index<l.log_index)
            OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index=l.log_index AND p.launch_id<l.launch_id)
          )) AS prior_launch_count
-    FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id
+    FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id${identityJoin}
     WHERE l.chain_id=? AND l.source='PONS_V2' AND CAST(l.block_number AS INTEGER)<=?
     ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT ?`)
     .bind(Number(tip),chainId,Number(tip),limit).all<LatestLaunchRow>();
@@ -151,6 +166,7 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
   const chainId = 4663;
   const tip = await authoritativeCheckpoint(db, now, chainId);
   const limit = Math.max(1, Math.min(MAX_CANDIDATES, candidateLimit));
+  const identitySchema=await hasPonsTokenIdentitySchema(db);
   await pruneSnapshots(db, now);
   const rows = await db.prepare(`SELECT l.creator, COUNT(DISTINCT l.launch_id) AS recurrence_count,
       MAX(CAST(l.block_number AS INTEGER)) AS latest_block
@@ -166,8 +182,9 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
   for (const row of rows.results ?? []) {
     if (!/^0x[0-9a-f]{40}$/.test(row.creator) || !Number.isSafeInteger(Number(row.recurrence_count)) ||
         Number(row.recurrence_count) < 2 || !/^\d+$/.test(String(row.latest_block))) continue;
-    const refsRows = await db.prepare(`SELECT launch_id,token,symbol,name,block_number FROM launches WHERE chain_id=? AND creator=?
-      AND CAST(block_number AS INTEGER)<=? ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC LIMIT ?`)
+    const identityJoin=identitySchema ? ' LEFT JOIN pons_token_identity_receipts i ON i.launch_id=l.launch_id' : '';
+    const refsRows = await db.prepare(`SELECT ${identityLaunchSelect(identitySchema)} FROM launches l${identityJoin} WHERE l.chain_id=? AND l.creator=?
+      AND CAST(l.block_number AS INTEGER)<=? ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT ?`)
       .bind(chainId, row.creator, Number(tip), MAX_EVIDENCE_PER_CANDIDATE).all<CandidateLaunchRow>();
     if (!refsRows.success || (refsRows.results?.length ?? 0) < 2) continue;
     try {
