@@ -6,16 +6,16 @@ export const telegramProductConfig = Object.freeze({
     username: 'BinratBot',
     name: 'BINRAT'
   },
-  description: 'BINRAT digs through indexed Robinhood/Pons launches and repeated deployers. Evidence receipts, explicit unknowns, no safety or profit verdicts.',
-  shortDescription: 'Launch receipts and repeated-deployer evidence. No guesses.',
+  description: 'BINRAT digs through Pons garbage, remembers familiar paws and keeps the receipts. Fresh Garbage, Dig Deeper and Rat Watch. No buy/sell verdicts.',
+  shortDescription: 'He gets the scraps. You get the receipts.',
   commandScopes: [
     {
       scope: { type: 'default' as const },
       commands: [
         { command: 'start', description: 'Wake the rat' },
-        { command: 'rats', description: 'Find repeated deployers' },
-        { command: 'dig', description: 'Investigate an address' },
-        { command: 'watches', description: 'Show active watches' },
+        { command: 'rats', description: 'Fresh Garbage worth digging into' },
+        { command: 'dig', description: 'Dig Deeper on an address' },
+        { command: 'watches', description: 'Open Rat Watch' },
         { command: 'help', description: 'How BINRAT works' }
       ]
     },
