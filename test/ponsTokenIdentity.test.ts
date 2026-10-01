@@ -83,6 +83,30 @@ test('identity enrichment upgrades Fresh Garbage labels without rewriting canoni
   } finally { f.db.close(); }
 });
 
+test('Fresh Garbage ignores a tampered identity receipt payload', async () => {
+  const f=await autonomousFixture();
+  try {
+    const older=await f.launch(99,CREATOR);
+    await f.checkpoint(100);
+    const identities=new Map([
+      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18,totalSupply:1_000_000n}],
+      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18,totalSupply:1_000_000n}]
+    ]);
+    await syncPonsTokenIdentities(sourceFor(identities),new D1PonsTokenIdentityStore(f.db),12);
+    const stored=await f.db.prepare('SELECT payload_json FROM pons_token_identity_receipts WHERE launch_id=?')
+      .bind(f.initial.launchId).first<{payload_json:string}>();
+    assert.ok(stored);
+    const forged=JSON.parse(stored.payload_json) as Record<string,unknown>;
+    forged.symbol='FORGED';
+    await f.db.prepare('UPDATE pons_token_identity_receipts SET payload_json=? WHERE launch_id=?')
+      .bind(JSON.stringify(forged),f.initial.launchId).run();
+
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.candidates[0]?.latestLaunch.symbol,'FIXTURE');
+    assert.notEqual(snapshot.candidates[0]?.latestLaunch.symbol,'FORGED');
+  } finally { f.db.close(); }
+});
+
 test('one unreadable token does not block other identity receipts', async () => {
   const f=await autonomousFixture();
   try {
