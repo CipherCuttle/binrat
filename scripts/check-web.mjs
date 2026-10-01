@@ -44,10 +44,11 @@ if (!fixtures.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_
 if (/^\s*creator\s*:/m.test(fixtures)) throw new Error('WEB_AMBIGUOUS_CREATOR_FIELD_REINTRODUCED');
 if (!dataSource.includes('get("fixtures") === "1"')) throw new Error('WEB_EXPLICIT_FIXTURE_MODE_MISSING');
 if (!dataSource.includes('import("./fixtures.js")')) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
-if (!dataSource.includes('fetch("/api/feed"')) throw new Error('WEB_LIVE_SOURCE_MISSING');
+if (!dataSource.includes('fetch("/api/launches/latest"')) throw new Error('WEB_LIVE_SOURCE_MISSING');
 if (!dataSource.includes('fetch("/api/dumpster-ledger"')) throw new Error('WEB_DUMPSTER_LEDGER_SOURCE_MISSING');
 if (!dataSource.includes('TREASURY_AUTHORITY_NOT_CONFIGURED')) throw new Error('WEB_DUMPSTER_LEDGER_FAIL_CLOSED_STATE_MISSING');
 if (!dataSource.includes('schemaVersion !== "binrat.public-feed/0.1"')) throw new Error('WEB_SCHEMA_VALIDATION_MISSING');
+if (!dataSource.includes('binrat.latest-launches/0.1')) throw new Error('WEB_LATEST_LAUNCH_SCHEMA_VALIDATION_MISSING');
 if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
