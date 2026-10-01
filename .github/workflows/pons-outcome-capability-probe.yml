@@ -29,19 +29,29 @@ jobs:
       - name: Install probe dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Validate Alchemy Robinhood archive endpoint
+      - name: Validate Alchemy Robinhood archive credential
         shell: bash
         env:
-          ROBINHOOD_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+          BINRAT_ALCHEMY_SECRET: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
         run: |
           set -euo pipefail
-          test -n "${ROBINHOOD_RPC_URL:-}" || {
+          test -n "${BINRAT_ALCHEMY_SECRET:-}" || {
             echo "::error::BINRAT_ROBINHOOD_ARCHIVE_RPC_URL is not configured"
             exit 2
           }
           node <<'NODE'
-          const raw = process.env.ROBINHOOD_RPC_URL;
-          const url = new URL(raw);
+          const raw = process.env.BINRAT_ALCHEMY_SECRET;
+          const keyPattern = /^[A-Za-z0-9_-]{8,128}$/;
+          if (keyPattern.test(raw)) {
+            console.log('Alchemy Robinhood credential shape: PASS (raw API key)');
+            process.exit(0);
+          }
+          let url;
+          try {
+            url = new URL(raw);
+          } catch {
+            throw new Error('BINRAT_ROBINHOOD_ARCHIVE_RPC_URL must be an Alchemy API key or Robinhood Mainnet Alchemy HTTPS endpoint');
+          }
           if (url.protocol !== 'https:' ||
               url.hostname !== 'robinhood-mainnet.g.alchemy.com' ||
               url.port !== '' ||
@@ -50,18 +60,23 @@ jobs:
               url.search !== '' ||
               url.hash !== '' ||
               !/^\/v2\/[A-Za-z0-9_-]{8,128}$/.test(url.pathname)) {
-            throw new Error('BINRAT_ROBINHOOD_ARCHIVE_RPC_URL must be a Robinhood Mainnet Alchemy HTTPS endpoint');
+            throw new Error('BINRAT_ROBINHOOD_ARCHIVE_RPC_URL must be an Alchemy API key or Robinhood Mainnet Alchemy HTTPS endpoint');
           }
-          console.log('Alchemy Robinhood archive endpoint shape: PASS');
+          console.log('Alchemy Robinhood credential shape: PASS (full endpoint)');
           NODE
 
       - name: Probe real Pons historical outcome capability
         shell: bash
         env:
           BINRAT_PUBLIC_BASE_URL: https://binrat-edge-v0.pettevik.workers.dev
-          ROBINHOOD_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+          BINRAT_ALCHEMY_SECRET: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
         run: |
           set -euo pipefail
+          if [[ "$BINRAT_ALCHEMY_SECRET" == https://* ]]; then
+            export ROBINHOOD_RPC_URL="$BINRAT_ALCHEMY_SECRET"
+          else
+            export ROBINHOOD_RPC_URL="https://robinhood-mainnet.g.alchemy.com/v2/$BINRAT_ALCHEMY_SECRET"
+          fi
           pnpm probe:pons-outcome | tee "$RUNNER_TEMP/pons-outcome-capability-probe.txt"
 
       - name: Preserve replayable probe receipt
