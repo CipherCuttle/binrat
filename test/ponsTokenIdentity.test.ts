@@ -37,8 +37,7 @@ test('Pons token identity receipts are deterministic, canonical and tamper-evide
     observedBlockHash:hash(123),
     name:'Bin Rat',
     symbol:'BIN',
-    decimals:18,
-    totalSupply:1_000_000_000n*10n**18n
+    decimals:18
   };
   const first=await buildPonsTokenIdentityReceipt(input);
   const second=await buildPonsTokenIdentityReceipt(input);
