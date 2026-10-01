@@ -14,6 +14,7 @@ function evaluate<T>(expression:string): T {
 test('UI V2 activation is dispatch-only, exact-branch and exact-confirmation gated', () => {
   const sha='a'.repeat(40);
   assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/codex/telegram-as-code-private-v2',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
+  assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-messaging-v1',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-ux-v2',eventName:'push',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),'TELEGRAM_UI_V2_DISPATCH_ONLY');
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/other',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),'REF_NOT_CONTROLLED_RAT_BRANCH');
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-ux-v2',eventName:'workflow_dispatch',confirmation:'wrong',reviewedSha:'${sha}',githubSha:'${sha}'})`),'TELEGRAM_UI_V2_CONFIRMATION_REQUIRED');
