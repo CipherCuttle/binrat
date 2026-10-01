@@ -105,6 +105,32 @@ test('a second DIG deterministically supersedes the first prompt and final card 
   } finally {f.db.close();}
 });
 
+test('backend failure after prompt consumption replaces DIGGING with a terminal error and cannot re-execute', async () => {
+  const f=await autonomousFixture(); const calls:Call[]=[]; const fetchImpl=telegram(calls) as typeof fetch;
+  let failExecute=true;
+  const failingDb:D1DatabaseLike={
+    prepare(sql) {
+      if (failExecute && sql.includes('SELECT user_id,chat_id,reply FROM rat_v1_commands')) {
+        return {bind:()=>({first:async()=>{ throw new Error('D1_EXECUTE_FAILED'); }})} as unknown as ReturnType<D1DatabaseLike['prepare']>;
+      }
+      return f.db.prepare(sql);
+    },
+    batch:s=>f.db.batch(s), exec:s=>f.db.exec(s)
+  };
+  try {
+    await callback(f,fetchImpl,1035);
+    const response=await reply(f,fetchImpl,1036,CREATOR,800,{db:failingDb});
+    assert.equal(response.status,200);
+    assert.equal(await loadActiveDigPrompt(f.db,77,77,f.now()),null);
+    assert.equal(await digCount(f),0);
+    assert.ok(calls.some(c=>c.method==='editMessageText' && /DIG STOPPED/.test(String(c.body.text))));
+    failExecute=false;
+    assert.equal((await reply(f,fetchImpl,1036,CREATOR,800,{db:failingDb})).status,200);
+    assert.equal(await digCount(f),0);
+    assert.equal(calls.filter(c=>c.method==='editMessageText' && /RUMMAGING/.test(String(c.body.text))).length,1);
+  } finally {f.db.close();}
+});
+
 test('definitive and ambiguous prompt sends create no state or research authority', async () => {
   for (const options of [{rejectPrompt:true},{ambiguousPrompt:true}]) {
     const f=await autonomousFixture(); const calls:Call[]=[];

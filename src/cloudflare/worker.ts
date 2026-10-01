@@ -60,7 +60,7 @@ import {
 } from './syncQueue.js';
 import { autonomousResultMedia, editRatCard, sendRatCard } from '../telegram/ratMedia.js';
 import { parseCallback, type TelegramUiAction } from '../telegram/ui/callback.js';
-import { digPromptOperationalErrorCard, diggingCard, digWaitingCard, malformedDigCard, renderRatCard } from '../telegram/ui/cards.js';
+import { digOperationalErrorCard, digPromptOperationalErrorCard, diggingCard, digWaitingCard, malformedDigCard, renderRatCard } from '../telegram/ui/cards.js';
 import { answerCallback, deleteMessage as deleteUiMessage, editCard as editUiCard, ratCardDigest, sendCard, sendDigForceReply, TelegramUiError } from '../telegram/ui/client.js';
 import { consumeExactDigPrompt, loadActiveDigPrompt, replaceDigPrompt } from '../telegram/ui/prompts.js';
 import { parseTarget } from '../autonomous/model.js';
@@ -845,9 +845,21 @@ async function telegramWebhook(
         if (consumed) {
           const digging=diggingCard();
           await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,digging,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
-          const outcome=await executeAutonomousCommand(env.DB,{name:'dig',argument:message.text.trim()},
-            {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
-            deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+          let outcome: AutonomousOutcome;
+          try {
+            outcome=await executeAutonomousCommand(env.DB,{name:'dig',argument:message.text.trim()},
+              {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
+              deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+          } catch {
+            // The prompt is already consumed, so this update must terminate visibly.
+            // Never leave the user on DIGGING or ask Telegram to replay a one-shot DIG.
+            const operational=digOperationalErrorCard();
+            await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,operational,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch).catch(()=>{});
+            await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:'UI_DIG_FAILED',
+              replyDigest:ratCardDigest(operational),telegramMessageId:consumed.cardMessageId,rendererVersion:operational.rendererVersion},deps.now()).catch(()=>{});
+            console.error(JSON.stringify({event:'TELEGRAM_UI_DIG',phase:'FAILED',stage:'EXECUTE',updateId:update.update_id}));
+            return json(200,{ok:true,uiV2:true,dig:false,reason:'DIG_EXECUTION_FAILED'});
+          }
           const result=renderRatCard(outcome);
           // If this final edit or ledger receipt fails, the prompt remains consumed: replay cannot DIG again.
           await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,result,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
