@@ -94,6 +94,36 @@ async function waitForExactPostdeployRelease(reviewedSha) {
   }
   throw new Error('POSTDEPLOY_RELEASE_SHA_MISMATCH');
 }
+
+function ponsHealthy(health) {
+  return health?.ok === true && health?.chainId === 4663 &&
+    health?.indexReady === true && health?.liveCaughtUp === true &&
+    health?.lastSyncError === null;
+}
+
+async function waitForHealthyPostdeployPons() {
+  let health = null;
+  for (let attempt = 0; attempt < 7; attempt += 1) {
+    health = await getJson(WORKER_URL + '/api/health');
+    note('Postdeploy Pons probe ' + JSON.stringify({
+      attempt: attempt + 1,
+      ok: health.ok,
+      chainId: health.chainId,
+      indexReady: health.indexReady,
+      checkpointBlock: health.checkpointBlock,
+      headBlock: health.headBlock,
+      targetBlock: health.targetBlock,
+      liveCaughtUp: health.liveCaughtUp,
+      launchCount: health.launchCount,
+      lastSyncError: health.lastSyncError,
+      runtimeFresh: health.runtimeFresh,
+      runtimeUpdatedAtMs: health.runtimeUpdatedAtMs
+    }));
+    if (ponsHealthy(health)) return health;
+    if (attempt < 6) await delay(5_000);
+  }
+  throw new Error('POSTDEPLOY_PONS_NOT_HEALTHY');
+}
 async function webhookUrl(token) {
   if (!token) return null;
   const response = await fetch('https://api.telegram.org/bot' + token + '/getWebhookInfo', {
@@ -376,10 +406,7 @@ try {
     '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
   ], { timeout: 180_000 });
   await waitForExactPostdeployRelease(process.env.GITHUB_SHA);
-  const afterPons = await getJson(WORKER_URL + '/api/health');
-  gate(afterPons.ok === true && afterPons.chainId === 4663 &&
-    afterPons.indexReady === true && afterPons.liveCaughtUp === true &&
-    afterPons.lastSyncError === null, 'POSTDEPLOY_PONS_NOT_HEALTHY');
+  await waitForHealthyPostdeployPons();
 
   const diagnostic = await fetch(WORKER_URL + '/__candidate/pons-bootstrap', {
     signal: AbortSignal.timeout(20_000)
