@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValueEvent,
@@ -11,12 +11,12 @@ import {
 import "./motion-lab.css";
 
 const milestones = [
-  { title: "SNIFF", kicker: "Find the launch.", accent: "#7ee2a8" },
-  { title: "REMEMBER", kicker: "Keep the trail.", accent: "#efad5c" },
-  { title: "INVESTIGATE", kicker: "Turn the trail into a case.", accent: "#c6cec8" },
-  { title: "WATCH", kicker: "Notice when the pattern moves again.", accent: "#9fb8bd" },
-  { title: "CONNECT", kicker: "See structure across cases.", accent: "#aeb2c4" },
-  { title: "AUTONOMOUS RAT", kicker: "Give the rat a bounded investigation.", accent: "#d0c2ab" },
+  { title: "SNIFF", kicker: "Find the launch.", accent: "var(--green)" },
+  { title: "REMEMBER", kicker: "Keep the trail.", accent: "var(--orange)" },
+  { title: "INVESTIGATE", kicker: "Turn the trail into a case.", accent: "var(--bone)" },
+  { title: "WATCH", kicker: "Notice when the pattern moves again.", accent: "var(--orange)" },
+  { title: "CONNECT", kicker: "See structure across cases.", accent: "var(--purple)" },
+  { title: "AUTONOMOUS RAT", kicker: "Give the rat a bounded investigation.", accent: "var(--red)" },
 ] as const;
 
 type Milestone = (typeof milestones)[number];
@@ -114,6 +114,9 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
   const runwayRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [moving, setMoving] = useState(false);
+  const [docked, setDocked] = useState(false);
+  const settleTimer = useRef<number | null>(null);
   const { scrollYProgress } = useScroll({
     target: runwayRef,
     offset: ["start start", "end end"],
@@ -126,15 +129,33 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
   });
   const railY = useTransform(progress, [0, 1], ["50svh", "-62svh"]);
   const pulseTop = useTransform(progress, [0, 1], ["0%", "100%"]);
+  const pulseOpacity = useTransform(progress, [0, 0.97, 0.994, 1], [1, 1, 0.72, 0]);
+  const pulseScale = useTransform(progress, [0, 0.97, 0.994, 1], [1, 1, 1.42, 0.42]);
 
   useMotionValueEvent(progress, "change", (latest) => {
     setActiveIndex(Math.max(0, Math.min(milestones.length - 1, Math.round(latest * (milestones.length - 1)))));
+    setDocked(latest >= 0.9985);
+    if (latest < 0.9985) setMoving(true);
+    if (settleTimer.current !== null) window.clearTimeout(settleTimer.current);
+    settleTimer.current = window.setTimeout(() => setMoving(false), 130);
   });
+
+  useEffect(() => () => {
+    if (settleTimer.current !== null) window.clearTimeout(settleTimer.current);
+  }, []);
 
   if (reducedMotion) return <ReducedTimeline navigate={navigate} />;
 
   return (
-    <div className="motion-lab-page" data-motion-lab data-reduced-motion="false" data-active-index={activeIndex}>
+    <div
+      className="motion-lab-page"
+      data-motion-lab
+      data-reduced-motion="false"
+      data-active-index={activeIndex}
+      data-moving={moving}
+      data-docked={docked}
+      style={{ "--motion-live-accent": milestones[activeIndex].accent } as React.CSSProperties}
+    >
       <button className="motion-lab__back" type="button" onClick={() => navigate("/roadmap")}>
         ROADMAP ↗
       </button>
@@ -150,11 +171,12 @@ export function MotionLabPage({ navigate }: { navigate: (path: string) => void }
                 aria-hidden="true"
                 style={{ scaleY: progress }}
               />
-              <motion.div
-                className="motion-lab__pulse"
-                aria-hidden="true"
-                style={{ top: pulseTop }}
-              />
+              <motion.div className="motion-lab__pulse-track" aria-hidden="true" style={{ top: pulseTop }}>
+                <motion.span
+                  className="motion-lab__pulse"
+                  style={{ opacity: pulseOpacity, scale: pulseScale }}
+                />
+              </motion.div>
 
               {milestones.map((milestone, index) => (
                 <MotionMilestone
