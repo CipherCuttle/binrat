@@ -112,7 +112,7 @@ export async function buildPonsTokenIdentityReceipt(input:{
   totalSupply:bigint;
 }):Promise<PonsTokenIdentityReceipt> {
   const token=input.launch.token.toLowerCase() as Hex;
-  const core={
+  const core:Omit<PonsTokenIdentityReceipt,'identityId'|'evidenceDigest'>={
     identityVersion:PONS_TOKEN_IDENTITY_VERSION,
     chainId:ROBINHOOD_CHAIN_ID,
     launchId:input.launch.launchId,
