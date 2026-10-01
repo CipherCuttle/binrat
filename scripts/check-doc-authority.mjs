@@ -58,6 +58,14 @@ for (const title of ["SNIFF", "REMEMBER", "WATCH", "HUNT", "ORGANIZE", "AUTONOMO
 }
 assert.doesNotMatch(motionLab, /title: "INVESTIGATE"|title: "CONNECT"/);
 
+const claimBoundary = read("docs/CLAIM_BOUNDARY.md");
+assert.match(claimBoundary, /source-reported `DEPLOYER` address/);
+assert.doesNotMatch(claimBoundary, /an address created a launch|same address created earlier launches/i);
+
+const networkPaper = read("docs/PRODUCT_NETWORK_PAPER_V0.md");
+assert.match(networkPaper.slice(0, 700), /BACKBURNER \/ LONG-HORIZON VISION/);
+assert.match(networkPaper.slice(0, 900), /DEPLOYER/);
+
 const language = read("docs/PRODUCT_LANGUAGE.md");
 assert.match(language, /DEPLOYER/);
 assert.match(language, /Degen decides attention\. Receipts decide truth\./i);

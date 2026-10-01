@@ -1,12 +1,12 @@
 # BINRAT claim boundary
 
-BINRAT publishes observations and deterministic derivations. It does not publish investment recommendations.
+BINRAT publishes observations and deterministic derivations. It does not publish investment recommendations. Current role vocabulary follows `docs/PRODUCT_LANGUAGE.md`; on Pons/Robinhood 4663, `DEPLOYER` is an event role and is not silently upgraded to creator, owner, trader, or human identity.
 
 ## BINRAT may say
 
 - a launch event was observed at a specific chain point;
-- an address created a launch;
-- the same address created earlier launches;
+- a source-reported `DEPLOYER` address appeared on a specific Pons launch event;
+- the same exact source-reported `DEPLOYER` address appeared on earlier retained Pons launch events;
 - an observation or historical outcome is missing;
 - coverage is `COMPLETE`, `PARTIAL`, or `UNVERIFIED`;
 - a deterministic rule emitted a named finding for the stated evidence/version.
