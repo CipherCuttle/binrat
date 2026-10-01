@@ -29,7 +29,7 @@ test('workflow keeps UI V2 off the push trigger and exposes only explicit dispat
   assert.match(workflow,/confirmation:[\s\S]*ENABLE_PRIVATE_TELEGRAM_UI_V2/);
   assert.match(workflow,/reviewed_sha:[\s\S]*Exact 40-character commit SHA/);
   assert.match(workflow,/CONTROLLED_RAT_ACTIVATION_MODE/);
-  assert.match(workflow,/TELEGRAM_WEBHOOK_SECRET:\s*\$\{\{ secrets\.TELEGRAM_WEBHOOK_SECRET \}\}/);
+  assert.match(workflow,/TELEGRAM_WEBHOOK_SECRET_NEXT:\s*\$\{\{ secrets\.TELEGRAM_WEBHOOK_SECRET_NEXT \}\}/);
 });
 
 test('activation modes generate only their explicit private flag sets', () => {
@@ -123,15 +123,18 @@ test('private rollout preflights Robinhood Rat schema and proves a valid Mini Ap
   assert.match(script,/\/api\/miniapp\/bootstrap/);
 });
 
-test('private UI rollout verifies webhook secret, subscribes callback_query, and restores prior updates on failure', () => {
+test('private UI rollout stages a next webhook secret, subscribes callback_query, and defines a no-rollback commit point', () => {
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
-  assert.match(script,/TELEGRAM_WEBHOOK_SECRET_MISSING_OR_INVALID/);
-  assert.match(script,/TELEGRAM_WEBHOOK_SECRET_PRECHECK_PASS/);
+  assert.match(script,/TELEGRAM_WEBHOOK_SECRET_NEXT_MISSING_OR_INVALID/);
+  assert.match(script,/secrets\.TELEGRAM_WEBHOOK_SECRET_NEXT = webhookNextSecret/);
   assert.match(script,/REQUIRED_TELEGRAM_UPDATES = Object\.freeze\(\['message','callback_query'\]\)/);
   assert.match(script,/secret_token: secret/);
+  assert.match(script,/TELEGRAM_WEBHOOK_NEXT_SECRET_PRECHECK_PASS/);
   assert.match(script,/TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_APPLY_PASS/);
   assert.match(script,/TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_VERIFY_PASS/);
-  assert.match(script,/TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_PASS/);
+  assert.match(script,/webhookRotationCommitted = true/);
+  assert.match(script,/TELEGRAM_WEBHOOK_ROTATION_COMMITTED: candidate retained/);
+  assert.doesNotMatch(script,/TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_PASS/);
 });
 
 test('private rollout snapshots and restores only the tester menu around postdeploy failure', () => {
