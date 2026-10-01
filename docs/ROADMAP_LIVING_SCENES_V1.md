@@ -61,7 +61,7 @@ The first implementation proves only SNIFF + REMEMBER.
 
 ## Four gates
 
-### Gate 0 — recover before regenerating
+### Gate 0 — recover before regenerating — PASS
 
 Search local sources for the historical G6 pack:
 
@@ -78,7 +78,7 @@ The committed G6 manifest expected:
 - `creator-files-384x256.png`
 - `watch-384x256.png`
 
-Those binaries were staged outside GitHub and explicitly not committed.
+Those binaries were staged outside GitHub and explicitly not committed. They were recovered and hash-verified on 2026-10-01; see `docs/ROADMAP_G6_RECOVERY_RECEIPT_2026_10_01.md`.
 
 ### Gate 1 — visual proof
 
