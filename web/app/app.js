@@ -138,7 +138,7 @@ function renderTrail(candidate) {
   const trap=el('article','panel');
   trap.append(
     el('p','eyebrow','RAT TRAP'),
-    el('p','', 'Historical outcome context is not available on this surface yet. No market-cap, ATH, lifespan or profitability claim is being made.')
+    el('p','', 'Outcome context is not shown here yet. No market-cap, ATH, lifespan or profitability claim is being made.')
   );
   root.append(trap);
 
@@ -157,17 +157,21 @@ async function api(path, body) {
 }
 async function loadCase(caseId) {
   show('case');
-  setCaseHeading('PROOF / PONS 4663','RECEIPTS');
+  setCaseHeading('PROOF','RECEIPTS');
   const root=byId('case-file');
   root.replaceChildren(el('div','panel','Checking the receipts…'));
   try {
     const {receipt}=await api('/api/miniapp/case',{caseId});
     root.replaceChildren();
+    setCaseHeading(receipt.chainId===4663?'PROOF / PONS 4663':'PROOF / HISTORICAL EVIDENCE','RECEIPTS');
+    const ponsDeployer=receipt.chainId===4663 && receipt.subject?.entityType==='CREATOR';
     const head=el('article','card');
     head.append(
       el('p','eyebrow','RETAINED CASE'),
       el('h3','',shortReference(receipt.subject.entityId)),
-      el('p','fact',`Receipts connect ${receipt.evidenceRefs?.length||0} launch${receipt.evidenceRefs?.length===1?'':'es'} to this exact Pons-reported deployer.`),
+      el('p','fact',ponsDeployer
+        ? `Receipts connect ${receipt.evidenceRefs?.length||0} launch${receipt.evidenceRefs?.length===1?'':'es'} to this exact Pons-reported deployer.`
+        : `Receipts connect ${receipt.evidenceRefs?.length||0} retained launch${receipt.evidenceRefs?.length===1?'':'es'} to this case subject.`),
       el('p','meta',`Coverage ${receipt.coverage.status} · as of block ${receipt.coverage.asOfBlock} · up to ${receipt.coverage.limit} retained records.`)
     );
     root.append(head);
@@ -194,7 +198,7 @@ async function loadCase(caseId) {
     back.addEventListener('click',()=>show('rats'));
     root.append(boundary,back);
   } catch(error) {
-    root.replaceChildren(el('div','panel error',`Lost the trail. Receipt unavailable: ${error.message}`));
+    root.replaceChildren(el('div','panel error',"Lost the trail. I can't verify this receipt right now."));
   }
 }
 
