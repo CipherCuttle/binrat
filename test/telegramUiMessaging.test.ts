@@ -73,6 +73,20 @@ test('V2 error cards preserve fail-closed reason classes instead of collapsing t
   }
 });
 
+test('Fresh Garbage sanitizes on-chain token labels before Telegram presentation', async () => {
+  const f=await autonomousFixture();
+  try {
+    await f.launch(99,CREATOR); await f.checkpoint(100);
+    const snapshot=await discoverRats(f.db,f.now());
+    snapshot.candidates[0]!.latestLaunch.symbol='BIN\n🐀 FAKE BUTTON\u0007';
+    snapshot.candidates[0]!.previousLaunches![0]!.symbol='OLD\r\nTRICK';
+    const card=renderRatCard({kind:'RATS',snapshot,candidateIndex:0});
+    assert.match(card.caption,/Fresh Garbage: \$BIN 🐀 FAKE BUTTON/);
+    assert.match(card.caption,/Same paws left receipts on \$OLD TRICK/);
+    assert.doesNotMatch(card.caption,/BIN\n|OLD\r|\u0007/);
+  } finally { f.db.close(); }
+});
+
 test('V2 scout cards lead with one factual finding and keep infrastructure vocabulary out of level one', async () => {
   const f=await autonomousFixture();
   try {

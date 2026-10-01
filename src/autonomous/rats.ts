@@ -1,5 +1,6 @@
 import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
 import { sha256Hex } from '../evidence/canonical.js';
+import { parsePonsTokenIdentityReceipt } from '../pons/tokenIdentity.js';
 import { authoritativeCheckpoint, evidenceForLaunch, saveCase } from './evidence.js';
 import { makeReceipt, type DiscoveryReason, type Entity, type EvidenceRef, type Receipt } from './model.js';
 
@@ -47,7 +48,7 @@ export interface RatsSnapshot {
 }
 
 interface CandidateRow { creator: string; recurrence_count: number; latest_block: string }
-interface CandidateLaunchRow { launch_id: string; token: string; symbol: string; name: string; block_number: string }
+interface CandidateLaunchRow { launch_id: string; token: string; symbol: string; name: string; block_number: string; identity_payload_json?: string | null }
 
 export interface LatestPonsLaunch {
   launchId: string;
@@ -80,6 +81,33 @@ interface LatestLaunchRow {
   twitter: string;
   telegram: string;
   prior_launch_count: number;
+  identity_payload_json?: string | null;
+}
+
+async function hasPonsTokenIdentitySchema(db:D1DatabaseLike):Promise<boolean> {
+  const row=await db.prepare(`
+    SELECT COUNT(*) AS n
+    FROM pragma_table_info('pons_token_identity_receipts')
+    WHERE name IN ('launch_id','payload_json')
+  `).first<{n:number}>();
+  return Number(row?.n ?? 0)===2;
+}
+
+function identityLaunchSelect(identitySchema:boolean):string {
+  return identitySchema
+    ? "l.launch_id,l.token,l.symbol,l.name,l.block_number,i.payload_json AS identity_payload_json"
+    : "l.launch_id,l.token,l.symbol,l.name,l.block_number,NULL AS identity_payload_json";
+}
+
+async function presentationIdentity(row:{launch_id:string;token:string;symbol:string;name:string;identity_payload_json?:string|null}):Promise<{symbol:string;name:string}> {
+  if (!row.identity_payload_json) return {symbol:row.symbol,name:row.name};
+  try {
+    const receipt=await parsePonsTokenIdentityReceipt(row.identity_payload_json);
+    if (receipt.launchId!==row.launch_id || receipt.token!==row.token.toLowerCase()) return {symbol:row.symbol,name:row.name};
+    return {symbol:receipt.symbol,name:receipt.name};
+  } catch {
+    return {symbol:row.symbol,name:row.name};
+  }
 }
 
 export async function latestPonsLaunchSnapshot(
@@ -90,7 +118,9 @@ export async function latestPonsLaunchSnapshot(
   const chainId = 4663;
   const tip = await authoritativeCheckpoint(db, now, chainId);
   const limit = Math.max(1, Math.min(20, requestedLimit));
-  const result = await db.prepare(`SELECT l.launch_id,l.token,l.symbol,l.name,l.block_number,l.tx_hash,l.creator,
+  const identitySchema=await hasPonsTokenIdentitySchema(db);
+  const identityJoin=identitySchema ? ' LEFT JOIN pons_token_identity_receipts i ON i.launch_id=l.launch_id' : '';
+  const result = await db.prepare(`SELECT ${identityLaunchSelect(identitySchema)},l.tx_hash,l.creator,
       l.image_uri,l.website,l.twitter,l.telegram,
       (SELECT COUNT(DISTINCT p.launch_id)
        FROM launches p JOIN provenance_facts pf ON pf.launch_id=p.launch_id AND pf.chain_id=p.chain_id
@@ -101,7 +131,7 @@ export async function latestPonsLaunchSnapshot(
            OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index<l.log_index)
            OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index=l.log_index AND p.launch_id<l.launch_id)
          )) AS prior_launch_count
-    FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id
+    FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id${identityJoin}
     WHERE l.chain_id=? AND l.source='PONS_V2' AND CAST(l.block_number AS INTEGER)<=?
     ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT ?`)
     .bind(Number(tip),chainId,Number(tip),limit).all<LatestLaunchRow>();
@@ -122,8 +152,9 @@ export async function latestPonsLaunchSnapshot(
     if (evidence.creator !== row.creator || evidence.blockNumber !== row.block_number) {
       throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
     }
+    const identity=await presentationIdentity(row);
     output.push({
-      launchId:row.launch_id,token:row.token,symbol:row.symbol,name:row.name,
+      launchId:row.launch_id,token:row.token,symbol:identity.symbol,name:identity.name,
       blockNumber:row.block_number,txHash:row.tx_hash,deployer:row.creator,
       priorLaunchCount:Number(row.prior_launch_count),factId:evidence.factId,
       metadata:{imageUri:row.image_uri,website:row.website,twitter:row.twitter,telegram:row.telegram}
@@ -151,6 +182,7 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
   const chainId = 4663;
   const tip = await authoritativeCheckpoint(db, now, chainId);
   const limit = Math.max(1, Math.min(MAX_CANDIDATES, candidateLimit));
+  const identitySchema=await hasPonsTokenIdentitySchema(db);
   await pruneSnapshots(db, now);
   const rows = await db.prepare(`SELECT l.creator, COUNT(DISTINCT l.launch_id) AS recurrence_count,
       MAX(CAST(l.block_number AS INTEGER)) AS latest_block
@@ -166,20 +198,22 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
   for (const row of rows.results ?? []) {
     if (!/^0x[0-9a-f]{40}$/.test(row.creator) || !Number.isSafeInteger(Number(row.recurrence_count)) ||
         Number(row.recurrence_count) < 2 || !/^\d+$/.test(String(row.latest_block))) continue;
-    const refsRows = await db.prepare(`SELECT launch_id,token,symbol,name,block_number FROM launches WHERE chain_id=? AND creator=?
-      AND CAST(block_number AS INTEGER)<=? ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC LIMIT ?`)
+    const identityJoin=identitySchema ? ' LEFT JOIN pons_token_identity_receipts i ON i.launch_id=l.launch_id' : '';
+    const refsRows = await db.prepare(`SELECT ${identityLaunchSelect(identitySchema)} FROM launches l${identityJoin} WHERE l.chain_id=? AND l.creator=?
+      AND CAST(l.block_number AS INTEGER)<=? ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT ?`)
       .bind(chainId, row.creator, Number(tip), MAX_EVIDENCE_PER_CANDIDATE).all<CandidateLaunchRow>();
     if (!refsRows.success || (refsRows.results?.length ?? 0) < 2) continue;
     try {
-      const evidenceRefs = await Promise.all((refsRows.results ?? []).map(item => evidenceForLaunch(db, item.launch_id, tip, chainId)));
+      const resolvedRows=await Promise.all((refsRows.results ?? []).map(async item=>({...item,...await presentationIdentity(item)})));
+      const evidenceRefs = await Promise.all(resolvedRows.map(item => evidenceForLaunch(db, item.launch_id, tip, chainId)));
       // Claim only the bounded retained count: every displayed recurrence has a public receipt.
       const observedCount = evidenceRefs.length;
       const recurrenceCount = Number(row.recurrence_count);
-      const latest = refsRows.results?.[0];
+      const latest = resolvedRows[0];
       if (!latest || !/^[0-9a-f]{64}$/.test(latest.launch_id) || !/^0x[0-9a-f]{40}$/.test(latest.token) ||
           typeof latest.symbol !== 'string' || typeof latest.name !== 'string' || !/^\d+$/.test(latest.block_number)) continue;
       const subject: Entity = { chainId, entityType: 'CREATOR', entityId: row.creator };
-      const previousLaunches=(refsRows.results ?? []).slice(1,4).flatMap(item =>
+      const previousLaunches=resolvedRows.slice(1,4).flatMap(item =>
         /^[0-9a-f]{64}$/.test(item.launch_id) && /^0x[0-9a-f]{40}$/.test(item.token) &&
         typeof item.symbol === 'string' && typeof item.name === 'string' && /^\d+$/.test(item.block_number)
           ? [{launchId:item.launch_id,token:item.token,symbol:item.symbol,name:item.name,blockNumber:item.block_number}]
