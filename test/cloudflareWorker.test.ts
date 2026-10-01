@@ -44,6 +44,27 @@ test('Cloudflare health is instant and fail-closed before durable runtime state 
   }
 });
 
+test('D1 launch count through checkpoint is exact without loading the full launch set', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  try {
+    for (const blockNumber of [99n,100n,101n]) {
+      const launcher=address(Number(blockNumber)+1),txHash=hex64(Number(blockNumber)+2),token=address(Number(blockNumber)+3);
+      const launch: LaunchObserved={
+        launchId:await deriveLaunchId({chainId:4663,launcher,txHash,token,source:'PONS_V2'}),
+        eventId:await deriveEventId({chainId:4663,launcher,txHash,logIndex:0,source:'PONS_V2'}),
+        chainId:4663,blockNumber,blockHash:hex64(Number(blockNumber)),observedAtMs:1,source:'PONS_V2',
+        launcher,txHash,logIndex:0,token,creator:address(55),pool:address(Number(blockNumber)+4),
+        name:'Count Rat',symbol:'COUNT',imageUri:'',website:'',twitter:'',telegram:''
+      };
+      await store.putLaunch(launch);
+    }
+    assert.equal(await store.countLaunchesThroughBlock(100n),2);
+    assert.equal(await store.countLaunchesThroughBlock(101n),3);
+  } finally { store.close(); db.close(); }
+});
+
 test('Cloudflare health requires checkpoint at or beyond the verified runtime target', async () => {
   const db=new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
