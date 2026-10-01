@@ -1,11 +1,14 @@
+import { createPublicClient, http, keccak256, type Address, type PublicClient } from 'viem';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import type { Hex } from '../core/types.js';
 import { OBSERVATION_HORIZONS } from '../observations/horizons.js';
-import { ROBINHOOD_CHAIN_ID } from './chain.js';
+import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from './chain.js';
+import { PONS_RPC_RETRY_COUNT, PONS_RPC_RETRY_DELAY_MS, PONS_RPC_TIMEOUT_MS } from './ponsSource.js';
 import {
   PONS_CURVE_OUTCOME_CAPABILITY_VERSION,
   readPonsCurveOutcomeCapability,
   verifyPonsCurveOutcomeCapabilityReceipt,
+  RpcPonsCurveOutcomeSource,
   type PonsCurveOutcomeCapabilityReceipt,
   type PonsCurveOutcomeSource,
   type PonsOutcomeLaunch
@@ -78,6 +81,70 @@ export interface PonsOutcomeObservationSyncReport {
   pendingMaturity: number;
   alreadyPresent: number;
   launchesVisited: number;
+}
+
+export class RpcPonsOutcomeObservationSource implements PonsOutcomeObservationSource {
+  private readonly blockClient: PublicClient;
+  private readonly outcomeSource: PonsCurveOutcomeSource;
+  private blockAuthorityVerified=false;
+
+  constructor(options:{
+    discoveryRpcUrl:string;
+    archiveRpcUrl:string;
+    discoveryClient?:PublicClient;
+    archiveClient?:PublicClient;
+  }) {
+    this.blockClient=options.discoveryClient ?? createPublicClient({
+      chain:robinhoodMainnet(options.discoveryRpcUrl),
+      transport:http(options.discoveryRpcUrl,{
+        timeout:PONS_RPC_TIMEOUT_MS,
+        retryCount:PONS_RPC_RETRY_COUNT,
+        retryDelay:PONS_RPC_RETRY_DELAY_MS
+      })
+    });
+    this.outcomeSource=new RpcPonsCurveOutcomeSource({
+      client:options.archiveClient ?? createPublicClient({
+        chain:robinhoodMainnet(options.archiveRpcUrl),
+        transport:http(options.archiveRpcUrl,{
+          timeout:PONS_RPC_TIMEOUT_MS,
+          retryCount:PONS_RPC_RETRY_COUNT,
+          retryDelay:PONS_RPC_RETRY_DELAY_MS
+        })
+      })
+    });
+  }
+
+  async assertAuthority():Promise<void> {
+    if (!this.blockAuthorityVerified) {
+      const chainId=await this.blockClient.getChainId();
+      if (chainId!==ROBINHOOD_CHAIN_ID) throw new Error('PONS_OUTCOME_DISCOVERY_CHAIN_ID_DRIFT');
+      const code=await this.blockClient.getBytecode({address:PONS_V2_FACTORY as Address});
+      if (!code || keccak256(code)!==PONS_V2_FACTORY_CODE_HASH) {
+        throw new Error('PONS_OUTCOME_DISCOVERY_FACTORY_AUTHORITY_DRIFT');
+      }
+      this.blockAuthorityVerified=true;
+    }
+    await this.outcomeSource.assertAuthority();
+  }
+
+  async getBlockPoint(blockNumber:bigint):Promise<PonsOutcomeBlockPoint> {
+    const block=await this.blockClient.getBlock({blockNumber});
+    if (!block.hash) throw new Error(`PONS_OUTCOME_BLOCK_HASH_MISSING:${blockNumber}`);
+    const timestampMs=Number(block.timestamp*1000n);
+    if (!Number.isSafeInteger(timestampMs)) throw new Error('PONS_OUTCOME_BLOCK_TIMESTAMP_INVALID');
+    return {
+      blockNumber,
+      blockHash:block.hash.toLowerCase() as Hex,
+      timestampMs
+    };
+  }
+
+  readOutcomeAt(
+    launch:PonsOutcomeLaunch,
+    blockNumber:bigint
+  ):Promise<PonsCurveOutcomeCapabilityReceipt> {
+    return readPonsCurveOutcomeCapability(this.outcomeSource,launch,blockNumber);
+  }
 }
 
 export class CapabilityBackedPonsOutcomeObservationSource implements PonsOutcomeObservationSource {
