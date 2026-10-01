@@ -180,6 +180,15 @@ export async function enqueuePonsTokenIdentityCycle(
   await env.SYNC_QUEUE.send({ kind:'PONS_TOKEN_IDENTITY_CYCLE', cycleId, enqueuedAtMs:nowMs });
 }
 
+export async function enqueuePonsOutcomeCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({ kind:'PONS_OUTCOME_CYCLE', cycleId, enqueuedAtMs:nowMs });
+}
+
 export async function enqueueObservationCycle(
   env: CloudflareSyncEnv,
   nowMs = Date.now(),
@@ -254,6 +263,11 @@ export async function handleSyncQueueBatch(
             console.error(JSON.stringify({event:'PONS_TOKEN_IDENTITY_ENQUEUE_FAILED',code:syncErrorCode(error)}));
           });
         }
+        if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_OUTCOME_ENABLED === 'true') {
+          await enqueuePonsOutcomeCycle(env,deps.now()).catch((error)=>{
+            console.error(JSON.stringify({event:'PONS_OUTCOME_ENQUEUE_FAILED',code:syncErrorCode(error)}));
+          });
+        }
         if (result.status === 'SUCCESS' && result.liveCaughtUp && shouldEnqueueRatWatch(message.body.enqueuedAtMs)) {
           await enqueueRatWatchCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event: 'PONS_RAT_WATCH_ENQUEUE_FAILED', code: syncErrorCode(error) }));
@@ -264,6 +278,13 @@ export async function handleSyncQueueBatch(
 
       if (message.body.kind === 'PONS_TOKEN_IDENTITY_CYCLE') {
         const result=await runCloudflarePonsTokenIdentityCycle(env,message.body,deps);
+        if (result.status === 'RETRY') message.retry({delaySeconds:30});
+        else message.ack();
+        continue;
+      }
+
+      if (message.body.kind === 'PONS_OUTCOME_CYCLE') {
+        const result=await runCloudflarePonsOutcomeCycle(env,message.body,deps);
         if (result.status === 'RETRY') message.retry({delaySeconds:30});
         else message.ack();
         continue;
