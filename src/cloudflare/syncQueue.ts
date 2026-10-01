@@ -1311,6 +1311,32 @@ export function resolveRobinhoodRpcUrl(env: Pick<CloudflareSyncEnv, 'ROBINHOOD_R
   return configured || ROBINHOOD_PUBLIC_RPC_FALLBACK_URL;
 }
 
+export function resolveRobinhoodArchiveRpcUrl(
+  env: Pick<CloudflareSyncEnv,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'>
+): string {
+  const raw=env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL?.trim();
+  if (!raw) throw new Error('MISSING_CONFIG:BINRAT_ROBINHOOD_ARCHIVE_RPC_URL');
+  if (/^[A-Za-z0-9_-]{8,128}$/.test(raw)) {
+    return `https://robinhood-mainnet.g.alchemy.com/v2/${raw}`;
+  }
+  let url:URL;
+  try { url=new URL(raw); }
+  catch { throw new Error('PONS_OUTCOME_ARCHIVE_RPC_INVALID'); }
+  if (
+    url.protocol!=='https:' ||
+    url.hostname!=='robinhood-mainnet.g.alchemy.com' ||
+    url.port!=='' ||
+    url.username!=='' ||
+    url.password!=='' ||
+    url.search!=='' ||
+    url.hash!=='' ||
+    !/^\/v2\/[A-Za-z0-9_-]{8,128}$/.test(url.pathname)
+  ) {
+    throw new Error('PONS_OUTCOME_ARCHIVE_RPC_INVALID');
+  }
+  return url.toString();
+}
+
 function integerSetting(
   value: string | undefined,
   fallback: number,
@@ -1340,6 +1366,7 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
       item.kind === 'SYNC_CYCLE' ||
       item.kind === 'PONS_SYNC_CYCLE' ||
       item.kind === 'PONS_TOKEN_IDENTITY_CYCLE' ||
+      item.kind === 'PONS_OUTCOME_CYCLE' ||
       item.kind === 'OBSERVATION_CYCLE' ||
       item.kind === 'RAT_WATCH_CYCLE' ||
       item.kind === 'RAT_RADAR_CYCLE'
