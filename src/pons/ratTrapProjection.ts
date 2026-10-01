@@ -76,6 +76,7 @@ export interface BuildPonsRatTrapProjectionInput {
   currentLaunch: LaunchObserved;
   launches: readonly LaunchObserved[];
   receiptsByLaunch: ReadonlyMap<string, readonly PonsOutcomeObservationReceipt[]>;
+  canonicalLaunchTimestampMsByLaunch: ReadonlyMap<string, number>;
   asOfBlock: bigint;
   asOfTimestampMs: number;
 }
@@ -87,7 +88,11 @@ export async function buildPonsRatTrapProjection(
   if (input.asOfBlock < input.currentLaunch.blockNumber) {
     throw new Error('PONS_RAT_TRAP_AS_OF_BLOCK_BEFORE_CURRENT');
   }
-  if (!Number.isSafeInteger(input.asOfTimestampMs) || input.asOfTimestampMs < input.currentLaunch.observedAtMs) {
+  const currentLaunchTimestampMs = canonicalLaunchTimestamp(
+    input.currentLaunch.launchId,
+    input.canonicalLaunchTimestampMsByLaunch
+  );
+  if (!Number.isSafeInteger(input.asOfTimestampMs) || input.asOfTimestampMs < currentLaunchTimestampMs) {
     throw new Error('PONS_RAT_TRAP_AS_OF_TIMESTAMP_BEFORE_CURRENT');
   }
 
@@ -107,6 +112,7 @@ export async function buildPonsRatTrapProjection(
     launches.push(await projectLaunch(
       launch,
       input.receiptsByLaunch.get(launch.launchId) ?? [],
+      canonicalLaunchTimestamp(launch.launchId, input.canonicalLaunchTimestampMsByLaunch),
       input.asOfBlock,
       input.asOfTimestampMs
     ));
@@ -128,6 +134,7 @@ export async function buildPonsRatTrapProjection(
 async function projectLaunch(
   launch: LaunchObserved,
   receipts: readonly PonsOutcomeObservationReceipt[],
+  canonicalLaunchTimestampMs: number,
   asOfBlock: bigint,
   asOfTimestampMs: number
 ): Promise<PonsRatTrapLaunchProjection> {
@@ -149,12 +156,15 @@ async function projectLaunch(
     if (byHorizon.has(receipt.horizonMs)) {
       throw new Error(`PONS_RAT_TRAP_DUPLICATE_HORIZON:${launch.launchId}:${receipt.horizonMs}`);
     }
+    if (receipt.targetTimestampMs !== canonicalLaunchTimestampMs + receipt.horizonMs) {
+      throw new Error(`PONS_RAT_TRAP_RECEIPT_TARGET_MISMATCH:${launch.launchId}:${receipt.horizonMs}`);
+    }
     byHorizon.set(receipt.horizonMs, receipt);
   }
 
   const observations = PONS_RAT_TRAP_HORIZONS_MS.map((horizonMs) => {
     const receipt = byHorizon.get(horizonMs);
-    const maturityTargetTimestampMs = launch.observedAtMs + horizonMs;
+    const maturityTargetTimestampMs = canonicalLaunchTimestampMs + horizonMs;
     if (!receipt) {
       return {
         horizonMs,
@@ -194,7 +204,7 @@ async function projectLaunch(
     symbol: launch.symbol,
     name: launch.name,
     launchBlock: launch.blockNumber,
-    launchTimestampMs: launch.observedAtMs,
+    launchTimestampMs: canonicalLaunchTimestampMs,
     observations,
     highestObserved: highestObservedFor(observations, launch.launchId)
   };
@@ -268,9 +278,17 @@ function assertPonsLaunch(launch: LaunchObserved): void {
   if (launch.chainId !== ROBINHOOD_CHAIN_ID || launch.source !== 'PONS_V2') {
     throw new Error('PONS_RAT_TRAP_LAUNCH_SCOPE_INVALID');
   }
-  if (!Number.isSafeInteger(launch.observedAtMs) || launch.observedAtMs < 0) {
-    throw new Error('PONS_RAT_TRAP_LAUNCH_TIMESTAMP_INVALID');
+}
+
+function canonicalLaunchTimestamp(
+  launchId: string,
+  timestamps: ReadonlyMap<string, number>
+): number {
+  const timestampMs = timestamps.get(launchId);
+  if (!Number.isSafeInteger(timestampMs) || timestampMs! < 0) {
+    throw new Error(`PONS_RAT_TRAP_LAUNCH_TIMESTAMP_MISSING:${launchId}`);
   }
+  return timestampMs!;
 }
 
 function isBeforeLaunch(candidate: LaunchObserved, current: LaunchObserved): boolean {
