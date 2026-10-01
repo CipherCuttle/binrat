@@ -144,7 +144,7 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
     FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id
     WHERE l.chain_id=? AND l.source='PONS_V2' AND CAST(l.block_number AS INTEGER)<=?
     GROUP BY l.creator HAVING COUNT(DISTINCT l.launch_id)>=2
-    ORDER BY recurrence_count DESC, latest_block DESC, l.creator ASC LIMIT ?`)
+    ORDER BY latest_block DESC, recurrence_count DESC, l.creator ASC LIMIT ?`)
     .bind(chainId, Number(tip), limit).all<CandidateRow>();
   if (!rows.success) throw new Error('DISCOVERY_UNAVAILABLE');
 
