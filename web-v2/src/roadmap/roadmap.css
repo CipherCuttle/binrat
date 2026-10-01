@@ -274,8 +274,22 @@
 .roadmap-scene--sniff {
   aspect-ratio: 665 / 375;
   margin: 0;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 61%, rgba(0, 0, 0, .88) 78%, transparent 100%);
-  mask-image: radial-gradient(ellipse at center, #000 61%, rgba(0, 0, 0, .88) 78%, transparent 100%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 92% 86% at 38% 52%,
+    #000 34%,
+    rgba(0, 0, 0, .96) 50%,
+    rgba(0, 0, 0, .72) 66%,
+    rgba(0, 0, 0, .26) 82%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 92% 86% at 38% 52%,
+    #000 34%,
+    rgba(0, 0, 0, .96) 50%,
+    rgba(0, 0, 0, .72) 66%,
+    rgba(0, 0, 0, .26) 82%,
+    transparent 100%
+  );
 }
 
 img.roadmap-scene--sniff {
@@ -361,6 +375,23 @@ img.roadmap-scene--sniff {
 
   .roadmap-stage[data-active="true"] .roadmap-stage__scene {
     transform: translate3d(0, 0, 0);
+  }
+
+  .roadmap-scene--sniff {
+    -webkit-mask-image: radial-gradient(
+      ellipse 96% 90% at 48% 50%,
+      #000 38%,
+      rgba(0, 0, 0, .94) 58%,
+      rgba(0, 0, 0, .58) 76%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 96% 90% at 48% 50%,
+      #000 38%,
+      rgba(0, 0, 0, .94) 58%,
+      rgba(0, 0, 0, .58) 76%,
+      transparent 100%
+    );
   }
 
   .roadmap-scene:not(.roadmap-scene--sniff) { aspect-ratio: 4 / 3; }
