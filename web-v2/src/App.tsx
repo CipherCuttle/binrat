@@ -130,7 +130,7 @@ export default function App() {
   };
   if (route.page === "roadmap") {
     return (
-      <div className="app-frame roadmap-route-frame">
+      <div className="roadmap-route-frame">
         <a className="skip-link" href="#content">Skip to roadmap</a>
         <main id="content" tabIndex={-1}>
           <RoadmapPage navigate={navigate} />
