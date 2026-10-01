@@ -165,7 +165,7 @@ export async function buildPonsOutcomeObservationReceipt(input: {
     capabilityEvidenceDigest: input.capability.evidenceDigest
   };
   return {
-    observationId: await derivePonsOutcomeObservationId(input),
+    observationId: await derivePonsOutcomeObservationId({launchId:input.launch.launchId,horizonMs:input.horizonMs}),
     ...core,
     evidenceDigest: await sha256Hex(core)
   };
