@@ -20,7 +20,7 @@ export function activationGateError(mode, context) {
   if (!parseActivationMode(mode)) return 'ACTIVATION_MODE_INVALID';
   const permittedRefs = mode === ACTIVATION_MODE.TEXT_PRIVATE
     ? ['refs/heads/feat/binrat-robinhood-live-rat-v1']
-    : ['refs/heads/feat/binrat-telegram-ux-v2','refs/heads/codex/telegram-as-code-private-v2','refs/heads/feat/binrat-telegram-messaging-v1'];
+    : ['refs/heads/feat/binrat-telegram-ux-v2','refs/heads/codex/telegram-as-code-private-v2','refs/heads/feat/binrat-telegram-messaging-v1','refs/heads/fix/binrat-4663-surface-authority-v1'];
   if (!permittedRefs.includes(context.ref)) return 'REF_NOT_CONTROLLED_RAT_BRANCH';
   if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
     if (context.eventName !== 'workflow_dispatch') return 'TELEGRAM_UI_V2_DISPATCH_ONLY';
@@ -37,7 +37,7 @@ export function candidateVars(mode, releaseSha) {
   if (!/^[0-9a-f]{40}$/.test(releaseSha ?? '')) throw new Error('RELEASE_SHA_INVALID');
   const uiV2 = mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE;
   return {
-    BINRAT_PONS_MAX_BATCH_BLOCKS: '512',
+    BINRAT_PONS_MAX_BATCH_BLOCKS: '1024',
     BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
     BINRAT_PONS_CATCHUP_MAX_BATCHES: '4',
     BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000',

@@ -23,7 +23,7 @@ function version(): WorkerVersionConfiguration {
 }
 
 const provenPonsVars: Record<string, string> = {
-  BINRAT_PONS_MAX_BATCH_BLOCKS: '512',
+  BINRAT_PONS_MAX_BATCH_BLOCKS: '1024',
   BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
   BINRAT_PONS_CATCHUP_MAX_BATCHES: '4',
   BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000',
@@ -36,7 +36,7 @@ test('binding parity preserves active resources while allowing only the approved
   const candidate = version();
   candidate.resources!.bindings![6]!.text = 'new';
   candidate.resources!.bindings!.push(
-    { name: 'BINRAT_PONS_MAX_BATCH_BLOCKS', type: 'plain_text', text: '512' },
+    { name: 'BINRAT_PONS_MAX_BATCH_BLOCKS', type: 'plain_text', text: '1024' },
     { name: 'BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS', type: 'plain_text', text: '4096' },
     { name: 'BINRAT_PONS_CATCHUP_MAX_BATCHES', type: 'plain_text', text: '4' },
     { name: 'BINRAT_PONS_CATCHUP_WORK_BUDGET_MS', type: 'plain_text', text: '60000' },
@@ -141,6 +141,34 @@ test('controlled text Rat manifest cannot accidentally enable public mode, UI V2
   assert.ok(uiResult.errors.includes('TELEGRAM_UI_V2_NOT_FLAG_OFF'));
 });
 
+test('controlled activation permits only the exact Pons steady-capacity migration 512 to 1024', () => {
+  const active=version();
+  active.resources!.bindings!.push(
+    { name:'BINRAT_PONS_MAX_BATCH_BLOCKS',type:'plain_text',text:'512' },
+    { name:'BINRAT_AUTONOMOUS_RAT_ENABLED',type:'plain_text',text:'true' },
+    { name:'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED',type:'plain_text',text:'false' },
+    { name:'BINRAT_TELEGRAM_UI_V2_ENABLED',type:'plain_text',text:'true' },
+    { name:'BINRAT_TELEGRAM_MEDIA_ENABLED',type:'plain_text',text:'true' },
+    { name:'BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID',type:'secret_text' },
+    { name:'RAT_CANDIDATE_ALLOWED_USER_ID',type:'secret_text' }
+  );
+  const candidate=structuredClone(active);
+  candidate.resources!.bindings!.find(binding=>binding.name==='BINRAT_PONS_MAX_BATCH_BLOCKS')!.text='1024';
+
+  assert.deepEqual(
+    verifyWorkerBindingParity(active,candidate,{controlledTelegramUiV2Activation:true}),
+    {ok:true,errors:[]}
+  );
+  assert.ok(verifyWorkerBindingParity(active,candidate).errors.includes('VARIABLE_CHANGED:BINRAT_PONS_MAX_BATCH_BLOCKS'));
+
+  const oversized=structuredClone(candidate);
+  oversized.resources!.bindings!.find(binding=>binding.name==='BINRAT_PONS_MAX_BATCH_BLOCKS')!.text='2048';
+  assert.ok(
+    verifyWorkerBindingParity(active,oversized,{controlledTelegramUiV2Activation:true})
+      .errors.includes('VARIABLE_CHANGED:BINRAT_PONS_MAX_BATCH_BLOCKS')
+  );
+});
+
 test('controlled UI V2 parity permits first activation and exact private-to-private upgrades', () => {
   const active = version();
   active.resources!.bindings!.push(
@@ -194,6 +222,8 @@ test('controlled UI V2 manifest requires private UI/media on while default mode 
   assert.ok(verifyCandidateManifest(publicManifest,{controlledTelegramUiV2Activation:true}).errors.includes('AUTONOMOUS_RAT_PUBLIC_MODE_NOT_DISABLED'));
   const oldCatchupManifest=structuredClone(manifest) as typeof manifest & { vars: Record<string,string> }; oldCatchupManifest.vars.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS='512';
   assert.ok(verifyCandidateManifest(oldCatchupManifest,{controlledTelegramUiV2Activation:true}).errors.includes('PONS_CATCHUP_BATCH_BOUND_INVALID'));
+  const oldSteadyManifest=structuredClone(manifest) as typeof manifest & { vars: Record<string,string> }; oldSteadyManifest.vars.BINRAT_PONS_MAX_BATCH_BLOCKS='512';
+  assert.ok(verifyCandidateManifest(oldSteadyManifest,{controlledTelegramUiV2Activation:true}).errors.includes('PONS_BATCH_BOUND_INVALID'));
 });
 
 test('visible candidate whole-bot gate must match the exact selected tester', () => {

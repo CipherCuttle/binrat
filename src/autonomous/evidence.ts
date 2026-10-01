@@ -1,6 +1,6 @@
 import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
 import { D1Store } from '../cloudflare/d1Store.js';
-import { D1RuntimeStateStore } from '../cloudflare/runtimeState.js';
+import { D1RuntimeStateStore, verifiedRuntimeTarget } from '../cloudflare/runtimeState.js';
 import { buildProvenanceFact } from '../intelligence/provenance.js';
 import { canonicalJson } from '../evidence/canonical.js';
 import { makeReceipt, type Entity, type EvidenceRef, type Receipt } from './model.js';
@@ -8,15 +8,13 @@ import { makeReceipt, type Entity, type EvidenceRef, type Receipt } from './mode
 export async function authoritativeCheckpoint(db: D1DatabaseLike, now: number, chainId = 5042): Promise<bigint> {
   const state = await new D1RuntimeStateStore(db, chainId).get();
   const checkpoint = await new D1Store(db, chainId).getCheckpoint();
-  if (!state?.sourceVerified || !state.liveCaughtUp || state.lastSyncError || !checkpoint ||
-      state.updatedAtMs > now || now - state.updatedAtMs > 180_000 ||
-      state.targetBlock === null || checkpoint.blockNumber < state.targetBlock) {
-    throw new Error('INDEX_UNAVAILABLE');
-  }
-  // Runtime target is the bounded verified snapshot. The durable checkpoint may
-  // legitimately advance beyond it between reads; never treat that as unhealthy
-  // and never expose evidence newer than the verified runtime target.
-  return state.targetBlock;
+  const target = verifiedRuntimeTarget(state, checkpoint?.blockNumber ?? null, now, 180_000);
+  if (target === null) throw new Error('INDEX_UNAVAILABLE');
+  // Runtime target is the bounded verified snapshot. A newer in-flight sync may
+  // advance the durable checkpoint before publishing its next runtime row; keep
+  // serving only the last fresh, verified target rather than trusting the stale
+  // previous-cycle liveCaughtUp bit.
+  return target;
 }
 
 export async function evidenceForLaunch(db: D1DatabaseLike, id: string, checkpoint: bigint, chainId = 5042): Promise<EvidenceRef> {

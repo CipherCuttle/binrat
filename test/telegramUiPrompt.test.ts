@@ -31,7 +31,7 @@ function telegram(calls:Call[], options:{rejectPrompt?:boolean; ambiguousPrompt?
     // MEDIA OFF cards in this fixture are text messages, so Telegram definitively
     // rejects a caption edit before the client falls back to editMessageText.
     if (method === 'editMessageCaption') return Response.json({ok:false,description:'Bad Request: message is not a photo'},{status:400});
-    if (method === 'editMessageText' && options.failFinalEdit && /CASE/.test(String(body.text))) return Response.json({ok:false},{status:500});
+    if (method === 'editMessageText' && options.failFinalEdit && /DUG IT UP/.test(String(body.text))) return Response.json({ok:false},{status:500});
     return Response.json({ok:true,result:{message_id:method === 'sendMessage' && body.reply_markup ? promptId++ : 700}});
   };
 }
@@ -102,6 +102,32 @@ test('a second DIG deterministically supersedes the first prompt and final card 
     assert.equal(await digCount(f),1);
     assert.equal((await reply(f,fetchImpl,1033,CREATOR,801)).status,200);
     assert.equal(await digCount(f),1);
+  } finally {f.db.close();}
+});
+
+test('backend failure after prompt consumption replaces DIGGING with a terminal error and cannot re-execute', async () => {
+  const f=await autonomousFixture(); const calls:Call[]=[]; const fetchImpl=telegram(calls) as typeof fetch;
+  let failExecute=true;
+  const failingDb:D1DatabaseLike={
+    prepare(sql) {
+      if (failExecute && sql.includes('SELECT user_id,chat_id,reply FROM rat_v1_commands')) {
+        return {bind:()=>({first:async()=>{ throw new Error('D1_EXECUTE_FAILED'); }})} as unknown as ReturnType<D1DatabaseLike['prepare']>;
+      }
+      return f.db.prepare(sql);
+    },
+    batch:s=>f.db.batch(s), exec:s=>f.db.exec(s)
+  };
+  try {
+    await callback(f,fetchImpl,1035);
+    const response=await reply(f,fetchImpl,1036,CREATOR,800,{db:failingDb});
+    assert.equal(response.status,200);
+    assert.equal(await loadActiveDigPrompt(f.db,77,77,f.now()),null);
+    assert.equal(await digCount(f),0);
+    assert.ok(calls.some(c=>c.method==='editMessageText' && /DIG STOPPED/.test(String(c.body.text))));
+    failExecute=false;
+    assert.equal((await reply(f,fetchImpl,1036,CREATOR,800,{db:failingDb})).status,200);
+    assert.equal(await digCount(f),0);
+    assert.equal(calls.filter(c=>c.method==='editMessageText' && /RUMMAGING/.test(String(c.body.text))).length,1);
   } finally {f.db.close();}
 });
 
@@ -208,9 +234,9 @@ test('media ON edits inquisitive → digging → CASE, while final ledger failur
     assert.equal((await reply(f,fetchImpl,1051,CREATOR,800)).status,200);
     assert.equal(await digCount(f),1);
     const mediaEdits=calls.filter(c=>c.method==='editMessageMedia').map(c=>String((c.body.media as {caption?:string}|undefined)?.caption));
-    assert.ok(mediaEdits.some(text=>text.includes('GIVE ME A DEPLOYER ADDRESS')));
+    assert.ok(mediaEdits.some(text=>text.includes('DROP THE ADDRESS')));
     assert.ok(mediaEdits.some(text=>text.includes('RUMMAGING')));
-    assert.ok(mediaEdits.some(text=>text.includes('CASE')));
+    assert.ok(mediaEdits.some(text=>text.includes('DUG IT UP')));
   } finally {f.db.close();}
 });
 

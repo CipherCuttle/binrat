@@ -13,7 +13,7 @@ import {
   syncObservations,
   type ObservationSource
 } from '../observations/syncObservations.js';
-import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
+import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
@@ -50,6 +50,7 @@ export interface CloudflareSyncEnv {
   BINRAT_PONS_CATCHUP_WORK_BUDGET_MS?: string;
   BINRAT_PONS_NEAR_HEAD_BLOCKS?: string;
   BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
+  BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
   BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
   BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE?: string;
@@ -513,7 +514,7 @@ export async function runCloudflarePonsSyncCycle(
     // Near head remains deliberately compact.  Backlog slices use an adaptive
     // Pons-only range, always narrowed before a checkpoint when event density
     // requires it.  The queue/lease remains a single checkpoint authority.
-    const steadyMaxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 512, 1, 4_096));
+    const steadyMaxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 1_024, 1, 4_096));
     const catchupMaxBatchBlocks = BigInt(integerSetting(
       env.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS, PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS, PONS_CATCHUP_INITIAL_BATCH_BLOCKS, 8_192
     ));
@@ -585,6 +586,22 @@ export async function runCloudflarePonsSyncCycle(
       backlogDelta: velocity.backlogDelta?.toString() ?? null,
       catchupHeadRatio: velocity.catchupHeadRatio
     }));
+    const previousVerifiedTarget = verifiedRuntimeTarget(
+      previous,
+      after?.blockNumber ?? null,
+      updatedAtMs,
+      integerSetting(env.BINRAT_MAX_STATUS_AGE_MS, 180_000, 1_000, 3_600_000)
+    );
+    if (!liveCaughtUp && previousVerifiedTarget !== null) {
+      console.error(JSON.stringify({
+        event:'PONS_VERIFIED_RUNTIME_RETAINED',
+        cycleId:message.cycleId,
+        verifiedTarget:previousVerifiedTarget.toString(),
+        checkpointBlock:after?.blockNumber.toString() ?? null,
+        nextTarget:report.targetBlock?.toString() ?? null
+      }));
+      return { status:'SUCCESS', liveCaughtUp:false };
+    }
     await runtime.put({
       sourceVerified: true, liveCaughtUp, headBlock: report.headBlock, targetBlock: report.targetBlock,
       observationReady: false, historyBackfillComplete: false, historyBackfillTargetBlock: null,

@@ -15,6 +15,25 @@ export interface D1RuntimeState {
   updatedAtMs: number;
 }
 
+/**
+ * Read authority is the last verified runtime target, not the previous cycle's
+ * cached liveCaughtUp bit. A newer in-flight sync may advance the durable
+ * checkpoint past that verified target before it publishes its next runtime row.
+ */
+export function verifiedRuntimeTarget(
+  state: D1RuntimeState | null,
+  checkpointBlock: bigint | null,
+  nowMs: number,
+  maxAgeMs: number
+): bigint | null {
+  if (!state || !Number.isSafeInteger(nowMs) || !Number.isSafeInteger(maxAgeMs) || maxAgeMs < 0) return null;
+  const age=nowMs-state.updatedAtMs;
+  if (!state.sourceVerified || state.lastSyncError || state.targetBlock === null ||
+      checkpointBlock === null || checkpointBlock < state.targetBlock ||
+      age < 0 || age > maxAgeMs) return null;
+  return state.targetBlock;
+}
+
 export class D1RuntimeStateStore {
   constructor(
     private readonly db: D1DatabaseLike,

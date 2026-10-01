@@ -3,7 +3,7 @@ import test from 'node:test';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { dig, why } from '../src/autonomous/evidence.js';
 import { parseTarget } from '../src/autonomous/model.js';
-import { discoverRats, renderRats } from '../src/autonomous/rats.js';
+import { discoverRats, RATS_RECENT_BLOCK_WINDOW, renderRats } from '../src/autonomous/rats.js';
 import { createPublicShareReceipt, openPublicShareReceipt, renderOpenedReceipt, renderShareArtifact, telegramDeepLink } from '../src/autonomous/share.js';
 import { FreeEntitlements, FREE_CAPACITY } from '../src/autonomous/entitlements.js';
 import { listWatches } from '../src/autonomous/watches.js';
@@ -29,16 +29,57 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.deepEqual(again,first);
     assert.equal(first.candidates.length,2);
     assert.equal(first.candidates[0]!.entity.entityId,CREATOR);
+    assert.equal(first.candidates[0]!.recurrenceCount,4);
+    assert.equal(first.candidates[0]!.latestLaunch.blockNumber,'100');
+    assert.equal(first.candidates[0]!.latestLaunch.symbol,'FIXTURE');
+    assert.deepEqual(first.candidates[0]!.previousLaunches?.map(item=>item.blockNumber),['99','96','95']);
     assert.equal(first.candidates[1]!.entity.entityId,other);
+    assert.deepEqual(first.candidates[1]!.previousLaunches?.map(item=>item.blockNumber),['97']);
+    assert.equal(first.candidates[1]!.recurrenceCount,2);
     assert.ok(first.candidates.every(candidate => candidate.entity.chainId===4663 && candidate.evidenceRefs.length>=2));
     assert.ok(first.candidates.every(candidate => candidate.reasons.every(reason => reason.evidenceRefs.length>0)));
     assert.equal(first.coverage.status,'PARTIAL');
-    assert.match(renderRats(first),/Coverage: PARTIAL/);
+    assert.match(renderRats(first),/Same paws left receipts on \$FIXTURE/);
+    assert.match(renderRats(first),/Fresh findings only/);
     assert.ok(renderRats(first).length<4096);
     assert.doesNotMatch(JSON.stringify(first),/profit|p.?&.?l|smart.money|score|whale|insider/i);
     const receipt=await why(f.db,first.candidates[0]!.caseId,f.now());
     assert.deepEqual(receipt.discovery?.reasons,first.candidates[0]!.reasons);
+    assert.deepEqual(receipt.discovery?.previousLaunches?.map(item=>item.blockNumber),['99','96','95']);
     assert.equal(await count(f.db,'rat_v11_pons_discovery_snapshots'),1);
+  } finally { f.db.close(); }
+});
+
+test('RATS ranks the freshest repeat activity ahead of older high-volume deployers', async () => {
+  const {f}=await recurrentFixture();
+  const fresher=addr(8);
+  try {
+    await f.launch(101,fresher);
+    await f.launch(102,fresher);
+    await f.checkpoint(102);
+    await f.launch(96,CREATOR);
+    await f.launch(95,CREATOR);
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.candidates[0]!.entity.entityId,fresher);
+    assert.equal(snapshot.candidates[0]!.latestLaunch.blockNumber,'102');
+    assert.equal(snapshot.candidates[0]!.recurrenceCount,2);
+    const olderHeavy=snapshot.candidates.find(candidate=>candidate.entity.entityId===CREATOR);
+    assert.equal(olderHeavy?.recurrenceCount,4);
+    assert.equal(olderHeavy?.latestLaunch.blockNumber,'100');
+  } finally { f.db.close(); }
+});
+
+test('RATS omits stale repeaters instead of padding the fresh list with old history', async () => {
+  const f=await autonomousFixture();
+  const stale=addr(9),fresh=addr(10);
+  try {
+    await f.launch(20,stale); await f.launch(30,stale);
+    const tip=Number(RATS_RECENT_BLOCK_WINDOW)+100;
+    await f.launch(tip-1,fresh); await f.launch(tip,fresh);
+    await f.checkpoint(tip);
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.ok(snapshot.candidates.some(candidate=>candidate.entity.entityId===fresh));
+    assert.equal(snapshot.candidates.some(candidate=>candidate.entity.entityId===stale),false);
   } finally { f.db.close(); }
 });
 
@@ -79,13 +120,21 @@ test('RATS fails closed when the durable checkpoint is behind the verified runti
   } finally { f.db.close(); }
 });
 
-test('RATS fails closed on stale/unready state and rejects malformed source evidence', async () => {
+test('RATS uses the verified target when a newer sync has crossed it but the cached cycle bit still says not caught up', async () => {
+  const {f}=await recurrentFixture();
+  try {
+    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:100n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.sourceCheckpoint,'100');
+    assert.ok(snapshot.candidates.every(candidate=>candidate.evidenceRefs.every(ref=>BigInt(ref.blockNumber)<=100n)));
+  } finally { f.db.close(); }
+});
+
+test('RATS fails closed on unverified state and rejects malformed source evidence', async () => {
   const {f} = await recurrentFixture();
   try {
     await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:false,liveCaughtUp:true,headBlock:102n,targetBlock:100n,
-      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
-    await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
-    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:100n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
     await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
   } finally { f.db.close(); }
@@ -142,7 +191,13 @@ test('DIG, RATS and future ALERT cases create opaque public receipts without cro
     const opened=f.sent.at(-1)!.text;
     assert.match(opened,/SOMEBODY LEFT YOU A RECEIPT/); assert.doesNotMatch(opened,/private attention/i);
     assert.match(renderOpenedReceipt(publicReceipt),/WATCH: \/watch 4663:CREATOR/);
-    await f.send(`/watch 4663:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:803});
+    const historicalReceipt={...publicReceipt,chainId:5042,finding:{...publicReceipt.finding,chainId:5042}};
+    assert.match(renderOpenedReceipt(historicalReceipt),/WATCH unavailable for Arc 5042 historical receipts/);
+    const historicalWatch=await f.send(`/watch 5042:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:803});
+    assert.equal(historicalWatch.status,200);
+    assert.match(f.sent.at(-1)!.text,/Live watches are available only on Robinhood\/Pons 4663/);
+    assert.equal((await listWatches(f.db,{userId:88,chatId:88})).length,0);
+    await f.send(`/watch 4663:CREATOR:${CREATOR}`,{userId:88,chatId:88,updateId:804});
     assert.equal((await listWatches(f.db,PRINCIPAL)).length,1);
     assert.equal((await listWatches(f.db,{userId:88,chatId:88})).length,1);
     assert.deepEqual(await new FreeEntitlements().resolve({userId:88,chatId:88}),FREE_CAPACITY);

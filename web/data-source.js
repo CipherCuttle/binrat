@@ -13,13 +13,13 @@ export async function loadDumpsterFeed() {
       bags: hotGarbageFixtures.map((bag) => ({ ...bag, mode: "FIXTURE" })),
     };
   }
-  const response = await fetch("/api/feed", {
+  const response = await fetch("/api/launches/latest", {
     headers: { accept: "application/json" },
     cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("LIVE_INDEX_NOT_AVAILABLE");
-  return adaptPublicFeed(await response.json());
+  return adaptLatestLaunches(await response.json());
 }
 
 export async function loadDumpsterLedger() {
@@ -92,10 +92,78 @@ export async function loadDumpsterLedger() {
   return value;
 }
 
+export function adaptLatestLaunches(feed) {
+  if (
+    feed?.schemaVersion !== "binrat.latest-launches/0.1" ||
+    feed.chainId !== 4663 ||
+    feed.historyCoverage !== "PARTIAL" ||
+    !block(feed.sourceCheckpoint) ||
+    !Array.isArray(feed.launches) ||
+    feed.launches.length > 20
+  ) throw new Error("WEB_LATEST_LAUNCHES_INVALID");
+
+  const bags = feed.launches.map((launch) => {
+    if (
+      typeof launch?.launchId !== "string" || !/^[0-9a-f]{64}$/.test(launch.launchId) ||
+      !address(launch.token) || !hash(launch.txHash) || !address(launch.deployer) ||
+      !block(launch.blockNumber) || BigInt(launch.blockNumber) > BigInt(feed.sourceCheckpoint) ||
+      typeof launch.symbol !== "string" || typeof launch.name !== "string" ||
+      !Number.isSafeInteger(launch.priorLaunchCount) || launch.priorLaunchCount < 0 ||
+      typeof launch.factId !== "string" || !launch.factId ||
+      !launch.metadata || !["imageUri","website","twitter","telegram"].every(key => typeof launch.metadata[key] === "string")
+    ) throw new Error("WEB_LATEST_LAUNCH_INVALID");
+
+    const evidence = [
+      { tone:"observed", text:"Pons reported this deployer address on a canonical indexed launch." },
+      ...(launch.priorLaunchCount > 0
+        ? [{ tone:"noted", text:`The same Pons-reported deployer appears on ${launch.priorLaunchCount} earlier indexed launch${launch.priorLaunchCount===1?"":"es"}.` }]
+        : []),
+      { tone:"unknown", text:"Human identity, intent, safety, profitability and future outcome are not inferred." }
+    ];
+
+    return {
+      mode:"LIVE",
+      id:launch.launchId,
+      symbol:launch.symbol,
+      name:launch.name,
+      token:launch.token,
+      reportedCreatorAddress:launch.deployer,
+      block:launch.blockNumber,
+      txHash:launch.txHash,
+      age:`BLOCK ${launch.blockNumber}`,
+      priorLaunches:launch.priorLaunchCount,
+      coverage:"PARTIAL",
+      notedConditions:launch.priorLaunchCount > 0 ? 1 : 0,
+      evidence,
+      imageUri:launch.metadata.imageUri,
+      socials:{
+        website:launch.metadata.website,
+        twitter:launch.metadata.twitter,
+        telegram:launch.metadata.telegram
+      },
+      trail:[],
+      mature24h:"NOT PROJECTED",
+      concentration:"NOT PROJECTED",
+      note:ratNote(launch.priorLaunchCount),
+      receipt:`fact:${launch.factId}`,
+      asOfBlock:feed.sourceCheckpoint,
+      asOfBlockHash:""
+    };
+  });
+
+  return {
+    version:WEB_DATA_SOURCE_VERSION,
+    mode:"LIVE",
+    asOfBlock:feed.sourceCheckpoint,
+    historyCoverage:"PARTIAL",
+    bags
+  };
+}
+
 export function adaptPublicFeed(feed) {
   if (
     feed?.schemaVersion !== "binrat.public-feed/0.1" ||
-    feed.chainId !== 5042 ||
+    feed.chainId !== 4663 ||
     !Array.isArray(feed.bags) ||
     feed.historyCoverage !== "UNVERIFIED" ||
     !block(feed.asOfBlock) ||
@@ -103,7 +171,7 @@ export function adaptPublicFeed(feed) {
     feed.receipt?.projectionVersion !== "BINRAT_PUBLIC_PROJECTION_V0" ||
     typeof feed.receipt.receiptId !== "string" ||
     !feed.receipt.receiptId ||
-    feed.receipt.chainId !== 5042 ||
+    feed.receipt.chainId !== 4663 ||
     feed.receipt.asOfBlock !== feed.asOfBlock ||
     feed.receipt.asOfBlockHash !== feed.asOfBlockHash ||
     feed.receipt.historyCoverage !== "UNVERIFIED"
@@ -115,6 +183,7 @@ export function adaptPublicFeed(feed) {
     if (
       typeof bag?.id !== "string" ||
       !bag.id ||
+      bag.source !== "PONS_V2" ||
       typeof bag.symbol !== "string" ||
       typeof bag.name !== "string" ||
       !address(bag.token) ||
@@ -220,6 +289,29 @@ function block(value) {
 }
 
 
+export async function loadPublicBag(bagId) {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  if (typeof bagId !== "string" || !/^[0-9a-f]{64}$/.test(bagId)) throw new Error("PUBLIC_BAG_ID_INVALID");
+  const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}`, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("PUBLIC_BAG_NOT_AVAILABLE");
+  const value = await response.json();
+  if (value?.bag?.id !== bagId || typeof value?.receipt?.asOfBlockHash !== "string") {
+    throw new Error("PUBLIC_BAG_INVALID");
+  }
+  const adapted = adaptPublicFeed({
+    ...value,
+    asOfBlockHash: value.receipt.asOfBlockHash,
+    bags: [value.bag],
+  });
+  const bag = adapted.bags[0];
+  if (!bag || bag.id !== bagId) throw new Error("PUBLIC_BAG_INVALID");
+  return bag;
+}
+
 export async function loadBagIntelligence(bagId) {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`, {
@@ -232,7 +324,7 @@ export async function loadBagIntelligence(bagId) {
   if (
     value?.schemaVersion !== "binrat.bag-intelligence/0.1" ||
     value.projectionVersion !== "BINRAT_BAG_INTELLIGENCE_V0" ||
-    value.chainId !== 5042 ||
+    value.chainId !== 4663 ||
     value.bagId !== bagId ||
     !["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value.observationCoverage) ||
     !Array.isArray(value.snapshots) ||
@@ -253,7 +345,7 @@ export async function loadCreatorFile(reportedCreatorAddress) {
   const value = await response.json();
   if (
     value?.schemaVersion !== "binrat.creator-file/0.1" ||
-    value.chainId !== 5042 ||
+    value.chainId !== 4663 ||
     String(value.reportedCreatorAddress).toLowerCase() !== String(reportedCreatorAddress).toLowerCase() ||
     value.historyCoverage !== "UNVERIFIED" ||
     !Number.isSafeInteger(value.indexedLaunchCount) ||
@@ -276,7 +368,7 @@ export async function loadReplayBundle(bagId) {
   if (
     value?.schemaVersion !== "binrat.replay-bundle/0.1" ||
     value.projectionVersion !== "BINRAT_REPLAY_BUNDLE_V0" ||
-    value.chainId !== 5042 ||
+    value.chainId !== 4663 ||
     value.launch?.id !== bagId ||
     value.historyCoverage !== "UNVERIFIED" ||
     !Array.isArray(value.stages) ||

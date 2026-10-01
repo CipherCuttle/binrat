@@ -22,7 +22,7 @@ assert.equal(card.stamp, 'FIXTURE // NOT LIVE EVIDENCE');
 
 const post = buildSharePostText(fixture);
 assert.match(post, /HOT GARBAGE/);
-assert.match(post, /ArcPad-reported creator/);
+assert.match(post, /Pons-reported deployer/);
 assert.match(post, /prior indexed bags in this fixture: 8/);
 assert.match(post, /FIXTURE \/\/ NOT LIVE EVIDENCE/);
 

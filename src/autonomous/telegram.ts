@@ -67,6 +67,7 @@ export async function executeAutonomousCommand(
       UNSUPPORTED_CHAIN:'Only Robinhood 4663 live intelligence and stored Arc 5042 historical evidence are supported.',
       UNSUPPORTED_ENTITY:'This entity is unsupported. Arbitrary wallet history is not available; a protocol address is not a human identity.',
       WATCH_CREATOR_ONLY:'Live watches support exact Pons-reported deployers only. Use the deployer target shown by DIG.',
+      WATCH_LIVE_CHAIN_ONLY:'Live watches are available only on Robinhood/Pons 4663. Arc 5042 remains historical evidence only.',
       EVIDENCE_UNAVAILABLE:'Canonical evidence is missing or incomplete for this target. No analysis or safety conclusion is available.',
       RECEIPT_UNAVAILABLE:'Receipt unavailable: missing, changed or incomplete canonical evidence. The previous claim cannot be reconstructed.',
       INDEX_UNAVAILABLE:'The live index is unavailable or stale. No new investigation or alert authority.',
@@ -88,11 +89,11 @@ export async function executeAutonomousCommand(
 /** Legacy commands retain their established full-text rendering. */
 export function renderLegacyAutonomousOutcome(outcome: AutonomousOutcome): string {
   switch (outcome.kind) {
-    case 'HOME': return '🐀 BINRAT\n\nI dig through Pons launches and reported deployers. You get the receipts.\n\n/rats — what the rat noticed\n/dig <address> — investigate\n/watches — what I\'m watching';
+    case 'HOME': return '🐀 BINRAT\n\nI dig through Pons garbage. When something smells worth keeping, I bring back the receipts.\n\n/rats — Fresh Garbage\n/dig <address> — Dig Deeper\n/watches — Rat Watch';
     case 'RATS': return renderRats(outcome.snapshot);
     case 'CASE': return renderReceipt(outcome.receipt,outcome.mode) + (outcome.privateAttention ? `\n\n${outcome.privateAttention}` : '');
     case 'WATCH': case 'REPLAY': return outcome.reply;
-    case 'WATCHLIST': return ['🐀 watch list (FREE: 25).',...outcome.watches.map(w=>`${entityKey({chainId:w.chain_id,entityType:w.entity_type,entityId:w.entity_id})} · after block ${w.start_block}`),outcome.watches.length?'':'No active V1 watches.',outcome.legacyWatchCount?'Legacy watches require explicit re-arm with /watch <target>.':''].filter(Boolean).join('\n');
+    case 'WATCHLIST': return ['🐀 RAT WATCH',...outcome.watches.map(w=>`${entityKey({chainId:w.chain_id,entityType:w.entity_type,entityId:w.entity_id})}`),outcome.watches.length?'':'Nothing on Rat Watch yet.',outcome.legacyWatchCount?'Older watches need to be re-armed on Pons 4663.':''].filter(Boolean).join('\n');
     case 'SHARE': return renderShareArtifact(outcome.receipt);
     case 'OPEN_RECEIPT': return renderOpenedReceipt(outcome.receipt);
     case 'ERROR': return `🐀 ${outcome.code}`;

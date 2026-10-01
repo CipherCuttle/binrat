@@ -306,6 +306,20 @@ function signedMiniAppInitData(token, tester, nowMs = Date.now()) {
   return new URLSearchParams({ ...fields, hash }).toString();
 }
 
+async function smokePublicLatestLaunches() {
+  const response = await fetch(WORKER_URL + '/api/launches/latest', {
+    headers:{accept:'application/json'},
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.ok && body?.schemaVersion === 'binrat.latest-launches/0.1' && body?.chainId === 4663 &&
+    typeof body?.sourceCheckpoint === 'string' && Array.isArray(body?.launches) && body.launches.length <= 20 &&
+    body.launches.every(launch => launch && typeof launch.launchId === 'string' &&
+      typeof launch.blockNumber === 'string' && typeof launch.factId === 'string'),
+    'PUBLIC_LATEST_LAUNCHES_SMOKE_FAILED');
+  note('PUBLIC_LATEST_LAUNCHES_SMOKE_PASS');
+}
+
 async function smokePrivateMiniApp(token, tester) {
   for (let attempt=0; attempt<7; attempt+=1) {
     const response = await fetch(WORKER_URL + '/api/miniapp/bootstrap', {
@@ -316,10 +330,13 @@ async function smokePrivateMiniApp(token, tester) {
     });
     const body = await response.json().catch(() => null);
     const ok = response.ok && body && body.rats?.chainId === 4663 && Array.isArray(body.rats?.candidates) &&
+      Array.isArray(body.latestLaunches) && body.latestLaunches.every(launch => launch && typeof launch.launchId === 'string' &&
+        typeof launch.blockNumber === 'string' && typeof launch.deployer === 'string') &&
       Array.isArray(body.watches) && body.sourceHealth?.chainId === 4663 && body.sourceHealth?.indexReady === true;
     note('Mini App bootstrap probe ' + JSON.stringify({
       attempt:attempt+1,status:response.status,error:typeof body?.error==='string'?body.error:null,
       ratsChainId:body?.rats?.chainId ?? null,candidateCount:Array.isArray(body?.rats?.candidates)?body.rats.candidates.length:null,
+      latestLaunchCount:Array.isArray(body?.latestLaunches)?body.latestLaunches.length:null,
       watches:Array.isArray(body?.watches),sourceChainId:body?.sourceHealth?.chainId ?? null,
       sourceIndexReady:body?.sourceHealth?.indexReady ?? null,sourceCheckpoint:body?.rats?.sourceCheckpoint ?? null
     }));
@@ -435,25 +452,31 @@ try {
   const versions = jsonFromOutput(cli(['versions','list','--name',WORKER,'--json']));
   const candidateVersion = taggedVersionIdFromList(versions, tag);
   gate(candidateVersion, 'CANDIDATE_VERSION_NOT_RESOLVED');
-  gate(candidateVersion !== previousVersion, 'CANDIDATE_VERSION_EQUALS_ACTIVE');
+  const candidateAlreadyActive = candidateVersion === previousVersion;
 
-  execFileSync('pnpm', [
-    'verify:production-binding-parity','--',
-    '--worker',WORKER,
-    '--active-version',previousVersion,
-    '--candidate-version',candidateVersion,
-    '--config',CONFIG,
-    mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? '--controlled-telegram-ui-v2-activation' : '--controlled-rat-activation'
-  ], { stdio: 'inherit', env: process.env, timeout: 180_000 });
-  note('Candidate binding parity PASS; candidate remained non-live until this point.');
+  if (candidateAlreadyActive) {
+    gate(plainBinding(activeConfig,'BINRAT_RELEASE_SHA') === process.env.GITHUB_SHA,
+      'ACTIVE_RELEASE_SHA_MISMATCH');
+    note('Exact reviewed candidate version is already active at 100%; skipping redundant promotion and continuing postdeploy verification.');
+  } else {
+    execFileSync('pnpm', [
+      'verify:production-binding-parity','--',
+      '--worker',WORKER,
+      '--active-version',previousVersion,
+      '--candidate-version',candidateVersion,
+      '--config',CONFIG,
+      mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? '--controlled-telegram-ui-v2-activation' : '--controlled-rat-activation'
+    ], { stdio: 'inherit', env: process.env, timeout: 180_000 });
+    note('Candidate binding parity PASS; candidate remained non-live until this point.');
 
-  // Treat a transport-ambiguous promotion result as potentially live. A
-  // best-effort code rollback is safer than assuming the candidate stayed dark.
-  promotionAttempted = true;
-  cli([
-    'versions','deploy',candidateVersion + '@100%','--name',WORKER,'--yes',
-    '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
-  ], { timeout: 180_000 });
+    // Treat a transport-ambiguous promotion result as potentially live. A
+    // best-effort code rollback is safer than assuming the candidate stayed dark.
+    promotionAttempted = true;
+    cli([
+      'versions','deploy',candidateVersion + '@100%','--name',WORKER,'--yes',
+      '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
+    ], { timeout: 180_000 });
+  }
   await waitForExactPostdeployRelease(process.env.GITHUB_SHA);
   await waitForHealthyPons('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY');
 
@@ -476,6 +499,7 @@ try {
         (deployedCandidateGate?.type === 'plain_text' && deployedCandidateGate.text === tester)),
     'POSTDEPLOY_TESTER_BINDING_MISSING');
     await smokePrivateMiniApp(botToken, tester);
+    await smokePublicLatestLaunches();
     // The default menu is commands. The Mini App is an explicitly tester-scoped
     // side effect and is snapshotted so a later postdeploy failure can restore it.
     execFileSync('pnpm',['telegram:private-menu-activate'],{

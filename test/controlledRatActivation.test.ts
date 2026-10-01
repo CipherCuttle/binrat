@@ -15,6 +15,7 @@ test('UI V2 activation is dispatch-only, exact-branch and exact-confirmation gat
   const sha='a'.repeat(40);
   assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/codex/telegram-as-code-private-v2',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
   assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-messaging-v1',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
+  assert.equal(evaluate<string>(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/fix/binrat-4663-surface-authority-v1',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),null);
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-ux-v2',eventName:'push',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),'TELEGRAM_UI_V2_DISPATCH_ONLY');
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/other',eventName:'workflow_dispatch',confirmation:h.UI_V2_CONFIRMATION,reviewedSha:'${sha}',githubSha:'${sha}'})`),'REF_NOT_CONTROLLED_RAT_BRANCH');
   assert.equal(evaluate(`h.activationGateError(h.ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE,{ref:'refs/heads/feat/binrat-telegram-ux-v2',eventName:'workflow_dispatch',confirmation:'wrong',reviewedSha:'${sha}',githubSha:'${sha}'})`),'TELEGRAM_UI_V2_CONFIRMATION_REQUIRED');
@@ -40,7 +41,7 @@ test('activation modes generate only their explicit private flag sets', () => {
   assert.deepEqual([ui.BINRAT_AUTONOMOUS_RAT_ENABLED,ui.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED,ui.BINRAT_TELEGRAM_UI_V2_ENABLED,ui.BINRAT_TELEGRAM_MEDIA_ENABLED],['true','false','true','true']);
   assert.deepEqual(
     [ui.BINRAT_PONS_MAX_BATCH_BLOCKS,ui.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS,ui.BINRAT_PONS_CATCHUP_MAX_BATCHES,ui.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS,ui.BINRAT_PONS_NEAR_HEAD_BLOCKS,ui.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS],
-    ['512','4096','4','60000','2048','128']
+    ['1024','4096','4','60000','2048','128']
   );
 });
 
@@ -94,11 +95,28 @@ test('the exact local prompt migration produces the schema accepted by the futur
   } finally { db.close(); }
 });
 
+test('private rollout reruns accept the exact reviewed version already active and continue verification', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/const candidateAlreadyActive = candidateVersion === previousVersion/);
+  assert.match(script,/ACTIVE_RELEASE_SHA_MISMATCH/);
+  assert.match(script,/already active at 100%; skipping redundant promotion and continuing postdeploy verification/);
+  assert.doesNotMatch(script,/CANDIDATE_VERSION_EQUALS_ACTIVE/);
+});
+
+test('final Telegram smoke retries bounded Pons readiness instead of sampling once', () => {
+  const script=readFileSync(new URL('../src/telegram/configCli.ts',import.meta.url),'utf8');
+  assert.match(script,/for \(let attempt=0;attempt<7;attempt\+=1\)/);
+  assert.match(script,/TELEGRAM_SMOKE_PONS_PROBE/);
+  assert.match(script,/setTimeout\(resolve,5_000\)/);
+  assert.match(script,/if \(!ponsHealthy\) throw new Error\('SMOKE_PONS_UNHEALTHY'\)/);
+});
+
 test('activation harness never includes a prompt-table drop and retains additive schema on rollback', () => {
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
   assert.match(script,/--file',initial\.migration/);
   assert.doesNotMatch(script,/DROP\s+TABLE\s+rat_ui_prompts/i);
-  assert.match(script,/Candidate binding parity PASS; candidate remained non-live until this point\.'\);\n\n  \/\/ Treat a transport-ambiguous promotion result[\s\S]*promotionAttempted = true/);
+  assert.match(script,/Candidate binding parity PASS; candidate remained non-live until this point/);
+  assert.match(script,/Treat a transport-ambiguous promotion result[\s\S]*promotionAttempted = true/);
   assert.match(script,/if \(promotionAttempted && previousVersion\)/);
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
 });
@@ -112,6 +130,14 @@ test('predeploy and postdeploy Pons readiness are bounded-retry and logged befor
   assert.match(script,/throw new Error\(failureCode\)/);
   assert.match(script,/waitForHealthyPons\('Predeploy','PONS_PREFLIGHT_NOT_HEALTHY'\)/);
   assert.match(script,/waitForHealthyPons\('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY'\)/);
+});
+
+test('private rollout proves the bounded public latest-launch surface after promotion', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/async function smokePublicLatestLaunches\(\)/);
+  assert.match(script,/\/api\/launches\/latest/);
+  assert.match(script,/PUBLIC_LATEST_LAUNCHES_SMOKE_PASS/);
+  assert.match(script,/PUBLIC_LATEST_LAUNCHES_SMOKE_FAILED/);
 });
 
 test('private rollout preflights Robinhood Rat schema and proves a valid Mini App bootstrap', () => {

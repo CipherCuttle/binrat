@@ -15,10 +15,20 @@ export interface DiscoveryReason {
   text: string;
   evidenceRefs: string[];
 }
+export interface DiscoveryLaunchContext {
+  launchId: string;
+  token: string;
+  symbol: string;
+  name: string;
+  blockNumber: string;
+}
 export interface DiscoveryDetails {
   ruleVersion: 'RATS_CREATOR_RECURRENCE_V1' | 'RATS_PONS_DEPLOYER_RECURRENCE_V1';
   reasons: DiscoveryReason[];
   sourceCheckpoint: string;
+  /** New Pons discovery receipts may retain up to three prior launches for
+   * human-facing Trash Trail context. Older receipts remain valid without it. */
+  previousLaunches?: DiscoveryLaunchContext[];
 }
 export interface Receipt {
   version: 'binrat.finding/1';

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
 import type { AutonomousOutcome } from '../autonomous/outcome.js';
-import { discoverRats, loadRatsSnapshot } from '../autonomous/rats.js';
+import { discoverRats, latestPonsLaunches, latestPonsLaunchSnapshot, loadRatsSnapshot } from '../autonomous/rats.js';
 import { why } from '../autonomous/evidence.js';
 import { listWatches } from '../autonomous/watches.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
@@ -38,7 +38,7 @@ import {
   type RatAiBinding, type RatMemory
 } from './ratConversation.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
-import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
+import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
@@ -60,7 +60,7 @@ import {
 } from './syncQueue.js';
 import { autonomousResultMedia, editRatCard, sendRatCard } from '../telegram/ratMedia.js';
 import { parseCallback, type TelegramUiAction } from '../telegram/ui/callback.js';
-import { digPromptOperationalErrorCard, diggingCard, digWaitingCard, malformedDigCard, renderRatCard } from '../telegram/ui/cards.js';
+import { digOperationalErrorCard, digPromptOperationalErrorCard, diggingCard, digWaitingCard, malformedDigCard, renderRatCard } from '../telegram/ui/cards.js';
 import { answerCallback, deleteMessage as deleteUiMessage, editCard as editUiCard, ratCardDigest, sendCard, sendDigForceReply, TelegramUiError } from '../telegram/ui/client.js';
 import { consumeExactDigPrompt, loadActiveDigPrompt, replaceDigPrompt } from '../telegram/ui/prompts.js';
 import { parseTarget } from '../autonomous/model.js';
@@ -301,8 +301,9 @@ async function miniAppBootstrap(request: Request, env: BinratWorkerEnv, now: num
   try {
     const body = await miniAppBody(request);
     const principal = miniAppPrincipal(body.initData, env, now);
-    const [rats, watches, sourceHealth] = await Promise.all([
+    const [rats, latestLaunches, watches, sourceHealth] = await Promise.all([
       discoverRats(env.DB, now),
+      latestPonsLaunches(env.DB, now, 20),
       listWatches(env.DB, { userId: principal.userId, chatId: principal.chatId }),
       chainHealth(env, ROBINHOOD_CHAIN_ID)
     ]);
@@ -310,6 +311,7 @@ async function miniAppBootstrap(request: Request, env: BinratWorkerEnv, now: num
       user: { firstName: principal.user.first_name ?? null, username: principal.user.username ?? null },
       sourceHealth,
       rats,
+      latestLaunches,
       watches: watches.map(watch => ({
         chainId: watch.chain_id, entityType: watch.entity_type, entityId: watch.entity_id,
         startBlock: watch.start_block, createdAtMs: watch.created_at_ms, policy: watch.policy
@@ -353,12 +355,30 @@ export async function handleBinratApiRequest(
     if (pathname === '/api/capabilities') return capabilities(env);
     if (pathname === '/api/health') return health(env);
     if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
+    if (pathname === '/api/launches/latest') {
+      const snapshot = await latestPonsLaunchSnapshot(env.DB,deps.now(),20);
+      return json(200,{
+        schemaVersion:'binrat.latest-launches/0.1',
+        chainId:ROBINHOOD_CHAIN_ID,
+        sourceCheckpoint:snapshot.sourceCheckpoint,
+        historyCoverage:'PARTIAL',
+        launches:snapshot.launches
+      });
+    }
 
     const ready = await readyContext(env);
     if (!ready) return json(503, { ready: false, reason: 'INDEX_NOT_READY' });
     const { store, feed } = ready;
 
     if (pathname === '/api/feed') return json(200, feed);
+
+    if (feed.chainId === ROBINHOOD_CHAIN_ID && pathname.startsWith('/api/rat-radar/')) {
+      return json(410, {
+        error: 'LEGACY_ARC_RADAR_RETIRED',
+        chainId: ROBINHOOD_CHAIN_ID,
+        replacement: 'PONS_DEPLOYER_RECURRENCE'
+      });
+    }
 
     if (pathname === '/api/rat-radar/watchlist') {
       const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
@@ -591,6 +611,30 @@ async function telegramWebhook(
     return json(400, { error: 'INVALID_JSON' });
   }
 
+  const receivedCallback = update.callback_query;
+  const callbackStartedAt = receivedCallback ? deps.now() : null;
+  const receivedAction = receivedCallback && typeof receivedCallback.data === 'string'
+    ? parseCallback(receivedCallback.data)
+    : null;
+  if (receivedCallback && typeof receivedCallback.id === 'string' && receivedCallback.id) {
+    if (receivedAction) {
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'RECEIVED',updateId:update.update_id,action:receivedAction.action}));
+    }
+    try {
+      // Telegram's progress state is transport-level UX. Attempt the ACK before
+      // any D1 claim/rate/evidence work so storage latency cannot strand it.
+      await answerCallback(token,receivedCallback.id,deps.externalFetch);
+      if (receivedAction) {
+        console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACKED',updateId:update.update_id,action:receivedAction.action,
+          elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
+      }
+    } catch {
+      if (receivedAction) {
+        console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACK_FAILED',updateId:update.update_id,action:receivedAction.action}));
+      }
+    }
+  }
+
   const ledger = new D1TelegramLedger(env.DB);
   let claim: 'CLAIMED' | 'BUSY' | 'SEEN';
   try {
@@ -614,32 +658,25 @@ async function telegramWebhook(
     const callback = update.callback_query;
     if (callback) {
       if (env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true') {
-        // Acknowledge known Telegram callback traffic even while the rollout is off.
-        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'TELEGRAM_UI_V2_DISABLED'});
       }
       const message = callback.message;
       if (!message || !candidateRatAllowedPrincipal(callback.from,message.chat,env) ||
           !autonomousRatAllowedPrincipal(callback.from,message.chat,env)) {
-        if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'PRIVATE_DM_REQUIRED'});
       }
-      const action = typeof callback.data === 'string' ? parseCallback(callback.data) : null;
-      // Telegram explicitly requires an answer to stop its client progress state.
+      const action = receivedAction;
       if (!action || !callback.id) {
-        if (callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'INVALID_CALLBACK'});
       }
       const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
       if (!(await ledger.allowChat(message.chat.id,rateLimit,60_000,deps.now()))) {
-        await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
         await ledger.completeIgnored(update.update_id,'RATE_LIMITED',deps.now());
         return json(200,{ok:true,rateLimited:true});
       }
-      await answerCallback(token,callback.id,deps.externalFetch);
       if (!Number.isSafeInteger(message.message_id) || message.message_id < 1) throw new Error('TELEGRAM_CALLBACK_MESSAGE_INVALID');
       const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
       if (action.action === 'DIG_PROMPT') {
@@ -687,8 +724,13 @@ async function telegramWebhook(
         return json(200,{ok:true,uiV2:true,prompt:true});
       }
       const outcome = await executeUiCallback(env.DB,action,{userId:callback.from.id,chatId:message.chat.id},update.update_id,deps.now(),deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'OUTCOME',updateId:update.update_id,action:action.action,
+        outcome:outcome.kind,errorCode:outcome.kind === 'ERROR' ? outcome.code : undefined,
+        elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
       const card = renderRatCard(outcome);
       await editUiCard(token,message.chat.id,message.message_id,origin,card,mediaEnabled,deps.externalFetch);
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'EDITED',updateId:update.update_id,action:action.action,
+        view:card.view,elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
       // The compact card remains the surface; FULL is the explicit canonical expansion.
       if (action.action === 'FULL') await sendMessage(token,message.chat.id,renderLegacyAutonomousOutcome(outcome),deps.externalFetch);
       await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:`UI_${action.action}`,
@@ -804,9 +846,21 @@ async function telegramWebhook(
         if (consumed) {
           const digging=diggingCard();
           await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,digging,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
-          const outcome=await executeAutonomousCommand(env.DB,{name:'dig',argument:message.text.trim()},
-            {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
-            deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+          let outcome: AutonomousOutcome;
+          try {
+            outcome=await executeAutonomousCommand(env.DB,{name:'dig',argument:message.text.trim()},
+              {userId:message.from!.id,chatId:message.chat.id},update.update_id,deps.now(),
+              deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+          } catch {
+            // The prompt is already consumed, so this update must terminate visibly.
+            // Never leave the user on DIGGING or ask Telegram to replay a one-shot DIG.
+            const operational=digOperationalErrorCard();
+            await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,operational,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch).catch(()=>{});
+            await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:'UI_DIG_FAILED',
+              replyDigest:ratCardDigest(operational),telegramMessageId:consumed.cardMessageId,rendererVersion:operational.rendererVersion},deps.now()).catch(()=>{});
+            console.error(JSON.stringify({event:'TELEGRAM_UI_DIG',phase:'FAILED',stage:'EXECUTE',updateId:update.update_id}));
+            return json(200,{ok:true,uiV2:true,dig:false,reason:'DIG_EXECUTION_FAILED'});
+          }
           const result=renderRatCard(outcome);
           // If this final edit or ledger receipt fails, the prompt remains consumed: replay cannot DIG again.
           await editUiCard(token,message.chat.id,consumed.cardMessageId,origin,result,env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true',deps.externalFetch);
@@ -1134,7 +1188,7 @@ async function handleRatWatchCommand(
     return {
       intent: 'WATCH_LIST',
       text: rows.length === 0
-        ? '🐀 no watched creator addresses yet.\n\n/watch 0x... — watch an indexed ArcPad-reported creator address'
+        ? '🐀 no watched creator addresses yet.\n\n/watch 0x... — watch an indexed Pons-reported deployer address'
         : [
             '🐀 watch list.',
             '',
@@ -1179,7 +1233,7 @@ async function handleRatWatchCommand(
     return {
       intent: 'WATCH',
       text: [
-        '🐀 that address is not currently indexed as an ArcPad-reported creator.',
+        '🐀 that address is not currently indexed as a Pons-reported deployer.',
         'watch was not added. unknown is not clean.'
       ].join('\n')
     };
@@ -1210,7 +1264,7 @@ async function handleRatWatchCommand(
       command.creator,
       '',
       `starting after block ${ready.feed.asOfBlock}.`,
-      'i will alert on a future launch from the same ArcPad-reported address.',
+      'i will alert on a future launch from the same Pons-reported deployer address.',
       'same address != same human identity.'
     ].join('\n')
   };
@@ -1274,23 +1328,16 @@ async function health(env: BinratWorkerEnv): Promise<Response> {
 async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Record<string, unknown>> {
   const store = new D1Store(env.DB, chainId);
   const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
-  const [checkpoint, launches, nextBlock, runtime] = await Promise.all([
+  const [checkpoint, nextBlock, runtime] = await Promise.all([
     store.getCheckpoint(),
-    store.listLaunches(),
     store.getHistoricalBackfillNextBlock(),
     runtimeStore.get()
   ]);
+  const launchCount = checkpoint ? await store.countLaunchesThroughBlock(checkpoint.blockNumber) : 0;
 
   const fresh = runtime ? runtimeFresh(runtime, maxStatusAgeMs(env)) : false;
-  const indexReady = Boolean(
-    checkpoint &&
-    runtime?.sourceVerified &&
-    runtime.liveCaughtUp &&
-    !runtime.lastSyncError &&
-    fresh &&
-    runtime.targetBlock !== null &&
-    checkpoint.blockNumber >= runtime.targetBlock
-  );
+  const verifiedTarget = verifiedRuntimeTarget(runtime, checkpoint?.blockNumber ?? null, Date.now(), maxStatusAgeMs(env));
+  const indexReady = verifiedTarget !== null;
   const observationReady = Boolean(runtime?.observationReady && !runtime.lastObservationError && fresh);
 
   return {
@@ -1300,10 +1347,8 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
     checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
     headBlock: runtime?.headBlock?.toString() ?? null,
     targetBlock: runtime?.targetBlock?.toString() ?? null,
-    liveCaughtUp: runtime?.liveCaughtUp ?? false,
-    launchCount: checkpoint
-      ? launches.filter((launch) => launch.blockNumber <= checkpoint.blockNumber).length
-      : 0,
+    liveCaughtUp: indexReady,
+    launchCount,
     historyBackfillComplete: runtime?.historyBackfillComplete ?? false,
     historyBackfillTargetBlock: runtime?.historyBackfillTargetBlock?.toString() ?? null,
     historyBackfillNextBlock: nextBlock?.toString() ?? null,

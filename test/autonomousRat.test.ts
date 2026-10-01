@@ -127,7 +127,7 @@ test('controlled activation scopes autonomous commands to one private tester and
     (f.env as typeof f.env & {BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID?:string}).BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID='77';
 
     await f.send('/watches',{userId:77,chatId:77,updateId:7100});
-    assert.match(f.sent.at(-1)!.text,/watch list \(FREE: 25\)/);
+    assert.match(f.sent.at(-1)!.text,/RAT WATCH/);
 
     await f.send('/watches',{userId:88,chatId:88,updateId:7101});
     assert.match(f.sent.at(-1)!.text,/no watched creator addresses yet/);
