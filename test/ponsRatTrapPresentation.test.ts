@@ -76,10 +76,11 @@ test('presentation leads with sparse memory coverage instead of pretending cohor
   assert.equal(out.summary.launchesWithAnyMemory,1);
   assert.equal(out.summary.launchesWithFullMemory,1);
   assert.equal(out.summary.launchesPendingMemory,1);
-  assert.match(out.summary.coverageText,/1\/2 prior launches with outcome receipts/);
-  assert.match(out.summary.coverageText,/1 still pending memory/);
+  assert.match(out.summary.coverageText,/I know what happened next for 1 of 2 prior launches/);
+  assert.match(out.summary.coverageText,/1 trail is still filling in/);
+  assert.equal(out.summary.canOfferRatWatch,true);
   assert.equal(out.launches[0]!.memoryState,'PENDING');
-  assert.match(out.launches[0]!.memoryText,/has not stored its outcome receipts yet/);
+  assert.match(out.launches[0]!.memoryText,/haven't got its outcome trail yet/);
 });
 
 test('presentation preserves a flat live-production shape as a tie, not a fake peak',()=>{
@@ -124,7 +125,7 @@ test('ERC20 quote values stay explicitly quote-token denominated and are never c
 
   const out=buildRatTrapPresentation(p);
   const text=JSON.stringify(out);
-  assert.match(out.launches[0]!.highestObservedText??'',/quote-token est\. FDV/);
+  assert.match(out.launches[0]!.highestObservedText??'',/quote tokens/);
   assert.match(out.launches[0]!.highestObservedText??'',/0xf30814…6e3d67/);
   assert.doesNotMatch(text,/USD|\$74|74.*ETH/);
   assert.match(out.footer,/Different quote assets are not compared/);
@@ -146,4 +147,5 @@ test('PARTIAL receipts remain visible as incomplete evidence and do not produce 
   assert.equal(out.launches[0]!.highestObservedText,null);
   assert.deepEqual(out.launches[0]!.observations[0]!.missing,['V4_POOL_STATE']);
   assert.match(out.launches[0]!.memoryText,/Trail is still incomplete/);
+  assert.equal(out.summary.canOfferRatWatch,false);
 });
