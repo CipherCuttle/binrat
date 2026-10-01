@@ -22,19 +22,23 @@
       "engineeringStatus": "ENGINEERING_PASS",
       "reviewedHead": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
       "deploymentStatus": "NOT_VERIFIED",
-      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED"
+      "publicStatus": "NOT_PUBLIC_LIVE_AUTHORIZED",
+      "statusScope": "LEGACY_ARC_5042_BASELINE"
     },
     "replayLab": {
       "engineeringStatus": "ENGINEERING_PASS",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "endpoint": "/api/bag/:bagId/replay"
+      "endpoint": "/api/bag/:bagId/replay",
+      "statusScope": "LEGACY_ARC_EVIDENCE_SURFACE"
     },
     "telegramRatV0": {
       "engineeringStatus": "ENGINEERING_PASS",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5"
+      "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
+      "statusScope": "LEGACY_2026_09_21_DEPLOYMENT_SNAPSHOT",
+      "currentRailRevalidationRequired": true
     },
     "dumpsterLedger": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -44,7 +48,9 @@
       "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
       "productionFundingAuthority": "PRELAUNCH_AUTHORITIES_CONFIGURED",
       "productionAccountingActive": false,
-      "configuredWalletCount": 2
+      "configuredWalletCount": 2,
+      "statusScope": "LEGACY_ARC_PRELAUNCH_AUTHORITY_SNAPSHOT",
+      "currentRailRebindRequired": true
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",
@@ -55,7 +61,9 @@
     "ratWatchV0": {
       "engineeringStatus": "ENGINEERING_PASS",
       "deploymentStatus": "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED",
-      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING"
+      "publicStatus": "LIVE_CANDIDATE_RECURRENCE_PENDING",
+      "statusScope": "LEGACY_ARC_5042_STATUS_SNAPSHOT",
+      "currentRailRevalidationRequired": true
     },
     "dumpsterRaidsV0": {
       "engineeringStatus": "EXPERIMENTAL",
@@ -66,7 +74,9 @@
       "engineeringStatus": "ENGINEERING_PASS",
       "deploymentStatus": "CLOUDFLARE_LIVE_VERIFIED",
       "publicStatus": "PUBLIC_LIVE_BETA",
-      "evidenceStatus": "WALLET_ACTIVITY_INDEX_LIVE_VERIFIED"
+      "evidenceStatus": "WALLET_ACTIVITY_INDEX_LIVE_VERIFIED",
+      "statusScope": "LEGACY_ARC_5042_STATUS_SNAPSHOT",
+      "currentRailReplacementStatus": "BUILDING_ON_PONS_4663"
     },
     "holderGateV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -74,7 +84,9 @@
       "publicStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
       "walletAuthStatus": "DISABLED_BY_DEFAULT",
       "productionHolderEligibilityActive": false,
-      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY"
+      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY",
+      "statusScope": "PRETOKEN_FAIL_CLOSED",
+      "currentRailRebindRequired": true
     },
     "launchMechanicsV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -177,5 +189,11 @@
     "legacyEvidenceChainId": 5042,
     "legacyEvidenceState": "HISTORICAL_LEGACY_EVIDENCE_ONLY",
     "tokenLaunchRailState": "REQUIRES_CURRENT_RAIL_REVERIFICATION_AND_OWNER_REFREEZE"
+  },
+  "capabilityStatusFreshness": {
+    "note": "Arc-era status fields retained below are scoped snapshots, not automatic current Pons 4663 authority.",
+    "canonicalizedAt": "2026-10-01",
+    "currentRail": "PONS_V2_DIRECT_FACTORY",
+    "currentRailChainId": 4663
   }
 }

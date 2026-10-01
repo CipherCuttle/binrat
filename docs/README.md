@@ -37,6 +37,36 @@ Arc `5042` remains historical / legacy evidence. The dated Arc launch-mechanics 
 
 See the capability manifest for current authority state.
 
+## Document classes
+
+### KEEP / active authority
+
+Always prefer the canonical global authorities above. Load these scoped contracts only when the task touches them:
+
+- `docs/PRODUCT_SURFACE_V1.md` — current V2 product-surface contract;
+- `docs/product/ROBINHOOD_LIVE_INTELLIGENCE_V1.md` — current Pons/4663 source semantics;
+- `docs/RAT_PERSONALITY_V0_5.md` — Telegram-specific renderer/parser behavior;
+- `docs/product/AUTONOMOUS_RAT_V1_PLAN.md` — Autonomous Rat implementation contract while that capability is active work.
+
+### BACKBURNER / vision
+
+Do not preload these for normal implementation work:
+
+- `docs/PRODUCT_NETWORK_PAPER_V0.md` — long-horizon product/network vision, not current status or execution authority;
+- future capabilities named in `docs/ROADMAP.md` remain roadmap inventory until deliberately promoted to active work;
+- do not create speculative `*_PLAN_V1.md` files for backburner features.
+
+### HISTORY / receipts / superseded plans
+
+Do not use these as current authority:
+
+- `docs/ROADMAP_V0.md`;
+- the superseded `ROADMAP_LIVING_SCENES_*` planning set;
+- dated Gate / recovery / verification receipts;
+- completed handoffs and reviews once their durable decisions have been extracted.
+
+Keep them in Git for provenance. “Discard” means **discard from active context**, not erase history.
+
 ## Context-budget rule
 
 For a normal task:
