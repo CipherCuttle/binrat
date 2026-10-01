@@ -15,8 +15,13 @@ function shortReference(value: string): string {
   return Array.from(value).length > 20 ? `${value.slice(0,10)}…${value.slice(-8)}` : value;
 }
 function launches(count: number): string { return `${count} launch${count === 1 ? '' : 'es'}`; }
+function cleanTokenText(value:string):string {
+  return value.replace(/[\u0000-\u001f\u007f-\u009f]+/g,' ').replace(/\s+/g,' ').trim();
+}
 function launchLabel(launch: {symbol:string;name:string;token:string}): string {
-  const raw=launch.symbol.trim() ? String.fromCharCode(36) + launch.symbol.trim() : (launch.name.trim() || shortReference(launch.token));
+  const symbol=cleanTokenText(launch.symbol);
+  const name=cleanTokenText(launch.name);
+  const raw=symbol ? String.fromCharCode(36) + symbol : (name || shortReference(launch.token));
   return Array.from(raw).length > 24 ? `${Array.from(raw).slice(0,23).join('')}…` : raw;
 }
 function caseFact(receipt: Receipt): string {
