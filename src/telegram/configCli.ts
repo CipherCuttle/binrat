@@ -47,10 +47,15 @@ async function smoke(): Promise<void> {
   let pons: Record<string, unknown> | null = null;
   let ponsHealthy=false;
   for (let attempt=0;attempt<7;attempt+=1) {
-    const ponsResponse=await fetch(`${origin}/api/health`, { signal: AbortSignal.timeout(20_000) });
-    pons=await ponsResponse.json().catch(()=>null) as Record<string, unknown> | null;
-    ponsHealthy=Boolean(ponsResponse.ok && pons?.ok === true && pons.chainId === 4663 &&
-      pons.indexReady === true && pons.liveCaughtUp === true && pons.lastSyncError === null);
+    try {
+      const ponsResponse=await fetch(`${origin}/api/health`, { signal: AbortSignal.timeout(20_000) });
+      pons=await ponsResponse.json().catch(()=>null) as Record<string, unknown> | null;
+      ponsHealthy=Boolean(ponsResponse.ok && pons?.ok === true && pons.chainId === 4663 &&
+        pons.indexReady === true && pons.liveCaughtUp === true && pons.lastSyncError === null);
+    } catch {
+      pons=null;
+      ponsHealthy=false;
+    }
     console.log(`TELEGRAM_SMOKE_PONS_PROBE attempt=${attempt+1} healthy=${ponsHealthy}`);
     if (ponsHealthy) break;
     if (attempt<6) await new Promise(resolve=>setTimeout(resolve,5_000));
