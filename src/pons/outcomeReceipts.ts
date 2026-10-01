@@ -12,6 +12,7 @@ import {
 } from './outcomeCapability.js';
 
 export const PONS_OUTCOME_OBSERVATION_VERSION = 'BINRAT_PONS_OUTCOME_OBSERVATION_V1' as const;
+const PONS_OUTCOME_HORIZON_MS=new Set<number>(OBSERVATION_HORIZONS.map((horizon)=>horizon.ms));
 
 export interface PonsOutcomeObservationLaunch extends PonsOutcomeLaunch {
   blockNumber: bigint;
@@ -451,7 +452,7 @@ function validateOptions(options: PonsOutcomeObservationSyncOptions): void {
   const horizons = options.horizons ?? OBSERVATION_HORIZONS;
   if (
     horizons.length === 0 ||
-    horizons.some((horizon) => !Number.isSafeInteger(horizon.ms) || horizon.ms <= 0) ||
+    horizons.some((horizon) => !Number.isSafeInteger(horizon.ms) || !PONS_OUTCOME_HORIZON_MS.has(horizon.ms)) ||
     new Set(horizons.map((horizon) => horizon.ms)).size !== horizons.length
   ) {
     throw new Error('PONS_OUTCOME_HORIZONS_INVALID');
@@ -459,8 +460,7 @@ function validateOptions(options: PonsOutcomeObservationSyncOptions): void {
 }
 
 function validateHorizon(horizonMs: number): void {
-  const allowed=new Set<number>(OBSERVATION_HORIZONS.map((horizon)=>horizon.ms));
-  if (!Number.isSafeInteger(horizonMs) || !allowed.has(horizonMs)) {
+  if (!Number.isSafeInteger(horizonMs) || !PONS_OUTCOME_HORIZON_MS.has(horizonMs)) {
     throw new Error('PONS_OUTCOME_HORIZON_INVALID');
   }
 }
