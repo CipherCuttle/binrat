@@ -158,7 +158,7 @@
 
 .roadmap-stage__scene {
   grid-column: 1;
-  width: min(680px, 45vw);
+  width: min(720px, 47vw);
   justify-self: end;
   opacity: .12;
   filter: brightness(.28) saturate(.45);
@@ -173,7 +173,7 @@
 
 .roadmap-stage[data-active="true"] .roadmap-stage__scene {
   opacity: 1;
-  filter: brightness(.78) saturate(.78);
+  filter: brightness(.96) saturate(.9);
   transform: translate3d(0, 0, 0);
 }
 
@@ -271,8 +271,8 @@
   background:
     radial-gradient(circle at 57% 48%, rgba(18, 64, 52, .28), transparent 28%),
     linear-gradient(145deg, #111713 0%, #070a08 48%, #020303 100%);
-  -webkit-mask-image: radial-gradient(ellipse 76% 70% at 50% 50%, #000 46%, transparent 82%);
-  mask-image: radial-gradient(ellipse 76% 70% at 50% 50%, #000 46%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 82% 76% at 50% 50%, #000 52%, transparent 88%);
+  mask-image: radial-gradient(ellipse 82% 76% at 50% 50%, #000 52%, transparent 88%);
 }
 
 .roadmap-scene--remember {
@@ -283,7 +283,7 @@
 
 .roadmap-scene__room {
   position: absolute;
-  inset: 13% 9%;
+  inset: 9% 5%;
   border-top: 2px solid #263b35;
   border-bottom: 7px solid #111914;
   background:
@@ -354,8 +354,8 @@
 }
 
 .roadmap-stage[data-active="true"] .roadmap-radar {
-  opacity: .76;
-  filter: drop-shadow(0 0 7px rgba(143,199,165,.24));
+  opacity: .9;
+  filter: drop-shadow(0 0 9px rgba(143,199,165,.3));
 }
 
 .roadmap-stage[data-active="true"] .roadmap-radar i {
@@ -437,8 +437,8 @@
 }
 
 .roadmap-stage[data-active="true"] .roadmap-scene__rat {
-  opacity: .52;
-  filter: brightness(.68) saturate(.58) contrast(1.08);
+  opacity: .72;
+  filter: brightness(.82) saturate(.72) contrast(1.08);
   transform: translateY(0) scale(1);
 }
 
@@ -461,7 +461,7 @@
 }
 
 .roadmap-stage[data-active="true"] .roadmap-scene__lamp {
-  opacity: .72;
+  opacity: .82;
   animation: roadmap-voltage 8.4s steps(1,end) infinite;
 }
 
@@ -555,7 +555,7 @@
   opacity: .8;
 }
 
-.roadmap-stage[data-active="true"] .roadmap-scene__darkness { opacity: .36; }
+.roadmap-stage[data-active="true"] .roadmap-scene__darkness { opacity: .22; }
 
 .roadmap-footer {
   min-height: 45vh;
