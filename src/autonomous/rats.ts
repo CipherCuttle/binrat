@@ -70,11 +70,11 @@ interface LatestLaunchRow {
   prior_launch_count: number;
 }
 
-export async function latestPonsLaunches(
+export async function latestPonsLaunchSnapshot(
   db: D1DatabaseLike,
   now: number,
   requestedLimit = 20
-): Promise<LatestPonsLaunch[]> {
+): Promise<{ sourceCheckpoint: string; launches: LatestPonsLaunch[] }> {
   const chainId = 4663;
   const tip = await authoritativeCheckpoint(db, now, chainId);
   const limit = Math.max(1, Math.min(20, requestedLimit));
@@ -117,7 +117,15 @@ export async function latestPonsLaunches(
       metadata:{imageUri:row.image_uri,website:row.website,twitter:row.twitter,telegram:row.telegram}
     });
   }
-  return output;
+  return { sourceCheckpoint: tip.toString(), launches: output };
+}
+
+export async function latestPonsLaunches(
+  db: D1DatabaseLike,
+  now: number,
+  requestedLimit = 20
+): Promise<LatestPonsLaunch[]> {
+  return (await latestPonsLaunchSnapshot(db,now,requestedLimit)).launches;
 }
 
 /**
