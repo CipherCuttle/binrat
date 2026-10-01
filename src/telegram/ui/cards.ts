@@ -19,8 +19,14 @@ function launchLabel(launch: {symbol:string;name:string;token:string}): string {
   const raw=launch.symbol.trim() ? String.fromCharCode(36) + launch.symbol.trim() : (launch.name.trim() || shortReference(launch.token));
   return Array.from(raw).length > 24 ? `${Array.from(raw).slice(0,23).join('')}…` : raw;
 }
-function caseFact(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
-  return `Trash Trail: ${launches(receipt.evidenceRefs.length)} with retained receipts from this reported deployer.`;
+function caseFact(receipt: Receipt): string {
+  const previous=(receipt.discovery?.previousLaunches ?? []).slice(0,3).map(launchLabel);
+  return [
+    'TRASH TRAIL',
+    previous.length ? `Same paws left receipts on ${previous.join(' · ')}.` : `${launches(receipt.evidenceRefs.length)} share this reported deployer.`,
+    `Receipts connect ${launches(receipt.evidenceRefs.length)} to this reported deployer.`,
+    "Price trail isn't verified yet, so I'm not calling this gold."
+  ].join('\n');
 }
 function whyFacts(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
   const latest=receipt.evidenceRefs[0];
@@ -75,7 +81,6 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
     if (!candidate) return card({view:'EMPTY',media:'empty-paws',caption:'🐀 EMPTY PAWS.\nNothing fresh in the bin is leaving a familiar trail right now.',keyboard:[[callbackButton('Dig',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]});
     const id=share({shareId:candidate.caseId.slice(0,40)});
-    const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
     const latestName=launchLabel(latest);
     const previous=(candidate.previousLaunches ?? []).slice(0,3).map(launchLabel);
