@@ -1,0 +1,63 @@
+name: provenance-repair-production-promotion
+
+on:
+  push:
+    branches:
+      - ops/binrat-provenance-repair-deploy-v1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-provenance-repair-production
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: ${{ contains(github.event.head_commit.message, '[deploy-provenance-repair]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+      PROVENANCE_REPAIR_PROD_APPROVED: 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Re-run exact source regression gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/promote-provenance-repair-production.mjs
+          pnpm check
+
+      - name: Guarded production promotion
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/promote-provenance-repair-production.mjs | tee "$RUNNER_TEMP/provenance-repair-production.txt"
+
+      - name: Preserve promotion receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provenance-repair-production
+          path: ${{ runner.temp }}/provenance-repair-production.txt
+          retention-days: 30
+          if-no-files-found: warn
