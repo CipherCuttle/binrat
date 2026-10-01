@@ -82,7 +82,7 @@ export function verifyWorkerBindingParity(
   }
 
   if (mode !== null) {
-    requireDisabledActivationSources(activeBindings, errors);
+    requireCompatibleActivationSource(activeBindings, mode, errors);
     const master = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_ENABLED');
     const publicMode = candidateBindings.get('BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED');
     const uiV2 = candidateBindings.get('BINRAT_TELEGRAM_UI_V2_ENABLED');
@@ -112,24 +112,48 @@ export function verifyWorkerBindingParity(
   return { ok: errors.length === 0, errors };
 }
 
-/** Existing explicit flags must be off; this harness is an activation, not a reconfiguration path. */
-function requireDisabledActivationSources(
+/**
+ * A first private activation must start from OFF. A later UI-V2 private update may
+ * start from the exact already-private state, but never from a partial/public state.
+ */
+function requireCompatibleActivationSource(
   activeBindings: Map<string, WorkerBinding>,
+  mode: 'TEXT' | 'UI_V2',
   errors: string[]
 ): void {
-  const requiredOff = [
-    ['BINRAT_AUTONOMOUS_RAT_ENABLED', 'CONTROLLED_RAT_MASTER_SOURCE_NOT_DISABLED'],
-    ['BINRAT_TELEGRAM_UI_V2_ENABLED', 'CONTROLLED_RAT_UI_V2_SOURCE_NOT_DISABLED'],
-    ['BINRAT_TELEGRAM_MEDIA_ENABLED', 'CONTROLLED_RAT_MEDIA_SOURCE_NOT_DISABLED']
-  ] as const;
-  for (const [name, error] of requiredOff) {
-    const binding = activeBindings.get(name);
-    if (binding && (binding.type !== 'plain_text' || binding.text !== 'false')) errors.push(error);
-  }
   const publicMode = activeBindings.get('BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED');
   if (publicMode && (publicMode.type !== 'plain_text' || publicMode.text !== 'false')) {
     errors.push('CONTROLLED_RAT_PUBLIC_SOURCE_NOT_DISABLED');
+    return;
   }
+
+  const master = activeBindings.get('BINRAT_AUTONOMOUS_RAT_ENABLED');
+  const ui = activeBindings.get('BINRAT_TELEGRAM_UI_V2_ENABLED');
+  const media = activeBindings.get('BINRAT_TELEGRAM_MEDIA_ENABLED');
+  const value = (binding: WorkerBinding | undefined) =>
+    binding?.type === 'plain_text' ? binding.text : undefined;
+
+  if (mode === 'TEXT') {
+    if (master && value(master) !== 'false') errors.push('CONTROLLED_RAT_MASTER_SOURCE_NOT_DISABLED');
+    if (ui && value(ui) !== 'false') errors.push('CONTROLLED_RAT_UI_V2_SOURCE_NOT_DISABLED');
+    if (media && value(media) !== 'false') errors.push('CONTROLLED_RAT_MEDIA_SOURCE_NOT_DISABLED');
+    return;
+  }
+
+  const state = [value(master), value(ui), value(media)];
+  if (state.every(item => item === undefined || item === 'false')) return;
+
+  if (state.every(item => item === 'true')) {
+    const tester = activeBindings.get('BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID');
+    const candidateGate = activeBindings.get('RAT_CANDIDATE_ALLOWED_USER_ID');
+    if (tester?.type !== 'secret_text') errors.push('CONTROLLED_UI_V2_SOURCE_TESTER_MISSING');
+    if (!candidateGate || (candidateGate.type !== 'secret_text' && candidateGate.type !== 'plain_text')) {
+      errors.push('CONTROLLED_UI_V2_SOURCE_CANDIDATE_GATE_MISSING');
+    }
+    return;
+  }
+
+  errors.push('CONTROLLED_UI_V2_SOURCE_STATE_INVALID');
 }
 
 export function verifyCandidateManifest(config: unknown, options: BindingParityOptions = {}): BindingParityResult {
