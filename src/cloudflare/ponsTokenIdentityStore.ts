@@ -50,12 +50,12 @@ export class D1PonsTokenIdentityStore implements PonsTokenIdentityStore {
     const result=await this.db.prepare(`
       INSERT OR IGNORE INTO pons_token_identity_receipts (
         identity_id,identity_version,chain_id,launch_id,token,observed_block,observed_block_hash,
-        name,symbol,decimals,total_supply,evidence_digest,payload_json
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        name,symbol,decimals,evidence_digest,payload_json
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
     `).bind(
       receipt.identityId,receipt.identityVersion,receipt.chainId,receipt.launchId,receipt.token,
       receipt.observedBlock.toString(),receipt.observedBlockHash,receipt.name,receipt.symbol,
-      receipt.decimals,receipt.totalSupply.toString(),receipt.evidenceDigest,payload
+      receipt.decimals,receipt.evidenceDigest,payload
     ).run();
     if (changes(result)===1) return 'INSERTED';
     const existing=await this.db.prepare(`
