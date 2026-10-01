@@ -140,18 +140,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 8); do
-            if curl -fsS --max-time 20 "${PREVIEW_URL}/health" >/tmp/preview-health.json; then break; fi
-            [ "$attempt" -lt 8 ] || exit 1
-            sleep 4
-          done
-          node <<'NODE'
+          matched=false
+          for attempt in $(seq 1 10); do
+            if curl -fsS --max-time 20 "${PREVIEW_URL}/health" >/tmp/preview-health.json; then
+              if node <<'NODE'
           const fs=require('fs');
           const h=JSON.parse(fs.readFileSync('/tmp/preview-health.json','utf8'));
-          if(h.ok!==true || h.service!=='binrat-cloudflare-edge' || h.releaseSha!==process.env.GITHUB_SHA) {
-            console.error(h); process.exit(2);
-          }
+          process.exit(h.ok===true && h.service==='binrat-cloudflare-edge' && h.releaseSha===process.env.GITHUB_SHA ? 0 : 1);
           NODE
+              then
+                matched=true
+                break
+              fi
+            fi
+            [ "$attempt" -lt 10 ] || break
+            sleep 4
+          done
+          if [ "$matched" != "true" ]; then
+            cat /tmp/preview-health.json 2>/dev/null || true
+            exit 2
+          fi
 
           node <<'NODE' >/tmp/preview-bootstrap-body.json
           const crypto=require('crypto');
