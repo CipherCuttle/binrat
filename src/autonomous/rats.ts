@@ -253,8 +253,8 @@ export function renderRats(snapshot: RatsSnapshot): string {
     '🐀 FRESHEST REPEAT DEPLOYERS',
     snapshot.candidates.map(candidate => {
       const prior=Math.max(1,candidate.recurrenceCount-1);
-      const latest=candidate.latestLaunch.symbol ? `${candidate.latestLaunch.symbol}` : (candidate.latestLaunch.name || 'unnamed launch');
-      const previous=(candidate.previousLaunches ?? []).map(item => item.symbol ? `${item.symbol}` : (item.name || item.token));
+      const latest=candidate.latestLaunch.symbol ? String.fromCharCode(36) + candidate.latestLaunch.symbol : (candidate.latestLaunch.name || 'unnamed launch');
+      const previous=(candidate.previousLaunches ?? []).map(item => item.symbol ? String.fromCharCode(36) + item.symbol : (item.name || item.token));
       return [
         `${candidate.rankPosition}. Recent repeat launch: ${latest}`,
         `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
