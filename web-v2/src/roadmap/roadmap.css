@@ -117,7 +117,7 @@
 }
 
 .roadmap-spine__glow {
-  top: calc((var(--roadmap-active-index) + .5) * (100% / var(--roadmap-stage-count)));
+  top: var(--roadmap-active-position);
   width: 2px;
   height: 26vh;
   transform: translate(-50%, -50%);
