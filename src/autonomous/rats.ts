@@ -37,6 +37,71 @@ export interface RatsSnapshot {
 interface CandidateRow { creator: string; recurrence_count: number; latest_block: string }
 interface CandidateLaunchRow { launch_id: string; token: string; symbol: string; name: string; block_number: string }
 
+export interface LatestPonsLaunch {
+  launchId: string;
+  token: string;
+  symbol: string;
+  name: string;
+  blockNumber: string;
+  deployer: string;
+  priorLaunchCount: number;
+}
+
+interface LatestLaunchRow {
+  launch_id: string;
+  token: string;
+  symbol: string;
+  name: string;
+  block_number: string;
+  creator: string;
+  prior_launch_count: number;
+}
+
+export async function latestPonsLaunches(
+  db: D1DatabaseLike,
+  now: number,
+  requestedLimit = 20
+): Promise<LatestPonsLaunch[]> {
+  const chainId = 4663;
+  const tip = await authoritativeCheckpoint(db, now, chainId);
+  const limit = Math.max(1, Math.min(20, requestedLimit));
+  const result = await db.prepare(`SELECT l.launch_id,l.token,l.symbol,l.name,l.block_number,l.creator,
+      (SELECT COUNT(DISTINCT p.launch_id)
+       FROM launches p JOIN provenance_facts pf ON pf.launch_id=p.launch_id AND pf.chain_id=p.chain_id
+       WHERE p.chain_id=l.chain_id AND p.source='PONS_V2' AND p.creator=l.creator
+         AND CAST(p.block_number AS INTEGER)<=?
+         AND (
+           CAST(p.block_number AS INTEGER)<CAST(l.block_number AS INTEGER)
+           OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index<l.log_index)
+           OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index=l.log_index AND p.launch_id<l.launch_id)
+         )) AS prior_launch_count
+    FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id
+    WHERE l.chain_id=? AND l.source='PONS_V2' AND CAST(l.block_number AS INTEGER)<=?
+    ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT ?`)
+    .bind(Number(tip),chainId,Number(tip),limit).all<LatestLaunchRow>();
+  if (!result.success) throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
+
+  const output: LatestPonsLaunch[] = [];
+  for (const row of result.results ?? []) {
+    if (!/^[0-9a-f]{64}$/.test(row.launch_id) || !/^0x[0-9a-f]{40}$/.test(row.token) ||
+        !/^0x[0-9a-f]{40}$/.test(row.creator) || !/^\d+$/.test(row.block_number) ||
+        !Number.isSafeInteger(Number(row.prior_launch_count)) || Number(row.prior_launch_count) < 0 ||
+        typeof row.symbol !== 'string' || typeof row.name !== 'string') {
+      throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
+    }
+    // Re-validate the canonical provenance receipt for every launch we expose.
+    const evidence = await evidenceForLaunch(db,row.launch_id,tip,chainId);
+    if (evidence.creator !== row.creator || evidence.blockNumber !== row.block_number) {
+      throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
+    }
+    output.push({
+      launchId:row.launch_id,token:row.token,symbol:row.symbol,name:row.name,
+      blockNumber:row.block_number,deployer:row.creator,priorLaunchCount:Number(row.prior_launch_count)
+    });
+  }
+  return output;
+}
+
 /**
  * Shared discovery only: verified reported creators with at least two retained,
  * canonical launch facts. Sort tuple is recurrence DESC, latest block DESC,
