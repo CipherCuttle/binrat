@@ -232,6 +232,7 @@ function controlledAddition(name: string, binding: WorkerBinding, mode: 'TEXT' |
   if (mode === 'UI_V2' && (name === 'BINRAT_TELEGRAM_UI_V2_ENABLED' || name === 'BINRAT_TELEGRAM_MEDIA_ENABLED')) {
     return binding.type === 'plain_text' && binding.text === 'true';
   }
+  if (mode === 'UI_V2' && name === 'TELEGRAM_WEBHOOK_SECRET_NEXT') return binding.type === 'secret_text';
   return mode === 'UI_V2' && name === 'RAT_CANDIDATE_ALLOWED_USER_ID' && binding.type === 'secret_text';
 }
 
