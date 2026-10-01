@@ -60,6 +60,11 @@ export interface CloudflareSyncEnv {
   BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
   BINRAT_PONS_TOKEN_IDENTITY_ENABLED?: string;
   BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE?: string;
+  /** Default-off O2 memory rail. Requires additive D1 migration before activation. */
+  BINRAT_PONS_OUTCOME_ENABLED?: string;
+  BINRAT_PONS_OUTCOME_MAX_PER_CYCLE?: string;
+  /** Cloudflare secret binding; raw Alchemy key or Robinhood Mainnet HTTPS endpoint. */
+  BINRAT_ROBINHOOD_ARCHIVE_RPC_URL?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
   BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS?: string;
@@ -73,7 +78,7 @@ export interface CloudflareSyncEnv {
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_TOKEN_IDENTITY_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
+  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_TOKEN_IDENTITY_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -83,6 +88,7 @@ export interface CloudflareSyncDeps {
   launchSource?: LaunchSource;
   ponsLaunchSource?: LaunchSource;
   ponsTokenIdentitySource?: PonsTokenIdentitySource;
+  ponsOutcomeSource?: PonsOutcomeObservationSource;
   observationSource?: ObservationSource;
   ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
@@ -97,6 +103,7 @@ export type SyncCycleResult =
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const PONS_SYNC_LEASE_NAME = 'binrat:pons-sync';
 const PONS_TOKEN_IDENTITY_LEASE_NAME = 'binrat:pons-token-identity';
+const PONS_OUTCOME_LEASE_NAME = 'binrat:pons-outcome';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
@@ -105,6 +112,7 @@ const LIVE_SYNC_LEASE_MS = 120_000;
 // reads inside its unchanged 60s work budget; Arc keeps its existing lease.
 export const PONS_SYNC_LEASE_MS = 180_000;
 export const PONS_TOKEN_IDENTITY_LEASE_MS = 120_000;
+export const PONS_OUTCOME_LEASE_MS = 120_000;
 const PONS_CATCHUP_INITIAL_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCHES = 4;
