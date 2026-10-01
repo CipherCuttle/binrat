@@ -52,7 +52,7 @@ test('DIG callback acknowledges first, creates one exact ForceReply, and media O
     assert.equal(response.status,200);
     assert.equal(calls[0]!.method,'answerCallbackQuery');
     assert.ok(calls.findIndex(c=>c.method==='editMessageText') < calls.findIndex(c=>c.method==='sendMessage'));
-    assert.deepEqual(calls.find(c=>c.method==='sendMessage')!.body.reply_markup,{force_reply:true,input_field_placeholder:'Robinhood/Pons deployer address'});
+    assert.deepEqual(calls.find(c=>c.method==='sendMessage')!.body.reply_markup,{force_reply:true,input_field_placeholder:'Deployer address'});
     assert.equal((await loadActiveDigPrompt(f.db,77,77,f.now()))?.promptMessageId,800);
     assert.equal(calls.some(c=>JSON.stringify(c.body).includes('/assets/telegram/')),false);
   } finally {f.db.close();}
@@ -72,7 +72,7 @@ test('only a same-principal exact reply executes DIG once; ordinary text and mal
     assert.equal(await loadActiveDigPrompt(f.db,77,77,f.now()),null);
     await reply(f,fetchImpl,1014,CREATOR,800);
     assert.equal(await digCount(f),1);
-    assert.equal(calls.filter(c=>c.method==='editMessageText' && /DIGGING/.test(String(c.body.text))).length,1);
+    assert.equal(calls.filter(c=>c.method==='editMessageText' && /RUMMAGING/.test(String(c.body.text))).length,1);
   } finally {f.db.close();}
 });
 
@@ -208,8 +208,8 @@ test('media ON edits inquisitive → digging → CASE, while final ledger failur
     assert.equal((await reply(f,fetchImpl,1051,CREATOR,800)).status,200);
     assert.equal(await digCount(f),1);
     const mediaEdits=calls.filter(c=>c.method==='editMessageMedia').map(c=>String((c.body.media as {caption?:string}|undefined)?.caption));
-    assert.ok(mediaEdits.some(text=>text.includes('DIG')));
-    assert.ok(mediaEdits.some(text=>text.includes('DIGGING')));
+    assert.ok(mediaEdits.some(text=>text.includes('GIVE ME A DEPLOYER ADDRESS')));
+    assert.ok(mediaEdits.some(text=>text.includes('RUMMAGING')));
     assert.ok(mediaEdits.some(text=>text.includes('CASE')));
   } finally {f.db.close();}
 });
