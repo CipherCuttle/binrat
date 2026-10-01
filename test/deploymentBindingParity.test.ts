@@ -155,12 +155,14 @@ test('controlled UI V2 parity permits first activation and exact private-to-priv
   }
   candidate.resources!.bindings!.push(
     { name:'BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID',type:'secret_text' },
-    { name:'RAT_CANDIDATE_ALLOWED_USER_ID',type:'secret_text' }
+    { name:'RAT_CANDIDATE_ALLOWED_USER_ID',type:'secret_text' },
+    { name:'TELEGRAM_WEBHOOK_SECRET_NEXT',type:'secret_text' }
   );
   assert.deepEqual(verifyWorkerBindingParity(active,candidate,{controlledTelegramUiV2Activation:true}),{ok:true,errors:[]});
   const defaultMode = verifyWorkerBindingParity(active,candidate);
   assert.equal(defaultMode.ok,false);
   assert.ok(defaultMode.errors.includes('VARIABLE_CHANGED:BINRAT_TELEGRAM_UI_V2_ENABLED'));
+  assert.ok(defaultMode.errors.includes('CANDIDATE_BINDING_UNAUTHORIZED:TELEGRAM_WEBHOOK_SECRET_NEXT'));
 
   const alreadyEnabled = structuredClone(candidate);
   assert.deepEqual(verifyWorkerBindingParity(candidate,alreadyEnabled,{controlledTelegramUiV2Activation:true}),{ok:true,errors:[]});
