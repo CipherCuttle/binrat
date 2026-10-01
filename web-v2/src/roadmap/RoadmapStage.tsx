@@ -1,48 +1,5 @@
 import type { CSSProperties, RefCallback } from "react";
-import type { RoadmapStage as RoadmapStageModel, RoadmapStageId } from "./roadmapData";
-
-function SceneHardware({ id, active }: { id: RoadmapStageId; active: boolean }) {
-  const hero = `${import.meta.env.BASE_URL}binrat-hero.webp`;
-
-  if (id === "sniff") {
-    return (
-      <div className="roadmap-scene roadmap-scene--sniff" data-active={active}>
-        <div className="roadmap-scene__room" />
-        <div className="roadmap-scene__terminal roadmap-scene__terminal--wide">
-          <span className="roadmap-radar"><i /></span>
-          <span className="roadmap-terminal-led roadmap-terminal-led--a" />
-          <span className="roadmap-terminal-led roadmap-terminal-led--b" />
-        </div>
-        <div className="roadmap-scene__terminal roadmap-scene__terminal--small">
-          <span className="roadmap-terminal-lines" />
-        </div>
-        <img className="roadmap-scene__rat roadmap-scene__rat--sniff" src={hero} alt="" />
-        <div className="roadmap-scene__lamp" />
-        <div className="roadmap-scene__foreground" />
-        <div className="roadmap-scene__darkness" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="roadmap-scene roadmap-scene--remember" data-active={active}>
-      <div className="roadmap-scene__room" />
-      <div className="roadmap-archive" aria-hidden="true">
-        {Array.from({ length: 12 }, (_, index) => <span key={index} />)}
-      </div>
-      <div className="roadmap-paper-stack" aria-hidden="true">
-        <i /><i /><i />
-      </div>
-      <div className="roadmap-scene__terminal roadmap-scene__terminal--archive">
-        <span className="roadmap-terminal-lines" />
-      </div>
-      <img className="roadmap-scene__rat roadmap-scene__rat--remember" src={hero} alt="" />
-      <div className="roadmap-scene__lamp roadmap-scene__lamp--warm" />
-      <div className="roadmap-scene__foreground" />
-      <div className="roadmap-scene__darkness" />
-    </div>
-  );
-}
+import type { RoadmapStage as RoadmapStageModel } from "./roadmapData";
 
 export function RoadmapStage({
   stage,
@@ -63,7 +20,7 @@ export function RoadmapStage({
       style={{ "--roadmap-active-accent": stage.accent } as CSSProperties}
     >
       <div className="roadmap-stage__scene">
-        <SceneHardware id={stage.id} active={active} />
+        <div className="roadmap-scene" data-scene-art="empty" aria-hidden="true" />
       </div>
 
       <div className="roadmap-stage__node" aria-hidden="true">
