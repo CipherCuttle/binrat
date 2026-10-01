@@ -18,7 +18,7 @@ interface BotDescription { description: string }
 interface BotShortDescription { short_description: string }
 interface BotCommand { command: string; description: string }
 interface ProfilePhotos { total_count: number; photos: Array<Array<{ file_id: string; file_unique_id: string }>> }
-interface WebhookInfo { url: string; has_custom_certificate?: boolean; pending_update_count?: number; last_error_date?: number }
+interface WebhookInfo { url: string; has_custom_certificate?: boolean; pending_update_count?: number; last_error_date?: number; allowed_updates?: string[] }
 interface ActualTelegramConfig {
   me: TelegramUser;
   name: string;
@@ -202,6 +202,12 @@ export function diffTelegramConfig(actual: ActualTelegramConfig, config = telegr
   rows.push({
     key: 'WEBHOOK', expected: config.webhook.url, actual: actual.webhook.url || '(empty)',
     status: actual.webhook.url === config.webhook.url ? 'unchanged' : 'blocked'
+  });
+  const expectedWebhookUpdates = [...config.webhook.allowedUpdates].sort();
+  const actualWebhookUpdates = [...(actual.webhook.allowed_updates ?? [])].sort();
+  rows.push({
+    key: 'WEBHOOK UPDATES', expected: display(expectedWebhookUpdates), actual: display(actualWebhookUpdates),
+    status: same(expectedWebhookUpdates, actualWebhookUpdates) ? 'unchanged' : 'blocked'
   });
   rows.push({
     key: 'PROFILE PHOTO', expected: 'present (repo asset; content readback unavailable)',
