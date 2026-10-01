@@ -32,11 +32,14 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.equal(first.candidates[0]!.recurrenceCount,4);
     assert.equal(first.candidates[0]!.latestLaunch.blockNumber,'100');
     assert.equal(first.candidates[0]!.latestLaunch.symbol,'FIXTURE');
+    assert.deepEqual(first.candidates[0]!.previousLaunches?.map(item=>item.blockNumber),['99','96','95']);
     assert.equal(first.candidates[1]!.entity.entityId,other);
+    assert.deepEqual(first.candidates[1]!.previousLaunches?.map(item=>item.blockNumber),['97']);
     assert.equal(first.candidates[1]!.recurrenceCount,2);
     assert.ok(first.candidates.every(candidate => candidate.entity.chainId===4663 && candidate.evidenceRefs.length>=2));
     assert.ok(first.candidates.every(candidate => candidate.reasons.every(reason => reason.evidenceRefs.length>0)));
     assert.equal(first.coverage.status,'PARTIAL');
+    assert.match(renderRats(first),/Previous: \$FIXTURE/);
     assert.match(renderRats(first),/Newest repeat activity first/);
     assert.ok(renderRats(first).length<4096);
     assert.doesNotMatch(JSON.stringify(first),/profit|p.?&.?l|smart.money|score|whale|insider/i);
