@@ -1,4 +1,4 @@
-import type { RefCallback } from "react";
+import type { CSSProperties, RefCallback } from "react";
 import type { RoadmapStage as RoadmapStageModel, RoadmapStageId } from "./roadmapData";
 
 function SceneHardware({ id, active }: { id: RoadmapStageId; active: boolean }) {
@@ -60,6 +60,7 @@ export function RoadmapStage({
       data-stage={stage.id}
       data-active={active}
       aria-current={active ? "step" : undefined}
+      style={{ "--roadmap-active-accent": stage.accent } as CSSProperties}
     >
       <div className="roadmap-stage__scene">
         <SceneHardware id={stage.id} active={active} />
