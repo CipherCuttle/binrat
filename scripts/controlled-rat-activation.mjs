@@ -20,7 +20,7 @@ export function activationGateError(mode, context) {
   if (!parseActivationMode(mode)) return 'ACTIVATION_MODE_INVALID';
   const permittedRefs = mode === ACTIVATION_MODE.TEXT_PRIVATE
     ? ['refs/heads/feat/binrat-robinhood-live-rat-v1']
-    : ['refs/heads/feat/binrat-telegram-ux-v2','refs/heads/codex/telegram-as-code-private-v2'];
+    : ['refs/heads/feat/binrat-telegram-ux-v2','refs/heads/codex/telegram-as-code-private-v2','refs/heads/feat/binrat-telegram-messaging-v1'];
   if (!permittedRefs.includes(context.ref)) return 'REF_NOT_CONTROLLED_RAT_BRANCH';
   if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
     if (context.eventName !== 'workflow_dispatch') return 'TELEGRAM_UI_V2_DISPATCH_ONLY';
