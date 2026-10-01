@@ -28,7 +28,9 @@ const provenPonsVars: Record<string, string> = {
   BINRAT_PONS_CATCHUP_MAX_BATCHES: '4',
   BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000',
   BINRAT_PONS_NEAR_HEAD_BLOCKS: '2048',
-  BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS: '128'
+  BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS: '128',
+  BINRAT_PONS_OUTCOME_ENABLED: 'false',
+  BINRAT_PONS_OUTCOME_MAX_PER_CYCLE: '3'
 } as const;
 
 test('binding parity preserves active resources while allowing only the approved release additions', () => {
@@ -241,4 +243,30 @@ test('candidate manifest requires known-good bindings and flag-off Pons configur
   assert.ok(fail.errors.includes('AI_BINDING_MISSING_FROM_MANIFEST'));
   assert.ok(fail.errors.includes('CRON_PARITY_FAILED'));
   assert.ok(fail.errors.includes('AUTONOMOUS_RAT_NOT_FLAG_OFF'));
+});
+
+
+test('candidate manifest keeps O2 explicitly disabled and bounded before migration activation', () => {
+  const base={
+    name:'binrat-edge-v0',
+    ai:{binding:'AI'},
+    triggers:{crons:['* * * * *']},
+    assets:{directory:'./web'},
+    vars:{
+      BINRAT_AUTONOMOUS_RAT_ENABLED:'false',
+      BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'false',
+      BINRAT_TELEGRAM_UI_V2_ENABLED:'false',
+      BINRAT_TELEGRAM_MEDIA_ENABLED:'false',
+      ...provenPonsVars
+    }
+  };
+  assert.deepEqual(verifyCandidateManifest(base),{ok:true,errors:[]});
+
+  const enabled=structuredClone(base) as typeof base & {vars:Record<string,string>};
+  enabled.vars.BINRAT_PONS_OUTCOME_ENABLED='true';
+  assert.ok(verifyCandidateManifest(enabled).errors.includes('PONS_OUTCOME_NOT_FLAG_OFF'));
+
+  const widened=structuredClone(base) as typeof base & {vars:Record<string,string>};
+  widened.vars.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE='12';
+  assert.ok(verifyCandidateManifest(widened).errors.includes('PONS_OUTCOME_CYCLE_BOUND_INVALID'));
 });
