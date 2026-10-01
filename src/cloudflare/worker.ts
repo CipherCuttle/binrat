@@ -725,7 +725,8 @@ async function telegramWebhook(
       }
       const outcome = await executeUiCallback(env.DB,action,{userId:callback.from.id,chatId:message.chat.id},update.update_id,deps.now(),deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
       console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'OUTCOME',updateId:update.update_id,action:action.action,
-        outcome:outcome.kind,elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
+        outcome:outcome.kind,errorCode:outcome.kind === 'ERROR' ? outcome.code : undefined,
+        elapsedMs:Math.max(0,deps.now()-(callbackStartedAt ?? deps.now()))}));
       const card = renderRatCard(outcome);
       await editUiCard(token,message.chat.id,message.message_id,origin,card,mediaEnabled,deps.externalFetch);
       console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'EDITED',updateId:update.update_id,action:action.action,
