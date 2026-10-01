@@ -95,7 +95,7 @@ export async function loadDumpsterLedger() {
 export function adaptPublicFeed(feed) {
   if (
     feed?.schemaVersion !== "binrat.public-feed/0.1" ||
-    feed.chainId !== 5042 ||
+    feed.chainId !== 4663 ||
     !Array.isArray(feed.bags) ||
     feed.historyCoverage !== "UNVERIFIED" ||
     !block(feed.asOfBlock) ||
@@ -103,7 +103,7 @@ export function adaptPublicFeed(feed) {
     feed.receipt?.projectionVersion !== "BINRAT_PUBLIC_PROJECTION_V0" ||
     typeof feed.receipt.receiptId !== "string" ||
     !feed.receipt.receiptId ||
-    feed.receipt.chainId !== 5042 ||
+    feed.receipt.chainId !== 4663 ||
     feed.receipt.asOfBlock !== feed.asOfBlock ||
     feed.receipt.asOfBlockHash !== feed.asOfBlockHash ||
     feed.receipt.historyCoverage !== "UNVERIFIED"
@@ -115,6 +115,7 @@ export function adaptPublicFeed(feed) {
     if (
       typeof bag?.id !== "string" ||
       !bag.id ||
+      bag.source !== "PONS_V2" ||
       typeof bag.symbol !== "string" ||
       typeof bag.name !== "string" ||
       !address(bag.token) ||
@@ -232,7 +233,7 @@ export async function loadBagIntelligence(bagId) {
   if (
     value?.schemaVersion !== "binrat.bag-intelligence/0.1" ||
     value.projectionVersion !== "BINRAT_BAG_INTELLIGENCE_V0" ||
-    value.chainId !== 5042 ||
+    value.chainId !== 4663 ||
     value.bagId !== bagId ||
     !["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value.observationCoverage) ||
     !Array.isArray(value.snapshots) ||
@@ -253,7 +254,7 @@ export async function loadCreatorFile(reportedCreatorAddress) {
   const value = await response.json();
   if (
     value?.schemaVersion !== "binrat.creator-file/0.1" ||
-    value.chainId !== 5042 ||
+    value.chainId !== 4663 ||
     String(value.reportedCreatorAddress).toLowerCase() !== String(reportedCreatorAddress).toLowerCase() ||
     value.historyCoverage !== "UNVERIFIED" ||
     !Number.isSafeInteger(value.indexedLaunchCount) ||
@@ -276,7 +277,7 @@ export async function loadReplayBundle(bagId) {
   if (
     value?.schemaVersion !== "binrat.replay-bundle/0.1" ||
     value.projectionVersion !== "BINRAT_REPLAY_BUNDLE_V0" ||
-    value.chainId !== 5042 ||
+    value.chainId !== 4663 ||
     value.launch?.id !== bagId ||
     value.historyCoverage !== "UNVERIFIED" ||
     !Array.isArray(value.stages) ||
