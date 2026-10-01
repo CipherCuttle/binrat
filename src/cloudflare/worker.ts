@@ -7,6 +7,8 @@ import { listWatches } from '../autonomous/watches.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
 import { ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
+import { RpcPonsOutcomeObservationSource } from '../pons/outcomeReceipts.js';
+import { buildRatTrapPresentation } from '../pons/ratTrapPresentation.js';
 import { resolveProductionFundingConfig } from '../dumpsterLedger/config.js';
 import { projectDumpsterLedger } from '../dumpsterLedger/project.js';
 import { projectBagIntelligence } from '../public/bagIntelligence.js';
@@ -50,10 +52,12 @@ import {
   proveHolderWallet
 } from './holderAuth.js';
 import type { D1DatabaseLike } from './d1Types.js';
+import { readPonsRatTrapProjection, type PonsRatTrapBlockPointReader } from './ponsRatTrapReadModel.js';
 import {
   enqueueSyncCycle,
   enqueuePonsSyncCycle,
   handleSyncQueueBatch,
+  resolveRobinhoodArchiveRpcUrl,
   type CloudflareSyncEnv,
   type SyncQueueBatchLike,
   type SyncQueueProducerLike
@@ -150,6 +154,7 @@ export interface WorkerDeps {
   now: () => number;
   holderEligibilitySource?: HolderEligibilitySource;
   watchSource?: WatchSource;
+  ponsRatTrapBlockSource?: PonsRatTrapBlockPointReader;
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -223,6 +228,10 @@ export async function handleWorkerRequest(
     return miniAppCase(request, env, deps.now());
   }
 
+  if (request.method === 'POST' && pathname === '/api/miniapp/rat-trap') {
+    return miniAppRatTrap(request, env, deps, deps.now());
+  }
+
   if (request.method === 'POST' && pathname === '/api/holder/challenge') {
     return holderChallenge(request, env, origin, deps);
   }
@@ -260,7 +269,7 @@ export async function handleWorkerRequest(
   return json(404, { error: 'NOT_FOUND' });
 }
 
-async function miniAppBody(request: Request): Promise<{ initData: string; caseId?: string }> {
+async function miniAppBody(request: Request): Promise<{ initData: string; caseId?: string; launchId?: string }> {
   const length = Number(request.headers.get('content-length') ?? '0');
   if (Number.isFinite(length) && length > 16 * 1024) throw new Error('MINI_APP_BODY_INVALID');
   let parsed: unknown;
@@ -269,7 +278,12 @@ async function miniAppBody(request: Request): Promise<{ initData: string; caseId
   const body = parsed as Record<string, unknown>;
   if (typeof body.initData !== 'string' || body.initData.length > 8192) throw new Error('MINI_APP_BODY_INVALID');
   if (body.caseId !== undefined && typeof body.caseId !== 'string') throw new Error('MINI_APP_BODY_INVALID');
-  return { initData: body.initData, ...(typeof body.caseId === 'string' ? { caseId: body.caseId } : {}) };
+  if (body.launchId !== undefined && typeof body.launchId !== 'string') throw new Error('MINI_APP_BODY_INVALID');
+  return {
+    initData: body.initData,
+    ...(typeof body.caseId === 'string' ? { caseId: body.caseId } : {}),
+    ...(typeof body.launchId === 'string' ? { launchId: body.launchId } : {})
+  };
 }
 
 function miniAppPrincipal(initData: string, env: BinratWorkerEnv, now: number) {
@@ -332,6 +346,41 @@ async function miniAppCase(request: Request, env: BinratWorkerEnv, now: number):
     miniAppPrincipal(body.initData, env, now);
     if (!body.caseId || !/^[0-9a-f]{64}$/.test(body.caseId)) throw new Error('MINI_APP_BODY_INVALID');
     return json(200, { receipt: await why(env.DB, body.caseId, now) });
+  } catch (error) { return miniAppError(error); }
+}
+
+async function miniAppRatTrap(
+  request: Request,
+  env: BinratWorkerEnv,
+  deps: WorkerDeps,
+  now: number
+): Promise<Response> {
+  try {
+    const body = await miniAppBody(request);
+    miniAppPrincipal(body.initData, env, now);
+    if (!body.launchId || !/^[0-9a-f]{64}$/i.test(body.launchId)) throw new Error('MINI_APP_BODY_INVALID');
+
+    const checkpoint = await env.DB.prepare(
+      'SELECT block_number FROM chain_checkpoints WHERE chain_id=? LIMIT 1'
+    ).bind(ROBINHOOD_CHAIN_ID).first<{block_number:string}>();
+    if (!checkpoint || !/^(0|[1-9]\d*)$/.test(checkpoint.block_number)) {
+      throw new Error('PONS_RAT_TRAP_CHECKPOINT_MISSING');
+    }
+    const asOfBlock = BigInt(checkpoint.block_number);
+    const blockSource = deps.ponsRatTrapBlockSource ?? (() => {
+      const archiveRpcUrl = resolveRobinhoodArchiveRpcUrl(env);
+      return new RpcPonsOutcomeObservationSource({
+        discoveryRpcUrl: archiveRpcUrl,
+        archiveRpcUrl
+      });
+    })();
+
+    const projection = await readPonsRatTrapProjection(env.DB, blockSource, {
+      currentLaunchId: body.launchId.toLowerCase(),
+      asOfBlock,
+      maxPreviousLaunches: 25
+    });
+    return json(200, { ratTrap: buildRatTrapPresentation(projection) });
   } catch (error) { return miniAppError(error); }
 }
 
