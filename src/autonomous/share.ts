@@ -90,9 +90,11 @@ export function renderShareArtifact(receipt: PublicShareReceipt): string {
 }
 
 export function renderOpenedReceipt(receipt: PublicShareReceipt): string {
-  const watch = receipt.subject.entityType === 'CREATOR'
-    ? `WATCH: /watch ${receipt.chainId}:CREATOR:${receipt.subject.entityId}`
-    : 'WATCH unavailable for this role in V1; WHY remains public.';
+  const watch = receipt.subject.entityType === 'CREATOR' && receipt.chainId === 4663
+    ? `WATCH: /watch 4663:CREATOR:${receipt.subject.entityId}`
+    : receipt.subject.entityType === 'CREATOR'
+      ? 'WATCH unavailable for Arc 5042 historical receipts; WHY remains public.'
+      : 'WATCH unavailable for this role in V1; WHY remains public.';
   return [
     '🐀 SOMEBODY LEFT YOU A RECEIPT.',
     `Subject: ${receipt.chainId === 4663 ? 'Robinhood/Pons' : 'Arc'} ${receipt.chainId} · ${receipt.subject.entityType} ${receipt.subject.entityId}`,
