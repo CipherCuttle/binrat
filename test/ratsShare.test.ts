@@ -37,7 +37,7 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.ok(first.candidates.every(candidate => candidate.entity.chainId===4663 && candidate.evidenceRefs.length>=2));
     assert.ok(first.candidates.every(candidate => candidate.reasons.every(reason => reason.evidenceRefs.length>0)));
     assert.equal(first.coverage.status,'PARTIAL');
-    assert.match(renderRats(first),/Coverage: PARTIAL/);
+    assert.match(renderRats(first),/Newest repeat activity first/);
     assert.ok(renderRats(first).length<4096);
     assert.doesNotMatch(JSON.stringify(first),/profit|p.?&.?l|smart.money|score|whale|insider/i);
     const receipt=await why(f.db,first.candidates[0]!.caseId,f.now());
