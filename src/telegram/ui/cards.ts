@@ -1,8 +1,7 @@
 import type { AutonomousOutcome } from '../../autonomous/outcome.js';
 import { type Receipt } from '../../autonomous/model.js';
-import { callbackButton, copyButton, webAppButton } from './keyboard.js';
+import { callbackButton, copyButton } from './keyboard.js';
 import { TELEGRAM_UI_RENDERER_VERSION, type RatCard } from './types.js';
-import { TELEGRAM_MINI_APP_URL } from '../config.js';
 
 export const TELEGRAM_V2_CAPTION_LIMIT = 1024;
 
@@ -16,6 +15,10 @@ function shortReference(value: string): string {
   return Array.from(value).length > 20 ? `${value.slice(0,10)}…${value.slice(-8)}` : value;
 }
 function launches(count: number): string { return `${count} launch${count === 1 ? '' : 'es'}`; }
+function launchLabel(launch: {symbol:string;name:string;token:string}): string {
+  const raw=launch.symbol.trim() ? `${launch.symbol.trim()}` : (launch.name.trim() || shortReference(launch.token));
+  return Array.from(raw).length > 24 ? `${Array.from(raw).slice(0,23).join('')}…` : raw;
+}
 function caseFact(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
   return `BINRAT found ${launches(receipt.evidenceRefs.length)} from this reported deployer.`;
 }
@@ -36,7 +39,7 @@ function watchCopy(reply: string): string {
   return '🐀 WATCH STATE CHANGED.\nCheck your watches for the current list.';
 }
 function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): string {
-  const visible=outcome.watches.slice(0,5);
+  const visible=outcome.watches.slice(0,25);
   const hidden=outcome.watches.length-visible.length;
   const lines=outcome.watches.length
     ? [
@@ -75,19 +78,21 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
     const prior=Math.max(1,count-1);
-    const latestName=latest.symbol ? String.fromCharCode(36) + latest.symbol : (latest.name || 'unnamed launch');
+    const latestName=launchLabel(latest);
+    const previous=(candidate.previousLaunches ?? []).slice(0,3).map(launchLabel);
     const pageCount=outcome.snapshot.candidates.length;
     const pageNav=[
-      ...(outcome.candidateIndex > 0 ? [callbackButton('Prev',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex-1})] : []),
-      ...(outcome.candidateIndex < pageCount-1 ? [callbackButton('Next',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex+1})] : [])
+      ...(outcome.candidateIndex > 0 ? [callbackButton('Newer',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex-1})] : []),
+      ...(outcome.candidateIndex < pageCount-1 ? [callbackButton('Older',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex+1})] : [])
     ];
     return card({view:'RATS',media:'repeat-creator',caption:[
       '🐀 REPEAT DEPLOYER ACTIVE.',
-      `Latest repeat launch: ${latestName} · block ${latest.blockNumber}`,
-      `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
+      `${latestName} just launched · block ${latest.blockNumber}`,
+      previous.length ? `Previous from same deployer: ${previous.join(' · ')}` : '',
+      `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'} total.`,
       'Watch this deployer and BINRAT will ping you if these paws launch again.',
-      `Rat ${outcome.candidateIndex+1} of ${pageCount} · newest repeat activity first.`
-    ].join('\n'),keyboard:[
+      `Fresh repeat ${outcome.candidateIndex+1}/${pageCount} · newest first.`
+    ].filter(Boolean).join('\n'),keyboard:[
       [callbackButton('Open case',{action:'CASE',shareId:id}),callbackButton('Watch deployer',{action:'WATCH',shareId:id})],
       [callbackButton('Why flagged',{action:'WHY',shareId:id}),copyButton('Copy deployer',candidate.entity.entityId)],
       ...(pageNav.length ? [pageNav] : []),
@@ -105,7 +110,6 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
       ? `🐀 WHY I NOTICED\n${whyFacts(outcome.receipt)}`
       : `🐀 CASE FILE\n${caseFact(outcome.receipt)}`,keyboard:[
       caseActions,
-      [webAppButton('Open Case',`${TELEGRAM_MINI_APP_URL}?case=${outcome.receipt.caseId}`)],
       [callbackButton('Full receipt',{action:'FULL',shareId:id}),callbackButton('Share',{action:'SHARE',shareId:id})],
       creator ? [copyButton('Copy address',creator)] : [],
       [callbackButton('Home',{action:'HOME'})]
@@ -117,7 +121,6 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
   if (outcome.kind === 'WATCHLIST') {
     const hasWatchState=outcome.watches.length > 0 || outcome.legacyWatchCount > 0;
     return card({view:hasWatchState?'WATCHLIST':'EMPTY',media:hasWatchState?'inquisitive':'empty-paws',caption:watchListCopy(outcome),keyboard:[
-      [webAppButton('Open Watch List',`${TELEGRAM_MINI_APP_URL}?view=watches`)],
       [callbackButton('Home',{action:'HOME'})]
     ]});
   }
