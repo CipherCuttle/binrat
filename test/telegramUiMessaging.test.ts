@@ -94,7 +94,8 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
     }
     assert.match(cards[0]!.caption,/freshest deployers that just came back/i);
     assert.match(cards[1]!.caption,/REPEAT DEPLOYER ACTIVE/);
-    assert.match(cards[1]!.caption,/\$FIXTURE just launched · block 100/);
+    assert.match(cards[1]!.caption,/Recent repeat launch: \$FIXTURE/);
+    assert.doesNotMatch(cards[1]!.caption,/block 100/);
     assert.match(cards[1]!.caption,/Previous from same deployer: \$FIXTURE/);
     assert.match(cards[1]!.caption,/1 earlier indexed launch total/);
     assert.match(cards[1]!.caption,/BINRAT will ping you if these paws launch again/);
