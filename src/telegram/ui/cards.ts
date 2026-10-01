@@ -64,9 +64,9 @@ function errorCopy(code: string): string {
   return "🐀 PIPE SMELLS WRONG.\nCan't verify fresh chain data right now.";
 }
 export function renderRatCard(outcome: AutonomousOutcome): RatCard {
-  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nCatch repeat launchers early.\nBINRAT remembers who launched what — and squeaks when familiar paws return.',keyboard:[
-    [callbackButton('Rats',{action:'RATS'}),callbackButton('DIG',{action:'DIG_PROMPT'})],
-    [callbackButton('Watches',{action:'WATCHES'})],[webAppButton('Open Radar',TELEGRAM_MINI_APP_URL)]
+  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nCatch repeat launchers early.\nRATS shows the freshest deployers that just came back. WATCH pings you if one launches again.',keyboard:[
+    [callbackButton('Fresh Rats',{action:'RATS'}),callbackButton('DIG',{action:'DIG_PROMPT'})],
+    [callbackButton('Watches',{action:'WATCHES'})]
   ]});
   if (outcome.kind === 'RATS') {
     const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
@@ -74,23 +74,23 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const id=share({shareId:candidate.caseId.slice(0,40)});
     const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
-    const retained=candidate.evidenceRefs.length;
-    const latestName=latest.symbol ? String.fromCharCode(36) + latest.symbol : (latest.name || 'latest launch');
+    const prior=Math.max(1,count-1);
+    const latestName=latest.symbol ? String.fromCharCode(36) + latest.symbol : (latest.name || 'unnamed launch');
     const pageCount=outcome.snapshot.candidates.length;
     const pageNav=[
       ...(outcome.candidateIndex > 0 ? [callbackButton('Prev',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex-1})] : []),
       ...(outcome.candidateIndex < pageCount-1 ? [callbackButton('Next',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex+1})] : [])
     ];
     return card({view:'RATS',media:'repeat-creator',caption:[
-      `🐀 SAME PAWS. ${launches(count).toUpperCase()} INDEXED.`,
-      `Latest: ${latestName} · block ${latest.blockNumber}`,
-      `${retained} retained receipt${retained===1?'':'s'} back this card.`,
-      `Rat ${outcome.candidateIndex+1} of ${pageCount}.`
+      '🐀 REPEAT DEPLOYER ACTIVE.',
+      `Latest repeat launch: ${latestName} · block ${latest.blockNumber}`,
+      `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
+      'Watch this deployer and BINRAT will ping you if these paws launch again.',
+      `Rat ${outcome.candidateIndex+1} of ${pageCount} · newest repeat activity first.`
     ].join('\n'),keyboard:[
-      [callbackButton('Investigate',{action:'CASE',shareId:id}),callbackButton('Watch',{action:'WATCH',shareId:id})],
-      [callbackButton('Why',{action:'WHY',shareId:id}),copyButton('Copy address',candidate.entity.entityId)],
+      [callbackButton('Open case',{action:'CASE',shareId:id}),callbackButton('Watch deployer',{action:'WATCH',shareId:id})],
+      [callbackButton('Why flagged',{action:'WHY',shareId:id}),copyButton('Copy deployer',candidate.entity.entityId)],
       ...(pageNav.length ? [pageNav] : []),
-      [webAppButton('Open Radar',TELEGRAM_MINI_APP_URL)],
       [callbackButton('Home',{action:'HOME'})]
     ]});
   }
