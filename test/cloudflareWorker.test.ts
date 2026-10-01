@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHmac } from 'node:crypto';
 import test from 'node:test';
 import worker from '../src/cloudflare/worker.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
@@ -164,6 +165,71 @@ test('Cloudflare read API projects the same durable BINRAT evidence from D1', as
 
     const capabilities = await worker.fetch(new Request('https://binrat.example/api/capabilities'), env);
     assert.equal(capabilities.status, 200);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+test('Mini App bootstrap exposes the same verified 4663 latest launches and recurrence summary', async () => {
+  const db = new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store = new D1Store(db,4663);
+  const runtime = new D1RuntimeStateStore(db,4663);
+  const now = Date.now();
+  const creator = address(77);
+  try {
+    const launches: LaunchObserved[] = [];
+    for (const blockNumber of [100n,101n]) {
+      const launcher=address(1),txHash=hex64(Number(blockNumber)+1000),token=address(Number(blockNumber)+2000);
+      const launch: LaunchObserved = {
+        launchId:await deriveLaunchId({chainId:4663,launcher,txHash,token,source:'PONS_V2'}),
+        eventId:await deriveEventId({chainId:4663,launcher,txHash,logIndex:0,source:'PONS_V2'}),
+        chainId:4663,blockNumber,blockHash:hex64(Number(blockNumber)),observedAtMs:now,
+        source:'PONS_V2',launcher,txHash,logIndex:0,token,creator,pool:address(Number(blockNumber)+3000),
+        name:blockNumber===101n?'Latest Rat':'Older Rat',symbol:blockNumber===101n?'NEW':'OLD',
+        imageUri:'',website:'',twitter:'',telegram:''
+      };
+      launches.push(launch);
+      await store.putLaunch(launch);
+      await store.putProvenanceFact(await buildProvenanceFact(launch));
+    }
+    await store.commitCheckpoint({blockNumber:101n,blockHash:hex64(101),guardBlockNumber:100n,guardBlockHash:hex64(100)});
+    await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:103n,targetBlock:101n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,
+      lastHistoryError:null,lastObservationError:null,updatedAtMs:now});
+
+    const token='123456:fixture-token';
+    const fields={
+      auth_date:String(Math.floor(now/1000)),
+      query_id:'surface-authority-test',
+      user:JSON.stringify({id:77,first_name:'Rat Tester'})
+    };
+    const check=Object.entries(fields).sort(([a],[b])=>a.localeCompare(b)).map(([key,value])=>`${key}=${value}`).join('\n');
+    const secret=createHmac('sha256','WebAppData').update(token).digest();
+    const hash=createHmac('sha256',secret).update(check).digest('hex');
+    const initData=new URLSearchParams({...fields,hash}).toString();
+
+    const response=await worker.fetch(new Request('https://binrat.example/api/miniapp/bootstrap',{
+      method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({initData})
+    }),{
+      DB:db,TELEGRAM_BOT_TOKEN:token,BINRAT_AUTONOMOUS_RAT_ENABLED:'true',BINRAT_TELEGRAM_UI_V2_ENABLED:'true',
+      BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED:'false',BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID:'77',
+      RAT_CANDIDATE_ALLOWED_USER_ID:'77'
+    });
+    assert.equal(response.status,200);
+    const body=await response.json() as {
+      latestLaunches:Array<{symbol:string;blockNumber:string;deployer:string;priorLaunchCount:number}>;
+      rats:{chainId:number;candidates:Array<{recurrenceCount:number;latestLaunch:{symbol:string;blockNumber:string}}>}
+    };
+    assert.equal(body.latestLaunches[0]?.symbol,'NEW');
+    assert.equal(body.latestLaunches[0]?.blockNumber,'101');
+    assert.equal(body.latestLaunches[0]?.deployer,creator);
+    assert.equal(body.latestLaunches[0]?.priorLaunchCount,1);
+    assert.equal(body.rats.chainId,4663);
+    assert.equal(body.rats.candidates[0]?.recurrenceCount,2);
+    assert.equal(body.rats.candidates[0]?.latestLaunch.symbol,'NEW');
+    assert.equal(body.rats.candidates[0]?.latestLaunch.blockNumber,'101');
   } finally {
     store.close();
     db.close();
