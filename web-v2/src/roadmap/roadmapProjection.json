@@ -1,0 +1,103 @@
+{
+  "authority": "docs/ROADMAP.md",
+  "languageAuthority": "docs/PRODUCT_LANGUAGE.md",
+  "stages": [
+    {
+      "id": "sniff",
+      "index": 1,
+      "title": "SNIFF",
+      "headline": "THE RAT CATCHES THE LAUNCH.",
+      "literal": "Find the launch and preserve the first receipt before the trail gets rewritten.",
+      "features": [
+        { "id": "pons_live_intelligence", "label": "Pons Live Intelligence" },
+        { "id": "rats_discovery", "label": "RATS" },
+        { "id": "dig_case", "label": "DIG" },
+        { "id": "rat_radar", "label": "Rat Radar" }
+      ],
+      "side": "left",
+      "accent": "var(--green)"
+    },
+    {
+      "id": "remember",
+      "index": 2,
+      "title": "REMEMBER",
+      "headline": "SITES VANISH. THE TRAIL DOESN'T.",
+      "literal": "Keep the history, replay what was knowable at the time, and preserve evidence that later disappears.",
+      "features": [
+        { "id": "launch_memory", "label": "Launch Memory" },
+        { "id": "trash_trails", "label": "Trash Trails" },
+        { "id": "replay_lab", "label": "Replay Lab" },
+        { "id": "dead_drops", "label": "Dead Drops" }
+      ],
+      "side": "right",
+      "accent": "var(--orange)"
+    },
+    {
+      "id": "watch",
+      "index": 3,
+      "title": "WATCH",
+      "headline": "LEAVE A TRIPWIRE IN THE TRASH.",
+      "literal": "Notice when observed structure moves again without turning alerts into trading recommendations.",
+      "features": [
+        { "id": "rat_watch", "label": "Rat Watch" },
+        { "id": "observation_alerts", "label": "Observation Alerts" },
+        { "id": "trash_dna_tripwires", "label": "Trash DNA Tripwires" },
+        { "id": "webhook_alerts", "label": "Webhook Alerts" }
+      ],
+      "side": "left",
+      "accent": "var(--bone)"
+    },
+    {
+      "id": "hunt",
+      "index": 4,
+      "title": "HUNT",
+      "headline": "POINT THE RATS AT SOMETHING WORTH DIGGING.",
+      "literal": "Turn curiosity and degen energy into bounded evidence work.",
+      "features": [
+        { "id": "trash_dna", "label": "Trash DNA" },
+        { "id": "trash_hunts", "label": "Trash Hunts" },
+        { "id": "trash_bounties", "label": "Trash Bounties" },
+        { "id": "dumpster_raids", "label": "Dumpster Raids" },
+        { "id": "feed_the_rat", "label": "Feed the Rat" },
+        { "id": "bounty_boost", "label": "Bounty Boost" },
+        { "id": "case_sponsor", "label": "Case Sponsor" }
+      ],
+      "ratLine": "DEGEN DECIDES ATTENTION. RECEIPTS DECIDE TRUTH.",
+      "side": "right",
+      "accent": "var(--orange)"
+    },
+    {
+      "id": "organize",
+      "index": 5,
+      "title": "ORGANIZE",
+      "headline": "USEFUL WORK EARNS A RECEIPT.",
+      "literal": "Coordinate contributors without letting money, popularity or token balance buy factual authority.",
+      "features": [
+        { "id": "rat_credits", "label": "Rat Credits" },
+        { "id": "proof_of_first", "label": "Proof of First" },
+        { "id": "rat_reputation", "label": "Rat Reputation" },
+        { "id": "case_files", "label": "Case Files" },
+        { "id": "creator_right_of_reply", "label": "Creator Right of Reply" },
+        { "id": "rat_den", "label": "Rat Den" }
+      ],
+      "side": "left",
+      "accent": "var(--purple)"
+    },
+    {
+      "id": "autonomous_rat",
+      "index": 6,
+      "title": "AUTONOMOUS RAT",
+      "headline": "GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.",
+      "literal": "Automation can investigate, replay and distribute evidence. It never becomes evidence authority itself.",
+      "features": [
+        { "id": "autonomous_rat", "label": "Autonomous Rat" },
+        { "id": "rat_machine", "label": "Rat Machine" },
+        { "id": "rat_lab", "label": "Rat Lab" },
+        { "id": "rat_api", "label": "Rat API" },
+        { "id": "rat_nodes", "label": "Rat Nodes" }
+      ],
+      "side": "right",
+      "accent": "var(--red)"
+    }
+  ]
+}

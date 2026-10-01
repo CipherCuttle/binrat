@@ -5,6 +5,8 @@ import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode 
 import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
+import { RoadmapPage } from "./roadmap/RoadmapPage";
+import { MotionLabPage } from "./roadmap/MotionLabPage";
 import type {
   Bag,
   EvidenceState,
@@ -37,6 +39,8 @@ type Route =
   | { page: "watch" }
   | { page: "ledger" }
   | { page: "binrat" }
+  | { page: "roadmap" }
+  | { page: "roadmapMotionLab" }
   | { page: "bag"; id: string }
   | { page: "placeholder"; name: string };
 const primaryNav = [
@@ -54,6 +58,14 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
+  const previewMotionLab = new URLSearchParams(window.location.search).get("motionlab") === "1";
+  if ((path === "/" || path === "/index.html") && previewMotionLab) {
+    return { page: "roadmapMotionLab" };
+  }
+  if (
+    (path === "/" || path === "/index.html") &&
+    import.meta.env.VITE_ROADMAP_MOTION_LAB_PREVIEW === "1"
+  ) return { page: "roadmapMotionLab" };
   if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/saved") return { page: "saved" };
   if (path === "/more") return { page: "more" };
@@ -68,6 +80,8 @@ function readRoute(): Route {
   if (path === "/watch") return { page: "watch" };
   if (path === "/ledger") return { page: "ledger" };
   if (path === "/binrat") return { page: "binrat" };
+  if (path === "/roadmap") return { page: "roadmap" };
+  if (path === "/roadmap-motion-lab") return { page: "roadmapMotionLab" };
   if (path.startsWith("/bag/"))
     return { page: "bag", id: bagIdFromPath(path) };
   return { page: "placeholder", name: path.slice(1).toUpperCase() || "HOME" };
@@ -125,6 +139,24 @@ export default function App() {
         : "smooth",
     });
   };
+  if (route.page === "roadmap") {
+    return (
+      <div className="roadmap-route-frame">
+        <a className="skip-link" href="#content">Skip to roadmap</a>
+        <main id="content" tabIndex={-1}>
+          <RoadmapPage navigate={navigate} />
+        </main>
+      </div>
+    );
+  }
+  if (route.page === "roadmapMotionLab") {
+    return (
+      <main id="content" tabIndex={-1}>
+        <MotionLabPage navigate={navigate} />
+      </main>
+    );
+  }
+
   const requestedBag = feed && route.page === "bag"
     ? findBagAtCheckpoint(feed, route.id)
     : undefined;

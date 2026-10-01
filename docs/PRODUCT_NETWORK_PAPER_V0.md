@@ -1,3 +1,6 @@
+> **SCOPE: BACKBURNER / LONG-HORIZON VISION, NOT CURRENT STATUS, ROLE, ROADMAP, OR EXECUTION AUTHORITY.**  
+> Current authority starts at `docs/README.md`. Older ArcPad and “creator” examples below are historical concept language. Current Pons/Robinhood role vocabulary is defined in `docs/PRODUCT_LANGUAGE.md`, where `DEPLOYER` remains an exact event role.
+
 # BINRAT PRODUCT / NETWORK PAPER V0.1
 
 Status: product / network + early fair-launch design draft  
