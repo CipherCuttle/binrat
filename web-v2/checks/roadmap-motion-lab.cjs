@@ -38,6 +38,12 @@ async function capture(browser, width, height) {
     await scrollToProgress(page, 1);
     const root = page.locator("[data-motion-lab]");
     assert.equal(await root.getAttribute("data-active-index"), "5");
+    await page.waitForFunction(() => {
+      const lab = document.querySelector("[data-motion-lab]");
+      const pulse = document.querySelector(".motion-lab__pulse");
+      if (!lab || !pulse) return false;
+      return lab.getAttribute("data-docked") === "true" && Number(getComputedStyle(pulse).opacity) < 0.08;
+    }, undefined, { timeout: 4000 });
     assert.equal(await root.getAttribute("data-docked"), "true", "signal head docks at the final milestone");
     const pulseOpacity = await page.locator(".motion-lab__pulse").evaluate((node) => Number(getComputedStyle(node).opacity));
     assert.ok(pulseOpacity < 0.08, "docked signal head disappears, opacity=" + pulseOpacity);
