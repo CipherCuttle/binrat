@@ -45,3 +45,15 @@ test('Mini App Rat Watch presents recognizable trail context before protocol ide
   assert.doesNotMatch(app,/\$\{watch\.chainId\} · \$\{watch\.policy\}/);
   assert.doesNotMatch(app,/Future indexed launches after block/);
 });
+
+
+test('Mini App shell integrates Telegram BackButton without changing backend state', () => {
+  const app=readFileSync(new URL('../web/app/app.js',import.meta.url),'utf8');
+  assert.match(app,/BackButton\?\.onClick\?\.\(backView\)/);
+  assert.match(app,/if\(state\.view==='home'\) back\.hide\(\)/);
+  assert.match(app,/else back\.show\(\)/);
+  assert.match(app,/state\.viewStack\.push\(previous\)/);
+  assert.match(app,/const prior=state\.viewStack\.pop\(\) \|\| 'home'/);
+  assert.match(app,/show\(prior,\{remember:false\}\)/);
+  assert.doesNotMatch(app,/history\.pushState|history\.replaceState/);
+});
