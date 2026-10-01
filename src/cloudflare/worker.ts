@@ -301,15 +301,26 @@ async function miniAppBootstrap(request: Request, env: BinratWorkerEnv, now: num
   try {
     const body = await miniAppBody(request);
     const principal = miniAppPrincipal(body.initData, env, now);
-    const [rats, watches, sourceHealth] = await Promise.all([
+    const [rats, watches, sourceHealth, ready] = await Promise.all([
       discoverRats(env.DB, now),
       listWatches(env.DB, { userId: principal.userId, chatId: principal.chatId }),
-      chainHealth(env, ROBINHOOD_CHAIN_ID)
+      chainHealth(env, ROBINHOOD_CHAIN_ID),
+      readyContext(env)
     ]);
+    if (!ready || ready.feed.chainId !== ROBINHOOD_CHAIN_ID) throw new Error('MINI_APP_INDEX_UNAVAILABLE');
     return json(200, {
       user: { firstName: principal.user.first_name ?? null, username: principal.user.username ?? null },
       sourceHealth,
       rats,
+      latestLaunches: ready.feed.bags.slice(0, 20).map(bag => ({
+        launchId: bag.id,
+        token: bag.token,
+        symbol: bag.symbol,
+        name: bag.name,
+        blockNumber: bag.blockNumber,
+        deployer: bag.reportedCreatorAddress,
+        priorLaunchCount: bag.trashTrail.priorLaunchCount
+      })),
       watches: watches.map(watch => ({
         chainId: watch.chain_id, entityType: watch.entity_type, entityId: watch.entity_id,
         startBlock: watch.start_block, createdAtMs: watch.created_at_ms, policy: watch.policy
@@ -361,6 +372,13 @@ export async function handleBinratApiRequest(
     if (pathname === '/api/feed') return json(200, feed);
 
     if (pathname === '/api/rat-radar/watchlist') {
+      if (feed.chainId === ROBINHOOD_CHAIN_ID) {
+        return json(410, {
+          error: 'LEGACY_ARC_RADAR_RETIRED',
+          chainId: ROBINHOOD_CHAIN_ID,
+          replacement: 'PONS_DEPLOYER_RECURRENCE'
+        });
+      }
       const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
       const receipts = await radar.listThroughBlock(BigInt(feed.asOfBlock));
       const depth = url.searchParams.get('depth');
