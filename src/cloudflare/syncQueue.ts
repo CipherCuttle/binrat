@@ -513,7 +513,7 @@ export async function runCloudflarePonsSyncCycle(
     // Near head remains deliberately compact.  Backlog slices use an adaptive
     // Pons-only range, always narrowed before a checkpoint when event density
     // requires it.  The queue/lease remains a single checkpoint authority.
-    const steadyMaxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 512, 1, 4_096));
+    const steadyMaxBatchBlocks = BigInt(integerSetting(env.BINRAT_PONS_MAX_BATCH_BLOCKS, 1_024, 1, 4_096));
     const catchupMaxBatchBlocks = BigInt(integerSetting(
       env.BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS, PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS, PONS_CATCHUP_INITIAL_BATCH_BLOCKS, 8_192
     ));
