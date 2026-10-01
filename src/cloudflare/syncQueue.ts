@@ -112,7 +112,7 @@ const LIVE_SYNC_LEASE_MS = 120_000;
 // reads inside its unchanged 60s work budget; Arc keeps its existing lease.
 export const PONS_SYNC_LEASE_MS = 180_000;
 export const PONS_TOKEN_IDENTITY_LEASE_MS = 120_000;
-export const PONS_OUTCOME_LEASE_MS = 120_000;
+export const PONS_OUTCOME_LEASE_MS = 180_000;
 const PONS_CATCHUP_INITIAL_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCHES = 4;
@@ -747,6 +747,12 @@ export async function runCloudflarePonsOutcomeCycle(
   if (!(await lease.claim(PONS_OUTCOME_LEASE_NAME,message.cycleId,deps.now(),PONS_OUTCOME_LEASE_MS))) {
     return {status:'BUSY'};
   }
+  let ponsWriterClaimed=false;
+  if (!(await lease.claim(PONS_SYNC_LEASE_NAME,message.cycleId,deps.now(),PONS_SYNC_LEASE_MS))) {
+    await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
+    return {status:'BUSY'};
+  }
+  ponsWriterClaimed=true;
 
   try {
     const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
@@ -786,6 +792,7 @@ export async function runCloudflarePonsOutcomeCycle(
     console.error(JSON.stringify({event:'PONS_OUTCOME_FAILED',cycleId:message.cycleId,code}));
     return {status:'RETRY',code};
   } finally {
+    if (ponsWriterClaimed) await lease.release(PONS_SYNC_LEASE_NAME,message.cycleId);
     await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
   }
 }
