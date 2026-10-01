@@ -85,10 +85,12 @@ interface LatestLaunchRow {
 }
 
 async function hasPonsTokenIdentitySchema(db:D1DatabaseLike):Promise<boolean> {
-  const row=await db.prepare(
-    "SELECT 1 AS present FROM sqlite_master WHERE type='table' AND name='pons_token_identity_receipts' LIMIT 1"
-  ).first<{present:number}>();
-  return row?.present===1;
+  const row=await db.prepare(`
+    SELECT COUNT(*) AS n
+    FROM pragma_table_info('pons_token_identity_receipts')
+    WHERE name IN ('launch_id','payload_json')
+  `).first<{n:number}>();
+  return Number(row?.n ?? 0)===2;
 }
 
 function identityLaunchSelect(identitySchema:boolean):string {
