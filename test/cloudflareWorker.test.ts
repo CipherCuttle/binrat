@@ -236,6 +236,43 @@ test('Mini App bootstrap exposes the same verified 4663 latest launches and recu
   }
 });
 
+test('active Robinhood authority retires every legacy Arc Rat Radar route instead of mixing chains', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const runtime=new D1RuntimeStateStore(db,4663);
+  const now=Date.now();
+  try {
+    const launcher=address(11),txHash=hex64(12),token=address(13),creator=address(14);
+    const launch: LaunchObserved={
+      launchId:await deriveLaunchId({chainId:4663,launcher,txHash,token,source:'PONS_V2'}),
+      eventId:await deriveEventId({chainId:4663,launcher,txHash,logIndex:0,source:'PONS_V2'}),
+      chainId:4663,blockNumber:100n,blockHash:hex64(100),observedAtMs:now,source:'PONS_V2',
+      launcher,txHash,logIndex:0,token,creator,pool:address(15),name:'Pons Rat',symbol:'PRAT',
+      imageUri:'',website:'',twitter:'',telegram:''
+    };
+    await store.putLaunch(launch);
+    await store.putProvenanceFact(await buildProvenanceFact(launch));
+    await store.commitCheckpoint({blockNumber:100n,blockHash:hex64(100),guardBlockNumber:null,guardBlockHash:null});
+    await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:102n,targetBlock:100n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,
+      lastHistoryError:null,lastObservationError:null,updatedAtMs:now});
+
+    for (const path of [
+      '/api/rat-radar/watchlist',
+      '/api/rat-radar/activity/'+'a'.repeat(64),
+      '/api/rat-radar/address/'+address(99)+'/activity'
+    ]) {
+      const response=await worker.fetch(new Request('https://binrat.example'+path),{DB:db});
+      assert.equal(response.status,410,path);
+      const body=await response.json() as Record<string,unknown>;
+      assert.equal(body.error,'LEGACY_ARC_RADAR_RETIRED');
+      assert.equal(body.chainId,4663);
+      assert.equal(body.replacement,'PONS_DEPLOYER_RECURRENCE');
+    }
+  } finally { store.close(); db.close(); }
+});
+
 test('Cloudflare read API refuses stale runtime authority even when old evidence remains durable', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
