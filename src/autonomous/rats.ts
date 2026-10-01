@@ -43,8 +43,16 @@ export interface LatestPonsLaunch {
   symbol: string;
   name: string;
   blockNumber: string;
+  txHash: string;
   deployer: string;
   priorLaunchCount: number;
+  factId: string;
+  metadata: {
+    imageUri: string;
+    website: string;
+    twitter: string;
+    telegram: string;
+  };
 }
 
 interface LatestLaunchRow {
@@ -53,7 +61,12 @@ interface LatestLaunchRow {
   symbol: string;
   name: string;
   block_number: string;
+  tx_hash: string;
   creator: string;
+  image_uri: string;
+  website: string;
+  twitter: string;
+  telegram: string;
   prior_launch_count: number;
 }
 
@@ -65,7 +78,8 @@ export async function latestPonsLaunches(
   const chainId = 4663;
   const tip = await authoritativeCheckpoint(db, now, chainId);
   const limit = Math.max(1, Math.min(20, requestedLimit));
-  const result = await db.prepare(`SELECT l.launch_id,l.token,l.symbol,l.name,l.block_number,l.creator,
+  const result = await db.prepare(`SELECT l.launch_id,l.token,l.symbol,l.name,l.block_number,l.tx_hash,l.creator,
+      l.image_uri,l.website,l.twitter,l.telegram,
       (SELECT COUNT(DISTINCT p.launch_id)
        FROM launches p JOIN provenance_facts pf ON pf.launch_id=p.launch_id AND pf.chain_id=p.chain_id
        WHERE p.chain_id=l.chain_id AND p.source='PONS_V2' AND p.creator=l.creator
@@ -84,9 +98,11 @@ export async function latestPonsLaunches(
   const output: LatestPonsLaunch[] = [];
   for (const row of result.results ?? []) {
     if (!/^[0-9a-f]{64}$/.test(row.launch_id) || !/^0x[0-9a-f]{40}$/.test(row.token) ||
-        !/^0x[0-9a-f]{40}$/.test(row.creator) || !/^\d+$/.test(row.block_number) ||
+        !/^0x[0-9a-f]{64}$/.test(row.tx_hash) || !/^0x[0-9a-f]{40}$/.test(row.creator) || !/^\d+$/.test(row.block_number) ||
         !Number.isSafeInteger(Number(row.prior_launch_count)) || Number(row.prior_launch_count) < 0 ||
-        typeof row.symbol !== 'string' || typeof row.name !== 'string') {
+        typeof row.symbol !== 'string' || typeof row.name !== 'string' ||
+        typeof row.image_uri !== 'string' || typeof row.website !== 'string' ||
+        typeof row.twitter !== 'string' || typeof row.telegram !== 'string') {
       throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
     }
     // Re-validate the canonical provenance receipt for every launch we expose.
@@ -96,7 +112,9 @@ export async function latestPonsLaunches(
     }
     output.push({
       launchId:row.launch_id,token:row.token,symbol:row.symbol,name:row.name,
-      blockNumber:row.block_number,deployer:row.creator,priorLaunchCount:Number(row.prior_launch_count)
+      blockNumber:row.block_number,txHash:row.tx_hash,deployer:row.creator,
+      priorLaunchCount:Number(row.prior_launch_count),factId:evidence.factId,
+      metadata:{imageUri:row.image_uri,website:row.website,twitter:row.twitter,telegram:row.telegram}
     });
   }
   return output;
