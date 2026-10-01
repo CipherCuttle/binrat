@@ -1,3 +1,4 @@
+# PR #75 only: read-only live capability proof; no deploy or writes.
 name: pons-outcome-capability-probe
 
 on:
