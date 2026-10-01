@@ -20,7 +20,7 @@ function launchLabel(launch: {symbol:string;name:string;token:string}): string {
   return Array.from(raw).length > 24 ? `${Array.from(raw).slice(0,23).join('')}…` : raw;
 }
 function caseFact(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
-  return `BINRAT found ${launches(receipt.evidenceRefs.length)} from this reported deployer.`;
+  return `Trash Trail: ${launches(receipt.evidenceRefs.length)} with retained receipts from this reported deployer.`;
 }
 function whyFacts(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
   const latest=receipt.evidenceRefs[0];
@@ -32,7 +32,7 @@ function whyFacts(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string
   ].filter(Boolean).join('\n');
 }
 function watchCopy(reply: string): string {
-  if (/already watching|watch armed/i.test(reply)) return '🐀 WATCHING THESE PAWS. ✓\nA future indexed launch will bring you back.';
+  if (/already watching|watch armed/i.test(reply)) return '🐀 RAT WATCH SET. ✓\nI’ll squeak if these paws launch again.';
   if (/stopped watching/i.test(reply)) return '🐀 PAWS RELEASED.\nNo more alerts for this watch.';
   if (/superseded by a newer watch command/i.test(reply)) return '🐀 NEWER PAW COMMAND WON.\nNo watch changed.';
   if (/watch limit reached/i.test(reply)) return '🐀 BIN IS FULL.\nNo new watch was added.';
@@ -43,12 +43,12 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
   const hidden=outcome.watches.length-visible.length;
   const lines=outcome.watches.length
     ? [
-        `🐀 WATCHING ${outcome.watches.length} SET${outcome.watches.length === 1 ? '' : 'S'} OF PAWS.`,
+        `🐀 RAT WATCH · ${outcome.watches.length} SET${outcome.watches.length === 1 ? '' : 'S'} OF PAWS.`,
         ...visible.map(w=>`• ${shortReference(w.entity_id)}`),
         hidden > 0 ? `+ ${hidden} more active watch${hidden === 1 ? '' : 'es'} in the full list.` : '',
-        'I squeak only when a new indexed launch appears.'
+        'I’ll squeak when one of these paws launches again.'
       ]
-    : ['🐀 NOTHING IN THE BIN.','No active V1 watches.'];
+    : ['🐀 RAT WATCH.','No traps worth keeping yet.'];
   if (outcome.legacyWatchCount > 0) {
     lines.push(`${outcome.legacyWatchCount} legacy watch${outcome.legacyWatchCount === 1 ? '' : 'es'} ${outcome.legacyWatchCount === 1 ? 'is' : 'are'} not active here; re-arm explicitly on Pons 4663.`);
   }
@@ -56,24 +56,24 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
 }
 function errorCopy(code: string): string {
   if (/capacity|limit reached/i.test(code)) return '🐀 BIN IS FULL FOR NOW.\nTry again after 00:00 UTC.';
-  if (/live index is unavailable or stale/i.test(code)) return '🐀 INDEX WENT COLD.\nFresh Pons 4663 state is not verified right now. No new claim was made; try again shortly.';
-  if (/fresh canonical Robinhood boundary could not be verified/i.test(code)) return '🐀 PONS HEAD NOT VERIFIED.\nThe live boundary could not be checked, so no Watch was added.';
+  if (/live index is unavailable or stale/i.test(code)) return '🐀 LOST THE TRAIL.\nFresh Pons receipts are not verified right now. No new claim made.';
+  if (/fresh canonical Robinhood boundary could not be verified/i.test(code)) return '🐀 STUCK IN A PIPE.\nCould not verify the live Pons boundary. Nothing invented.';
   if (/snapshot is unavailable|snapshot.*expired/i.test(code)) return '🐀 THAT RAT PAGE EXPIRED.\nOpen RATS again for a fresh discovery snapshot.';
   if (/discovery receipts are unavailable/i.test(code)) return '🐀 RAT RECEIPTS UNAVAILABLE.\nI could not reconstruct a verified discovery snapshot.';
   if (/discovery receipts could not be saved|discovery retention is unavailable/i.test(code)) return '🐀 RAT SNAPSHOT NOT SAVED.\nDiscovery evidence could not be persisted safely. No Rat card was invented.';
   if (/receipt/i.test(code)) return "🐀 THAT RECEIPT ISN'T HERE.\nIt may have expired or failed verification.";
   if (/live watches|historical evidence/i.test(code)) return '🐀 OLD TRAIL ONLY.\nArc 5042 stays historical. Live watches run on Pons 4663.';
   if (/malformed|unsupported/i.test(code)) return '🐀 WRONG KIND OF SCRAP.\nPaste a deployer address and I\'ll check it.';
-  return "🐀 PIPE SMELLS WRONG.\nCan't verify fresh chain data right now.";
+  return "🐀 LOST THE TRAIL.\nCan't verify the next receipt right now.";
 }
 export function renderRatCard(outcome: AutonomousOutcome): RatCard {
-  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nCatch repeat launchers early.\nRATS shows the freshest deployers that just came back. WATCH pings you if one launches again.',keyboard:[
-    [callbackButton('Fresh Rats',{action:'RATS'}),callbackButton('DIG',{action:'DIG_PROMPT'})],
-    [callbackButton('Watches',{action:'WATCHES'})]
+  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nI dig through Pons garbage. When something smells worth keeping, I bring back the receipts.',keyboard:[
+    [callbackButton('Fresh Garbage',{action:'RATS'}),callbackButton('Dig',{action:'DIG_PROMPT'})],
+    [callbackButton('Rat Watch',{action:'WATCHES'})]
   ]});
   if (outcome.kind === 'RATS') {
     const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
-    if (!candidate) return card({view:'EMPTY',media:'empty-paws',caption:'🐀 NOTHING IN THE BIN.\nNo repeat launchers in BINRAT\'s current memory.',keyboard:[[callbackButton('DIG',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]});
+    if (!candidate) return card({view:'EMPTY',media:'empty-paws',caption:'🐀 EMPTY PAWS.\nNothing fresh in the bin is leaving a familiar trail right now.',keyboard:[[callbackButton('Dig',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]});
     const id=share({shareId:candidate.caseId.slice(0,40)});
     const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
@@ -86,15 +86,14 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
       ...(outcome.candidateIndex < pageCount-1 ? [callbackButton('Older',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex+1})] : [])
     ];
     return card({view:'RATS',media:'repeat-creator',caption:[
-      '🐀 REPEAT DEPLOYER ACTIVE.',
-      `Recent repeat launch: ${latestName}`,
-      previous.length ? `Previous from same deployer: ${previous.join(' · ')}` : '',
-      `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'} total.`,
-      'Watch this deployer and BINRAT will ping you if these paws launch again.',
-      `Fresh repeat ${outcome.candidateIndex+1}/${pageCount} · newest first.`
-    ].filter(Boolean).join('\n'),keyboard:[
-      [callbackButton('Open case',{action:'CASE',shareId:id}),callbackButton('Watch deployer',{action:'WATCH',shareId:id})],
-      [callbackButton('Why flagged',{action:'WHY',shareId:id}),copyButton('Copy deployer',candidate.entity.entityId)],
+      '🐀 SMELLS FAMILIAR.',
+      `Fresh Garbage: ${latestName}`,
+      previous.length ? `Same paws left receipts on ${previous.join(' · ')}.` : 'Same paws left older receipts in the bin.',
+      'That is a trail worth digging. Not a verdict.',
+      `Fresh find ${outcome.candidateIndex+1}/${pageCount} · newest first.`
+    ].join('\n'),keyboard:[
+      [callbackButton('Dig Deeper',{action:'CASE',shareId:id})],
+      [callbackButton('Receipts',{action:'WHY',shareId:id}),copyButton('Copy deployer',candidate.entity.entityId)],
       ...(pageNav.length ? [pageNav] : []),
       [callbackButton('Home',{action:'HOME'})]
     ]});
@@ -103,12 +102,11 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const id=share(outcome.receipt); const creator=outcome.receipt.evidenceRefs[0]?.creator;
     const isWhy=outcome.mode === 'WHY';
     const caseActions=creator
-      ? [callbackButton(isWhy ? 'Investigate' : 'Why',{action:isWhy ? 'CASE' : 'WHY',shareId:id}),
-          ...(outcome.receipt.chainId === 4663 ? [callbackButton('Watch',{action:'WATCH',shareId:id})] : [])]
+      ? [callbackButton(isWhy ? 'Back to case' : 'Receipts',{action:isWhy ? 'CASE' : 'WHY',shareId:id})]
       : [];
     return card({view:isWhy?'WHY':'CASE',media:outcome.receipt.discovery?'repeat-creator':'evidence-found',caption:isWhy
-      ? `🐀 WHY I NOTICED\n${whyFacts(outcome.receipt)}`
-      : `🐀 CASE FILE\n${caseFact(outcome.receipt)}`,keyboard:[
+      ? `🐀 RECEIPTS\n${whyFacts(outcome.receipt)}`
+      : `🐀 DUG IT UP.\n${caseFact(outcome.receipt)}`,keyboard:[
       caseActions,
       [callbackButton('Full receipt',{action:'FULL',shareId:id}),callbackButton('Share',{action:'SHARE',shareId:id})],
       creator ? [copyButton('Copy address',creator)] : [],
