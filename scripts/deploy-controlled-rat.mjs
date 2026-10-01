@@ -101,11 +101,11 @@ function ponsHealthy(health) {
     health?.lastSyncError === null;
 }
 
-async function waitForHealthyPostdeployPons() {
+async function waitForHealthyPons(label, failureCode) {
   let health = null;
   for (let attempt = 0; attempt < 7; attempt += 1) {
     health = await getJson(WORKER_URL + '/api/health');
-    note('Postdeploy Pons probe ' + JSON.stringify({
+    note(label + ' Pons probe ' + JSON.stringify({
       attempt: attempt + 1,
       ok: health.ok,
       chainId: health.chainId,
@@ -122,7 +122,7 @@ async function waitForHealthyPostdeployPons() {
     if (ponsHealthy(health)) return health;
     if (attempt < 6) await delay(5_000);
   }
-  throw new Error('POSTDEPLOY_PONS_NOT_HEALTHY');
+  throw new Error(failureCode);
 }
 async function webhookUrl(token) {
   if (!token) return null;
@@ -310,24 +310,7 @@ note('Cloudflare Workers Paid verified by read-only account subscription check.'
 const beforeHealth = await getJson(WORKER_URL + '/health');
 gate(beforeHealth.ok === true && beforeHealth.service === 'binrat-cloudflare-edge',
   'LIVE_WORKER_HEALTH_FAILED');
-const beforePons = await getJson(WORKER_URL + '/api/health');
-note('Pons preflight ' + JSON.stringify({
-  ok: beforePons.ok,
-  chainId: beforePons.chainId,
-  indexReady: beforePons.indexReady,
-  checkpointBlock: beforePons.checkpointBlock,
-  headBlock: beforePons.headBlock,
-  targetBlock: beforePons.targetBlock,
-  liveCaughtUp: beforePons.liveCaughtUp,
-  launchCount: beforePons.launchCount,
-  historyBackfillComplete: beforePons.historyBackfillComplete,
-  lastSyncError: beforePons.lastSyncError,
-  runtimeFresh: beforePons.runtimeFresh,
-  runtimeUpdatedAtMs: beforePons.runtimeUpdatedAtMs
-}));
-gate(beforePons.ok === true && beforePons.chainId === 4663 &&
-  beforePons.indexReady === true && beforePons.liveCaughtUp === true &&
-  beforePons.lastSyncError === null, 'PONS_PREFLIGHT_NOT_HEALTHY');
+await waitForHealthyPons('Predeploy','PONS_PREFLIGHT_NOT_HEALTHY');
 
 const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? '';
 const beforeWebhook = await webhookUrl(botToken);
@@ -406,7 +389,7 @@ try {
     '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
   ], { timeout: 180_000 });
   await waitForExactPostdeployRelease(process.env.GITHUB_SHA);
-  await waitForHealthyPostdeployPons();
+  await waitForHealthyPons('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY');
 
   const diagnostic = await fetch(WORKER_URL + '/__candidate/pons-bootstrap', {
     signal: AbortSignal.timeout(20_000)
