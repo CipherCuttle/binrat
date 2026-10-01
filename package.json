@@ -28,7 +28,8 @@
     "telegram:verify": "tsx src/telegram/configCli.ts verify",
     "telegram:private-menu-activate": "tsx src/telegram/configCli.ts private-menu-activate",
     "telegram:private-menu-restore": "tsx src/telegram/configCli.ts private-menu-restore",
-    "telegram:smoke": "tsx src/telegram/configCli.ts smoke"
+    "telegram:smoke": "tsx src/telegram/configCli.ts smoke",
+    "probe:pons-outcome": "tsx scripts/probe-pons-outcome.ts"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
