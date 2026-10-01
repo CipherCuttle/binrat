@@ -292,12 +292,88 @@
   );
 }
 
-img.roadmap-scene--sniff {
+.roadmap-scene--sniff > img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+  user-select: none;
   transform: translateZ(0);
+}
+
+.roadmap-scene__base {
+  z-index: 1;
+}
+
+.roadmap-scene__emissive {
+  z-index: 2;
+  opacity: 0;
+  mix-blend-mode: screen;
+  filter: brightness(1.32) saturate(1.12);
+  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), filter 900ms ease;
+}
+
+.roadmap-scene__emissive--radar {
+  -webkit-mask-image: radial-gradient(circle 18% at 79% 39%, #000 0 68%, rgba(0,0,0,.78) 82%, transparent 100%);
+  mask-image: radial-gradient(circle 18% at 79% 39%, #000 0 68%, rgba(0,0,0,.78) 82%, transparent 100%);
+}
+
+.roadmap-scene__emissive--crt-a {
+  -webkit-mask-image: radial-gradient(ellipse 20% 34% at 53% 35%, #000 0 58%, rgba(0,0,0,.7) 78%, transparent 100%);
+  mask-image: radial-gradient(ellipse 20% 34% at 53% 35%, #000 0 58%, rgba(0,0,0,.7) 78%, transparent 100%);
+}
+
+.roadmap-scene__emissive--crt-b {
+  -webkit-mask-image: radial-gradient(ellipse 11% 22% at 94% 54%, #000 0 55%, rgba(0,0,0,.64) 76%, transparent 100%);
+  mask-image: radial-gradient(ellipse 11% 22% at 94% 54%, #000 0 55%, rgba(0,0,0,.64) 76%, transparent 100%);
+}
+
+.roadmap-scene__emissive--lamp {
+  -webkit-mask-image: radial-gradient(ellipse 15% 22% at 82% 16%, #000 0 46%, rgba(0,0,0,.66) 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse 15% 22% at 82% 16%, #000 0 46%, rgba(0,0,0,.66) 72%, transparent 100%);
+  filter: brightness(1.18) saturate(1.04);
+}
+
+.roadmap-stage[data-active="true"] .roadmap-scene__emissive--radar {
+  opacity: .58;
+  animation: roadmap-raster-radar-life 7.8s ease-in-out infinite;
+}
+
+.roadmap-stage[data-active="true"] .roadmap-scene__emissive--crt-a {
+  opacity: .44;
+  animation: roadmap-raster-crt-life 6.4s steps(1,end) infinite;
+}
+
+.roadmap-stage[data-active="true"] .roadmap-scene__emissive--crt-b {
+  opacity: .38;
+  animation: roadmap-raster-crt-life 7.1s steps(1,end) -2.3s infinite;
+}
+
+.roadmap-stage[data-active="true"] .roadmap-scene__emissive--lamp {
+  opacity: .34;
+  animation: roadmap-raster-lamp-life 9.2s steps(1,end) infinite;
+}
+
+@keyframes roadmap-raster-radar-life {
+  0%, 100% { opacity: .46; filter: brightness(1.2) saturate(1.08); }
+  48% { opacity: .62; filter: brightness(1.42) saturate(1.16); }
+  54% { opacity: .57; filter: brightness(1.32) saturate(1.12); }
+}
+
+@keyframes roadmap-raster-crt-life {
+  0%, 16%, 19%, 61%, 65%, 100% { opacity: .44; }
+  17% { opacity: .35; }
+  63% { opacity: .4; }
+}
+
+@keyframes roadmap-raster-lamp-life {
+  0%, 12%, 14%, 49%, 52%, 100% { opacity: .34; }
+  13% { opacity: .29; }
+  50% { opacity: .31; }
+  51% { opacity: .25; }
 }
 
 .roadmap-footer {
@@ -403,7 +479,8 @@ img.roadmap-scene--sniff {
   .roadmap-stage__scene,
   .roadmap-stage__copy,
   .roadmap-stage__node,
-  .roadmap-stage__node span {
+  .roadmap-stage__node span,
+  .roadmap-scene__emissive {
     animation: none !important;
     transition-duration: 1ms !important;
     transform: none !important;
