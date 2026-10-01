@@ -108,22 +108,26 @@ test('receipt existence cannot authorize launch or marketing', async () => {
   });
 });
 
-test('launch status remains consistent across doctrine and public status surfaces', async () => {
-  const [roadmap, doctrine, website, telegram, dumpster, holder] = await Promise.all([
-    readFile(new URL('../docs/ROADMAP_V0.md', import.meta.url), 'utf8'),
+test('launch status remains consistent with canonical manifest authority', async () => {
+  const [manifestRaw, roadmap, doctrine, website, telegram, holder] = await Promise.all([
+    readFile(new URL('../docs/CAPABILITY_MANIFEST_V0.json', import.meta.url), 'utf8'),
+    readFile(new URL('../docs/ROADMAP.md', import.meta.url), 'utf8'),
     readFile(new URL('../docs/TOKEN_LAUNCH_DOCTRINE.md', import.meta.url), 'utf8'),
     readFile(new URL('../web/index.html', import.meta.url), 'utf8'),
     readFile(new URL('../src/telegram/rat.ts', import.meta.url), 'utf8'),
-    readFile(new URL('../docs/DUMPSTER_LEDGER_V0.md', import.meta.url), 'utf8'),
     readFile(new URL('../src/holder/eligibility.ts', import.meta.url), 'utf8')
   ]);
+  const manifest = JSON.parse(manifestRaw);
 
-  assert.match(roadmap, /BLOCKED.*marketingAuthorized=false.*tokenState=NOT_LAUNCHED/);
-  assert.match(doctrine, /marketingAuthorized.*launchAuthorized.*false/);
+  assert.equal(manifest.launchAuthorization.status, 'BLOCKED');
+  assert.equal(manifest.launchAuthorization.marketingAuthorized, false);
+  assert.equal(manifest.launchAuthorization.launchAuthorized, false);
+  assert.equal(manifest.launchAuthorization.tokenState, 'NOT_LAUNCHED');
+  assert.equal(manifest.launchAuthorization.currentRailReverificationRequired, true);
+  assert.match(roadmap, /Public status badges must come from canonical capability state/);
+  assert.match(doctrine, /canonical capability manifest remains fail-closed/);
   assert.match(website, /\$BINRAT IS NOT LIVE\./);
   assert.match(website, /NO OFFICIAL BINRAT CONTRACT EXISTS/);
   assert.match(telegram, /no official \$BINRAT token is launched yet\./);
-  assert.match(dumpster, /tokenState: NOT_LAUNCHED/);
-  assert.match(dumpster, /launchAuthorization: BLOCKED/);
   assert.match(holder, /TOKEN_AUTHORITY_NOT_CONFIGURED/);
 });
