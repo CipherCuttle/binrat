@@ -46,8 +46,11 @@ export async function mutateWatch(
 ): Promise<string> {
   const replay = await commandReplay(db, p, updateId);
   if (replay !== null) return replay;
-  // Explicit historical targets remain reconstructible; bare/default targets are 4663.
+  // Arc 5042 remains reconstructible historical evidence, but the active
+  // recurrence alert authority is Robinhood/Pons 4663 only. Keep UNWATCH
+  // available for cleanup of any historical V1 rows; never arm a dead watch.
   if (target.chainId !== 4663 && target.chainId !== 5042) throw new Error('UNSUPPORTED_CHAIN');
+  if (action === 'WATCH' && target.chainId !== 4663) throw new Error('WATCH_LIVE_CHAIN_ONLY');
   if (target.entityType !== 'CREATOR') throw new Error('WATCH_CREATOR_ONLY');
   const old = await db.prepare(`SELECT * FROM rat_v1_watches WHERE user_id=? AND chat_id=?
     AND chain_id=? AND entity_type=? AND entity_id=?`)
