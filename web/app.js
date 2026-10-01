@@ -40,16 +40,16 @@ const modeCopy = {
   LIVE: {
     header: "LIVE INDEX",
     desk: "LIVE // PUBLIC PROJECTION V0",
-    status: "PUBLIC PROJECTION / ARC 5042",
+    status: "PUBLIC PROJECTION / PONS 4663",
     detail: "HISTORY COVERAGE: UNVERIFIED",
     end: "END OF CURRENT INDEX",
     bagLabel: "INDEXED BAGS",
     report: "PUBLIC PROJECTION",
-    token: "TOKEN ADDRESS / OBSERVED ON ARC",
+    token: "TOKEN ADDRESS / OBSERVED ON ROBINHOOD",
     source: "LIVE // PUBLIC PROJECTION V0",
     stamp: "PUBLIC EVIDENCE",
     scope: "this projection",
-    launch: "Observed on Arc",
+    launch: "Observed on Pons",
     empty: "NO BAGS IN CURRENT INDEX WINDOW",
     unavailable: "LIVE INDEX NOT AVAILABLE",
   },
@@ -157,7 +157,7 @@ if (WEB_DATA_SOURCE_MODE === "LIVE") {
         !response.ok ||
         !health.ok ||
         !health.indexReady ||
-        health.chainId !== 5042
+        health.chainId !== 4663
       )
         throw new Error("LIVE_INDEX_NOT_AVAILABLE");
       if (!drawer.classList.contains("open")) await bootstrap();
@@ -248,7 +248,7 @@ function renderUnavailable(error) {
     copy().unavailable;
   latestBag.innerHTML =
     '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
-  liveRail.innerHTML = '<span class="live-rail-dot offline" aria-hidden="true"></span><strong>OFFLINE</strong><span>ARC 5042</span><span>LIVE INDEX NOT AVAILABLE</span>';
+  liveRail.innerHTML = '<span class="live-rail-dot offline" aria-hidden="true"></span><strong>OFFLINE</strong><span>PONS 4663</span><span>LIVE INDEX NOT AVAILABLE</span>';
   document.querySelector("#feed-count").textContent = "INDEX UNAVAILABLE";
   for (const element of document.querySelectorAll(".filter-button span")) {
     element.textContent = "—";
@@ -324,7 +324,7 @@ function renderCard(bag) {
     <article class="bag-card" tabindex="0" role="button" aria-haspopup="dialog" data-bag-id="${escapeHtml(bag.id)}" data-noted="${noted}" aria-label="Open ${escapeHtml(bag.symbol)} ${copy().report}">
       <div class="feed-cell feed-age" data-label="AGE / BLOCK"><span>BLK</span>${escapeHtml(bag.block)}</div>
       <div class="feed-cell feed-token" data-label="TOKEN"><div class="feed-token-main">${renderTokenThumb(bag)}<div class="feed-token-copy"><h3 class="token-symbol">${escapeHtml(bag.symbol)}</h3><div class="token-name">${escapeHtml(bag.name)}</div><code>${escapeHtml(shortAddress(bag.token))}</code></div></div></div>
-      <div class="feed-cell feed-creator" data-label="ARCPAD-REPORTED CREATOR"><code title="${escapeHtml(bag.reportedCreatorAddress)}">${escapeHtml(shortAddress(bag.reportedCreatorAddress))}</code><span>${bag.priorLaunches > 0 ? "REPEAT ADDRESS" : "NO PRIOR BAG IN INDEX"}</span></div>
+      <div class="feed-cell feed-creator" data-label="PONS-REPORTED DEPLOYER"><code title="${escapeHtml(bag.reportedCreatorAddress)}">${escapeHtml(shortAddress(bag.reportedCreatorAddress))}</code><span>${bag.priorLaunches > 0 ? "REPEAT ADDRESS" : "NO PRIOR BAG IN INDEX"}</span></div>
       <div class="feed-cell feed-prior" data-label="PRIOR BAGS"><strong>${escapeHtml(bag.priorLaunches)}</strong><span>INDEXED</span></div>
       <div class="feed-cell feed-socials" data-label="SOCIALS">${renderSocials(bag)}</div>
       <div class="feed-cell feed-evidence" data-label="EVIDENCE STATE"><span class="evidence-summary ${evidenceState.toLowerCase()}">${evidenceState}</span><small>${coverage} HISTORY</small></div>
@@ -335,7 +335,7 @@ function renderCard(bag) {
 
 function renderFeedHeader() {
   return `<div class="feed-table-head" aria-hidden="true">
-    <span>AGE / BLOCK</span><span>TOKEN</span><span>ARCPAD-REPORTED CREATOR</span><span>PRIOR BAGS</span><span>SOCIALS</span><span>EVIDENCE STATE</span><span>INSPECT</span>
+    <span>AGE / BLOCK</span><span>TOKEN</span><span>PONS-REPORTED DEPLOYER</span><span>PRIOR BAGS</span><span>SOCIALS</span><span>EVIDENCE STATE</span><span>INSPECT</span>
   </div>`;
 }
 
@@ -378,7 +378,7 @@ function summarizeEvidence(bag) {
 function renderLiveRail(feed) {
   if (!liveRail) return;
   if (activeMode === "LIVE") {
-    liveRail.innerHTML = `<span class="live-rail-dot" aria-hidden="true"></span><strong>LIVE</strong><span>ARC 5042</span><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>BLOCK ${escapeHtml(feed.asOfBlock)}</span><span>HISTORY ${escapeHtml(feed.historyCoverage)}</span>`;
+    liveRail.innerHTML = `<span class="live-rail-dot" aria-hidden="true"></span><strong>LIVE</strong><span>PONS 4663</span><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>BLOCK ${escapeHtml(feed.asOfBlock)}</span><span>HISTORY ${escapeHtml(feed.historyCoverage)}</span>`;
     return;
   }
   liveRail.innerHTML = `<span class="live-rail-dot fixture" aria-hidden="true"></span><strong>FIXTURE</strong><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>SYNTHETIC DATA</span>`;
@@ -475,7 +475,7 @@ function openBag(id, origin = document.activeElement) {
   drawerContent.innerHTML = `
     <p class="drawer-kicker">TRASH TRAIL // ${copy().report}</p>
     <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${String(bags.indexOf(bag) + 1).padStart(3, "0")}</b></div></div>
-    <div class="address creator-address"><span>ArcPad-reported creator address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
+    <div class="address creator-address"><span>Pons-reported deployer address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
     <div class="address"><span>${copy().token}</span><code>${escapeHtml(bag.token)}</code></div>
     ${activeMode === "LIVE" ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ""}
     <div class="drawer-note"><span>RAT NOTE / PRESENTATION, NOT A VERDICT</span>“${escapeHtml(bag.note)}”</div>
@@ -501,12 +501,12 @@ function openBag(id, origin = document.activeElement) {
     </section>
 
     <section class="replay-lab-panel rb-card" data-replay-panel>
-      <div class="file-section-heading"><h3>05 / REPLAY LAB</h3><span>REAL INDEXED ARC EVIDENCE</span></div>
+      <div class="file-section-heading"><h3>05 / REPLAY LAB</h3><span>REAL INDEXED PONS EVIDENCE</span></div>
       <p class="intel-loading">Composing launch → 5m → 1h → 24h evidence chain…</p>
     </section>
 
     <div class="receipt-box">
-      <div class="receipt-head"><h3>06 / RECEIPT</h3><span>BINRAT / ARC 5042</span></div>
+      <div class="receipt-head"><h3>06 / RECEIPT</h3><span>BINRAT / PONS 4663</span></div>
       <dl class="receipt-grid">
         <dt>receipt</dt><dd>${escapeHtml(bag.receipt)}</dd>
         <dt>coverage</dt><dd>${escapeHtml(normalizeCoverage(bag.coverage))}</dd>
@@ -605,7 +605,7 @@ async function hydrateCreatorFile(bag) {
         <div><span>LAST INDEXED BLOCK</span><b>${escapeHtml(file.lastIndexedBlock)}</b></div>
         <div><span>HISTORY</span><b>${escapeHtml(file.historyCoverage)}</b></div>
       </div>
-      <p class="intel-boundary">Same ArcPad-reported address only. This does not establish common human ownership. Full indexed trail shown; open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
+      <p class="intel-boundary">Same Pons-reported deployer address only. This does not establish common human ownership. Full indexed trail shown; open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
       <div class="creator-launches">${rows}</div>
       <div class="intel-receipt">CREATOR FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
     `;
@@ -641,7 +641,7 @@ async function hydrateReplayLab(bag) {
       </div>`).join("");
     panel.innerHTML = `
       <div class="file-section-heading"><h3>05 / REPLAY LAB</h3><span>${escapeHtml(replay.stages.length)} EVIDENCE STAGES</span></div>
-      <p class="intel-boundary">Deterministic replay of real indexed Arc evidence. Missing 5m / 1h / 24h stages remain missing; nothing is simulated.</p>
+      <p class="intel-boundary">Deterministic replay of real indexed Pons evidence. Missing 5m / 1h / 24h stages remain missing; nothing is simulated.</p>
       <div class="intel-snapshots">${stages}</div>
       <div class="creator-file-stats">
         <div><span>CREATOR FILE</span><b>${escapeHtml(replay.creatorFile.indexedLaunchCount)} LAUNCHES</b></div>
