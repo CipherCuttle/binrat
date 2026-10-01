@@ -40,6 +40,23 @@ test('WATCHES card discloses truncation and legacy migration state, with a direc
   assert.match(legacyOnly.caption,/1 legacy watch is not active here/);
 });
 
+test('historical Arc CASE cards expose evidence but never a dead Watch action', async () => {
+  const f=await autonomousFixture();
+  try {
+    const receipt=await dig(f.db,{chainId:4663,entityType:'CREATOR',entityId:CREATOR},f.now());
+    const historical={...receipt,chainId:5042};
+    const card=renderRatCard({kind:'CASE',receipt:historical,mode:'DIG',privateAttention:null});
+    const actions=card.keyboard.flatMap(row=>row.flatMap(button=>'callbackData' in button ? [parseCallback(button.callbackData)?.action] : []));
+    assert.ok(actions.includes('WHY'));
+    assert.equal(actions.includes('WATCH'),false);
+
+    const error=renderRatCard({kind:'ERROR',code:'Live watches are available only on Robinhood/Pons 4663. Arc 5042 remains historical evidence only.'});
+    assert.match(error.caption,/OLD TRAIL ONLY/);
+    assert.match(error.caption,/Live watches run on Pons 4663/);
+    assert.doesNotMatch(error.caption,/PIPE SMELLS WRONG/);
+  } finally { f.db.close(); }
+});
+
 test('V2 scout cards lead with one factual finding and keep infrastructure vocabulary out of level one', async () => {
   const f=await autonomousFixture();
   try {
