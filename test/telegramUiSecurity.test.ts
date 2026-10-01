@@ -8,9 +8,24 @@ import { discoverRats } from '../src/autonomous/rats.js';
 import { encodeCallback } from '../src/telegram/ui/callback.js';
 import { addr } from './support/autonomousFixture.js';
 
-function callbackRequest(updateId:number, from:number, chatId:number, type:string, data:string) {
-  return new Request('https://fixture.invalid/telegram/webhook',{method:'POST',headers:{'content-type':'application/json','x-telegram-bot-api-secret-token':'fixture-secret'},body:JSON.stringify({update_id:updateId,callback_query:{id:`cb-${updateId}`,from:{id:from},data,message:{message_id:91,chat:{id:chatId,type},from:{id:77}}}})});
+function callbackRequest(updateId:number, from:number, chatId:number, type:string, data:string, secret='fixture-secret') {
+  return new Request('https://fixture.invalid/telegram/webhook',{method:'POST',headers:{'content-type':'application/json','x-telegram-bot-api-secret-token':secret},body:JSON.stringify({update_id:updateId,callback_query:{id:`cb-${updateId}`,from:{id:from},data,message:{message_id:91,chat:{id:chatId,type},from:{id:77}}}})});
 }
+
+test('staged next webhook secret is accepted during rotation while unrelated secrets are rejected', async () => {
+  const f=await autonomousFixture(); const calls:string[]=[];
+  try {
+    Object.assign(f.env,{BINRAT_TELEGRAM_UI_V2_ENABLED:'true',TELEGRAM_WEBHOOK_SECRET_NEXT:'next-fixture-secret'});
+    const api:typeof fetch=async (url) => { const method=String(url).split('/').at(-1)!; calls.push(method);
+      if(method==='answerCallbackQuery') return Response.json({ok:true,result:true});
+      if(method==='editMessageCaption') return Response.json({ok:true,result:{message_id:91}});
+      throw new Error('UNEXPECTED_TELEGRAM_'+method); };
+    const rotated=await handleWorkerRequest(callbackRequest(879,77,77,'private','br2:h','next-fixture-secret'),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
+    assert.equal(rotated.status,200); assert.deepEqual(calls,['answerCallbackQuery','editMessageCaption']);
+    const rejected=await handleWorkerRequest(callbackRequest(878,77,77,'private','br2:h','wrong-secret'),f.env,{now:f.now,externalFetch:api,watchSource:f.source});
+    assert.equal(rejected.status,401);
+  } finally { f.db.close(); }
+});
 
 test('callback acknowledgement precedes card edit and controlled actor is re-authorized', async () => {
   const f=await autonomousFixture(); const calls:string[]=[];
