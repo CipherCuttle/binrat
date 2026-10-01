@@ -34,6 +34,8 @@ const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>(
   ['BINRAT_PONS_CATCHUP_WORK_BUDGET_MS', { type: 'plain_text', text: '60000' }],
   ['BINRAT_PONS_NEAR_HEAD_BLOCKS', { type: 'plain_text', text: '2048' }],
   ['BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS', { type: 'plain_text', text: '128' }],
+  ['BINRAT_PONS_OUTCOME_ENABLED', { type: 'plain_text', text: 'false' }],
+  ['BINRAT_PONS_OUTCOME_MAX_PER_CYCLE', { type: 'plain_text', text: '3' }],
   ['ROBINHOOD_RPC_URL', { type: 'plain_text', text: 'https://rpc.ordofi.network' }],
   ['BINRAT_AUTONOMOUS_RAT_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', { type: 'plain_text', text: 'false' }],
@@ -183,6 +185,8 @@ export function verifyCandidateManifest(config: unknown, options: BindingParityO
   if (value.vars?.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS !== '60000') errors.push('PONS_CATCHUP_WORK_BUDGET_INVALID');
   if (value.vars?.BINRAT_PONS_NEAR_HEAD_BLOCKS !== '2048') errors.push('PONS_NEAR_HEAD_BOUND_INVALID');
   if (value.vars?.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS !== '128') errors.push('PONS_CANONICAL_DENSITY_BOUND_INVALID');
+  if (value.vars?.BINRAT_PONS_OUTCOME_ENABLED !== 'false') errors.push('PONS_OUTCOME_NOT_FLAG_OFF');
+  if (value.vars?.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE !== '3') errors.push('PONS_OUTCOME_CYCLE_BOUND_INVALID');
   return { ok: errors.length === 0, errors };
 }
 
