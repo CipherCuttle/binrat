@@ -8,6 +8,9 @@ const MAX_CANDIDATES = 5;
 const MAX_EVIDENCE_PER_CANDIDATE = 5;
 const SNAPSHOT_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_RETAINED_SNAPSHOTS = 200;
+// RATS is an attention surface, not a historical leaderboard. At the current
+// Robinhood/Pons block cadence this is roughly a several-hour freshness window.
+export const RATS_RECENT_BLOCK_WINDOW = 200_000n;
 
 export interface RatsCandidate {
   entity: Entity;
@@ -154,8 +157,9 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
     FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id
     WHERE l.chain_id=? AND l.source='PONS_V2' AND CAST(l.block_number AS INTEGER)<=?
     GROUP BY l.creator HAVING COUNT(DISTINCT l.launch_id)>=2
+      AND MAX(CAST(l.block_number AS INTEGER))>=?
     ORDER BY latest_block DESC, recurrence_count DESC, l.creator ASC LIMIT ?`)
-    .bind(chainId, Number(tip), limit).all<CandidateRow>();
+    .bind(chainId, Number(tip), Number(tip > RATS_RECENT_BLOCK_WINDOW ? tip-RATS_RECENT_BLOCK_WINDOW : 0n), limit).all<CandidateRow>();
   if (!rows.success) throw new Error('DISCOVERY_UNAVAILABLE');
 
   const candidates: RatsCandidate[] = [];
@@ -252,7 +256,7 @@ export function renderRats(snapshot: RatsSnapshot): string {
       const latest=candidate.latestLaunch.symbol ? `${candidate.latestLaunch.symbol}` : (candidate.latestLaunch.name || 'unnamed launch');
       const previous=(candidate.previousLaunches ?? []).map(item => item.symbol ? `${item.symbol}` : (item.name || item.token));
       return [
-        `${candidate.rankPosition}. ${latest} · block ${candidate.latestLaunch.blockNumber}`,
+        `${candidate.rankPosition}. Recent repeat launch: ${latest}`,
         `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
         previous.length ? `Previous: ${previous.join(' · ')}` : '',
         `WATCH NEXT LAUNCH: /watch 4663:CREATOR:${candidate.entity.entityId}`,
