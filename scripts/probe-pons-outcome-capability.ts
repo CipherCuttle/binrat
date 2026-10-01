@@ -86,10 +86,10 @@ async function findHistoricalNativeLaunch(
   fromBlock:bigint,
   throughBlock:bigint
 ):Promise<{launchId:string;token:`0x${string}`;curve:`0x${string}`;blockNumber:bigint;timestampMs:number}> {
-  for (let from=fromBlock;from<=throughBlock;) {
-    const to=from+HISTORICAL_SCAN_CHUNK_BLOCKS-1n>throughBlock
-      ? throughBlock
-      : from+HISTORICAL_SCAN_CHUNK_BLOCKS-1n;
+  let to=throughBlock;
+  while (to>=fromBlock) {
+    const candidateFrom=to-HISTORICAL_SCAN_CHUNK_BLOCKS+1n;
+    const from=candidateFrom<fromBlock ? fromBlock : candidateFrom;
     const logs=await client.getLogs({
       address:PONS_V2_FACTORY as Address,
       event:ponsTokenLaunchedEvent,
@@ -97,7 +97,7 @@ async function findHistoricalNativeLaunch(
       toBlock:to,
       strict:true
     });
-    for (const log of logs) {
+    for (const log of [...logs].reverse()) {
       if (log.blockNumber===null || log.transactionHash===null) continue;
       if (!log.args.token || !log.args.curve || !log.args.pairToken) continue;
       if (log.args.pairToken.toLowerCase()!==zeroAddress) continue;
@@ -118,7 +118,8 @@ async function findHistoricalNativeLaunch(
         timestampMs:await observedBlockTimestampMs(client,log.blockNumber)
       };
     }
-    from=to+1n;
+    if (from===fromBlock) break;
+    to=from-1n;
   }
   throw new Error('PROBE_NO_AGED_NATIVE_LAUNCH');
 }
@@ -208,7 +209,9 @@ const historicalMaturityReceipts=[] as Array<{
   window:'5m'|'1h'|'24h';
   targetTimestampMs:number;
   targetBlock:string;
-  receipt:ReturnType<typeof printable>;
+  availability:'AVAILABLE'|'UNAVAILABLE';
+  receipt:ReturnType<typeof printable>|null;
+  error:string|null;
 }>;
 for (const window of maturityWindows) {
   const targetTimestampMs=agedLaunch.timestampMs+window.offsetMs;
@@ -218,19 +221,51 @@ for (const window of maturityWindows) {
     checkpoint,
     targetTimestampMs
   );
-  const receipt=await readPonsCurveOutcomeCapability(
-    source,
-    {launchId:agedLaunch.launchId,token:agedLaunch.token,curve:agedLaunch.curve},
-    targetBlock
-  );
-  gate(receipt.observedTimestampMs>=targetTimestampMs,`PROBE_${window.label.toUpperCase()}_BEFORE_MATURITY`);
-  historicalMaturityReceipts.push({
-    window:window.label,
-    targetTimestampMs,
-    targetBlock:targetBlock.toString(),
-    receipt:printable(receipt)
-  });
+  try {
+    const receipt=await readPonsCurveOutcomeCapability(
+      source,
+      {launchId:agedLaunch.launchId,token:agedLaunch.token,curve:agedLaunch.curve},
+      targetBlock
+    );
+    gate(receipt.observedTimestampMs>=targetTimestampMs,`PROBE_${window.label.toUpperCase()}_BEFORE_MATURITY`);
+    historicalMaturityReceipts.push({
+      window:window.label,
+      targetTimestampMs,
+      targetBlock:targetBlock.toString(),
+      availability:'AVAILABLE',
+      receipt:printable(receipt),
+      error:null
+    });
+  } catch (error) {
+    const message=error instanceof Error ? error.message : String(error);
+    historicalMaturityReceipts.push({
+      window:window.label,
+      targetTimestampMs,
+      targetBlock:targetBlock.toString(),
+      availability:'UNAVAILABLE',
+      receipt:null,
+      error:message.includes('historical state') ? 'HISTORICAL_STATE_UNAVAILABLE' : message.slice(0,240)
+    });
+  }
 }
+console.log(JSON.stringify({
+  kind:'PONS_OUTCOME_ARCHIVE_PROBE_RESULT',
+  publicSourceCheckpoint:checkpoint.toString(),
+  checkpointTimestampMs,
+  agedLaunch:{
+    launchId:agedLaunch.launchId,
+    token:agedLaunch.token,
+    curve:agedLaunch.curve,
+    blockNumber:agedLaunch.blockNumber.toString(),
+    timestampMs:agedLaunch.timestampMs,
+    ageMsAtCheckpoint:checkpointTimestampMs-agedLaunch.timestampMs
+  },
+  historicalMaturityReceipts
+},null,2));
+gate(
+  historicalMaturityReceipts.every((item)=>item.availability==='AVAILABLE'),
+  'PROBE_HISTORICAL_MATURITY_UNAVAILABLE'
+);
 
 console.log(JSON.stringify({
   kind:'PONS_OUTCOME_CAPABILITY_PROBE_PASS',
