@@ -11,12 +11,12 @@ import {
 import "./motion-lab.css";
 
 const milestones = [
-  { title: "SNIFF", kicker: "Find the launch.", accent: "var(--green)" },
-  { title: "REMEMBER", kicker: "Keep the trail.", accent: "var(--orange)" },
-  { title: "INVESTIGATE", kicker: "Turn the trail into a case.", accent: "var(--bone)" },
-  { title: "WATCH", kicker: "Notice when the pattern moves again.", accent: "var(--orange)" },
-  { title: "CONNECT", kicker: "See structure across cases.", accent: "var(--purple)" },
-  { title: "AUTONOMOUS RAT", kicker: "Give the rat a bounded investigation.", accent: "var(--red)" },
+  { title: "SNIFF", kicker: "The rat catches the launch.", accent: "var(--green)" },
+  { title: "REMEMBER", kicker: "Sites vanish. The trail doesn't.", accent: "var(--orange)" },
+  { title: "WATCH", kicker: "Leave a tripwire in the trash.", accent: "var(--bone)" },
+  { title: "HUNT", kicker: "Point the rats at something worth digging.", accent: "var(--orange)" },
+  { title: "ORGANIZE", kicker: "Useful work earns a receipt.", accent: "var(--purple)" },
+  { title: "AUTONOMOUS RAT", kicker: "Give it a case. It comes back with receipts.", accent: "var(--red)" },
 ] as const;
 
 type Milestone = (typeof milestones)[number];
