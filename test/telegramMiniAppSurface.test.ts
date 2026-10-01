@@ -11,9 +11,34 @@ test('Telegram Mini App accepts only known view deep links and preserves case pr
   assert.match(app,/else if\([^\n]+requestedView[^\n]+\) show\(requestedView\)/);
 });
 
-test('Mini App exposes a full WATCHES destination for Telegram handoff', () => {
+test('Mini App exposes Rat Watch without leaking the internal RATS name into navigation', () => {
   const html=readFileSync(new URL('../web/app/index.html',import.meta.url),'utf8');
   assert.match(html,/id="watches"/);
   assert.match(html,/data-view="watches"/);
-  assert.match(html,/PRIVATE ATTENTION/);
+  assert.match(html,/RAT WATCH/);
+  assert.match(html,/FRESH GARBAGE/);
+  assert.doesNotMatch(html,/>RATS</);
+  assert.doesNotMatch(html,/REPEAT DEPLOYERS/);
+  assert.doesNotMatch(html,/PRIVATE ATTENTION/);
+});
+
+test('Mini App progressively discloses Trash Trail before raw receipts and keeps Rat Trap fail-closed', () => {
+  const app=readFileSync(new URL('../web/app/app.js',import.meta.url),'utf8');
+  assert.match(app,/DIG DEEPER/);
+  assert.match(app,/TRASH TRAIL/);
+  assert.match(app,/OPEN RECEIPTS/);
+  assert.match(app,/RAT TRAP/);
+  assert.match(app,/Historical outcome context is not available on this surface yet/);
+  assert.match(app,/No market-cap, ATH, lifespan or profitability claim is being made/);
+  assert.match(app,/Not a verdict\. Human identity, intent, safety and future outcome stay unknown/);
+  assert.doesNotMatch(app,/PONS 4663 · READY · block/);
+});
+
+test('Mini App Rat Watch presents recognizable trail context before protocol identifiers', () => {
+  const app=readFileSync(new URL('../web/app/app.js',import.meta.url),'utf8');
+  assert.match(app,/watchLabels/);
+  assert.match(app,/I'll squeak if these paws launch again/);
+  assert.match(app,/Pons-reported deployer/);
+  assert.doesNotMatch(app,/\$\{watch\.chainId\} · \$\{watch\.policy\}/);
+  assert.doesNotMatch(app,/Future indexed launches after block/);
 });
