@@ -30,13 +30,13 @@ test('WATCHES card stays fully native and discloses legacy migration state', () 
   assert.match(card.caption,/RAT WATCH · 7 SETS OF PAWS/);
   assert.equal((card.caption.match(/^• /gm) ?? []).length,7);
   assert.doesNotMatch(card.caption,/more active watches/);
-  assert.match(card.caption,/2 legacy watches are not active here; re-arm explicitly on Pons 4663/);
+  assert.match(card.caption,/2 older watches are outside Rat Watch; re-arm on Pons 4663/);
   assert.equal(card.keyboard.flat().some(button=>'webAppUrl' in button),false);
 
   const legacyOnly=renderRatCard({kind:'WATCHLIST',watches:[],legacyWatchCount:1});
   assert.equal(legacyOnly.view,'WATCHLIST');
   assert.match(legacyOnly.caption,/Nothing on Rat Watch yet/);
-  assert.match(legacyOnly.caption,/1 legacy watch is not active here/);
+  assert.match(legacyOnly.caption,/1 older watch is outside Rat Watch/);
 });
 
 test('historical Arc CASE cards expose evidence but never a dead Watch action', async () => {
@@ -61,10 +61,10 @@ test('V2 error cards preserve fail-closed reason classes instead of collapsing t
   const cases:Array<[string,RegExp]> = [
     ['The live index is unavailable or stale. No new investigation or alert authority.',/LOST THE TRAIL/],
     ['A fresh canonical Robinhood boundary could not be verified. Watch was not added.',/STUCK IN A PIPE/],
-    ['That Rat snapshot is unavailable or expired.',/THAT RAT PAGE EXPIRED/],
-    ['Discovery receipts are unavailable. No rats invented.',/RAT RECEIPTS UNAVAILABLE/],
-    ['Discovery receipts could not be saved. No rats invented.',/RAT SNAPSHOT NOT SAVED/],
-    ['Discovery retention is unavailable. No rats invented.',/RAT SNAPSHOT NOT SAVED/]
+    ['That Rat snapshot is unavailable or expired.',/TRAIL WENT COLD/],
+    ['Discovery receipts are unavailable. No rats invented.',/CAME BACK EMPTY/],
+    ['Discovery receipts could not be saved. No rats invented.',/DROPPED THE RECEIPT/],
+    ['Discovery retention is unavailable. No rats invented.',/DROPPED THE RECEIPT/]
   ];
   for (const [code,expected] of cases) {
     const card=renderRatCard({kind:'ERROR',code});
