@@ -631,6 +631,7 @@ async function telegramWebhook(
 
     const callback = update.callback_query;
     if (callback) {
+      const callbackStartedAt = deps.now();
       if (env.BINRAT_TELEGRAM_UI_V2_ENABLED !== 'true') {
         // Acknowledge known Telegram callback traffic even while the rollout is off.
         if (typeof callback.id === 'string' && callback.id) await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
@@ -651,6 +652,7 @@ async function telegramWebhook(
         await ledger.completeIgnored(update.update_id,'IGNORED',deps.now());
         return json(200,{ok:true,ignored:true,reason:'INVALID_CALLBACK'});
       }
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'RECEIVED',updateId:update.update_id,action:action.action}));
       const rateLimit = integerSetting(env.TELEGRAM_MAX_MESSAGES_PER_MINUTE, 12, 1, 10_000);
       if (!(await ledger.allowChat(message.chat.id,rateLimit,60_000,deps.now()))) {
         await answerCallback(token,callback.id,deps.externalFetch).catch(()=>{});
@@ -658,6 +660,8 @@ async function telegramWebhook(
         return json(200,{ok:true,rateLimited:true});
       }
       await answerCallback(token,callback.id,deps.externalFetch);
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'ACKED',updateId:update.update_id,action:action.action,
+        elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
       if (!Number.isSafeInteger(message.message_id) || message.message_id < 1) throw new Error('TELEGRAM_CALLBACK_MESSAGE_INVALID');
       const mediaEnabled = env.BINRAT_TELEGRAM_MEDIA_ENABLED === 'true';
       if (action.action === 'DIG_PROMPT') {
@@ -705,8 +709,12 @@ async function telegramWebhook(
         return json(200,{ok:true,uiV2:true,prompt:true});
       }
       const outcome = await executeUiCallback(env.DB,action,{userId:callback.from.id,chatId:message.chat.id},update.update_id,deps.now(),deps.watchSource ?? robinhoodWatchSource(env.ROBINHOOD_RPC_URL?.trim() || 'https://rpc.mainnet.chain.robinhood.com'));
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'OUTCOME',updateId:update.update_id,action:action.action,
+        outcome:outcome.kind,elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
       const card = renderRatCard(outcome);
       await editUiCard(token,message.chat.id,message.message_id,origin,card,mediaEnabled,deps.externalFetch);
+      console.error(JSON.stringify({event:'TELEGRAM_UI_CALLBACK',phase:'EDITED',updateId:update.update_id,action:action.action,
+        view:card.view,elapsedMs:Math.max(0,deps.now()-callbackStartedAt)}));
       // The compact card remains the surface; FULL is the explicit canonical expansion.
       if (action.action === 'FULL') await sendMessage(token,message.chat.id,renderLegacyAutonomousOutcome(outcome),deps.externalFetch);
       await ledger.completeOperationalReply({updateId:update.update_id,chatId:message.chat.id,intent:`UI_${action.action}`,
