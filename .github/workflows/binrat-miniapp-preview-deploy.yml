@@ -231,7 +231,8 @@ jobs:
           const fs=require('fs');
           const body=JSON.parse(fs.readFileSync('/tmp/menu-after.json','utf8'));
           const button=body?.result;
-          if(body?.ok!==true || button?.type!=='web_app' || button?.web_app?.url!==process.env.PREVIEW_URL) {
+          const normalize=value=>String(value||'').replace(/\/+$/,'');
+          if(body?.ok!==true || button?.type!=='web_app' || normalize(button?.web_app?.url)!==normalize(process.env.PREVIEW_URL)) {
             console.error(body); process.exit(2);
           }
           NODE
