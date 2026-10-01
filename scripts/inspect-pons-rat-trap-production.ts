@@ -91,11 +91,15 @@ function launchColumns(prefix=''):string {
 
 function beforeCurrentSql(alias:string,current:LaunchObserved):string {
   const p=alias?`${alias}.`:'';
-  return `(
-    + `CAST(${p}block_number AS INTEGER) < ${current.blockNumber.toString()} `
-    + `OR (CAST(${p}block_number AS INTEGER) = ${current.blockNumber.toString()} AND (`
-    + `${p}log_index < ${current.logIndex} OR (${p}log_index = ${current.logIndex} AND ${p}launch_id < ${sqlLaunchId(current.launchId)})))`
-    + `)`;
+  return [
+    '(',
+    `CAST(${p}block_number AS INTEGER) < ${current.blockNumber.toString()}`,
+    `OR (CAST(${p}block_number AS INTEGER) = ${current.blockNumber.toString()} AND (`,
+    `${p}log_index < ${current.logIndex}`,
+    `OR (${p}log_index = ${current.logIndex} AND ${p}launch_id < ${sqlLaunchId(current.launchId)})`,
+    '))',
+    ')'
+  ].join(' ');
 }
 
 function short(value:string):string { return value.length>20?`${value.slice(0,10)}…${value.slice(-8)}`:value; }
@@ -172,7 +176,7 @@ try {
     if(previousCount<1) continue;
     if(previousCount>MAX_PREVIOUS_LAUNCHES){ skipped.push({creator,currentLaunchId:current.launchId,previousCount,reason:'COHORT_TOO_LARGE'}); continue; }
 
-    const receiptRows=selectRows<{launch_id:string;payload_json:string}>(`SELECT r.launch_id AS launch_id,r.payload_json AS payload_json FROM pons_outcome_receipts r JOIN launches l ON l.launch_id=r.launch_id WHERE r.chain_id=4663 AND l.chain_id=4663 AND l.source='PONS_V2' AND l.creator=${sqlAddress(creator)} AND ${beforeCurrentSql('l',current)} ORDER BY l.block_number,l.log_index,l.launch_id,r.horizon_ms`);
+    const receiptRows=selectRows<{launch_id:string;payload_json:string}>(`SELECT r.launch_id AS launch_id,r.payload_json AS payload_json FROM pons_outcome_receipts r JOIN launches l ON l.launch_id=r.launch_id WHERE r.chain_id=4663 AND l.chain_id=4663 AND l.source='PONS_V2' AND l.creator=${sqlAddress(creator)} AND ${beforeCurrentSql('l',current)} ORDER BY CAST(l.block_number AS INTEGER),l.log_index,l.launch_id,r.horizon_ms`);
     if(receiptRows.length===0) continue;
 
     const priorRows=selectRows<LaunchRow>(`SELECT ${launchColumns()} FROM launches WHERE chain_id=4663 AND source='PONS_V2' AND creator=${sqlAddress(creator)} AND ${beforeCurrentSql('',current)} ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC`);
