@@ -25,7 +25,7 @@ function caseFact(receipt: Receipt): string {
     'TRASH TRAIL',
     previous.length ? `Same paws left receipts on ${previous.join(' · ')}.` : `${launches(receipt.evidenceRefs.length)} share this reported deployer.`,
     `Receipts connect ${launches(receipt.evidenceRefs.length)} to this reported deployer.`,
-    "Price trail isn't verified yet, so I'm not calling this gold."
+    "RAT TRAP: price trail isn't verified yet, so I'm not calling this gold."
   ].join('\n');
 }
 function whyFacts(receipt: { evidenceRefs:Array<{blockNumber:string}> }): string {
