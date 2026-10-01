@@ -30,7 +30,7 @@ export function buildSharePostText(bag) {
     '🔥🗑️ HOT GARBAGE',
     '',
     `${card.symbol} hit THE DUMPSTER.`,
-    `ArcPad-reported creator: ${card.creatorShort}`,
+    `Pons-reported deployer: ${card.creatorShort}`,
     `${card.mode === 'LIVE' ? 'prior indexed bags' : 'prior indexed bags in this fixture'}: ${card.priorLaunches}`,
     `coverage: ${card.coverage}`,
     '',
