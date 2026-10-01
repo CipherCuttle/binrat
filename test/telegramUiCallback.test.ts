@@ -37,7 +37,7 @@ test('RATS pages use a compact persisted snapshot reference with bounded next an
     const loaded=await loadRatsSnapshot(f.db,snapshot.discoveryId,f.now());
     const second=renderRatCard({kind:'RATS',snapshot:loaded,candidateIndex:1});
     assert.match(second.caption,/Fresh repeat 2\/2 · newest first/);
-    const secondPageButtons=second.keyboard.flat().filter(button=>'callbackData' in button && ['Prev','Next'].includes(button.text));
+    const secondPageButtons=second.keyboard.flat().filter(button=>'callbackData' in button && ['Newer','Older'].includes(button.text));
     assert.deepEqual(secondPageButtons.map(button=>button.text),['Newer']);
     const previousData=(secondPageButtons[0] as {callbackData:string}).callbackData;
     assert.deepEqual(parseCallback(previousData),{action:'RATS_PAGE',discoveryId:snapshot.discoveryId,index:0});
