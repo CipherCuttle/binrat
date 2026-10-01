@@ -23,9 +23,9 @@ export const telegramProductConfig = Object.freeze({
       scope: { type: 'all_private_chats' as const },
       commands: [
         { command: 'start', description: 'Wake the rat' },
-        { command: 'rats', description: 'Find repeated deployers' },
-        { command: 'dig', description: 'Investigate an address' },
-        { command: 'watches', description: 'Show active watches' },
+        { command: 'rats', description: 'Fresh Garbage worth digging into' },
+        { command: 'dig', description: 'Dig Deeper on an address' },
+        { command: 'watches', description: 'Open Rat Watch' },
         { command: 'help', description: 'How BINRAT works' }
       ]
     }
