@@ -3,7 +3,7 @@ import test from 'node:test';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { dig, why } from '../src/autonomous/evidence.js';
 import { parseTarget } from '../src/autonomous/model.js';
-import { discoverRats, renderRats } from '../src/autonomous/rats.js';
+import { discoverRats, RATS_RECENT_BLOCK_WINDOW, renderRats } from '../src/autonomous/rats.js';
 import { createPublicShareReceipt, openPublicShareReceipt, renderOpenedReceipt, renderShareArtifact, telegramDeepLink } from '../src/autonomous/share.js';
 import { FreeEntitlements, FREE_CAPACITY } from '../src/autonomous/entitlements.js';
 import { listWatches } from '../src/autonomous/watches.js';
@@ -65,6 +65,20 @@ test('RATS ranks the freshest repeat activity ahead of older high-volume deploye
     const olderHeavy=snapshot.candidates.find(candidate=>candidate.entity.entityId===CREATOR);
     assert.equal(olderHeavy?.recurrenceCount,4);
     assert.equal(olderHeavy?.latestLaunch.blockNumber,'100');
+  } finally { f.db.close(); }
+});
+
+test('RATS omits stale repeaters instead of padding the fresh list with old history', async () => {
+  const f=await autonomousFixture();
+  const stale=addr(9),fresh=addr(10);
+  try {
+    await f.launch(20,stale); await f.launch(30,stale);
+    const tip=Number(RATS_RECENT_BLOCK_WINDOW)+100;
+    await f.launch(tip-1,fresh); await f.launch(tip,fresh);
+    await f.checkpoint(tip);
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.ok(snapshot.candidates.some(candidate=>candidate.entity.entityId===fresh));
+    assert.equal(snapshot.candidates.some(candidate=>candidate.entity.entityId===stale),false);
   } finally { f.db.close(); }
 });
 
