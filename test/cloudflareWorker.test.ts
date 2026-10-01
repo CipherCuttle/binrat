@@ -65,24 +65,26 @@ test('D1 launch count through checkpoint is exact without loading the full launc
   } finally { store.close(); db.close(); }
 });
 
-test('Cloudflare health requires checkpoint at or beyond the verified runtime target', async () => {
+test('Cloudflare health derives readiness from the fresh verified target, not a lagging cycle bit', async () => {
   const db=new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
   const store=new D1Store(db,4663);
   const runtime=new D1RuntimeStateStore(db,4663);
   try {
     await store.commitCheckpoint({blockNumber:100n,blockHash:hex64(100),guardBlockNumber:null,guardBlockHash:null});
-    await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:102n,targetBlock:99n,
+    await runtime.put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:99n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:Date.now()});
     let response=await worker.fetch(new Request('https://binrat.example/api/health'),{DB:db});
     let body=await response.json() as Record<string,unknown>;
     assert.equal(body.indexReady,true);
+    assert.equal(body.liveCaughtUp,true);
 
     await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:102n,targetBlock:101n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:Date.now()});
     response=await worker.fetch(new Request('https://binrat.example/api/health'),{DB:db});
     body=await response.json() as Record<string,unknown>;
     assert.equal(body.indexReady,false);
+    assert.equal(body.liveCaughtUp,false);
   } finally { db.close(); }
 });
 
