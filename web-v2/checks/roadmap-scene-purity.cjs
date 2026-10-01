@@ -54,8 +54,15 @@ assert.match(stage, /stage\.id === "sniff"/, "SNIFF must be the only rendered ra
 assert.match(stage, /<SniffScene\s*\/>/, "SNIFF must render through its dedicated scene component");
 assert.match(stage, /data-scene-art="empty"/, "unimplemented stages must retain an empty scene-art shell");
 assert.match(sniffScene, /import sniffBase from "\.\/assets\/sniff\/sniff-base\.webp"/, "SNIFF must use its approved raster asset");
-assert.match(sniffScene, /<img[\s\S]*src=\{sniffBase\}[\s\S]*alt=""[\s\S]*\/>/, "SNIFF must render the authored raster directly");
-assert.doesNotMatch(sniffScene, /<\/?(?!img\b)[a-z][^>]*>/i, "SNIFF may not add decorative DOM scene primitives");
+assert.match(sniffScene, /data-scene-art="raster"/, "SNIFF must declare raster-authored scene art");
+assert.doesNotMatch(sniffScene, /<\/?(?!img\b|div\b)[a-z][^>]*>/i, "SNIFF may only use structural divs plus authored raster images");
+assert.doesNotMatch(sniffScene, /<(?:span|i|b|em|svg|canvas)\b/i, "SNIFF may not add pictorial DOM primitives");
+const sniffImageSources = [...sniffScene.matchAll(/<img[\s\S]*?src=\{([^}]+)\}[\s\S]*?\/>/g)].map((match) => match[1]);
+assert.ok(sniffImageSources.length >= 4, "SNIFF should expose multiple raster-lighting layers");
+assert.ok(sniffImageSources.every((source) => source === "sniffBase"), "every SNIFF visual layer must use the exact approved raster source");
+assert.match(sniffScene, /data-scene-layer="radar"/, "SNIFF radar life must be raster-derived");
+assert.match(sniffScene, /data-scene-layer="crt-a"/, "SNIFF CRT life must be raster-derived");
+assert.match(sniffScene, /data-scene-layer="lamp"/, "SNIFF lamp life must be raster-derived");
 assert.deepEqual(assetFiles, ["assets/sniff/sniff-base.webp"], "only the approved SNIFF raster may exist at this gate");
 assert.equal(
   crypto.createHash("sha256").update(fs.readFileSync(sniffAsset)).digest("hex"),
