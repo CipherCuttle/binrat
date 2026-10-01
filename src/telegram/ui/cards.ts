@@ -53,7 +53,79 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
     const retained=candidate.evidenceRefs.length;
-    const latestName=latest.symbol ? `${latest.symbol}` : (latest.name || 'latest launch');
+    const latestName=latest.symbol ? '
+    return card({view:'RATS',media:'repeat-creator',caption:[
+      `🐀 SAME PAWS. ${launches(count).toUpperCase()} INDEXED.`,
+      `Latest: ${latestName} · block ${latest.blockNumber}`,
+      `${retained} retained receipt${retained===1?'':'s'} back this card.`
+    ].join('\n'),keyboard:[
+      [callbackButton('Investigate',{action:'CASE',shareId:id}),callbackButton('Watch',{action:'WATCH',shareId:id})],
+      [callbackButton('Why',{action:'WHY',shareId:id}),copyButton('Copy address',candidate.entity.entityId)],
+      [callbackButton('Prev',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:Math.max(0,outcome.candidateIndex-1)}),callbackButton(`${outcome.candidateIndex+1}/${outcome.snapshot.candidates.length}`,{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:outcome.candidateIndex}),callbackButton('Next',{action:'RATS_PAGE',discoveryId:outcome.snapshot.discoveryId,index:Math.min(outcome.snapshot.candidates.length-1,outcome.candidateIndex+1)})],
+      [webAppButton('Open Radar',TELEGRAM_MINI_APP_URL)],
+      [callbackButton('Home',{action:'HOME'})]
+    ]});
+  }
+  if (outcome.kind === 'CASE') {
+    const id=share(outcome.receipt); const creator=outcome.receipt.evidenceRefs[0]?.creator;
+    const isWhy=outcome.mode === 'WHY';
+    return card({view:isWhy?'WHY':'CASE',media:outcome.receipt.discovery?'repeat-creator':'evidence-found',caption:isWhy
+      ? `🐀 WHY I NOTICED\n${whyFacts(outcome.receipt)}`
+      : `🐀 CASE FILE\n${caseFact(outcome.receipt)}`,keyboard:[
+      creator ? [callbackButton(isWhy ? 'Investigate' : 'Why',{action:isWhy ? 'CASE' : 'WHY',shareId:id}),callbackButton('Watch',{action:'WATCH',shareId:id})] : [],
+      [webAppButton('Open Case',`${TELEGRAM_MINI_APP_URL}?case=${outcome.receipt.caseId}`)],
+      [callbackButton('Full receipt',{action:'FULL',shareId:id}),callbackButton('Share',{action:'SHARE',shareId:id})],
+      creator ? [copyButton('Copy address',creator)] : [],
+      [callbackButton('Home',{action:'HOME'})]
+    ].filter(row=>row.length>0)});
+  }
+  if (outcome.kind === 'WATCH') {
+    return card({view:'WATCH_STATE',media:'inquisitive',caption:watchCopy(outcome.reply),keyboard:[[callbackButton('Watches',{action:'WATCHES'}),callbackButton('Home',{action:'HOME'})]]});
+  }
+  if (outcome.kind === 'WATCHLIST') return card({view:outcome.watches.length?'WATCHLIST':'EMPTY',media:outcome.watches.length?'inquisitive':'empty-paws',caption:outcome.watches.length
+    ? `🐀 WATCHING ${outcome.watches.length} SET${outcome.watches.length === 1 ? '' : 'S'} OF PAWS.\n${outcome.watches.slice(0,5).map(w=>`• ${shortReference(w.entity_id)}`).join('\n')}\nI squeak only when a new indexed launch appears.`
+    : '🐀 NOTHING IN THE BIN.\nNo paws are being watched.',keyboard:[[callbackButton('Home',{action:'HOME'})]]});
+  if (outcome.kind === 'SHARE') return card({view:'CASE',media:'evidence-found',caption:`🐀 RECEIPT PACKED.\nPublic evidence only. No private watch data.\n\nhttps://t.me/BinratBot?start=receipt_${outcome.receipt.receiptId}`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
+  if (outcome.kind === 'OPEN_RECEIPT') {
+    const id=share(outcome.receipt.finding);
+    return card({view:'CASE',media:'evidence-found',caption:`🐀 SOMEONE LEFT A RECEIPT.\n${caseFact(outcome.receipt.finding)}`,keyboard:[
+      [callbackButton('Full receipt',{action:'FULL',shareId:id})],
+      [callbackButton('Home',{action:'HOME'})]
+    ]});
+  }
+  if (outcome.kind === 'REPLAY') return card({view:'WATCH_STATE',media:'inquisitive',caption:outcome.reply,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
+  return card({view:'ERROR',media:'error',caption:errorCopy(outcome.code),keyboard:[[callbackButton('DIG',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]});
+}
+
+/**
+ * Presentation only: delivery has already re-verified the watch, event and
+ * canonical evidence before it reaches this renderer. Keep the compact alert
+ * separate from the full receipt available through the existing callbacks.
+ */
+export function renderAlertCard(receipt: Receipt, watchStartBlock: number): RatCard {
+  const ref = receipt.evidenceRefs[0];
+  if (!ref || !Number.isSafeInteger(watchStartBlock) || watchStartBlock < 0) throw new Error('ALERT_CARD_INPUT_INVALID');
+  const id = share(receipt);
+  return card({
+    view:'ALERT', media:'alert',
+    caption:[
+      '🐀 SAME PAWS. NEW LAUNCH.',
+      'A watched reported deployer showed up again.',
+      'Your watch caught a fresh indexed launch.'
+    ].join('\n\n'),
+    keyboard:[
+      [callbackButton('Investigate',{action:'CASE',shareId:id}),callbackButton('Why',{action:'WHY',shareId:id})],
+      [callbackButton('Share',{action:'SHARE',shareId:id}),callbackButton('Unwatch',{action:'UNWATCH',shareId:id},'danger')],
+      [copyButton('Copy address',ref.creator)]
+    ]
+  });
+}
+
+export function digWaitingCard(): RatCard { return card({view:'DIG_WAITING',media:'inquisitive',caption:"🐀 GIVE ME A DEPLOYER ADDRESS.\nI'll check what BINRAT remembers.",keyboard:[[callbackButton('Home',{action:'HOME'})]]}); }
+export function diggingCard(): RatCard { return card({view:'DIGGING',media:'digging',caption:'🐀 RUMMAGING THROUGH OLD LAUNCHES…\nChecking what BINRAT remembers.',keyboard:[]}); }
+export function malformedDigCard(): RatCard { return card({view:'DIG_WAITING',media:'empty-paws',caption:"🐀 THAT ISN'T A DEPLOYER ADDRESS I CAN CHECK.\nTry another set of paws.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
+export function digPromptOperationalErrorCard(): RatCard { return card({view:'ERROR',media:'error',caption:"🐀 PIPE SMELLS WRONG.\nI didn't start a dig. Try again.",keyboard:[[callbackButton('Try again',{action:'DIG_PROMPT'}),callbackButton('Home',{action:'HOME'})]]}); }
+ + latest.symbol : (latest.name || 'latest launch');
     return card({view:'RATS',media:'repeat-creator',caption:[
       `🐀 SAME PAWS. ${launches(count).toUpperCase()} INDEXED.`,
       `Latest: ${latestName} · block ${latest.blockNumber}`,
