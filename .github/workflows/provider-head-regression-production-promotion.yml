@@ -61,3 +61,5 @@ jobs:
           path: ${{ runner.temp }}/provider-head-regression-production.txt
           retention-days: 30
           if-no-files-found: warn
+
+# promotion trigger: 2026-10-01T22:30Z
