@@ -10,19 +10,23 @@ const QUEUE='binrat-sync-v0';
 const DB_ID='46814564-1a41-449a-88e5-c1349eed3a27';
 const WORKER_URL='https://binrat-edge-v0.pettevik.workers.dev';
 
-const BRANCH='ops/binrat-pons-provider-regression-deploy-v1';
+const BRANCH='ops/binrat-provenance-repair-deploy-v1';
 const EXPECTED_LIVE_VERSION='38ec8576-0b14-48e4-a425-175f4606c26f';
 const EXPECTED_LIVE_SHA='cf85ee9cf33cdd3e7c04048e39e86b14ded775ae';
-const REVIEWED_RELEASE_SHA='9d7d926f10db93802e76eab96b655ba449f23db1';
+const REVIEWED_RELEASE_SHA='23afe944d1faf5ec4e681f66481ff88cbb4b7353';
 const EXPECTED_DIFF=[
-  'src/cloudflare/syncQueue.ts',
+  'src/cloudflare/d1Store.ts',
+  'src/core/ports.ts',
   'src/indexer/syncLaunches.ts',
-  'test/cloudflareSyncQueue.test.ts'
+  'src/intelligence/provenance.ts',
+  'src/store/sqliteStore.ts',
+  'test/ponsProvenanceRepairD1.test.ts',
+  'test/sync.test.ts'
 ];
 
-const CONFIG='wrangler.provider-regression.generated.jsonc';
-const PROVISION='/tmp/binrat-provider-regression-provision.json';
-const SECRETS='/tmp/binrat-provider-regression-secrets.json';
+const CONFIG='wrangler.provenance-repair.generated.jsonc';
+const PROVISION='/tmp/binrat-provenance-repair-provision.json';
+const SECRETS='/tmp/binrat-provenance-repair-secrets.json';
 const WRANGLER=['dlx','wrangler@4.135.0'];
 const summary=process.env.GITHUB_STEP_SUMMARY;
 
@@ -231,8 +235,8 @@ function writeConfig(){
   },null,2));
 }
 
-gate(process.env.GITHUB_REF==='refs/heads/'+BRANCH,'PROVIDER_FIX_REF_INVALID');
-gate(process.env.PROVIDER_FIX_PROD_APPROVED==='true','PROVIDER_FIX_APPROVAL_GATE_CLOSED');
+gate(process.env.GITHUB_REF==='refs/heads/'+BRANCH,'PROVENANCE_REPAIR_REF_INVALID');
+gate(process.env.PROVENANCE_REPAIR_PROD_APPROVED==='true','PROVENANCE_REPAIR_APPROVAL_GATE_CLOSED');
 for(const name of ['CLOUDFLARE_API_TOKEN','CLOUDFLARE_ACCOUNT_ID','BINRAT_ROBINHOOD_ARCHIVE_RPC_URL']){
   gate(Boolean(process.env[name]?.trim()),'MISSING_REQUIRED_SECRET:'+name);
 }
