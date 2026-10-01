@@ -27,7 +27,7 @@ function watchRows(count:number) {
 test('WATCHES card stays fully native and discloses legacy migration state', () => {
   const card=renderRatCard({kind:'WATCHLIST',watches:watchRows(7),legacyWatchCount:2});
   assert.equal(card.view,'WATCHLIST');
-  assert.match(card.caption,/WATCHING 7 SETS OF PAWS/);
+  assert.match(card.caption,/RAT WATCH · 7 SETS OF PAWS/);
   assert.equal((card.caption.match(/^• /gm) ?? []).length,7);
   assert.doesNotMatch(card.caption,/more active watches/);
   assert.match(card.caption,/2 legacy watches are not active here; re-arm explicitly on Pons 4663/);
@@ -35,7 +35,7 @@ test('WATCHES card stays fully native and discloses legacy migration state', () 
 
   const legacyOnly=renderRatCard({kind:'WATCHLIST',watches:[],legacyWatchCount:1});
   assert.equal(legacyOnly.view,'WATCHLIST');
-  assert.match(legacyOnly.caption,/No active V1 watches/);
+  assert.match(legacyOnly.caption,/Nothing on Rat Watch yet/);
   assert.match(legacyOnly.caption,/1 legacy watch is not active here/);
 });
 
@@ -59,8 +59,8 @@ test('historical Arc CASE cards expose evidence but never a dead Watch action', 
 
 test('V2 error cards preserve fail-closed reason classes instead of collapsing to a generic pipe error', () => {
   const cases:Array<[string,RegExp]> = [
-    ['The live index is unavailable or stale. No new investigation or alert authority.',/INDEX WENT COLD/],
-    ['A fresh canonical Robinhood boundary could not be verified. Watch was not added.',/PONS HEAD NOT VERIFIED/],
+    ['The live index is unavailable or stale. No new investigation or alert authority.',/LOST THE TRAIL/],
+    ['A fresh canonical Robinhood boundary could not be verified. Watch was not added.',/STUCK IN A PIPE/],
     ['That Rat snapshot is unavailable or expired.',/THAT RAT PAGE EXPIRED/],
     ['Discovery receipts are unavailable. No rats invented.',/RAT RECEIPTS UNAVAILABLE/],
     ['Discovery receipts could not be saved. No rats invented.',/RAT SNAPSHOT NOT SAVED/],
@@ -92,27 +92,26 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
       assert.doesNotMatch(card.caption,JARGON,card.view);
       assert.ok(primaryActions(card)<=2,`${card.view} primary actions`);
     }
-    assert.match(cards[0]!.caption,/freshest deployers that just came back/i);
-    assert.match(cards[1]!.caption,/REPEAT DEPLOYER ACTIVE/);
-    assert.match(cards[1]!.caption,/Recent repeat launch: \$FIXTURE/);
-    assert.doesNotMatch(cards[1]!.caption,/block 100/);
-    assert.match(cards[1]!.caption,/Previous from same deployer: \$FIXTURE/);
-    assert.match(cards[1]!.caption,/1 earlier indexed launch total/);
-    assert.match(cards[1]!.caption,/BINRAT will ping you if these paws launch again/);
-    assert.doesNotMatch(cards[1]!.caption,/retained receipt|LAUNCHES INDEXED/i);
+    assert.match(cards[0]!.caption,/dig through Pons garbage/i);
+    assert.match(cards[1]!.caption,/SMELLS FAMILIAR/);
+    assert.match(cards[1]!.caption,/Fresh Garbage: \$FIXTURE/);
+    assert.doesNotMatch(cards[1]!.caption,/block 100|indexed launch total|retained receipt/i);
+    assert.match(cards[1]!.caption,/Same paws left receipts on \$FIXTURE/);
+    assert.match(cards[1]!.caption,/trail worth digging/i);
     const ratLabels=cards[1]!.keyboard.flat().map(button=>button.text);
-    assert.ok(ratLabels.includes('Open case'));
-    assert.ok(ratLabels.includes('Watch deployer'));
-    assert.ok(ratLabels.includes('Why flagged'));
+    assert.ok(ratLabels.includes('Dig Deeper'));
+    assert.ok(ratLabels.includes('Receipts'));
+    assert.equal(ratLabels.includes('Watch deployer'),false);
     assert.equal(ratLabels.includes('Open Radar'),false);
     assert.equal(cards[1]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
     assert.equal(cards[2]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
     assert.equal(cards[5]!.keyboard.flat().some(button=>'webAppUrl' in button),false);
-    assert.match(cards[2]!.caption,/found .* launches from this reported deployer/i);
-    assert.match(cards[3]!.caption,/WHY I NOTICED/);
-    assert.match(cards[4]!.caption,/WATCHING THESE PAWS/);
-    assert.match(cards[5]!.caption,/NOTHING IN THE BIN/);
-    assert.match(cards[6]!.caption,/PIPE SMELLS WRONG/);
+    assert.match(cards[2]!.caption,/DUG IT UP/);
+    assert.match(cards[2]!.caption,/Trash Trail/);
+    assert.match(cards[3]!.caption,/RECEIPTS/);
+    assert.match(cards[4]!.caption,/RAT WATCH SET/);
+    assert.match(cards[5]!.caption,/RAT WATCH/);
+    assert.match(cards[6]!.caption,/LOST THE TRAIL/);
 
     const publicReceipt=await createPublicShareReceipt(f.db,receipt.caseId,f.now());
     const opened=renderRatCard({kind:'OPEN_RECEIPT',receipt:publicReceipt});
