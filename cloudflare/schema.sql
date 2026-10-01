@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS pons_token_identity_receipts (
   name TEXT NOT NULL,
   symbol TEXT NOT NULL,
   decimals INTEGER NOT NULL CHECK(decimals BETWEEN 0 AND 255),
-  total_supply TEXT NOT NULL,
   evidence_digest TEXT NOT NULL,
   payload_json TEXT NOT NULL
 );
