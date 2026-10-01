@@ -316,10 +316,13 @@ async function smokePrivateMiniApp(token, tester) {
     });
     const body = await response.json().catch(() => null);
     const ok = response.ok && body && body.rats?.chainId === 4663 && Array.isArray(body.rats?.candidates) &&
+      Array.isArray(body.latestLaunches) && body.latestLaunches.every(launch => launch && typeof launch.launchId === 'string' &&
+        typeof launch.blockNumber === 'string' && typeof launch.deployer === 'string') &&
       Array.isArray(body.watches) && body.sourceHealth?.chainId === 4663 && body.sourceHealth?.indexReady === true;
     note('Mini App bootstrap probe ' + JSON.stringify({
       attempt:attempt+1,status:response.status,error:typeof body?.error==='string'?body.error:null,
       ratsChainId:body?.rats?.chainId ?? null,candidateCount:Array.isArray(body?.rats?.candidates)?body.rats.candidates.length:null,
+      latestLaunchCount:Array.isArray(body?.latestLaunches)?body.latestLaunches.length:null,
       watches:Array.isArray(body?.watches),sourceChainId:body?.sourceHealth?.chainId ?? null,
       sourceIndexReady:body?.sourceHealth?.indexReady ?? null,sourceCheckpoint:body?.rats?.sourceCheckpoint ?? null
     }));
