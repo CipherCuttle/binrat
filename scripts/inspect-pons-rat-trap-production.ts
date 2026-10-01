@@ -4,6 +4,7 @@ import { rmSync, writeFileSync } from 'node:fs';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { parsePonsOutcomeObservationReceipt, RpcPonsOutcomeObservationSource, type PonsOutcomeObservationReceipt } from '../src/pons/outcomeReceipts.js';
 import { buildPonsRatTrapProjection, type PonsRatTrapProjection } from '../src/pons/ratTrapProjection.js';
+import { resolveRobinhoodArchiveRpcUrl } from '../src/cloudflare/syncQueue.js';
 
 const DB='binrat-v0';
 const DB_ID='46814564-1a41-449a-88e5-c1349eed3a27';
@@ -131,10 +132,11 @@ function summarizeProjection(projection:PonsRatTrapProjection) {
   };
 }
 
-const archiveRpcUrl=process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL?.trim();
 gate(process.env.CLOUDFLARE_API_TOKEN,'RAT_TRAP_INSPECT_CLOUDFLARE_TOKEN_MISSING');
 gate(process.env.CLOUDFLARE_ACCOUNT_ID,'RAT_TRAP_INSPECT_CLOUDFLARE_ACCOUNT_MISSING');
-gate(archiveRpcUrl,'RAT_TRAP_INSPECT_ARCHIVE_RPC_MISSING');
+const archiveRpcUrl=resolveRobinhoodArchiveRpcUrl({
+  BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL
+});
 
 writeFileSync(CONFIG,JSON.stringify({
   name:'binrat-rat-trap-readonly-inspect',main:'src/cloudflare/worker.ts',compatibility_date:'2026-09-18',
