@@ -39,7 +39,7 @@ export interface RatTrapPresentationSummary {
 
 export interface RatTrapPresentation {
   presentationVersion:typeof PONS_RAT_TRAP_PRESENTATION_VERSION;
-  heading:'RAT TRAP';
+  heading:'TRASH TRAIL';
   deck:string;
   summary:RatTrapPresentationSummary;
   launches:RatTrapPresentationLaunch[];
@@ -57,8 +57,8 @@ export function buildRatTrapPresentation(
 
   return {
     presentationVersion:PONS_RAT_TRAP_PRESENTATION_VERSION,
-    heading:'RAT TRAP',
-    deck:'What happened the other times these paws showed up?',
+    heading:'TRASH TRAIL',
+    deck:'What happened the other times this exact deployer showed up?',
     summary:{
       previousLaunches:projection.previousLaunchCount,
       launchesWithAnyMemory,
@@ -136,7 +136,7 @@ function coverageText(summary:{
   launchesPendingMemory:number;
   launchesStillImmature:number;
 }):string {
-  if(summary.previousLaunches===0) return 'No previous launches from these reported paws.';
+  if(summary.previousLaunches===0) return 'No previous launches from this source-reported deployer.';
   const parts=[
     `I know what happened next for ${summary.launchesWithAnyMemory} of ${summary.previousLaunches} prior launch${summary.previousLaunches===1?'':'es'}`,
     `${summary.launchesWithFullMemory} complete through 24h`

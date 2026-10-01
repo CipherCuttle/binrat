@@ -150,3 +150,12 @@ test('PARTIAL receipts remain visible as incomplete evidence and do not produce 
   assert.match(out.launches[0]!.memoryText,/Trail is still incomplete/);
   assert.equal(out.summary.canOfferRatWatch,false);
 });
+
+
+test('presentation uses canonical Trash Trail + deployer language rather than stale Rat Trap/paws copy',()=>{
+  const out=buildRatTrapPresentation(projection({launches:[]}));
+  assert.equal(out.heading,'TRASH TRAIL');
+  assert.match(out.deck,/exact deployer/i);
+  assert.match(out.summary.coverageText,/source-reported deployer/i);
+  assert.doesNotMatch(JSON.stringify(out),/RAT TRAP|paws/i);
+});
