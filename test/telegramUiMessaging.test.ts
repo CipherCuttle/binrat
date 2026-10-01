@@ -109,7 +109,7 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
     assert.match(cards[2]!.caption,/DUG IT UP/);
     assert.match(cards[2]!.caption,/TRASH TRAIL/);
     assert.match(cards[2]!.caption,/Same paws left receipts on \$FIXTURE/);
-    assert.match(cards[2]!.caption,/Price trail isn't verified yet/);
+    assert.match(cards[2]!.caption,/RAT TRAP: price trail isn't verified yet/);
     const caseActions=cards[2]!.keyboard.flatMap(row=>row.flatMap(button=>'callbackData' in button ? [parseCallback(button.callbackData)?.action] : []));
     assert.equal(caseActions.includes('WATCH'),false);
     assert.match(cards[3]!.caption,/RECEIPTS/);
