@@ -355,6 +355,18 @@ export async function handleBinratApiRequest(
     if (pathname === '/api/capabilities') return capabilities(env);
     if (pathname === '/api/health') return health(env);
     if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
+    if (pathname === '/api/launches/latest') {
+      const launches = await latestPonsLaunches(env.DB,deps.now(),20);
+      const sourceHealth = await chainHealth(env,ROBINHOOD_CHAIN_ID);
+      if (sourceHealth.indexReady !== true) return json(503,{ready:false,reason:'INDEX_NOT_READY'});
+      return json(200,{
+        schemaVersion:'binrat.latest-launches/0.1',
+        chainId:ROBINHOOD_CHAIN_ID,
+        sourceCheckpoint:sourceHealth.targetBlock,
+        historyCoverage:'PARTIAL',
+        launches
+      });
+    }
 
     const ready = await readyContext(env);
     if (!ready) return json(503, { ready: false, reason: 'INDEX_NOT_READY' });
