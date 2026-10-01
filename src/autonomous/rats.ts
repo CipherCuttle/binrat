@@ -15,6 +15,14 @@ export interface RatsCandidate {
   evidenceRefs: EvidenceRef[];
   caseId: string;
   rankPosition: number;
+  recurrenceCount: number;
+  latestLaunch: {
+    launchId: string;
+    token: string;
+    symbol: string;
+    name: string;
+    blockNumber: string;
+  };
 }
 export interface RatsSnapshot {
   discoveryId: string;
@@ -27,6 +35,7 @@ export interface RatsSnapshot {
 }
 
 interface CandidateRow { creator: string; recurrence_count: number; latest_block: string }
+interface CandidateLaunchRow { launch_id: string; token: string; symbol: string; name: string; block_number: string }
 
 /**
  * Shared discovery only: verified reported creators with at least two retained,
@@ -52,21 +61,25 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
   for (const row of rows.results ?? []) {
     if (!/^0x[0-9a-f]{40}$/.test(row.creator) || !Number.isSafeInteger(Number(row.recurrence_count)) ||
         Number(row.recurrence_count) < 2 || !/^\d+$/.test(String(row.latest_block))) continue;
-    const refsRows = await db.prepare(`SELECT launch_id FROM launches WHERE chain_id=? AND creator=?
+    const refsRows = await db.prepare(`SELECT launch_id,token,symbol,name,block_number FROM launches WHERE chain_id=? AND creator=?
       AND CAST(block_number AS INTEGER)<=? ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC LIMIT ?`)
-      .bind(chainId, row.creator, Number(tip), MAX_EVIDENCE_PER_CANDIDATE).all<{ launch_id: string }>();
+      .bind(chainId, row.creator, Number(tip), MAX_EVIDENCE_PER_CANDIDATE).all<CandidateLaunchRow>();
     if (!refsRows.success || (refsRows.results?.length ?? 0) < 2) continue;
     try {
       const evidenceRefs = await Promise.all((refsRows.results ?? []).map(item => evidenceForLaunch(db, item.launch_id, tip, chainId)));
       // Claim only the bounded retained count: every displayed recurrence has a public receipt.
       const observedCount = evidenceRefs.length;
+      const recurrenceCount = Number(row.recurrence_count);
+      const latest = refsRows.results?.[0];
+      if (!latest || !/^[0-9a-f]{64}$/.test(latest.launch_id) || !/^0x[0-9a-f]{40}$/.test(latest.token) ||
+          typeof latest.symbol !== 'string' || typeof latest.name !== 'string' || !/^\d+$/.test(latest.block_number)) continue;
       const subject: Entity = { chainId, entityType: 'CREATOR', entityId: row.creator };
       const discovery = {
         ruleVersion: RATS_RULE_VERSION,
         sourceCheckpoint: tip.toString(),
         reasons: [
           { kind: 'RECURRENCE' as const, epistemicClass: 'DERIVED' as const,
-            text: `Exact Pons-reported deployer appears across ${observedCount} retained indexed launches.`,
+            text: `Exact Pons-reported deployer appears across ${recurrenceCount} indexed launches; this card retains ${observedCount} receipts.`,
             evidenceRefs: evidenceRefs.map(ref => ref.factId) },
           { kind: 'RECENCY' as const, epistemicClass: 'OBSERVED' as const,
             text: `Latest retained launch receipt is at indexed block ${evidenceRefs[0]!.blockNumber}.`,
@@ -75,15 +88,21 @@ export async function discoverRats(db: D1DatabaseLike, now: number, candidateLim
       };
       const receipt = await saveCase(db, await makeReceipt(subject, evidenceRefs, tip.toString(), now,
         'INDEXED_LAUNCH_EVIDENCE', discovery));
-      candidates.push({ entity: subject, reasons: discovery.reasons, evidenceRefs, caseId: receipt.caseId,
-        rankPosition: candidates.length + 1 });
+      candidates.push({
+        entity: subject, reasons: discovery.reasons, evidenceRefs, caseId: receipt.caseId,
+        rankPosition: candidates.length + 1, recurrenceCount,
+        latestLaunch: {
+          launchId: latest.launch_id, token: latest.token, symbol: latest.symbol,
+          name: latest.name, blockNumber: latest.block_number
+        }
+      });
     } catch {
       // An incomplete/malformed candidate is not substituted with a weaker claim.
     }
   }
   const core = { chainId: 4663 as const, sourceCheckpoint: tip.toString(), ruleVersion: RATS_RULE_VERSION,
-    candidates: candidates.map(({ entity, reasons, evidenceRefs, caseId, rankPosition }) =>
-      ({ entity, reasons, evidenceRefs, caseId, rankPosition })) };
+    candidates: candidates.map(({ entity, reasons, evidenceRefs, caseId, rankPosition, recurrenceCount, latestLaunch }) =>
+      ({ entity, reasons, evidenceRefs, caseId, rankPosition, recurrenceCount, latestLaunch })) };
   const discoveryId = await sha256Hex(core);
   const existing = await db.prepare('SELECT snapshot_json FROM rat_v11_pons_discovery_snapshots WHERE discovery_id=? AND expires_at_ms>?')
     .bind(discoveryId, now).first<{ snapshot_json: string }>();
@@ -122,6 +141,7 @@ export function renderRats(snapshot: RatsSnapshot): string {
     '🐀 RATS WORTH WATCHING',
     snapshot.candidates.map(candidate => [
       `${candidate.rankPosition}. Robinhood/Pons 4663 · DEPLOYER ${candidate.entity.entityId}`,
+      `${candidate.recurrenceCount} indexed launches · latest ${candidate.latestLaunch.symbol || '?'} at block ${candidate.latestLaunch.blockNumber}`,
       'Observed / derived:',
       ...candidate.reasons.map(reason => `• ${reason.text}`),
       'Coverage: PARTIAL · indexed Pons V2 launches only.',
@@ -145,6 +165,8 @@ async function pruneSnapshots(db: D1DatabaseLike, now: number): Promise<void> {
 function parseSnapshot(input: string): RatsSnapshot {
   const value = JSON.parse(input) as RatsSnapshot;
   if (value.chainId !== 4663 || value.ruleVersion !== RATS_RULE_VERSION || !Array.isArray(value.candidates) ||
-      value.candidates.length > MAX_CANDIDATES) throw new Error('DISCOVERY_UNAVAILABLE');
+      value.candidates.length > MAX_CANDIDATES ||
+      value.candidates.some(candidate => !Number.isSafeInteger(candidate.recurrenceCount) || candidate.recurrenceCount < 2 ||
+        !candidate.latestLaunch || !/^\d+$/.test(candidate.latestLaunch.blockNumber))) throw new Error('DISCOVERY_UNAVAILABLE');
   return value;
 }
