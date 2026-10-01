@@ -92,7 +92,7 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
       assert.doesNotMatch(card.caption,JARGON,card.view);
       assert.ok(primaryActions(card)<=2,`${card.view} primary actions`);
     }
-    assert.match(cards[0]!.caption,/Fresh Rats/);
+    assert.match(cards[0]!.caption,/freshest deployers that just came back/i);
     assert.match(cards[1]!.caption,/REPEAT DEPLOYER ACTIVE/);
     assert.match(cards[1]!.caption,/Latest repeat launch: \$FIXTURE · block 100/);
     assert.match(cards[1]!.caption,/1 earlier indexed launch/);
