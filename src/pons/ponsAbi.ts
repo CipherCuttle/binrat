@@ -16,3 +16,10 @@ export const ponsErc20Abi = [
   { type: 'function', name: 'decimals', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint8' }] },
   { type: 'function', name: 'totalSupply', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] }
 ] as const;
+
+export const ponsV2BondingCurveAbi = [
+  { type:'function', name:'token', stateMutability:'view', inputs:[], outputs:[{type:'address'}] },
+  { type:'function', name:'pairToken', stateMutability:'view', inputs:[], outputs:[{type:'address'}] },
+  { type:'function', name:'graduated', stateMutability:'view', inputs:[], outputs:[{type:'bool'}] },
+  { type:'function', name:'getReserves', stateMutability:'view', inputs:[], outputs:[{type:'uint256'},{type:'uint256'}] }
+] as const;
