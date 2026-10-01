@@ -19,8 +19,21 @@ export class D1PonsTokenIdentityStore implements PonsTokenIdentityStore {
 
   async listMissing(limit:number):Promise<PonsTokenIdentityLaunch[]> {
     const result=await this.db.prepare(`
+      WITH checkpoint AS (
+        SELECT CAST(block_number AS INTEGER) AS tip
+        FROM chain_checkpoints WHERE chain_id=4663 LIMIT 1
+      ),
+      fresh_repeaters AS (
+        SELECT l.creator
+        FROM launches l,checkpoint c
+        WHERE l.chain_id=4663 AND l.source='PONS_V2'
+        GROUP BY l.creator
+        HAVING COUNT(DISTINCT l.launch_id)>=2
+           AND MAX(CAST(l.block_number AS INTEGER))>=MAX(0,c.tip-200000)
+      )
       SELECT l.launch_id,l.token
       FROM launches l
+      JOIN fresh_repeaters r ON r.creator=l.creator
       LEFT JOIN pons_token_identity_receipts i ON i.launch_id=l.launch_id
       WHERE l.chain_id=4663 AND l.source='PONS_V2' AND i.launch_id IS NULL
       ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC
