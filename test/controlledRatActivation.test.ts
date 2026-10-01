@@ -102,6 +102,15 @@ test('activation harness never includes a prompt-table drop and retains additive
   assert.equal(evaluate(`h.rollbackSchemaNotice(true)`),'ROLLBACK_CODE_ONLY: additive Telegram prompt schema retained.');
 });
 
+test('private rollout preflights Robinhood Rat schema and proves a valid Mini App bootstrap', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/20260929_robinhood_live_rat_v1\.sql/);
+  assert.match(script,/ROBINHOOD_RAT_SCHEMA_(?:APPLIED|ALREADY_PRESENT)/);
+  assert.match(script,/MINI_APP_VALID_BOOTSTRAP_PASS/);
+  assert.match(script,/signedMiniAppInitData/);
+  assert.match(script,/\/api\/miniapp\/bootstrap/);
+});
+
 test('private rollout snapshots and restores only the tester menu around postdeploy failure', () => {
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
   assert.match(script,/telegram:private-menu-activate/);
