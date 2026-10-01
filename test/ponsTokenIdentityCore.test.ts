@@ -175,3 +175,86 @@ test('identity migration is additive and idempotent against a pre-identity schem
     db.close();
   }
 });
+
+
+test('identity receipt verifier rejects semantically invalid observation fields even when self-consistent', async () => {
+  await assert.rejects(
+    buildPonsTokenIdentityReceipt({
+      launch:{launchId:'a'.repeat(64),token:'0x1234' as Hex},
+      observedBlock:123n,
+      observedBlockHash:hash(123),
+      name:'Bad',
+      symbol:'BAD',
+      decimals:18
+    }),
+    /PONS_TOKEN_IDENTITY_TOKEN_INVALID/
+  );
+  await assert.rejects(
+    buildPonsTokenIdentityReceipt({
+      launch:{launchId:'a'.repeat(64),token:addr(1)},
+      observedBlock:-1n,
+      observedBlockHash:hash(123),
+      name:'Bad',
+      symbol:'BAD',
+      decimals:18
+    }),
+    /PONS_TOKEN_IDENTITY_BLOCK_INVALID/
+  );
+  await assert.rejects(
+    buildPonsTokenIdentityReceipt({
+      launch:{launchId:'a'.repeat(64),token:addr(1)},
+      observedBlock:123n,
+      observedBlockHash:'0x1234' as Hex,
+      name:'Bad',
+      symbol:'BAD',
+      decimals:18
+    }),
+    /PONS_TOKEN_IDENTITY_BLOCK_HASH_INVALID/
+  );
+  await assert.rejects(
+    buildPonsTokenIdentityReceipt({
+      launch:{launchId:'a'.repeat(64),token:addr(1)},
+      observedBlock:123n,
+      observedBlockHash:hash(123),
+      name:'Bad',
+      symbol:'X'.repeat(65),
+      decimals:18
+    }),
+    /PONS_TOKEN_IDENTITY_TEXT_TOO_LARGE/
+  );
+  await assert.rejects(
+    buildPonsTokenIdentityReceipt({
+      launch:{launchId:'a'.repeat(64),token:addr(1)},
+      observedBlock:123n,
+      observedBlockHash:hash(123),
+      name:'Bad',
+      symbol:'BAD',
+      decimals:256
+    }),
+    /PONS_TOKEN_IDENTITY_DECIMALS_INVALID/
+  );
+});
+
+test('identity store refuses an invalid receipt before any D1 write', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const identityStore=new D1PonsTokenIdentityStore(db);
+  try {
+    const valid=await buildPonsTokenIdentityReceipt({
+      launch:{launchId:'f'.repeat(64),token:addr(9)},
+      observedBlock:123n,
+      observedBlockHash:hash(123),
+      name:'Valid',
+      symbol:'OK',
+      decimals:18
+    });
+    await assert.rejects(
+      identityStore.put({...valid,observedBlockHash:'0x1234' as Hex}),
+      /PONS_TOKEN_IDENTITY_BLOCK_HASH_INVALID/
+    );
+    const count=await db.prepare('SELECT COUNT(*) AS n FROM pons_token_identity_receipts').first<{n:number}>();
+    assert.equal(Number(count?.n??0),0);
+  } finally {
+    db.close();
+  }
+});

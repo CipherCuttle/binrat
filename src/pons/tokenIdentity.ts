@@ -7,6 +7,25 @@ import { PONS_RPC_RETRY_COUNT, PONS_RPC_RETRY_DELAY_MS, PONS_RPC_TIMEOUT_MS } fr
 
 export const PONS_TOKEN_IDENTITY_VERSION = 'BINRAT_PONS_TOKEN_IDENTITY_V1' as const;
 
+function assertIdentityObservationInput(input:{
+  launch:PonsTokenIdentityLaunch;
+  observedBlock:bigint;
+  observedBlockHash:Hex;
+  name:string;
+  symbol:string;
+  decimals:number;
+}):void {
+  if (!/^[0-9a-f]{64}$/i.test(input.launch.launchId)) throw new Error('PONS_TOKEN_IDENTITY_LAUNCH_ID_INVALID');
+  if (!/^0x[0-9a-f]{40}$/i.test(input.launch.token)) throw new Error('PONS_TOKEN_IDENTITY_TOKEN_INVALID');
+  if (input.observedBlock < 0n) throw new Error('PONS_TOKEN_IDENTITY_BLOCK_INVALID');
+  if (!/^0x[0-9a-f]{64}$/i.test(input.observedBlockHash)) throw new Error('PONS_TOKEN_IDENTITY_BLOCK_HASH_INVALID');
+  if (typeof input.name!=='string' || typeof input.symbol!=='string') throw new Error('PONS_TOKEN_IDENTITY_TEXT_INVALID');
+  if (Array.from(input.name).length>256 || Array.from(input.symbol).length>64) throw new Error('PONS_TOKEN_IDENTITY_TEXT_TOO_LARGE');
+  if (!Number.isSafeInteger(input.decimals) || input.decimals<0 || input.decimals>255) {
+    throw new Error('PONS_TOKEN_IDENTITY_DECIMALS_INVALID');
+  }
+}
+
 export interface PonsTokenIdentityLaunch {
   launchId: string;
   token: Hex;
@@ -107,6 +126,7 @@ export async function buildPonsTokenIdentityReceipt(input:{
   symbol:string;
   decimals:number;
 }):Promise<PonsTokenIdentityReceipt> {
+  assertIdentityObservationInput(input);
   const token=input.launch.token.toLowerCase() as Hex;
   const core:Omit<PonsTokenIdentityReceipt,'identityId'|'evidenceDigest'>={
     identityVersion:PONS_TOKEN_IDENTITY_VERSION,

@@ -3,7 +3,8 @@ import type { Hex } from '../core/types.js';
 import type {
   PonsTokenIdentityLaunch,
   PonsTokenIdentityReceipt,
-  PonsTokenIdentityStore
+  PonsTokenIdentityStore,
+  verifyPonsTokenIdentityReceipt
 } from '../pons/tokenIdentity.js';
 import type { D1DatabaseLike, D1ResultLike } from './d1Types.js';
 
@@ -46,6 +47,7 @@ export class D1PonsTokenIdentityStore implements PonsTokenIdentityStore {
   }
 
   async put(receipt:PonsTokenIdentityReceipt):Promise<'INSERTED'|'DUPLICATE'> {
+    await verifyPonsTokenIdentityReceipt(receipt);
     const payload=canonicalJson(receipt);
     const result=await this.db.prepare(`
       INSERT OR IGNORE INTO pons_token_identity_receipts (
