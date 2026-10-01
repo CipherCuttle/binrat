@@ -22,10 +22,10 @@ It must not emit BUY/SELL advice, future price forecasts, rug/safety scores, pro
 
 ## Why "estimated FDV", not market cap
 
-Pons V2 launcher tokens have a fixed total supply, but BINRAT does not currently maintain a verified circulating-supply contract. Therefore:
+Pons V2 launcher tokens mint their initial supply at construction, but the token inherits ERC20Burnable, so `totalSupply()` can decrease after holder burns. BINRAT also does not currently maintain a verified circulating-supply contract. Therefore:
 
 - **market cap** is prohibited unless circulating supply is separately verified;
-- **estimated FDV** = qualified token spot price × verified total supply is allowed;
+- **estimated FDV** = qualified token spot price × `totalSupply()` observed at the **same canonical block** is allowed;
 - if quote asset is native ETH, display ETH-denominated estimated FDV;
 - do not convert to USD without a separately receipted quote/USD observation;
 - if the quote asset is an ERC-20, identify the quote asset and its decimals explicitly; do not silently treat it as USD.
