@@ -33,7 +33,7 @@ jobs:
             cat "$RUNNER_TEMP/binrat-prod-tail.jsonl"
             exit "$code"
           fi
-          grep -E 'SYNC_FAILURE|PONS_|D1_|REORG_|exception|outcome' "$RUNNER_TEMP/binrat-prod-tail.jsonl" | tail -n 300 || true
+          grep -E 'SYNC_PHASE|SYNC_FAILURE|PONS_|D1_|REORG_|exception|outcome' "$RUNNER_TEMP/binrat-prod-tail.jsonl" | tail -n 300 || true
       - name: Preserve read-only tail
         if: always()
         uses: actions/upload-artifact@v4
