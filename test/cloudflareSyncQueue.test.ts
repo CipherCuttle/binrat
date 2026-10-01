@@ -475,6 +475,61 @@ test('live queue skips observation scheduling on the alternate minute', async ()
   }
 });
 
+test('Pons partial slice retains the previous verified runtime boundary until its continuation catches up', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const source=new FakePonsSource();
+  const store=new D1Store(db,ROBINHOOD_CHAIN_ID);
+  const runtime=new D1RuntimeStateStore(db,ROBINHOOD_CHAIN_ID);
+  const latestTarget=source.head-2n;
+  const previousTarget=latestTarget-600n;
+  try {
+    await store.commitCheckpoint({
+      blockNumber:previousTarget,
+      blockHash:hash(previousTarget),
+      guardBlockNumber:null,
+      guardBlockHash:null
+    });
+    await runtime.put({
+      sourceVerified:true,
+      liveCaughtUp:true,
+      headBlock:previousTarget+2n,
+      targetBlock:previousTarget,
+      observationReady:false,
+      historyBackfillComplete:false,
+      historyBackfillTargetBlock:null,
+      lastSyncError:null,
+      lastHistoryError:null,
+      lastObservationError:null,
+      updatedAtMs:100_000
+    });
+
+    const first=await runCloudflarePonsSyncCycle(
+      {DB:db,BINRAT_PONS_MAX_BATCH_BLOCKS:'512'},
+      {kind:'PONS_SYNC_CYCLE',cycleId:'pons-partial-retain-1',enqueuedAtMs:120_000},
+      {now:()=>120_000,ponsLaunchSource:source}
+    );
+    assert.deepEqual(first,{status:'SUCCESS',liveCaughtUp:false});
+    const retained=await runtime.get();
+    assert.equal(retained?.targetBlock,previousTarget);
+    assert.equal(retained?.liveCaughtUp,true);
+    assert.equal(retained?.updatedAtMs,100_000);
+    const partialCheckpoint=await store.getCheckpoint();
+    assert.equal(partialCheckpoint?.blockNumber,previousTarget+512n);
+
+    const second=await runCloudflarePonsSyncCycle(
+      {DB:db,BINRAT_PONS_MAX_BATCH_BLOCKS:'512'},
+      {kind:'PONS_SYNC_CYCLE',cycleId:'pons-partial-retain-2',enqueuedAtMs:121_000},
+      {now:()=>121_000,ponsLaunchSource:source}
+    );
+    assert.deepEqual(second,{status:'SUCCESS',liveCaughtUp:true});
+    const advanced=await runtime.get();
+    assert.equal(advanced?.targetBlock,latestTarget);
+    assert.equal(advanced?.liveCaughtUp,true);
+    assert.equal(advanced?.updatedAtMs,121_000);
+  } finally { store.close(); db.close(); }
+});
+
 test('Pons steady slice stays ahead of observed roughly 600 block-per-minute head growth', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
