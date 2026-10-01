@@ -14,16 +14,20 @@ export function RoadmapPage({ navigate }: { navigate: (path: string) => void }) 
     const selectClosestStage = () => {
       frame = 0;
       const viewportCenter = window.innerHeight / 2;
-      let closest: { id: RoadmapStageId; distance: number } | null = null;
+      let closestId: RoadmapStageId | null = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
 
-      stageNodes.current.forEach((node, id) => {
+      for (const [id, node] of stageNodes.current.entries()) {
         const rect = node.getBoundingClientRect();
         const center = rect.top + rect.height / 2;
         const distance = Math.abs(center - viewportCenter);
-        if (!closest || distance < closest.distance) closest = { id, distance };
-      });
+        if (distance < closestDistance) {
+          closestId = id;
+          closestDistance = distance;
+        }
+      }
 
-      if (closest) setActiveStage(closest.id);
+      if (closestId !== null) setActiveStage(closestId);
     };
 
     const scheduleSelection = () => {
