@@ -92,3 +92,5 @@ After it is superseded, do not keep editing it. Git history and dated receipts p
 Files explicitly marked `SUPERSEDED`, `RECEIPT`, `HANDOFF`, `REVIEW`, or dated verification/recovery artifacts are reference/history unless a canonical authority explicitly points to them for a current fact.
 
 Historical evidence should not be deleted merely to save context. Reduce context by routing correctly, not by destroying provenance.
+
+A few root-level **LEGACY POINTER** stubs remain only because the frozen 2026-09 Arc launch-gate snapshot names those exact paths. The stubs contain no current product claims and point to byte-preserved archive copies.

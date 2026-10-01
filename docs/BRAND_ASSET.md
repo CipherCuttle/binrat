@@ -1,6 +1,9 @@
+> **SCOPE: HASH / PROVENANCE RECEIPT, NOT CURRENT PRODUCT OR VISUAL AUTHORITY.**  
+> Current product/roadmap/language authority starts at `docs/README.md`. Historical presentation notes below are preserved because web invariant checks bind the recorded mascot hashes.
+
 # BINRAT MASCOT ASSETS
 
-## Astra frontend sprint — current presentation
+## Astra frontend sprint — historical presentation provenance
 
 The owner explicitly supplied this exact approved artwork for the frontend rebuild, superseding the V0 presentation derivative below. No image generation, redrawing, or artificial pixelation was applied.
 

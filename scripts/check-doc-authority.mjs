@@ -101,9 +101,47 @@ for (const archived of [
   "docs/archive/legacy-arc-product/INTELLIGENCE_V1.md",
   "docs/archive/legacy-arc-product/PRODUCT_SURFACE_V1.md",
   "docs/archive/legacy-arc-product/LAUNCH_PRESENTATION_V0.md",
+  "docs/archive/legacy-arc-product/LIVE_READ_V0.md",
+  "docs/archive/legacy-arc-product/PUBLIC_READ_PLANE.md",
+  "docs/archive/legacy-arc-product/TELEGRAM_RATBOT_V0.md",
+  "docs/archive/legacy-arc-product/SHARE_CARDS_V0.md",
+  "docs/archive/legacy-arc-product/REPLAY_LAB_V1.md",
+  "docs/archive/legacy-arc-product/DUMPSTER_LEDGER_V0.md",
+  "docs/archive/legacy-design/ASSET_BIBLE_V0.md",
+  "docs/archive/legacy-design/ASSET_INVENTORY_V0.md",
+  "docs/archive/legacy-design/ASSET_PRODUCTION_BRIEF_V1.md",
+  "docs/archive/legacy-arc-launch/BINRAT_LAUNCH_CONFIG_V0.md",
+  "docs/archive/legacy-arc-launch/LAUNCH_MECHANICS_VERIFICATION_V0.md",
+  "docs/archive/receipts-2026-09/RAT_WATCH_V0_LIVE_SUBSCRIPTION_ACCEPTANCE_2026_09_19.md",
+  "docs/archive/receipts-2026-09/TELEGRAM_RAT_CLOUDFLARE_LIVE_ACCEPTANCE_2026_09_19.md",
   "docs/archive/roadmap-precanonical/ROADMAP_V0.md",
   "docs/archive/roadmap-precanonical/ROADMAP_LIVING_SCENES_V1.md",
   "docs/archive/roadmap-precanonical/ROADMAP_GATE1_VERIFY_2026_10_01.md",
 ]) assert.ok(fs.existsSync(path.join(root, archived)), archived + " archive artifact must remain");
+
+for (const pointer of [
+  "docs/DUMPSTER_LEDGER_V0.md",
+  "docs/REPLAY_LAB_V1.md",
+  "docs/RAT_WATCH_V0_LIVE_SUBSCRIPTION_ACCEPTANCE_2026_09_19.md",
+  "docs/TELEGRAM_RAT_CLOUDFLARE_LIVE_ACCEPTANCE_2026_09_19.md",
+  "docs/BINRAT_LAUNCH_CONFIG_V0.md",
+  "docs/LAUNCH_MECHANICS_HOSTILE_REVIEW_V0.md",
+  "docs/LAUNCH_MECHANICS_VERIFICATION_V0.md",
+]) assert.match(read(pointer).slice(0, 500), /LEGACY POINTER/);
+
+for (const removed of [
+  "docs/ASSET_BIBLE_V0.md",
+  "docs/ASSET_INVENTORY_V0.md",
+  "docs/ASSET_PRODUCTION_BRIEF_V1.md",
+  "docs/LIVE_READ_V0.md",
+  "docs/PUBLIC_READ_PLANE.md",
+  "docs/TELEGRAM_RATBOT_V0.md",
+  "docs/SHARE_CARDS_V0.md",
+  "docs/CLOUDFLARE_WEB_LIVE_ACCEPTANCE_2026_09_19.md",
+  "docs/BINRAT_LAUNCH_CONFIG_HOSTILE_REVIEW_V0.md",
+  "docs/BINRAT_LAUNCH_EXECUTION_REHEARSAL_V0.md",
+]) assert.equal(fs.existsSync(path.join(root, removed)), false, removed + " must be archive-only");
+
+assert.match(read("docs/BRAND_ASSET.md").slice(0, 600), /HASH \/ PROVENANCE RECEIPT, NOT CURRENT PRODUCT OR VISUAL AUTHORITY/);
 
 process.stdout.write("BINRAT DOC AUTHORITY: PASS\n");
