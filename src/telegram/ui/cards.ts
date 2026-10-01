@@ -53,7 +53,7 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
     const retained=candidate.evidenceRefs.length;
-    const latestName=latest.symbol ? '
+    const latestName=latest.symbol ? String.fromCharCode(36) + latest.symbol : (latest.name || 'latest launch');
     return card({view:'RATS',media:'repeat-creator',caption:[
       `🐀 SAME PAWS. ${launches(count).toUpperCase()} INDEXED.`,
       `Latest: ${latestName} · block ${latest.blockNumber}`,
