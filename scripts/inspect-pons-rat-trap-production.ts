@@ -11,7 +11,6 @@ import { createPublicClient, http, type Address } from 'viem';
 
 const DB='binrat-v0';
 const DB_ID='46814564-1a41-449a-88e5-c1349eed3a27';
-const WORKER_URL='https://binrat-edge-v0.pettevik.workers.dev';
 const CONFIG='/tmp/binrat-rat-trap-inspect-wrangler.jsonc';
 const WRANGLER=['dlx','wrangler@4.135.0'];
 const MAX_COHORTS=3;
@@ -63,65 +62,6 @@ function selectRows<T>(sql:string):T[] {
   gate(Number(meta.rows_written ?? 0)===0,'RAT_TRAP_INSPECT_D1_ROWS_WRITTEN_NONZERO');
   gate(meta.changed_db!==true,'RAT_TRAP_INSPECT_D1_CHANGED_DB');
   return batches[0]!.results ?? [];
-}
-
-
-async function getJson(path:string):Promise<Record<string,unknown>> {
-  const response=await fetch(WORKER_URL+path,{signal:AbortSignal.timeout(20_000)});
-  const body=await response.json().catch(()=>null);
-  gate(response.ok&&body&&typeof body==='object','RAT_TRAP_INSPECT_HTTP_PROBE_FAILED:'+path);
-  return body as Record<string,unknown>;
-}
-
-function provenanceGap() {
-  const rows=selectRows<{
-    fact_count:number;missing_direct:number;missing_previous:number;missing_any:number
-  }>(`
-    WITH contextual AS (
-      SELECT p.fact_id,p.chain_id,p.launch_id,p.creator,p.observed_block,p.log_index,
-        (
-          SELECT prior.fact_id
-          FROM provenance_facts prior
-          WHERE prior.chain_id=p.chain_id
-            AND prior.creator=p.creator
-            AND (
-              CAST(prior.observed_block AS INTEGER)<CAST(p.observed_block AS INTEGER)
-              OR (CAST(prior.observed_block AS INTEGER)=CAST(p.observed_block AS INTEGER) AND prior.log_index<p.log_index)
-              OR (
-                CAST(prior.observed_block AS INTEGER)=CAST(p.observed_block AS INTEGER)
-                AND prior.log_index=p.log_index
-                AND prior.fact_id<p.fact_id
-              )
-            )
-          ORDER BY CAST(prior.observed_block AS INTEGER) DESC,prior.log_index DESC,prior.fact_id DESC
-          LIMIT 1
-        ) AS previous_fact_id
-      FROM provenance_facts p
-      WHERE p.chain_id=4663
-    )
-    SELECT
-      COUNT(*) AS fact_count,
-      SUM(CASE WHEN direct.edge_id IS NULL THEN 1 ELSE 0 END) AS missing_direct,
-      SUM(CASE WHEN c.previous_fact_id IS NOT NULL AND previous.edge_id IS NULL THEN 1 ELSE 0 END) AS missing_previous,
-      SUM(CASE WHEN direct.edge_id IS NULL OR (c.previous_fact_id IS NOT NULL AND previous.edge_id IS NULL) THEN 1 ELSE 0 END) AS missing_any
-    FROM contextual c
-    LEFT JOIN provenance_edges direct
-      ON direct.edge_id=('reported-creator:' || c.fact_id)
-    LEFT JOIN provenance_edges previous
-      ON previous.edge_id=CASE
-        WHEN c.previous_fact_id IS NULL THEN NULL
-        ELSE ('previous-launch:' || c.fact_id || ':' || c.previous_fact_id)
-      END
-  `);
-  const edgeRows=selectRows<{edge_count:number}>("SELECT COUNT(*) AS edge_count FROM provenance_edges WHERE chain_id=4663");
-  const row=rows[0]??{fact_count:0,missing_direct:0,missing_previous:0,missing_any:0};
-  return {
-    factCount:Number(row.fact_count??0),
-    missingDirect:Number(row.missing_direct??0),
-    missingPrevious:Number(row.missing_previous??0),
-    missingAny:Number(row.missing_any??0),
-    edgeCount:Number(edgeRows[0]?.edge_count??0)
-  };
 }
 
 function sqlAddress(value:string):string {
@@ -230,8 +170,6 @@ try {
   const checkpoint={blockNumber:BigInt(checkpointRows[0]!.block_number),blockHash:checkpointRows[0]!.block_hash.toLowerCase() as Hex};
   const receiptCountRows=selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_outcome_receipts WHERE chain_id=4663");
   const receiptCount=Number(receiptCountRows[0]?.n??0);
-  const provenance=provenanceGap();
-  const health=await getJson('/api/health');
 
   const source=new RpcPonsOutcomeObservationSource({discoveryRpcUrl:archiveRpcUrl,archiveRpcUrl});
   const identityClient=createPublicClient({chain:robinhoodMainnet(archiveRpcUrl),transport:http(archiveRpcUrl)});
@@ -315,13 +253,7 @@ try {
   const report={
     kind:'BINRAT_PONS_RAT_TRAP_PRODUCTION_INSPECTION_V1',productionMutation:false,
     checkpoint:{blockNumber:checkpoint.blockNumber.toString(),blockHash:checkpoint.blockHash,timestampMs:checkpointPoint.timestampMs},
-    receiptCount,provenanceGap:provenance,
-    health:{
-      ok:health.ok??null,releaseSha:health.releaseSha??null,chainId:health.chainId??null,indexReady:health.indexReady??null,
-      liveCaughtUp:health.liveCaughtUp??null,checkpointBlock:health.checkpointBlock??null,headBlock:health.headBlock??null,
-      targetBlock:health.targetBlock??null,lastSyncError:health.lastSyncError??null,runtimeFresh:health.runtimeFresh??null
-    },
-    d1ReadCalls,creatorCandidates:creatorRows.length,selectedCohorts:cohorts.length,skipped,cohorts
+    receiptCount,d1ReadCalls,creatorCandidates:creatorRows.length,selectedCohorts:cohorts.length,skipped,cohorts
   };
   console.log(JSON.stringify(report,null,2));
 } finally {
