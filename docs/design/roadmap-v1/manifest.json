@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "binrat.roadmap-raster-source/1",
+  "approvedAt": "2026-10-01",
+  "source": {
+    "name": "gritty_binrat_roadmap_neon_sewer_network.png",
+    "width": 1448,
+    "height": 1086,
+    "sha256": "95becddb235c825b591b8b454fbd0726d8adcfd2ddb13066446113a3ad613849",
+    "note": "Owner-approved visual donor. Baked concept copy/status is non-authoritative."
+  },
+  "scenes": {
+    "sniff": {
+      "crop": [
+        0,
+        55,
+        665,
+        430
+      ],
+      "output": "sniff-base.webp",
+      "width": 665,
+      "height": 375,
+      "webpQuality": 80,
+      "sha256": "6aad1c3a02fd031b048adb5d6b9ac389af38c6834c5d782c7fd190f37788d969"
+    },
+    "remember": {
+      "crop": [
+        770,
+        325,
+        1448,
+        660
+      ],
+      "output": "remember-base.webp",
+      "width": 678,
+      "height": 335,
+      "webpQuality": 80,
+      "sha256": "ea492807c6240dcf2f979a5e36de01b657a438eb5bf24535b279bcb0d79294e4"
+    }
+  }
+}
