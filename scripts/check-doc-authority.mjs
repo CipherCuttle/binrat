@@ -23,6 +23,11 @@ assert.equal(manifest.currentProductAuthority.activeIntelligenceChainId, 4663);
 assert.equal(manifest.currentProductAuthority.activeIntelligenceRail, "PONS_V2_DIRECT_FACTORY");
 assert.equal(manifest.currentProductAuthority.legacyEvidenceChainId, 5042);
 assert.equal(manifest.currentProductAuthority.legacyEvidenceState, "HISTORICAL_LEGACY_EVIDENCE_ONLY");
+assert.equal(manifest.capabilityStatusFreshness.currentRailChainId, 4663);
+assert.equal(manifest.capabilities.ratRadarV0.statusScope, "LEGACY_ARC_5042_STATUS_SNAPSHOT");
+assert.equal(manifest.capabilities.ratWatchV0.statusScope, "LEGACY_ARC_5042_STATUS_SNAPSHOT");
+assert.equal(manifest.capabilities.telegramRatV0.currentRailRevalidationRequired, true);
+assert.equal(manifest.launchGateStatus.recomputeRequired, true);
 assert.equal(manifest.capabilities.launchMechanicsV0.authorityStatus, "LEGACY_ARC_5042_REFERENCE_ONLY");
 assert.equal(manifest.capabilities.launchConfigurationV0.authorityStatus, "LEGACY_ARC_5042_REFERENCE_ONLY");
 assert.equal(manifest.launchAuthorization.status, "BLOCKED");
@@ -30,6 +35,11 @@ assert.equal(manifest.launchAuthorization.marketingAuthorized, false);
 assert.equal(manifest.launchAuthorization.launchAuthorized, false);
 assert.equal(manifest.launchAuthorization.tokenState, "NOT_LAUNCHED");
 assert.equal(manifest.launchAuthorization.currentRailReverificationRequired, true);
+
+const router = read("docs/README.md");
+assert.match(router, /KEEP \/ active authority/);
+assert.match(router, /BACKBURNER \/ vision/);
+assert.match(router, /discard from active context/i);
 
 const roadmap = read("docs/ROADMAP.md");
 for (const heading of [
