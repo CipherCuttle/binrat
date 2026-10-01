@@ -92,6 +92,7 @@ export class RpcPonsCurveOutcomeSource implements PonsCurveOutcomeSource {
 
     const block=await this.client.getBlock({blockNumber});
     if (!block.hash) throw new Error('PONS_OUTCOME_BLOCK_HASH_MISSING');
+    const observedBlockHash=block.hash.toLowerCase() as Hex;
     const timestampMs=Number(block.timestamp*1000n);
     if (!Number.isSafeInteger(timestampMs)) throw new Error('PONS_OUTCOME_BLOCK_TIMESTAMP_INVALID');
 
@@ -146,10 +147,18 @@ export class RpcPonsCurveOutcomeSource implements PonsCurveOutcomeSource {
       }
     }
 
+    const confirmedBlock=await this.client.getBlock({blockNumber});
+    if (!confirmedBlock.hash || confirmedBlock.hash.toLowerCase()!==observedBlockHash) {
+      throw new Error('PONS_OUTCOME_BLOCK_REORG_DURING_READ');
+    }
+    if (confirmedBlock.timestamp!==block.timestamp) {
+      throw new Error('PONS_OUTCOME_BLOCK_TIMESTAMP_DRIFT');
+    }
+
     return {
       launch:{launchId:launch.launchId,token,curve},
       observedBlock:blockNumber,
-      observedBlockHash:block.hash.toLowerCase() as Hex,
+      observedBlockHash,
       observedTimestampMs:timestampMs,
       pairToken,
       quoteDecimals,
