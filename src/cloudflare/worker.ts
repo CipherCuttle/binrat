@@ -1152,7 +1152,7 @@ async function handleRatWatchCommand(
     return {
       intent: 'WATCH_LIST',
       text: rows.length === 0
-        ? '🐀 no watched creator addresses yet.\n\n/watch 0x... — watch an indexed ArcPad-reported creator address'
+        ? '🐀 no watched creator addresses yet.\n\n/watch 0x... — watch an indexed Pons-reported deployer address'
         : [
             '🐀 watch list.',
             '',
@@ -1197,7 +1197,7 @@ async function handleRatWatchCommand(
     return {
       intent: 'WATCH',
       text: [
-        '🐀 that address is not currently indexed as an ArcPad-reported creator.',
+        '🐀 that address is not currently indexed as a Pons-reported deployer.',
         'watch was not added. unknown is not clean.'
       ].join('\n')
     };
@@ -1228,7 +1228,7 @@ async function handleRatWatchCommand(
       command.creator,
       '',
       `starting after block ${ready.feed.asOfBlock}.`,
-      'i will alert on a future launch from the same ArcPad-reported address.',
+      'i will alert on a future launch from the same Pons-reported deployer address.',
       'same address != same human identity.'
     ].join('\n')
   };
