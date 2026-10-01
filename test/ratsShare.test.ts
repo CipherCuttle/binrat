@@ -83,13 +83,21 @@ test('RATS fails closed when the durable checkpoint is behind the verified runti
   } finally { f.db.close(); }
 });
 
-test('RATS fails closed on stale/unready state and rejects malformed source evidence', async () => {
+test('RATS uses the verified target when a newer sync has crossed it but the cached cycle bit still says not caught up', async () => {
+  const {f}=await recurrentFixture();
+  try {
+    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:100n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.sourceCheckpoint,'100');
+    assert.ok(snapshot.candidates.every(candidate=>candidate.evidenceRefs.every(ref=>BigInt(ref.blockNumber)<=100n)));
+  } finally { f.db.close(); }
+});
+
+test('RATS fails closed on unverified state and rejects malformed source evidence', async () => {
   const {f} = await recurrentFixture();
   try {
     await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:false,liveCaughtUp:true,headBlock:102n,targetBlock:100n,
-      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
-    await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
-    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:true,liveCaughtUp:false,headBlock:102n,targetBlock:100n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
     await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
   } finally { f.db.close(); }
