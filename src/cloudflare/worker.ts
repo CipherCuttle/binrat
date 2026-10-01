@@ -38,7 +38,7 @@ import {
   type RatAiBinding, type RatMemory
 } from './ratConversation.js';
 import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
-import { D1RuntimeStateStore, type D1RuntimeState } from './runtimeState.js';
+import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
@@ -1336,15 +1336,8 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
   const launchCount = checkpoint ? await store.countLaunchesThroughBlock(checkpoint.blockNumber) : 0;
 
   const fresh = runtime ? runtimeFresh(runtime, maxStatusAgeMs(env)) : false;
-  const indexReady = Boolean(
-    checkpoint &&
-    runtime?.sourceVerified &&
-    runtime.liveCaughtUp &&
-    !runtime.lastSyncError &&
-    fresh &&
-    runtime.targetBlock !== null &&
-    checkpoint.blockNumber >= runtime.targetBlock
-  );
+  const verifiedTarget = verifiedRuntimeTarget(runtime, checkpoint?.blockNumber ?? null, Date.now(), maxStatusAgeMs(env));
+  const indexReady = verifiedTarget !== null;
   const observationReady = Boolean(runtime?.observationReady && !runtime.lastObservationError && fresh);
 
   return {
@@ -1354,7 +1347,7 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
     checkpointBlock: checkpoint?.blockNumber.toString() ?? null,
     headBlock: runtime?.headBlock?.toString() ?? null,
     targetBlock: runtime?.targetBlock?.toString() ?? null,
-    liveCaughtUp: runtime?.liveCaughtUp ?? false,
+    liveCaughtUp: indexReady,
     launchCount,
     historyBackfillComplete: runtime?.historyBackfillComplete ?? false,
     historyBackfillTargetBlock: runtime?.historyBackfillTargetBlock?.toString() ?? null,
@@ -1399,16 +1392,10 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
   const store = new D1Store(env.DB, chainId);
   const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
   const runtime = await runtimeStore.get();
-  if (
-    !runtime ||
-    !runtime.sourceVerified ||
-    !runtime.liveCaughtUp ||
-    runtime.lastSyncError ||
-    !runtimeFresh(runtime, maxStatusAgeMs(env))
-  ) return null;
+  if (!runtime) return null;
 
   const state = await store.readPublicProjectionState();
-  if (!state) return null;
+  if (!state || verifiedRuntimeTarget(runtime, state.checkpoint.blockNumber, Date.now(), maxStatusAgeMs(env)) === null) return null;
 
   const feed = await projectPublicFeed({
     chainId,
@@ -1428,10 +1415,7 @@ async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> 
     after.blockHash !== state.checkpoint.blockHash ||
     !afterRuntime ||
     afterRuntime.updatedAtMs !== runtime.updatedAtMs ||
-    !afterRuntime.sourceVerified ||
-    !afterRuntime.liveCaughtUp ||
-    afterRuntime.lastSyncError ||
-    !runtimeFresh(afterRuntime, maxStatusAgeMs(env))
+    verifiedRuntimeTarget(afterRuntime, after.blockNumber, Date.now(), maxStatusAgeMs(env)) === null
   ) return null;
 
   return { store, runtime: afterRuntime, feed };
