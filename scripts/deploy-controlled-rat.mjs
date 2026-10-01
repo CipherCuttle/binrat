@@ -452,25 +452,31 @@ try {
   const versions = jsonFromOutput(cli(['versions','list','--name',WORKER,'--json']));
   const candidateVersion = taggedVersionIdFromList(versions, tag);
   gate(candidateVersion, 'CANDIDATE_VERSION_NOT_RESOLVED');
-  gate(candidateVersion !== previousVersion, 'CANDIDATE_VERSION_EQUALS_ACTIVE');
+  const candidateAlreadyActive = candidateVersion === previousVersion;
 
-  execFileSync('pnpm', [
-    'verify:production-binding-parity','--',
-    '--worker',WORKER,
-    '--active-version',previousVersion,
-    '--candidate-version',candidateVersion,
-    '--config',CONFIG,
-    mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? '--controlled-telegram-ui-v2-activation' : '--controlled-rat-activation'
-  ], { stdio: 'inherit', env: process.env, timeout: 180_000 });
-  note('Candidate binding parity PASS; candidate remained non-live until this point.');
+  if (candidateAlreadyActive) {
+    gate(plainBinding(activeConfig,'BINRAT_RELEASE_SHA') === process.env.GITHUB_SHA,
+      'ACTIVE_RELEASE_SHA_MISMATCH');
+    note('Exact reviewed candidate version is already active at 100%; skipping redundant promotion and continuing postdeploy verification.');
+  } else {
+    execFileSync('pnpm', [
+      'verify:production-binding-parity','--',
+      '--worker',WORKER,
+      '--active-version',previousVersion,
+      '--candidate-version',candidateVersion,
+      '--config',CONFIG,
+      mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? '--controlled-telegram-ui-v2-activation' : '--controlled-rat-activation'
+    ], { stdio: 'inherit', env: process.env, timeout: 180_000 });
+    note('Candidate binding parity PASS; candidate remained non-live until this point.');
 
-  // Treat a transport-ambiguous promotion result as potentially live. A
-  // best-effort code rollback is safer than assuming the candidate stayed dark.
-  promotionAttempted = true;
-  cli([
-    'versions','deploy',candidateVersion + '@100%','--name',WORKER,'--yes',
-    '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
-  ], { timeout: 180_000 });
+    // Treat a transport-ambiguous promotion result as potentially live. A
+    // best-effort code rollback is safer than assuming the candidate stayed dark.
+    promotionAttempted = true;
+    cli([
+      'versions','deploy',candidateVersion + '@100%','--name',WORKER,'--yes',
+      '--message',mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE ? 'BINRAT private Telegram UX V2' : 'BINRAT controlled private Autonomous Rat'
+    ], { timeout: 180_000 });
+  }
   await waitForExactPostdeployRelease(process.env.GITHUB_SHA);
   await waitForHealthyPons('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY');
 
