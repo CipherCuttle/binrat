@@ -9,6 +9,7 @@ import { FreeEntitlements, FREE_CAPACITY } from '../src/autonomous/entitlements.
 import { listWatches } from '../src/autonomous/watches.js';
 import { CREATOR, PRINCIPAL, addr, autonomousFixture, runRatsShareDemo } from './support/autonomousFixture.js';
 
+const hashForTest=(n:number)=>`0x${n.toString(16).padStart(64,'0')}`;
 const count = async (db: Awaited<ReturnType<typeof autonomousFixture>>['db'], table: string) =>
   (await db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first<{n:number}>())!.n;
 
@@ -56,6 +57,26 @@ test('maximum RATS cards and five-receipt public recovery fit one Telegram messa
     const opened=renderOpenedReceipt(receipt);
     assert.ok(opened.length<4096);
     assert.equal((opened.match(/source: /g) ?? []).length,5);
+  } finally { f.db.close(); }
+});
+
+test('RATS accepts a durable checkpoint ahead of the verified runtime target and stays bounded to that target', async () => {
+  const {f}=await recurrentFixture();
+  try {
+    await f.launch(101,CREATOR);
+    await f.store.commitCheckpoint({blockNumber:101n,blockHash:hashForTest(101),guardBlockNumber:null,guardBlockHash:null});
+    const snapshot=await discoverRats(f.db,f.now());
+    assert.equal(snapshot.sourceCheckpoint,'100');
+    assert.ok(snapshot.candidates.every(candidate=>candidate.evidenceRefs.every(ref=>BigInt(ref.blockNumber)<=100n)));
+  } finally { f.db.close(); }
+});
+
+test('RATS fails closed when the durable checkpoint is behind the verified runtime target', async () => {
+  const {f}=await recurrentFixture();
+  try {
+    await new D1RuntimeStateStore(f.db,4663).put({sourceVerified:true,liveCaughtUp:true,headBlock:103n,targetBlock:101n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,lastHistoryError:null,lastObservationError:null,updatedAtMs:f.now()});
+    await assert.rejects(discoverRats(f.db,f.now()),/INDEX_UNAVAILABLE/);
   } finally { f.db.close(); }
 });
 
