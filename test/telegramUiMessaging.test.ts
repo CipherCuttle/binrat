@@ -57,6 +57,22 @@ test('historical Arc CASE cards expose evidence but never a dead Watch action', 
   } finally { f.db.close(); }
 });
 
+test('V2 error cards preserve fail-closed reason classes instead of collapsing to a generic pipe error', () => {
+  const cases:Array<[string,RegExp]> = [
+    ['The live index is unavailable or stale. No new investigation or alert authority.',/INDEX WENT COLD/],
+    ['A fresh canonical Robinhood boundary could not be verified. Watch was not added.',/PONS HEAD NOT VERIFIED/],
+    ['That Rat snapshot is unavailable or expired.',/THAT RAT PAGE EXPIRED/],
+    ['Discovery receipts are unavailable. No rats invented.',/RAT RECEIPTS UNAVAILABLE/],
+    ['Discovery receipts could not be saved. No rats invented.',/RAT SNAPSHOT NOT SAVED/],
+    ['Discovery retention is unavailable. No rats invented.',/RAT SNAPSHOT NOT SAVED/]
+  ];
+  for (const [code,expected] of cases) {
+    const card=renderRatCard({kind:'ERROR',code});
+    assert.match(card.caption,expected);
+    assert.doesNotMatch(card.caption,/PIPE SMELLS WRONG/);
+  }
+});
+
 test('V2 scout cards lead with one factual finding and keep infrastructure vocabulary out of level one', async () => {
   const f=await autonomousFixture();
   try {
