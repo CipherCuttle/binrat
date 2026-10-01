@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // One-shot controlled private Autonomous Rat rollout. Uploads a candidate first,
-// verifies parity, then promotes. It never merges, changes token/Holder authority,
-// or mutates the Telegram webhook. UI V2 may add only its exact prompt schema.
+// verifies parity, then promotes. It never merges or changes token/Holder authority.
+// UI V2 may repair only the exact Telegram webhook update subscription while preserving
+// the verified webhook URL and secret, plus its exact additive prompt schema.
 import { execFileSync } from 'node:child_process';
 import { createHmac } from 'node:crypto';
 import { readFileSync, writeFileSync, rmSync, appendFileSync, existsSync } from 'node:fs';
@@ -24,6 +25,8 @@ const summary = process.env.GITHUB_STEP_SUMMARY;
 let promotionAttempted = false;
 let previousVersion = null;
 let privateMenuSnapshotCreated = false;
+let webhookUpdatesChanged = false;
+let previousWebhookAllowedUpdates = null;
 
 function note(line) {
   console.log(line);
@@ -124,14 +127,58 @@ async function waitForHealthyPons(label, failureCode) {
   }
   throw new Error(failureCode);
 }
-async function webhookUrl(token) {
+const REQUIRED_TELEGRAM_UPDATES = Object.freeze(['message','callback_query']);
+
+function sameStrings(left, right) {
+  return JSON.stringify([...(left ?? [])].sort()) === JSON.stringify([...(right ?? [])].sort());
+}
+
+async function telegramWebhookInfo(token) {
   if (!token) return null;
   const response = await fetch('https://api.telegram.org/bot' + token + '/getWebhookInfo', {
     signal: AbortSignal.timeout(20_000)
   });
   const body = await response.json().catch(() => null);
-  gate(response.ok && body?.ok === true, 'TELEGRAM_WEBHOOK_READBACK_FAILED');
-  return String(body.result?.url ?? '');
+  gate(response.ok && body?.ok === true && body.result, 'TELEGRAM_WEBHOOK_READBACK_FAILED');
+  return {
+    url: String(body.result.url ?? ''),
+    allowedUpdates: Array.isArray(body.result.allowed_updates) ? body.result.allowed_updates.map(String) : null
+  };
+}
+
+async function verifyWebhookSecretAtLiveWorker(secret) {
+  const response = await fetch(WORKER_URL + '/telegram/webhook', {
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-telegram-bot-api-secret-token':secret
+    },
+    body:JSON.stringify({ update_id:null }),
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.status === 400 && body?.error === 'INVALID_UPDATE_ID', 'TELEGRAM_WEBHOOK_SECRET_MISMATCH');
+  note('TELEGRAM_WEBHOOK_SECRET_PRECHECK_PASS');
+}
+
+async function setTelegramWebhookUpdates(token, secret, allowedUpdates) {
+  const response = await fetch('https://api.telegram.org/bot' + token + '/setWebhook', {
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({
+      url: WORKER_URL + '/telegram/webhook',
+      secret_token: secret,
+      allowed_updates: allowedUpdates,
+      drop_pending_updates:false
+    }),
+    signal:AbortSignal.timeout(20_000)
+  });
+  const body = await response.json().catch(() => null);
+  gate(response.ok && body?.ok === true && body.result === true, 'TELEGRAM_WEBHOOK_UPDATE_FAILED');
+  const verified = await telegramWebhookInfo(token);
+  gate(verified?.url === WORKER_URL + '/telegram/webhook', 'TELEGRAM_WEBHOOK_URL_MISMATCH');
+  gate(sameStrings(verified?.allowedUpdates, allowedUpdates), 'TELEGRAM_WEBHOOK_UPDATES_MISMATCH');
+  return verified;
 }
 function parseJsonc(path) {
   return JSON.parse(
@@ -290,6 +337,10 @@ gate(process.env.CONTROLLED_RAT_DEPLOY_APPROVED === 'true',
 gate(Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()) &&
   Boolean(process.env.CLOUDFLARE_ACCOUNT_ID?.trim()), 'CLOUDFLARE_CREDENTIALS_MISSING');
 gate(Boolean(process.env.TELEGRAM_BOT_TOKEN?.trim()), 'TELEGRAM_BOT_TOKEN_MISSING');
+const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim() ?? '';
+if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  gate(/^[A-Za-z0-9_-]{1,256}$/.test(webhookSecret), 'TELEGRAM_WEBHOOK_SECRET_MISSING_OR_INVALID');
+}
 
 let tester = (process.env.CONTROLLED_RAT_ALLOWED_USER_ID?.trim() ||
   process.env.CONTROLLED_RAT_ALLOWED_USER_ID_FALLBACK?.trim() || '');
@@ -313,9 +364,14 @@ gate(beforeHealth.ok === true && beforeHealth.service === 'binrat-cloudflare-edg
 await waitForHealthyPons('Predeploy','PONS_PREFLIGHT_NOT_HEALTHY');
 
 const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? '';
-const beforeWebhook = await webhookUrl(botToken);
+const beforeWebhook = await telegramWebhookInfo(botToken);
 if (beforeWebhook !== null) {
-  gate(beforeWebhook === WORKER_URL + '/telegram/webhook', 'TELEGRAM_WEBHOOK_PREDEPLOY_MISMATCH');
+  gate(beforeWebhook.url === WORKER_URL + '/telegram/webhook', 'TELEGRAM_WEBHOOK_PREDEPLOY_MISMATCH');
+}
+if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  gate(Array.isArray(beforeWebhook?.allowedUpdates), 'TELEGRAM_WEBHOOK_ALLOWED_UPDATES_UNRESOLVED');
+  previousWebhookAllowedUpdates = [...beforeWebhook.allowedUpdates];
+  await verifyWebhookSecretAtLiveWorker(webhookSecret);
 }
 
 const cfg = parseJsonc('cloudflare/wrangler.example.jsonc');
@@ -396,8 +452,19 @@ try {
   });
   gate(diagnostic.status === 404, 'CANDIDATE_DIAGNOSTIC_STILL_EXPOSED');
 
-  const afterWebhook = await webhookUrl(botToken);
-  if (beforeWebhook !== null) gate(afterWebhook === beforeWebhook, 'TELEGRAM_WEBHOOK_CHANGED');
+  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+    if (!sameStrings(previousWebhookAllowedUpdates, REQUIRED_TELEGRAM_UPDATES)) {
+      await setTelegramWebhookUpdates(botToken, webhookSecret, REQUIRED_TELEGRAM_UPDATES);
+      webhookUpdatesChanged = true;
+      note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_APPLY_PASS');
+    }
+  }
+  const afterWebhook = await telegramWebhookInfo(botToken);
+  if (beforeWebhook !== null) gate(afterWebhook?.url === beforeWebhook.url, 'TELEGRAM_WEBHOOK_CHANGED');
+  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+    gate(sameStrings(afterWebhook?.allowedUpdates, REQUIRED_TELEGRAM_UPDATES), 'TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_MISSING');
+    note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_VERIFY_PASS');
+  }
 
   const deployed = activeVersionFrom(deploymentStatus());
   gate(deployed === candidateVersion, 'CANDIDATE_NOT_AT_100_PERCENT');
@@ -427,12 +494,20 @@ try {
       stdio:'inherit',timeout:180_000,
       env:{...process.env,BINRAT_CLOUDFLARE_VERSION_ID:candidateVersion,BINRAT_MIGRATION_STATE:'telegram-ui-v2-prompt-schema-compatible'}
     });
-    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook unchanged; no merge performed.');
+    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook URL/secret preserved; message+callback_query delivery verified; no merge performed.');
   } else {
     note('CONTROLLED_RAT_DEPLOYMENT_PASS: candidate is live at 100%; autonomous scope remains one private tester.');
     note('Public autonomous mode OFF. Telegram UI V2 OFF. Telegram media OFF. No merge performed.');
   }
 } catch (error) {
+  if (webhookUpdatesChanged && Array.isArray(previousWebhookAllowedUpdates)) {
+    try {
+      await setTelegramWebhookUpdates(botToken, webhookSecret, previousWebhookAllowedUpdates);
+      note('TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_PASS');
+    } catch {
+      note('TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_FAILED: manual Telegram webhook repair required immediately.');
+    }
+  }
   if (privateMenuSnapshotCreated || existsSync(TELEGRAM_MENU_STATE)) {
     try {
       execFileSync('pnpm',['telegram:private-menu-restore'],{
