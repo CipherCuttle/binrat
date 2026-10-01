@@ -250,20 +250,17 @@ export function renderRats(snapshot: RatsSnapshot): string {
     'No profitability, safety or identity conclusion.'
   ].join('\n\n');
   return [
-    '🐀 FRESHEST REPEAT DEPLOYERS',
+    '🐀 FRESH GARBAGE',
     snapshot.candidates.map(candidate => {
-      const prior=Math.max(1,candidate.recurrenceCount-1);
       const latest=candidate.latestLaunch.symbol ? String.fromCharCode(36) + candidate.latestLaunch.symbol : (candidate.latestLaunch.name || 'unnamed launch');
       const previous=(candidate.previousLaunches ?? []).map(item => item.symbol ? String.fromCharCode(36) + item.symbol : (item.name || item.token));
       return [
-        `${candidate.rankPosition}. Recent repeat launch: ${latest}`,
-        `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
-        previous.length ? `Previous: ${previous.join(' · ')}` : '',
-        `WATCH NEXT LAUNCH: /watch 4663:CREATOR:${candidate.entity.entityId}`,
-        `OPEN CASE: /why ${candidate.caseId}`
-      ].filter(Boolean).join('\n');
+        `${candidate.rankPosition}. SMELLS FAMILIAR · ${latest}`,
+        previous.length ? `Same paws left receipts on ${previous.join(' · ')}.` : 'Same paws left older receipts in the bin.',
+        `DIG DEEPER: /why ${candidate.caseId}`
+      ].join('\n');
     }).join('\n\n'),
-    'Newest repeat activity first. Same address does not establish human identity.'
+    'Fresh findings only. Same address does not establish human identity.'
   ].join('\n\n');
 }
 
