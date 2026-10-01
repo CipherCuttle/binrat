@@ -362,14 +362,15 @@ export async function handleBinratApiRequest(
 
     if (pathname === '/api/feed') return json(200, feed);
 
+    if (feed.chainId === ROBINHOOD_CHAIN_ID && pathname.startsWith('/api/rat-radar/')) {
+      return json(410, {
+        error: 'LEGACY_ARC_RADAR_RETIRED',
+        chainId: ROBINHOOD_CHAIN_ID,
+        replacement: 'PONS_DEPLOYER_RECURRENCE'
+      });
+    }
+
     if (pathname === '/api/rat-radar/watchlist') {
-      if (feed.chainId === ROBINHOOD_CHAIN_ID) {
-        return json(410, {
-          error: 'LEGACY_ARC_RADAR_RETIRED',
-          chainId: ROBINHOOD_CHAIN_ID,
-          replacement: 'PONS_DEPLOYER_RECURRENCE'
-        });
-      }
       const radar = new D1RatRadarStore(env.DB, ARC_CHAIN_ID);
       const receipts = await radar.listThroughBlock(BigInt(feed.asOfBlock));
       const depth = url.searchParams.get('depth');
