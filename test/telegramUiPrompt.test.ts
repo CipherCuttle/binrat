@@ -234,7 +234,7 @@ test('media ON edits inquisitive → digging → CASE, while final ledger failur
     assert.equal((await reply(f,fetchImpl,1051,CREATOR,800)).status,200);
     assert.equal(await digCount(f),1);
     const mediaEdits=calls.filter(c=>c.method==='editMessageMedia').map(c=>String((c.body.media as {caption?:string}|undefined)?.caption));
-    assert.ok(mediaEdits.some(text=>text.includes('GIVE ME A DEPLOYER ADDRESS')));
+    assert.ok(mediaEdits.some(text=>text.includes('DROP THE ADDRESS')));
     assert.ok(mediaEdits.some(text=>text.includes('RUMMAGING')));
     assert.ok(mediaEdits.some(text=>text.includes('CASE')));
   } finally {f.db.close();}
