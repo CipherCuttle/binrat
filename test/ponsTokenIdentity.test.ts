@@ -14,7 +14,7 @@ import {
 import { autonomousFixture, CREATOR, hash } from './support/autonomousFixture.js';
 
 function sourceFor(
-  identities:Map<string,{name:string;symbol:string;decimals:number;totalSupply:bigint}>,
+  identities:Map<string,{name:string;symbol:string;decimals:number}>,
   failTokens=new Set<string>()
 ):PonsTokenIdentitySource {
   return {
@@ -60,8 +60,8 @@ test('identity enrichment upgrades Fresh Garbage labels without rewriting canoni
     assert.ok(before);
 
     const identities=new Map([
-      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18,totalSupply:1_000_000n}],
-      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18,totalSupply:1_000_000n}]
+      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18}],
+      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18}]
     ]);
     const report=await syncPonsTokenIdentities(
       sourceFor(identities),
@@ -89,8 +89,8 @@ test('Fresh Garbage ignores a tampered identity receipt payload', async () => {
     const older=await f.launch(99,CREATOR);
     await f.checkpoint(100);
     const identities=new Map([
-      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18,totalSupply:1_000_000n}],
-      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18,totalSupply:1_000_000n}]
+      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18}],
+      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18}]
     ]);
     await syncPonsTokenIdentities(sourceFor(identities),new D1PonsTokenIdentityStore(f.db),12);
     const stored=await f.db.prepare('SELECT payload_json FROM pons_token_identity_receipts WHERE launch_id=?')
@@ -113,7 +113,7 @@ test('one unreadable token does not block other identity receipts', async () => 
     const older=await f.launch(99,CREATOR);
     await f.checkpoint(100);
     const identities=new Map([
-      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18,totalSupply:1_000_000n}]
+      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18}]
     ]);
     const report=await syncPonsTokenIdentities(
       sourceFor(identities,new Set([f.initial.token])),
@@ -160,8 +160,8 @@ test('identity queue cycle never mutates Pons runtime readiness', async () => {
     const before=await f.db.prepare('SELECT * FROM binrat_runtime_state WHERE chain_id=4663').first<Record<string,unknown>>();
     assert.ok(before);
     const identities=new Map([
-      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18,totalSupply:1_000_000n}],
-      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18,totalSupply:1_000_000n}]
+      [f.initial.token,{name:'Bin Rat',symbol:'BIN',decimals:18}],
+      [older.token,{name:'Old Scrap',symbol:'SCRAP',decimals:18}]
     ]);
     const result=await runCloudflarePonsTokenIdentityCycle(
       {...f.env,BINRAT_PONS_TOKEN_IDENTITY_ENABLED:'true',BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE:'12'},
