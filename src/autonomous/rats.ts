@@ -130,8 +130,9 @@ export async function latestPonsLaunches(
 
 /**
  * Shared discovery only: verified reported creators with at least two retained,
- * canonical launch facts. Sort tuple is recurrence DESC, latest block DESC,
- * retained evidence count DESC, exact normalized address ASC. No financial field
+ * canonical launch facts. Sort tuple is latest block DESC, recurrence DESC,
+ * exact normalized address ASC. This surfaces fresh repeat activity instead of
+ * all-time high-volume deployers. No financial field
  * or opaque composite score participates in this ranking.
  */
 export async function discoverRats(db: D1DatabaseLike, now: number, candidateLimit = MAX_CANDIDATES): Promise<RatsSnapshot> {
@@ -229,19 +230,18 @@ export function renderRats(snapshot: RatsSnapshot): string {
     'No profitability, safety or identity conclusion.'
   ].join('\n\n');
   return [
-    '🐀 RATS WORTH WATCHING',
-    snapshot.candidates.map(candidate => [
-      `${candidate.rankPosition}. Robinhood/Pons 4663 · DEPLOYER ${candidate.entity.entityId}`,
-      `${candidate.recurrenceCount} indexed launches · latest ${candidate.latestLaunch.symbol || '?'} at block ${candidate.latestLaunch.blockNumber}`,
-      'Observed / derived:',
-      ...candidate.reasons.map(reason => `• ${reason.text}`),
-      'Coverage: PARTIAL · indexed Pons V2 launches only.',
-      `WHY: /why ${candidate.caseId}`,
-      `WATCH: /watch 4663:CREATOR:${candidate.entity.entityId}`,
-      `SHARE: /share ${candidate.caseId}`
-    ].join('\n')).join('\n\n'),
-    `Discovery ${snapshot.discoveryId.slice(0,12)} · source checkpoint ${snapshot.sourceCheckpoint}.`,
-    '🐀 receipts, not guesses. Same address != same human identity.'
+    '🐀 FRESHEST REPEAT DEPLOYERS',
+    snapshot.candidates.map(candidate => {
+      const prior=Math.max(1,candidate.recurrenceCount-1);
+      const latest=candidate.latestLaunch.symbol ? `${candidate.latestLaunch.symbol}` : (candidate.latestLaunch.name || 'unnamed launch');
+      return [
+        `${candidate.rankPosition}. ${latest} · block ${candidate.latestLaunch.blockNumber}`,
+        `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'}.`,
+        `WATCH NEXT LAUNCH: /watch 4663:CREATOR:${candidate.entity.entityId}`,
+        `OPEN CASE: /why ${candidate.caseId}`
+      ].join('\n');
+    }).join('\n\n'),
+    'Newest repeat activity first. Same address does not establish human identity.'
   ].join('\n\n');
 }
 
