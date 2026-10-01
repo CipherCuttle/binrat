@@ -9,7 +9,7 @@ import {
 export const PONS_RAT_TRAP_PROJECTION_VERSION = 'BINRAT_PONS_RAT_TRAP_PROJECTION_V1' as const;
 export const PONS_RAT_TRAP_HORIZONS_MS = [300_000, 3_600_000, 86_400_000] as const;
 
-export type PonsRatTrapHorizonState = 'COMPLETE' | 'PARTIAL' | 'IMMATURE' | 'MISSING';
+export type PonsRatTrapHorizonState = 'COMPLETE' | 'PARTIAL' | 'IMMATURE' | 'PENDING';
 
 export interface PonsRatTrapQuoteAsset {
   kind: 'NATIVE_ETH' | 'ERC20';
@@ -57,7 +57,7 @@ export interface PonsRatTrapCoverageProjection {
   complete: number;
   partial: number;
   immature: number;
-  missing: number;
+  pending: number;
 }
 
 export interface PonsRatTrapProjection {
@@ -168,7 +168,7 @@ async function projectLaunch(
     if (!receipt) {
       return {
         horizonMs,
-        state: asOfTimestampMs < maturityTargetTimestampMs ? 'IMMATURE' : 'MISSING',
+        state: asOfTimestampMs < maturityTargetTimestampMs ? 'IMMATURE' : 'PENDING',
         maturityTargetTimestampMs,
         observationId: null,
         observedBlock: null,
@@ -254,7 +254,7 @@ function coverageFor(
     complete: states.filter((state) => state === 'COMPLETE').length,
     partial: states.filter((state) => state === 'PARTIAL').length,
     immature: states.filter((state) => state === 'IMMATURE').length,
-    missing: states.filter((state) => state === 'MISSING').length
+    pending: states.filter((state) => state === 'PENDING').length
   };
 }
 
