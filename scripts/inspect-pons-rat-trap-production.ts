@@ -231,7 +231,7 @@ try {
   const receiptCountRows=selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_outcome_receipts WHERE chain_id=4663");
   const receiptCount=Number(receiptCountRows[0]?.n??0);
   const provenance=provenanceGap();
-  const health=await getJson('/health');
+  const health=await getJson('/api/health');
 
   const source=new RpcPonsOutcomeObservationSource({discoveryRpcUrl:archiveRpcUrl,archiveRpcUrl});
   const identityClient=createPublicClient({chain:robinhoodMainnet(archiveRpcUrl),transport:http(archiveRpcUrl)});
