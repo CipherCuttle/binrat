@@ -53,10 +53,16 @@ for (const heading of [
 assert.doesNotMatch(roadmap, /ArcPad|chain ID 5042|Arc 5042/i);
 
 const motionLab = read("web-v2/src/roadmap/MotionLabPage.tsx");
-for (const title of ["SNIFF", "REMEMBER", "WATCH", "HUNT", "ORGANIZE", "AUTONOMOUS RAT"]) {
-  assert.match(motionLab, new RegExp('title: "' + title + '"'));
-}
-assert.doesNotMatch(motionLab, /title: "INVESTIGATE"|title: "CONNECT"/);
+const roadmapProjection = JSON.parse(read("web-v2/src/roadmap/roadmapProjection.json"));
+assert.match(motionLab, /roadmapStages/, "motion lab must render from the structured roadmap projection");
+assert.deepEqual(
+  roadmapProjection.stages.map((stage) => stage.title),
+  ["SNIFF", "REMEMBER", "WATCH", "HUNT", "ORGANIZE", "AUTONOMOUS RAT"],
+);
+assert.ok(
+  roadmapProjection.stages.every((stage) => !["INVESTIGATE", "CONNECT"].includes(stage.title)),
+  "superseded roadmap chapter names must not return",
+);
 
 const claimBoundary = read("docs/CLAIM_BOUNDARY.md");
 assert.match(claimBoundary, /source-reported `DEPLOYER` address/);
