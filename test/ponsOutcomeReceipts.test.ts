@@ -110,6 +110,7 @@ async function fixture(checkpointBlock=20n) {
   });
   return {
     db,
+    baseStore,
     launch:{launchId:launch.launchId,token:launch.token,curve:launch.pool,blockNumber:launch.blockNumber,blockHash:launch.blockHash},
     store:new D1PonsOutcomeObservationStore(db)
   };
@@ -240,5 +241,22 @@ test('append-only store rejects a divergent replay for the same launch horizon',
       f.store.put(divergent),
       /PONS_OUTCOME_OBSERVATION_CONFLICT/
     );
+  } finally { f.db.close(); }
+});
+
+
+test('D1 rewind removes reorged Pons outcome receipts without deleting an earlier launch', async () => {
+  const f=await fixture(20n);
+  try {
+    await syncPonsOutcomeObservations(sourceFor(),f.store,{
+      maxReceiptsPerSync:10,
+      horizons:[{label:'5m',ms:300_000}]
+    });
+    assert.equal((await f.store.listForLaunch(f.launch.launchId)).length,1);
+
+    await f.baseStore.rewindFromBlock(15n);
+
+    assert.equal((await f.store.listForLaunch(f.launch.launchId)).length,0);
+    assert.ok(await f.baseStore.getLaunch(f.launch.launchId));
   } finally { f.db.close(); }
 });
