@@ -35,6 +35,22 @@ function watchCopy(reply: string): string {
   if (/watch limit reached/i.test(reply)) return '🐀 BIN IS FULL.\nNo new watch was added.';
   return '🐀 WATCH STATE CHANGED.\nCheck your watches for the current list.';
 }
+function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): string {
+  const visible=outcome.watches.slice(0,5);
+  const hidden=outcome.watches.length-visible.length;
+  const lines=outcome.watches.length
+    ? [
+        `🐀 WATCHING ${outcome.watches.length} SET${outcome.watches.length === 1 ? '' : 'S'} OF PAWS.`,
+        ...visible.map(w=>`• ${shortReference(w.entity_id)}`),
+        hidden > 0 ? `+ ${hidden} more active watch${hidden === 1 ? '' : 'es'} in the full list.` : '',
+        'I squeak only when a new indexed launch appears.'
+      ]
+    : ['🐀 NOTHING IN THE BIN.','No active V1 watches.'];
+  if (outcome.legacyWatchCount > 0) {
+    lines.push(`${outcome.legacyWatchCount} legacy watch${outcome.legacyWatchCount === 1 ? '' : 'es'} are not active here; re-arm explicitly on Pons 4663.`);
+  }
+  return lines.filter(Boolean).join('\n');
+}
 function errorCopy(code: string): string {
   if (/capacity|limit reached/i.test(code)) return '🐀 BIN IS FULL FOR NOW.\nTry again after 00:00 UTC.';
   if (/receipt/i.test(code)) return "🐀 THAT RECEIPT ISN'T HERE.\nIt may have expired or failed verification.";
@@ -82,9 +98,13 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
   if (outcome.kind === 'WATCH') {
     return card({view:'WATCH_STATE',media:'inquisitive',caption:watchCopy(outcome.reply),keyboard:[[callbackButton('Watches',{action:'WATCHES'}),callbackButton('Home',{action:'HOME'})]]});
   }
-  if (outcome.kind === 'WATCHLIST') return card({view:outcome.watches.length?'WATCHLIST':'EMPTY',media:outcome.watches.length?'inquisitive':'empty-paws',caption:outcome.watches.length
-    ? `🐀 WATCHING ${outcome.watches.length} SET${outcome.watches.length === 1 ? '' : 'S'} OF PAWS.\n${outcome.watches.slice(0,5).map(w=>`• ${shortReference(w.entity_id)}`).join('\n')}\nI squeak only when a new indexed launch appears.`
-    : '🐀 NOTHING IN THE BIN.\nNo paws are being watched.',keyboard:[[callbackButton('Home',{action:'HOME'})]]});
+  if (outcome.kind === 'WATCHLIST') {
+    const hasWatchState=outcome.watches.length > 0 || outcome.legacyWatchCount > 0;
+    return card({view:hasWatchState?'WATCHLIST':'EMPTY',media:hasWatchState?'inquisitive':'empty-paws',caption:watchListCopy(outcome),keyboard:[
+      [webAppButton('Open Watch List',`${TELEGRAM_MINI_APP_URL}?view=watches`)],
+      [callbackButton('Home',{action:'HOME'})]
+    ]});
+  }
   if (outcome.kind === 'SHARE') return card({view:'CASE',media:'evidence-found',caption:`🐀 RECEIPT PACKED.\nPublic evidence only. No private watch data.\n\nhttps://t.me/BinratBot?start=receipt_${outcome.receipt.receiptId}`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
   if (outcome.kind === 'OPEN_RECEIPT') {
     const id=share(outcome.receipt.finding);
