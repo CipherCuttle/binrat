@@ -63,3 +63,5 @@ jobs:
           if-no-files-found: warn
 
 # promotion trigger: 2026-10-01T22:30Z
+
+# retry trigger after release propagation guard
