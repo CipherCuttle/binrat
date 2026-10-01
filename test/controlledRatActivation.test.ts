@@ -115,6 +115,14 @@ test('predeploy and postdeploy Pons readiness are bounded-retry and logged befor
   assert.match(script,/waitForHealthyPons\('Postdeploy','POSTDEPLOY_PONS_NOT_HEALTHY'\)/);
 });
 
+test('private rollout proves the bounded public latest-launch surface after promotion', () => {
+  const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
+  assert.match(script,/async function smokePublicLatestLaunches\(\)/);
+  assert.match(script,/\/api\/launches\/latest/);
+  assert.match(script,/PUBLIC_LATEST_LAUNCHES_SMOKE_PASS/);
+  assert.match(script,/PUBLIC_LATEST_LAUNCHES_SMOKE_FAILED/);
+});
+
 test('private rollout preflights Robinhood Rat schema and proves a valid Mini App bootstrap', () => {
   const script=readFileSync(new URL('../scripts/deploy-controlled-rat.mjs',import.meta.url),'utf8');
   assert.match(script,/20260929_robinhood_live_rat_v1\.sql/);
