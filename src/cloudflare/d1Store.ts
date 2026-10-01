@@ -109,43 +109,45 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
     const newestLimit = Math.floor(limit / 2);
     const rows = await all<{ payload_json: string; previous_payload_json: string | null }>(
       this.db.prepare(`
-        WITH missing AS (
-          SELECT p.fact_id,p.chain_id,p.launch_id,p.creator,p.observed_block,p.log_index,p.payload_json
-          FROM provenance_facts p
-          LEFT JOIN provenance_edges direct
-            ON direct.edge_id = ('reported-creator:' || p.fact_id)
-          LEFT JOIN provenance_edges previous
-            ON previous.chain_id = p.chain_id
-           AND previous.kind = 'PREVIOUS_LAUNCH'
-           AND previous.from_id = ('launch:' || p.chain_id || ':' || p.launch_id)
-          WHERE p.chain_id = ?
-            AND (
-              direct.edge_id IS NULL
-              OR (
-                previous.edge_id IS NULL
-                AND EXISTS (
-                  SELECT 1
-                  FROM provenance_facts prior
-                  WHERE prior.chain_id = p.chain_id
-                    AND prior.creator = p.creator
-                    AND (
-                      CAST(prior.observed_block AS INTEGER) < CAST(p.observed_block AS INTEGER)
-                      OR (
-                        CAST(prior.observed_block AS INTEGER) = CAST(p.observed_block AS INTEGER)
-                        AND prior.log_index < p.log_index
-                      )
-                      OR (
-                        CAST(prior.observed_block AS INTEGER) = CAST(p.observed_block AS INTEGER)
-                        AND prior.log_index = p.log_index
-                        AND prior.fact_id < p.fact_id
-                      )
-                    )
-                  LIMIT 1
+          WITH contextual AS (
+          SELECT p.fact_id,p.chain_id,p.launch_id,p.creator,p.observed_block,p.log_index,p.payload_json,
+            (
+              SELECT prior.fact_id
+              FROM provenance_facts prior
+              WHERE prior.chain_id = p.chain_id
+                AND prior.creator = p.creator
+                AND (
+                  CAST(prior.observed_block AS INTEGER) < CAST(p.observed_block AS INTEGER)
+                  OR (
+                    CAST(prior.observed_block AS INTEGER) = CAST(p.observed_block AS INTEGER)
+                    AND prior.log_index < p.log_index
+                  )
+                  OR (
+                    CAST(prior.observed_block AS INTEGER) = CAST(p.observed_block AS INTEGER)
+                    AND prior.log_index = p.log_index
+                    AND prior.fact_id < p.fact_id
+                  )
                 )
-              )
-            )
+              ORDER BY CAST(prior.observed_block AS INTEGER) DESC,prior.log_index DESC,prior.fact_id DESC
+              LIMIT 1
+            ) AS previous_fact_id
+          FROM provenance_facts p
+          WHERE p.chain_id = ?
         ),
-        oldest AS (
+        missing AS (
+          SELECT c.*
+          FROM contextual c
+          LEFT JOIN provenance_edges direct
+            ON direct.edge_id = ('reported-creator:' || c.fact_id)
+          LEFT JOIN provenance_edges previous
+            ON previous.edge_id = CASE
+              WHEN c.previous_fact_id IS NULL THEN NULL
+              ELSE ('previous-launch:' || c.fact_id || ':' || c.previous_fact_id)
+            END
+          WHERE direct.edge_id IS NULL
+             OR (c.previous_fact_id IS NOT NULL AND previous.edge_id IS NULL)
+        ),
+      oldest AS (
           SELECT * FROM missing
           ORDER BY CAST(observed_block AS INTEGER),log_index,fact_id
           LIMIT ?
@@ -164,21 +166,7 @@ export class D1Store implements LaunchStore, ObservationStore, HistoricalBackfil
           (
             SELECT prev.payload_json
             FROM provenance_facts prev
-            WHERE prev.chain_id = s.chain_id
-              AND prev.creator = s.creator
-              AND (
-                CAST(prev.observed_block AS INTEGER) < CAST(s.observed_block AS INTEGER)
-                OR (
-                  CAST(prev.observed_block AS INTEGER) = CAST(s.observed_block AS INTEGER)
-                  AND prev.log_index < s.log_index
-                )
-                OR (
-                  CAST(prev.observed_block AS INTEGER) = CAST(s.observed_block AS INTEGER)
-                  AND prev.log_index = s.log_index
-                  AND prev.fact_id < s.fact_id
-                )
-              )
-            ORDER BY CAST(prev.observed_block AS INTEGER) DESC,prev.log_index DESC,prev.fact_id DESC
+            WHERE prev.fact_id = s.previous_fact_id
             LIMIT 1
           ) AS previous_payload_json
         FROM selected s
