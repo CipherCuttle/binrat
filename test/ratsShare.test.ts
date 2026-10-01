@@ -29,7 +29,11 @@ test('RATS snapshots are deterministic, chain-scoped, bounded and explain every 
     assert.deepEqual(again,first);
     assert.equal(first.candidates.length,2);
     assert.equal(first.candidates[0]!.entity.entityId,CREATOR);
+    assert.equal(first.candidates[0]!.recurrenceCount,4);
+    assert.equal(first.candidates[0]!.latestLaunch.blockNumber,'100');
+    assert.equal(first.candidates[0]!.latestLaunch.symbol,'FIXTURE');
     assert.equal(first.candidates[1]!.entity.entityId,other);
+    assert.equal(first.candidates[1]!.recurrenceCount,2);
     assert.ok(first.candidates.every(candidate => candidate.entity.chainId===4663 && candidate.evidenceRefs.length>=2));
     assert.ok(first.candidates.every(candidate => candidate.reasons.every(reason => reason.evidenceRefs.length>0)));
     assert.equal(first.coverage.status,'PARTIAL');
