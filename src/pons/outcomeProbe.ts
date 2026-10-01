@@ -1,6 +1,6 @@
 import { createPublicClient, getAddress, http, keccak256, zeroAddress, type Address, type PublicClient } from 'viem';
 import type { Hex } from '../core/types.js';
-import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
+import { sha256Hex } from '../evidence/canonical.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH, ROBINHOOD_CHAIN_ID, robinhoodMainnet } from './chain.js';
 import { ponsErc20Abi, ponsV2BondingCurveAbi } from './ponsAbi.js';
 import { PONS_RPC_RETRY_COUNT, PONS_RPC_RETRY_DELAY_MS, PONS_RPC_TIMEOUT_MS } from './ponsSource.js';
@@ -249,7 +249,5 @@ export async function verifyPonsOutcomeProbeReceipt(receipt:PonsOutcomeProbeRece
     blockNumber:receipt.observedBlock,
     blockHash:receipt.observedBlockHash
   });
-  if (expectedId!==receipt.probeId || canonicalJson(core)===canonicalJson({})) {
-    throw new Error('PONS_OUTCOME_RECEIPT_ID_INVALID');
-  }
+  if (expectedId!==receipt.probeId) throw new Error('PONS_OUTCOME_RECEIPT_ID_INVALID');
 }
