@@ -3,7 +3,8 @@ import type { LaunchSource, LaunchStore } from '../core/ports.js';
 import {
   buildProvenanceFact,
   projectProvenanceEdges,
-  projectProvenanceEdgesForFact
+  projectProvenanceEdgesForFact,
+  type ProvenanceEdge
 } from '../intelligence/provenance.js';
 
 export interface SyncOptions {
@@ -88,12 +89,9 @@ export async function syncLaunches(source: LaunchSource, store: LaunchStore, opt
   if (!deferProvenanceProjection) {
     await options.beforeProjection?.();
     provenanceRefreshElapsedMs += await refreshProvenanceProjection(store, now, fromBlock, targetBlock);
-  } else {
-    await options.beforeProjection?.();
-    provenanceRefreshElapsedMs += await repairProvenanceProjection(store, now, fromBlock, targetBlock);
   }
   if (fromBlock > targetBlock) {
-    if (deferProvenanceProjection && provenanceDirty) {
+    if (deferProvenanceProjection) {
       await options.beforeProjection?.();
       provenanceRefreshElapsedMs += await repairProvenanceProjection(store, now, fromBlock, targetBlock);
     }
@@ -259,7 +257,7 @@ async function repairProvenanceProjection(
   }));
   const candidates=await store.listProvenanceEdgeRepairCandidates(PROVENANCE_REPAIR_FACTS_PER_SLICE+1);
   const selected=candidates.slice(0,PROVENANCE_REPAIR_FACTS_PER_SLICE);
-  const edges=[];
+  const edges: ProvenanceEdge[]=[];
   for(const candidate of selected){
     edges.push(...await projectProvenanceEdgesForFact(candidate.fact,candidate.previous));
   }
