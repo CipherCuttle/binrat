@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
 import type { AutonomousOutcome } from '../autonomous/outcome.js';
-import { discoverRats, loadRatsSnapshot } from '../autonomous/rats.js';
+import { discoverRats, latestPonsLaunches, loadRatsSnapshot } from '../autonomous/rats.js';
 import { why } from '../autonomous/evidence.js';
 import { listWatches } from '../autonomous/watches.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
@@ -301,26 +301,17 @@ async function miniAppBootstrap(request: Request, env: BinratWorkerEnv, now: num
   try {
     const body = await miniAppBody(request);
     const principal = miniAppPrincipal(body.initData, env, now);
-    const [rats, watches, sourceHealth, ready] = await Promise.all([
+    const [rats, latestLaunches, watches, sourceHealth] = await Promise.all([
       discoverRats(env.DB, now),
+      latestPonsLaunches(env.DB, now, 20),
       listWatches(env.DB, { userId: principal.userId, chatId: principal.chatId }),
-      chainHealth(env, ROBINHOOD_CHAIN_ID),
-      readyContext(env)
+      chainHealth(env, ROBINHOOD_CHAIN_ID)
     ]);
-    if (!ready || ready.feed.chainId !== ROBINHOOD_CHAIN_ID) throw new Error('MINI_APP_INDEX_UNAVAILABLE');
     return json(200, {
       user: { firstName: principal.user.first_name ?? null, username: principal.user.username ?? null },
       sourceHealth,
       rats,
-      latestLaunches: ready.feed.bags.slice(0, 20).map(bag => ({
-        launchId: bag.id,
-        token: bag.token,
-        symbol: bag.symbol,
-        name: bag.name,
-        blockNumber: bag.blockNumber,
-        deployer: bag.reportedCreatorAddress,
-        priorLaunchCount: bag.trashTrail.priorLaunchCount
-      })),
+      latestLaunches,
       watches: watches.map(watch => ({
         chainId: watch.chain_id, entityType: watch.entity_type, entityId: watch.entity_id,
         startBlock: watch.start_block, createdAtMs: watch.created_at_ms, policy: watch.policy
