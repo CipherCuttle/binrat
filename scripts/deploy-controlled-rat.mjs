@@ -25,7 +25,7 @@ const summary = process.env.GITHUB_STEP_SUMMARY;
 let promotionAttempted = false;
 let previousVersion = null;
 let privateMenuSnapshotCreated = false;
-let webhookUpdatesChanged = false;
+let webhookRotationCommitted = false;
 let previousWebhookAllowedUpdates = null;
 
 function note(line) {
@@ -337,9 +337,9 @@ gate(process.env.CONTROLLED_RAT_DEPLOY_APPROVED === 'true',
 gate(Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()) &&
   Boolean(process.env.CLOUDFLARE_ACCOUNT_ID?.trim()), 'CLOUDFLARE_CREDENTIALS_MISSING');
 gate(Boolean(process.env.TELEGRAM_BOT_TOKEN?.trim()), 'TELEGRAM_BOT_TOKEN_MISSING');
-const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim() ?? '';
+const webhookNextSecret = process.env.TELEGRAM_WEBHOOK_SECRET_NEXT?.trim() ?? '';
 if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
-  gate(/^[A-Za-z0-9_-]{1,256}$/.test(webhookSecret), 'TELEGRAM_WEBHOOK_SECRET_MISSING_OR_INVALID');
+  gate(/^[A-Za-z0-9_-]{1,256}$/.test(webhookNextSecret), 'TELEGRAM_WEBHOOK_SECRET_NEXT_MISSING_OR_INVALID');
 }
 
 let tester = (process.env.CONTROLLED_RAT_ALLOWED_USER_ID?.trim() ||
@@ -371,7 +371,6 @@ if (beforeWebhook !== null) {
 if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
   gate(Array.isArray(beforeWebhook?.allowedUpdates), 'TELEGRAM_WEBHOOK_ALLOWED_UPDATES_UNRESOLVED');
   previousWebhookAllowedUpdates = [...beforeWebhook.allowedUpdates];
-  await verifyWebhookSecretAtLiveWorker(webhookSecret);
 }
 
 const cfg = parseJsonc('cloudflare/wrangler.example.jsonc');
@@ -396,6 +395,7 @@ if (!tester) tester = testerFromFeedbackMarker(CONFIG);
 gate(/^[1-9]\d{3,16}$/.test(tester), 'CONTROLLED_RAT_TESTER_ID_MISSING_OR_INVALID');
 const secrets = { BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID: tester };
 if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
+  secrets.TELEGRAM_WEBHOOK_SECRET_NEXT = webhookNextSecret;
   const existingCandidateGate = binding(activeConfig, 'RAT_CANDIDATE_ALLOWED_USER_ID');
   if (existingCandidateGate?.type === 'plain_text') {
     gate(existingCandidateGate.text === tester, 'CANDIDATE_GATE_TESTER_MISMATCH');
@@ -452,20 +452,6 @@ try {
   });
   gate(diagnostic.status === 404, 'CANDIDATE_DIAGNOSTIC_STILL_EXPOSED');
 
-  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
-    if (!sameStrings(previousWebhookAllowedUpdates, REQUIRED_TELEGRAM_UPDATES)) {
-      await setTelegramWebhookUpdates(botToken, webhookSecret, REQUIRED_TELEGRAM_UPDATES);
-      webhookUpdatesChanged = true;
-      note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_APPLY_PASS');
-    }
-  }
-  const afterWebhook = await telegramWebhookInfo(botToken);
-  if (beforeWebhook !== null) gate(afterWebhook?.url === beforeWebhook.url, 'TELEGRAM_WEBHOOK_CHANGED');
-  if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
-    gate(sameStrings(afterWebhook?.allowedUpdates, REQUIRED_TELEGRAM_UPDATES), 'TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_MISSING');
-    note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_VERIFY_PASS');
-  }
-
   const deployed = activeVersionFrom(deploymentStatus());
   gate(deployed === candidateVersion, 'CANDIDATE_NOT_AT_100_PERCENT');
   if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
@@ -488,25 +474,43 @@ try {
     });
     privateMenuSnapshotCreated = existsSync(TELEGRAM_MENU_STATE);
     gate(privateMenuSnapshotCreated, 'TELEGRAM_PRIVATE_MENU_SNAPSHOT_MISSING');
+
+    const deployedNextSecret = binding(deployedConfig,'TELEGRAM_WEBHOOK_SECRET_NEXT');
+    gate(deployedNextSecret?.type === 'secret_text', 'POSTDEPLOY_WEBHOOK_NEXT_SECRET_MISSING');
+    await verifyWebhookSecretAtLiveWorker(webhookNextSecret);
+    note('TELEGRAM_WEBHOOK_NEXT_SECRET_PRECHECK_PASS');
+
+    if (!sameStrings(previousWebhookAllowedUpdates, REQUIRED_TELEGRAM_UPDATES)) {
+      await setTelegramWebhookUpdates(botToken, webhookNextSecret, REQUIRED_TELEGRAM_UPDATES);
+      webhookRotationCommitted = true;
+      note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_APPLY_PASS');
+    } else {
+      // Even if the update filter is already correct, rotate to the staged secret so
+      // future controlled rollouts have a recoverable protected authority.
+      await setTelegramWebhookUpdates(botToken, webhookNextSecret, REQUIRED_TELEGRAM_UPDATES);
+      webhookRotationCommitted = true;
+      note('TELEGRAM_WEBHOOK_SECRET_ROTATION_APPLY_PASS');
+    }
+    const afterWebhook = await telegramWebhookInfo(botToken);
+    if (beforeWebhook !== null) gate(afterWebhook?.url === beforeWebhook.url, 'TELEGRAM_WEBHOOK_CHANGED');
+    gate(sameStrings(afterWebhook?.allowedUpdates, REQUIRED_TELEGRAM_UPDATES), 'TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_MISSING');
+    note('TELEGRAM_WEBHOOK_CALLBACK_SUBSCRIPTION_VERIFY_PASS');
+
     execFileSync('pnpm',['telegram:apply'],{stdio:'inherit',env:process.env,timeout:180_000});
     execFileSync('pnpm',['telegram:verify'],{stdio:'inherit',env:process.env,timeout:120_000});
     execFileSync('pnpm',['telegram:smoke'],{
       stdio:'inherit',timeout:180_000,
       env:{...process.env,BINRAT_CLOUDFLARE_VERSION_ID:candidateVersion,BINRAT_MIGRATION_STATE:'telegram-ui-v2-prompt-schema-compatible'}
     });
-    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook URL/secret preserved; message+callback_query delivery verified; no merge performed.');
+    note('PRIVATE_TELEGRAM_UX_V2_DEPLOYMENT_PASS: candidate live at 100%; single private tester only; UI V2 ON; Telegram media ON; public autonomous mode OFF; prompt schema verified; webhook URL preserved; secret rotated through staged dual-secret window; message+callback_query delivery verified; no merge performed.');
   } else {
     note('CONTROLLED_RAT_DEPLOYMENT_PASS: candidate is live at 100%; autonomous scope remains one private tester.');
     note('Public autonomous mode OFF. Telegram UI V2 OFF. Telegram media OFF. No merge performed.');
   }
 } catch (error) {
-  if (webhookUpdatesChanged && Array.isArray(previousWebhookAllowedUpdates)) {
-    try {
-      await setTelegramWebhookUpdates(botToken, webhookSecret, previousWebhookAllowedUpdates);
-      note('TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_PASS');
-    } catch {
-      note('TELEGRAM_WEBHOOK_UPDATES_ROLLBACK_FAILED: manual Telegram webhook repair required immediately.');
-    }
+  if (webhookRotationCommitted) {
+    note('TELEGRAM_WEBHOOK_ROTATION_COMMITTED: candidate retained; rollback to the old Worker is intentionally disabled because Telegram now uses the staged next secret.');
+    throw error;
   }
   if (privateMenuSnapshotCreated || existsSync(TELEGRAM_MENU_STATE)) {
     try {
