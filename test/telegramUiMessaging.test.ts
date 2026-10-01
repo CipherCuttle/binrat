@@ -34,6 +34,9 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
     }
     assert.match(cards[0]!.caption,/Catch repeat launchers early/);
     assert.match(cards[1]!.caption,/SAME PAWS/);
+    assert.match(cards[1]!.caption,/2 LAUNCHES INDEXED/);
+    assert.match(cards[1]!.caption,/Latest: \$FIXTURE · block 100/);
+    assert.match(cards[1]!.caption,/2 retained receipts/);
     assert.match(cards[2]!.caption,/found .* launches from this reported deployer/i);
     assert.match(cards[3]!.caption,/WHY I NOTICED/);
     assert.match(cards[4]!.caption,/WATCHING THESE PAWS/);
