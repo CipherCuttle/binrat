@@ -599,7 +599,7 @@ test('Pons provider head regression is explicit, preserves the checkpoint, and r
   await db.exec(D1_SCHEMA_SQL);
 
   class LaggingPonsSource extends FakePonsSource {
-    hashCalls:bigint[]=[];
+    hashCalls=new Array<bigint>();
     override async getBlockHash(blockNumber:bigint) {
       this.hashCalls.push(blockNumber);
       if (blockNumber>this.head) throw new Error('TEST_FUTURE_BLOCK_READ');
@@ -657,7 +657,7 @@ test('Pons provider head regression is explicit, preserves the checkpoint, and r
       {now:()=>nowMs,ponsLaunchSource:source}
     );
     assert.deepEqual(recovered,{status:'SUCCESS',liveCaughtUp:true});
-    assert.ok(source.hashCalls.includes(checkpointBlock));
+    assert.equal(source.hashCalls[0],checkpointBlock);
     assert.ok((await store.getCheckpoint())!.blockNumber>checkpointBlock);
     const healthy=await runtime.get();
     assert.equal(healthy?.sourceVerified,true);
