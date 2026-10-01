@@ -1,1 +1,2 @@
 Owner authorized live O2 rollout in chat on 2026-10-01. No merge authority granted.
+Retry after checkout-root Wrangler config fix; prior attempt stopped at stage NONE before remote mutation.
