@@ -101,6 +101,15 @@ test('D1 Pons provenance repair drains 150 missing facts without a giant replace
     await syncLaunches(source,store,options);
     assert.deepEqual(await store.listProvenanceEdges(),expected);
 
+    const derived=expected.find((edge)=>edge.kind==='PREVIOUS_LAUNCH');
+    assert.ok(derived);
+    await db.prepare('DELETE FROM provenance_edges WHERE edge_id=?').bind(derived.edgeId).run();
+    const directId='reported-creator:'+derived.sourceFactIds[0];
+    assert.ok(await db.prepare('SELECT edge_id FROM provenance_edges WHERE edge_id=?').bind(directId).first());
+
+    await syncLaunches(source,store,options);
+    assert.deepEqual(await store.listProvenanceEdges(),expected);
+
     assert.ok(db.batchCalls>1);
     assert.ok(db.maxBatchStatements<=32,`max batch statements=${db.maxBatchStatements}`);
   } finally {
