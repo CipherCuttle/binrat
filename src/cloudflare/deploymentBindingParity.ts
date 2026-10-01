@@ -24,6 +24,8 @@ export interface BindingParityOptions {
   controlledRatActivation?: boolean;
   /** Explicit private Telegram UI V2 activation; never a general toggle. */
   controlledTelegramUiV2Activation?: boolean;
+  /** Explicit O2 production activation after the disabled candidate is live. */
+  controlledPonsOutcomeActivation?: boolean;
 }
 
 const REQUIRED_BINDINGS = ['DB', 'SYNC_QUEUE', 'AI', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET'] as const;
@@ -36,6 +38,7 @@ const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>(
   ['BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS', { type: 'plain_text', text: '128' }],
   ['BINRAT_PONS_OUTCOME_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_PONS_OUTCOME_MAX_PER_CYCLE', { type: 'plain_text', text: '3' }],
+  ['BINRAT_ROBINHOOD_ARCHIVE_RPC_URL', { type: 'secret_text' }],
   ['ROBINHOOD_RPC_URL', { type: 'plain_text', text: 'https://rpc.ordofi.network' }],
   ['BINRAT_AUTONOMOUS_RAT_ENABLED', { type: 'plain_text', text: 'false' }],
   ['BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', { type: 'plain_text', text: 'false' }],
@@ -61,6 +64,7 @@ export function verifyWorkerBindingParity(
 ): BindingParityResult {
   const errors: string[] = [];
   const mode = controlledMode(options, errors);
+  const ponsOutcomeActivation=options.controlledPonsOutcomeActivation===true;
   const activeBindings = bindingMap(active, 'active', errors);
   const candidateBindings = bindingMap(candidate, 'candidate', errors);
   for (const name of REQUIRED_BINDINGS) {
@@ -71,7 +75,7 @@ export function verifyWorkerBindingParity(
   for (const [name, before] of activeBindings) {
     const after = candidateBindings.get(name);
     if (!after) { errors.push(`CANDIDATE_BINDING_MISSING:${name}`); continue; }
-    compareBinding(before, after, errors, mode);
+    compareBinding(before, after, errors, mode, ponsOutcomeActivation);
   }
   for (const [name, binding] of candidateBindings) {
     if (!activeBindings.has(name)) {
@@ -172,6 +176,7 @@ export function verifyCandidateManifest(config: unknown, options: BindingParityO
   }
   if (value.assets?.directory !== './web') errors.push('STATIC_ASSET_MANIFEST_FAILED');
   const expectedRat = mode === null ? 'false' : 'true';
+  const ponsOutcomeActivation=options.controlledPonsOutcomeActivation===true;
   if (value.vars?.BINRAT_AUTONOMOUS_RAT_ENABLED !== expectedRat) {
     errors.push(mode === null ? 'AUTONOMOUS_RAT_NOT_FLAG_OFF' : 'CONTROLLED_RAT_MASTER_NOT_ENABLED');
   }
@@ -185,8 +190,14 @@ export function verifyCandidateManifest(config: unknown, options: BindingParityO
   if (value.vars?.BINRAT_PONS_CATCHUP_WORK_BUDGET_MS !== '60000') errors.push('PONS_CATCHUP_WORK_BUDGET_INVALID');
   if (value.vars?.BINRAT_PONS_NEAR_HEAD_BLOCKS !== '2048') errors.push('PONS_NEAR_HEAD_BOUND_INVALID');
   if (value.vars?.BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS !== '128') errors.push('PONS_CANONICAL_DENSITY_BOUND_INVALID');
-  if (value.vars?.BINRAT_PONS_OUTCOME_ENABLED !== 'false') errors.push('PONS_OUTCOME_NOT_FLAG_OFF');
-  if (value.vars?.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE !== '3') errors.push('PONS_OUTCOME_CYCLE_BOUND_INVALID');
+  const expectedOutcome=ponsOutcomeActivation ? 'true' : 'false';
+  const expectedOutcomeBound=ponsOutcomeActivation ? '1' : '3';
+  if (value.vars?.BINRAT_PONS_OUTCOME_ENABLED !== expectedOutcome) {
+    errors.push(ponsOutcomeActivation ? 'PONS_OUTCOME_ACTIVATION_NOT_ENABLED' : 'PONS_OUTCOME_NOT_FLAG_OFF');
+  }
+  if (value.vars?.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE !== expectedOutcomeBound) {
+    errors.push('PONS_OUTCOME_CYCLE_BOUND_INVALID');
+  }
   return { ok: errors.length === 0, errors };
 }
 
@@ -206,7 +217,8 @@ function compareBinding(
   before: WorkerBinding,
   after: WorkerBinding,
   errors: string[],
-  mode: 'TEXT' | 'UI_V2' | null
+  mode: 'TEXT' | 'UI_V2' | null,
+  ponsOutcomeActivation: boolean
 ): void {
   if (before.type !== after.type) { errors.push(`BINDING_TYPE_CHANGED:${before.name}`); return; }
   if (before.type === 'd1' && (before.id ?? before.database_id) !== (after.id ?? after.database_id)) {
@@ -220,9 +232,16 @@ function compareBinding(
   const mediaToggle = mode === 'UI_V2' && before.name === 'BINRAT_TELEGRAM_MEDIA_ENABLED' && before.text === 'false' && after.text === 'true';
   const controlledPonsSteadyUpgrade = mode !== null && before.name === 'BINRAT_PONS_MAX_BATCH_BLOCKS' &&
     before.text === '512' && after.text === '1024';
+  const controlledOutcomeToggle = ponsOutcomeActivation &&
+    before.name === 'BINRAT_PONS_OUTCOME_ENABLED' &&
+    before.text === 'false' && after.text === 'true';
+  const controlledOutcomeBound = ponsOutcomeActivation &&
+    before.name === 'BINRAT_PONS_OUTCOME_MAX_PER_CYCLE' &&
+    before.text === '3' && after.text === '1';
   if (before.type === 'plain_text' && !ALLOWED_VALUE_CHANGES.has(before.name) &&
       !disablesCandidateDiagnostic && !controlledRatToggle && !uiV2Toggle && !mediaToggle &&
-      !controlledPonsSteadyUpgrade && before.text !== after.text) {
+      !controlledPonsSteadyUpgrade && !controlledOutcomeToggle && !controlledOutcomeBound &&
+      before.text !== after.text) {
     errors.push(`VARIABLE_CHANGED:${before.name}`);
   }
 }
