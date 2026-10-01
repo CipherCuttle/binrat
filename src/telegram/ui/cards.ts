@@ -48,7 +48,7 @@ function watchListCopy(outcome: Extract<AutonomousOutcome,{kind:'WATCHLIST'}>): 
         hidden > 0 ? `+ ${hidden} more active watch${hidden === 1 ? '' : 'es'} in the full list.` : '',
         'I’ll squeak when one of these paws launches again.'
       ]
-    : ['🐀 RAT WATCH.','No traps worth keeping yet.'];
+    : ['🐀 RAT WATCH.','Nothing on Rat Watch yet.'];
   if (outcome.legacyWatchCount > 0) {
     lines.push(`${outcome.legacyWatchCount} legacy watch${outcome.legacyWatchCount === 1 ? '' : 'es'} ${outcome.legacyWatchCount === 1 ? 'is' : 'are'} not active here; re-arm explicitly on Pons 4663.`);
   }
@@ -77,7 +77,6 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
     const id=share({shareId:candidate.caseId.slice(0,40)});
     const count=candidate.recurrenceCount;
     const latest=candidate.latestLaunch;
-    const prior=Math.max(1,count-1);
     const latestName=launchLabel(latest);
     const previous=(candidate.previousLaunches ?? []).slice(0,3).map(launchLabel);
     const pageCount=outcome.snapshot.candidates.length;
