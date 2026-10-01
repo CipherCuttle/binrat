@@ -23,7 +23,6 @@ export interface PonsTokenIdentityReceipt {
   name: string;
   symbol: string;
   decimals: number;
-  totalSupply: bigint;
   evidenceDigest: string;
 }
 
@@ -33,7 +32,7 @@ export interface PonsTokenIdentitySource {
   readIdentity(
     launch: PonsTokenIdentityLaunch,
     blockNumber: bigint
-  ): Promise<Pick<PonsTokenIdentityReceipt,'name'|'symbol'|'decimals'|'totalSupply'>>;
+  ): Promise<Pick<PonsTokenIdentityReceipt,'name'|'symbol'|'decimals'>>;
 }
 
 export interface PonsTokenIdentityStore {
@@ -85,20 +84,18 @@ export class RpcPonsTokenIdentitySource implements PonsTokenIdentitySource {
   async readIdentity(
     launch:PonsTokenIdentityLaunch,
     blockNumber:bigint
-  ):Promise<Pick<PonsTokenIdentityReceipt,'name'|'symbol'|'decimals'|'totalSupply'>> {
+  ):Promise<Pick<PonsTokenIdentityReceipt,'name'|'symbol'|'decimals'>> {
     if (!/^0x[0-9a-f]{40}$/.test(launch.token)) throw new Error('PONS_TOKEN_IDENTITY_TOKEN_INVALID');
     const address=launch.token as Address;
-    const [name,symbol,decimals,totalSupply]=await Promise.all([
+    const [name,symbol,decimals]=await Promise.all([
       this.client.readContract({address,abi:ponsErc20Abi,functionName:'name',blockNumber}),
       this.client.readContract({address,abi:ponsErc20Abi,functionName:'symbol',blockNumber}),
-      this.client.readContract({address,abi:ponsErc20Abi,functionName:'decimals',blockNumber}),
-      this.client.readContract({address,abi:ponsErc20Abi,functionName:'totalSupply',blockNumber})
+      this.client.readContract({address,abi:ponsErc20Abi,functionName:'decimals',blockNumber})
     ]);
     if (typeof name!=='string' || typeof symbol!=='string') throw new Error('PONS_TOKEN_IDENTITY_TEXT_INVALID');
     if (Array.from(name).length>256 || Array.from(symbol).length>64) throw new Error('PONS_TOKEN_IDENTITY_TEXT_TOO_LARGE');
     if (!Number.isInteger(decimals) || decimals<0 || decimals>255) throw new Error('PONS_TOKEN_IDENTITY_DECIMALS_INVALID');
-    if (typeof totalSupply!=='bigint' || totalSupply<0n) throw new Error('PONS_TOKEN_IDENTITY_TOTAL_SUPPLY_INVALID');
-    return {name,symbol,decimals,totalSupply};
+    return {name,symbol,decimals};
   }
 }
 
@@ -109,7 +106,6 @@ export async function buildPonsTokenIdentityReceipt(input:{
   name:string;
   symbol:string;
   decimals:number;
-  totalSupply:bigint;
 }):Promise<PonsTokenIdentityReceipt> {
   const token=input.launch.token.toLowerCase() as Hex;
   const core:Omit<PonsTokenIdentityReceipt,'identityId'|'evidenceDigest'>={
@@ -122,8 +118,7 @@ export async function buildPonsTokenIdentityReceipt(input:{
     name:input.name,
     symbol:input.symbol,
     decimals:input.decimals,
-    totalSupply:input.totalSupply
-  };
+      };
   return {
     identityId:await sha256Hex({kind:PONS_TOKEN_IDENTITY_VERSION,chainId:ROBINHOOD_CHAIN_ID,launchId:input.launch.launchId,token}),
     ...core,
@@ -139,8 +134,7 @@ export async function verifyPonsTokenIdentityReceipt(receipt:PonsTokenIdentityRe
     observedBlockHash:receipt.observedBlockHash,
     name:receipt.name,
     symbol:receipt.symbol,
-    decimals:receipt.decimals,
-    totalSupply:receipt.totalSupply
+    decimals:receipt.decimals
   });
   if (canonicalJson(rebuilt)!==canonicalJson(receipt)) throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID');
 }
@@ -155,7 +149,7 @@ export async function parsePonsTokenIdentityReceipt(payload:string):Promise<Pons
     typeof raw.token!=='string' || typeof raw.observedBlock!=='string' ||
     typeof raw.observedBlockHash!=='string' || typeof raw.name!=='string' ||
     typeof raw.symbol!=='string' || typeof raw.decimals!=='number' || !Number.isInteger(raw.decimals) ||
-    typeof raw.totalSupply!=='string' || typeof raw.evidenceDigest!=='string'
+    typeof raw.evidenceDigest!=='string'
   ) throw new Error('PONS_TOKEN_IDENTITY_RECEIPT_INVALID');
   let receipt:PonsTokenIdentityReceipt;
   try {
@@ -170,7 +164,6 @@ export async function parsePonsTokenIdentityReceipt(payload:string):Promise<Pons
       name:raw.name,
       symbol:raw.symbol,
       decimals:Number(raw.decimals),
-      totalSupply:BigInt(raw.totalSupply),
       evidenceDigest:raw.evidenceDigest
     };
   } catch {
