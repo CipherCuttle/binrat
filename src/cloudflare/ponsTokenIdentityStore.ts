@@ -1,10 +1,10 @@
 import { canonicalJson } from '../evidence/canonical.js';
 import type { Hex } from '../core/types.js';
+import { verifyPonsTokenIdentityReceipt } from '../pons/tokenIdentity.js';
 import type {
   PonsTokenIdentityLaunch,
   PonsTokenIdentityReceipt,
-  PonsTokenIdentityStore,
-  verifyPonsTokenIdentityReceipt
+  PonsTokenIdentityStore
 } from '../pons/tokenIdentity.js';
 import type { D1DatabaseLike, D1ResultLike } from './d1Types.js';
 
