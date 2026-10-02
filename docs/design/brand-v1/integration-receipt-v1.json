@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "binrat.brand-v1-composition-receipt/1",
+  "status": "BRAND_V1_COMPOSED_PASS",
+  "authority": {
+    "branch": "design/binrat-brand-system-v1",
+    "sha": "770c7aa8741236ee5d8fc8ddd6411bc2addfdade"
+  },
+  "workers": {
+    "copy": "91cee9f12563f2d4286736155400910ad1ca1cb5",
+    "social": "568b0a3c7214e3252e3c7278ba35c2c382955814",
+    "motion": "0b96eead965a788f4b14d9c714692f995b090545",
+    "export": "de0fa94edbe4412054fc6bbd388f7c66165fc747"
+  },
+  "composedArtifactsCommit": "5c6f6bb6441e0a079d4a6535dbf3616a1b15f2ed",
+  "proofRuns": {
+    "integratedMatrix": {
+      "id": 37065886563,
+      "conclusion": "success"
+    }
+  },
+  "findings": {
+    "critical": [],
+    "highOpen": [],
+    "resolved": [
+      {
+        "severity": "high",
+        "area": "motion/palette",
+        "resolution": "Motion neutral canvas and H.264 pad use Brand V1 Ink #101210."
+      }
+    ]
+  },
+  "candidateAssets": [
+    "favicon 32/48 real-browser use",
+    "X header crop geometry",
+    "default OpenGraph unfurl composition",
+    "exact Motion proof MP4"
+  ],
+  "intentionalDeviations": []
+}
