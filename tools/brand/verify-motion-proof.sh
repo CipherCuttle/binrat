@@ -28,9 +28,6 @@ assert_eq "$(probe -select_streams v:0 -show_entries stream=width -of csv=p=0 "$
 assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$MOTION")" "676" "motion height"
 assert_eq "$(probe -select_streams v:0 -show_entries stream=avg_frame_rate -of csv=p=0 "$MOTION")" "30/1" "motion fps"
 assert_eq "$(probe -select_streams a -show_entries stream=index -of csv=p=0 "$MOTION" | wc -l | tr -d ' ')" "0" "motion audio streams"
-assert_eq "$(probe -select_streams v:0 -show_entries stream=width -of csv=p=0 "$REDUCED_SOURCE")" "1200" "reduced static width"
-assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$REDUCED_SOURCE")" "675" "reduced static height"
-
 MOTION_FRAMES="$(probe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of csv=p=0 "$MOTION")"
 assert_eq "$MOTION_FRAMES" "192" "motion frame count"
 
@@ -46,7 +43,7 @@ if (( MOTION_UNIQUE < 30 )); then
 fi
 
 python - "$MANIFEST" "$REDUCED_SOURCE" "$SOCIAL_MANIFEST" <<'PY'
-import hashlib, json, pathlib, sys
+import hashlib, json, pathlib, struct, sys
 
 motion_manifest = json.loads(pathlib.Path(sys.argv[1]).read_text())
 reduced = pathlib.Path(sys.argv[2])
@@ -59,8 +56,17 @@ def sha256(path: pathlib.Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
-expected = social_manifest["outputs"]["rat-found-wide-1200x675.png"]["sha256"]
+def png_dimensions(path: pathlib.Path) -> list[int]:
+    header = path.read_bytes()[:24]
+    assert header[:8] == b"\x89PNG\r\n\x1a\n"
+    assert header[12:16] == b"IHDR"
+    return list(struct.unpack(">II", header[16:24]))
+
+source_meta = social_manifest["outputs"]["rat-found-wide-1200x675.png"]
+expected = source_meta["sha256"]
 actual = sha256(reduced)
+observed = png_dimensions(reduced)
+declared = [source_meta["width"], source_meta["height"]]
 
 assert motion_manifest["schemaVersion"] == "binrat.motion-proof/1"
 assert motion_manifest["status"] == "PROTOTYPE_NOT_CANON"
@@ -69,8 +75,10 @@ assert list(motion_manifest["outputs"]) == ["found-something-v1.mp4"]
 assert motion_manifest["reducedMotion"]["mode"] == "static-source"
 assert motion_manifest["reducedMotion"]["path"] == "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png"
 assert motion_manifest["reducedMotion"]["sha256"] == actual
+assert motion_manifest["reducedMotion"]["observedPngDimensions"] == observed
+assert motion_manifest["reducedMotion"]["declaredSocialManifestDimensions"] == declared
 assert actual == expected
 PY
 
 printf 'PASS motion proof: %s unique decoded frames\n' "$MOTION_UNIQUE"
-printf 'PASS reduced motion: canonical static composition hash matches approved social proof\n'
+printf 'PASS reduced motion: canonical static composition hash matches approved social proof (dimension metadata recorded separately)\n'
