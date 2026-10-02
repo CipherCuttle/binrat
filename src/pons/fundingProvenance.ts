@@ -62,20 +62,6 @@ export interface PonsFundingSource {
   ): Promise<PonsExternalNativeInboundCandidate | null>;
 }
 
-export interface PonsFundingStore {
-  listPending(limit:number): Promise<PonsFundingLaunch[]>;
-  put(receipt:PonsPrelaunchNativeInboundReceipt): Promise<'INSERTED'|'DUPLICATE'>;
-  markNoMatch(launch:PonsFundingLaunch, checkedAtMs:number): Promise<'INSERTED'|'DUPLICATE'>;
-}
-
-export interface PonsFundingSyncReport {
-  attempted:number;
-  inserted:number;
-  duplicates:number;
-  noMatch:number;
-  remaining:number;
-}
-
 export interface FundingSourceRecurrence {
   sourceAddress: Hex;
   distinctDeployers: number;
@@ -198,7 +184,7 @@ export class AlchemyPonsFundingSource implements PonsFundingSource {
             excludeZeroValue: true,
             withMetadata: false,
             order: 'desc',
-            maxCount: '0x1'
+            maxCount: '0x5'
           }]
         })
       });
@@ -212,7 +198,9 @@ export class AlchemyPonsFundingSource implements PonsFundingSource {
 
     const payload = await response.json() as AlchemyTransferResponse;
     if (payload.error) throw new Error('PONS_FUNDING_TRANSFERS_RPC_ERROR');
-    const transfer = payload.result?.transfers?.[0];
+    const transfer = payload.result?.transfers?.find(
+      (item) => String(item.from ?? '').toLowerCase() !== deployer.toLowerCase()
+    );
     if (!transfer) return null;
 
     const from = String(transfer.from ?? '').toLowerCase() as Hex;
@@ -254,13 +242,7 @@ export async function readPonsPrelaunchNativeInbound(
     launch.deployer.toLowerCase() as Hex,
     launch.blockNumber - 1n
   );
-  if (!candidate) {
-    const launchAgain = await source.getBlockPoint(launch.blockNumber);
-    if (launchAgain.blockHash.toLowerCase() !== launchPoint.blockHash.toLowerCase()) {
-      throw new Error('PONS_FUNDING_LAUNCH_REORG_DURING_READ');
-    }
-    return null;
-  }
+  if (!candidate) return null;
 
   const tx = await source.getTransaction(candidate.txHash);
   if (
@@ -295,41 +277,6 @@ export async function readPonsPrelaunchNativeInbound(
   });
 }
 
-export async function syncPonsFundingProvenance(
-  source:PonsFundingSource,
-  store:PonsFundingStore,
-  options:{limit:number;nowMs:number}
-):Promise<PonsFundingSyncReport> {
-  if (!Number.isSafeInteger(options.limit) || options.limit<1 || options.limit>12) {
-    throw new Error('PONS_FUNDING_LIMIT_INVALID');
-  }
-  if (!Number.isSafeInteger(options.nowMs) || options.nowMs<0) {
-    throw new Error('PONS_FUNDING_NOW_INVALID');
-  }
-
-  const launches=await store.listPending(options.limit);
-  let inserted=0,duplicates=0,noMatch=0;
-  for (const launch of launches) {
-    const receipt=await readPonsPrelaunchNativeInbound(source,launch);
-    if (!receipt) {
-      const result=await store.markNoMatch(launch,options.nowMs);
-      if (result==='INSERTED') noMatch+=1;
-      continue;
-    }
-    const result=await store.put(receipt);
-    if (result==='INSERTED') inserted+=1;
-    else duplicates+=1;
-  }
-  const remaining=(await store.listPending(1)).length;
-  return {
-    attempted:launches.length,
-    inserted,
-    duplicates,
-    noMatch,
-    remaining
-  };
-}
-
 export async function buildPonsPrelaunchNativeInboundReceipt(input: {
   launch: PonsFundingLaunch;
   sourceAddress: Hex;
@@ -341,6 +288,9 @@ export async function buildPonsPrelaunchNativeInboundReceipt(input: {
 }): Promise<PonsPrelaunchNativeInboundReceipt> {
   validateLaunch(input.launch);
   assertAddress(input.sourceAddress, 'PONS_FUNDING_SOURCE_INVALID');
+  if (input.sourceAddress.toLowerCase()===input.launch.deployer.toLowerCase()) {
+    throw new Error('PONS_FUNDING_SOURCE_IS_DEPLOYER');
+  }
   assertHash(input.transferTxHash, 'PONS_FUNDING_TX_HASH_INVALID');
   assertHash(input.transferBlockHash, 'PONS_FUNDING_TRANSFER_BLOCK_HASH_INVALID');
   if (input.transferBlock < 0n || input.transferBlock >= input.launch.blockNumber) {
