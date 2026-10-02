@@ -261,6 +261,7 @@ function assertReplay(
   }
   if(value.asOfBlock!==asOfBlock) throw new Error('BINRAT_CASE_REPLAY_BLOCK_MISMATCH');
   if(value.semantics!=='KNOWABLE_AS_OF_BLOCK') throw new Error('BINRAT_CASE_REPLAY_SEMANTICS_INVALID');
+  if(!value.targetLaunchKnown) throw new Error('BINRAT_CASE_REPLAY_TARGET_NOT_KNOWN');
   if(!/^[0-9a-f]{64}$/i.test(value.outputDigest)) throw new Error('BINRAT_CASE_REPLAY_DIGEST_INVALID');
 }
 
@@ -275,8 +276,21 @@ function assertFunding(
   }
   if(value.asOfBlock!==asOfBlock) throw new Error('BINRAT_CASE_FUNDING_BLOCK_MISMATCH');
   if(value.sameFundingSource) {
+    if(!value.currentFunding) throw new Error('BINRAT_CASE_FUNDING_RECURRENCE_WITHOUT_CURRENT');
+    if(value.sameFundingSource.sourceAddress.toLowerCase()!==value.currentFunding.sourceAddress.toLowerCase()) {
+      throw new Error('BINRAT_CASE_FUNDING_SOURCE_MISMATCH');
+    }
     if(value.sameFundingSource.distinctDeployersAtLeast<2||value.sameFundingSource.distinctLaunchesAtLeast<2) {
       throw new Error('BINRAT_CASE_FUNDING_RECURRENCE_INVALID');
+    }
+    const launchIds=new Set(value.sameFundingSource.relatedLaunches.map((item)=>item.launchId));
+    const deployers=new Set(value.sameFundingSource.relatedLaunches.map((item)=>item.deployer.toLowerCase()));
+    if(!launchIds.has(launchId)) throw new Error('BINRAT_CASE_FUNDING_CURRENT_MISSING');
+    if(
+      launchIds.size<value.sameFundingSource.distinctLaunchesAtLeast ||
+      deployers.size<value.sameFundingSource.distinctDeployersAtLeast
+    ) {
+      throw new Error('BINRAT_CASE_FUNDING_RECURRENCE_OVERCLAIM');
     }
   }
 }
