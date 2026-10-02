@@ -33,8 +33,8 @@
     "rat-found-wide-1200x675.png": {
       "width": 1200,
       "height": 675,
-      "bytes": 691121,
-      "sha256": "0bcca2b79b8d88f6bfff963606b2f2d628aeb020c50ea539d1964705b1bcc406"
+      "bytes": 692834,
+      "sha256": "1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c"
     },
     "receipt-square-1080.png": {
       "width": 1080,
@@ -51,8 +51,8 @@
     "rat-found-square-1080.png": {
       "width": 1080,
       "height": 1080,
-      "bytes": 594424,
-      "sha256": "59a10a804ba8effa570fb1ca8e3a150ba69193da035786d48078dac126d274aa"
+      "bytes": 593994,
+      "sha256": "a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7"
     }
   },
   "note": "All proof values are demo-only. Templates inherit canonical Rat Zero and Geist brand contracts."
