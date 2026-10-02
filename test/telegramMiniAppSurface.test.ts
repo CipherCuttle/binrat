@@ -35,6 +35,9 @@ test('Mini App loads HOT, NEW and WATCH independently instead of using the write
   assert.match(app,/Hot Garbage is unavailable right now/);
   assert.match(app,/New Drops are unavailable right now/);
   assert.match(app,/Rat Watch is unavailable right now\. Hot Garbage and New Drops can still work/);
+  assert.match(app,/CACHE_MAX_AGE_MS=60\*60\*1000/);
+  assert.match(app,/Showing the last verified snapshot from this device/);
+  assert.match(app,/source-badge'\)\.textContent='STALE'/);
 });
 
 test('Hot Garbage is a transparent attention surface, not an opaque hype score', () => {
