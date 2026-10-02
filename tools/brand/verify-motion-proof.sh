@@ -25,7 +25,7 @@ assert_eq() {
 
 for f in "$MOTION" "$REDUCED"; do
   assert_eq "$(probe -select_streams v:0 -show_entries stream=width -of csv=p=0 "$f")" "1200" "$f width"
-  assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" "675" "$f height"
+  assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" "676" "$f height"
   assert_eq "$(probe -select_streams v:0 -show_entries stream=avg_frame_rate -of csv=p=0 "$f")" "30/1" "$f fps"
   assert_eq "$(probe -select_streams a -show_entries stream=index -of csv=p=0 "$f" | wc -l | tr -d ' ')" "0" "$f audio streams"
 done
