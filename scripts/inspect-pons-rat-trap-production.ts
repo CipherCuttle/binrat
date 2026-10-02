@@ -11,6 +11,7 @@ import { createPublicClient, http, type Address } from 'viem';
 
 const DB='binrat-v0';
 const DB_ID='46814564-1a41-449a-88e5-c1349eed3a27';
+const WORKER_URL='https://binrat-edge-v0.pettevik.workers.dev';
 const CONFIG='/tmp/binrat-rat-trap-inspect-wrangler.jsonc';
 const WRANGLER=['dlx','wrangler@4.135.0'];
 const MAX_COHORTS=3;
@@ -170,6 +171,13 @@ try {
   const checkpoint={blockNumber:BigInt(checkpointRows[0]!.block_number),blockHash:checkpointRows[0]!.block_hash.toLowerCase() as Hex};
   const receiptCountRows=selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_outcome_receipts WHERE chain_id=4663");
   const receiptCount=Number(receiptCountRows[0]?.n??0);
+  const identityCount=Number(selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_token_identity_receipts WHERE chain_id=4663")[0]?.n??0);
+  const latestIdentity=selectRows<{launch_id:string;token:string;name:string;symbol:string;decimals:number;observed_block:string}>(
+    "SELECT launch_id,token,name,symbol,decimals,observed_block FROM pons_token_identity_receipts WHERE chain_id=4663 ORDER BY rowid DESC LIMIT 1"
+  )[0]??null;
+  const healthResponse=await fetch(WORKER_URL+'/api/health',{signal:AbortSignal.timeout(20_000)});
+  const apiHealth=await healthResponse.json().catch(()=>null);
+  gate(healthResponse.ok&&apiHealth&&typeof apiHealth==='object','POST_CANARY_IDENTITY_HEALTH_FAILED');
 
   const source=new RpcPonsOutcomeObservationSource({discoveryRpcUrl:archiveRpcUrl,archiveRpcUrl});
   const identityClient=createPublicClient({chain:robinhoodMainnet(archiveRpcUrl),transport:http(archiveRpcUrl)});
@@ -253,7 +261,10 @@ try {
   const report={
     kind:'BINRAT_PONS_RAT_TRAP_PRODUCTION_INSPECTION_V1',productionMutation:false,
     checkpoint:{blockNumber:checkpoint.blockNumber.toString(),blockHash:checkpoint.blockHash,timestampMs:checkpointPoint.timestampMs},
-    receiptCount,d1ReadCalls,creatorCandidates:creatorRows.length,selectedCohorts:cohorts.length,skipped,cohorts
+    receiptCount,
+    postCanaryIdentity:{kind:'POST_CANARY_IDENTITY_CHECK_V1',identityCount,latestIdentity},
+    apiHealth,
+    d1ReadCalls,creatorCandidates:creatorRows.length,selectedCohorts:cohorts.length,skipped,cohorts
   };
   console.log(JSON.stringify(report,null,2));
 } finally {
