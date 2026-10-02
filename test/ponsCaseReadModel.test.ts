@@ -315,3 +315,54 @@ test('Case Adapter falls back to canonical launch label without inventing a toke
     db.close();
   }
 });
+
+
+test('Case Adapter treats an undeployed funding rail as NOT_PROVIDED rather than negative evidence',async()=>{
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const current=launch({
+    id:'e'.repeat(64),
+    block:200,
+    token:9,
+    curve:10,
+    name:'No Funding Rail Yet',
+    symbol:'NOFUND'
+  });
+
+  try {
+    await store.putLaunch(current);
+    await store.putProvenanceFact(await buildProvenanceFact(current));
+    await store.commitCheckpoint({
+      blockNumber:220n,
+      blockHash:hash(220),
+      guardBlockNumber:null,
+      guardBlockHash:null
+    });
+    await db.exec('DROP TABLE pons_funding_receipts;');
+
+    const points=new Map<bigint,{blockNumber:bigint;blockHash:Hex;timestampMs:number}>([
+      [200n,{blockNumber:200n,blockHash:hash(200),timestampMs:10_000_000}],
+      [220n,{blockNumber:220n,blockHash:hash(220),timestampMs:10_100_000}]
+    ]);
+    const readOnly=new StrictReadOnlyDb(db);
+    const model=await readBinratPonsCase(readOnly,{
+      async getBlockPoint(blockNumber:bigint){
+        const value=points.get(blockNumber);
+        if(!value) throw new Error('POINT_MISSING:'+blockNumber.toString());
+        return value;
+      }
+    },{
+      currentLaunchId:current.launchId,
+      asOfBlock:220n
+    });
+
+    assert.equal(readOnly.writeAttempts,0);
+    assert.equal(model.coverage.funding,'NOT_PROVIDED');
+    assert.deepEqual(model.facts,[]);
+    assert.doesNotMatch(JSON.stringify(model.facts),/NOT FUNDED|NO FUNDING|UNFUNDED/i);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
