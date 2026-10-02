@@ -72,6 +72,7 @@ export async function verifyPonsReplayReceipt(
 export async function verifyPonsReplaySnapshotDigest(
   snapshot:PonsReplaySnapshot
 ):Promise<void> {
+  assertReplaySnapshotBoundary(snapshot);
   const {outputDigest,...core}=snapshot;
   if(!/^[0-9a-f]{64}$/i.test(outputDigest)) throw new Error('PONS_REPLAY_SNAPSHOT_DIGEST_INVALID');
   const expected=await sha256Hex(core);
@@ -142,5 +143,49 @@ function collectLaunchEvidence(
       evidenceDigest:observation.evidenceDigest,
       observedBlock:observation.observedBlock
     });
+  }
+}
+
+
+function assertReplaySnapshotBoundary(snapshot:PonsReplaySnapshot):void {
+  if(!/^(0|[1-9][0-9]*)$/.test(snapshot.asOfBlock)) {
+    throw new Error('PONS_REPLAY_RECEIPT_AS_OF_BLOCK_INVALID');
+  }
+  if(!/^0x[0-9a-f]{64}$/i.test(snapshot.asOfBlockHash)) {
+    throw new Error('PONS_REPLAY_RECEIPT_AS_OF_HASH_INVALID');
+  }
+  const asOf=BigInt(snapshot.asOfBlock);
+
+  if(snapshot.targetLaunchKnown !== (snapshot.targetLaunch !== null)) {
+    throw new Error('PONS_REPLAY_RECEIPT_TARGET_VISIBILITY_INVALID');
+  }
+  if(snapshot.targetLaunch && snapshot.targetLaunch.launchId!==snapshot.targetLaunchId) {
+    throw new Error('PONS_REPLAY_RECEIPT_TARGET_ID_MISMATCH');
+  }
+
+  const launches=[
+    ...(snapshot.targetLaunch?[snapshot.targetLaunch]:[]),
+    ...snapshot.previousLaunches
+  ];
+  const targetDeployer=snapshot.targetLaunch?.deployer.toLowerCase()??null;
+
+  for(const launch of launches) {
+    if(BigInt(launch.launchBlock)>asOf) {
+      throw new Error('PONS_REPLAY_RECEIPT_FUTURE_LAUNCH:'+launch.launchId);
+    }
+    if(targetDeployer && launch.deployer.toLowerCase()!==targetDeployer) {
+      throw new Error('PONS_REPLAY_RECEIPT_DEPLOYER_SCOPE_DRIFT:'+launch.launchId);
+    }
+    if(launch.tokenIdentity && BigInt(launch.tokenIdentity.observedBlock)>asOf) {
+      throw new Error('PONS_REPLAY_RECEIPT_FUTURE_IDENTITY:'+launch.launchId);
+    }
+    for(const observation of launch.observations) {
+      if(observation.observedBlock!==null && BigInt(observation.observedBlock)>asOf) {
+        throw new Error('PONS_REPLAY_RECEIPT_FUTURE_OUTCOME:'+launch.launchId+':'+observation.horizonLabel);
+      }
+      if((observation.observationId===null)!==(observation.evidenceDigest===null)) {
+        throw new Error('PONS_REPLAY_RECEIPT_OUTCOME_REF_INCOMPLETE:'+launch.launchId+':'+observation.horizonLabel);
+      }
+    }
   }
 }
