@@ -74,7 +74,9 @@ No urgency, price language, buy/sell/ape instruction, or second action.
 ## Evidence-boundary rules
 
 - `coverage` is mandatory and one of COMPLETE / PARTIAL / UNKNOWN / MISSING.
-- `source.state` is independently mandatory. Coverage and source state may differ.
+- Coverage is a bounded completeness dimension, not the full evidence taxonomy.
+- `source.state` and optional case-fact `state` use the canonical evidence vocabulary: OBSERVED / DERIVED / PATTERN / UNKNOWN / COMPLETE / PARTIAL / UNVERIFIED / MISSING.
+- Coverage and source/fact evidence state may differ. `UNVERIFIED` must remain UNVERIFIED rather than being coerced to UNKNOWN or MISSING.
 - RECEIPT always exposes coverage and source state.
 - CASE FILE requires exactly `PATTERN · NOT A VERDICT` plus 3–5 structured facts.
 - RAT FOUND SOMETHING must expose coverage in its evidence strip and source state in the footer.
@@ -87,6 +89,10 @@ No urgency, price language, buy/sell/ape instruction, or second action.
 The validator rejects production copy containing hype/advice or unsupported labels including:
 
 `smart money`, `alpha`, `good buy`, `bad buy`, `buy now`, `sell now`, `ape`, `safe score`, `rug score`, `scammer`, `rugger`, `guaranteed`, `profitability`.
+
+This proof schema has no field that authorizes a source-backed role override, so public-card copy also fails closed on creator/founder/dev role upgrades, human-identity upgrades, recurrence→skill/profitability language, missing→safe/clean/legit/benign language, and ENGINEERING_PASS→live/deployed/shipped upgrades. The browser adapter repeats those fail-closed checks before rendering so bypassing the CLI validator does not silently strengthen a claim.
+
+The validator carries hostile probes for those failure modes.
 
 ## Mutation proof
 

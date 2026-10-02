@@ -6,6 +6,43 @@
     return;
   }
 
+  const COVERAGE_STATES = new Set(["COMPLETE","PARTIAL","UNKNOWN","MISSING"]);
+  const EVIDENCE_STATES = new Set(["OBSERVED","DERIVED","PATTERN","UNKNOWN","COMPLETE","PARTIAL","UNVERIFIED","MISSING"]);
+  const CTA = {
+    OPEN_RECEIPTS:"OPEN RECEIPTS →",
+    OPEN_CASE:"OPEN CASE →",
+    DIG_DEEPER:"DIG DEEPER →"
+  };
+  const SEMANTIC_REJECTS = [
+    { id:"unsupported-role-upgrade", rx:/\b(?:creator|founder|dev)\b/i },
+    { id:"unsupported-human-identity", rx:/\b(?:same|this)\s+(?:human|person|team)\b/i },
+    { id:"recurrence-to-skill-or-outcome", rx:/\b(?:skill(?:ed)?|expertise|expert|profitable|profitability|winning|knows? what (?:it|they) (?:is|are) doing)\b/i },
+    { id:"missing-to-positive-verdict", rx:/\b(?:safe|clean|legit|benign|all clear|nothing suspicious)\b/i },
+    { id:"capability-status-upgrade", rx:/\bENGINEERING_PASS\b.{0,48}\b(?:live|deployed|shipped)\b|\b(?:live|deployed|shipped)\b.{0,48}\bENGINEERING_PASS\b/i }
+  ];
+
+  const authoredText = (f) => [
+    f.headline,
+    f.literalExplanation,
+    f.literalSummary,
+    f.literalFinding,
+    f.observation,
+    f.evidenceStrip,
+    ...(f.facts || []).flatMap((fact) => [fact.label, fact.value]),
+    f.cta?.label
+  ].filter(Boolean).join("\n");
+
+  function assertContract(f) {
+    if (!COVERAGE_STATES.has(f.coverage)) throw new Error(`${f.fixtureId}: invalid coverage`);
+    if (!f.source || !EVIDENCE_STATES.has(f.source.state)) throw new Error(`${f.fixtureId}: invalid source evidence state`);
+    if (!f.cta || CTA[f.cta.action] !== f.cta.label) throw new Error(`${f.fixtureId}: invalid CTA pair`);
+    for (const fact of f.facts || []) {
+      if (fact.state && !EVIDENCE_STATES.has(fact.state)) throw new Error(`${f.fixtureId}: invalid fact evidence state`);
+    }
+    const semanticBad = SEMANTIC_REJECTS.find(({rx}) => rx.test(authoredText(f)));
+    if (semanticBad) throw new Error(`${f.fixtureId}: semantic upgrade ${semanticBad.id}`);
+  }
+
   const esc = (value) => String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -66,6 +103,7 @@
   }
 
   function renderFixture(f, ratio) {
+    assertContract(f);
     const html = renderer.renderCard(f.family, ratio, toViewModel(f), metaFor(f));
     const attrs = ` data-fixture-id="${esc(f.fixtureId)}" data-source-state="${esc(f.source.state)}" data-coverage="${esc(f.coverage)}"`;
     return html.replace(

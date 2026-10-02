@@ -7,7 +7,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const FIXTURES = path.join(ROOT, "docs/design/brand-v1/social-production-v1/fixtures.json");
 const data = JSON.parse(fs.readFileSync(FIXTURES, "utf8"));
 
-const STATES = new Set(["COMPLETE", "PARTIAL", "UNKNOWN", "MISSING"]);
+const COVERAGE_STATES = new Set(["COMPLETE", "PARTIAL", "UNKNOWN", "MISSING"]);
+const EVIDENCE_STATES = new Set(["OBSERVED", "DERIVED", "PATTERN", "UNKNOWN", "COMPLETE", "PARTIAL", "UNVERIFIED", "MISSING"]);
 const LIMITS = {
   common: { fixtureId:48, sourceLabel:28, sourceValue:120, cta:24 },
   receipt: { receiptId:24, headline:38, literalExplanation:170, deployer:96, observation:96 },
@@ -25,10 +26,29 @@ const FORBIDDEN = [
   /guaranteed/i, /profitability/i
 ];
 
+const SEMANTIC_REJECTS = [
+  { id:"unsupported-role-upgrade", rx:/\b(?:creator|founder|dev)\b/i },
+  { id:"unsupported-human-identity", rx:/\b(?:same|this)\s+(?:human|person|team)\b/i },
+  { id:"recurrence-to-skill-or-outcome", rx:/\b(?:skill(?:ed)?|expertise|expert|profitable|profitability|winning|knows? what (?:it|they) (?:is|are) doing)\b/i },
+  { id:"missing-to-positive-verdict", rx:/\b(?:safe|clean|legit|benign|all clear|nothing suspicious)\b/i },
+  { id:"capability-status-upgrade", rx:/\bENGINEERING_PASS\b.{0,48}\b(?:live|deployed|shipped)\b|\b(?:live|deployed|shipped)\b.{0,48}\bENGINEERING_PASS\b/i }
+];
+
 const errors=[];
 const fail=(id,msg)=>errors.push(`${id}: ${msg}`);
 const isString=(v)=>typeof v==="string" && v.length>0;
 const textFields=(obj)=>JSON.stringify(obj);
+const authoredText=(f)=>[
+  f.headline,
+  f.literalExplanation,
+  f.literalSummary,
+  f.literalFinding,
+  f.observation,
+  f.evidenceStrip,
+  ...(f.facts || []).flatMap((fact)=>[fact.label, fact.value]),
+  f.cta?.label
+].filter(Boolean).join("\n");
+const semanticViolation=(f)=>SEMANTIC_REJECTS.find(({rx})=>rx.test(authoredText(f)));
 
 if (data.schemaVersion !== "binrat.social-fixtures/1") fail("root","wrong fixture schemaVersion");
 if (data.proof !== "DEMO / NON-LIVE") fail("root","proof must be DEMO / NON-LIVE");
@@ -53,10 +73,10 @@ for (const f of data.fixtures || []) {
   familyCounts.set(f.family,(familyCounts.get(f.family)||0)+1);
 
   if (!isString(f.headline)) fail(id,"headline required");
-  if (!STATES.has(f.coverage)) fail(id,"invalid coverage");
+  if (!COVERAGE_STATES.has(f.coverage)) fail(id,"invalid coverage");
   else coverageSeen.add(f.coverage);
 
-  if (!f.source || !isString(f.source.label) || !isString(f.source.value) || !STATES.has(f.source.state)) {
+  if (!f.source || !isString(f.source.label) || !isString(f.source.value) || !EVIDENCE_STATES.has(f.source.state)) {
     fail(id,"source label/value/state required");
   } else {
     if (f.source.label.length > LIMITS.common.sourceLabel) fail(id,"source label over limit");
@@ -69,6 +89,8 @@ for (const f of data.fixtures || []) {
 
   const bad=FORBIDDEN.find((rx)=>rx.test(textFields(f)));
   if (bad) fail(id,`forbidden public-copy pattern ${bad}`);
+  const semanticBad=semanticViolation(f);
+  if (semanticBad) fail(id,`semantic upgrade ${semanticBad.id}`);
 
   if (f.family === "receipt") {
     const L=LIMITS.receipt;
@@ -91,7 +113,7 @@ for (const f of data.fixtures || []) {
     for (const fact of f.facts || []) {
       if (!isString(fact.label) || fact.label.length>L.factLabel) fail(id,"case fact label invalid/over limit");
       if (!isString(fact.value) || fact.value.length>L.factValue) fail(id,"case fact value invalid/over limit");
-      if (fact.state && !STATES.has(fact.state)) fail(id,"case fact state invalid");
+      if (fact.state && !EVIDENCE_STATES.has(fact.state)) fail(id,"case fact state invalid");
     }
   }
 
@@ -109,7 +131,7 @@ for (const family of ["receipt","case-file","rat-found"]) {
   if ((familyCounts.get(family)||0) < 3) fail("matrix",`${family} needs at least 3 fixtures`);
   if (!headlineMaxSeen.has(family)) fail("matrix",`${family} lacks exact max-length headline fixture`);
 }
-for (const state of STATES) if (!coverageSeen.has(state)) fail("matrix",`coverage state ${state} not exercised`);
+for (const state of COVERAGE_STATES) if (!coverageSeen.has(state)) fail("matrix",`coverage state ${state} not exercised`);
 
 const corpus=JSON.stringify(data.fixtures);
 if (!data.fixtures.some((f)=>f.family==="receipt" && f.deployer.length<=12)) fail("matrix","very short deployer fixture missing");
@@ -118,10 +140,26 @@ if (!/1 retained demo launch/.test(corpus)) fail("matrix","1-launch case missing
 if (!/12 retained demo launches/.test(corpus)) fail("matrix","12-launch case missing");
 if (!data.fixtures.some((f)=>f.source.value.length>=100)) fail("matrix","overlong source mutation missing");
 
+const hostileProbes = [
+  ["deployer-to-creator", "This creator launched five tokens.", "unsupported-role-upgrade"],
+  ["address-to-human", "Same person behind all five launches.", "unsupported-human-identity"],
+  ["recurrence-to-skill", "Five launches. This wallet knows what it is doing.", "recurrence-to-skill-or-outcome"],
+  ["missing-to-clean", "No source receipt. Looks clean.", "missing-to-positive-verdict"],
+  ["engineering-to-live", "Replay Lab is ENGINEERING_PASS and live.", "capability-status-upgrade"]
+];
+for (const [id,text,expected] of hostileProbes) {
+  const hit=SEMANTIC_REJECTS.find(({rx})=>rx.test(text));
+  if (hit?.id !== expected) fail("hostile",`${id} was not rejected as ${expected}`);
+}
+for (const state of ["OBSERVED","DERIVED","PATTERN","UNVERIFIED"]) {
+  if (!EVIDENCE_STATES.has(state)) fail("taxonomy",`canonical evidence state ${state} unsupported`);
+  if (COVERAGE_STATES.has(state)) fail("taxonomy",`evidence state ${state} incorrectly accepted as coverage`);
+}
+
 if (errors.length) {
   console.error("SOCIAL PRODUCTION VALIDATION FAIL");
   for (const e of errors) console.error("- "+e);
   process.exit(1);
 }
 
-console.log(`SOCIAL PRODUCTION VALIDATION PASS · ${data.fixtures.length} fixtures · ${[...STATES].join("/")}`);
+console.log(`SOCIAL PRODUCTION VALIDATION PASS · ${data.fixtures.length} fixtures · coverage ${[...COVERAGE_STATES].join("/")} · evidence ${[...EVIDENCE_STATES].join("/")}`);

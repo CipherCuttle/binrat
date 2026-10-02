@@ -1,7 +1,8 @@
 export const SOCIAL_SCHEMA_VERSION = "binrat.social/1" as const;
 export const PROOF_LABEL = "DEMO / NON-LIVE" as const;
 
-export type EvidenceState = "COMPLETE" | "PARTIAL" | "UNKNOWN" | "MISSING";
+export type CoverageState = "COMPLETE" | "PARTIAL" | "UNKNOWN" | "MISSING";
+export type EvidenceState = "OBSERVED" | "DERIVED" | "PATTERN" | "UNKNOWN" | "COMPLETE" | "PARTIAL" | "UNVERIFIED" | "MISSING";
 export type SocialFamily = "receipt" | "case-file" | "rat-found";
 export type CtaAction = "OPEN_RECEIPTS" | "OPEN_CASE" | "DIG_DEEPER";
 export type CtaLabel = "OPEN RECEIPTS →" | "OPEN CASE →" | "DIG DEEPER →";
@@ -23,7 +24,7 @@ export type SocialBase = {
   proof: typeof PROOF_LABEL;
   family: SocialFamily;
   headline: string;
-  coverage: EvidenceState;
+  coverage: CoverageState;
   source: SourceSlot;
   cta: CtaSlot;
 };
