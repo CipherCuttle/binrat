@@ -43,10 +43,12 @@ ffmpeg -hide_banner -loglevel error -y \
 
 python - "$OUT" "$RAT" <<'PY'
 from __future__ import annotations
-import hashlib, json, pathlib, subprocess, sys
+import hashlib, json, pathlib, struct, subprocess, sys
 
 out = pathlib.Path(sys.argv[1])
 reduced_source = pathlib.Path(sys.argv[2])
+social_manifest_path = reduced_source.parent / "manifest.json"
+social_manifest = json.loads(social_manifest_path.read_text())
 motion = out / "found-something-v1.mp4"
 
 def sha256(path: pathlib.Path) -> str:
@@ -55,6 +57,13 @@ def sha256(path: pathlib.Path) -> str:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+def png_dimensions(path: pathlib.Path) -> list[int]:
+    header = path.read_bytes()[:24]
+    if header[:8] != b"\x89PNG\r\n\x1a\n" or header[12:16] != b"IHDR":
+        raise RuntimeError(f"not a PNG with IHDR: {path}")
+    width, height = struct.unpack(">II", header[16:24])
+    return [width, height]
 
 def probe(path: pathlib.Path) -> dict:
     raw = subprocess.check_output([
@@ -81,7 +90,12 @@ manifest = {
         "mode": "static-source",
         "path": "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
         "sha256": sha256(reduced_source),
-        "note": "No duplicate video: reduced motion resolves immediately to the already-approved final static composition.",
+        "observedPngDimensions": png_dimensions(reduced_source),
+        "declaredSocialManifestDimensions": [
+            social_manifest["outputs"]["rat-found-wide-1200x675.png"]["width"],
+            social_manifest["outputs"]["rat-found-wide-1200x675.png"]["height"],
+        ],
+        "note": "No duplicate video: reduced motion resolves immediately to the already-approved final static composition. Hash is authoritative if upstream declared dimensions disagree with the committed PNG.",
     },
     "outputs": {
         "found-something-v1.mp4": {
