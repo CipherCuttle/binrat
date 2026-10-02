@@ -4,10 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT="$ROOT/docs/design/brand-v1/proofs/motion-v1"
 MOTION="$OUT/found-something-v1.mp4"
-REDUCED="$OUT/found-something-v1-reduced.mp4"
 MANIFEST="$OUT/manifest.json"
+REDUCED_SOURCE="$ROOT/docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png"
+SOCIAL_MANIFEST="$ROOT/docs/design/brand-v1/proofs/social-v1/manifest.json"
 
-for f in "$MOTION" "$REDUCED" "$MANIFEST"; do
+for f in "$MOTION" "$MANIFEST" "$REDUCED_SOURCE" "$SOCIAL_MANIFEST"; do
   test -s "$f"
 done
 
@@ -23,42 +24,53 @@ assert_eq() {
   fi
 }
 
-for f in "$MOTION" "$REDUCED"; do
-  assert_eq "$(probe -select_streams v:0 -show_entries stream=width -of csv=p=0 "$f")" "1200" "$f width"
-  assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$f")" "676" "$f height"
-  assert_eq "$(probe -select_streams v:0 -show_entries stream=avg_frame_rate -of csv=p=0 "$f")" "30/1" "$f fps"
-  assert_eq "$(probe -select_streams a -show_entries stream=index -of csv=p=0 "$f" | wc -l | tr -d ' ')" "0" "$f audio streams"
-done
+assert_eq "$(probe -select_streams v:0 -show_entries stream=width -of csv=p=0 "$MOTION")" "1200" "motion width"
+assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$MOTION")" "676" "motion height"
+assert_eq "$(probe -select_streams v:0 -show_entries stream=avg_frame_rate -of csv=p=0 "$MOTION")" "30/1" "motion fps"
+assert_eq "$(probe -select_streams a -show_entries stream=index -of csv=p=0 "$MOTION" | wc -l | tr -d ' ')" "0" "motion audio streams"
+assert_eq "$(probe -select_streams v:0 -show_entries stream=width -of csv=p=0 "$REDUCED_SOURCE")" "1200" "reduced static width"
+assert_eq "$(probe -select_streams v:0 -show_entries stream=height -of csv=p=0 "$REDUCED_SOURCE")" "675" "reduced static height"
 
 MOTION_FRAMES="$(probe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of csv=p=0 "$MOTION")"
-REDUCED_FRAMES="$(probe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of csv=p=0 "$REDUCED")"
 assert_eq "$MOTION_FRAMES" "192" "motion frame count"
-assert_eq "$REDUCED_FRAMES" "144" "reduced frame count"
 
-unique_hashes() {
-  ffmpeg -hide_banner -loglevel error -i "$1" -f framemd5 - 2>/dev/null \
+MOTION_UNIQUE="$(
+  ffmpeg -hide_banner -loglevel error -i "$MOTION" -f framemd5 - 2>/dev/null \
     | awk -F',' '/^[0-9]/ {gsub(/[[:space:]]/, "", $6); print $6}' \
     | sort -u | wc -l | tr -d ' '
-}
-
-MOTION_UNIQUE="$(unique_hashes "$MOTION")"
-REDUCED_UNIQUE="$(unique_hashes "$REDUCED")"
+)"
 
 if (( MOTION_UNIQUE < 30 )); then
   printf 'FAIL motion proof has too little visible change: %s unique decoded frames\n' "$MOTION_UNIQUE" >&2
   exit 1
 fi
 
-assert_eq "$REDUCED_UNIQUE" "1" "reduced-motion unique decoded frames"
+python - "$MANIFEST" "$REDUCED_SOURCE" "$SOCIAL_MANIFEST" <<'PY'
+import hashlib, json, pathlib, sys
 
-python - "$MANIFEST" <<'PY'
-import json, pathlib, sys
-m = json.loads(pathlib.Path(sys.argv[1]).read_text())
-assert m["schemaVersion"] == "binrat.motion-proof/1"
-assert m["status"] == "PROTOTYPE_NOT_CANON"
-assert m["fixture"] == "DEMO / NON-LIVE"
-assert len(m["outputs"]) == 2
+motion_manifest = json.loads(pathlib.Path(sys.argv[1]).read_text())
+reduced = pathlib.Path(sys.argv[2])
+social_manifest = json.loads(pathlib.Path(sys.argv[3]).read_text())
+
+def sha256(path: pathlib.Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+expected = social_manifest["outputs"]["rat-found-wide-1200x675.png"]["sha256"]
+actual = sha256(reduced)
+
+assert motion_manifest["schemaVersion"] == "binrat.motion-proof/1"
+assert motion_manifest["status"] == "PROTOTYPE_NOT_CANON"
+assert motion_manifest["fixture"] == "DEMO / NON-LIVE"
+assert list(motion_manifest["outputs"]) == ["found-something-v1.mp4"]
+assert motion_manifest["reducedMotion"]["mode"] == "static-source"
+assert motion_manifest["reducedMotion"]["path"] == "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png"
+assert motion_manifest["reducedMotion"]["sha256"] == actual
+assert actual == expected
 PY
 
 printf 'PASS motion proof: %s unique decoded frames\n' "$MOTION_UNIQUE"
-printf 'PASS reduced motion: static semantic composition (%s unique frame)\n' "$REDUCED_UNIQUE"
+printf 'PASS reduced motion: canonical static composition hash matches approved social proof\n'
