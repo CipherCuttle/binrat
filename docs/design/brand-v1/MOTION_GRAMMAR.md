@@ -3,10 +3,11 @@
 **Status:** bounded motion-identity prototype  
 **Branch:** `design/binrat-motion-identity-v1`  
 **Visual authority:** `docs/design/brand-v1/`  
+**Palette authority:** `design/binrat-brand-system-v1` at `770c7aa8741236ee5d8fc8ddd6411bc2addfdade` (`Ink #101210` for neutral motion canvas/pad)  
 **Product language authority:** `docs/PRODUCT_LANGUAGE.md`  
 **Roadmap raster authority:** `docs/design/roadmap-v1/README.md`
 
-Motion may reveal, move, dim, mask, illuminate or settle approved raster artwork. It may not redraw the Rat or the physical BINRAT world.
+Motion may reveal, move, dim, mask, illuminate or settle approved raster artwork. It may not redraw the Rat or the physical BINRAT world. Neutral motion backgrounds/pads use frozen Brand V1 tokens; do not invent near-black substitutes.
 
 ## North star
 
