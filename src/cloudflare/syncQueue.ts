@@ -8,6 +8,11 @@ import {
   syncPonsOutcomeObservations,
   type PonsOutcomeObservationSource
 } from '../pons/outcomeReceipts.js';
+import {
+  RpcPonsTokenIdentitySource,
+  syncPonsTokenIdentities,
+  type PonsTokenIdentitySource
+} from '../pons/tokenIdentity.js';
 import { PONS_V2_START_BLOCK, ROBINHOOD_CHAIN_ID } from '../pons/chain.js';
 import { ArcObservationSource } from '../arc/observationSource.js';
 import { ArcRatRadarSource, type RatRadarSource } from '../arc/ratRadarSource.js';
@@ -22,6 +27,7 @@ import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from 
 import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1PonsOutcomeObservationStore } from './ponsOutcomeStore.js';
+import { D1PonsTokenIdentityStore } from './ponsTokenIdentityStore.js';
 import { D1Store } from './d1Store.js';
 import { D1SyncLeaseStore } from './syncLease.js';
 import type { D1DatabaseLike } from './d1Types.js';
@@ -58,6 +64,8 @@ export interface CloudflareSyncEnv {
   BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
   BINRAT_PONS_OUTCOME_ENABLED?: string;
   BINRAT_PONS_OUTCOME_MAX_PER_CYCLE?: string;
+  BINRAT_PONS_TOKEN_IDENTITY_ENABLED?: string;
+  BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE?: string;
   BINRAT_ROBINHOOD_ARCHIVE_RPC_URL?: string;
   BINRAT_MAX_STATUS_AGE_MS?: string;
   BINRAT_MAX_OBSERVATIONS_PER_SYNC?: string;
@@ -72,7 +80,7 @@ export interface CloudflareSyncEnv {
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
+  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'PONS_TOKEN_IDENTITY_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -82,6 +90,7 @@ export interface CloudflareSyncDeps {
   launchSource?: LaunchSource;
   ponsLaunchSource?: LaunchSource;
   ponsOutcomeSource?: PonsOutcomeObservationSource;
+  ponsTokenIdentitySource?: PonsTokenIdentitySource;
   observationSource?: ObservationSource;
   ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
@@ -96,6 +105,7 @@ export type SyncCycleResult =
 const SYNC_LEASE_NAME = 'binrat:arc-sync';
 const PONS_SYNC_LEASE_NAME = 'binrat:pons-sync';
 const PONS_OUTCOME_LEASE_NAME = 'binrat:pons-outcome';
+const PONS_TOKEN_IDENTITY_LEASE_NAME = 'binrat:pons-token-identity';
 const OBSERVATION_LEASE_NAME = 'binrat:arc-observation';
 const RAT_WATCH_LEASE_NAME = 'binrat:rat-watch';
 const RAT_RADAR_LEASE_NAME = 'binrat:rat-radar';
@@ -104,6 +114,7 @@ const LIVE_SYNC_LEASE_MS = 120_000;
 // reads inside its unchanged 60s work budget; Arc keeps its existing lease.
 export const PONS_SYNC_LEASE_MS = 180_000;
 export const PONS_OUTCOME_LEASE_MS = 180_000;
+export const PONS_TOKEN_IDENTITY_LEASE_MS = 120_000;
 const PONS_CATCHUP_INITIAL_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCH_BLOCKS = 4_096;
 const PONS_CATCHUP_DEFAULT_MAX_BATCHES = 4;
@@ -169,6 +180,15 @@ export async function enqueuePonsOutcomeCycle(
 ): Promise<void> {
   if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
   await env.SYNC_QUEUE.send({ kind:'PONS_OUTCOME_CYCLE', cycleId, enqueuedAtMs:nowMs });
+}
+
+export async function enqueuePonsTokenIdentityCycle(
+  env: CloudflareSyncEnv,
+  nowMs = Date.now(),
+  cycleId = crypto.randomUUID()
+): Promise<void> {
+  if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({ kind:'PONS_TOKEN_IDENTITY_CYCLE', cycleId, enqueuedAtMs:nowMs });
 }
 
 export async function enqueueObservationCycle(
@@ -245,6 +265,11 @@ export async function handleSyncQueueBatch(
             console.error(JSON.stringify({ event:'PONS_OUTCOME_ENQUEUE_FAILED', code:syncErrorCode(error) }));
           });
         }
+        if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_TOKEN_IDENTITY_ENABLED === 'true') {
+          await enqueuePonsTokenIdentityCycle(env, deps.now()).catch((error) => {
+            console.error(JSON.stringify({ event:'PONS_TOKEN_IDENTITY_ENQUEUE_FAILED', code:syncErrorCode(error) }));
+          });
+        }
         if (result.status === 'SUCCESS' && result.liveCaughtUp && shouldEnqueueRatWatch(message.body.enqueuedAtMs)) {
           await enqueueRatWatchCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event: 'PONS_RAT_WATCH_ENQUEUE_FAILED', code: syncErrorCode(error) }));
@@ -255,6 +280,13 @@ export async function handleSyncQueueBatch(
 
       if (message.body.kind === 'PONS_OUTCOME_CYCLE') {
         const result=await runCloudflarePonsOutcomeCycle(env,message.body,deps);
+        if (result.status === 'RETRY') message.retry({delaySeconds:30});
+        else message.ack();
+        continue;
+      }
+
+      if (message.body.kind === 'PONS_TOKEN_IDENTITY_CYCLE') {
+        const result=await runCloudflarePonsTokenIdentityCycle(env,message.body,deps);
         if (result.status === 'RETRY') message.retry({delaySeconds:30});
         else message.ack();
         continue;
@@ -648,6 +680,62 @@ export async function runCloudflarePonsSyncCycle(
   } finally {
     store.close();
     await lease.release(PONS_SYNC_LEASE_NAME, message.cycleId);
+  }
+}
+
+export async function runCloudflarePonsTokenIdentityCycle(
+  env:CloudflareSyncEnv,
+  message:BinratSyncMessage,
+  deps:CloudflareSyncDeps={now:Date.now}
+):Promise<
+  | {status:'SUCCESS';attempted:number;inserted:number;duplicates:number;failed:number;remaining:number}
+  | {status:'BUSY'}
+  | {status:'RETRY';code:string}
+> {
+  if (!isSyncMessage(message) || message.kind!=='PONS_TOKEN_IDENTITY_CYCLE') {
+    return {status:'RETRY',code:'PONS_TOKEN_IDENTITY_MESSAGE_INVALID'};
+  }
+  if (env.BINRAT_PONS_TOKEN_IDENTITY_ENABLED!=='true') {
+    return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,failed:0,remaining:0};
+  }
+
+  const lease=new D1SyncLeaseStore(env.DB);
+  if (!(await lease.claim(PONS_TOKEN_IDENTITY_LEASE_NAME,message.cycleId,deps.now(),PONS_TOKEN_IDENTITY_LEASE_MS))) {
+    return {status:'BUSY'};
+  }
+  try {
+    const source=deps.ponsTokenIdentitySource ?? new RpcPonsTokenIdentitySource({
+      rpcUrl:resolveRobinhoodArchiveRpcUrl(env)
+    });
+    const report=await syncPonsTokenIdentities(
+      source,
+      new D1PonsTokenIdentityStore(env.DB),
+      integerSetting(env.BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE,4,1,12)
+    );
+    console.error(JSON.stringify({
+      event:'PONS_TOKEN_IDENTITY_RECEIPT',
+      cycleId:message.cycleId,
+      observedBlock:report.observedBlock?.toString() ?? null,
+      attempted:report.attempted,
+      inserted:report.inserted,
+      duplicates:report.duplicates,
+      failed:report.failed,
+      remaining:report.remaining
+    }));
+    return {
+      status:'SUCCESS',
+      attempted:report.attempted,
+      inserted:report.inserted,
+      duplicates:report.duplicates,
+      failed:report.failed,
+      remaining:report.remaining
+    };
+  } catch(error) {
+    const code=syncErrorCode(error);
+    console.error(JSON.stringify({event:'PONS_TOKEN_IDENTITY_FAILED',cycleId:message.cycleId,code}));
+    return {status:'RETRY',code};
+  } finally {
+    await lease.release(PONS_TOKEN_IDENTITY_LEASE_NAME,message.cycleId);
   }
 }
 
@@ -1297,6 +1385,7 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
       item.kind === 'SYNC_CYCLE' ||
       item.kind === 'PONS_SYNC_CYCLE' ||
       item.kind === 'PONS_OUTCOME_CYCLE' ||
+      item.kind === 'PONS_TOKEN_IDENTITY_CYCLE' ||
       item.kind === 'OBSERVATION_CYCLE' ||
       item.kind === 'RAT_WATCH_CYCLE' ||
       item.kind === 'RAT_RADAR_CYCLE'
