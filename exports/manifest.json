@@ -583,6 +583,8 @@
         "docs/design/brand-v1/canon/rat-zero.jpg",
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css"
@@ -591,6 +593,8 @@
         "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
         "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
@@ -866,11 +870,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png": "sha256:bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:ead4216fe55c0fad78ad1c6e0327687f14562cc719beff3f83368c04f017a5aa",
@@ -901,11 +909,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:5937c00cd4c6f197ef6d0742d2d3b17e1e03f87b2496e2dea2906cdcb12f1cec",
@@ -936,11 +948,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:e51056c1097be599b33e92f54fc622651f731002af7ae428e3e8f709cdd77706",
@@ -971,11 +987,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:5937c00cd4c6f197ef6d0742d2d3b17e1e03f87b2496e2dea2906cdcb12f1cec",
