@@ -32,17 +32,18 @@ For one canonical Pons launch:
 
 1. use the exact `TokenLaunched.deployer`;
 2. search only direct `external` native transfers whose recipient is that exact deployer;
-3. consider transfers only through `launchBlock - 1`;
-4. select the latest qualifying transfer;
-5. independently re-read the canonical transaction and require exact:
+3. require the source address to differ from the deployer address; self-transfers are not funding evidence;
+4. consider transfers only through `launchBlock - 1`;
+5. inspect only a tiny bounded newest-first page and select the latest qualifying non-self transfer;
+6. independently re-read the canonical transaction and require exact:
    - sender;
    - recipient;
    - value;
    - transaction hash;
    - block number;
-6. bind canonical launch and transfer block hashes;
-7. fail closed on reorg or mismatch;
-8. emit no negative receipt when no transfer is observed.
+7. bind canonical launch and transfer block hashes;
+8. fail closed on reorg or mismatch;
+9. emit no negative receipt when no transfer is observed.
 
 The receipt is append-only evidence. It never rewrites canonical launch authority.
 
@@ -65,7 +66,7 @@ The initial source may use Alchemy's `alchemy_getAssetTransfers` only as a bound
 - `category = ["external"]`;
 - `excludeZeroValue = true`;
 - `order = "desc"`;
-- `maxCount = "0x1"`;
+- `maxCount = "0x5"`, then discard self-transfers and use the newest qualifying result;
 - `fromBlock = "0x0"`;
 - `toBlock = launchBlock - 1`.
 
