@@ -88,6 +88,12 @@ jobs:
       - name: Commit deterministic export pack
         run: |
           set -euo pipefail
+          REMOTE_HEAD="$(git ls-remote origin refs/heads/design/binrat-export-pack-v1 | cut -f1)"
+          if [ "$REMOTE_HEAD" != "$GITHUB_SHA" ]; then
+            echo "Branch advanced while this run was rendering; skip stale artifact push."
+            echo "run_sha=$GITHUB_SHA remote_head=$REMOTE_HEAD"
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add exports/
