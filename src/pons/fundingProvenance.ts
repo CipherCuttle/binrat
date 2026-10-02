@@ -164,25 +164,36 @@ export class AlchemyPonsFundingSource implements PonsFundingSource {
     assertAddress(deployer, 'PONS_FUNDING_DEPLOYER_INVALID');
     if (throughBlockInclusive < 0n) return null;
 
-    const response = await this.fetchImpl(this.rpcUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'alchemy_getAssetTransfers',
-        params: [{
-          fromBlock: '0x0',
-          toBlock: `0x${throughBlockInclusive.toString(16)}`,
-          toAddress: deployer,
-          category: ['external'],
-          excludeZeroValue: true,
-          withMetadata: false,
-          order: 'desc',
-          maxCount: '0x1'
-        }]
-      })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), PONS_RPC_TIMEOUT_MS);
+    let response: Response;
+    try {
+      response = await this.fetchImpl(this.rpcUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'alchemy_getAssetTransfers',
+          params: [{
+            fromBlock: '0x0',
+            toBlock: `0x${throughBlockInclusive.toString(16)}`,
+            toAddress: deployer,
+            category: ['external'],
+            excludeZeroValue: true,
+            withMetadata: false,
+            order: 'desc',
+            maxCount: '0x1'
+          }]
+        })
+      });
+    } catch (error) {
+      if (controller.signal.aborted) throw new Error('PONS_FUNDING_TRANSFERS_TIMEOUT');
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!response.ok) throw new Error(`PONS_FUNDING_TRANSFERS_HTTP_${response.status}`);
 
     const payload = await response.json() as AlchemyTransferResponse;
