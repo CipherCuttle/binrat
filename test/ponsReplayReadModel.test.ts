@@ -132,3 +132,29 @@ test('read model hides a launch that exists in D1 but is after the requested blo
     store.close();db.close();
   }
 });
+
+
+test('read model fails closed on canonical launch-block hash drift',async()=>{
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const target=launch('d'.repeat(64),200,7,8);
+  try {
+    await store.putLaunch(target);
+    await store.commitCheckpoint({blockNumber:260n,blockHash:hash(260),guardBlockNumber:null,guardBlockHash:null});
+    const readOnly=new StrictReadOnlyDb(db);
+    await assert.rejects(
+      readPonsReplaySnapshot(readOnly,{
+        async getBlockPoint(blockNumber:bigint){
+          if(blockNumber===210n) return {blockNumber,blockHash:hash(210),timestampMs:10_500_000};
+          if(blockNumber===200n) return {blockNumber,blockHash:hash(999),timestampMs:10_000_000};
+          throw new Error('POINT_MISSING:'+blockNumber.toString());
+        }
+      },{targetLaunchId:target.launchId,asOfBlock:210n}),
+      /PONS_REPLAY_LAUNCH_REORG/
+    );
+    assert.equal(readOnly.writeAttempts,0);
+  } finally {
+    store.close();db.close();
+  }
+});
