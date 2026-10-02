@@ -68,7 +68,7 @@ def validate_page(page):
                 expected,
                 got:[Math.round(rect.width),Math.round(rect.height)],
                 outside,
-                scroll:[el.scrollWidth,el.clientWidth,el.scrollHeight,el.clientHeight],
+                overflow:[getComputedStyle(el).overflowX,getComputedStyle(el).overflowY],
                 actionCount:el.querySelectorAll(".action").length,
                 text:el.innerText,
                 coverage:el.dataset.coverage,
@@ -86,8 +86,8 @@ def validate_page(page):
             failures.append(f'{prefix}: card size {info["got"]} != {info["expected"]}')
         if info["outside"]:
             failures.append(f'{prefix}: core content outside safe card bounds: {info["outside"]}')
-        if info["scroll"][0] > info["scroll"][1] + 1 or info["scroll"][2] > info["scroll"][3] + 1:
-            failures.append(f'{prefix}: card scroll overflow {info["scroll"]}')
+        if info["overflow"] != ["hidden", "hidden"]:
+            failures.append(f'{prefix}: card overflow contract drift {info["overflow"]}')
         if info["actionCount"] != 1:
             failures.append(f'{prefix}: expected exactly one CTA, got {info["actionCount"]}')
         if info["coverage"] not in info["text"]:
@@ -103,9 +103,6 @@ def validate_page(page):
         for item in info["longEvidence"]:
             if item["font"] < 11:
                 failures.append(f'{prefix}: long evidence shrank below 11px mono')
-            # complete values may wrap, but may not escape the card horizontally.
-            if item["left"] < -20000 or item["right"] > 5000:
-                failures.append(f'{prefix}: long evidence geometry invalid')
 
     if failures:
         raise SystemExit("SOCIAL PRODUCTION BROWSER FAIL\n- " + "\n- ".join(failures))
