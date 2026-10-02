@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto';
 import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
 import type { AutonomousOutcome } from '../autonomous/outcome.js';
 import { discoverRats, latestPonsLaunches, latestPonsLaunchSnapshot, loadRatsSnapshot } from '../autonomous/rats.js';
-import { why } from '../autonomous/evidence.js';
+import { dig, why } from '../autonomous/evidence.js';
+import { readHotGarbage } from '../autonomous/hotGarbage.js';
 import { listWatches } from '../autonomous/watches.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
 import { ARC_CHAIN_ID } from '../arc/chain.js';
@@ -224,6 +225,22 @@ export async function handleWorkerRequest(
     return miniAppBootstrap(request, env, deps.now());
   }
 
+  if (request.method === 'POST' && pathname === '/api/miniapp/hot') {
+    return miniAppHot(request, env, deps.now());
+  }
+
+  if (request.method === 'POST' && pathname === '/api/miniapp/latest') {
+    return miniAppLatest(request, env, deps.now());
+  }
+
+  if (request.method === 'POST' && pathname === '/api/miniapp/watches') {
+    return miniAppWatches(request, env, deps.now());
+  }
+
+  if (request.method === 'POST' && pathname === '/api/miniapp/dig') {
+    return miniAppDig(request, env, deps.now());
+  }
+
   if (request.method === 'POST' && pathname === '/api/miniapp/case') {
     return miniAppCase(request, env, deps.now());
   }
@@ -269,7 +286,7 @@ export async function handleWorkerRequest(
   return json(404, { error: 'NOT_FOUND' });
 }
 
-async function miniAppBody(request: Request): Promise<{ initData: string; caseId?: string; launchId?: string }> {
+async function miniAppBody(request: Request): Promise<{ initData: string; caseId?: string; launchId?: string; deployer?: string }> {
   const length = Number(request.headers.get('content-length') ?? '0');
   if (Number.isFinite(length) && length > 16 * 1024) throw new Error('MINI_APP_BODY_INVALID');
   let parsed: unknown;
@@ -279,10 +296,12 @@ async function miniAppBody(request: Request): Promise<{ initData: string; caseId
   if (typeof body.initData !== 'string' || body.initData.length > 8192) throw new Error('MINI_APP_BODY_INVALID');
   if (body.caseId !== undefined && typeof body.caseId !== 'string') throw new Error('MINI_APP_BODY_INVALID');
   if (body.launchId !== undefined && typeof body.launchId !== 'string') throw new Error('MINI_APP_BODY_INVALID');
+  if (body.deployer !== undefined && typeof body.deployer !== 'string') throw new Error('MINI_APP_BODY_INVALID');
   return {
     initData: body.initData,
     ...(typeof body.caseId === 'string' ? { caseId: body.caseId } : {}),
-    ...(typeof body.launchId === 'string' ? { launchId: body.launchId } : {})
+    ...(typeof body.launchId === 'string' ? { launchId: body.launchId } : {}),
+    ...(typeof body.deployer === 'string' ? { deployer: body.deployer } : {})
   };
 }
 
@@ -337,6 +356,60 @@ async function miniAppBootstrap(request: Request, env: BinratWorkerEnv, now: num
         unknowns: ['human identity', 'intent', 'safety', 'future outcome']
       }
     });
+  } catch (error) { return miniAppError(error); }
+}
+
+async function miniAppHot(request: Request, env: BinratWorkerEnv, now: number): Promise<Response> {
+  try {
+    const body = await miniAppBody(request);
+    miniAppPrincipal(body.initData, env, now);
+    return json(200, { hotGarbage: await readHotGarbage(env.DB, now, 5) });
+  } catch (error) { return miniAppError(error); }
+}
+
+async function miniAppLatest(request: Request, env: BinratWorkerEnv, now: number): Promise<Response> {
+  try {
+    const body = await miniAppBody(request);
+    miniAppPrincipal(body.initData, env, now);
+    const snapshot = await latestPonsLaunchSnapshot(env.DB, now, 20);
+    return json(200, {
+      chainId: ROBINHOOD_CHAIN_ID,
+      sourceCheckpoint: snapshot.sourceCheckpoint,
+      launches: snapshot.launches
+    });
+  } catch (error) { return miniAppError(error); }
+}
+
+async function miniAppWatches(request: Request, env: BinratWorkerEnv, now: number): Promise<Response> {
+  try {
+    const body = await miniAppBody(request);
+    const principal = miniAppPrincipal(body.initData, env, now);
+    const watches = await listWatches(env.DB, { userId: principal.userId, chatId: principal.chatId });
+    return json(200, {
+      watches: watches.map(watch => ({
+        chainId: watch.chain_id,
+        entityType: watch.entity_type,
+        entityId: watch.entity_id,
+        startBlock: watch.start_block,
+        createdAtMs: watch.created_at_ms,
+        policy: watch.policy
+      }))
+    });
+  } catch (error) { return miniAppError(error); }
+}
+
+async function miniAppDig(request: Request, env: BinratWorkerEnv, now: number): Promise<Response> {
+  try {
+    const body = await miniAppBody(request);
+    miniAppPrincipal(body.initData, env, now);
+    const deployer = body.deployer?.toLowerCase();
+    if (!deployer || !/^0x[0-9a-f]{40}$/.test(deployer)) throw new Error('MINI_APP_BODY_INVALID');
+    const receipt = await dig(env.DB, {
+      chainId: ROBINHOOD_CHAIN_ID,
+      entityType: 'CREATOR',
+      entityId: deployer
+    }, now);
+    return json(200, { receipt });
   } catch (error) { return miniAppError(error); }
 }
 
