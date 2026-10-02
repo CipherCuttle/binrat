@@ -1,21 +1,10 @@
-import capabilityManifest from "../../../docs/CAPABILITY_MANIFEST_V0.json";
-import projection from "./roadmapProjection.json";
-
 export type RoadmapStageId =
   | "sniff"
   | "remember"
+  | "investigate"
   | "watch"
-  | "hunt"
-  | "organize"
+  | "connect"
   | "autonomous_rat";
-
-export type RoadmapFeatureStatus = "LIVE" | "BUILDING" | "PLANNED" | "EXPERIMENT";
-
-export type RoadmapFeature = {
-  id: string;
-  label: string;
-  status?: RoadmapFeatureStatus;
-};
 
 export type RoadmapStage = {
   id: RoadmapStageId;
@@ -23,79 +12,20 @@ export type RoadmapStage = {
   title: string;
   headline: string;
   literal: string;
-  ratLine?: string;
-  features: RoadmapFeature[];
-  kicker: string;
-  body: string[];
+  receipt: string;
   side: "left" | "right";
-  accent: string;
+  accent: "copper" | "mint" | "bruise" | "bone" | "eye";
+  crop: string;
+  scale: number;
 };
 
-type ProjectionStage = {
-  id: string;
-  index: number;
-  title: string;
-  headline: string;
-  literal: string;
-  ratLine?: string;
-  features: Array<{ id: string; label: string }>;
-  side: "left" | "right";
-  accent: string;
-};
-
-const capabilities = capabilityManifest.capabilities;
-
-function resolveFeatureStatus(id: string): RoadmapFeatureStatus | undefined {
-  if (id === "pons_live_intelligence") {
-    return capabilities.robinhoodLiveIntelligenceV1.engineeringStatus === "BUILDING"
-      ? "BUILDING"
-      : undefined;
-  }
-
-  if (id === "rat_radar") {
-    if (capabilities.ratRadarV0.currentRailReplacementStatus === "BUILDING_ON_PONS_4663") {
-      return "BUILDING";
-    }
-    return capabilities.ratRadarV0.publicStatus === "PUBLIC_LIVE_BETA"
-      ? "LIVE"
-      : undefined;
-  }
-
-  if (id === "replay_lab") {
-    return capabilities.replayLab.publicStatus === "PUBLIC_LIVE_BETA"
-      ? "LIVE"
-      : undefined;
-  }
-
-  if (id === "rat_watch") {
-    if (capabilities.ratWatchV0.currentRailRevalidationRequired) return "BUILDING";
-    return capabilities.ratWatchV0.deploymentStatus === "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED"
-      ? "LIVE"
-      : undefined;
-  }
-
-  if (id === "dumpster_raids") {
-    return capabilities.dumpsterRaidsV0.engineeringStatus === "EXPERIMENTAL"
-      ? "EXPERIMENT"
-      : undefined;
-  }
-
-  if (id === "rat_den") {
-    return capabilities.ratDenV0.engineeringStatus === "PLANNED"
-      ? "PLANNED"
-      : undefined;
-  }
-
-  return undefined;
-}
-
-export const roadmapStages: RoadmapStage[] = (projection.stages as ProjectionStage[]).map((stage) => ({
-  ...stage,
-  id: stage.id as RoadmapStageId,
-  kicker: stage.headline,
-  body: [stage.literal],
-  features: stage.features.map((feature) => ({
-    ...feature,
-    status: resolveFeatureStatus(feature.id),
-  })),
-}));
+// This is an experiential capability sequence, not a live-status projection.
+// It intentionally consumes no runtime product data.
+export const roadmapStages: RoadmapStage[] = [
+  { id: "sniff", index: 1, title: "SNIFF", headline: "A TRAIL STARTS WITH A TRACE.", literal: "Notice the first observable signal before the surrounding story gets louder.", receipt: "FIRST TRACE / ROADMAP CANDIDATE", side: "left", accent: "copper", crop: "48% 48%", scale: 1.34 },
+  { id: "remember", index: 2, title: "REMEMBER", headline: "KEEP WHAT THE TRAIL LEAVES.", literal: "Retain a readable record so a later claim can be compared with what was visible then.", receipt: "RETAINED CONTEXT / NOT A LIVE CLAIM", side: "right", accent: "mint", crop: "24% 48%", scale: 1.26 },
+  { id: "investigate", index: 3, title: "INVESTIGATE", headline: "PUT THE RECEIPT BEFORE THE THEORY.", literal: "Turn an observed trace into a bounded question with source, coverage and unknowns intact.", receipt: "CASE SHAPE / SOURCE REQUIRED", side: "left", accent: "bruise", crop: "54% 34%", scale: 1.46 },
+  { id: "watch", index: 4, title: "WATCH", headline: "NOTICE WHEN THE TRAIL MOVES AGAIN.", literal: "Follow a defined observation over time without treating attention as a recommendation.", receipt: "CHANGE DETECTED / INTERPRETATION SEPARATE", side: "right", accent: "bone", crop: "77% 42%", scale: 1.28 },
+  { id: "connect", index: 5, title: "CONNECT", headline: "LET RECEIPTS TRAVEL WITH CONTEXT.", literal: "Connect people to a source trail while keeping evidence state visible at every handoff.", receipt: "SOURCE CHAIN / STATE PRESERVED", side: "left", accent: "mint", crop: "50% 67%", scale: 1.40 },
+  { id: "autonomous_rat", index: 6, title: "AUTONOMOUS RAT", headline: "GIVE IT A QUESTION. KEEP THE RECEIPTS.", literal: "Automation can help gather and organize material; it never turns missing evidence into truth.", receipt: "ASSISTED WORK / HUMAN REVIEW REMAINS", side: "right", accent: "eye", crop: "49% 46%", scale: 1.16 },
+];

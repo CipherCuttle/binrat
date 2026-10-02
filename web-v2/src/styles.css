@@ -1,3 +1,5 @@
+@import "../../docs/design/brand-v1/brand-tokens.css";
+
 @font-face {
   font-family: Plex Mono;
   src: url("/fonts/plex-mono-regular.woff2") format("woff2");

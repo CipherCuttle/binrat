@@ -59,10 +59,10 @@ export function RoadmapPage({ navigate }: { navigate: (path: string) => void }) 
         <button className="roadmap-back" type="button" onClick={() => navigate("/")}>
           BINRAT ↗
         </button>
-        <p>FROM SIGNAL TO MEMORY</p>
-        <h1>DOWN THE RAT HOLE.</h1>
+        <p>BINRAT / CAPABILITY PATH</p>
+        <h1>FOLLOW THE RECEIPTS.</h1>
         <span>
-          The roadmap is a trail of capabilities, not a promise calendar.
+          Six capability chapters. No live status, no promise calendar, no invented evidence.
         </span>
       </header>
 
@@ -87,8 +87,8 @@ export function RoadmapPage({ navigate }: { navigate: (path: string) => void }) 
       </div>
 
       <footer className="roadmap-footer">
-        <p>Six chapters. No promise calendar.</p>
-        <span>Receipts still decide truth.</span>
+        <p>Six chapters. Evidence state stays literal.</p>
+        <span>Automation can assist. Receipts still decide truth.</span>
       </footer>
     </div>
   );

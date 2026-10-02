@@ -4,170 +4,75 @@ const path = require("node:path");
 const { chromium } = require("playwright");
 
 const base = (process.env.BINRAT_PREVIEW_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
-const output = path.resolve(__dirname, "../browser-artifacts/roadmap-v1");
+const output = path.resolve(__dirname, "../browser-artifacts/roadmap-v2");
 fs.mkdirSync(output, { recursive: true });
-
-const sizes = [
-  [320, 720],
-  [390, 844],
-  [430, 932],
-  [1024, 768],
-  [1440, 900],
-];
+const sizes = [[390, 844], [390, 568], [1024, 768], [1440, 900]];
+const stages = ["sniff", "remember", "investigate", "watch", "connect", "autonomous_rat"];
 
 async function noOverflow(page, width, label) {
-  const data = await page.evaluate(() => ({
-    html: document.documentElement.scrollWidth,
-    body: document.body.scrollWidth,
-  }));
-  assert.ok(data.html <= width + 1 && data.body <= width + 1,
-    label + " overflow at " + width + ": " + JSON.stringify(data));
+  const size = await page.evaluate(() => ({ html: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
+  assert.ok(size.html <= width + 1 && size.body <= width + 1, `${label} overflow: ${JSON.stringify(size)}`);
 }
-
-async function centerStage(page, id) {
-  await page.locator('[data-stage="' + id + '"]').evaluate((node) => {
+async function center(page, id) {
+  await page.locator(`[data-stage="${id}"]`).evaluate((node) => {
     const rect = node.getBoundingClientRect();
-    const top = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = "auto";
-    window.scrollTo({ top, behavior: "auto" });
-    root.style.scrollBehavior = previous;
+    window.scrollTo({ top: window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2, behavior: "auto" });
   });
-  await page.locator('[data-stage="' + id + '"][data-active="true"]').waitFor();
+  await page.locator(`[data-stage="${id}"][data-active="true"]`).waitFor();
+  await page.waitForTimeout(700);
 }
-
-async function capture(browser, width, height) {
+async function testViewport(browser, width, height) {
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
   const page = await context.newPage();
+  const errors = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(String(error)));
   try {
-    await page.goto(base + "/roadmap", { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "DOWN THE RAT HOLE." }).waitFor();
-    await noOverflow(page, width, "roadmap intro");
-
-    await centerStage(page, "sniff");
-    assert.equal(await page.locator('[data-active="true"][data-stage]').count(), 1, "one active stage at SNIFF");
-    await page.screenshot({
-      path: path.join(output, "sniff-active-" + width + ".png"),
-      fullPage: false,
-      animations: "disabled",
-    });
-
-    await page.locator('[data-stage="sniff"]').evaluate((node) => {
-      node.setAttribute("data-active", "false");
-    });
-    await page.screenshot({
-      path: path.join(output, "sniff-inactive-" + width + ".png"),
-      fullPage: false,
-      animations: "disabled",
-    });
-    await page.locator('[data-stage="sniff"]').evaluate((node) => {
-      node.setAttribute("data-active", "true");
-    });
-
-    await page.addStyleTag({
-      content: ".roadmap-spine, .roadmap-stage__node, .roadmap-stage__copy { visibility: hidden !important; }",
-    });
-    await page.locator('[data-stage="sniff"] .roadmap-scene--sniff').screenshot({
-      path: path.join(output, "sniff-art-only-" + width + ".png"),
-      animations: "disabled",
-    });
-
-    await centerStage(page, "remember");
-    assert.equal(await page.locator('[data-active="true"][data-stage]').count(), 1, "one active stage at REMEMBER");
-    await noOverflow(page, width, "roadmap remember");
-    await page.screenshot({
-      path: path.join(output, "remember-" + width + ".png"),
-      fullPage: false,
-      animations: "disabled",
-    });
-
-    process.stdout.write("PASS ROADMAP " + width + "px SNIFF -> REMEMBER\n");
-  } finally {
-    await context.close();
-  }
+    await page.goto(base + "/roadmap", { waitUntil: "networkidle" });
+    await page.getByRole("heading", { name: "FOLLOW THE RECEIPTS." }).waitFor();
+    assert.equal(await page.locator("[data-stage]").count(), 6);
+    for (const id of stages) {
+      await center(page, id);
+      assert.equal(await page.locator('[data-stage][data-active="true"]').count(), 1, `one active stage at ${id}`);
+      assert.equal(await page.locator(`[data-stage="${id}"] [data-scene-art="canonical-raster"] img`).count(), 1);
+      await noOverflow(page, width, id);
+    }
+    const perf = await page.evaluate(() => ({
+      permanentAnimations: document.getAnimations().filter((item) => item.playState === "running").length,
+      activeLayerCount: document.querySelector('[data-stage][data-active="true"] [data-scene-art]')?.childElementCount,
+      ratRequests: performance.getEntriesByType("resource").filter((entry) => entry.name.includes("rat-zero")).length,
+    }));
+    assert.equal(perf.permanentAnimations, 0, "no permanent animation loop");
+    assert.ok(perf.activeLayerCount <= 6, `active scene layer budget exceeded: ${perf.activeLayerCount}`);
+    assert.ok(perf.ratRequests <= 1, `Rat Zero must be cached/shared: ${perf.ratRequests}`);
+    assert.deepEqual(errors, [], `console errors: ${errors.join(" | ")}`);
+    await page.screenshot({ path: path.join(output, `roadmap-${width}x${height}.png`), fullPage: false, animations: "disabled" });
+    process.stdout.write(`PASS ROADMAP V2 ${width}x${height}\n`);
+  } finally { await context.close(); }
 }
-
-async function reducedMotion(browser, width, height) {
-  const context = await browser.newContext({
-    viewport: { width, height },
-    reducedMotion: "reduce",
-  });
+async function reduced(browser) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
   const page = await context.newPage();
   try {
-    await page.goto(base + "/roadmap", { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "DOWN THE RAT HOLE." }).waitFor();
-    await centerStage(page, "sniff");
-    const motion = await page.evaluate(() => {
-      const signal = document.querySelector(".roadmap-spine__signal");
-      const node = document.querySelector('[data-stage="sniff"] .roadmap-stage__node span');
-      const radar = document.querySelector('[data-stage="sniff"] [data-scene-layer="radar"]');
-      return {
-        signalDisplay: signal ? getComputedStyle(signal).display : "missing",
-        nodeAnimation: node ? getComputedStyle(node).animationName : "missing",
-        radarAnimation: radar ? getComputedStyle(radar).animationName : "missing",
-      };
-    });
-    assert.equal(motion.signalDisplay, "none", "reduced motion hides travelling signal");
-    assert.equal(motion.nodeAnimation, "none", "reduced motion stops node animation");
-    assert.equal(motion.radarAnimation, "none", "reduced motion stops raster radar life");
-    await noOverflow(page, width, "roadmap reduced motion");
-    await page.screenshot({
-      path: path.join(output, "sniff-reduced-motion-" + width + ".png"),
-      fullPage: false,
-      animations: "disabled",
-    });
-    process.stdout.write("PASS ROADMAP REDUCED MOTION " + width + "px\n");
-  } finally {
-    await context.close();
-  }
+    await page.goto(base + "/roadmap", { waitUntil: "networkidle" });
+    await center(page, "autonomous_rat");
+    const state = await page.evaluate(() => ({
+      focus: getComputedStyle(document.querySelector(".roadmap-spine__focus")).display,
+      activeEvidence: getComputedStyle(document.querySelector('[data-stage="autonomous_rat"] .roadmap-scene__evidence')).opacity,
+      activeScene: getComputedStyle(document.querySelector('[data-stage="autonomous_rat"] .roadmap-scene')).opacity,
+      animations: document.getAnimations().filter((item) => item.playState === "running").length,
+    }));
+    assert.equal(state.focus, "none");
+    assert.equal(state.activeEvidence, "1");
+    assert.equal(state.activeScene, "1");
+    assert.equal(state.animations, 0);
+    await noOverflow(page, 390, "reduced motion");
+    await page.screenshot({ path: path.join(output, "roadmap-reduced-390x844.png"), fullPage: false, animations: "disabled" });
+    process.stdout.write("PASS ROADMAP V2 REDUCED MOTION\n");
+  } finally { await context.close(); }
 }
-
-async function motionPreview(browser, width, height) {
-  const videoDir = path.join(output, ".video-" + width);
-  fs.mkdirSync(videoDir, { recursive: true });
-  const context = await browser.newContext({
-    viewport: { width, height },
-    deviceScaleFactor: 1,
-    recordVideo: { dir: videoDir, size: { width, height } },
-  });
-  const page = await context.newPage();
-  const target = path.join(output, "sniff-live-" + width + ".webm");
-  try {
-    await page.goto(base + "/roadmap", { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "DOWN THE RAT HOLE." }).waitFor();
-    await centerStage(page, "sniff");
-
-    const stage = page.locator('[data-stage="sniff"]');
-    await stage.evaluate((node) => node.setAttribute("data-active", "false"));
-    await page.waitForTimeout(900);
-    await stage.evaluate((node) => node.setAttribute("data-active", "true"));
-    await page.waitForTimeout(6200);
-
-    const video = page.video();
-    await page.close();
-    if (video) await video.saveAs(target);
-    assert.ok(fs.existsSync(target), "SNIFF motion preview must be recorded at " + width + "px");
-    process.stdout.write("PASS ROADMAP MOTION PREVIEW " + width + "px\n");
-  } finally {
-    if (!page.isClosed()) await page.close();
-    await context.close();
-    fs.rmSync(videoDir, { recursive: true, force: true });
-  }
-}
-
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
-  try {
-    for (const [width, height] of sizes) await capture(browser, width, height);
-    for (const [width, height] of sizes) await reducedMotion(browser, width, height);
-    await motionPreview(browser, 1440, 900);
-    await motionPreview(browser, 390, 844);
-    process.stdout.write("BINRAT ROADMAP V1 PREVIEW: ALL PASS\n");
-  } finally {
-    await browser.close();
-  }
-})().catch((error) => {
-  process.stderr.write("ROADMAP PREVIEW FAILED: " + (error?.stack || error) + "\n");
-  process.exitCode = 1;
-});
+  try { for (const [width, height] of sizes) await testViewport(browser, width, height); await reduced(browser); }
+  finally { await browser.close(); }
+})().catch((error) => { process.stderr.write(`ROADMAP V2 PREVIEW FAILED: ${error?.stack || error}\n`); process.exitCode = 1; });
