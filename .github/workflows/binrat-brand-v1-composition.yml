@@ -1,0 +1,113 @@
+name: BINRAT Brand V1 Composition Matrix
+
+on:
+  push:
+    branches:
+      - integration/binrat-brand-v1-composed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-brand-v1-composition-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deterministic proof dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install "Pillow==11.3.0" "playwright==1.55.0"
+          python -m playwright install --with-deps chromium
+
+      - name: Brand palette gate
+        run: python tools/brand/check-brand-palette.py
+
+      - name: Copy Library validator
+        run: node tools/brand/validate-copy-library.mjs
+
+      - name: Canonical Social V1 proof remains frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/brand/render-social-proof.py
+          git diff --exit-code -- docs/design/brand-v1/proofs/social-v1
+
+      - name: Social Production proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/design/brand-v1/social-v1/social.js
+          node --check docs/design/brand-v1/social-production-v1/production.js
+          node --check tools/brand/validate-social-production.mjs
+          node tools/brand/validate-social-production.mjs
+          python tools/brand/render-social-production.py
+
+      - name: Install Motion source-lock encoder
+        shell: bash
+        run: |
+          set -euo pipefail
+          LOCK="docs/design/brand-v1/motion-v1/SOURCE_LOCK.json"
+          mapfile -t TOOLCHAIN < <(python - "$LOCK" <<'PY'
+          import json, sys
+          tool = json.load(open(sys.argv[1]))["toolchain"]
+          print(tool["ffmpegAptVersion"])
+          print(tool["libx264AptVersion"])
+          PY
+          )
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            "ffmpeg=${TOOLCHAIN[0]}" \
+            "libx264-164=${TOOLCHAIN[1]}"
+
+      - name: Motion proof and source lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          MOTION="docs/design/brand-v1/proofs/motion-v1/found-something-v1.mp4"
+          MANIFEST="docs/design/brand-v1/proofs/motion-v1/manifest.json"
+          bash tools/brand/render-motion-proof.sh
+          first_motion="$(sha256sum "$MOTION" | awk '{print $1}')"
+          first_manifest="$(sha256sum "$MANIFEST" | awk '{print $1}')"
+          bash tools/brand/render-motion-proof.sh
+          test "$first_motion" = "$(sha256sum "$MOTION" | awk '{print $1}')"
+          test "$first_manifest" = "$(sha256sum "$MANIFEST" | awk '{print $1}')"
+          bash tools/brand/verify-motion-proof.sh
+
+      - name: Export Pack render, verify, and same-run determinism
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/brand/render-export-pack.py
+          python tools/brand/render-export-pack.py --verify
+          find exports -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/export-hashes-first.txt
+          python tools/brand/render-export-pack.py
+          python tools/brand/render-export-pack.py --verify
+          find exports -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/export-hashes-second.txt
+          diff -u /tmp/export-hashes-first.txt /tmp/export-hashes-second.txt
+
+      - name: Retain integrated proof receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-brand-v1-composition-${{ github.run_id }}
+          path: |
+            docs/design/brand-v1/proofs/social-production-v1/
+            docs/design/brand-v1/proofs/motion-v1/
+            exports/
+          if-no-files-found: error
