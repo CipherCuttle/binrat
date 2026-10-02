@@ -36,7 +36,7 @@
       "coverage": "PARTIAL",
       "source": {
         "label": "Pons V2 demo archive",
-        "value": "Pons V2 / Robinhood 4663 / deliberately long demo archive source description used to verify wrapping without hiding evidence",
+        "value": "Pons V2 / Robinhood 4663 / deliberately long demo archive source description proving wrap without hiding partial evidence",
         "state": "PARTIAL"
       },
       "cta": {
