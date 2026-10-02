@@ -4,6 +4,7 @@ import test from 'node:test';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import { D1Store } from '../src/cloudflare/d1Store.js';
+import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { runCloudflarePonsFundingCycle } from '../src/cloudflare/syncQueue.js';
 import type {
   PonsCanonicalTransaction,
@@ -41,6 +42,22 @@ function launch(input:{id:string;block:number;token:number;pool:number;deployer:
     twitter:'',
     telegram:''
   };
+}
+
+async function putHealthyRuntime(db:D1CompatDatabase,now:number):Promise<void> {
+  await new D1RuntimeStateStore(db,4663).put({
+    sourceVerified:true,
+    liveCaughtUp:true,
+    headBlock:120n,
+    targetBlock:120n,
+    observationReady:true,
+    historyBackfillComplete:false,
+    historyBackfillTargetBlock:null,
+    lastSyncError:null,
+    lastHistoryError:null,
+    lastObservationError:null,
+    updatedAtMs:now
+  });
 }
 
 function sourceFor(input:Map<string,{source:Hex;transferBlock:number;valueWei:bigint}|null>):PonsFundingSource {
@@ -117,6 +134,7 @@ test('funding runtime obeys one-launch cycle bound and preserves launch authorit
     await store.commitCheckpoint({
       blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null
     });
+    await putHealthyRuntime(db,1);
     const before=await db.prepare('SELECT launch_id,authority_json FROM launches ORDER BY launch_id')
       .all<{launch_id:string;authority_json:string}>();
 
@@ -175,6 +193,7 @@ test('no-match creates private scan state but never a funding evidence receipt',
     await store.commitCheckpoint({
       blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null
     });
+    await putHealthyRuntime(db,123);
 
     const result=await runCloudflarePonsFundingCycle(
       {
@@ -205,10 +224,49 @@ test('no-match creates private scan state but never a funding evidence receipt',
   }
 });
 
+test('funding runtime performs zero provider work when current Pons runtime is not authoritative', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  let providerCalls=0;
+  const source:PonsFundingSource={
+    async assertAuthority(){providerCalls+=1;},
+    async getBlockPoint(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');},
+    async findLatestExternalNativeInbound(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');},
+    async getTransaction(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');}
+  };
+  try {
+    await new D1RuntimeStateStore(db,4663).put({
+      sourceVerified:true,
+      liveCaughtUp:false,
+      headBlock:120n,
+      targetBlock:120n,
+      observationReady:false,
+      historyBackfillComplete:false,
+      historyBackfillTargetBlock:null,
+      lastSyncError:'PONS_TEST_UNHEALTHY',
+      lastHistoryError:null,
+      lastObservationError:null,
+      updatedAtMs:1
+    });
+    const result=await runCloudflarePonsFundingCycle(
+      {DB:db,BINRAT_PONS_FUNDING_ENABLED:'true'},
+      {kind:'PONS_FUNDING_CYCLE',cycleId:'unhealthy',enqueuedAtMs:1},
+      {now:()=>1,ponsFundingSource:source}
+    );
+    assert.deepEqual(result,{
+      status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0
+    });
+    assert.equal(providerCalls,0);
+  } finally {
+    db.close();
+  }
+});
+
 test('enabled funding runtime requires archive Alchemy rail without injected source', async () => {
   const db=new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
   try {
+    await putHealthyRuntime(db,1);
     const result=await runCloudflarePonsFundingCycle(
       {DB:db,BINRAT_PONS_FUNDING_ENABLED:'true'},
       {kind:'PONS_FUNDING_CYCLE',cycleId:'archive-required',enqueuedAtMs:1},
