@@ -1,0 +1,73 @@
+name: case-surface-canonical-private-preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_release_sha:
+        description: Exact reviewed 40-character release SHA; must be a descendant of canonical Case #104.
+        required: true
+        type: string
+      candidate_version:
+        description: Existing uploaded Worker version UUID to inspect; this workflow never uploads or promotes it.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-case-canonical-private-preview-read-only
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      EXPECTED_RELEASE_SHA: ${{ inputs.expected_release_sha }}
+      CANDIDATE_VERSION: ${{ inputs.candidate_version }}
+      CANONICAL_CASE_SHA: 9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_release_sha }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Assert reviewed canonical release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_RELEASE_SHA"
+          git merge-base --is-ancestor "$CANONICAL_CASE_SHA" HEAD
+      - name: Full regression gate
+        run: pnpm check
+      - name: Non-deploying Worker bundle gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp cloudflare/wrangler.example.jsonc wrangler.jsonc
+          sed -i 's/REPLACE_WITH_D1_DATABASE_ID/00000000-0000-0000-0000-000000000000/g' wrangler.jsonc
+          sed -i 's#https://REPLACE_WITH_PUBLIC_SITE#https://example.invalid#g' wrangler.jsonc
+          pnpm dlx wrangler@4.135.0 deploy --dry-run --outdir .wrangler-case-private-preview-dry-run
+          test -n "$(find .wrangler-case-private-preview-dry-run -type f -print -quit)"
+      - name: Read-only candidate parity and funding schema preflight
+        run: node scripts/case-private-preview-verify.mjs preflight "$EXPECTED_RELEASE_SHA" "$CANDIDATE_VERSION"
+      - name: Upload read-only preflight receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-case-canonical-private-preview-preflight
+          path: .artifacts/
+          retention-days: 30
+          if-no-files-found: warn

@@ -1,0 +1,5 @@
+Prepared-only canonical Case live smoke.
+
+Run only after a separately authorized owner deployment. Supply the exact reviewed release SHA and
+the already-active Worker version. The smoke rejects release, binding, Pons-health, funding-schema,
+or Case-bundle authority drift without making remote state changes.

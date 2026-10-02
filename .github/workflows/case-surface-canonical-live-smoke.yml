@@ -1,0 +1,66 @@
+name: case-surface-canonical-live-smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_release_sha:
+        description: Exact deployed, reviewed 40-character release SHA.
+        required: true
+        type: string
+      expected_worker_version:
+        description: Worker version UUID already at 100 percent; this workflow never changes traffic.
+        required: true
+        type: string
+      private_tester_id:
+        description: Existing authorized Telegram tester ID used only to sign read requests.
+        required: true
+        type: string
+      worker_url:
+        description: Existing Worker URL to read.
+        required: true
+        default: https://binrat-edge-v0.pettevik.workers.dev
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-case-canonical-live-smoke-read-only
+  cancel-in-progress: false
+
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      EXPECTED_RELEASE_SHA: ${{ inputs.expected_release_sha }}
+      EXPECTED_WORKER_VERSION: ${{ inputs.expected_worker_version }}
+      PRIVATE_TESTER_ID: ${{ inputs.private_tester_id }}
+      WORKER_URL: ${{ inputs.worker_url }}
+      CANONICAL_CASE_SHA: 9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_release_sha }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Assert reviewed canonical release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_RELEASE_SHA"
+          git merge-base --is-ancestor "$CANONICAL_CASE_SHA" HEAD
+      - name: Read-only Worker, Pons, Mini App, and Case smoke
+        run: node scripts/case-private-preview-verify.mjs live-smoke "$EXPECTED_RELEASE_SHA" "$EXPECTED_WORKER_VERSION" "$WORKER_URL" "$PRIVATE_TESTER_ID"

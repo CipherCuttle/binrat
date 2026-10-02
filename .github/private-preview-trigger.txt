@@ -1,0 +1,5 @@
+Prepared-only canonical Case private-preview verification.
+
+Canonical Case authority: 9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3 (PR #104).
+The accompanying workflows are manual read-only preflight and smoke gates. They do not deploy,
+promote traffic, apply D1 migrations, configure Telegram, enqueue funding work, or change Rat flags.
