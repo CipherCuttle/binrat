@@ -32,13 +32,66 @@ jobs:
         with:
           node-version: 22
 
-      - name: Resolve private tester from exact read-only marker
+      - name: Resolve exact deployed private tester read-only
         shell: bash
         run: |
           set -euo pipefail
           test -n "${CLOUDFLARE_API_TOKEN:-}"
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
-          cat >/tmp/binrat-live-smoke-wrangler.jsonc <<'JSON'
+
+          pnpm dlx wrangler@4.135.0 deployments status --name binrat-edge-v0 --json >/tmp/binrat-live-smoke-status.json
+          ACTIVE_VERSION="$(node <<'NODE'
+          const fs=require('node:fs');
+          function parse(path){
+            const raw=fs.readFileSync(path,'utf8');
+            const positions=[raw.indexOf('{'),raw.indexOf('[')].filter(i=>i>=0);
+            if(!positions.length) process.exit(2);
+            return JSON.parse(raw.slice(Math.min(...positions)));
+          }
+          function walk(value){
+            if(!value||typeof value!=='object') return null;
+            const id=value.version_id??value.versionId;
+            const pct=value.percentage??value.percent??value.traffic;
+            if(typeof id==='string' && /^[0-9a-f-]{36}$/i.test(id) && (pct===100||pct==='100'||pct===1||pct==='1')) return id;
+            for(const child of Array.isArray(value)?value:Object.values(value)){
+              const hit=walk(child); if(hit) return hit;
+            }
+            return null;
+          }
+          const id=walk(parse('/tmp/binrat-live-smoke-status.json'));
+          if(!id) process.exit(3);
+          process.stdout.write(id);
+          NODE
+          )"
+
+          pnpm dlx wrangler@4.135.0 versions view "$ACTIVE_VERSION" --name binrat-edge-v0 --json >/tmp/binrat-live-smoke-version.json
+          TESTER_ID_RESOLVED="$(node <<'NODE'
+          const fs=require('node:fs');
+          const raw=fs.readFileSync('/tmp/binrat-live-smoke-version.json','utf8');
+          const positions=[raw.indexOf('{'),raw.indexOf('[')].filter(i=>i>=0);
+          if(!positions.length) process.exit(2);
+          const parsed=JSON.parse(raw.slice(Math.min(...positions)));
+          function walk(value,name){
+            if(!value||typeof value!=='object') return null;
+            if(value.name===name && value.type==='plain_text' && typeof value.text==='string'){
+              const id=value.text.trim();
+              if(/^[1-9]\d{3,16}$/.test(id)) return id;
+            }
+            for(const child of Array.isArray(value)?value:Object.values(value)){
+              const hit=walk(child,name); if(hit) return hit;
+            }
+            return null;
+          }
+          const candidate=walk(parsed,'RAT_CANDIDATE_ALLOWED_USER_ID');
+          const admin=walk(parsed,'RAT_FEEDBACK_ADMIN_USER_ID');
+          process.stdout.write(candidate||admin||'');
+          NODE
+          )"
+
+          if [ -n "$TESTER_ID_RESOLVED" ]; then
+            echo "TESTER_SOURCE=ACTIVE_CONFIG" >> "$GITHUB_ENV"
+          else
+            cat >/tmp/binrat-live-smoke-wrangler.jsonc <<'JSON'
           {
             "name": "binrat-live-case-smoke",
             "main": "src/cloudflare/worker.ts",
@@ -50,13 +103,16 @@ jobs:
             }]
           }
           JSON
-          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --json             --config /tmp/binrat-live-smoke-wrangler.jsonc             --command "SELECT CASE WHEN COUNT(*)=1 THEN MAX(user_id) ELSE NULL END AS user_id, COUNT(*) AS matches FROM rat_feedback WHERE body='binrat-controlled-rat-id-0929';"             >/tmp/binrat-live-smoke-tester.json
-          TESTER_ID_RESOLVED="$(node <<'NODE'
+            pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --json \
+              --config /tmp/binrat-live-smoke-wrangler.jsonc \
+              --command "SELECT CASE WHEN COUNT(*)=1 THEN MAX(user_id) ELSE NULL END AS user_id, COUNT(*) AS matches FROM rat_feedback WHERE body='binrat-controlled-rat-id-0929';" \
+              >/tmp/binrat-live-smoke-tester.json
+            TESTER_ID_RESOLVED="$(node <<'NODE'
           const fs=require('node:fs');
           const raw=fs.readFileSync('/tmp/binrat-live-smoke-tester.json','utf8');
-          const begin=Math.min(...[raw.indexOf('{'),raw.indexOf('[')].filter(i=>i>=0));
-          if(!Number.isFinite(begin)) process.exit(2);
-          const parsed=JSON.parse(raw.slice(begin));
+          const positions=[raw.indexOf('{'),raw.indexOf('[')].filter(i=>i>=0);
+          if(!positions.length) process.exit(2);
+          const parsed=JSON.parse(raw.slice(Math.min(...positions)));
           const stack=[parsed];
           let hit=null;
           while(stack.length){
@@ -69,8 +125,13 @@ jobs:
           process.stdout.write(String(hit.user_id));
           NODE
           )"
+            echo "TESTER_SOURCE=D1_MARKER" >> "$GITHUB_ENV"
+          fi
+
+          test -n "$TESTER_ID_RESOLVED"
           echo "TESTER_ID_RESOLVED=$TESTER_ID_RESOLVED" >> "$GITHUB_ENV"
-          rm -f /tmp/binrat-live-smoke-tester.json /tmp/binrat-live-smoke-wrangler.jsonc
+          rm -f /tmp/binrat-live-smoke-status.json /tmp/binrat-live-smoke-version.json \
+            /tmp/binrat-live-smoke-tester.json /tmp/binrat-live-smoke-wrangler.jsonc
 
       - name: Read-only live Case surface smoke
         shell: bash
@@ -126,6 +187,14 @@ jobs:
             headers:{'content-type':'application/json'},
             body:JSON.stringify({initData:signed})
           });
+          if(!bootstrap.response.ok) {
+            console.log(JSON.stringify({
+              event:'LIVE_BOOTSTRAP_FAILED',
+              status:bootstrap.response.status,
+              error:typeof bootstrap.body?.error==='string'?bootstrap.body.error:null,
+              testerSource:process.env.TESTER_SOURCE||null
+            }));
+          }
           gate(bootstrap.response.ok,'LIVE_BOOTSTRAP_FAILED');
           const launches=Array.isArray(bootstrap.body?.latestLaunches)?bootstrap.body.latestLaunches:[];
           gate(launches.length>0,'LIVE_BOOTSTRAP_NO_LAUNCHES');
