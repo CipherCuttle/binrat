@@ -402,10 +402,21 @@ async function miniAppCaseIntelligence(
     ).bind(ROBINHOOD_CHAIN_ID).first<{block_number:string;block_hash:string}>();
     if (
       !afterCheckpoint ||
-      afterCheckpoint.block_number !== checkpoint.block_number ||
-      afterCheckpoint.block_hash.toLowerCase() !== pinnedHash
+      !/^(0|[1-9]\d*)$/.test(afterCheckpoint.block_number) ||
+      !/^0x[0-9a-f]{64}$/i.test(afterCheckpoint.block_hash)
     ) {
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_DRIFT');
+    }
+
+    const afterBlock = BigInt(afterCheckpoint.block_number);
+    if (afterBlock < asOfBlock) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REGRESSION');
+    }
+    if (
+      afterBlock === asOfBlock &&
+      afterCheckpoint.block_hash.toLowerCase() !== pinnedHash
+    ) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG');
     }
 
     const afterPoint = await blockSource.getBlockPoint(asOfBlock);
