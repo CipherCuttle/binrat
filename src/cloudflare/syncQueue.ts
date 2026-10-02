@@ -793,7 +793,15 @@ export async function runCloudflarePonsFundingCycle(
   }
   try {
     const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
-    if (!runtime || !runtime.sourceVerified || !runtime.liveCaughtUp || runtime.lastSyncError) {
+    const runtimeAgeMs=runtime ? deps.now()-runtime.updatedAtMs : Number.POSITIVE_INFINITY;
+    if (
+      !runtime ||
+      !runtime.sourceVerified ||
+      !runtime.liveCaughtUp ||
+      runtime.lastSyncError ||
+      runtimeAgeMs<0 ||
+      runtimeAgeMs>integerSetting(env.BINRAT_MAX_STATUS_AGE_MS,180_000,1_000,3_600_000)
+    ) {
       return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0};
     }
     const source=deps.ponsFundingSource ?? new AlchemyPonsFundingSource({
