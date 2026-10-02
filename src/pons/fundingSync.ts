@@ -53,7 +53,10 @@ export async function syncPonsFundingProvenance(
 
   const launches=await store.listCandidates(options.limit,options.nowMs);
   if (launches.length===0) {
-    return {attempted:0,inserted:0,duplicates:0,noInbound:0,failed:0,remaining:0};
+    return {
+      attempted:0,inserted:0,duplicates:0,noInbound:0,failed:0,
+      remaining:await store.countRemaining(options.nowMs)
+    };
   }
 
   await source.assertAuthority();
@@ -77,10 +80,12 @@ export async function syncPonsFundingProvenance(
       else duplicates+=1;
       await store.markComplete(launch,'FOUND',options.nowMs);
     } catch(error) {
+      const code=fundingErrorCode(error);
+      if (isFatalFundingEvidenceError(code)) throw error;
       failed+=1;
       await store.markFailure(
         launch,
-        fundingErrorCode(error),
+        code,
         options.nowMs+failureRetryMs,
         options.nowMs
       );
@@ -101,6 +106,10 @@ export function fundingErrorCode(error:unknown):string {
   const raw=error instanceof Error ? error.message : String(error);
   const code=raw.split(':',1)[0]?.trim() || 'PONS_FUNDING_UNKNOWN';
   return /^[A-Z0-9_]{1,120}$/.test(code) ? code : 'PONS_FUNDING_UNKNOWN';
+}
+
+export function isFatalFundingEvidenceError(code:string):boolean {
+  return /(REORG|MISMATCH|CONFLICT|INVALID|DRIFT)/.test(code);
 }
 
 export type { PonsFundingLaunch, PonsFundingSource, PonsPrelaunchNativeInboundReceipt, Hex };
