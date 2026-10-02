@@ -1,0 +1,105 @@
+name: BINRAT Brand Export Pack
+
+on:
+  push:
+    branches:
+      - design/binrat-export-pack-v1
+    paths:
+      - ".github/workflows/binrat-brand-export-pack.yml"
+      - "tools/brand/render-export-pack.py"
+      - "docs/design/brand-v1/export-v1/**"
+      - "docs/design/brand-v1/canon/rat-zero.jpg"
+      - "docs/design/brand-v1/proofs/social-v1/**"
+      - "docs/design/brand-v1/LOGO_LOCKUP.md"
+      - "docs/design/brand-v1/TYPOGRAPHY.md"
+      - "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md"
+      - "docs/design/brand-v1/PALETTE.md"
+      - "docs/design/brand-v1/tokens.json"
+      - "docs/design/brand-v1/brand-tokens.css"
+      - "docs/PRODUCT_LANGUAGE.md"
+      - "docs/PHILOSOPHY.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: binrat-brand-export-pack-v1
+  cancel-in-progress: false
+
+jobs:
+  render-export-pack:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout export branch
+        uses: actions/checkout@v4
+        with:
+          ref: design/binrat-export-pack-v1
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned render dependencies
+        run: |
+          python -m pip install "Pillow==11.3.0" "playwright==1.55.0"
+          python -m playwright install --with-deps chromium
+
+      - name: Render export pack
+        run: python tools/brand/render-export-pack.py
+
+      - name: Verify export manifest and source/output hashes
+        run: python tools/brand/render-export-pack.py --verify
+
+      - name: Prove same-run determinism
+        run: |
+          set -euo pipefail
+          find exports -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/export-hashes-first.txt
+          python tools/brand/render-export-pack.py
+          python tools/brand/render-export-pack.py --verify
+          find exports -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/export-hashes-second.txt
+          diff -u /tmp/export-hashes-first.txt /tmp/export-hashes-second.txt
+
+      - name: Assert pack boundaries
+        run: |
+          set -euo pipefail
+          test -s exports/manifest.json
+          test -s exports/logo/canonical-horizontal-dark-1200x320.png
+          test -s exports/logo/canonical-horizontal-light-1200x320.png
+          test -s exports/x/avatar-400.png
+          test -s exports/x/header-1500x500.png
+          test -s exports/telegram/profile-512.png
+          test -s exports/opengraph/default-og-1200x630.png
+          test -s exports/proofs/pressure-tests-1800x1600.png
+          if find exports -type f \( -name '*.woff' -o -name '*.woff2' -o -name '*.ttf' -o -name '*.otf' -o -name '*.svg' \) | grep -q .; then
+            echo "Forbidden font/vector artifact found in exports" >&2
+            exit 1
+          fi
+
+      - name: Upload distribution pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-brand-export-pack-v1
+          path: exports/
+          if-no-files-found: error
+
+      - name: Commit deterministic export pack
+        run: |
+          set -euo pipefail
+          REMOTE_HEAD="$(git ls-remote origin refs/heads/design/binrat-export-pack-v1 | cut -f1)"
+          if [ "$REMOTE_HEAD" != "$GITHUB_SHA" ]; then
+            echo "Branch advanced while this run was rendering; skip stale artifact push."
+            echo "run_sha=$GITHUB_SHA remote_head=$REMOTE_HEAD"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exports/
+          if git diff --cached --quiet; then
+            echo "Export pack already current."
+            exit 0
+          fi
+          git commit -m "build(brand): render distribution export pack v1 [skip ci]"
+          git push origin HEAD:design/binrat-export-pack-v1
