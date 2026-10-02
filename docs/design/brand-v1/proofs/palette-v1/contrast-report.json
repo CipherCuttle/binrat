@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "binrat.palette-contrast/1",
+  "status": "PASS",
+  "tokenSource": "docs/design/brand-v1/tokens.json",
+  "requiredNormalTextPairs": [
+    {
+      "foreground": "bone",
+      "background": "ink",
+      "foregroundHex": "#e4ddcc",
+      "backgroundHex": "#101210",
+      "contrast": 13.9,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "paper",
+      "background": "ink",
+      "foregroundHex": "#cec6b5",
+      "backgroundHex": "#101210",
+      "contrast": 11.08,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "muted",
+      "background": "ink",
+      "foregroundHex": "#93978d",
+      "backgroundHex": "#101210",
+      "contrast": 6.32,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "copper",
+      "background": "ink",
+      "foregroundHex": "#cf9567",
+      "backgroundHex": "#101210",
+      "contrast": 7.3,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "ratEye",
+      "background": "ink",
+      "foregroundHex": "#ff3948",
+      "backgroundHex": "#101210",
+      "contrast": 5.31,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "oxidizedMint",
+      "background": "ink",
+      "foregroundHex": "#a8b795",
+      "backgroundHex": "#101210",
+      "contrast": 8.85,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "bruise",
+      "background": "ink",
+      "foregroundHex": "#9a8aa2",
+      "backgroundHex": "#101210",
+      "contrast": 5.85,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "bone",
+      "background": "panel",
+      "foregroundHex": "#e4ddcc",
+      "backgroundHex": "#1c201c",
+      "contrast": 12.19,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "paper",
+      "background": "panel",
+      "foregroundHex": "#cec6b5",
+      "backgroundHex": "#1c201c",
+      "contrast": 9.72,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "muted",
+      "background": "panel",
+      "foregroundHex": "#93978d",
+      "backgroundHex": "#1c201c",
+      "contrast": 5.54,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "copper",
+      "background": "panel",
+      "foregroundHex": "#cf9567",
+      "backgroundHex": "#1c201c",
+      "contrast": 6.4,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "ratEye",
+      "background": "panel",
+      "foregroundHex": "#ff3948",
+      "backgroundHex": "#1c201c",
+      "contrast": 4.66,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "oxidizedMint",
+      "background": "panel",
+      "foregroundHex": "#a8b795",
+      "backgroundHex": "#1c201c",
+      "contrast": 7.76,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "bruise",
+      "background": "panel",
+      "foregroundHex": "#9a8aa2",
+      "backgroundHex": "#1c201c",
+      "contrast": 5.13,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "ink",
+      "background": "paper",
+      "foregroundHex": "#101210",
+      "backgroundHex": "#cec6b5",
+      "contrast": 11.08,
+      "minimum": 4.5,
+      "pass": true
+    }
+  ],
+  "diagnostic": {
+    "lineHighOnInk": 2.92,
+    "lineHighOnPanel": 2.56,
+    "mutedOnPaper": 1.75,
+    "copperOnPaper": 1.52,
+    "ratEyeOnPaper": 2.09,
+    "oxidizedMintOnPaper": 1.25,
+    "bruiseOnPaper": 1.89
+  },
+  "rules": {
+    "lineHighIsDecorativeOnly": true,
+    "paperUsesInkForNormalText": true,
+    "colorAloneNeverCarriesEvidenceMeaning": true
+  },
+  "failures": []
+}
