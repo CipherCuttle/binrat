@@ -45,7 +45,7 @@ test('Mini App progressively discloses real Trash Trail outcome memory before ra
 test('Mini App Rat Watch presents recognizable trail context before protocol identifiers', () => {
   const app=readFileSync(new URL('../web/app/app.js',import.meta.url),'utf8');
   assert.match(app,/watchLabels/);
-  assert.match(app,/I'll squeak if these paws launch again/);
+  assert.match(app,/I'll squeak if this exact deployer launches again/);
   assert.match(app,/Pons-reported deployer/);
   assert.doesNotMatch(app,/\$\{watch\.chainId\} · \$\{watch\.policy\}/);
   assert.doesNotMatch(app,/Future indexed launches after block/);
