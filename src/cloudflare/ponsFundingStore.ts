@@ -11,7 +11,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
   constructor(private readonly db:D1DatabaseLike) {}
 
   async listCandidates(limit:number, nowMs:number):Promise<PonsFundingLaunch[]> {
-    const result=await this.db.prepare(\`
+    const result=await this.db.prepare(`
       WITH checkpoint AS (
         SELECT CAST(block_number AS INTEGER) AS tip
         FROM chain_checkpoints WHERE chain_id=4663 LIMIT 1
@@ -32,7 +32,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
         )
       ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC
       LIMIT ?
-    \`).bind(nowMs,limit).all<{
+    `).bind(nowMs,limit).all<{
       launch_id:string;
       creator:Hex;
       block_number:string;
@@ -48,7 +48,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
   }
 
   async countRemaining(_nowMs:number):Promise<number> {
-    const row=await this.db.prepare(\`
+    const row=await this.db.prepare(`
       WITH checkpoint AS (
         SELECT CAST(block_number AS INTEGER) AS tip
         FROM chain_checkpoints WHERE chain_id=4663 LIMIT 1
@@ -64,20 +64,20 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
           0
         )
         AND (s.launch_id IS NULL OR s.state='FAILED')
-    \`).first<{n:number}>();
+    `).first<{n:number}>();
     return Number(row?.n ?? 0);
   }
 
   async put(receipt:PonsPrelaunchNativeInboundReceipt):Promise<'INSERTED'|'DUPLICATE'> {
     await verifyPonsPrelaunchNativeInboundReceipt(receipt);
     const payload=canonicalJson(receipt);
-    const result=await this.db.prepare(\`
+    const result=await this.db.prepare(`
       INSERT OR IGNORE INTO pons_funding_receipts (
         funding_id,funding_version,chain_id,launch_id,deployer,launch_block,launch_block_hash,
         source_address,transfer_tx_hash,transfer_block,transfer_block_hash,transfer_timestamp_ms,
         value_wei,evidence_digest,payload_json
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    \`).bind(
+    `).bind(
       receipt.fundingId,receipt.fundingVersion,receipt.chainId,receipt.launchId,receipt.deployer,
       receipt.launchBlock.toString(),receipt.launchBlockHash,receipt.sourceAddress,receipt.transferTxHash,
       receipt.transferBlock.toString(),receipt.transferBlockHash,receipt.transferTimestampMs,
@@ -85,12 +85,12 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
     ).run();
     if (changes(result)===1) return 'INSERTED';
 
-    const existing=await this.db.prepare(\`
+    const existing=await this.db.prepare(`
       SELECT funding_id,evidence_digest,payload_json
       FROM pons_funding_receipts
       WHERE funding_id=? OR launch_id=?
       LIMIT 1
-    \`).bind(receipt.fundingId,receipt.launchId)
+    `).bind(receipt.fundingId,receipt.launchId)
       .first<{funding_id:string;evidence_digest:string;payload_json:string}>();
     if (
       !existing ||
@@ -98,7 +98,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
       existing.evidence_digest!==receipt.evidenceDigest ||
       existing.payload_json!==payload
     ) {
-      throw new Error(\`PONS_FUNDING_RECEIPT_CONFLICT:${receipt.launchId}\`);
+      throw new Error(`PONS_FUNDING_RECEIPT_CONFLICT:${receipt.launchId}`);
     }
     return 'DUPLICATE';
   }
@@ -112,9 +112,9 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
     if (existing) {
       this.assertSameLaunchHash(existing.launch_block_hash,launch.blockHash,launch.launchId);
       if (existing.state===state) return;
-      if (existing.state!=='FAILED') throw new Error(\`PONS_FUNDING_SCAN_CONFLICT:${launch.launchId}\`);
+      if (existing.state!=='FAILED') throw new Error(`PONS_FUNDING_SCAN_CONFLICT:${launch.launchId}`);
     }
-    await this.db.prepare(\`
+    await this.db.prepare(`
       INSERT INTO pons_funding_scan_state (
         launch_id,launch_block_hash,state,failure_count,retry_after_ms,last_error,updated_at_ms
       ) VALUES (?,?,?,?,?,?,?)
@@ -125,7 +125,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
         retry_after_ms=0,
         last_error=NULL,
         updated_at_ms=excluded.updated_at_ms
-    \`).bind(
+    `).bind(
       launch.launchId,launch.blockHash.toLowerCase(),state,0,0,null,nowMs
     ).run();
   }
@@ -142,7 +142,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
       this.assertSameLaunchHash(existing.launch_block_hash,launch.blockHash,launch.launchId);
       if (existing.state!=='FAILED') return;
     }
-    await this.db.prepare(\`
+    await this.db.prepare(`
       INSERT INTO pons_funding_scan_state (
         launch_id,launch_block_hash,state,failure_count,retry_after_ms,last_error,updated_at_ms
       ) VALUES (?,?,?,?,?,?,?)
@@ -153,7 +153,7 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
         retry_after_ms=excluded.retry_after_ms,
         last_error=excluded.last_error,
         updated_at_ms=excluded.updated_at_ms
-    \`).bind(
+    `).bind(
       launch.launchId,launch.blockHash.toLowerCase(),'FAILED',1,retryAfterMs,code,nowMs
     ).run();
   }
@@ -162,17 +162,17 @@ export class D1PonsFundingStore implements PonsFundingScanStore {
     launch_block_hash:Hex;
     state:ScanState;
   }|null> {
-    return this.db.prepare(\`
+    return this.db.prepare(`
       SELECT launch_block_hash,state
       FROM pons_funding_scan_state
       WHERE launch_id=?
       LIMIT 1
-    \`).bind(launchId).first<{launch_block_hash:Hex;state:ScanState}>();
+    `).bind(launchId).first<{launch_block_hash:Hex;state:ScanState}>();
   }
 
   private assertSameLaunchHash(existing:Hex,current:Hex,launchId:string):void {
     if (existing.toLowerCase()!==current.toLowerCase()) {
-      throw new Error(\`PONS_FUNDING_SCAN_HASH_CONFLICT:${launchId}\`);
+      throw new Error(`PONS_FUNDING_SCAN_HASH_CONFLICT:${launchId}`);
     }
   }
 }
