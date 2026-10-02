@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#10130f">
-  <title>BINRAT · Rat Radar</title>
+  <title>BINRAT · Hot Garbage</title>
   <link rel="icon" href="/assets/favicon.png">
   <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
   <link rel="stylesheet" href="/app/styles.css">
@@ -13,33 +13,32 @@
   <header class="topbar">
     <img src="/assets/telegram/profile.png" alt="" width="42" height="42">
     <div><p class="eyebrow">BINRAT / PRIVATE TEST</p><h1>RAT RADAR</h1></div>
-    <span id="source-badge" class="badge">CHECKING</span>
+    <span id="source-badge" class="badge">PRIVATE</span>
   </header>
   <main id="main" aria-live="polite">
     <section id="home" class="view active">
-      <p class="eyebrow">ROBINHOOD / PONS 4663</p>
-      <h2>The rat remembers.</h2>
-      <p class="lede">Fresh launches come and go. BINRAT keeps the scraps, spots familiar paws, and keeps the receipts.</p>
-      <div id="health" class="panel">Checking source health…</div>
-      <button class="primary" data-view="rats">FRESH GARBAGE</button>
-      <button class="inspect" data-view="launches">LATEST LAUNCHES</button>
+      <p class="eyebrow">THE RAT REMEMBERS</p>
+      <h2>He gets the scraps.</h2>
+      <p class="lede">You get the receipts. Start with what the rat noticed, then dig only when something is worth your time.</p>
+      <button class="primary" data-view="hot">HOT GARBAGE</button>
+      <button class="inspect" data-view="launches">NEW DROPS</button>
     </section>
     <section id="launches" class="view">
-      <p class="eyebrow">NEW SCRAPS / PONS 4663</p>
-      <h2>LATEST LAUNCHES</h2>
-      <p class="lede">Newest Pons launches. Recurrence is context, not a verdict.</p>
+      <p class="eyebrow">CHRONOLOGICAL</p>
+      <h2>NEW DROPS</h2>
+      <p class="lede">Newest indexed launches. No ranking. No verdict.</p>
       <div id="launch-list" class="stack"></div>
     </section>
-    <section id="rats" class="view">
-      <p class="eyebrow">DISCOVERY / PONS 4663</p>
-      <h2>FRESH GARBAGE</h2>
-      <p class="lede">Fresh launches leaving a familiar deployer trail worth digging.</p>
-      <div id="rat-list" class="stack"></div>
+    <section id="hot" class="view">
+      <p class="eyebrow">WHAT THE RAT NOTICED</p>
+      <h2>HOT GARBAGE</h2>
+      <p class="lede">Recent launches with an exact repeat-deployer trail. Newest repeat activity first; no hype score.</p>
+      <div id="hot-list" class="stack"></div>
     </section>
     <section id="case" class="view">
       <p id="case-kicker" class="eyebrow">DUG IT UP.</p>
       <h2 id="case-title">TRASH TRAIL</h2>
-      <div id="case-file" class="stack"><p>Open a Fresh Garbage finding to inspect what the rat kept.</p></div>
+      <div id="case-file" class="stack"><p>Dig into Hot Garbage or a New Drop to inspect what the rat kept.</p></div>
     </section>
     <section id="watches" class="view">
       <p class="eyebrow">TRIPWIRES</p>
@@ -50,14 +49,14 @@
     <section id="about" class="view">
       <p class="eyebrow">ABOUT</p>
       <h2>What BINRAT knows</h2>
-      <div class="panel"><p><strong>Observed:</strong> canonical indexed launch receipts.</p><p><strong>Derived:</strong> exact-address recurrence within stated coverage.</p><p><strong>Unknown:</strong> human identity, intent, safety, profitability, and future outcome.</p></div>
-      <div id="feature-state" class="panel"></div>
+      <div class="panel"><p><strong>Observed:</strong> canonical indexed launch receipts and remembered outcome receipts.</p><p><strong>Derived:</strong> exact-address recurrence within stated coverage.</p><p><strong>Unknown:</strong> human identity, intent, safety, profitability, and future outcome.</p></div>
+      <p class="note">Memory beats prediction. Receipts beat scores.</p>
     </section>
   </main>
   <nav aria-label="Mini App sections">
     <button data-view="home" class="selected">HOME</button>
-    <button data-view="launches">LAUNCHES</button>
-    <button data-view="rats">FRESH</button>
+    <button data-view="hot">HOT</button>
+    <button data-view="launches">NEW</button>
     <button data-view="watches">WATCH</button>
     <button data-view="about">ABOUT</button>
   </nav>
