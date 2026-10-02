@@ -8,6 +8,7 @@ import { D1PonsOutcomeObservationStore } from '../src/cloudflare/ponsOutcomeStor
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import type { D1DatabaseLike, D1PreparedStatementLike, D1ResultLike } from '../src/cloudflare/d1Types.js';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
+import { buildProvenanceFact } from '../src/intelligence/provenance.js';
 import { buildPonsCurveOutcomeCapabilityReceipt, NATIVE_QUOTE } from '../src/pons/outcomeCapability.js';
 import { buildPonsOutcomeObservationReceipt } from '../src/pons/outcomeReceipts.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
@@ -129,7 +130,9 @@ test('Mini App HOT, NEW and WATCH surfaces are independent passive reads with ze
   const token='123456:fixture-token';
   try {
     await store.putLaunch(first);
+    await store.putProvenanceFact(await buildProvenanceFact(first));
     await store.putLaunch(current);
+    await store.putProvenanceFact(await buildProvenanceFact(current));
     await store.commitCheckpoint({
       blockNumber:220n,blockHash:hash(220),guardBlockNumber:null,guardBlockHash:null
     });
@@ -210,6 +213,7 @@ test('Mini App creates a case only after explicit DIG', async () => {
   const token='123456:fixture-token';
   try {
     await store.putLaunch(value);
+    await store.putProvenanceFact(await buildProvenanceFact(value));
     await store.commitCheckpoint({
       blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null
     });
