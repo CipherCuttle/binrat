@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Hex } from '../src/core/types.js';
 import {
+  AlchemyPonsFundingSource,
   buildPonsPrelaunchNativeInboundReceipt,
   projectFundingSourceRecurrence,
   readPonsPrelaunchNativeInbound,
@@ -249,4 +250,49 @@ test('different source addresses never collapse into a funding cluster', async (
     valueWei:10n
   });
   assert.deepEqual(await projectFundingSourceRecurrence([first,second]),[]);
+});
+
+
+test('Alchemy candidate locator is bounded to newest direct external native inbound before launch', async () => {
+  let requestBody:Record<string,unknown>|null=null;
+  const fetchImpl:typeof fetch=async (_input,init) => {
+    requestBody=JSON.parse(String(init?.body)) as Record<string,unknown>;
+    return new Response(JSON.stringify({
+      jsonrpc:'2.0',
+      id:1,
+      result:{
+        transfers:[{
+          blockNum:'0x7b',
+          hash:hash(700),
+          from:addr(70),
+          to:addr(71),
+          category:'external',
+          rawContract:{value:'0x10',address:null}
+        }]
+      }
+    }),{status:200,headers:{'content-type':'application/json'}});
+  };
+  const source=new AlchemyPonsFundingSource({
+    rpcUrl:'https://robinhood-mainnet.g.alchemy.com/v2/test',
+    client:{} as never,
+    fetchImpl
+  });
+  const candidate=await source.findLatestExternalNativeInbound(addr(71),124n);
+  assert.ok(candidate);
+  assert.equal(candidate.from,addr(70));
+  assert.equal(candidate.to,addr(71));
+  assert.equal(candidate.blockNumber,123n);
+  assert.equal(candidate.valueWei,16n);
+
+  const params=(requestBody?.params as Array<Record<string,unknown>>)?.[0];
+  assert.deepEqual(params,{
+    fromBlock:'0x0',
+    toBlock:'0x7c',
+    toAddress:addr(71),
+    category:['external'],
+    excludeZeroValue:true,
+    withMetadata:false,
+    order:'desc',
+    maxCount:'0x1'
+  });
 });
