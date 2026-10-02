@@ -67,7 +67,7 @@ exports/
     favicon-candidate-32.png
     favicon-candidate-48.png
   x/
-    avatar-512.png
+    avatar-400.png
     header-1500x500.png
     post-receipt-wide-1200x675.png
     post-rat-found-square-1080.png
@@ -96,7 +96,7 @@ exports/
 - **canonical** — direct deterministic derivative or exact copy of an already-frozen Brand V1 decision.
 - **candidate** — platform geometry or tiny-size use that still needs real-surface validation; frozen brand ingredients remain unchanged.
 
-Current candidate classes are intentionally narrow: favicon/tiny use, X-style header preset, default OG preset, and the diagnostic pressure-test board.
+Current candidate classes are intentionally narrow: favicon/tiny use, X header preset, default OG preset, and the diagnostic pressure-test board. The X profile avatar itself follows X’s current 400×400 recommendation and remains a direct Rat Zero derivative.
 
 ## Modification rule
 
