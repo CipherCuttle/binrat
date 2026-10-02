@@ -63,7 +63,7 @@ The reduced render is a static 4.8-second presentation of the final approved RAT
 
 Verification requires:
 
-- 1200×675;
+- 1200×676 H.264 output from the untouched 1200×675 source composition, with a one-pixel dark bottom pad for yuv420p compatibility;
 - 30 fps;
 - no audio;
 - exactly one unique decoded frame hash across the reduced clip.
