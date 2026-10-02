@@ -16,15 +16,50 @@
     <span id="source-badge" class="badge">CHECKING</span>
   </header>
   <main id="main" aria-live="polite">
-    <section id="home" class="view active"><p class="eyebrow">ROBINHOOD / PONS 4663</p><h2>The rat remembers.</h2><p class="lede">Fresh indexed launches, repeat deployers, Watches and receipts from one Pons evidence plane.</p><div id="health" class="panel">Checking source health…</div><button class="primary" data-view="launches">SEE LATEST LAUNCHES</button><button class="inspect" data-view="rats">SEE REPEAT DEPLOYERS</button></section>
-    <section id="launches" class="view"><p class="eyebrow">LIVE INDEX / PONS 4663</p><h2>LATEST LAUNCHES</h2><p class="lede">Newest canonical launches at the current verified checkpoint.</p><div id="launch-list" class="stack"></div></section>
-    <section id="rats" class="view"><p class="eyebrow">REPEAT DEPLOYERS / PONS 4663</p><h2>RATS</h2><div id="rat-list" class="stack"></div></section>
-    <section id="case" class="view"><p class="eyebrow">CANONICAL EVIDENCE</p><h2>CASE FILE</h2><div id="case-file" class="stack"><p>Select a Rat to inspect its retained receipts.</p></div></section>
-    <section id="watches" class="view"><p class="eyebrow">PRIVATE ATTENTION</p><h2>WATCHES</h2><div id="watch-list" class="stack"></div><p class="note">Watch changes remain in native Telegram during this read-only release.</p></section>
-    <section id="about" class="view"><p class="eyebrow">SETTINGS / ABOUT</p><h2>What BINRAT knows</h2><div class="panel"><p><strong>Observed:</strong> canonical indexed launch receipts.</p><p><strong>Derived:</strong> exact-address recurrence within stated coverage.</p><p><strong>Unknown:</strong> human identity, intent, safety, profitability, and future outcome.</p></div><div id="feature-state" class="panel"></div></section>
+    <section id="home" class="view active">
+      <p class="eyebrow">ROBINHOOD / PONS 4663</p>
+      <h2>The rat remembers.</h2>
+      <p class="lede">Fresh launches come and go. BINRAT keeps the scraps, spots familiar paws, and keeps the receipts.</p>
+      <div id="health" class="panel">Checking source health…</div>
+      <button class="primary" data-view="rats">FRESH GARBAGE</button>
+      <button class="inspect" data-view="launches">LATEST LAUNCHES</button>
+    </section>
+    <section id="launches" class="view">
+      <p class="eyebrow">NEW SCRAPS / PONS 4663</p>
+      <h2>LATEST LAUNCHES</h2>
+      <p class="lede">Newest Pons launches. Recurrence is context, not a verdict.</p>
+      <div id="launch-list" class="stack"></div>
+    </section>
+    <section id="rats" class="view">
+      <p class="eyebrow">DISCOVERY / PONS 4663</p>
+      <h2>FRESH GARBAGE</h2>
+      <p class="lede">Fresh launches leaving a familiar deployer trail worth digging.</p>
+      <div id="rat-list" class="stack"></div>
+    </section>
+    <section id="case" class="view">
+      <p id="case-kicker" class="eyebrow">DUG IT UP.</p>
+      <h2 id="case-title">TRASH TRAIL</h2>
+      <div id="case-file" class="stack"><p>Open a Fresh Garbage finding to inspect what the rat kept.</p></div>
+    </section>
+    <section id="watches" class="view">
+      <p class="eyebrow">TRIPWIRES</p>
+      <h2>RAT WATCH</h2>
+      <div id="watch-list" class="stack"></div>
+      <p class="note">Watch changes remain in native Telegram during this read-only release.</p>
+    </section>
+    <section id="about" class="view">
+      <p class="eyebrow">ABOUT</p>
+      <h2>What BINRAT knows</h2>
+      <div class="panel"><p><strong>Observed:</strong> canonical indexed launch receipts.</p><p><strong>Derived:</strong> exact-address recurrence within stated coverage.</p><p><strong>Unknown:</strong> human identity, intent, safety, profitability, and future outcome.</p></div>
+      <div id="feature-state" class="panel"></div>
+    </section>
   </main>
   <nav aria-label="Mini App sections">
-    <button data-view="home" class="selected">HOME</button><button data-view="launches">LAUNCHES</button><button data-view="rats">RATS</button><button data-view="watches">WATCHES</button><button data-view="about">ABOUT</button>
+    <button data-view="home" class="selected">HOME</button>
+    <button data-view="launches">LAUNCHES</button>
+    <button data-view="rats">FRESH</button>
+    <button data-view="watches">WATCH</button>
+    <button data-view="about">ABOUT</button>
   </nav>
   <script type="module" src="/app/app.js"></script>
 </body>
