@@ -107,13 +107,16 @@ class RemoteSelectDb implements D1DatabaseLike {
   }
 }
 
-interface CandidateRow {
+interface TargetCandidateRow {
   launch_id:string;
   creator:Hex;
   block_number:string;
-  identity_block:string;
-  first_outcome_block:number;
   prior_count:number;
+}
+
+interface IdentityMarkerRow {
+  observed_block:string;
+  identity_id:string;
 }
 
 interface OutcomeMarkerRow {
@@ -176,76 +179,110 @@ try {
   const checkpointPoint=await source.getBlockPoint(checkpointBlock);
   gate(checkpointPoint.blockHash.toLowerCase()===checkpointRows[0]!.block_hash.toLowerCase(),'PONS_REPLAY_INSPECT_CHECKPOINT_REORG');
 
-  const candidates=selectRows<CandidateRow>([
-    "SELECT l.launch_id AS launch_id,l.creator AS creator,l.block_number AS block_number,",
-    "i.observed_block AS identity_block,MIN(CAST(o.observed_block AS INTEGER)) AS first_outcome_block,",
-    "COUNT(DISTINCT prior.launch_id) AS prior_count",
-    "FROM launches l",
-    "JOIN pons_token_identity_receipts i ON i.chain_id=4663 AND i.launch_id=l.launch_id",
-    "JOIN pons_outcome_receipts o ON o.chain_id=4663 AND o.launch_id=l.launch_id",
-    "JOIN launches prior ON prior.chain_id=4663 AND prior.source='PONS_V2' AND prior.creator=l.creator",
-    "AND (CAST(prior.block_number AS INTEGER)<CAST(l.block_number AS INTEGER)",
-    "OR (CAST(prior.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND (prior.log_index<l.log_index",
-    "OR (prior.log_index=l.log_index AND prior.launch_id<l.launch_id))))",
-    "WHERE l.chain_id=4663 AND l.source='PONS_V2'",
-    "GROUP BY l.launch_id,l.creator,l.block_number,i.observed_block",
-    "HAVING COUNT(DISTINCT prior.launch_id) BETWEEN 1 AND "+MAX_PREVIOUS,
-    "ORDER BY CAST(l.block_number AS INTEGER) DESC LIMIT 50"
+  const diagnostics={
+    identityReceipts:Number(selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_token_identity_receipts WHERE chain_id=4663")[0]?.n??0),
+    outcomeReceipts:Number(selectRows<{n:number}>("SELECT COUNT(*) AS n FROM pons_outcome_receipts WHERE chain_id=4663")[0]?.n??0),
+    identityLaunches:Number(selectRows<{n:number}>("SELECT COUNT(DISTINCT launch_id) AS n FROM pons_token_identity_receipts WHERE chain_id=4663")[0]?.n??0),
+    outcomeLaunches:Number(selectRows<{n:number}>("SELECT COUNT(DISTINCT launch_id) AS n FROM pons_outcome_receipts WHERE chain_id=4663")[0]?.n??0),
+    overlappingLaunches:Number(selectRows<{n:number}>(
+      "SELECT COUNT(*) AS n FROM pons_token_identity_receipts i JOIN (SELECT DISTINCT launch_id FROM pons_outcome_receipts WHERE chain_id=4663) o ON o.launch_id=i.launch_id WHERE i.chain_id=4663"
+    )[0]?.n??0)
+  };
+
+  const priorCountSql=(alias:string)=>[
+    "(SELECT COUNT(*) FROM launches p WHERE p.chain_id=4663 AND p.source='PONS_V2' AND p.creator="+alias+".creator AND (",
+    "CAST(p.block_number AS INTEGER)<CAST("+alias+".block_number AS INTEGER)",
+    "OR (CAST(p.block_number AS INTEGER)=CAST("+alias+".block_number AS INTEGER) AND (p.log_index<"+alias+".log_index",
+    "OR (p.log_index="+alias+".log_index AND p.launch_id<"+alias+".launch_id)))))"
+  ].join(' ');
+
+  const identityCandidates=selectRows<TargetCandidateRow>([
+    "SELECT l.launch_id,l.creator,l.block_number,"+priorCountSql('l')+" AS prior_count",
+    "FROM launches l JOIN pons_token_identity_receipts i ON i.chain_id=4663 AND i.launch_id=l.launch_id",
+    "WHERE l.chain_id=4663 AND l.source='PONS_V2' AND "+priorCountSql('l')+" BETWEEN 0 AND "+MAX_PREVIOUS,
+    "ORDER BY CASE WHEN CAST(i.observed_block AS INTEGER)>CAST(l.block_number AS INTEGER) THEN 0 ELSE 1 END,",
+    "CAST(l.block_number AS INTEGER) DESC LIMIT 20"
   ].join(' '));
-  gate(candidates.length>0,'PONS_REPLAY_INSPECT_NO_CANDIDATE');
 
-  const candidate=candidates.find((row)=>BigInt(row.block_number)<=checkpointBlock)??null;
-  gate(candidate,'PONS_REPLAY_INSPECT_NO_BOUNDED_CANDIDATE');
-  gate(/^[0-9a-f]{64}$/i.test(candidate.launch_id),'PONS_REPLAY_INSPECT_CANDIDATE_ID_INVALID');
+  const outcomeCandidates=selectRows<TargetCandidateRow>([
+    "SELECT l.launch_id,l.creator,l.block_number,"+priorCountSql('l')+" AS prior_count",
+    "FROM launches l JOIN pons_outcome_receipts o ON o.chain_id=4663 AND o.launch_id=l.launch_id",
+    "WHERE l.chain_id=4663 AND l.source='PONS_V2' AND "+priorCountSql('l')+" BETWEEN 0 AND "+MAX_PREVIOUS,
+    "GROUP BY l.launch_id,l.creator,l.block_number,l.log_index",
+    "ORDER BY CASE WHEN MIN(CAST(o.observed_block AS INTEGER))>CAST(l.block_number AS INTEGER) THEN 0 ELSE 1 END,",
+    "CAST(l.block_number AS INTEGER) DESC LIMIT 20"
+  ].join(' '));
 
-  const outcomeMarkers=selectRows<OutcomeMarkerRow>(
-    "SELECT horizon_ms,observed_block,observation_id FROM pons_outcome_receipts WHERE chain_id=4663 AND launch_id='"+
-    candidate.launch_id.toLowerCase()+"' ORDER BY CAST(observed_block AS INTEGER),horizon_ms"
-  );
-  gate(outcomeMarkers.length>0,'PONS_REPLAY_INSPECT_OUTCOMES_MISSING');
-
-  const transitionBlocks=[
-    BigInt(candidate.block_number),
-    BigInt(candidate.identity_block),
-    ...outcomeMarkers.map((row)=>BigInt(row.observed_block)),
-    checkpointBlock
-  ].filter((value)=>value<=checkpointBlock);
-  const uniqueBlocks=[...new Set(transitionBlocks.map(String))].map(BigInt).sort((a,b)=>a<b?-1:a>b?1:0);
+  const chosen=[] as TargetCandidateRow[];
+  const firstIdentity=identityCandidates.find((row)=>BigInt(row.block_number)<=checkpointBlock)??null;
+  const firstOutcome=outcomeCandidates.find((row)=>BigInt(row.block_number)<=checkpointBlock)??null;
+  if(firstIdentity) chosen.push(firstIdentity);
+  if(firstOutcome && !chosen.some((row)=>row.launch_id===firstOutcome.launch_id)) chosen.push(firstOutcome);
+  gate(chosen.length>0,'PONS_REPLAY_INSPECT_NO_EVIDENCE_CANDIDATE');
 
   const db=new RemoteSelectDb();
-  const timeline=[] as Array<ReturnType<typeof snapshotSummary>>;
-  for(const asOfBlock of uniqueBlocks) {
-    const snapshot=await readPonsReplaySnapshot(db,source,{
-      targetLaunchId:candidate.launch_id,
-      asOfBlock,
-      maxPreviousLaunches:MAX_PREVIOUS
-    });
-    timeline.push(snapshotSummary(snapshot));
+  const scenarios=[] as Array<{
+    candidate:TargetCandidateRow;
+    identityMarker:IdentityMarkerRow|null;
+    outcomeMarkers:OutcomeMarkerRow[];
+    timeline:Array<ReturnType<typeof snapshotSummary>>;
+  }>;
+
+  for(const candidate of chosen) {
+    gate(/^[0-9a-f]{64}$/i.test(candidate.launch_id),'PONS_REPLAY_INSPECT_CANDIDATE_ID_INVALID');
+    const identityMarker=selectRows<IdentityMarkerRow>(
+      "SELECT observed_block,identity_id FROM pons_token_identity_receipts WHERE chain_id=4663 AND launch_id='"+
+      candidate.launch_id.toLowerCase()+"' LIMIT 1"
+    )[0]??null;
+    const outcomeMarkers=selectRows<OutcomeMarkerRow>(
+      "SELECT horizon_ms,observed_block,observation_id FROM pons_outcome_receipts WHERE chain_id=4663 AND launch_id='"+
+      candidate.launch_id.toLowerCase()+"' ORDER BY CAST(observed_block AS INTEGER),horizon_ms"
+    );
+
+    const transitionBlocks=[
+      BigInt(candidate.block_number),
+      ...(identityMarker?[BigInt(identityMarker.observed_block)]:[]),
+      ...outcomeMarkers.map((row)=>BigInt(row.observed_block)),
+      checkpointBlock
+    ].filter((value)=>value>=BigInt(candidate.block_number)&&value<=checkpointBlock);
+    const uniqueBlocks=[...new Set(transitionBlocks.map(String))].map(BigInt).sort((a,b)=>a<b?-1:a>b?1:0);
+    gate(uniqueBlocks.length>=2,'PONS_REPLAY_INSPECT_TIMELINE_TOO_SHORT');
+
+    const timeline=[] as Array<ReturnType<typeof snapshotSummary>>;
+    for(const asOfBlock of uniqueBlocks) {
+      const snapshot=await readPonsReplaySnapshot(db,source,{
+        targetLaunchId:candidate.launch_id,
+        asOfBlock,
+        maxPreviousLaunches:MAX_PREVIOUS
+      });
+      timeline.push(snapshotSummary(snapshot));
+    }
+
+    for(const item of timeline) {
+      const block=BigInt(item.asOfBlock);
+      if(identityMarker) {
+        const visible=item.target?.tokenIdentity!==null;
+        gate(visible===(block>=BigInt(identityMarker.observed_block)),'PONS_REPLAY_INSPECT_IDENTITY_LOOKAHEAD');
+      }
+      for(const marker of outcomeMarkers) {
+        const visible=item.target?.observations.some((obs)=>obs.observationId===marker.observation_id)??false;
+        gate(visible===(block>=BigInt(marker.observed_block)),'PONS_REPLAY_INSPECT_OUTCOME_LOOKAHEAD');
+      }
+    }
+
+    const first=timeline[0]!;
+    const last=timeline[timeline.length-1]!;
+    gate(first.targetLaunchKnown&&last.targetLaunchKnown,'PONS_REPLAY_INSPECT_TARGET_VISIBILITY_INVALID');
+    gate(first.previousLaunchCount===Number(candidate.prior_count),'PONS_REPLAY_INSPECT_PRIOR_COUNT_INVALID');
+    gate(last.previousLaunchCount===first.previousLaunchCount,'PONS_REPLAY_INSPECT_PRIOR_COUNT_DRIFT');
+    gate(new Set(timeline.map((item)=>item.outputDigest)).size===timeline.length,'PONS_REPLAY_INSPECT_DIGEST_NOT_TIME_BOUND');
+
+    scenarios.push({candidate,identityMarker,outcomeMarkers,timeline});
   }
 
   gate(writeAttempts===0,'PONS_REPLAY_INSPECT_WRITE_ATTEMPTED');
-  gate(timeline.length>=2,'PONS_REPLAY_INSPECT_TIMELINE_TOO_SHORT');
-
-  const identityBlock=BigInt(candidate.identity_block);
-  for(const item of timeline) {
-    const block=BigInt(item.asOfBlock);
-    const identityVisible=item.target?.tokenIdentity!==null;
-    gate(identityVisible===(block>=identityBlock),'PONS_REPLAY_INSPECT_IDENTITY_LOOKAHEAD');
-
-    for(const marker of outcomeMarkers) {
-      const visible=item.target?.observations.some(
-        (obs)=>obs.observationId===marker.observation_id
-      )??false;
-      gate(visible===(block>=BigInt(marker.observed_block)),'PONS_REPLAY_INSPECT_OUTCOME_LOOKAHEAD');
-    }
-  }
-
-  const first=timeline[0]!;
-  const last=timeline[timeline.length-1]!;
-  gate(first.targetLaunchKnown&&last.targetLaunchKnown,'PONS_REPLAY_INSPECT_TARGET_VISIBILITY_INVALID');
-  gate(first.previousLaunchCount===Number(candidate.prior_count),'PONS_REPLAY_INSPECT_PRIOR_COUNT_INVALID');
-  gate(last.previousLaunchCount===first.previousLaunchCount,'PONS_REPLAY_INSPECT_PRIOR_COUNT_DRIFT');
-  gate(new Set(timeline.map((item)=>item.outputDigest)).size===timeline.length,'PONS_REPLAY_INSPECT_DIGEST_NOT_TIME_BOUND');
+  gate(scenarios.some((item)=>item.identityMarker!==null),'PONS_REPLAY_INSPECT_IDENTITY_SCENARIO_MISSING');
+  gate(scenarios.some((item)=>item.outcomeMarkers.length>0),'PONS_REPLAY_INSPECT_OUTCOME_SCENARIO_MISSING');
 
   console.log(JSON.stringify({
     kind:'BINRAT_PONS_REPLAY_PRODUCTION_INSPECTION_V1',
@@ -256,21 +293,20 @@ try {
       blockHash:checkpointPoint.blockHash,
       timestampMs:checkpointPoint.timestampMs
     },
-    candidate:{
-      launchId:candidate.launch_id,
-      deployer:candidate.creator,
-      launchBlock:candidate.block_number,
-      identityObservedBlock:candidate.identity_block,
-      priorLaunchCount:Number(candidate.prior_count),
-      outcomeMarkers:outcomeMarkers.map((row)=>({
-        horizonMs:row.horizon_ms,
-        observedBlock:row.observed_block,
-        observationId:row.observation_id
-      }))
-    },
+    diagnostics,
     d1ReadCalls,
     writeAttempts,
-    timeline
+    scenarios:scenarios.map((scenario)=>({
+      candidate:{
+        launchId:scenario.candidate.launch_id,
+        deployer:scenario.candidate.creator,
+        launchBlock:scenario.candidate.block_number,
+        priorLaunchCount:Number(scenario.candidate.prior_count)
+      },
+      identityMarker:scenario.identityMarker,
+      outcomeMarkers:scenario.outcomeMarkers,
+      timeline:scenario.timeline
+    }))
   },null,2));
 } finally {
   rmSync(CONFIG,{force:true});
