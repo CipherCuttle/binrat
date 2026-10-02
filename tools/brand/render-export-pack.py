@@ -49,6 +49,15 @@ SOCIAL_FILES = {
     "rat-found-square": "rat-found-square-1080.png",
 }
 
+SOCIAL_TARGET_DIMENSIONS = {
+    "receipt-wide-1200x675.png": (1200, 675),
+    "receipt-square-1080.png": (1080, 1080),
+    "case-file-wide-1200x675.png": (1200, 675),
+    "case-file-square-1080.png": (1080, 1080),
+    "rat-found-wide-1200x675.png": (1200, 675),
+    "rat-found-square-1080.png": (1080, 1080),
+}
+
 
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -126,7 +135,22 @@ def copy_social_exports() -> None:
     telegram.mkdir(parents=True, exist_ok=True)
 
     for filename in SOCIAL_FILES.values():
-        shutil.copyfile(SOCIAL_PROOFS / filename, generic / filename)
+        source = SOCIAL_PROOFS / filename
+        destination = generic / filename
+        expected = SOCIAL_TARGET_DIMENSIONS[filename]
+        with Image.open(source) as img:
+            actual = img.size
+            allowed = {expected, (expected[0], expected[1] + 1)}
+            if actual not in allowed:
+                raise SystemExit(
+                    f"Social V1 proof geometry drift {filename}: {actual} not in {sorted(allowed)}"
+                )
+            if actual == expected:
+                shutil.copyfile(source, destination)
+            else:
+                # Frozen Social V1 proofs carry one extra bottom raster row from their
+                # browser capture. Normalize only that row for declared export geometry.
+                save_png(img.crop((0, 0, expected[0], expected[1])), destination)
 
     shutil.copyfile(generic / SOCIAL_FILES["receipt-wide"], xdir / "post-receipt-wide-1200x675.png")
     shutil.copyfile(generic / SOCIAL_FILES["rat-found-square"], xdir / "post-rat-found-square-1080.png")
@@ -276,7 +300,7 @@ def build_manifest() -> dict[str, Any]:
     ]
     for key, role, filename in social_map:
         source = f"docs/design/brand-v1/proofs/social-v1/{filename}"
-        records.append(record(key, role, f"exports/generic-social/{filename}", [source, social_doc, language_doc], ["generic social", "editorial share"], "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.", "canonical"))
+        records.append(record(key, role, f"exports/generic-social/{filename}", [source, social_doc, language_doc], ["generic social", "editorial share"], "Opaque deterministic export from approved Social V1 proof; one extra bottom capture row is removed when present. Fixture is explicitly DEMO / NON-LIVE.", "canonical"))
 
     platform_copies = [
         ("x-post-receipt-wide", "X representative RECEIPT post", "exports/x/post-receipt-wide-1200x675.png", "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png", ["X post"]),
@@ -285,7 +309,7 @@ def build_manifest() -> dict[str, Any]:
         ("telegram-card-rat-found-square", "Telegram representative RAT FOUND SOMETHING card", "exports/telegram/card-rat-found-square-1080.png", "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png", ["Telegram message media"]),
     ]
     for name, role, rel, source, surfaces in platform_copies:
-        records.append(record(name, role, rel, [source, social_doc, language_doc], surfaces, "Exact approved Social V1 proof copy; fixture remains DEMO / NON-LIVE.", "canonical"))
+        records.append(record(name, role, rel, [source, social_doc, language_doc], surfaces, "Deterministic export of approved Social V1 proof; one extra bottom capture row is removed when present. Fixture remains DEMO / NON-LIVE.", "canonical"))
 
     records.append(record("pressure-tests", "multi-context diagnostic contact sheet", "exports/proofs/pressure-tests-1800x1600.png", [rat, logo_doc, social_doc, language_doc, template_html, template_css, "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png", "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png"], ["review only"], "Diagnostic only; simulates circular avatar crops, X-style header/profile, Telegram card, OG preview, mobile feed, and dark/light page contexts.", "candidate", include_fonts=True))
 
