@@ -31,6 +31,12 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Static syntax gate
+        run: |
+          node --check docs/design/brand-v1/social-v1/social.js
+          node --check docs/design/brand-v1/social-production-v1/production.js
+          node --check tools/brand/validate-social-production.mjs
+
       - name: Validate structured content
         run: node tools/brand/validate-social-production.mjs
 
@@ -42,6 +48,11 @@ jobs:
         run: |
           python -m pip install "playwright==1.55.0"
           python -m playwright install --with-deps chromium
+
+      - name: Re-render frozen Social V1 regression proof
+        run: |
+          python tools/brand/render-social-proof.py
+          git diff --exit-code -- docs/design/brand-v1/proofs/social-v1
 
       - name: Render mutation contact sheets
         run: python tools/brand/render-social-production.py
