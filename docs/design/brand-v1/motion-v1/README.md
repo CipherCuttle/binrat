@@ -38,11 +38,13 @@ Verifier:
 
 `tools/brand/verify-motion-proof.sh`
 
-Rendered outputs:
+Rendered proof:
 
 `docs/design/brand-v1/proofs/motion-v1/found-something-v1.mp4`
 
-`docs/design/brand-v1/proofs/motion-v1/found-something-v1-reduced.mp4`
+Reduced-motion proof:
+
+`docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png`
 
 Manifest:
 
@@ -57,18 +59,19 @@ bash tools/brand/verify-motion-proof.sh
 
 Requires `ffmpeg` + `ffprobe` on PATH. No npm dependency is added.
 
+The approved source composition is 1200×675. The H.264 proof is encoded at 1200×676 by adding one dark bottom pixel row because `yuv420p` requires even dimensions. Nothing is cropped or stretched.
+
 ## Reduced-motion proof
 
-The reduced render is a static 4.8-second presentation of the final approved RAT FOUND SOMETHING card.
+Reduced motion does **not** create another video. It resolves immediately to the already-approved final static RAT FOUND SOMETHING composition.
 
-Verification requires:
+Verification proves that:
 
-- 1200×676 H.264 output from the untouched 1200×675 source composition, with a one-pixel dark bottom pad for yuv420p compatibility;
-- 30 fps;
-- no audio;
-- exactly one unique decoded frame hash across the reduced clip.
+- the static reduced-motion asset is exactly 1200×675;
+- its SHA-256 matches the existing approved social-proof manifest;
+- all literal explanation/evidence remains present without travel, settle, Rat movement or ambient motion.
 
-This proves that the semantic content remains intact when all travel, settle, Rat movement and ambient movement are removed.
+This avoids a redundant large binary while making the reduced-motion contract stronger: the fallback is literally the frozen truthful composition, not a separately encoded approximation.
 
 ## What this proof does not prove
 
