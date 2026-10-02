@@ -15,7 +15,7 @@ EXPECTED_SOURCE_SIZE = (1536, 1536)
 
 # Explicit, reviewable source-space crops. Never mirror Rat Zero.
 PROFILE_CROP = (350, 180, 1230, 1060)  # 880x880, character + some dumpster context
-AVATAR_CROP = (420, 215, 1180, 975)    # 760x760, face/ears/paws emphasis
+AVATAR_CROP = (465, 235, 1105, 875)    # 640x640, tighter face/ears mark for 32–128px
 
 BG = (16, 18, 16)
 PANEL = (28, 32, 28)
