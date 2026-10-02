@@ -74,6 +74,7 @@ body { padding:48px; }
 .brand strong {
   font:800 31px/.9 "Geist Proof";
   letter-spacing:-.055em;
+  color:var(--bone);
 }
 .mono {
   font-family:"Geist Mono Proof", monospace;
@@ -270,7 +271,17 @@ body { padding:48px; }
   background:linear-gradient(90deg, var(--black) 0%, var(--black) 36%, rgba(16,18,16,.92) 48%, rgba(16,18,16,.18) 73%, rgba(16,18,16,.02) 100%);
   pointer-events:none;
 }
-.found-card footer { position:relative; z-index:3; }
+.found-card footer {
+  position:relative;
+  z-index:3;
+}
+.wide.found-card footer {
+  width:52%;
+}
+.wide.found-card .footer-source,
+.square.found-card .footer-source {
+  text-align:right;
+}
 
 /* Square adaptations */
 .social-card.square {
