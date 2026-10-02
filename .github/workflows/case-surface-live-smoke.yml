@@ -15,28 +15,73 @@ jobs:
     timeout-minutes: 10
     env:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TESTER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID }}
-      TESTER_ID_FALLBACK: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
       WORKER_URL: https://binrat-edge-v0.pettevik.workers.dev
       EXPECTED_RELEASE_SHA: 63e734931b4d0ac62a9039f16e79df56c31be849
 
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Resolve private tester from exact read-only marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          cat >/tmp/binrat-live-smoke-wrangler.jsonc <<'JSON'
+          {
+            "name": "binrat-live-case-smoke",
+            "main": "src/cloudflare/worker.ts",
+            "compatibility_date": "2026-09-18",
+            "d1_databases": [{
+              "binding": "DB",
+              "database_name": "binrat-v0",
+              "database_id": "46814564-1a41-449a-88e5-c1349eed3a27"
+            }]
+          }
+          JSON
+          pnpm dlx wrangler@4.135.0 d1 execute DB --remote --yes --json             --config /tmp/binrat-live-smoke-wrangler.jsonc             --command "SELECT CASE WHEN COUNT(*)=1 THEN MAX(user_id) ELSE NULL END AS user_id, COUNT(*) AS matches FROM rat_feedback WHERE body='binrat-controlled-rat-id-0929';"             >/tmp/binrat-live-smoke-tester.json
+          TESTER_ID_RESOLVED="$(node <<'NODE'
+          const fs=require('node:fs');
+          const raw=fs.readFileSync('/tmp/binrat-live-smoke-tester.json','utf8');
+          const begin=Math.min(...[raw.indexOf('{'),raw.indexOf('[')].filter(i=>i>=0));
+          if(!Number.isFinite(begin)) process.exit(2);
+          const parsed=JSON.parse(raw.slice(begin));
+          const stack=[parsed];
+          let hit=null;
+          while(stack.length){
+            const value=stack.pop();
+            if(!value||typeof value!=='object') continue;
+            if(Object.hasOwn(value,'matches')&&Object.hasOwn(value,'user_id')) { hit=value; break; }
+            for(const child of Array.isArray(value)?value:Object.values(value)) stack.push(child);
+          }
+          if(!hit||Number(hit.matches)!==1||!/^[1-9]\d{3,16}$/.test(String(hit.user_id??''))) process.exit(3);
+          process.stdout.write(String(hit.user_id));
+          NODE
+          )"
+          echo "TESTER_ID_RESOLVED=$TESTER_ID_RESOLVED" >> "$GITHUB_ENV"
+          rm -f /tmp/binrat-live-smoke-tester.json /tmp/binrat-live-smoke-wrangler.jsonc
 
       - name: Read-only live Case surface smoke
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
-          const { createHmac } = require('node:crypto');
+          import { createHmac } from 'node:crypto';
 
           const worker = process.env.WORKER_URL;
           const token = process.env.TELEGRAM_BOT_TOKEN?.trim() || '';
-          const tester = (process.env.TESTER_ID?.trim() || process.env.TESTER_ID_FALLBACK?.trim() || '');
+          const tester = process.env.TESTER_ID_RESOLVED?.trim() || '';
           const expectedSha = process.env.EXPECTED_RELEASE_SHA;
 
           function gate(ok, code) {
