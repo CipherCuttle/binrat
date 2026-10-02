@@ -3,14 +3,14 @@
   "status": "DISTRIBUTION_PACK_V1",
   "authority": {
     "branch": "design/binrat-brand-system-v1",
-    "commit": "25a54278e6a5d8eb6f5a568e9e8f05d39ea21a4c",
+    "commit": "770c7aa8741236ee5d8fc8ddd6411bc2addfdade",
     "ratZeroSha256": "43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
     "geistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
   },
   "generation": {
     "command": "python tools/brand/render-export-pack.py",
     "verifyCommand": "python tools/brand/render-export-pack.py --verify",
-    "version": "binrat.brand-export/1.0.0",
+    "version": "binrat.brand-export/1.1.0",
     "fonts": {
       "GeistSans": "https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/Geist/webfonts/Geist%5Bwght%5D.woff2",
       "GeistMono": "https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/GeistMono/webfonts/GeistMono%5Bwght%5D.woff2",
@@ -30,6 +30,8 @@
         "docs/design/brand-v1/canon/rat-zero.jpg",
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css"
       ],
@@ -37,8 +39,10 @@
         "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
         "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
       },
@@ -52,7 +56,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -73,6 +77,8 @@
         "docs/design/brand-v1/canon/rat-zero.jpg",
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css"
       ],
@@ -80,8 +86,10 @@
         "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
         "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
       },
@@ -95,7 +103,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -115,14 +123,18 @@
       "sourceAssets": [
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
         "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
       },
@@ -136,7 +148,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -156,14 +168,18 @@
       "sourceAssets": [
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
         "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
       },
@@ -177,7 +193,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -210,7 +226,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -243,7 +259,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -276,7 +292,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -309,7 +325,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -342,7 +358,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -374,7 +390,7 @@
       "status": "candidate",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -405,7 +421,7 @@
       "status": "candidate",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -437,7 +453,7 @@
       "status": "candidate",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -447,12 +463,12 @@
       }
     },
     {
-      "name": "x-avatar-512",
-      "role": "X-style profile avatar",
-      "path": "exports/x/avatar-512.png",
+      "name": "x-avatar-400",
+      "role": "X profile avatar",
+      "path": "exports/x/avatar-400.png",
       "dimensions": [
-        512,
-        512
+        400,
+        400
       ],
       "sourceAssets": [
         "docs/design/brand-v1/canon/rat-zero.jpg"
@@ -460,15 +476,15 @@
       "sourceHashes": {
         "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
       },
-      "outputHash": "sha256:6bb9cabc512d65776fef888af9baff2089dba7c5024a85d49ca4e2bfeaee3b1a",
+      "outputHash": "sha256:451759537daad0ff3a6fbd9b22823834eb54c598208ba5e50b24ab588edc6597",
       "intendedSurfaces": [
         "X profile"
       ],
-      "backgroundAssumptions": "Upload square; validate under circular presentation crop.",
+      "backgroundAssumptions": "Official X recommended profile dimensions: 400\u00d7400. Upload square; validate under circular presentation crop.",
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -489,6 +505,8 @@
         "docs/design/brand-v1/canon/rat-zero.jpg",
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css"
@@ -497,9 +515,11 @@
         "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
         "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
       },
@@ -511,7 +531,7 @@
       "status": "candidate",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -542,7 +562,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -573,7 +593,7 @@
         "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
         "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
       },
@@ -586,7 +606,7 @@
       "status": "candidate",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -606,11 +626,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png": "sha256:bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:ead4216fe55c0fad78ad1c6e0327687f14562cc719beff3f83368c04f017a5aa",
@@ -622,7 +646,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -642,11 +666,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png": "sha256:becde4002883781f970816fc24a80da2d21cdbf9555db05601f3b923fa33e19f",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:8841e26ac06e237cf3f86346d0da76980d6e9614c4ca63fbacd6e5bd3d5a7776",
@@ -658,7 +686,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -678,11 +706,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:e51056c1097be599b33e92f54fc622651f731002af7ae428e3e8f709cdd77706",
@@ -694,7 +726,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -714,11 +746,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/case-file-square-1080.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/case-file-square-1080.png": "sha256:5567fdb403612472d4a7619b7d628b6d3ee00a48441d4491de997acc0bcdd822",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:12e5bbee03a8e8cceb4639dcab4c1128aedeb6057de82f2efb11258d7a6ef62d",
@@ -730,7 +766,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -750,11 +786,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png": "sha256:1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:34a5ca90f17ec10e41d394e66ec041c9899f4b91a448e9e30a322f4b012dde0a",
@@ -766,7 +806,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -786,11 +826,15 @@
       "sourceAssets": [
         "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md"
       ],
       "sourceHashes": {
         "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
       },
       "outputHash": "sha256:5937c00cd4c6f197ef6d0742d2d3b17e1e03f87b2496e2dea2906cdcb12f1cec",
@@ -802,7 +846,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -837,7 +881,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -872,7 +916,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -907,7 +951,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -942,7 +986,7 @@
       "status": "canonical",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
@@ -963,6 +1007,8 @@
         "docs/design/brand-v1/canon/rat-zero.jpg",
         "docs/design/brand-v1/LOGO_LOCKUP.md",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/design/brand-v1/PALETTE.md",
+        "docs/design/brand-v1/tokens.json",
         "docs/PRODUCT_LANGUAGE.md",
         "docs/design/brand-v1/export-v1/index.html",
         "docs/design/brand-v1/export-v1/export.css",
@@ -973,9 +1019,11 @@
         "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
         "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
         "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/design/brand-v1/PALETTE.md": "sha256:7302722ceb32a939cc84a71296776873bd6a629ec036d21e355219bebd079abe",
+        "docs/design/brand-v1/tokens.json": "sha256:3a3efbe70cf07e707c74b4314eea660171f71d605876eb45cfbaabedf52dd173",
         "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
         "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
-        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:903ce345177b79feca9332f0a554cfe990b8b14798d6c6b07054526c7ce0ee9f",
         "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png": "sha256:becde4002883781f970816fc24a80da2d21cdbf9555db05601f3b923fa33e19f",
         "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
         "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
@@ -989,7 +1037,7 @@
       "status": "candidate",
       "generation": {
         "command": "python tools/brand/render-export-pack.py",
-        "version": "binrat.brand-export/1.0.0",
+        "version": "binrat.brand-export/1.1.0",
         "dependencies": {
           "Pillow": "11.3.0",
           "playwright": "1.55.0",
