@@ -46,6 +46,10 @@ Reduced-motion proof:
 
 `docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png`
 
+Source/toolchain lock:
+
+`docs/design/brand-v1/motion-v1/SOURCE_LOCK.json`
+
 Manifest:
 
 `docs/design/brand-v1/proofs/motion-v1/manifest.json`
@@ -57,7 +61,9 @@ bash tools/brand/render-motion-proof.sh
 bash tools/brand/verify-motion-proof.sh
 ```
 
-Requires `ffmpeg` + `ffprobe` on PATH. No npm dependency is added.
+Requires the exact FFmpeg/libx264 package versions pinned in `SOURCE_LOCK.json`; the renderer fails closed if either package or either consumed raster hash drifts. No npm dependency is added.
+
+CI renders twice with the pinned toolchain and requires identical MP4 and manifest SHA-256 values before verification. Both raster inputs are independently hash-checked against the Social V1 manifest.
 
 The approved source composition is 1200×675. The H.264 proof is encoded at 1200×676 by adding one dark bottom pixel row because `yuv420p` requires even dimensions. Nothing is cropped or stretched.
 
@@ -67,6 +73,7 @@ Reduced motion does **not** create another video. It resolves immediately to the
 
 Verification proves that:
 
+- both motion input rasters are exact pinned Social V1 bytes before encoding;
 - the reduced-motion asset is the exact already-approved `rat-found-wide-1200x675.png` bytes;
 - its SHA-256 matches the existing approved social-proof manifest;
 - all literal explanation/evidence remains present without travel, settle, Rat movement or ambient motion.
@@ -93,3 +100,8 @@ Those remain separate gates.
 **Do not add for V1:** GSAP, Rive, Remotion.
 
 Re-evaluate Remotion when a real need exists for repeatable data-bound batches (many tokens/cases/platform ratios), because that is where a React composition system starts paying for its dependency and maintenance cost.
+
+
+## Reproducibility / source drift
+
+`SOURCE_LOCK.json` is the fail-closed receipt for this bounded prototype. Any change to either Social V1 input—including an eventual upstream one-pixel normalization—or to the pinned FFmpeg/libx264 packages requires an intentional lock refresh and regenerated proof receipts. The workflow also triggers when either consumed source raster or its Social V1 manifest changes.

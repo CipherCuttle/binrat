@@ -4,17 +4,72 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SRC="$ROOT/docs/design/brand-v1/proofs/social-v1"
 OUT="$ROOT/docs/design/brand-v1/proofs/motion-v1"
+LOCK="$ROOT/docs/design/brand-v1/motion-v1/SOURCE_LOCK.json"
+SOCIAL_MANIFEST="$SRC/manifest.json"
 
 RAT="$SRC/rat-found-wide-1200x675.png"
 RECEIPT="$SRC/receipt-wide-1200x675.png"
 MOTION="$OUT/found-something-v1.mp4"
 
-command -v ffmpeg >/dev/null
-command -v ffprobe >/dev/null
-test -s "$RAT"
-test -s "$RECEIPT"
+for cmd in ffmpeg ffprobe python3 dpkg-query; do
+  command -v "$cmd" >/dev/null
+done
+for f in "$RAT" "$RECEIPT" "$LOCK" "$SOCIAL_MANIFEST"; do
+  test -s "$f"
+done
 mkdir -p "$OUT"
 rm -f "$OUT/found-something-v1-reduced.mp4"
+
+python3 - "$ROOT" "$LOCK" "$SOCIAL_MANIFEST" <<'PY'
+from __future__ import annotations
+import hashlib, json, pathlib, struct, subprocess, sys
+
+root = pathlib.Path(sys.argv[1])
+lock_path = pathlib.Path(sys.argv[2])
+social_manifest_path = pathlib.Path(sys.argv[3])
+lock = json.loads(lock_path.read_text())
+social = json.loads(social_manifest_path.read_text())
+
+def sha256(path: pathlib.Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+def png_dimensions(path: pathlib.Path) -> list[int]:
+    header = path.read_bytes()[:24]
+    if header[:8] != b"\x89PNG\r\n\x1a\n" or header[12:16] != b"IHDR":
+        raise RuntimeError(f"not a PNG with IHDR: {path}")
+    return list(struct.unpack(">II", header[16:24]))
+
+def package_version(name: str) -> str:
+    return subprocess.check_output(
+        ["dpkg-query", "-W", "-f=${Version}", name], text=True
+    ).strip()
+
+assert lock["schemaVersion"] == "binrat.motion-source-lock/1"
+assert lock["status"] == "PINNED_PROTOTYPE_INPUTS"
+assert lock["socialManifest"] == "docs/design/brand-v1/proofs/social-v1/manifest.json"
+
+for source in lock["sources"]:
+    path = root / source["path"]
+    assert path.is_file(), path
+    actual_hash = sha256(path)
+    actual_dims = png_dimensions(path)
+    social_meta = social["outputs"][path.name]
+    declared_dims = [social_meta["width"], social_meta["height"]]
+    assert actual_hash == source["sha256"], (path, actual_hash, source["sha256"])
+    assert actual_hash == social_meta["sha256"], (path, actual_hash, social_meta["sha256"])
+    assert actual_dims == source["observedPngDimensions"], (path, actual_dims, source["observedPngDimensions"])
+    assert declared_dims == source["declaredSocialManifestDimensions"], (path, declared_dims, source["declaredSocialManifestDimensions"])
+
+tool = lock["toolchain"]
+ffmpeg_line = subprocess.check_output(["ffmpeg", "-version"], text=True).splitlines()[0]
+assert ffmpeg_line == tool["ffmpegVersionLine"], (ffmpeg_line, tool["ffmpegVersionLine"])
+assert package_version("ffmpeg") == tool["ffmpegAptVersion"]
+assert package_version("libx264-164") == tool["libx264AptVersion"]
+PY
 
 ffmpeg -hide_banner -loglevel error -y \
   -loop 1 -framerate 30 -t 6.4 -i "$RAT" \
@@ -41,15 +96,15 @@ ffmpeg -hide_banner -loglevel error -y \
   -threads 1 -x264-params "keyint=192:min-keyint=192:scenecut=0" \
   -movflags +faststart "$MOTION"
 
-python - "$OUT" "$RAT" <<'PY'
+python3 - "$OUT" "$LOCK" "$RAT" "$MOTION" <<'PY'
 from __future__ import annotations
 import hashlib, json, pathlib, struct, subprocess, sys
 
 out = pathlib.Path(sys.argv[1])
-reduced_source = pathlib.Path(sys.argv[2])
-social_manifest_path = reduced_source.parent / "manifest.json"
-social_manifest = json.loads(social_manifest_path.read_text())
-motion = out / "found-something-v1.mp4"
+lock_path = pathlib.Path(sys.argv[2])
+reduced_source = pathlib.Path(sys.argv[3])
+motion = pathlib.Path(sys.argv[4])
+lock = json.loads(lock_path.read_text())
 
 def sha256(path: pathlib.Path) -> str:
     h = hashlib.sha256()
@@ -62,8 +117,12 @@ def png_dimensions(path: pathlib.Path) -> list[int]:
     header = path.read_bytes()[:24]
     if header[:8] != b"\x89PNG\r\n\x1a\n" or header[12:16] != b"IHDR":
         raise RuntimeError(f"not a PNG with IHDR: {path}")
-    width, height = struct.unpack(">II", header[16:24])
-    return [width, height]
+    return list(struct.unpack(">II", header[16:24]))
+
+def package_version(name: str) -> str:
+    return subprocess.check_output(
+        ["dpkg-query", "-W", "-f=${Version}", name], text=True
+    ).strip()
 
 def probe(path: pathlib.Path) -> dict:
     raw = subprocess.check_output([
@@ -75,26 +134,34 @@ def probe(path: pathlib.Path) -> dict:
     ], text=True)
     return json.loads(raw)
 
+rat_source = next(
+    source for source in lock["sources"]
+    if source["path"].endswith("/rat-found-wide-1200x675.png")
+)
+toolchain = {
+    "runner": lock["toolchain"]["runner"],
+    "ffmpegAptVersion": package_version("ffmpeg"),
+    "ffmpegVersionLine": subprocess.check_output(["ffmpeg", "-version"], text=True).splitlines()[0],
+    "libx264AptVersion": package_version("libx264-164"),
+}
+
 manifest = {
     "schemaVersion": "binrat.motion-proof/1",
     "status": "PROTOTYPE_NOT_CANON",
     "fixture": "DEMO / NON-LIVE",
-    "sources": [
-        "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
-        "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
-    ],
+    "sourceLock": "docs/design/brand-v1/motion-v1/SOURCE_LOCK.json",
+    "sourceLockSha256": sha256(lock_path),
+    "sources": lock["sources"],
+    "toolchain": toolchain,
     "render": "bash tools/brand/render-motion-proof.sh",
     "verify": "bash tools/brand/verify-motion-proof.sh",
-    "ffmpeg": subprocess.check_output(["ffmpeg", "-version"], text=True).splitlines()[0],
+    "ffmpeg": toolchain["ffmpegVersionLine"],
     "reducedMotion": {
         "mode": "static-source",
-        "path": "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+        "path": rat_source["path"],
         "sha256": sha256(reduced_source),
         "observedPngDimensions": png_dimensions(reduced_source),
-        "declaredSocialManifestDimensions": [
-            social_manifest["outputs"]["rat-found-wide-1200x675.png"]["width"],
-            social_manifest["outputs"]["rat-found-wide-1200x675.png"]["height"],
-        ],
+        "declaredSocialManifestDimensions": rat_source["declaredSocialManifestDimensions"],
         "note": "No duplicate video: reduced motion resolves immediately to the already-approved final static composition. Hash is authoritative if upstream declared dimensions disagree with the committed PNG.",
     },
     "outputs": {
