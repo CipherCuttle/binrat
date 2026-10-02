@@ -1,0 +1,45 @@
+name: BINRAT Brand Palette Gate
+
+on:
+  push:
+    branches:
+      - design/binrat-brand-system-v1
+    paths:
+      - ".github/workflows/binrat-brand-palette-gate.yml"
+      - "tools/brand/check-brand-palette.py"
+      - "docs/design/brand-v1/PALETTE.md"
+      - "docs/design/brand-v1/tokens.json"
+      - "docs/design/brand-v1/brand-tokens.css"
+      - "docs/design/brand-v1/social-v1/social.css"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  palette-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/binrat-brand-system-v1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify frozen palette and contrast
+        run: python tools/brand/check-brand-palette.py --write-report
+
+      - name: Commit deterministic contrast receipt
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/design/brand-v1/proofs/palette-v1/contrast-report.json
+          if git diff --cached --quiet; then
+            echo "Palette receipt already current."
+            exit 0
+          fi
+          git commit -m "build(brand): record palette contrast receipt [skip ci]"
+          git push origin HEAD:design/binrat-brand-system-v1
