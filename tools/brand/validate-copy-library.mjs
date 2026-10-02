@@ -121,6 +121,26 @@ for (const stale of [
   if (copy.includes(stale)) fail(`COPY_LIBRARY retains stale social-card rule: ${stale}`);
 }
 
+const socialStart = copy.indexOf("## 1. RECEIPT posts");
+const socialEnd = copy.indexOf("## 4. X launch / feature announcements");
+if (socialStart < 0 || socialEnd <= socialStart) {
+  fail("could not isolate canonical social-card copy sections");
+} else {
+  const socialCopy = copy.slice(socialStart, socialEnd);
+  const actionLines = socialCopy.split("\n").filter((line) => line.includes("** · ") && line.includes("→"));
+  for (const line of actionLines) {
+    const action = line.split("** · ").at(-1)?.trim();
+    if (!expectedSocial.cta_labels.includes(action)) {
+      fail(`social-card example uses non-renderer CTA: ${action}`);
+    }
+  }
+}
+
+const receiptFixture = (data.good_fixtures || []).find((fixture) => fixture.id === "receipt_deployer_recurrence");
+if (!receiptFixture?.text.includes("OPEN RECEIPTS →")) {
+  fail("receipt_deployer_recurrence fixture does not use exact rendered CTA label");
+}
+
 if (data.recommended_max?.case_file_post?.literal_chars > expectedSocial.families["case-file"].literal_chars) {
   fail("case_file_post recommended literal budget exceeds rendered card hard max");
 }

@@ -61,7 +61,7 @@ Examples:
 
 1. **SMELLS FAMILIAR.**  
    This exact source-reported deployer appears across {launch_count} retained launches.  
-   **PATTERN · {coverage}** · Open receipts →
+   **PATTERN · {coverage}** · OPEN RECEIPTS →
 
 2. **THE RAT KEPT THIS.**  
    {artifact_type} was observed for {launch_id} at {observed_at}.  

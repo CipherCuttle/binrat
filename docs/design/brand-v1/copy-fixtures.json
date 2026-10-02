@@ -290,7 +290,7 @@
     {
       "id": "receipt_deployer_recurrence",
       "category": "receipt",
-      "text": "SMELLS FAMILIAR. This exact source-reported deployer appears across 4 retained launches. PATTERN · PARTIAL · Open receipts →",
+      "text": "SMELLS FAMILIAR. This exact source-reported deployer appears across 4 retained launches. PATTERN · PARTIAL · OPEN RECEIPTS →",
       "expected": "PASS"
     },
     {
