@@ -20,7 +20,7 @@ ffmpeg -hide_banner -loglevel error -y \
   -loop 1 -framerate 30 -t 6.4 -i "$RAT" \
   -loop 1 -framerate 30 -t 6.4 -i "$RECEIPT" \
   -filter_complex "
-    color=c=0x060606:s=1200x675:r=30:d=6.4[bg];
+    color=c=0x101210:s=1200x675:r=30:d=6.4[bg];
     [0:v]split=3[leftsrc][rightsrc][endsrc];
     [leftsrc]crop=610:675:0:0,format=rgba,fade=t=in:st=0.15:d=0.55:alpha=1[left];
     [rightsrc]crop=590:675:610:0,format=rgba,fade=t=in:st=1.00:d=0.38:alpha=1[right];
@@ -34,7 +34,7 @@ ffmpeg -hide_banner -loglevel error -y \
       format=auto[c];
     [endsrc]format=rgba,fade=t=in:st=5.05:d=0.35:alpha=1[end];
     [c][end]overlay=x=0:y=0:enable='gte(t,5.05)':format=auto[scene];
-    [scene]pad=1200:676:0:0:color=0x060606[out]
+    [scene]pad=1200:676:0:0:color=0x101210[out]
   " \
   -map "[out]" -an -r 30 -t 6.4 \
   -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
