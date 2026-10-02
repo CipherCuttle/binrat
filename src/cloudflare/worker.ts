@@ -51,7 +51,7 @@ import {
   proveHolderWallet
 } from './holderAuth.js';
 import type { D1DatabaseLike } from './d1Types.js';
-import { readBinratPonsCase, type BinratPonsCaseBlockPointReader } from './ponsCaseReadModel.js';
+import { readBinratPonsCaseBundle, type BinratPonsCaseBlockPointReader } from './ponsCaseReadModel.js';
 import {
   enqueueSyncCycle,
   enqueuePonsSyncCycle,
@@ -390,7 +390,7 @@ async function miniAppCaseIntelligence(
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG');
     }
 
-    const caseModel = await readBinratPonsCase(env.DB, blockSource, {
+    const bundle = await readBinratPonsCaseBundle(env.DB, blockSource, {
       currentLaunchId: body.launchId.toLowerCase(),
       asOfBlock,
       maxPreviousLaunches: 25,
@@ -402,10 +402,21 @@ async function miniAppCaseIntelligence(
     ).bind(ROBINHOOD_CHAIN_ID).first<{block_number:string;block_hash:string}>();
     if (
       !afterCheckpoint ||
-      afterCheckpoint.block_number !== checkpoint.block_number ||
-      afterCheckpoint.block_hash.toLowerCase() !== pinnedHash
+      !/^(0|[1-9]\d*)$/.test(afterCheckpoint.block_number) ||
+      !/^0x[0-9a-f]{64}$/i.test(afterCheckpoint.block_hash)
     ) {
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_DRIFT');
+    }
+
+    const afterBlock = BigInt(afterCheckpoint.block_number);
+    if (afterBlock < asOfBlock) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REGRESSION');
+    }
+    if (
+      afterBlock === asOfBlock &&
+      afterCheckpoint.block_hash.toLowerCase() !== pinnedHash
+    ) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG');
     }
 
     const afterPoint = await blockSource.getBlockPoint(asOfBlock);
@@ -416,7 +427,11 @@ async function miniAppCaseIntelligence(
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG_DURING_READ');
     }
 
-    return json(200, { case: caseModel });
+    return json(200, {
+      case: bundle.caseModel,
+      trashTrail: bundle.trashTrail,
+      replay: bundle.replay
+    });
   } catch (error) { return miniAppError(error); }
 }
 

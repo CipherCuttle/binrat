@@ -173,7 +173,21 @@ test('authenticated Case endpoint returns one assembled read-only Case pinned to
         handoffs:Array<{kind:string}>;
         coverage:{trashTrail:string;replay:string;funding:string};
         caseDigest:string;
-      }
+      };
+      trashTrail:{
+        presentationVersion:string;
+        summary:{previousLaunches:number;coverageText:string};
+        launches:Array<unknown>;
+      };
+      replay:{
+        replayVersion:string;
+        semantics:string;
+        asOfBlock:string;
+        targetLaunchKnown:boolean;
+        targetLaunch:{launchId:string}|null;
+        previousLaunches:Array<unknown>;
+        outputDigest:string;
+      };
     };
 
     assert.equal(body.case.caseVersion,'BINRAT_CASE_MODEL_V1');
@@ -190,6 +204,17 @@ test('authenticated Case endpoint returns one assembled read-only Case pinned to
     assert.equal(body.case.coverage.replay,'AVAILABLE');
     assert.equal(body.case.coverage.funding,'NO_POSITIVE_FACT');
     assert.match(body.case.caseDigest,/^[0-9a-f]{64}$/);
+
+    assert.equal(body.trashTrail.presentationVersion,'BINRAT_PONS_TRASH_TRAIL_PRESENTATION_V1');
+    assert.equal(body.trashTrail.summary.previousLaunches,0);
+    assert.deepEqual(body.trashTrail.launches,[]);
+    assert.equal(body.replay.replayVersion,'BINRAT_PONS_REPLAY_LAB_V1');
+    assert.equal(body.replay.semantics,'KNOWABLE_AS_OF_BLOCK');
+    assert.equal(body.replay.asOfBlock,'220');
+    assert.equal(body.replay.targetLaunchKnown,true);
+    assert.equal(body.replay.targetLaunch?.launchId,current.launchId);
+    assert.deepEqual(body.replay.previousLaunches,[]);
+    assert.match(body.replay.outputDigest,/^[0-9a-f]{64}$/);
 
     assert.equal(calls.get('200'),1);
     assert.equal(calls.get('220'),3);
@@ -337,6 +362,75 @@ test('Case endpoint discards a Case when the canonical checkpoint reorgs during 
     assert.equal(asOfReads,3);
     const body=await response.json() as {error:string};
     assert.equal(body.error,'MINI_APP_UNAVAILABLE');
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+
+test('Case endpoint tolerates normal checkpoint advancement during assembly',async()=>{
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const current=launch();
+  const now=12_000_000;
+
+  try {
+    await store.putLaunch(current);
+    await store.putProvenanceFact(await buildProvenanceFact(current));
+    await store.commitCheckpoint({
+      blockNumber:220n,
+      blockHash:hash(220),
+      guardBlockNumber:null,
+      guardBlockHash:null
+    });
+
+    let asOfReads=0;
+    const blockSource={
+      async getBlockPoint(blockNumber:bigint){
+        if(blockNumber===200n) {
+          return {blockNumber,blockHash:hash(200),timestampMs:10_000_000};
+        }
+        if(blockNumber===220n) {
+          asOfReads+=1;
+          if(asOfReads===2) {
+            await store.commitCheckpoint({
+              blockNumber:221n,
+              blockHash:hash(221),
+              guardBlockNumber:null,
+              guardBlockHash:null
+            });
+          }
+          return {blockNumber,blockHash:hash(220),timestampMs:11_000_000};
+        }
+        throw new Error('POINT_MISSING:'+blockNumber.toString());
+      }
+    };
+
+    const readOnly=new StrictReadOnlyDb(db);
+    const response=await handleWorkerRequest(
+      new Request('https://binrat.example/api/miniapp/case-intelligence',{
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify({
+          initData:signedInitData(now),
+          launchId:current.launchId
+        })
+      }),
+      privateEnv(readOnly),
+      {
+        externalFetch:fetch,
+        now:()=>now,
+        ponsCaseBlockSource:blockSource
+      }
+    );
+
+    assert.equal(response.status,200);
+    assert.equal(readOnly.writeAttempts,0);
+    assert.equal(asOfReads,3);
+    const body=await response.json() as {case:{asOfBlock:string}};
+    assert.equal(body.case.asOfBlock,'220');
   } finally {
     store.close();
     db.close();
