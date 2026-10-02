@@ -367,3 +367,72 @@ test('Case endpoint discards a Case when the canonical checkpoint reorgs during 
     db.close();
   }
 });
+
+
+test('Case endpoint tolerates normal checkpoint advancement during assembly',async()=>{
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const current=launch();
+  const now=12_000_000;
+
+  try {
+    await store.putLaunch(current);
+    await store.putProvenanceFact(await buildProvenanceFact(current));
+    await store.commitCheckpoint({
+      blockNumber:220n,
+      blockHash:hash(220),
+      guardBlockNumber:null,
+      guardBlockHash:null
+    });
+
+    let asOfReads=0;
+    const blockSource={
+      async getBlockPoint(blockNumber:bigint){
+        if(blockNumber===200n) {
+          return {blockNumber,blockHash:hash(200),timestampMs:10_000_000};
+        }
+        if(blockNumber===220n) {
+          asOfReads+=1;
+          if(asOfReads===2) {
+            await store.commitCheckpoint({
+              blockNumber:221n,
+              blockHash:hash(221),
+              guardBlockNumber:null,
+              guardBlockHash:null
+            });
+          }
+          return {blockNumber,blockHash:hash(220),timestampMs:11_000_000};
+        }
+        throw new Error('POINT_MISSING:'+blockNumber.toString());
+      }
+    };
+
+    const readOnly=new StrictReadOnlyDb(db);
+    const response=await handleWorkerRequest(
+      new Request('https://binrat.example/api/miniapp/case-intelligence',{
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify({
+          initData:signedInitData(now),
+          launchId:current.launchId
+        })
+      }),
+      privateEnv(readOnly),
+      {
+        externalFetch:fetch,
+        now:()=>now,
+        ponsCaseBlockSource:blockSource
+      }
+    );
+
+    assert.equal(response.status,200);
+    assert.equal(readOnly.writeAttempts,0);
+    assert.equal(asOfReads,3);
+    const body=await response.json() as {case:{asOfBlock:string}};
+    assert.equal(body.case.asOfBlock,'220');
+  } finally {
+    store.close();
+    db.close();
+  }
+});
