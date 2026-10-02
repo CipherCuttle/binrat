@@ -11,7 +11,7 @@ import type { D1DatabaseLike, D1ResultLike } from './d1Types.js';
 export class D1PonsFundingStore implements PonsFundingStore {
   constructor(private readonly db:D1DatabaseLike) {}
 
-  async listPending(limit:number):Promise<PonsFundingLaunch[]> {
+  async listPending(limit:number,nowMs:number):Promise<PonsFundingLaunch[]> {
     const result=await this.db.prepare(`
       WITH checkpoint AS (
         SELECT CAST(block_number AS INTEGER) AS tip
@@ -21,16 +21,19 @@ export class D1PonsFundingStore implements PonsFundingStore {
       FROM launches l
       LEFT JOIN pons_funding_receipts r ON r.launch_id=l.launch_id
       LEFT JOIN pons_funding_scan_state s ON s.launch_id=l.launch_id
+      LEFT JOIN pons_funding_retry_state f ON f.launch_id=l.launch_id
       WHERE l.chain_id=4663
         AND l.source='PONS_V2'
         AND r.launch_id IS NULL
         AND s.launch_id IS NULL
+        AND (f.launch_id IS NULL OR f.retry_after_ms<=?)
+        AND CAST(l.block_number AS INTEGER)<=COALESCE((SELECT tip FROM checkpoint),-1)
         AND CAST(l.block_number AS INTEGER)>=(
           SELECT CASE WHEN tip>200000 THEN tip-200000 ELSE 0 END FROM checkpoint
         )
       ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC
       LIMIT ?
-    `).bind(limit).all<{
+    `).bind(nowMs,limit).all<{
       launch_id:string;
       creator:Hex;
       block_number:string;
@@ -66,7 +69,11 @@ export class D1PonsFundingStore implements PonsFundingStore {
       receipt.transferBlock.toString(),receipt.transferBlockHash,receipt.transferTimestampMs,
       receipt.valueWei.toString(),receipt.evidenceDigest,payload
     ).run();
-    if (changes(result)===1) return 'INSERTED';
+    if (changes(result)===1) {
+      await this.db.prepare('DELETE FROM pons_funding_retry_state WHERE launch_id=?')
+        .bind(receipt.launchId).run();
+      return 'INSERTED';
+    }
 
     const existing=await this.db.prepare(`
       SELECT funding_id,evidence_digest,payload_json
@@ -92,6 +99,8 @@ export class D1PonsFundingStore implements PonsFundingStore {
       throw new Error('PONS_FUNDING_SCAN_TIME_INVALID');
     }
     await this.assertLaunchAuthority(launch);
+    await this.db.prepare('DELETE FROM pons_funding_retry_state WHERE launch_id=?')
+      .bind(launch.launchId).run();
     const result=await this.db.prepare(`
       INSERT OR IGNORE INTO pons_funding_scan_state (
         launch_id,chain_id,deployer,launch_block,launch_block_hash,status,checked_at_ms
@@ -124,6 +133,56 @@ export class D1PonsFundingStore implements PonsFundingStore {
       throw new Error(`PONS_FUNDING_SCAN_CONFLICT:${launch.launchId}`);
     }
     return 'DUPLICATE';
+  }
+
+  async markRetry(
+    launch:PonsFundingLaunch,
+    code:string,
+    retryAfterMs:number,
+    nowMs:number
+  ):Promise<void> {
+    if (!/^[A-Z0-9_]{1,120}$/.test(code)) throw new Error('PONS_FUNDING_FAILURE_CODE_INVALID');
+    if (!Number.isSafeInteger(retryAfterMs) || retryAfterMs<nowMs) {
+      throw new Error('PONS_FUNDING_RETRY_TIME_INVALID');
+    }
+    if (!Number.isSafeInteger(nowMs) || nowMs<0) throw new Error('PONS_FUNDING_RETRY_TIME_INVALID');
+    await this.assertLaunchAuthority(launch);
+    const result=await this.db.prepare(`
+      INSERT INTO pons_funding_retry_state (
+        launch_id,launch_block_hash,failure_count,retry_after_ms,last_error,updated_at_ms
+      ) VALUES (?,?,?,?,?,?)
+      ON CONFLICT(launch_id) DO UPDATE SET
+        launch_block_hash=excluded.launch_block_hash,
+        failure_count=pons_funding_retry_state.failure_count+1,
+        retry_after_ms=excluded.retry_after_ms,
+        last_error=excluded.last_error,
+        updated_at_ms=excluded.updated_at_ms
+    `).bind(
+      launch.launchId,launch.blockHash.toLowerCase(),1,retryAfterMs,code,nowMs
+    ).run();
+    if (!result.success) throw new Error('PONS_FUNDING_RETRY_WRITE_FAILED');
+  }
+
+  async countRemaining():Promise<number> {
+    const row=await this.db.prepare(`
+      WITH checkpoint AS (
+        SELECT CAST(block_number AS INTEGER) AS tip
+        FROM chain_checkpoints WHERE chain_id=4663 LIMIT 1
+      )
+      SELECT COUNT(*) AS n
+      FROM launches l
+      LEFT JOIN pons_funding_receipts r ON r.launch_id=l.launch_id
+      LEFT JOIN pons_funding_scan_state s ON s.launch_id=l.launch_id
+      WHERE l.chain_id=4663
+        AND l.source='PONS_V2'
+        AND r.launch_id IS NULL
+        AND s.launch_id IS NULL
+        AND CAST(l.block_number AS INTEGER)<=COALESCE((SELECT tip FROM checkpoint),-1)
+        AND CAST(l.block_number AS INTEGER)>=(
+          SELECT CASE WHEN tip>200000 THEN tip-200000 ELSE 0 END FROM checkpoint
+        )
+    `).first<{n:number}>();
+    return Number(row?.n ?? 0);
   }
 
   private async assertLaunchAuthority(launch:PonsFundingLaunch):Promise<void> {

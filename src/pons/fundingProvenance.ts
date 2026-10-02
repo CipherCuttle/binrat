@@ -63,9 +63,11 @@ export interface PonsFundingSource {
 }
 
 export interface PonsFundingStore {
-  listPending(limit:number): Promise<PonsFundingLaunch[]>;
+  listPending(limit:number, nowMs:number): Promise<PonsFundingLaunch[]>;
   put(receipt:PonsPrelaunchNativeInboundReceipt): Promise<'INSERTED'|'DUPLICATE'>;
   markNoMatch(launch:PonsFundingLaunch, checkedAtMs:number): Promise<'INSERTED'|'DUPLICATE'>;
+  markRetry(launch:PonsFundingLaunch, code:string, retryAfterMs:number, nowMs:number): Promise<void>;
+  countRemaining(): Promise<number>;
 }
 
 export interface PonsFundingSyncReport {
@@ -73,8 +75,11 @@ export interface PonsFundingSyncReport {
   inserted:number;
   duplicates:number;
   noMatch:number;
+  failed:number;
   remaining:number;
 }
+
+export const PONS_FUNDING_FAILURE_RETRY_MS = 5 * 60_000;
 
 export interface FundingSourceRecurrence {
   sourceAddress: Hex;
@@ -300,7 +305,7 @@ export async function readPonsPrelaunchNativeInbound(
 export async function syncPonsFundingProvenance(
   source:PonsFundingSource,
   store:PonsFundingStore,
-  options:{limit:number;nowMs:number}
+  options:{limit:number;nowMs:number;failureRetryMs?:number}
 ):Promise<PonsFundingSyncReport> {
   if (!Number.isSafeInteger(options.limit) || options.limit<1 || options.limit>12) {
     throw new Error('PONS_FUNDING_LIMIT_INVALID');
@@ -308,11 +313,28 @@ export async function syncPonsFundingProvenance(
   if (!Number.isSafeInteger(options.nowMs) || options.nowMs<0) {
     throw new Error('PONS_FUNDING_NOW_INVALID');
   }
+  const failureRetryMs=options.failureRetryMs ?? PONS_FUNDING_FAILURE_RETRY_MS;
+  if (!Number.isSafeInteger(failureRetryMs) || failureRetryMs<1_000 || failureRetryMs>86_400_000) {
+    throw new Error('PONS_FUNDING_RETRY_MS_INVALID');
+  }
 
-  const launches=await store.listPending(options.limit);
-  let inserted=0,duplicates=0,noMatch=0;
+  const launches=await store.listPending(options.limit,options.nowMs);
+  if (launches.length===0) {
+    return {attempted:0,inserted:0,duplicates:0,noMatch:0,failed:0,remaining:await store.countRemaining()};
+  }
+  await source.assertAuthority();
+  let inserted=0,duplicates=0,noMatch=0,failed=0;
   for (const launch of launches) {
-    const receipt=await readPonsPrelaunchNativeInbound(source,launch);
+    let receipt:PonsPrelaunchNativeInboundReceipt|null;
+    try {
+      receipt=await readPonsPrelaunchNativeInbound(source,launch);
+    } catch(error) {
+      const code=fundingErrorCode(error);
+      if (isFatalFundingEvidenceError(code)) throw error;
+      await store.markRetry(launch,code,options.nowMs+failureRetryMs,options.nowMs);
+      failed+=1;
+      continue;
+    }
     if (!receipt) {
       const result=await store.markNoMatch(launch,options.nowMs);
       if (result==='INSERTED') noMatch+=1;
@@ -322,14 +344,25 @@ export async function syncPonsFundingProvenance(
     if (result==='INSERTED') inserted+=1;
     else duplicates+=1;
   }
-  const remaining=(await store.listPending(1)).length;
   return {
     attempted:launches.length,
     inserted,
     duplicates,
     noMatch,
-    remaining
+    failed,
+    remaining:await store.countRemaining()
   };
+}
+
+export function fundingErrorCode(error:unknown):string {
+  const raw=error instanceof Error ? error.message : String(error);
+  const code=raw.split(':',1)[0]?.trim() || 'PONS_FUNDING_UNKNOWN';
+  return /^[A-Z0-9_]{1,120}$/.test(code) ? code : 'PONS_FUNDING_UNKNOWN';
+}
+
+/** Provider transport errors are retryable; canonical evidence failures are never scan noise. */
+export function isFatalFundingEvidenceError(code:string):boolean {
+  return /(REORG|MISMATCH|CONFLICT|INVALID|DRIFT|UNMINED|NOT_PRELAUNCH|NOT_NATIVE|SOURCE_IS_DEPLOYER|AUTHORITY|HASH_MISSING|AFTER_BOUNDARY)/.test(code);
 }
 
 export async function buildPonsPrelaunchNativeInboundReceipt(input: {

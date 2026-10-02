@@ -776,7 +776,7 @@ export async function runCloudflarePonsFundingCycle(
   message:BinratSyncMessage,
   deps:CloudflareSyncDeps={now:Date.now}
 ):Promise<
-  | {status:'SUCCESS';attempted:number;inserted:number;duplicates:number;noMatch:number;remaining:number}
+  | {status:'SUCCESS';attempted:number;inserted:number;duplicates:number;noMatch:number;failed:number;remaining:number}
   | {status:'BUSY'}
   | {status:'RETRY';code:string}
 > {
@@ -784,13 +784,19 @@ export async function runCloudflarePonsFundingCycle(
     return {status:'RETRY',code:'PONS_FUNDING_MESSAGE_INVALID'};
   }
   if (env.BINRAT_PONS_FUNDING_ENABLED!=='true') {
-    return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0};
+    return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,failed:0,remaining:0};
   }
 
   const lease=new D1SyncLeaseStore(env.DB);
   if (!(await lease.claim(PONS_FUNDING_LEASE_NAME,message.cycleId,deps.now(),PONS_FUNDING_LEASE_MS))) {
     return {status:'BUSY'};
   }
+  let ponsWriterClaimed=false;
+  if (!(await lease.claim(PONS_SYNC_LEASE_NAME,message.cycleId,deps.now(),PONS_SYNC_LEASE_MS))) {
+    await lease.release(PONS_FUNDING_LEASE_NAME,message.cycleId);
+    return {status:'BUSY'};
+  }
+  ponsWriterClaimed=true;
   try {
     const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
     const runtimeAgeMs=runtime ? deps.now()-runtime.updatedAtMs : Number.POSITIVE_INFINITY;
@@ -802,7 +808,7 @@ export async function runCloudflarePonsFundingCycle(
       runtimeAgeMs<0 ||
       runtimeAgeMs>integerSetting(env.BINRAT_MAX_STATUS_AGE_MS,180_000,1_000,3_600_000)
     ) {
-      return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0};
+      return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,failed:0,remaining:0};
     }
     const source=deps.ponsFundingSource ?? new AlchemyPonsFundingSource({
       rpcUrl:resolveRobinhoodArchiveRpcUrl(env),
@@ -823,6 +829,7 @@ export async function runCloudflarePonsFundingCycle(
       inserted:report.inserted,
       duplicates:report.duplicates,
       noMatch:report.noMatch,
+      failed:report.failed,
       remaining:report.remaining
     }));
     return {status:'SUCCESS',...report};
@@ -831,6 +838,7 @@ export async function runCloudflarePonsFundingCycle(
     console.error(JSON.stringify({event:'PONS_FUNDING_FAILED',cycleId:message.cycleId,code}));
     return {status:'RETRY',code};
   } finally {
+    if (ponsWriterClaimed) await lease.release(PONS_SYNC_LEASE_NAME,message.cycleId);
     await lease.release(PONS_FUNDING_LEASE_NAME,message.cycleId);
   }
 }

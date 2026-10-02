@@ -102,6 +102,17 @@ CREATE TABLE IF NOT EXISTS pons_funding_scan_state (
 CREATE INDEX IF NOT EXISTS idx_pons_funding_scan_status
   ON pons_funding_scan_state(chain_id, status, launch_block);
 
+CREATE TABLE IF NOT EXISTS pons_funding_retry_state (
+  launch_id TEXT PRIMARY KEY REFERENCES launches(launch_id) ON DELETE CASCADE,
+  launch_block_hash TEXT NOT NULL,
+  failure_count INTEGER NOT NULL CHECK(failure_count >= 0),
+  retry_after_ms INTEGER NOT NULL,
+  last_error TEXT NOT NULL,
+  updated_at_ms INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_pons_funding_retry_schedule
+  ON pons_funding_retry_state(retry_after_ms, updated_at_ms);
+
 CREATE TABLE IF NOT EXISTS provenance_facts (
   fact_id TEXT PRIMARY KEY,
   chain_id INTEGER NOT NULL,

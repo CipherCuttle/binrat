@@ -5,6 +5,7 @@ import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import { D1Store } from '../src/cloudflare/d1Store.js';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
+import { D1SyncLeaseStore } from '../src/cloudflare/syncLease.js';
 import { runCloudflarePonsFundingCycle } from '../src/cloudflare/syncQueue.js';
 import type {
   PonsCanonicalTransaction,
@@ -115,7 +116,7 @@ test('disabled funding runtime never touches funding schema', async () => {
       {now:()=>1}
     );
     assert.deepEqual(result,{
-      status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0
+      status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,failed:0,remaining:0
     });
   } finally {
     db.close();
@@ -156,8 +157,8 @@ test('funding runtime obeys one-launch cycle bound and preserves launch authorit
     assert.equal(first.status,'SUCCESS');
     if(first.status!=='SUCCESS') assert.fail('expected success');
     assert.deepEqual(
-      {attempted:first.attempted,inserted:first.inserted,noMatch:first.noMatch,remaining:first.remaining},
-      {attempted:1,inserted:1,noMatch:0,remaining:1}
+      {attempted:first.attempted,inserted:first.inserted,noMatch:first.noMatch,failed:first.failed,remaining:first.remaining},
+      {attempted:1,inserted:1,noMatch:0,failed:0,remaining:1}
     );
 
     const countOne=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_receipts')
@@ -207,8 +208,8 @@ test('no-match creates private scan state but never a funding evidence receipt',
     assert.equal(result.status,'SUCCESS');
     if(result.status!=='SUCCESS') assert.fail('expected success');
     assert.deepEqual(
-      {attempted:result.attempted,inserted:result.inserted,noMatch:result.noMatch,remaining:result.remaining},
-      {attempted:1,inserted:0,noMatch:1,remaining:0}
+      {attempted:result.attempted,inserted:result.inserted,noMatch:result.noMatch,failed:result.failed,remaining:result.remaining},
+      {attempted:1,inserted:0,noMatch:1,failed:0,remaining:0}
     );
 
     const receipts=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_receipts')
@@ -254,7 +255,7 @@ test('funding runtime performs zero provider work when current Pons runtime is n
       {now:()=>1,ponsFundingSource:source}
     );
     assert.deepEqual(result,{
-      status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0
+      status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,failed:0,remaining:0
     });
     assert.equal(providerCalls,0);
   } finally {
@@ -280,6 +281,146 @@ test('enabled funding runtime requires archive Alchemy rail without injected sou
   }
 });
 
+test('transient provider failure backs off one launch without starving the backlog', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const older=launch({id:'6',block:100,token:11,pool:12,deployer:13});
+  const newer=launch({id:'7',block:110,token:14,pool:15,deployer:16});
+  try {
+    await store.putLaunch(older);
+    await store.putLaunch(newer);
+    await store.commitCheckpoint({blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null});
+    await putHealthyRuntime(db,10);
+    const base=sourceFor(new Map([[older.creator,{source:addr(93),transferBlock:95,valueWei:3_000n}]]));
+    const source:PonsFundingSource={
+      ...base,
+      async findLatestExternalNativeInbound(deployer,throughBlockInclusive) {
+        if (deployer===newer.creator) throw new Error('PONS_FUNDING_TRANSFERS_TIMEOUT');
+        return base.findLatestExternalNativeInbound(deployer,throughBlockInclusive);
+      }
+    };
+    const env={DB:db,BINRAT_PONS_FUNDING_ENABLED:'true',BINRAT_PONS_FUNDING_MAX_PER_CYCLE:'1'};
+    const failed=await runCloudflarePonsFundingCycle(
+      env,{kind:'PONS_FUNDING_CYCLE',cycleId:'funding-timeout',enqueuedAtMs:10},
+      {now:()=>10,ponsFundingSource:source}
+    );
+    assert.equal(failed.status,'SUCCESS');
+    if (failed.status!=='SUCCESS') assert.fail('expected backoff success');
+    assert.deepEqual(
+      {attempted:failed.attempted,failed:failed.failed,remaining:failed.remaining},
+      {attempted:1,failed:1,remaining:2}
+    );
+    const retry=await db.prepare(
+      'SELECT failure_count,retry_after_ms,last_error FROM pons_funding_retry_state WHERE launch_id=?'
+    ).bind(newer.launchId).first<{failure_count:number;retry_after_ms:number;last_error:string}>();
+    assert.deepEqual(retry,{failure_count:1,retry_after_ms:10+5*60_000,last_error:'PONS_FUNDING_TRANSFERS_TIMEOUT'});
+
+    const next=await runCloudflarePonsFundingCycle(
+      env,{kind:'PONS_FUNDING_CYCLE',cycleId:'funding-next',enqueuedAtMs:11},
+      {now:()=>11,ponsFundingSource:source}
+    );
+    assert.equal(next.status,'SUCCESS');
+    if (next.status!=='SUCCESS') assert.fail('expected backlog success');
+    assert.deepEqual(
+      {attempted:next.attempted,inserted:next.inserted,failed:next.failed,remaining:next.remaining},
+      {attempted:1,inserted:1,failed:0,remaining:1}
+    );
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+test('canonical integrity failure is never persisted as retry noise', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const value=launch({id:'8',block:110,token:17,pool:18,deployer:19});
+  try {
+    await store.putLaunch(value);
+    await store.commitCheckpoint({blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null});
+    await putHealthyRuntime(db,20);
+    const base=sourceFor(new Map([[value.creator,{source:addr(94),transferBlock:105,valueWei:4_000n}]]));
+    const source:PonsFundingSource={
+      ...base,
+      async getBlockPoint(blockNumber) {
+        const point=await base.getBlockPoint(blockNumber);
+        return blockNumber===value.blockNumber ? {...point,blockHash:hash(999)} : point;
+      }
+    };
+    const result=await runCloudflarePonsFundingCycle(
+      {DB:db,BINRAT_PONS_FUNDING_ENABLED:'true'},
+      {kind:'PONS_FUNDING_CYCLE',cycleId:'funding-integrity',enqueuedAtMs:20},
+      {now:()=>20,ponsFundingSource:source}
+    );
+    assert.equal(result.status,'RETRY');
+    const retry=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_retry_state').first<{n:number}>();
+    const receipts=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_receipts').first<{n:number}>();
+    const scans=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_scan_state').first<{n:number}>();
+    assert.equal(Number(retry?.n),0);
+    assert.equal(Number(receipts?.n),0);
+    assert.equal(Number(scans?.n),0);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
+test('funding collector yields to the canonical Pons writer lease before provider work', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  let providerCalls=0;
+  try {
+    const lease=new D1SyncLeaseStore(db);
+    assert.equal(await lease.claim('binrat:pons-sync','normal-pons-sync',1,120_000),true);
+    const source:PonsFundingSource={
+      async assertAuthority(){providerCalls+=1;},
+      async getBlockPoint(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');},
+      async findLatestExternalNativeInbound(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');},
+      async getTransaction(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');}
+    };
+    const result=await runCloudflarePonsFundingCycle(
+      {DB:db,BINRAT_PONS_FUNDING_ENABLED:'true'},
+      {kind:'PONS_FUNDING_CYCLE',cycleId:'funding-race',enqueuedAtMs:1},
+      {now:()=>1,ponsFundingSource:source}
+    );
+    assert.deepEqual(result,{status:'BUSY'});
+    assert.equal(providerCalls,0);
+    await lease.release('binrat:pons-sync','normal-pons-sync');
+  } finally {
+    db.close();
+  }
+});
+
+test('funding collector never reads a launch beyond the canonical checkpoint', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  let providerCalls=0;
+  try {
+    await store.putLaunch(launch({id:'9',block:121,token:20,pool:21,deployer:22}));
+    await store.commitCheckpoint({blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null});
+    await putHealthyRuntime(db,1);
+    const source:PonsFundingSource={
+      async assertAuthority(){providerCalls+=1;},
+      async getBlockPoint(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');},
+      async findLatestExternalNativeInbound(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');},
+      async getTransaction(){providerCalls+=1; throw new Error('SHOULD_NOT_RUN');}
+    };
+    const result=await runCloudflarePonsFundingCycle(
+      {DB:db,BINRAT_PONS_FUNDING_ENABLED:'true'},
+      {kind:'PONS_FUNDING_CYCLE',cycleId:'funding-checkpoint',enqueuedAtMs:1},
+      {now:()=>1,ponsFundingSource:source}
+    );
+    assert.deepEqual(result,{status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,failed:0,remaining:0});
+    assert.equal(providerCalls,0);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
+
 test('funding migration is additive and idempotent against a pre-funding schema', async () => {
   const db=new D1CompatDatabase();
   try {
@@ -296,11 +437,15 @@ test('funding migration is additive and idempotent against a pre-funding schema'
     const scanTable=await db.prepare(
       "SELECT name FROM sqlite_master WHERE type='table' AND name='pons_funding_scan_state'"
     ).first<{name:string}>();
+    const retryTable=await db.prepare(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='pons_funding_retry_state'"
+    ).first<{name:string}>();
     const sourceIndex=await db.prepare(
       "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_pons_funding_source'"
     ).first<{name:string}>();
     assert.equal(receiptTable?.name,'pons_funding_receipts');
     assert.equal(scanTable?.name,'pons_funding_scan_state');
+    assert.equal(retryTable?.name,'pons_funding_retry_state');
     assert.equal(sourceIndex?.name,'idx_pons_funding_source');
   } finally {
     db.close();
