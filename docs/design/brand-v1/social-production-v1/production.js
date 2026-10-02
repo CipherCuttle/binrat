@@ -1,0 +1,147 @@
+(() => {
+  const payload = window.BINRAT_SOCIAL_PRODUCTION_FIXTURES;
+  const renderer = window.BINRAT_SOCIAL_RENDER;
+  if (!payload || !renderer) {
+    document.body.dataset.productionError = "missing-fixtures-or-renderer";
+    return;
+  }
+
+  const COVERAGE_STATES = new Set(["COMPLETE","PARTIAL","UNKNOWN","MISSING"]);
+  const EVIDENCE_STATES = new Set(["OBSERVED","DERIVED","PATTERN","UNKNOWN","COMPLETE","PARTIAL","UNVERIFIED","MISSING"]);
+  const CTA = {
+    OPEN_RECEIPTS:"OPEN RECEIPTS →",
+    OPEN_CASE:"OPEN CASE →",
+    DIG_DEEPER:"DIG DEEPER →"
+  };
+  const SEMANTIC_REJECTS = [
+    { id:"unsupported-role-upgrade", rx:/\b(?:creator|founder|dev)\b/i },
+    { id:"unsupported-human-identity", rx:/\b(?:same|this)\s+(?:human|person|team)\b/i },
+    { id:"recurrence-to-skill-or-outcome", rx:/\b(?:skill(?:ed)?|expertise|expert|profitable|profitability|winning|knows? what (?:it|they) (?:is|are) doing)\b/i },
+    { id:"missing-to-positive-verdict", rx:/\b(?:safe|clean|legit|benign|all clear|nothing suspicious)\b/i },
+    { id:"capability-status-upgrade", rx:/\bENGINEERING_PASS\b.{0,48}\b(?:live|deployed|shipped)\b|\b(?:live|deployed|shipped)\b.{0,48}\bENGINEERING_PASS\b/i }
+  ];
+
+  const authoredText = (f) => [
+    f.headline,
+    f.literalExplanation,
+    f.literalSummary,
+    f.literalFinding,
+    f.observation,
+    f.evidenceStrip,
+    ...(f.facts || []).flatMap((fact) => [fact.label, fact.value]),
+    f.cta?.label
+  ].filter(Boolean).join("\n");
+
+  function assertContract(f) {
+    if (!COVERAGE_STATES.has(f.coverage)) throw new Error(`${f.fixtureId}: invalid coverage`);
+    if (!f.source || !EVIDENCE_STATES.has(f.source.state)) throw new Error(`${f.fixtureId}: invalid source evidence state`);
+    if (!f.cta || CTA[f.cta.action] !== f.cta.label) throw new Error(`${f.fixtureId}: invalid CTA pair`);
+    for (const fact of f.facts || []) {
+      if (fact.state && !EVIDENCE_STATES.has(fact.state)) throw new Error(`${f.fixtureId}: invalid fact evidence state`);
+    }
+    const semanticBad = SEMANTIC_REJECTS.find(({rx}) => rx.test(authoredText(f)));
+    if (semanticBad) throw new Error(`${f.fixtureId}: semantic upgrade ${semanticBad.id}`);
+  }
+
+  const esc = (value) => String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+  function metaFor(f) {
+    return {
+      proof: esc(f.proof),
+      source: esc(`${f.source.label} · ${f.source.value} · ${f.source.state}`),
+      brand: "BINRAT"
+    };
+  }
+
+  function toViewModel(f) {
+    if (f.family === "receipt") {
+      return {
+        eyebrow: esc(`RECEIPT / ${f.receiptId}`),
+        headline: esc(f.headline),
+        literal: esc(f.literalExplanation),
+        facts: [
+          ["DEPLOYER", esc(f.deployer)],
+          ["OBSERVED", esc(f.observation)],
+          ["COVERAGE", esc(f.coverage), f.coverage],
+          ["SOURCE STATE", esc(f.source.state), f.source.state]
+        ],
+        action: esc(f.cta.label)
+      };
+    }
+
+    if (f.family === "case-file") {
+      return {
+        eyebrow: esc(`CASE FILE / ${f.caseId}`),
+        headline: esc(f.headline),
+        literal: esc(f.literalSummary),
+        boundary: esc(`COVERAGE ${f.coverage} · ${f.evidenceBoundary}`),
+        facts: f.facts.map((fact) => [esc(fact.label), esc(fact.value), fact.state || null]),
+        action: esc(f.cta.label)
+      };
+    }
+
+    return {
+      eyebrow: "RAT FOUND SOMETHING / DEMO",
+      headline: esc(f.headline),
+      literal: esc(f.literalFinding),
+      evidence: esc(f.evidenceStrip),
+      evidenceState: f.coverage,
+      action: esc(f.cta.label)
+    };
+  }
+
+  function densityFor(f) {
+    const n = f.headline.length;
+    if (n > 32) return "max";
+    if (n > 24) return "long";
+    return "normal";
+  }
+
+  function renderFixture(f, ratio) {
+    assertContract(f);
+    const html = renderer.renderCard(f.family, ratio, toViewModel(f), metaFor(f));
+    const attrs = ` data-fixture-id="${esc(f.fixtureId)}" data-source-state="${esc(f.source.state)}" data-coverage="${esc(f.coverage)}"`;
+    return html.replace(
+      '<article class="social-card ',
+      `<article${attrs} class="social-card production-card copy-${densityFor(f)} `
+    );
+  }
+
+  function renderSheet(fixtures, ratio, root) {
+    root.dataset.ratio = ratio;
+    root.innerHTML = fixtures.map((f) => `
+      <section class="contact-item" data-contact-fixture="${esc(f.fixtureId)}">
+        <div class="contact-label">
+          <strong>${esc(f.family.toUpperCase())}</strong>
+          <span>${esc(f.fixtureId)} · ${esc(f.coverage)} / ${esc(f.source.state)}</span>
+        </div>
+        <div class="contact-frame ${ratio}">
+          <div class="contact-scale">${renderFixture(f, ratio)}</div>
+        </div>
+      </section>
+    `).join("");
+  }
+
+  function renderNativeTests(fixtures, root) {
+    root.innerHTML = fixtures.flatMap((f) => ["wide","square"].map((ratio) => `
+      <div class="native-test" data-native-fixture="${esc(f.fixtureId)}" data-native-ratio="${ratio}">
+        ${renderFixture(f, ratio)}
+      </div>
+    `)).join("");
+  }
+
+  const params = new URLSearchParams(location.search);
+  const ratio = params.get("ratio") === "square" ? "square" : "wide";
+  renderSheet(payload.fixtures, ratio, document.querySelector("#contact-sheet"));
+  renderNativeTests(payload.fixtures, document.querySelector("#native-tests"));
+
+  window.BINRAT_SOCIAL_PRODUCTION = Object.freeze({
+    renderFixture,
+    toViewModel
+  });
+})();

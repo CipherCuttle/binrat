@@ -1,0 +1,334 @@
+{
+  "schemaVersion": "binrat.social-fixtures/1",
+  "proof": "DEMO / NON-LIVE",
+  "fixtures": [
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "receipt-short-complete",
+      "proof": "DEMO / NON-LIVE",
+      "family": "receipt",
+      "receiptId": "DEMO-R001",
+      "headline": "SMELLS FAMILIAR.",
+      "literalExplanation": "One retained demo launch points to this short synthetic deployer label. That is the whole claim.",
+      "deployer": "DEMO:0xB1",
+      "observation": "1 retained demo launch",
+      "coverage": "COMPLETE",
+      "source": {
+        "label": "Pons V2 demo",
+        "value": "Pons V2 / Robinhood 4663 / demo receipt fixture",
+        "state": "COMPLETE"
+      },
+      "cta": {
+        "label": "OPEN RECEIPTS →",
+        "action": "OPEN_RECEIPTS"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "receipt-long-partial",
+      "proof": "DEMO / NON-LIVE",
+      "family": "receipt",
+      "receiptId": "DEMO-R012",
+      "headline": "SAME DEPLOYER. TWELVE LAUNCHES. AGAIN.",
+      "literalExplanation": "This source-reported demo deployer appears across 12 retained demo launches. Coverage is partial, so recurrence stays a pattern, not a verdict.",
+      "deployer": "DEMO_0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "observation": "12 retained demo launches",
+      "coverage": "PARTIAL",
+      "source": {
+        "label": "Pons V2 demo archive",
+        "value": "Pons V2 / Robinhood 4663 / deliberately long archive source description proving wrap without hiding partial evidence",
+        "state": "PARTIAL"
+      },
+      "cta": {
+        "label": "OPEN RECEIPTS →",
+        "action": "OPEN_RECEIPTS"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "receipt-missing-source",
+      "proof": "DEMO / NON-LIVE",
+      "family": "receipt",
+      "receiptId": "DEMO-R404",
+      "headline": "RECEIPT EXISTS. SOURCE DOESN'T.",
+      "literalExplanation": "A demo observation was retained, but its supporting source artifact is intentionally missing in this fixture.",
+      "deployer": "DEMO_DEPLOYER_MISSING_SOURCE",
+      "observation": "1 retained observation; source artifact missing",
+      "coverage": "MISSING",
+      "source": {
+        "label": "Demo archive",
+        "value": "No demo source artifact retained for this mutation case",
+        "state": "MISSING"
+      },
+      "cta": {
+        "label": "OPEN RECEIPTS →",
+        "action": "OPEN_RECEIPTS"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "receipt-unknown-one-launch",
+      "proof": "DEMO / NON-LIVE",
+      "family": "receipt",
+      "receiptId": "DEMO-RUNK",
+      "headline": "ONE LAUNCH. THAT'S ALL WE KNOW.",
+      "literalExplanation": "The demo index contains one launch for this synthetic deployer. Earlier history is unknown in this fixture.",
+      "deployer": "DEMO_DEPLOYER_UNKNOWN",
+      "observation": "1 indexed demo launch",
+      "coverage": "UNKNOWN",
+      "source": {
+        "label": "Demo index",
+        "value": "Bounded demo index snapshot; earlier history intentionally unresolved",
+        "state": "UNKNOWN"
+      },
+      "cta": {
+        "label": "OPEN RECEIPTS →",
+        "action": "OPEN_RECEIPTS"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "case-three-facts-complete",
+      "proof": "DEMO / NON-LIVE",
+      "family": "case-file",
+      "caseId": "DEMO-C003",
+      "headline": "FOUND SOMETHING.",
+      "literalSummary": "Three demo facts line up around one source-reported deployer. Every fact in this fixture has complete demo coverage.",
+      "facts": [
+        {
+          "label": "DEPLOYER",
+          "value": "DEMO_DEPLOYER_03",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "TRAIL",
+          "value": "3 retained demo launches",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "OUTCOMES",
+          "value": "3 of 3 demo outcomes observed",
+          "state": "COMPLETE"
+        }
+      ],
+      "evidenceBoundary": "PATTERN · NOT A VERDICT",
+      "coverage": "COMPLETE",
+      "source": {
+        "label": "Demo case archive",
+        "value": "Pons V2 / Robinhood 4663 / complete demo case bundle",
+        "state": "COMPLETE"
+      },
+      "cta": {
+        "label": "OPEN CASE →",
+        "action": "OPEN_CASE"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "case-five-facts-partial",
+      "proof": "DEMO / NON-LIVE",
+      "family": "case-file",
+      "caseId": "DEMO-C012",
+      "headline": "TWELVE LAUNCHES. ONE TRAIL. DIG.",
+      "literalSummary": "The same synthetic deployer label recurs across 12 demo launches. Five compact facts fit; partial coverage stays explicit.",
+      "facts": [
+        {
+          "label": "DEPLOYER",
+          "value": "DEMO_0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+          "state": "PARTIAL"
+        },
+        {
+          "label": "TRAIL",
+          "value": "12 retained demo launches",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "OUTCOMES",
+          "value": "7 observed / 5 unresolved",
+          "state": "PARTIAL"
+        },
+        {
+          "label": "FIRST SEEN",
+          "value": "DEMO block 70000001",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "LAST SEEN",
+          "value": "DEMO block 70000999",
+          "state": "COMPLETE"
+        }
+      ],
+      "evidenceBoundary": "PATTERN · NOT A VERDICT",
+      "coverage": "PARTIAL",
+      "source": {
+        "label": "Demo case archive",
+        "value": "Pons V2 / Robinhood 4663 / bounded demo history with intentionally incomplete outcome coverage",
+        "state": "PARTIAL"
+      },
+      "cta": {
+        "label": "DIG DEEPER →",
+        "action": "DIG_DEEPER"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "case-max-headline-unknown",
+      "proof": "DEMO / NON-LIVE",
+      "family": "case-file",
+      "caseId": "DEMO-CUNK",
+      "headline": "TWELVE LAUNCHES. SAME TRAIL. KEEP DIGGING.",
+      "literalSummary": "This fixture deliberately ends at the boundary of the demo index. Anything before that point remains unknown.",
+      "facts": [
+        {
+          "label": "TRAIL",
+          "value": "4 retained demo launches",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "EARLIER HISTORY",
+          "value": "Not established in this demo fixture",
+          "state": "UNKNOWN"
+        },
+        {
+          "label": "OUTCOMES",
+          "value": "Coverage window not established",
+          "state": "UNKNOWN"
+        }
+      ],
+      "evidenceBoundary": "PATTERN · NOT A VERDICT",
+      "coverage": "UNKNOWN",
+      "source": {
+        "label": "Demo bounded index",
+        "value": "Synthetic bounded index receipt used to verify UNKNOWN stays prominent under dense copy",
+        "state": "UNKNOWN"
+      },
+      "cta": {
+        "label": "OPEN CASE →",
+        "action": "OPEN_CASE"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "case-missing-five-facts",
+      "proof": "DEMO / NON-LIVE",
+      "family": "case-file",
+      "caseId": "DEMO-C404",
+      "headline": "NO RECEIPT. NO CLAIM.",
+      "literalSummary": "The demo case has structural facts, but the source artifact for the historical link is missing. The card must say so plainly.",
+      "facts": [
+        {
+          "label": "CURRENT",
+          "value": "DEMO_TOKEN_404",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "DEPLOYER",
+          "value": "DEMO_DEPLOYER_404",
+          "state": "COMPLETE"
+        },
+        {
+          "label": "LINK",
+          "value": "Historical source artifact missing",
+          "state": "MISSING"
+        },
+        {
+          "label": "OUTCOMES",
+          "value": "Not evaluated",
+          "state": "UNKNOWN"
+        },
+        {
+          "label": "COVERAGE",
+          "value": "MISSING",
+          "state": "MISSING"
+        }
+      ],
+      "evidenceBoundary": "PATTERN · NOT A VERDICT",
+      "coverage": "MISSING",
+      "source": {
+        "label": "Demo source",
+        "value": "Missing by construction; no source receipt is available for the claimed historical link",
+        "state": "MISSING"
+      },
+      "cta": {
+        "label": "OPEN CASE →",
+        "action": "OPEN_CASE"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "found-complete",
+      "proof": "DEMO / NON-LIVE",
+      "family": "rat-found",
+      "headline": "FOUND SOMETHING.",
+      "literalFinding": "A synthetic deployer label appears in three retained demo launches. Complete demo coverage supports only that recurrence claim.",
+      "evidenceStrip": "3 DEMO LAUNCHES · COMPLETE",
+      "coverage": "COMPLETE",
+      "source": {
+        "label": "Demo receipt bundle",
+        "value": "Pons V2 / Robinhood 4663 / demo recurrence bundle",
+        "state": "COMPLETE"
+      },
+      "cta": {
+        "label": "OPEN RECEIPTS →",
+        "action": "OPEN_RECEIPTS"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "found-partial-max-headline",
+      "proof": "DEMO / NON-LIVE",
+      "family": "rat-found",
+      "headline": "ONE SCRAP. KEEP DIGGING.",
+      "literalFinding": "Twelve demo launches share the same synthetic deployer label, but outcome coverage is partial. The trail is not a verdict.",
+      "evidenceStrip": "12 DEMO LAUNCHES · PARTIAL",
+      "coverage": "PARTIAL",
+      "source": {
+        "label": "Demo trail",
+        "value": "Bounded demo trail with seven observed outcomes and five deliberately unresolved outcomes",
+        "state": "PARTIAL"
+      },
+      "cta": {
+        "label": "DIG DEEPER →",
+        "action": "DIG_DEEPER"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "found-unknown-long-source",
+      "proof": "DEMO / NON-LIVE",
+      "family": "rat-found",
+      "headline": "NOT ENOUGH TO CALL IT.",
+      "literalFinding": "One demo recurrence exists inside a bounded window. Earlier history is unknown, so the finding stays small.",
+      "evidenceStrip": "1 DEMO RECURRENCE · UNKNOWN",
+      "coverage": "UNKNOWN",
+      "source": {
+        "label": "Long demo source label",
+        "value": "Pons V2 / Robinhood 4663 / deliberately overlong source text proving the footer wraps instead of erasing uncertainty",
+        "state": "UNKNOWN"
+      },
+      "cta": {
+        "label": "OPEN RECEIPTS →",
+        "action": "OPEN_RECEIPTS"
+      }
+    },
+    {
+      "schemaVersion": "binrat.social/1",
+      "fixtureId": "found-missing",
+      "proof": "DEMO / NON-LIVE",
+      "family": "rat-found",
+      "headline": "SOURCE WENT MISSING.",
+      "literalFinding": "The demo card has a remembered pointer but no retained source artifact. Nothing stronger is claimed.",
+      "evidenceStrip": "SOURCE ARTIFACT · MISSING",
+      "coverage": "MISSING",
+      "source": {
+        "label": "Demo source",
+        "value": "No retained demo source artifact",
+        "state": "MISSING"
+      },
+      "cta": {
+        "label": "OPEN CASE →",
+        "action": "OPEN_CASE"
+      }
+    }
+  ]
+}
