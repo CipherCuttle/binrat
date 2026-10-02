@@ -1,0 +1,63 @@
+name: BINRAT Social Template Proof
+
+on:
+  push:
+    branches:
+      - design/binrat-brand-system-v1
+    paths:
+      - ".github/workflows/binrat-social-proof.yml"
+      - "tools/brand/render-social-proof.py"
+      - "docs/design/brand-v1/social-v1/**"
+      - "docs/design/brand-v1/proofs/identity-v1/rat-avatar-128.png"
+      - "docs/design/brand-v1/proofs/identity-v1/rat-profile-512.png"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  social-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/binrat-brand-system-v1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install browser proof dependency
+        run: |
+          python -m pip install "playwright==1.55.0"
+          python -m playwright install --with-deps chromium
+
+      - name: Render social proofs
+        run: python tools/brand/render-social-proof.py
+
+      - name: Verify outputs
+        run: |
+          set -euo pipefail
+          for f in             receipt-wide-1200x675.png             case-file-wide-1200x675.png             rat-found-wide-1200x675.png             receipt-square-1080.png             case-file-square-1080.png             rat-found-square-1080.png             manifest.json
+          do
+            test -s "docs/design/brand-v1/proofs/social-v1/$f"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binrat-social-proof-v1
+          path: docs/design/brand-v1/proofs/social-v1/
+          if-no-files-found: error
+
+      - name: Commit deterministic proof
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/design/brand-v1/proofs/social-v1/
+          if git diff --cached --quiet; then
+            echo "Proof already current."
+            exit 0
+          fi
+          git commit -m "build(brand): render social templates v1 [skip ci]"
+          git push origin HEAD:design/binrat-brand-system-v1
