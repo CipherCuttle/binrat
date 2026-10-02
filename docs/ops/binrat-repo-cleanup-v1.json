@@ -1,42 +1,46 @@
 {
   "manifest": "binrat-repo-cleanup-v1",
-  "generatedAt": "2026-10-02T21:23:16.513589Z",
+  "generatedAt": "2026-10-02T22:29:16.882230+00:00",
   "repo": "CipherCuttle/binrat",
   "summary": {
-    "openPrCount": 87,
-    "remoteBranchCount": 144,
-    "recordCount": 231,
+    "openPrCount": 88,
+    "remoteBranchCount": 147,
+    "recordCount": 235,
     "countsByCategory": {
-      "A": 27,
-      "B": 34,
-      "C": 2,
-      "D": 82,
+      "A": 28,
+      "B": 24,
+      "C": 0,
+      "D": 90,
       "E": 43,
-      "F": 20,
-      "G": 23
+      "F": 23,
+      "G": 27
     },
     "prCountsByCategory": {
       "A": 9,
-      "B": 16,
-      "C": 1,
-      "D": 30,
+      "B": 11,
+      "C": 0,
+      "D": 33,
       "E": 18,
-      "F": 3,
-      "G": 10
+      "F": 4,
+      "G": 13
     },
     "branchCountsByCategory": {
-      "A": 18,
-      "B": 18,
-      "C": 1,
-      "D": 52,
+      "A": 19,
+      "B": 13,
+      "C": 0,
+      "D": 57,
       "E": 25,
-      "F": 17,
-      "G": 13
+      "F": 19,
+      "G": 14
     },
     "notes": [
       "Remote branch count is 144 real branches; the 'origin' line emitted by git for-each-ref refs/remotes/origin is the origin/HEAD symbolic ref and is excluded.",
       "integration/binrat-brand-v1-composed appeared during the audit (2026-10-02) and is classified A (contains design/binrat-brand-system-v1 as ancestor).",
-      "git ancestry shows feat/binrat-pons-funding-provenance-v1 (#91) is NOT a commit-ancestor of #93/#103 heads despite being their declared PR base; all funding deletion is therefore gated on post-closure ancestry verification."
+      "git ancestry shows feat/binrat-pons-funding-provenance-v1 (#91) is NOT a commit-ancestor of #93/#103 heads despite being their declared PR base; all funding deletion is therefore gated on post-closure ancestry verification.",
+      "V1 update (2026-10-02): +3 branches (integration/binrat-case-canonical-v1, design/binrat-roadmap-brand-v1, ops/binrat-repo-cleanup-manifest-v1) and +1 PR (#104) since the 81868c2 snapshot; 0 refs gone; 0 head-SHA moves.",
+      "V1 update: old Case stack PRs #94/#98/#99/#100/#101 (+ their branch refs) reclassified B->G: canonical #104 reconstruction containment NOT proven (no commit-ancestry; multiple changed files differ/missing).",
+      "V1 update: #102 + ops/binrat-case-surface-private-preview-v1 reclassified A->F (preview donor until canonical private preview is reconstructed); #70 + feat/binrat-roadmap-living-scenes-v1 reclassified C->D (proven commit-ancestor of design/binrat-roadmap-brand-v1).",
+      "V1 update: G->D for codex/binrat-prelaunch-release-a911c23, feat/binrat-robinhood-live-rat-v1, feat/binrat-telegram-ux-v2, release/binrat-autonomous-rat-v1-1 (+ PRs #59/#60): proven commit-ancestors of the ACTIVE canonical/brand line."
     ]
   },
   "top10": [
@@ -77,8 +81,8 @@
       "why": "Superseded by Rat Trap projection + Case Model intelligence."
     },
     {
-      "ref": "#56/#58/#59/#60 (autonomous-rat stack)",
-      "why": "Stranded on dead prelaunch base; needs owner decision, then close 4 PRs."
+      "ref": "#56/#57/#58 (autonomous-rat stack)",
+      "why": "Stranded on dead prelaunch base; needs owner decision, then close 3 PRs. (V1 update: #59/#60 reclassified D - proven ancestors of the active canonical line.)"
     }
   ],
   "records": [
@@ -145,14 +149,14 @@
     {
       "ref": "codex/binrat-prelaunch-release-a911c23",
       "type": "branch",
-      "category": "G",
+      "category": "D",
       "headSha": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
       "base": null,
-      "reason": "Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.",
-      "replacement": null,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from G): head is a proven commit-ancestor of ACTIVE integration/binrat-case-canonical-v1 @ 9e8b37ec and integration/binrat-brand-v1-composed @ 0343d381 (git merge-base --is-ancestor=YES, verified 2026-10-02); content is preserved in the active canonical line. Not merged into main, so the ref is kept (safeToDeleteBranch=false).",
+      "replacement": "integration/binrat-brand-v1-composed",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": true
+      "requiresOwnerDecision": false
     },
     {
       "ref": "codex/prelaunch-hardening-v1",
@@ -553,50 +557,50 @@
     {
       "ref": "feat/binrat-case-adapter-v1",
       "type": "branch",
-      "category": "B",
+      "category": "G",
       "headSha": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
       "base": "feat/binrat-case-model-convergence-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #99 and base of PR #100 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): part of the old Case stack superseded by canonical reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec). Commit-ancestry and blob-content containment of the old stack in the canonical are NOT proven (heads are not ancestors; several changed files differ or are missing in the canonical). Preserved for historical/reconstruction evidence; owner must decide before any deletion.",
+      "replacement": "integration/binrat-case-canonical-v1 (PR #104)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "feat/binrat-case-endpoint-v1",
       "type": "branch",
-      "category": "B",
+      "category": "G",
       "headSha": "7a96a3c111af14b6d34585cd425904a59068b4be",
       "base": "feat/binrat-case-adapter-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #100 and base of PR #101 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): part of the old Case stack superseded by canonical reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec). Commit-ancestry and blob-content containment of the old stack in the canonical are NOT proven (heads are not ancestors; several changed files differ or are missing in the canonical). Preserved for historical/reconstruction evidence; owner must decide before any deletion.",
+      "replacement": "integration/binrat-case-canonical-v1 (PR #104)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "feat/binrat-case-model-convergence-v1",
       "type": "branch",
-      "category": "B",
+      "category": "G",
       "headSha": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
       "base": "feat/binrat-pons-funding-recurrence-read-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #98 and base of PR #99 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): part of the old Case stack superseded by canonical reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec). Commit-ancestry and blob-content containment of the old stack in the canonical are NOT proven (heads are not ancestors; several changed files differ or are missing in the canonical). Preserved for historical/reconstruction evidence; owner must decide before any deletion.",
+      "replacement": "integration/binrat-case-canonical-v1 (PR #104)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "feat/binrat-case-model-v1",
       "type": "branch",
-      "category": "B",
+      "category": "G",
       "headSha": "9dbc44b923b9e86b57d81aa9b1b7c573f840fa07",
       "base": "feat/binrat-pons-token-identity-production-v1",
-      "reason": "ACTIVE_ANCESTOR: base of open PR #98 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): part of the old Case stack superseded by canonical reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec). Commit-ancestry and blob-content containment of the old stack in the canonical are NOT proven (heads are not ancestors; several changed files differ or are missing in the canonical). Preserved for historical/reconstruction evidence; owner must decide before any deletion.",
+      "replacement": "integration/binrat-case-canonical-v1 (PR #104)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "feat/binrat-case-surface-v1",
@@ -604,7 +608,7 @@
       "category": "B",
       "headSha": "c9bcb01c01433147ca6d774ed807efafffaa437e",
       "base": "feat/binrat-case-endpoint-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #101 and base of PR #102 (Case stack).",
+      "reason": "ACTIVE_ANCESTOR (V1 update 2026-10-02): base of preserved preview PR #102 (F) and head of PR #101 (G, owner decision pending). NOT contained in canonical #104: head c9bcb01c is not an ancestor of 9e8b37ec and 8 of 23 changed files differ / 1 missing (src/pons/fundingSync.ts) vs the canonical. Preserved for reconstruction evidence; safeToDeleteBranch=false.",
       "replacement": null,
       "safeToClose": false,
       "safeToDeleteBranch": false,
@@ -889,14 +893,14 @@
     {
       "ref": "feat/binrat-pons-funding-recurrence-read-v1",
       "type": "branch",
-      "category": "B",
+      "category": "G",
       "headSha": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
       "base": "feat/binrat-pons-funding-collector-v1",
-      "reason": "ACTIVE_ANCESTOR: Case stack base (PR #94). NOTE: currently based on superseded #93 branch - pending rebase onto #103.",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): part of the old Case stack superseded by canonical reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec). Commit-ancestry and blob-content containment of the old stack in the canonical are NOT proven (heads are not ancestors; several changed files differ or are missing in the canonical). Preserved for historical/reconstruction evidence; owner must decide before any deletion.",
+      "replacement": "integration/binrat-case-canonical-v1 (PR #104)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "feat/binrat-pons-funding-storage-v1",
@@ -1213,11 +1217,11 @@
     {
       "ref": "feat/binrat-roadmap-living-scenes-v1",
       "type": "branch",
-      "category": "C",
+      "category": "D",
       "headSha": "ab844e4814d553b4485b7d3351e176c8376712a6",
       "base": "feat/binrat-telegram-messaging-v1",
-      "reason": "Roadmap living-scenes donor: not mergeable as-is and its old visual/mascot implementation is NOT canonical, but retains extractable mechanics (see extract field). Never delete.",
-      "replacement": null,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from C DONOR): feat/binrat-roadmap-living-scenes-v1 @ ab844e48 is provably contained in ACTIVE design/binrat-roadmap-brand-v1 @ 95c7e782 (git merge-base --is-ancestor=YES; 0 unique commits; verified 2026-10-02). Extract list (scene sequencing, lighting/effect mechanics, transition logic, roadmap interaction patterns) is preserved via ancestry in the active Roadmap V2 line. Ref kept preserved (safeToDeleteBranch=false).",
+      "replacement": "design/binrat-roadmap-brand-v1",
       "safeToClose": false,
       "safeToDeleteBranch": false,
       "requiresOwnerDecision": false,
@@ -1231,14 +1235,14 @@
     {
       "ref": "feat/binrat-robinhood-live-rat-v1",
       "type": "branch",
-      "category": "G",
+      "category": "D",
       "headSha": "5fed3ed3c6f6405617348e150275378b23c24a59",
       "base": "release/binrat-autonomous-rat-v1-1",
-      "reason": "Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.",
-      "replacement": null,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from G): head is a proven commit-ancestor of ACTIVE integration/binrat-case-canonical-v1 @ 9e8b37ec and integration/binrat-brand-v1-composed @ 0343d381 (git merge-base --is-ancestor=YES, verified 2026-10-02); content is preserved in the active canonical line. Not merged into main, so the ref is kept (safeToDeleteBranch=false).",
+      "replacement": "integration/binrat-brand-v1-composed",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": true
+      "requiresOwnerDecision": false
     },
     {
       "ref": "feat/binrat-telegram-messaging-v1",
@@ -1291,14 +1295,14 @@
     {
       "ref": "feat/binrat-telegram-ux-v2",
       "type": "branch",
-      "category": "G",
+      "category": "D",
       "headSha": "7fece313958558a7bb9789e9592aafee894422b5",
       "base": "feat/binrat-robinhood-live-rat-v1",
-      "reason": "Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.",
-      "replacement": null,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from G): head is a proven commit-ancestor of ACTIVE integration/binrat-case-canonical-v1 @ 9e8b37ec and integration/binrat-brand-v1-composed @ 0343d381 (git merge-base --is-ancestor=YES, verified 2026-10-02); content is preserved in the active canonical line. Not merged into main, so the ref is kept (safeToDeleteBranch=false).",
+      "replacement": "integration/binrat-brand-v1-composed",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": true
+      "requiresOwnerDecision": false
     },
     {
       "ref": "feat/binrat-trash-trails-v1",
@@ -1483,10 +1487,10 @@
     {
       "ref": "ops/binrat-case-surface-private-preview-v1",
       "type": "branch",
-      "category": "A",
+      "category": "F",
       "headSha": "f5934950011455061569075fc6111d0022a11629",
       "base": "feat/binrat-case-surface-v1",
-      "reason": "ACTIVE: current work (funding/Case/Brand/production stack, 2026-10-02). Must remain.",
+      "reason": "OPS_RECEIPT / private-preview donor (V1 update 2026-10-02, reclassified from A): preserved until the canonical private preview is reconstructed on top of #104 (integration/binrat-case-canonical-v1). safeToDeleteBranch=false.",
       "replacement": null,
       "safeToClose": false,
       "safeToDeleteBranch": false,
@@ -1747,14 +1751,14 @@
     {
       "ref": "release/binrat-autonomous-rat-v1-1",
       "type": "branch",
-      "category": "G",
+      "category": "D",
       "headSha": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
       "base": null,
-      "reason": "Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.",
-      "replacement": null,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from G): head is a proven commit-ancestor of ACTIVE integration/binrat-case-canonical-v1 @ 9e8b37ec and integration/binrat-brand-v1-composed @ 0343d381 (git merge-base --is-ancestor=YES, verified 2026-10-02); content is preserved in the active canonical line. Not merged into main, so the ref is kept (safeToDeleteBranch=false).",
+      "replacement": "integration/binrat-brand-v1-composed",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": true
+      "requiresOwnerDecision": false
     },
     {
       "ref": "research/pons-gates-holder-econ-v1",
@@ -2347,26 +2351,26 @@
     {
       "ref": "#59 (feat/binrat-robinhood-live-rat-v1)",
       "type": "pr",
-      "category": "G",
+      "category": "D",
       "headSha": "5fed3ed3c6f6405617348e150275378b23c24a59",
       "base": "release/binrat-autonomous-rat-v1-1",
-      "reason": "Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.",
-      "replacement": null,
-      "safeToClose": false,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from G): head is a proven commit-ancestor of ACTIVE integration/binrat-case-canonical-v1 @ 9e8b37ec and integration/binrat-brand-v1-composed @ 0343d381 (git merge-base --is-ancestor=YES, verified 2026-10-02); content is preserved in the active canonical line. Not merged into main, so the ref is kept (safeToDeleteBranch=false). Safe to close the PR.",
+      "replacement": "integration/binrat-brand-v1-composed",
+      "safeToClose": true,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": true
+      "requiresOwnerDecision": false
     },
     {
       "ref": "#60 (feat/binrat-telegram-ux-v2)",
       "type": "pr",
-      "category": "G",
+      "category": "D",
       "headSha": "7fece313958558a7bb9789e9592aafee894422b5",
       "base": "feat/binrat-robinhood-live-rat-v1",
-      "reason": "Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.",
-      "replacement": null,
-      "safeToClose": false,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from G): head is a proven commit-ancestor of ACTIVE integration/binrat-case-canonical-v1 @ 9e8b37ec and integration/binrat-brand-v1-composed @ 0343d381 (git merge-base --is-ancestor=YES, verified 2026-10-02); content is preserved in the active canonical line. Not merged into main, so the ref is kept (safeToDeleteBranch=false). Safe to close the PR.",
+      "replacement": "integration/binrat-brand-v1-composed",
+      "safeToClose": true,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": true
+      "requiresOwnerDecision": false
     },
     {
       "ref": "#63 (codex/telegram-as-code-private-v2)",
@@ -2455,12 +2459,12 @@
     {
       "ref": "#70 (feat/binrat-roadmap-living-scenes-v1)",
       "type": "pr",
-      "category": "C",
+      "category": "D",
       "headSha": "ab844e4814d553b4485b7d3351e176c8376712a6",
       "base": "feat/binrat-telegram-messaging-v1",
-      "reason": "Roadmap living-scenes donor: not mergeable as-is and its old visual/mascot implementation is NOT canonical, but retains extractable mechanics (see extract field). Never delete.",
-      "replacement": null,
-      "safeToClose": false,
+      "reason": "SUPERSEDED (V1 update 2026-10-02, reclassified from C DONOR): feat/binrat-roadmap-living-scenes-v1 @ ab844e48 is provably contained in ACTIVE design/binrat-roadmap-brand-v1 @ 95c7e782 (git merge-base --is-ancestor=YES; 0 unique commits; verified 2026-10-02). Extract list (scene sequencing, lighting/effect mechanics, transition logic, roadmap interaction patterns) is preserved via ancestry in the active Roadmap V2 line. Ref kept preserved (safeToDeleteBranch=false).",
+      "replacement": "design/binrat-roadmap-brand-v1",
+      "safeToClose": true,
       "safeToDeleteBranch": false,
       "requiresOwnerDecision": false
     },
@@ -2734,7 +2738,7 @@
       "category": "D",
       "headSha": "1175423a864ed6ac28c5473a55b850443f65076e",
       "base": "feat/binrat-pons-funding-provenance-v1",
-      "reason": "Authoritative funding verdict: every valuable #93 invariant was ported into canonical #103 and verified by test. safeToDeleteBranch=false until #103 PR closure + ancestry verification (note: git ancestry check shows funding-collector is NOT an ancestor of funding-storage; both share base #91).",
+      "reason": "Authoritative funding verdict: every valuable #93 invariant was ported into canonical #103 and verified by test. STRENGTHENED (V1 update 2026-10-02): feat/binrat-pons-funding-storage-v1 @ 90296437 is now a proven commit-ancestor of canonical Case reconstruction #104 head 9e8b37ec (merge-base --is-ancestor=YES) and #104 CI is green (check SUCCESS, wrangler-dry-run SUCCESS, 2026-10-02), proving #103 is reachable in the canonical line. #93 head 1175423a is NOT an ancestor of the canonical (10 unique commits) and its content differs. safeToClose=true; safeToDeleteBranch=false pending #103 closure + ancestry verification.",
       "replacement": "#103 feat/binrat-pons-funding-storage-v1",
       "safeToClose": true,
       "safeToDeleteBranch": false,
@@ -2743,14 +2747,14 @@
     {
       "ref": "#94 (feat/binrat-pons-funding-recurrence-read-v1)",
       "type": "pr",
-      "category": "B",
+      "category": "G",
       "headSha": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
       "base": "feat/binrat-pons-funding-collector-v1",
-      "reason": "ACTIVE_ANCESTOR: Case stack base (PR #94). NOTE: currently based on superseded #93 branch - pending rebase onto #103.",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): canonical Case reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec) is the new Case authority, but containment of this PR's feature delta is NOT proven: head a604f869 is not a commit-ancestor of 9e8b37ec (merge-base --is-ancestor=NO), and 9 files changed vs merge-base: 2 blob-identical in canonical, 6 differ, 1 missing (src/pons/fundingSync.ts). The canonical is a reconstruction with divergent content in those files. Owner must decide: accept the reconstruction as faithful successor (then close this PR) or require a fidelity review. Branch ref preserved (safeToDeleteBranch=false).",
+      "replacement": "#104 (integration/binrat-case-canonical-v1)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "#95 (ops/binrat-pons-replay-production-inspect-v1)",
@@ -2791,58 +2795,58 @@
     {
       "ref": "#98 (feat/binrat-case-model-convergence-v1)",
       "type": "pr",
-      "category": "B",
+      "category": "G",
       "headSha": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
       "base": "feat/binrat-pons-funding-recurrence-read-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #98 and base of PR #99 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): canonical Case reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec) is the new Case authority, but containment of this PR's feature delta is NOT proven: head 70bb71d0 is not a commit-ancestor of 9e8b37ec (merge-base --is-ancestor=NO), and 11 files changed vs merge-base: 4 blob-identical in canonical, 6 differ, 1 missing (src/pons/fundingSync.ts). The canonical is a reconstruction with divergent content in those files. Owner must decide: accept the reconstruction as faithful successor (then close this PR) or require a fidelity review. Branch ref preserved (safeToDeleteBranch=false).",
+      "replacement": "#104 (integration/binrat-case-canonical-v1)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "#99 (feat/binrat-case-adapter-v1)",
       "type": "pr",
-      "category": "B",
+      "category": "G",
       "headSha": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
       "base": "feat/binrat-case-model-convergence-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #99 and base of PR #100 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): canonical Case reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec) is the new Case authority, but containment of this PR's feature delta is NOT proven: head 192b1da1 is not a commit-ancestor of 9e8b37ec (merge-base --is-ancestor=NO), and 18 files changed vs merge-base: 10 blob-identical in canonical, 7 differ, 1 missing (src/pons/fundingSync.ts). The canonical is a reconstruction with divergent content in those files. Owner must decide: accept the reconstruction as faithful successor (then close this PR) or require a fidelity review. Branch ref preserved (safeToDeleteBranch=false).",
+      "replacement": "#104 (integration/binrat-case-canonical-v1)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "#100 (feat/binrat-case-endpoint-v1)",
       "type": "pr",
-      "category": "B",
+      "category": "G",
       "headSha": "7a96a3c111af14b6d34585cd425904a59068b4be",
       "base": "feat/binrat-case-adapter-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #100 and base of PR #101 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): canonical Case reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec) is the new Case authority, but containment of this PR's feature delta is NOT proven: head 7a96a3c1 is not a commit-ancestor of 9e8b37ec (merge-base --is-ancestor=NO), and 20 files changed vs merge-base: 10 blob-identical in canonical, 9 differ, 1 missing (src/pons/fundingSync.ts). The canonical is a reconstruction with divergent content in those files. Owner must decide: accept the reconstruction as faithful successor (then close this PR) or require a fidelity review. Branch ref preserved (safeToDeleteBranch=false).",
+      "replacement": "#104 (integration/binrat-case-canonical-v1)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "#101 (feat/binrat-case-surface-v1)",
       "type": "pr",
-      "category": "B",
+      "category": "G",
       "headSha": "c9bcb01c01433147ca6d774ed807efafffaa437e",
       "base": "feat/binrat-case-endpoint-v1",
-      "reason": "ACTIVE_ANCESTOR: head of PR #101 and base of PR #102 (Case stack).",
-      "replacement": null,
+      "reason": "UNKNOWN_REVIEW_REQUIRED (V1 update 2026-10-02): canonical Case reconstruction PR #104 (integration/binrat-case-canonical-v1 @ 9e8b37ec) is the new Case authority, but containment of this PR's feature delta is NOT proven: head c9bcb01c is not a commit-ancestor of 9e8b37ec (merge-base --is-ancestor=NO), and 23 files changed vs merge-base: 14 blob-identical in canonical, 8 differ, 1 missing (src/pons/fundingSync.ts). The canonical is a reconstruction with divergent content in those files. Owner must decide: accept the reconstruction as faithful successor (then close this PR) or require a fidelity review. Branch ref preserved (safeToDeleteBranch=false).",
+      "replacement": "#104 (integration/binrat-case-canonical-v1)",
       "safeToClose": false,
       "safeToDeleteBranch": false,
-      "requiresOwnerDecision": false
+      "requiresOwnerDecision": true
     },
     {
       "ref": "#102 (ops/binrat-case-surface-private-preview-v1)",
       "type": "pr",
-      "category": "A",
+      "category": "F",
       "headSha": "f5934950011455061569075fc6111d0022a11629",
       "base": "feat/binrat-case-surface-v1",
-      "reason": "ACTIVE: current work (funding/Case/Brand/production stack, 2026-10-02). Must remain.",
+      "reason": "OPS_RECEIPT / private-preview donor (V1 update 2026-10-02, reclassified from A): preserved until the canonical private preview is reconstructed on top of #104 (integration/binrat-case-canonical-v1). safeToDeleteBranch=false.",
       "replacement": null,
       "safeToClose": false,
       "safeToDeleteBranch": false,
@@ -2856,6 +2860,50 @@
       "base": "feat/binrat-pons-funding-provenance-v1",
       "reason": "ACTIVE: current work (funding/Case/Brand/production stack, 2026-10-02). Must remain.",
       "replacement": null,
+      "safeToClose": false,
+      "safeToDeleteBranch": false,
+      "requiresOwnerDecision": false
+    },
+    {
+      "ref": "integration/binrat-case-canonical-v1",
+      "type": "branch",
+      "category": "A",
+      "headSha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "base": "feat/binrat-pons-funding-storage-v1",
+      "reason": "ACTIVE (new authority, V1 update 2026-10-02): canonical Case reconstruction head (PR #104). Based directly on feat/binrat-pons-funding-storage-v1 @ 90296437 (merge-base = 90296437). CI green (check SUCCESS, wrangler-dry-run SUCCESS). Must remain.",
+      "safeToClose": false,
+      "safeToDeleteBranch": false,
+      "requiresOwnerDecision": false
+    },
+    {
+      "ref": "#104 (integration/binrat-case-canonical-v1)",
+      "type": "pr",
+      "category": "A",
+      "headSha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "base": "feat/binrat-pons-funding-storage-v1",
+      "reason": "ACTIVE (new authority, V1 update 2026-10-02): canonical Case stack reconstruction. CI green (check SUCCESS, wrangler-dry-run SUCCESS, 2026-10-02). Supersedes the old Case stack #94/#98/#99/#100/#101 (containment of the old deltas unproven - those are G pending owner decision). Must remain.",
+      "safeToClose": false,
+      "safeToDeleteBranch": false,
+      "requiresOwnerDecision": false
+    },
+    {
+      "ref": "design/binrat-roadmap-brand-v1",
+      "type": "branch",
+      "category": "A",
+      "headSha": "95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee",
+      "base": "integration/binrat-brand-v1-composed",
+      "reason": "ACTIVE (new authority, V1 update 2026-10-02): Roadmap V2 built directly on Brand V1 composed @ 0343d381 (first-parent). Provably contains feat/binrat-roadmap-living-scenes-v1 @ ab844e48 (commit-ancestor, 0 unique commits). Must remain.",
+      "safeToClose": false,
+      "safeToDeleteBranch": false,
+      "requiresOwnerDecision": false
+    },
+    {
+      "ref": "ops/binrat-repo-cleanup-manifest-v1",
+      "type": "branch",
+      "category": "F",
+      "headSha": "81868c2438684964e7c1bc0059e6fa3a44a84890",
+      "base": "main",
+      "reason": "OPS_RECEIPT (V1 update 2026-10-02): this cleanup manifest branch itself (based on main @ 9fea1c8). headSha records the pre-update snapshot head 81868c2; the update commit advances this branch. Retain ref.",
       "safeToClose": false,
       "safeToDeleteBranch": false,
       "requiresOwnerDecision": false

@@ -268,3 +268,73 @@ SUMMARY: JSON parses.
 - `plan/binrat-token-prelaunch-control-v1` - Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.
 - `release/binrat-autonomous-rat-v1-1` - Autonomous-Rat/prelaunch stack stranded on dead pre-reset base codex/binrat-prelaunch-release-a911c23; not in current lineage and not referenced on main docs, but no explicit rejection evidence - owner must decide abandon vs donor.
 
+
+## 9. V1 update (2026-10-02, post-81868c2 snapshot)
+
+This section documents the first refresh of manifest v1 against current remote state. Read-only except for this documentation commit on `ops/binrat-repo-cleanup-manifest-v1`. Nothing was closed, merged, deleted, deployed, or reconfigured.
+
+### 9.1 Snapshot delta vs 81868c2
+
+- Live inventory regenerated (`git fetch origin --prune`; `gh pr list --state open --limit 200 --json number,title,headRefName,baseRefName,updatedAt,headRefOid`; `git for-each-ref refs/remotes/origin` excluding the `origin`/`origin/HEAD` symbolic line): **88 open PRs + 147 remote branches (235 records)**.
+- New branches (3): `integration/binrat-case-canonical-v1`, `design/binrat-roadmap-brand-v1`, `ops/binrat-repo-cleanup-manifest-v1`.
+- New PRs (1): #104. Gone branches/PRs: **none**. Head-SHA moves: **none** (verified by join of snapshot vs live SHAs for all 144 old branches and 87 old PRs).
+- New authority SHAs verified with `git cat-file -t` + ref match: case-canonical `9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3`, brand-composed `0343d3815e509c45ef6b4991a7f8d438e2f4deb1`, roadmap-brand-v1 `95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee`, funding-storage `90296437d8846df71311f9523a4e7a29d9968798` (unchanged).
+
+### 9.2 New authorities added as records
+
+- `integration/binrat-case-canonical-v1` (branch, **A ACTIVE**) @ `9e8b37ec` — PR #104 head; based directly on `feat/binrat-pons-funding-storage-v1` @ `90296437` (merge-base = `90296437`). CI green: `check` SUCCESS, `wrangler-dry-run` SUCCESS (2026-10-02).
+- `#104 (integration/binrat-case-canonical-v1)` (PR, **A ACTIVE**) — "feat: reconstruct canonical Pons Case stack", base `feat/binrat-pons-funding-storage-v1`.
+- `design/binrat-roadmap-brand-v1` (branch, **A ACTIVE**) @ `95c7e782` — Roadmap V2 built directly on Brand V1 composed `0343d381` (first-parent).
+- `ops/binrat-repo-cleanup-manifest-v1` (branch, **F OPS_RECEIPT**) @ `81868c2` — this manifest branch itself (based on main @ `9fea1c8`).
+- `integration/binrat-brand-v1-composed` was already recorded as A in the 81868c2 snapshot; unchanged.
+
+### 9.3 Old Case stack reclassification (evidence-based)
+
+Method: for each old head H, `git merge-base --is-ancestor H 9e8b37ec`; unique-commit counts (`git rev-list --count`); and blob-content containment — for every file changed by H vs its merge-base with the canonical, compare blob SHAs between H and the canonical.
+
+**Result: containment NOT proven.** None of the old heads is a commit-ancestor of the canonical (it is a reconstruction), and in every case multiple changed files differ or are missing in the canonical (e.g. `src/pons/fundingSync.ts` missing; `cloudflare/schema.sql`, `src/cloudflare/ponsFundingStore.ts`, `src/cloudflare/syncQueue.ts` differ):
+
+| PR | head | files changed vs merge-base | identical / differ / missing |
+|----|------|------------------------------|------------------------------|
+| #94 | `a604f869` | 9 | 2 / 6 / 1 |
+| #98 | `70bb71d0` | 11 | 4 / 6 / 1 |
+| #99 | `192b1da1` | 18 | 10 / 7 / 1 |
+| #100 | `7a96a3c1` | 20 | 10 / 9 / 1 |
+| #101 | `c9bcb01c` | 23 | 14 / 8 / 1 |
+
+- PRs **#94, #98, #99, #100, #101: B → G UNKNOWN_REVIEW_REQUIRED** (`requiresOwnerDecision=true`, `safeToClose=false`). Replacement noted as #104, but the reconstruction's fidelity to the old deltas is unproven — owner must decide accept-vs-review before closure.
+- Branch refs `feat/binrat-pons-funding-recurrence-read-v1`, `feat/binrat-case-model-v1`, `feat/binrat-case-model-convergence-v1`, `feat/binrat-case-adapter-v1`, `feat/binrat-case-endpoint-v1`: **B → G** (`requiresOwnerDecision=true`, `safeToDeleteBranch=false`) — preserved for historical/reconstruction evidence. NOT marked safe to delete merely because #104 contains equivalent work.
+- `feat/binrat-case-surface-v1` @ `c9bcb01c`: **stays B ACTIVE_ANCESTOR** (`safeToDeleteBranch=false`) — base of the preserved #102 preview chain; not contained in the canonical (8/23 files differ, 1 missing).
+- **#102 / `ops/binrat-case-surface-private-preview-v1`: A → F OPS_RECEIPT** (private-preview donor, preserved until the canonical private preview is reconstructed on top of #104; `safeToDeleteBranch=false`).
+
+### 9.4 Roadmap donor reassessment
+
+- **#70 / `feat/binrat-roadmap-living-scenes-v1` @ `ab844e48`: C → D SUPERSEDED** — containment PROVEN: `git merge-base --is-ancestor ab844e48 95c7e782` = YES with **0 unique commits**; the extract list (scene sequencing, lighting/effect mechanics, transition logic, roadmap interaction patterns) is preserved via ancestry in the ACTIVE Roadmap V2 line. Ref kept (`safeToDeleteBranch=false`); PR `safeToClose=true`.
+
+### 9.5 #93 strengthened
+
+- `#93 (feat/binrat-pons-funding-collector-v1)` stays **D SUPERSEDED** (replacement #103, `safeToClose=true`, `safeToDeleteBranch=false`). Strengthened reason: `feat/binrat-pons-funding-storage-v1` @ `90296437` is now a proven commit-ancestor of the canonical #104 head `9e8b37ec`, and #104 CI is green — proving canonical #103 is reachable; #93 head `1175423a` is not an ancestor of the canonical (10 unique commits) and its content differs.
+
+### 9.6 G records resolved by ancestry evidence
+
+Proven commit-ancestors of the ACTIVE canonical line (`git merge-base --is-ancestor` = YES against both `9e8b37ec` and `0343d381`), reclassified **G → D SUPERSEDED** (replacement `integration/binrat-brand-v1-composed`; refs kept, `safeToDeleteBranch=false`; PRs `safeToClose=true`):
+
+- Branches: `codex/binrat-prelaunch-release-a911c23`, `feat/binrat-robinhood-live-rat-v1`, `feat/binrat-telegram-ux-v2`, `release/binrat-autonomous-rat-v1-1`.
+- PRs: #59, #60.
+
+Remaining **G (19 branch + 8 PR = 27 records)**: no proven ancestry into main or the active line — kept G per the never-guess rule.
+
+### 9.7 Updated counts
+
+| Category | Branches | PRs | Total |
+|----------|----------|-----|-------|
+| A ACTIVE | 19 | 9 | 28 |
+| B ACTIVE_ANCESTOR | 13 | 11 | 24 |
+| C DONOR | 0 | 0 | 0 |
+| D SUPERSEDED | 57 | 33 | 90 |
+| E HISTORICAL_EXPERIMENT | 25 | 18 | 43 |
+| F OPS_RECEIPT | 19 | 4 | 23 |
+| G UNKNOWN_REVIEW_REQUIRED | 14 | 13 | 27 |
+| **Total** | **147** | **88** | **235** |
+
+Full invariant verification (coverage, uniqueness, safety invariants, protected SHAs, live-SHA match, count cross-check) was re-run for this update; receipt in the verification log of the update commit.
