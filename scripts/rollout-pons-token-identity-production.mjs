@@ -235,7 +235,7 @@ function latestIdentitySample(){
   const result=d1Query(
     "SELECT i.identity_id,i.launch_id,i.token,i.observed_block,i.observed_block_hash,i.name,i.symbol,i.decimals,i.evidence_digest,"+
     "l.token AS launch_token FROM pons_token_identity_receipts i JOIN launches l ON l.launch_id=i.launch_id "+
-    "WHERE i.chain_id=4663 ORDER BY rowid DESC LIMIT 5;"
+    "WHERE i.chain_id=4663 ORDER BY i.rowid DESC LIMIT 5;"
   );
   return {count,rows:result?.[0]?.results??[]};
 }
@@ -295,14 +295,19 @@ writeFileSync(PROVISION,JSON.stringify({
 try{
   originalVersion=currentActiveVersion();
   const originalConfig=viewVersion(originalVersion);
-  gate(plain(originalConfig,'BINRAT_RELEASE_SHA')===EXPECTED_LIVE_SHA,'LIVE_RELEASE_SHA_DRIFT');
+  const liveRelease=plain(originalConfig,'BINRAT_RELEASE_SHA');
+  const liveIdentityEnabled=plain(originalConfig,'BINRAT_PONS_TOKEN_IDENTITY_ENABLED');
+  const liveIdentityBound=plain(originalConfig,'BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE');
+  const resumingDisabled=
+    liveRelease===REVIEWED_HEAD&&liveIdentityEnabled==='false'&&liveIdentityBound==='1';
+  const startingOriginal=
+    liveRelease===EXPECTED_LIVE_SHA&&liveIdentityEnabled===null&&liveIdentityBound===null;
+  gate(startingOriginal||resumingDisabled,'LIVE_IDENTITY_STATE_DRIFT');
   gate(plain(originalConfig,'BINRAT_PONS_OUTCOME_ENABLED')==='true','O2_ENABLED_STATE_DRIFT');
   gate(plain(originalConfig,'BINRAT_PONS_OUTCOME_MAX_PER_CYCLE')==='1','O2_BOUND_STATE_DRIFT');
   gate(secretPresent(originalConfig,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'),'ARCHIVE_SECRET_MISSING');
-  gate(plain(originalConfig,'BINRAT_PONS_TOKEN_IDENTITY_ENABLED')===null,'IDENTITY_FLAG_ALREADY_PRESENT_UNEXPECTED');
-  gate(plain(originalConfig,'BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE')===null,'IDENTITY_BOUND_ALREADY_PRESENT_UNEXPECTED');
 
-  await healthyPons('Pre-migration Pons probe');
+  await healthyPons(resumingDisabled?'Resume-disabled Pons probe':'Pre-migration Pons probe');
 
   writeConfig('false');
   cli(['deploy','--dry-run','--config',CONFIG],{timeout:180_000});
@@ -311,37 +316,46 @@ try{
   const cutoff=checkpointBlock();
   const authorityBefore=authorityFingerprint(cutoff);
   const beforeTable=identityTableState();
-  gate(beforeTable.tableCount===0||(beforeTable.tableCount===1&&beforeTable.rows===0),'IDENTITY_PREEXISTING_STATE_UNEXPECTED');
 
-  if(beforeTable.tableCount===0){
-    cli(['d1','execute','DB','--remote','--yes','--file',MIGRATION,'--config',CONFIG],{timeout:180_000});
+  let disabledConfig;
+  if(resumingDisabled){
+    gate(beforeTable.tableCount===1,'IDENTITY_RESUME_TABLE_MISSING');
+    disabledVersion=originalVersion;
+    disabledConfig=originalConfig;
+    note('IDENTITY_RESUME_DISABLED_STATE '+JSON.stringify({disabledVersion,beforeTable,authority:authorityBefore}));
+    await healthyPons('Resume-disabled verification Pons probe');
+  }else{
+    gate(beforeTable.tableCount===0||(beforeTable.tableCount===1&&beforeTable.rows===0),'IDENTITY_PREEXISTING_STATE_UNEXPECTED');
+    if(beforeTable.tableCount===0){
+      cli(['d1','execute','DB','--remote','--yes','--file',MIGRATION,'--config',CONFIG],{timeout:180_000});
+    }
+    const afterMigration=identityTableState();
+    gate(afterMigration.tableCount===1&&afterMigration.rows===0,'IDENTITY_MIGRATION_VERIFY_FAILED');
+    const authorityAfterMigration=authorityFingerprint(cutoff);
+    gate(authorityAfterMigration.digest===authorityBefore.digest&&authorityAfterMigration.total===authorityBefore.total,
+      'IDENTITY_MIGRATION_MUTATED_LAUNCH_AUTHORITY');
+    note('IDENTITY_REMOTE_D1_MIGRATION_PASS '+JSON.stringify({beforeTable,afterMigration,authority:authorityAfterMigration}));
+
+    const disabledTag='identity-disabled-'+REVIEWED_HEAD.slice(0,12);
+    disabledVersion=uploadVersion(disabledTag,'BINRAT #88 identity disabled production candidate');
+    disabledConfig=viewVersion(disabledVersion);
+    assertBindingDelta(
+      originalConfig,disabledConfig,
+      new Map([['BINRAT_RELEASE_SHA',{before:EXPECTED_LIVE_SHA,after:REVIEWED_HEAD}]]),
+      new Map([
+        ['BINRAT_PONS_TOKEN_IDENTITY_ENABLED',{type:'plain_text',text:'false'}],
+        ['BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE',{type:'plain_text',text:'1'}]
+      ])
+    );
+    gate(secretPresent(disabledConfig,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'),'DISABLED_ARCHIVE_SECRET_MISSING');
+    note('IDENTITY_DISABLED_VERSION_PARITY_PASS '+disabledVersion);
+
+    deployedStage='DISABLED_ATTEMPT';
+    deployVersion(disabledVersion,'BINRAT #88 identity disabled production canary');
+    deployedStage='DISABLED';
+    await waitDisabled();
+    note('IDENTITY_DISABLED_PRODUCTION_VERIFY_PASS');
   }
-  const afterMigration=identityTableState();
-  gate(afterMigration.tableCount===1&&afterMigration.rows===0,'IDENTITY_MIGRATION_VERIFY_FAILED');
-  const authorityAfterMigration=authorityFingerprint(cutoff);
-  gate(authorityAfterMigration.digest===authorityBefore.digest&&authorityAfterMigration.total===authorityBefore.total,
-    'IDENTITY_MIGRATION_MUTATED_LAUNCH_AUTHORITY');
-  note('IDENTITY_REMOTE_D1_MIGRATION_PASS '+JSON.stringify({beforeTable,afterMigration,authority:authorityAfterMigration}));
-
-  const disabledTag='identity-disabled-'+REVIEWED_HEAD.slice(0,12);
-  disabledVersion=uploadVersion(disabledTag,'BINRAT #88 identity disabled production candidate');
-  const disabledConfig=viewVersion(disabledVersion);
-  assertBindingDelta(
-    originalConfig,disabledConfig,
-    new Map([['BINRAT_RELEASE_SHA',{before:EXPECTED_LIVE_SHA,after:REVIEWED_HEAD}]]),
-    new Map([
-      ['BINRAT_PONS_TOKEN_IDENTITY_ENABLED',{type:'plain_text',text:'false'}],
-      ['BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE',{type:'plain_text',text:'1'}]
-    ])
-  );
-  gate(secretPresent(disabledConfig,'BINRAT_ROBINHOOD_ARCHIVE_RPC_URL'),'DISABLED_ARCHIVE_SECRET_MISSING');
-  note('IDENTITY_DISABLED_VERSION_PARITY_PASS '+disabledVersion);
-
-  deployedStage='DISABLED_ATTEMPT';
-  deployVersion(disabledVersion,'BINRAT #88 identity disabled production canary');
-  deployedStage='DISABLED';
-  await waitDisabled();
-  note('IDENTITY_DISABLED_PRODUCTION_VERIFY_PASS');
 
   writeConfig('true');
   const activeTag='identity-active-'+REVIEWED_HEAD.slice(0,12);
