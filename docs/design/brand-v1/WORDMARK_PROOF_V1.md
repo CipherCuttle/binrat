@@ -1,6 +1,6 @@
 # BINRAT Wordmark / Lockup Proof V1
 
-Status: **audition gate**. No wordmark variant is canonical until owner review.
+Status: **APPROVED / FROZEN Brand V1 lockup decision**.
 
 ## Scope
 
@@ -89,9 +89,8 @@ The orange `RAT` accent adds immediate visual memory but creates an avoidable me
 
 The accent treatment may still appear in ordinary campaign typography when justified, but it should not define the canonical wordmark.
 
-## Proposed freeze
+## Frozen decision — owner approved 2026-10-02
 
-Pending explicit owner approval:
 
 - canonical core lockup → **A / PURE**;
 - core wordmark → unmodified Geist Sans `BINRAT`, heavy weight, tight tracking;
@@ -100,3 +99,19 @@ Pending explicit owner approval:
 - C-style split-color wordmark → not canonical.
 
 No custom glyph drawing or pictorial vector mark is proposed.
+
+
+### Authority
+
+Owner explicitly approved the proposed A / PURE direction on 2026-10-02.
+
+This freezes:
+
+- primary wordmark: unmodified heavy Geist Sans `BINRAT`;
+- canonical horizontal lockup: Rat Zero deterministic avatar crop + wordmark;
+- optional secondary metadata: detachable Geist Mono evidence tab;
+- split-color `BIN/RAT` treatment: not canonical;
+- no custom glyph surgery;
+- no pictorial SVG/vector rat logo.
+
+Changing the primary wordmark or mascot mark requires a new explicit Brand decision.
