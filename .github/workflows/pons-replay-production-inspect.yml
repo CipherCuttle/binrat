@@ -1,0 +1,52 @@
+name: pons-replay-production-inspect
+
+on:
+  push:
+    branches:
+      - ops/binrat-pons-replay-production-inspect-v1
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: ${{ contains(github.event.head_commit.message, '[inspect-pons-replay-production]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Inspect production Replay Lab read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          test -n "${BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:-}"
+          pnpm exec tsx scripts/inspect-pons-replay-production.ts | tee "$RUNNER_TEMP/pons-replay-production-inspection.json"
+
+      - name: Preserve bounded Replay inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-replay-production-inspection
+          path: ${{ runner.temp }}/pons-replay-production-inspection.json
+          retention-days: 7
+          if-no-files-found: warn
