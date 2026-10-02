@@ -45,6 +45,10 @@ The workflow pins Python, Pillow, Playwright, and the Playwright Chromium bundle
 
 The workflow renders twice and compares every export SHA-256 in the same environment. Any byte drift fails the job before generated outputs are committed.
 
+### Social proof geometry normalization
+
+The frozen Social V1 source proofs are one raster row taller than their declared targets (1200×676 instead of 1200×675; 1080×1081 instead of 1080×1080). The export layer removes only that extra bottom row when present. It does not mutate the frozen source proofs, reflow copy, redraw artwork, or change the composition contract.
+
 ## Distribution tree
 
 \`\`\`text
