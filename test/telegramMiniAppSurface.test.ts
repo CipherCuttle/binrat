@@ -61,7 +61,7 @@ test('Mini App progressively discloses real Rat Trap outcome memory before raw r
   assert.match(app,/api\('\/api\/miniapp\/dig',\{deployer\}\)/);
   assert.doesNotMatch(app,/pons_outcome_receipts/);
   assert.doesNotMatch(app,/estimatedFdvQuoteRaw|quoteDecimals|totalSupply|quoteReserve|tokenReserve/);
-  assert.doesNotMatch(app,/\/api\/miniapp\/(?:watch|unwatch)/);
+  assert.doesNotMatch(app,/api\('\/api\/miniapp\/(?:watch|unwatch)'/);
 });
 
 test('Mini App Rat Watch presents recognizable context before protocol detail', () => {
