@@ -1,0 +1,1002 @@
+{
+  "schemaVersion": "binrat.brand-export/1",
+  "status": "DISTRIBUTION_PACK_V1",
+  "authority": {
+    "branch": "design/binrat-brand-system-v1",
+    "commit": "25a54278e6a5d8eb6f5a568e9e8f05d39ea21a4c",
+    "ratZeroSha256": "43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+    "geistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+  },
+  "generation": {
+    "command": "python tools/brand/render-export-pack.py",
+    "verifyCommand": "python tools/brand/render-export-pack.py --verify",
+    "version": "binrat.brand-export/1.0.0",
+    "fonts": {
+      "GeistSans": "https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/Geist/webfonts/Geist%5Bwght%5D.woff2",
+      "GeistMono": "https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/GeistMono/webfonts/GeistMono%5Bwght%5D.woff2",
+      "vendored": false
+    }
+  },
+  "records": [
+    {
+      "name": "canonical-horizontal-dark",
+      "role": "canonical horizontal lockup",
+      "path": "exports/logo/canonical-horizontal-dark-1200x320.png",
+      "dimensions": [
+        1200,
+        320
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg",
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:5ae066bb2b9fcbc647d59f8abf9e86c2eeab240e56113a1d64654c3c929ebbd9",
+      "intendedSurfaces": [
+        "web",
+        "social headers",
+        "editorial"
+      ],
+      "backgroundAssumptions": "Opaque Brand V1 near-black proof background.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "canonical-horizontal-light",
+      "role": "canonical horizontal lockup",
+      "path": "exports/logo/canonical-horizontal-light-1200x320.png",
+      "dimensions": [
+        1200,
+        320
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg",
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:6857c697c9be3618f91cedce501c5272f0071127271ec1fdcd3192597d3dc051",
+      "intendedSurfaces": [
+        "web",
+        "social headers",
+        "editorial"
+      ],
+      "backgroundAssumptions": "Opaque Brand V1 bone/paper proof background.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "wordmark-dark",
+      "role": "single-color BINRAT wordmark",
+      "path": "exports/logo/wordmark-dark-1000x280.png",
+      "dimensions": [
+        1000,
+        280
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:3ef1d840e5e2dce581ec7bb7e8206534c9f649bcea5f89957153c59356dec987",
+      "intendedSurfaces": [
+        "web",
+        "social",
+        "editorial"
+      ],
+      "backgroundAssumptions": "Bone wordmark on near-black proof background; use where dark-context contrast is guaranteed.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "wordmark-light",
+      "role": "single-color BINRAT wordmark",
+      "path": "exports/logo/wordmark-light-1000x280.png",
+      "dimensions": [
+        1000,
+        280
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:473a12c31cf5ebe9082f2e79ecdb48c70fe5e7f3dfa2bb0bebe3cd1d5738e7bd",
+      "intendedSurfaces": [
+        "web",
+        "social",
+        "editorial"
+      ],
+      "backgroundAssumptions": "Near-black wordmark on bone/paper proof background; use where light-context contrast is guaranteed.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-avatar-512",
+      "role": "Rat Zero avatar crop",
+      "path": "exports/logo/rat-avatar-512.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:6bb9cabc512d65776fef888af9baff2089dba7c5024a85d49ca4e2bfeaee3b1a",
+      "intendedSurfaces": [
+        "profile",
+        "social",
+        "web"
+      ],
+      "backgroundAssumptions": "Square raster crop; platform may apply circular mask. Never mirror.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-avatar-256",
+      "role": "Rat Zero avatar crop",
+      "path": "exports/logo/rat-avatar-256.png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:8bcb39589926f3658440d0dd6c4634bc7eb8ca2061b6b9032e74cfe5820b78f1",
+      "intendedSurfaces": [
+        "profile",
+        "social",
+        "web"
+      ],
+      "backgroundAssumptions": "Square raster crop; platform may apply circular mask. Never mirror.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-avatar-128",
+      "role": "Rat Zero avatar crop",
+      "path": "exports/logo/rat-avatar-128.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:db91ead6cc65c770e5f43fc2339fa838f94ef51e6abe823dc68dbcc300fd0e1c",
+      "intendedSurfaces": [
+        "profile",
+        "social",
+        "web"
+      ],
+      "backgroundAssumptions": "Square raster crop; platform may apply circular mask. Never mirror.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-avatar-64",
+      "role": "Rat Zero avatar crop",
+      "path": "exports/logo/rat-avatar-64.png",
+      "dimensions": [
+        64,
+        64
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:d177368a812233e2a9d3905c85d79512e3ca4b5a1458a2a31e40ea1c53e3e2b5",
+      "intendedSurfaces": [
+        "profile",
+        "social",
+        "web"
+      ],
+      "backgroundAssumptions": "Square raster crop; platform may apply circular mask. Never mirror.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-avatar-48",
+      "role": "Rat Zero avatar crop",
+      "path": "exports/logo/rat-avatar-48.png",
+      "dimensions": [
+        48,
+        48
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:fb54dbba0ec873daa0af533baa8e151923272f2685e7113835d30879b7ef3db0",
+      "intendedSurfaces": [
+        "profile",
+        "social",
+        "web"
+      ],
+      "backgroundAssumptions": "Square raster crop; platform may apply circular mask. Never mirror.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-avatar-32",
+      "role": "Rat Zero tiny avatar/favicon crop",
+      "path": "exports/logo/rat-avatar-32.png",
+      "dimensions": [
+        32,
+        32
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:f38aebb0e8f7389a2b8397b8ae407f66c951d2bc9c3fd7529bed46cebd5474f5",
+      "intendedSurfaces": [
+        "favicon candidate",
+        "tiny UI"
+      ],
+      "backgroundAssumptions": "Square raster; must survive real browser chrome validation.",
+      "status": "candidate",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "favicon-candidate-32",
+      "role": "favicon candidate",
+      "path": "exports/logo/favicon-candidate-32.png",
+      "dimensions": [
+        32,
+        32
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:f38aebb0e8f7389a2b8397b8ae407f66c951d2bc9c3fd7529bed46cebd5474f5",
+      "intendedSurfaces": [
+        "browser favicon"
+      ],
+      "backgroundAssumptions": "Browser may mask/resample; no simplification authorized.",
+      "status": "candidate",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "favicon-candidate-48",
+      "role": "favicon candidate",
+      "path": "exports/logo/favicon-candidate-48.png",
+      "dimensions": [
+        48,
+        48
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:fb54dbba0ec873daa0af533baa8e151923272f2685e7113835d30879b7ef3db0",
+      "intendedSurfaces": [
+        "browser favicon",
+        "compact UI"
+      ],
+      "backgroundAssumptions": "Browser may mask/resample; no simplification authorized.",
+      "status": "candidate",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "x-avatar-512",
+      "role": "X-style profile avatar",
+      "path": "exports/x/avatar-512.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:6bb9cabc512d65776fef888af9baff2089dba7c5024a85d49ca4e2bfeaee3b1a",
+      "intendedSurfaces": [
+        "X profile"
+      ],
+      "backgroundAssumptions": "Upload square; validate under circular presentation crop.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "x-header-1500x500",
+      "role": "X-style header/banner preset",
+      "path": "exports/x/header-1500x500.png",
+      "dimensions": [
+        1500,
+        500
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg",
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/PRODUCT_LANGUAGE.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:7537a14e70f079656e13ea5d6babd7bfbe7de08c0bb504bdf21d3b4fadd5c1a9",
+      "intendedSurfaces": [
+        "X-style profile header"
+      ],
+      "backgroundAssumptions": "Platform/header crop may vary by viewport; key lockup content stays inside central safe area.",
+      "status": "candidate",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "telegram-profile-512",
+      "role": "Telegram profile avatar",
+      "path": "exports/telegram/profile-512.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc"
+      },
+      "outputHash": "sha256:6bb9cabc512d65776fef888af9baff2089dba7c5024a85d49ca4e2bfeaee3b1a",
+      "intendedSurfaces": [
+        "Telegram profile"
+      ],
+      "backgroundAssumptions": "Upload square; Telegram presents circular crop.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "default-og-1200x630",
+      "role": "default OpenGraph preview",
+      "path": "exports/opengraph/default-og-1200x630.png",
+      "dimensions": [
+        1200,
+        630
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg",
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/TYPOGRAPHY.md",
+        "docs/PRODUCT_LANGUAGE.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/TYPOGRAPHY.md": "sha256:3f56f91ebda609c196fab41a0ff9b46e353ea4325925dfef053043861333a6ee",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:a8d425bd84d30f60d93a00a5625d181d8791b42c6b82c151b2034474d9814d9b",
+      "intendedSurfaces": [
+        "OpenGraph",
+        "link unfurl"
+      ],
+      "backgroundAssumptions": "Opaque dark proof background; no live claims or dynamic values.",
+      "status": "candidate",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "receipt-wide",
+      "role": "RECEIPT wide",
+      "path": "exports/generic-social/receipt-wide-1200x675.png",
+      "dimensions": [
+        1200,
+        676
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png": "sha256:bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
+      "intendedSurfaces": [
+        "generic social",
+        "editorial share"
+      ],
+      "backgroundAssumptions": "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "receipt-square",
+      "role": "RECEIPT square",
+      "path": "exports/generic-social/receipt-square-1080.png",
+      "dimensions": [
+        1080,
+        1081
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png": "sha256:becde4002883781f970816fc24a80da2d21cdbf9555db05601f3b923fa33e19f",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:becde4002883781f970816fc24a80da2d21cdbf9555db05601f3b923fa33e19f",
+      "intendedSurfaces": [
+        "generic social",
+        "editorial share"
+      ],
+      "backgroundAssumptions": "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "case-file-wide",
+      "role": "CASE FILE wide",
+      "path": "exports/generic-social/case-file-wide-1200x675.png",
+      "dimensions": [
+        1200,
+        676
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
+      "intendedSurfaces": [
+        "generic social",
+        "editorial share"
+      ],
+      "backgroundAssumptions": "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "case-file-square",
+      "role": "CASE FILE square",
+      "path": "exports/generic-social/case-file-square-1080.png",
+      "dimensions": [
+        1080,
+        1081
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/case-file-square-1080.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/case-file-square-1080.png": "sha256:5567fdb403612472d4a7619b7d628b6d3ee00a48441d4491de997acc0bcdd822",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:5567fdb403612472d4a7619b7d628b6d3ee00a48441d4491de997acc0bcdd822",
+      "intendedSurfaces": [
+        "generic social",
+        "editorial share"
+      ],
+      "backgroundAssumptions": "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-found-wide",
+      "role": "RAT FOUND SOMETHING wide",
+      "path": "exports/generic-social/rat-found-wide-1200x675.png",
+      "dimensions": [
+        1200,
+        676
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png": "sha256:1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c",
+      "intendedSurfaces": [
+        "generic social",
+        "editorial share"
+      ],
+      "backgroundAssumptions": "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "rat-found-square",
+      "role": "RAT FOUND SOMETHING square",
+      "path": "exports/generic-social/rat-found-square-1080.png",
+      "dimensions": [
+        1080,
+        1081
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
+      "intendedSurfaces": [
+        "generic social",
+        "editorial share"
+      ],
+      "backgroundAssumptions": "Opaque composition from approved Social V1 proof; fixture is explicitly DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "x-post-receipt-wide",
+      "role": "X representative RECEIPT post",
+      "path": "exports/x/post-receipt-wide-1200x675.png",
+      "dimensions": [
+        1200,
+        676
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png": "sha256:bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
+      "intendedSurfaces": [
+        "X post"
+      ],
+      "backgroundAssumptions": "Exact approved Social V1 proof copy; fixture remains DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "x-post-rat-found-square",
+      "role": "X representative RAT FOUND SOMETHING post",
+      "path": "exports/x/post-rat-found-square-1080.png",
+      "dimensions": [
+        1080,
+        1081
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
+      "intendedSurfaces": [
+        "X post"
+      ],
+      "backgroundAssumptions": "Exact approved Social V1 proof copy; fixture remains DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "telegram-card-case-file-wide",
+      "role": "Telegram representative CASE FILE card",
+      "path": "exports/telegram/card-case-file-wide-1200x675.png",
+      "dimensions": [
+        1200,
+        676
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
+      "intendedSurfaces": [
+        "Telegram message media"
+      ],
+      "backgroundAssumptions": "Exact approved Social V1 proof copy; fixture remains DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "telegram-card-rat-found-square",
+      "role": "Telegram representative RAT FOUND SOMETHING card",
+      "path": "exports/telegram/card-rat-found-square-1080.png",
+      "dimensions": [
+        1080,
+        1081
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479"
+      },
+      "outputHash": "sha256:a2a7df5f850790ca12d6325b06b788d8009300450fb9401fb3011be2d271b9c7",
+      "intendedSurfaces": [
+        "Telegram message media"
+      ],
+      "backgroundAssumptions": "Exact approved Social V1 proof copy; fixture remains DEMO / NON-LIVE.",
+      "status": "canonical",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    },
+    {
+      "name": "pressure-tests",
+      "role": "multi-context diagnostic contact sheet",
+      "path": "exports/proofs/pressure-tests-1800x1600.png",
+      "dimensions": [
+        1800,
+        1600
+      ],
+      "sourceAssets": [
+        "docs/design/brand-v1/canon/rat-zero.jpg",
+        "docs/design/brand-v1/LOGO_LOCKUP.md",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+        "docs/PRODUCT_LANGUAGE.md",
+        "docs/design/brand-v1/export-v1/index.html",
+        "docs/design/brand-v1/export-v1/export.css",
+        "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png",
+        "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png"
+      ],
+      "sourceHashes": {
+        "docs/design/brand-v1/canon/rat-zero.jpg": "sha256:43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+        "docs/design/brand-v1/LOGO_LOCKUP.md": "sha256:f261d4f02285514703dbdf1afc12794b3a763fd23385a98f27e8fb45873bf323",
+        "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md": "sha256:90831ad9f41a55423b5a8449bba9085ceeeca20c0e57f263485a007d0d7e68c9",
+        "docs/PRODUCT_LANGUAGE.md": "sha256:99481970bd2f395ddfb8613d0ca972172c2f9444299cf32ef48a95e649638479",
+        "docs/design/brand-v1/export-v1/index.html": "sha256:015de1221c50dada557b869f40c69db07cb5f785ff2a441e29e69dc2670bcff4",
+        "docs/design/brand-v1/export-v1/export.css": "sha256:e9b7e29cc5e6a797b11786f30255587f994ed4569b72ad1f427cd6e19ec17da5",
+        "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png": "sha256:becde4002883781f970816fc24a80da2d21cdbf9555db05601f3b923fa33e19f",
+        "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png": "sha256:16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9",
+        "Geist Sans": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b",
+        "Geist Mono": "git-commit:10dc7658f13c38a474cde201bb09a4617267545b"
+      },
+      "outputHash": "sha256:c41fd74829a138fa5f1e57069352cb3870e177aa52ba6dc022d0b922b91acb26",
+      "intendedSurfaces": [
+        "review only"
+      ],
+      "backgroundAssumptions": "Diagnostic only; simulates circular avatar crops, X-style header/profile, Telegram card, OG preview, mobile feed, and dark/light page contexts.",
+      "status": "candidate",
+      "generation": {
+        "command": "python tools/brand/render-export-pack.py",
+        "version": "binrat.brand-export/1.0.0",
+        "dependencies": {
+          "Pillow": "11.3.0",
+          "playwright": "1.55.0",
+          "chromium": "playwright-1.55.0-bundled",
+          "GeistCommit": "10dc7658f13c38a474cde201bb09a4617267545b"
+        }
+      }
+    }
+  ]
+}
