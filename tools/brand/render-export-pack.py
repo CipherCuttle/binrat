@@ -292,7 +292,7 @@ def build_manifest() -> dict[str, Any]:
     records.append(record("x-avatar-400", "X profile avatar", "exports/x/avatar-400.png", [rat], ["X profile"], "Official X recommended profile dimensions: 400×400. Upload square; validate under circular presentation crop.", "canonical"))
     records.append(record("x-header-1500x500", "X-style header/banner preset", "exports/x/header-1500x500.png", [rat, logo_doc, type_doc, palette_doc, token_doc, language_doc, template_html, template_css], ["X-style profile header"], "Platform/header crop may vary by viewport; key lockup content stays inside central safe area.", "candidate", include_fonts=True))
     records.append(record("telegram-profile-512", "Telegram profile avatar", "exports/telegram/profile-512.png", [rat], ["Telegram profile"], "Upload square; Telegram presents circular crop.", "canonical"))
-    records.append(record("default-og-1200x630", "default OpenGraph preview", "exports/opengraph/default-og-1200x630.png", [rat, logo_doc, type_doc, language_doc, template_html, template_css], ["OpenGraph", "link unfurl"], "Opaque dark proof background; no live claims or dynamic values.", "candidate", include_fonts=True))
+    records.append(record("default-og-1200x630", "default OpenGraph preview", "exports/opengraph/default-og-1200x630.png", [rat, logo_doc, type_doc, palette_doc, token_doc, language_doc, template_html, template_css], ["OpenGraph", "link unfurl"], "Opaque dark proof background; no live claims or dynamic values.", "candidate", include_fonts=True))
 
     social_map = [
         ("receipt-wide", "RECEIPT wide", "receipt-wide-1200x675.png"),
@@ -313,7 +313,7 @@ def build_manifest() -> dict[str, Any]:
         ("telegram-card-rat-found-square", "Telegram representative RAT FOUND SOMETHING card", "exports/telegram/card-rat-found-square-1080.png", "docs/design/brand-v1/proofs/social-v1/rat-found-square-1080.png", ["Telegram message media"]),
     ]
     for name, role, rel, source, surfaces in platform_copies:
-        records.append(record(name, role, rel, [source, social_doc, language_doc], surfaces, "Deterministic export of approved Social V1 proof; one extra bottom capture row is removed when present. Fixture remains DEMO / NON-LIVE.", "canonical"))
+        records.append(record(name, role, rel, [source, social_doc, palette_doc, token_doc, language_doc], surfaces, "Deterministic export of approved Social V1 proof; one extra bottom capture row is removed when present. Fixture remains DEMO / NON-LIVE.", "canonical"))
 
     records.append(record("pressure-tests", "multi-context diagnostic contact sheet", "exports/proofs/pressure-tests-1800x1600.png", [rat, logo_doc, social_doc, palette_doc, token_doc, language_doc, template_html, template_css, "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png", "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png"], ["review only"], "Diagnostic only; simulates circular avatar crops, X-style header/profile, Telegram card, OG preview, mobile feed, and dark/light page contexts.", "candidate", include_fonts=True))
 
