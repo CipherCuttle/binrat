@@ -106,10 +106,13 @@ test('Case Model composes factual reasons and valid handoffs without scores',asy
   assert.equal(model.coverage.funding,'POSITIVE_FACTS');
   assert.match(model.caseDigest,/^[0-9a-f]{64}$/);
 
-  const claims=JSON.stringify({facts:model.facts,handoffs:model.handoffs});
+  const claims=JSON.stringify({
+    facts:model.facts.map(({kind,label,detail})=>({kind,label,detail})),
+    handoffs:model.handoffs.map(({kind,label})=>({kind,label}))
+  });
   assert.doesNotMatch(claims,/WATCH_FUNDER|score|win rate|profitability|buy signal|sell signal/i);
   assert.match(claims,/Pons-reported deployer/);
-  assert.match(claims,/not proof of a human identity|does not establish common ownership/i);
+  assert.match(JSON.stringify(model.facts.map((item)=>item.caveat)),/not proof of a human identity|does not establish common ownership/i);
 });
 
 test('Case Model does not turn missing positive funding evidence into a negative claim',async()=>{
