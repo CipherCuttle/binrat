@@ -271,7 +271,8 @@ Interactive surfaces:
 
 Video proof target:
 
-- 1200×675;
+- authored source composition: 1200×675;
+- H.264 compatibility encode: 1200×676 via one dark bottom-row pad (no crop/stretch);
 - 30 fps;
 - H.264 / yuv420p;
 - no audio by default;
