@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "binrat.motion-source-lock/1",
+  "status": "PINNED_PROTOTYPE_INPUTS",
+  "socialManifest": "docs/design/brand-v1/proofs/social-v1/manifest.json",
+  "sources": [
+    {
+      "path": "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+      "sha256": "1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c",
+      "observedPngDimensions": [
+        1200,
+        676
+      ],
+      "declaredSocialManifestDimensions": [
+        1200,
+        675
+      ]
+    },
+    {
+      "path": "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
+      "sha256": "bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
+      "observedPngDimensions": [
+        1200,
+        676
+      ],
+      "declaredSocialManifestDimensions": [
+        1200,
+        675
+      ]
+    }
+  ],
+  "toolchain": {
+    "runner": "ubuntu-24.04",
+    "ffmpegAptVersion": "7:6.1.1-3ubuntu5",
+    "ffmpegVersionLine": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+    "libx264AptVersion": "2:0.164.3108+git31e19f9-1"
+  },
+  "note": "Fail closed if either consumed raster byte stream or the bounded encoder toolchain changes. Refresh intentionally and regenerate receipts."
+}

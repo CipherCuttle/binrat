@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "binrat.motion-proof/1",
+  "status": "PROTOTYPE_NOT_CANON",
+  "fixture": "DEMO / NON-LIVE",
+  "sourceLock": "docs/design/brand-v1/motion-v1/SOURCE_LOCK.json",
+  "sourceLockSha256": "bd82c7b0eb1ac9fda0f761c01045c5b016ab8430855743adfa617abd9c200266",
+  "sources": [
+    {
+      "path": "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+      "sha256": "1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c",
+      "observedPngDimensions": [
+        1200,
+        676
+      ],
+      "declaredSocialManifestDimensions": [
+        1200,
+        675
+      ]
+    },
+    {
+      "path": "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png",
+      "sha256": "bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0",
+      "observedPngDimensions": [
+        1200,
+        676
+      ],
+      "declaredSocialManifestDimensions": [
+        1200,
+        675
+      ]
+    }
+  ],
+  "toolchain": {
+    "runner": "ubuntu-24.04",
+    "ffmpegAptVersion": "7:6.1.1-3ubuntu5",
+    "ffmpegVersionLine": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+    "libx264AptVersion": "2:0.164.3108+git31e19f9-1"
+  },
+  "render": "bash tools/brand/render-motion-proof.sh",
+  "verify": "bash tools/brand/verify-motion-proof.sh",
+  "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "reducedMotion": {
+    "mode": "static-source",
+    "path": "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+    "sha256": "1bff41abbfbca66e9432ef2c24af631909925f85853bed568e5f215ee698932c",
+    "observedPngDimensions": [
+      1200,
+      676
+    ],
+    "declaredSocialManifestDimensions": [
+      1200,
+      675
+    ],
+    "note": "No duplicate video: reduced motion resolves immediately to the already-approved final static composition. Hash is authoritative if upstream declared dimensions disagree with the committed PNG."
+  },
+  "outputs": {
+    "found-something-v1.mp4": {
+      "bytes": 391065,
+      "sha256": "9bcc12723208b2dcd232edb56dbcd614e68b27d91e2ca3fe0aeb77b143d0fece",
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1200,
+            "height": 676,
+            "pix_fmt": "yuv420p",
+            "avg_frame_rate": "30/1"
+          }
+        ],
+        "format": {
+          "duration": "6.400000"
+        }
+      }
+    }
+  }
+}
