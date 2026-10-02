@@ -792,6 +792,10 @@ export async function runCloudflarePonsFundingCycle(
     return {status:'BUSY'};
   }
   try {
+    const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
+    if (!runtime || !runtime.sourceVerified || !runtime.liveCaughtUp || runtime.lastSyncError) {
+      return {status:'SUCCESS',attempted:0,inserted:0,duplicates:0,noMatch:0,remaining:0};
+    }
     const source=deps.ponsFundingSource ?? new AlchemyPonsFundingSource({
       rpcUrl:resolveRobinhoodArchiveRpcUrl(env),
       fetchImpl:deps.externalFetch
