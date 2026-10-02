@@ -546,11 +546,6 @@ Examples:
 - **Leave a Tripwire**
 - **Watch Address**
 - **View Source**
-- **Inspect Matches**
-- **Share Case**
-- **See What Changed**
-- **Show Gaps**
-- **Start Digging**
 
 ---
 
