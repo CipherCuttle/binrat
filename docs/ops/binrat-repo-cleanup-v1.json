@@ -1,13 +1,13 @@
 {
   "manifest": "binrat-repo-cleanup-v1",
-  "generatedAt": "2026-10-02T22:29:16.882230+00:00",
+  "generatedAt": "2026-10-02T22:42:25.096287+00:00",
   "repo": "CipherCuttle/binrat",
   "summary": {
     "openPrCount": 88,
-    "remoteBranchCount": 147,
-    "recordCount": 235,
+    "remoteBranchCount": 148,
+    "recordCount": 236,
     "countsByCategory": {
-      "A": 28,
+      "A": 29,
       "B": 24,
       "C": 0,
       "D": 90,
@@ -25,7 +25,7 @@
       "G": 13
     },
     "branchCountsByCategory": {
-      "A": 19,
+      "A": 20,
       "B": 13,
       "C": 0,
       "D": 57,
@@ -34,13 +34,14 @@
       "G": 14
     },
     "notes": [
-      "Remote branch count is 144 real branches; the 'origin' line emitted by git for-each-ref refs/remotes/origin is the origin/HEAD symbolic ref and is excluded.",
+      "Remote branch count is 145 real branches; the 'origin' line emitted by git for-each-ref refs/remotes/origin is the origin/HEAD symbolic ref and is excluded.",
       "integration/binrat-brand-v1-composed appeared during the audit (2026-10-02) and is classified A (contains design/binrat-brand-system-v1 as ancestor).",
       "git ancestry shows feat/binrat-pons-funding-provenance-v1 (#91) is NOT a commit-ancestor of #93/#103 heads despite being their declared PR base; all funding deletion is therefore gated on post-closure ancestry verification.",
       "V1 update (2026-10-02): +3 branches (integration/binrat-case-canonical-v1, design/binrat-roadmap-brand-v1, ops/binrat-repo-cleanup-manifest-v1) and +1 PR (#104) since the 81868c2 snapshot; 0 refs gone; 0 head-SHA moves.",
       "V1 update: old Case stack PRs #94/#98/#99/#100/#101 (+ their branch refs) reclassified B->G: canonical #104 reconstruction containment NOT proven (no commit-ancestry; multiple changed files differ/missing).",
       "V1 update: #102 + ops/binrat-case-surface-private-preview-v1 reclassified A->F (preview donor until canonical private preview is reconstructed); #70 + feat/binrat-roadmap-living-scenes-v1 reclassified C->D (proven commit-ancestor of design/binrat-roadmap-brand-v1).",
-      "V1 update: G->D for codex/binrat-prelaunch-release-a911c23, feat/binrat-robinhood-live-rat-v1, feat/binrat-telegram-ux-v2, release/binrat-autonomous-rat-v1-1 (+ PRs #59/#60): proven commit-ancestors of the ACTIVE canonical/brand line."
+      "V1 update: G->D for codex/binrat-prelaunch-release-a911c23, feat/binrat-robinhood-live-rat-v1, feat/binrat-telegram-ux-v2, release/binrat-autonomous-rat-v1-1 (+ PRs #59/#60): proven commit-ancestors of the ACTIVE canonical/brand line.",
+      "V2 update (2026-10-02): +1 branch (ops/binrat-case-canonical-private-preview-v1 @ fae06e67, classified A: direct child of canonical 9e8b37ec, single additive preview-checks commit) since 5958fb7; 0 refs gone; 0 head-SHA moves; PR set unchanged (88)."
     ]
   },
   "top10": [
@@ -2901,9 +2902,20 @@
       "ref": "ops/binrat-repo-cleanup-manifest-v1",
       "type": "branch",
       "category": "F",
-      "headSha": "81868c2438684964e7c1bc0059e6fa3a44a84890",
+      "headSha": "5958fb77a104a02f643e338cfcc158cc9217c1a7",
       "base": "main",
-      "reason": "OPS_RECEIPT (V1 update 2026-10-02): this cleanup manifest branch itself (based on main @ 9fea1c8). headSha records the pre-update snapshot head 81868c2; the update commit advances this branch. Retain ref.",
+      "reason": "OPS_RECEIPT (V2 update 2026-10-02): this cleanup manifest branch itself (based on main @ 9fea1c8). headSha records the pre-V2-update snapshot head 5958fb7; the V2 update commit advances this branch. Retain ref.",
+      "safeToClose": false,
+      "safeToDeleteBranch": false,
+      "requiresOwnerDecision": false
+    },
+    {
+      "ref": "ops/binrat-case-canonical-private-preview-v1",
+      "type": "branch",
+      "category": "A",
+      "headSha": "fae06e675bd68271a7f583a662b69e2451906236",
+      "base": "integration/binrat-case-canonical-v1",
+      "reason": "ACTIVE (V2 update 2026-10-02): canonical Case private-preview preparation, direct child of canonical #104 head 9e8b37ec (merge-base = 9e8b37ec, is-ancestor YES; 1 unique commit). Single additive commit (522 insertions): case-surface-canonical live-smoke + private-preview workflows, scripts/case-private-preview-verify.mjs, test/casePrivatePreviewVerify.test.ts. No open PR references it as head yet. Must remain.",
       "safeToClose": false,
       "safeToDeleteBranch": false,
       "requiresOwnerDecision": false

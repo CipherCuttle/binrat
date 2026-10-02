@@ -1,6 +1,6 @@
 # BINRAT Repo Cleanup Manifest v1
 
-- Repo: `CipherCuttle/binrat`  |  Generated: 2026-10-02T21:23:16.513589Z  |  Scope: 87 open PRs + 144 remote branches (231 records)
+- Repo: `CipherCuttle/binrat`  |  Generated: 2026-10-02T21:23:16.513589Z (V2 refresh 2026-10-02)  |  Scope: 88 open PRs + 148 remote branches (236 records)
 - Author of record: BINRAT repository-archaeology audit (read-only). **Nothing was closed, merged, deleted, or reconfigured by this audit.**
 - Companion machine-readable manifest: [`docs/ops/binrat-repo-cleanup-v1.json`](./binrat-repo-cleanup-v1.json)
 
@@ -336,5 +336,36 @@ Remaining **G (19 branch + 8 PR = 27 records)**: no proven ancestry into main or
 | F OPS_RECEIPT | 19 | 4 | 23 |
 | G UNKNOWN_REVIEW_REQUIRED | 14 | 13 | 27 |
 | **Total** | **147** | **88** | **235** |
+
+Full invariant verification (coverage, uniqueness, safety invariants, protected SHAs, live-SHA match, count cross-check) was re-run for this update; receipt in the verification log of the update commit.
+
+## 10. V2 update (2026-10-02, post-5958fb7 snapshot)
+
+Second refresh of manifest v1 against current remote state. Read-only except for this documentation commit on `ops/binrat-repo-cleanup-manifest-v1`. Nothing was closed, merged, deleted, deployed, or reconfigured.
+
+### 10.1 Snapshot delta vs 5958fb7
+
+- Live inventory regenerated (`git fetch origin --prune`; `gh pr list --state open --limit 200 --json number,title,headRefName,baseRefName,updatedAt,headRefOid`; `git for-each-ref refs/remotes/origin` excluding the `origin`/`origin/HEAD` symbolic line): **88 open PRs + 148 remote branches (236 records)**.
+- New branches (1): `ops/binrat-case-canonical-private-preview-v1` @ `fae06e675bd68271a7f583a662b69e2451906236`.
+- New PRs: **none** (set-diff of 88 live PR numbers vs 88 recorded: empty both directions). Gone branches/PRs: **none**. Head-SHA moves: **none** across all 147 previously recorded branches and 88 PRs (the only join difference is this manifest branch itself advancing 81868c2 → 5958fb7, expected).
+
+### 10.2 New authority added as record
+
+- `ops/binrat-case-canonical-private-preview-v1` (branch, **A ACTIVE**) @ `fae06e67` — canonical Case private-preview preparation. Evidence: `git merge-base --is-ancestor 9e8b37ec fae06e67` = YES with merge-base = `9e8b37ec` (direct child of canonical #104 head); 1 unique commit (`git rev-list --count 9e8b37ec..fae06e67` = 1), purely additive (522 insertions: `.github/workflows/case-surface-canonical-live-smoke.yml`, `.github/workflows/case-surface-canonical-private-preview.yml`, `scripts/case-private-preview-verify.mjs`, `test/casePrivatePreviewVerify.test.ts`, trigger files). No open PR references it as head yet. This is the anticipated canonical private-preview reconstruction line referenced by the V1 #102 → F donor note. Must remain.
+- All protected refs re-verified unchanged: funding-provenance `95968749`, funding-storage `90296437`, case-canonical `9e8b37ec`, brand-composed `0343d381`, roadmap-brand-v1 `95c7e782`, case-surface `c9bcb01c`, case-surface-private-preview `f5934950`, brand-system `770c7aa8`, copy-library `91cee9f1`, social-production `568b0a3c`, motion-identity `0b96eead`, export-pack `de0fa94e`, brand-v1-integration `74527474`, roadmap-living-scenes `ab844e48`, main, gh-pages.
+- No reclassifications in this update: #102 stays F (its donor purpose is now being fulfilled by the new canonical preview line, but the #102 preview remains preserved evidence); #93 stays D with the V1-strengthened reason; old Case stack #94/#98/#99/#100/#101 stay G (containment in `9e8b37ec` still unproven); remaining G records unchanged.
+
+### 10.3 Updated counts
+
+| Category | Branches | PRs | Total |
+|----------|----------|-----|-------|
+| A ACTIVE | 20 | 9 | 29 |
+| B ACTIVE_ANCESTOR | 13 | 11 | 24 |
+| C DONOR | 0 | 0 | 0 |
+| D SUPERSEDED | 57 | 33 | 90 |
+| E HISTORICAL_EXPERIMENT | 25 | 18 | 43 |
+| F OPS_RECEIPT | 19 | 4 | 23 |
+| G UNKNOWN_REVIEW_REQUIRED | 14 | 13 | 27 |
+| **Total** | **148** | **88** | **236** |
 
 Full invariant verification (coverage, uniqueness, safety invariants, protected SHAs, live-SHA match, count cross-check) was re-run for this update; receipt in the verification log of the update commit.
