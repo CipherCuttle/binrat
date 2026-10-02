@@ -1,0 +1,59 @@
+name: BINRAT Motion Identity Proof
+
+on:
+  push:
+    branches:
+      - design/binrat-motion-identity-v1
+    paths:
+      - ".github/workflows/binrat-motion-proof.yml"
+      - "tools/brand/render-motion-proof.sh"
+      - "tools/brand/verify-motion-proof.sh"
+      - "docs/design/brand-v1/MOTION_GRAMMAR.md"
+      - "docs/design/brand-v1/motion-v1/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: binrat-motion-proof-v1
+  cancel-in-progress: true
+
+jobs:
+  motion-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/binrat-motion-identity-v1
+          fetch-depth: 0
+
+      - name: Install deterministic render tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version | head -n 1
+
+      - name: Render motion proof
+        run: bash tools/brand/render-motion-proof.sh
+
+      - name: Verify motion proof
+        run: bash tools/brand/verify-motion-proof.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binrat-motion-proof-v1
+          path: docs/design/brand-v1/proofs/motion-v1/
+          if-no-files-found: error
+
+      - name: Commit deterministic proof
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/design/brand-v1/proofs/motion-v1/
+          if git diff --cached --quiet; then
+            echo "Proof already current."
+            exit 0
+          fi
+          git commit -m "build(brand): render motion identity proof v1 [skip ci]"
+          git push origin HEAD:design/binrat-motion-identity-v1
