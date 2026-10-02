@@ -1,0 +1,152 @@
+@import url("../social-v1/social.css");
+
+body {
+  min-width: 1100px;
+}
+
+.production-header {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 0 24px;
+  color: var(--paper);
+}
+
+.production-header h1 {
+  margin: 0 0 8px;
+  font: 750 30px/1 "Geist Proof", system-ui, sans-serif;
+  letter-spacing: -.035em;
+}
+
+.production-header p {
+  margin: 0;
+  color: var(--muted);
+  font: 500 13px/1.5 "Geist Mono Proof", monospace;
+}
+
+#contact-sheet {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 28px;
+  width: max-content;
+}
+
+.contact-item {
+  margin: 0;
+}
+
+.contact-label {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font: 550 11px/1 "Geist Mono Proof", monospace;
+}
+
+.contact-label strong {
+  color: var(--orange);
+  letter-spacing: .08em;
+}
+
+.contact-frame {
+  position: relative;
+  overflow: hidden;
+  background: #070807;
+  border: 1px solid #2d322c;
+}
+
+.contact-frame.wide {
+  width: 600px;
+  height: 338px;
+}
+
+.contact-frame.square {
+  width: 480px;
+  height: 480px;
+}
+
+.contact-frame.wide .contact-scale {
+  transform: scale(.5);
+}
+
+.contact-frame.square .contact-scale {
+  transform: scale(.4444444444);
+}
+
+.contact-scale {
+  transform-origin: top left;
+  width: max-content;
+  height: max-content;
+}
+
+.production-card .headline,
+.production-card .literal,
+.production-card .fact b,
+.production-card .case-row b,
+.production-card .evidence-strip,
+.production-card .footer-source {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.production-card .fact b,
+.production-card .case-row b {
+  min-width: 0;
+}
+
+.production-card .footer-source {
+  max-width: 390px;
+  white-space: normal;
+}
+
+.production-card.copy-long.wide .headline {
+  font-size: 70px;
+  line-height: .91;
+}
+
+.production-card.copy-max.wide .headline {
+  font-size: 62px;
+  line-height: .93;
+}
+
+.production-card.copy-long.square .headline {
+  font-size: 90px;
+  line-height: .91;
+}
+
+.production-card.copy-max.square .headline {
+  font-size: 80px;
+  line-height: .93;
+}
+
+.production-card .claim-boundary {
+  max-width: 610px;
+}
+
+.production-card .evidence-state,
+.production-card .evidence-strip[data-evidence-state] {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.production-card .state-PARTIAL,
+.production-card .state-UNKNOWN,
+.production-card .state-MISSING {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+}
+
+#native-tests {
+  position: absolute;
+  left: -30000px;
+  top: 0;
+  width: 1400px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.native-test {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
