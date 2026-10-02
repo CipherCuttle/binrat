@@ -51,7 +51,7 @@ import {
   proveHolderWallet
 } from './holderAuth.js';
 import type { D1DatabaseLike } from './d1Types.js';
-import { readBinratPonsCase, type BinratPonsCaseBlockPointReader } from './ponsCaseReadModel.js';
+import { readBinratPonsCaseBundle, type BinratPonsCaseBlockPointReader } from './ponsCaseReadModel.js';
 import {
   enqueueSyncCycle,
   enqueuePonsSyncCycle,
@@ -390,7 +390,7 @@ async function miniAppCaseIntelligence(
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG');
     }
 
-    const caseModel = await readBinratPonsCase(env.DB, blockSource, {
+    const bundle = await readBinratPonsCaseBundle(env.DB, blockSource, {
       currentLaunchId: body.launchId.toLowerCase(),
       asOfBlock,
       maxPreviousLaunches: 25,
@@ -416,7 +416,11 @@ async function miniAppCaseIntelligence(
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG_DURING_READ');
     }
 
-    return json(200, { case: caseModel });
+    return json(200, {
+      case: bundle.caseModel,
+      trashTrail: bundle.trashTrail,
+      replay: bundle.replay
+    });
   } catch (error) { return miniAppError(error); }
 }
 
