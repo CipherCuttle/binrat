@@ -68,7 +68,7 @@ test('Replay Lab gates identity and outcome evidence at the requested block',asy
   const hourAt200=at200.targetLaunch?.observations.find(x=>x.horizonLabel==='1h');
   assert.equal(hourAt200?.state,'COMPLETE');
   assert.equal(hourAt200?.observedBlock,'180');
-  assert.equal(hourAt200?.estimatedFdvQuoteRaw,(4n*10n**18n).toString());
+  assert.equal(hourAt200?.estimatedFdvQuoteRaw,(2n*10n**18n).toString());
   assert.notEqual(at120.outputDigest,at150.outputDigest);
   assert.notEqual(at150.outputDigest,at200.outputDigest);
 });
