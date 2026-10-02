@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "binrat.social-production-proof/1",
+  "status": "PASS",
+  "fixture": "DEMO / NON-LIVE",
+  "fixtureCount": 12,
+  "families": [
+    "receipt",
+    "case-file",
+    "rat-found"
+  ],
+  "ratios": {
+    "wide": [
+      1200,
+      675
+    ],
+    "square": [
+      1080,
+      1080
+    ]
+  },
+  "matrix": [
+    {
+      "fixtureId": "receipt-short-complete",
+      "family": "receipt",
+      "coverage": "COMPLETE",
+      "sourceState": "COMPLETE",
+      "headlineLength": 16
+    },
+    {
+      "fixtureId": "receipt-long-partial",
+      "family": "receipt",
+      "coverage": "PARTIAL",
+      "sourceState": "PARTIAL",
+      "headlineLength": 38
+    },
+    {
+      "fixtureId": "receipt-missing-source",
+      "family": "receipt",
+      "coverage": "MISSING",
+      "sourceState": "MISSING",
+      "headlineLength": 31
+    },
+    {
+      "fixtureId": "receipt-unknown-one-launch",
+      "family": "receipt",
+      "coverage": "UNKNOWN",
+      "sourceState": "UNKNOWN",
+      "headlineLength": 31
+    },
+    {
+      "fixtureId": "case-three-facts-complete",
+      "family": "case-file",
+      "coverage": "COMPLETE",
+      "sourceState": "COMPLETE",
+      "headlineLength": 16
+    },
+    {
+      "fixtureId": "case-five-facts-partial",
+      "family": "case-file",
+      "coverage": "PARTIAL",
+      "sourceState": "PARTIAL",
+      "headlineLength": 32
+    },
+    {
+      "fixtureId": "case-max-headline-unknown",
+      "family": "case-file",
+      "coverage": "UNKNOWN",
+      "sourceState": "UNKNOWN",
+      "headlineLength": 42
+    },
+    {
+      "fixtureId": "case-missing-five-facts",
+      "family": "case-file",
+      "coverage": "MISSING",
+      "sourceState": "MISSING",
+      "headlineLength": 21
+    },
+    {
+      "fixtureId": "found-complete",
+      "family": "rat-found",
+      "coverage": "COMPLETE",
+      "sourceState": "COMPLETE",
+      "headlineLength": 16
+    },
+    {
+      "fixtureId": "found-partial-max-headline",
+      "family": "rat-found",
+      "coverage": "PARTIAL",
+      "sourceState": "PARTIAL",
+      "headlineLength": 24
+    },
+    {
+      "fixtureId": "found-unknown-long-source",
+      "family": "rat-found",
+      "coverage": "UNKNOWN",
+      "sourceState": "UNKNOWN",
+      "headlineLength": 22
+    },
+    {
+      "fixtureId": "found-missing",
+      "family": "rat-found",
+      "coverage": "MISSING",
+      "sourceState": "MISSING",
+      "headlineLength": 20
+    }
+  ],
+  "outputs": {
+    "contact-wide.png": {
+      "width": 1228,
+      "height": 2420,
+      "bytes": 847873,
+      "sha256": "9d9cb95b69d5e240b4836b735eb0e917cbd6cc8824b1554bc00c2224484d7a7d"
+    },
+    "contact-square.png": {
+      "width": 988,
+      "height": 3272,
+      "bytes": 624320,
+      "sha256": "7696578dd3c1667b0fc085a2b54d80f2524d3f001be6bcdb903903ff2b7ca12e"
+    }
+  },
+  "checks": [
+    "exact card dimensions",
+    "no core content outside card bounds",
+    "no card scroll overflow",
+    "exactly one CTA",
+    "coverage and source state remain visible",
+    "primary evidence typography >= decorative proof flag",
+    "literal explanation >= 24px",
+    "Rat artwork remains behind literal layer with fade",
+    "long evidence remains >= 11px"
+  ],
+  "note": "All proof content is DEMO / NON-LIVE. No live metric or production observation is consumed."
+}
