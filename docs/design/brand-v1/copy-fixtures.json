@@ -69,8 +69,8 @@
     {
       "id": "trade_imperative",
       "severity": "ERROR",
-      "pattern": "\\b(?:buy|sell|ape|exit|load up|get in)\\b.{0,28}\\b(?:now|this|token|coin|launch)?\\b",
-      "note": "Apply only to BINRAT-authored imperative copy; quoted/source content is excluded."
+      "pattern": "(?:^|[\\n.!?]\\s*)\\s*(?:please\\s+)?(?:buy|sell|ape(?:\\s+in)?|exit|load up|get in)(?:\\s+(?:now|this|the|token|coin|launch|position|bag)){0,3}\\b",
+      "note": "Tripwire for command-style trading language at a sentence/line boundary. Exact hard-ban phrases such as 'buy now' remain independently banned anywhere."
     },
     {
       "id": "financial_guarantee",
