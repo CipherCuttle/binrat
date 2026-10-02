@@ -147,7 +147,7 @@ A template that only works with one exact sentence is not reusable and fails.
 
 ## Internal visual review — 2026-10-02
 
-Status: **CANDIDATE PASS / OWNER VISUAL APPROVAL PENDING**
+Status: **APPROVED / FROZEN Brand V1 social composition system**
 
 The six rendered proofs were reviewed at wide and square ratios.
 
@@ -233,3 +233,32 @@ On owner approval, promote:
 - RAT FOUND SOMETHING;
 
 to Brand V1 canonical social composition families and then build platform/export presets on top of them.
+
+
+## Frozen decision — owner approved 2026-10-02
+
+The owner explicitly approved the rendered Social V1 family on 2026-10-02.
+
+Canonical Brand V1 social composition families are now:
+
+- **RECEIPT** — evidence-first retained finding;
+- **CASE FILE** — compact investigation summary;
+- **RAT FOUND SOMETHING** — character-led discovery with immediate literal evidence.
+
+This approval freezes the composition grammar, not any demo copy or demo values.
+
+Allowed downstream work:
+
+- platform-specific crops and export presets;
+- real data binding that preserves evidence semantics;
+- accessibility/layout hardening;
+- deterministic PNG/WebP export;
+- additional aspect-ratio presets that preserve the same hierarchy.
+
+Requires a new explicit Brand decision:
+
+- replacing one of the three canonical families;
+- changing Rat identity;
+- changing the canonical wordmark;
+- changing the evidence/personality hierarchy;
+- introducing a new global palette or typography system.
