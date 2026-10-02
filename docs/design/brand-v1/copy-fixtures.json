@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "status": "brand-v1-copy-fixtures",
+  "authority": [
+    "docs/PRODUCT_LANGUAGE.md",
+    "docs/PHILOSOPHY.md",
+    "docs/design/brand-v1/README.md",
+    "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+    "docs/design/brand-v1/COPY_LIBRARY.md",
+    "docs/design/brand-v1/BANNED_LANGUAGE.md"
+  ],
+  "public_copy_pattern": [
+    "FERAL_HEADLINE",
+    "LITERAL_EXPLANATION",
+    "RECEIPT_OR_SOURCE"
+  ],
+  "evidence_states": [
+    "OBSERVED",
+    "DERIVED",
+    "PATTERN",
+    "UNKNOWN",
+    "COMPLETE",
+    "PARTIAL",
+    "UNVERIFIED",
+    "MISSING"
+  ],
+  "capability_states": [
+    "ENGINEERING_PASS",
+    "DEPLOYED",
+    "PUBLIC_LIVE",
+    "BUILDING",
+    "PLANNED",
+    "EXPERIMENTAL",
+    "BLOCKED"
+  ],
+  "hard_banned_exact": [
+    "smart money",
+    "good buy",
+    "bad buy",
+    "buy now",
+    "sell now",
+    "ape in",
+    "ape this",
+    "safe score",
+    "rug score",
+    "rugger",
+    "scammer",
+    "guaranteed returns",
+    "guaranteed yield",
+    "guaranteed apy",
+    "guaranteed listing",
+    "guaranteed price appreciation",
+    "ai-powered alpha",
+    "ai powered alpha",
+    "revolutionary blockchain intelligence",
+    "next 100x",
+    "gem found",
+    "alpha found",
+    "trade smarter",
+    "never miss the next gem",
+    "trust the rat",
+    "actionable alpha",
+    "unlock alpha",
+    "institutional-grade alpha",
+    "fully autonomous",
+    "hands-free alpha"
+  ],
+  "hard_banned_regex": [
+    {
+      "id": "trade_imperative",
+      "severity": "ERROR",
+      "pattern": "(?:^|[\\n.!?]\\s*)\\s*(?:please\\s+)?(?:buy|sell|ape(?:\\s+in)?|exit|load up|get in)(?:\\s+(?:now|this|the|token|coin|launch|position|bag)){0,3}\\b",
+      "note": "Tripwire for command-style trading language at a sentence/line boundary. Exact hard-ban phrases such as 'buy now' remain independently banned anywhere."
+    },
+    {
+      "id": "financial_guarantee",
+      "severity": "ERROR",
+      "pattern": "\\bguarantee(?:d|s)?\\b.{0,40}\\b(?:return|yield|apy|listing|price|profit)",
+      "note": "No guarantee language."
+    },
+    {
+      "id": "safe_rug_verdict",
+      "severity": "ERROR",
+      "pattern": "\\b(?:safe|rug)\\s*(?:score|rating|verdict)?\\b",
+      "note": "Context-aware exclusion required for documentation saying BINRAT does not issue these."
+    },
+    {
+      "id": "unrestricted_autonomy",
+      "severity": "ERROR",
+      "pattern": "\\b(?:fully|completely|unrestricted)\\s+autonomous\\b|\\btrades? for you\\b",
+      "note": "Autonomy must remain scoped and attributable."
+    },
+    {
+      "id": "generic_ai_alpha",
+      "severity": "ERROR",
+      "pattern": "\\b(?:ai[- ]powered|ai driven|powered by ai)\\b.{0,40}\\b(?:alpha|intelligence|insight|trading)\\b",
+      "note": "Generic startup/crypto overclaim."
+    },
+    {
+      "id": "identity_overreach",
+      "severity": "WARN",
+      "pattern": "\\b(?:same person|same team|same dev|their other launches|this founder)\\b",
+      "note": "Requires separate identity evidence; deployer recurrence is insufficient."
+    },
+    {
+      "id": "intent_overreach",
+      "severity": "WARN",
+      "pattern": "\\b(?:trying to|planning to|wants to|dumping on|baiting buyers|hiding)\\b",
+      "note": "Observable behavior does not establish motive."
+    },
+    {
+      "id": "coverage_erasure",
+      "severity": "WARN",
+      "pattern": "\\b(?:all clear|looks clean|nothing suspicious|no history|complete history)\\b",
+      "note": "Require explicit supported scope and evidence basis."
+    }
+  ],
+  "semantic_upgrades": [
+    {
+      "from": "deployer",
+      "must_not_become": [
+        "creator",
+        "founder",
+        "dev"
+      ],
+      "without": "explicit source-backed role evidence"
+    },
+    {
+      "from": "address",
+      "must_not_become": [
+        "human",
+        "person",
+        "team"
+      ],
+      "without": "separate identity evidence"
+    },
+    {
+      "from": "recipient",
+      "must_not_become": [
+        "trader",
+        "buyer"
+      ],
+      "without": "separate intent/role evidence"
+    },
+    {
+      "from": "recurrence",
+      "must_not_become": [
+        "skill",
+        "expertise",
+        "profitability",
+        "winning"
+      ],
+      "without": "separate outcome/method evidence"
+    },
+    {
+      "from": "pattern",
+      "must_not_become": [
+        "verdict",
+        "risk score",
+        "safety score"
+      ],
+      "without": "never: patterns remain inspectable evidence structures"
+    },
+    {
+      "from": "similarity",
+      "must_not_become": [
+        "common human identity"
+      ],
+      "without": "separate identity proof"
+    },
+    {
+      "from": "missing",
+      "must_not_become": [
+        "safe",
+        "clean",
+        "benign"
+      ],
+      "without": "never: missing evidence is not positive evidence"
+    },
+    {
+      "from": "ENGINEERING_PASS",
+      "must_not_become": [
+        "DEPLOYED",
+        "PUBLIC_LIVE",
+        "live",
+        "shipped"
+      ],
+      "without": "canonical deployment/public-state evidence"
+    },
+    {
+      "from": "DEPLOYED",
+      "must_not_become": [
+        "PUBLIC_LIVE",
+        "public"
+      ],
+      "without": "canonical public-state evidence"
+    }
+  ],
+  "preferred_ctas": [
+    "Open Receipt",
+    "Open Case",
+    "Follow Trash Trail",
+    "Inspect Evidence",
+    "Compare Receipts",
+    "See Coverage",
+    "Replay This",
+    "Leave a Tripwire",
+    "Watch Address",
+    "View Source"
+  ],
+  "banned_ctas": [
+    "Buy Now",
+    "Sell Now",
+    "Ape In",
+    "Ape This",
+    "Trade Now",
+    "Copy Trade",
+    "Follow Smart Money",
+    "Catch the Pump",
+    "Get Alpha",
+    "Trust the Rat"
+  ],
+  "recommended_max": {
+    "receipt_post": {
+      "headline_words": 4,
+      "literal_chars": 160,
+      "body_chars": 320
+    },
+    "case_file_post": {
+      "headline_words": 5,
+      "literal_chars": 200,
+      "fact_rows": 4,
+      "fact_rows_min": 3,
+      "fact_rows_max": 5
+    },
+    "rat_found_something": {
+      "headline_words": 3,
+      "literal_chars": 150,
+      "evidence_strips": 1
+    },
+    "x_announcement": {
+      "target_chars_before_link": 240,
+      "hard_chars_total": 280
+    },
+    "x_reply": {
+      "preferred_chars": 180,
+      "max_chars": 250
+    },
+    "telegram_alert": {
+      "first_line_chars": 55,
+      "body_chars": 300
+    },
+    "telegram_case_summary": {
+      "body_chars": 700,
+      "fact_rows": 5
+    },
+    "telegram_empty": {
+      "body_chars": 180
+    },
+    "telegram_error": {
+      "body_chars": 220
+    },
+    "website_hero": {
+      "headline_words": 8,
+      "supporting_chars": 220,
+      "cta_words": 4
+    },
+    "roadmap_announcement": {
+      "body_chars": 260
+    },
+    "product_update": {
+      "body_chars": 300
+    },
+    "nothing_found": {
+      "body_chars": 220
+    },
+    "partial_unknown": {
+      "body_chars": 260
+    },
+    "source_disclaimer": {
+      "footer_chars": 180,
+      "expanded_chars": 300
+    },
+    "cta": {
+      "preferred_words": 4,
+      "max_chars": 28
+    }
+  },
+  "good_fixtures": [
+    {
+      "id": "receipt_deployer_recurrence",
+      "category": "receipt",
+      "text": "SMELLS FAMILIAR. This exact source-reported deployer appears across 4 retained launches. PATTERN · PARTIAL · OPEN RECEIPTS →",
+      "expected": "PASS"
+    },
+    {
+      "id": "no_match_scoped",
+      "category": "nothing_found",
+      "text": "NO MATCH FOUND. Nothing matched this condition in the currently indexed coverage.",
+      "expected": "PASS"
+    },
+    {
+      "id": "identity_boundary",
+      "category": "x_reply",
+      "text": "Same deployer, yes. Same human, not established.",
+      "expected": "PASS"
+    },
+    {
+      "id": "missing_not_safe",
+      "category": "partial_unknown",
+      "text": "MISSING. The expected artifact is not available in the retained evidence bundle.",
+      "expected": "PASS"
+    },
+    {
+      "id": "capability_boring",
+      "category": "roadmap",
+      "text": "AUTONOMOUS RAT · EXPERIMENTAL. Scoped automation with attributable actions.",
+      "expected": "PASS"
+    },
+    {
+      "id": "source_disclaimer",
+      "category": "disclaimer",
+      "text": "Relationship: DERIVED from matching observed fields. Common human identity is not established.",
+      "expected": "PASS"
+    },
+    {
+      "id": "error_non_evidence",
+      "category": "telegram_error",
+      "text": "SOURCE DIDN’T ANSWER. This evidence area remains UNKNOWN for this attempt.",
+      "expected": "PASS"
+    },
+    {
+      "id": "hero_receipts",
+      "category": "website_hero",
+      "text": "THE RAT REMEMBERS. BINRAT keeps launch receipts and shows what was observable when. Missing evidence stays missing.",
+      "expected": "PASS"
+    }
+  ],
+  "reject_fixtures": [
+    {
+      "id": "reject_smart_money",
+      "text": "Follow the smart money.",
+      "expected": "ERROR",
+      "reason": "hard_banned_exact"
+    },
+    {
+      "id": "reject_buy",
+      "text": "BUY NOW. The Rat found alpha.",
+      "expected": "ERROR",
+      "reason": "trading instruction + alpha claim"
+    },
+    {
+      "id": "reject_identity",
+      "text": "Same deployer. Same guy behind all five launches.",
+      "expected": "ERROR",
+      "reason": "address/deployer upgraded to human identity"
+    },
+    {
+      "id": "reject_recurrence_skill",
+      "text": "Five launches. This wallet knows what it is doing.",
+      "expected": "ERROR",
+      "reason": "recurrence upgraded to skill"
+    },
+    {
+      "id": "reject_safe_from_missing",
+      "text": "Nothing found. Looks clean.",
+      "expected": "ERROR",
+      "reason": "missing/no-match upgraded to reassuring verdict"
+    },
+    {
+      "id": "reject_engineering_live",
+      "text": "Replay Lab is live everywhere.",
+      "expected": "ERROR",
+      "reason": "requires canonical public-live evidence"
+    },
+    {
+      "id": "reject_unrestricted_auto",
+      "text": "Fully autonomous Rat trades for you.",
+      "expected": "ERROR",
+      "reason": "unrestricted autonomy + trading claim"
+    },
+    {
+      "id": "reject_generic_ai",
+      "text": "Revolutionary AI-powered alpha for smarter trades.",
+      "expected": "ERROR",
+      "reason": "generic startup/crypto overclaim"
+    },
+    {
+      "id": "reject_rugger",
+      "text": "Serial rugger detected.",
+      "expected": "ERROR",
+      "reason": "verdict from recurrence"
+    },
+    {
+      "id": "reject_creator_upgrade",
+      "text": "This creator launched five tokens.",
+      "expected": "ERROR",
+      "reason": "invalid when source only reports DEPLOYER"
+    }
+  ],
+  "review_rules": [
+    "Passing lexical lint does not prove evidence support.",
+    "Quoted user/source content and banned-language documentation require exclusions.",
+    "COMPLETE must always name or inherit an explicit supported scope.",
+    "No-match claims must identify the searched/indexed scope when global absence could be inferred.",
+    "Feral headlines must be followed by a literal finding when published as standalone public copy."
+  ],
+  "social_card_contract": {
+    "schema_version": "binrat.social/1",
+    "note": "Hard compatibility envelope for canonical rendered social cards. Broader CTA/copy guidance elsewhere in this file applies to other product surfaces.",
+    "coverage_states": [
+      "COMPLETE",
+      "PARTIAL",
+      "UNKNOWN",
+      "MISSING"
+    ],
+    "evidence_states": [
+      "OBSERVED",
+      "DERIVED",
+      "PATTERN",
+      "UNKNOWN",
+      "COMPLETE",
+      "PARTIAL",
+      "UNVERIFIED",
+      "MISSING"
+    ],
+    "cta_labels": [
+      "OPEN RECEIPTS →",
+      "OPEN CASE →",
+      "DIG DEEPER →"
+    ],
+    "families": {
+      "receipt": {
+        "headline_chars": 38,
+        "literal_chars": 170
+      },
+      "case-file": {
+        "headline_chars": 42,
+        "literal_chars": 200,
+        "fact_rows_min": 3,
+        "fact_rows_max": 5
+      },
+      "rat-found": {
+        "headline_chars": 24,
+        "literal_chars": 150,
+        "evidence_strips": 1
+      }
+    }
+  }
+}

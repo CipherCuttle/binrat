@@ -1,0 +1,32 @@
+name: BINRAT Copy Library
+
+on:
+  push:
+    branches:
+      - design/binrat-copy-library-v1
+    paths:
+      - ".github/workflows/binrat-copy-library.yml"
+      - "tools/brand/validate-copy-library.mjs"
+      - "docs/design/brand-v1/COPY_LIBRARY.md"
+      - "docs/design/brand-v1/BANNED_LANGUAGE.md"
+      - "docs/design/brand-v1/copy-fixtures.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-copy-library:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Syntax gate
+        run: node --check tools/brand/validate-copy-library.mjs
+
+      - name: Validate machine-readable copy contract
+        run: node tools/brand/validate-copy-library.mjs
