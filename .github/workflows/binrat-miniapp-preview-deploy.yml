@@ -25,6 +25,7 @@ jobs:
       PREVIEW_WORKER: binrat-miniapp-preview-v1
       PREVIEW_URL: https://binrat-miniapp-preview-v1.pettevik.workers.dev
       PREVIEW_DB_ID: 46814564-1a41-449a-88e5-c1349eed3a27
+      PREVIEW_APP_SHA: 3eba47cc2ab6d72b057f13a4e561bda168447a29
 
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +80,7 @@ jobs:
               "BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED": "false",
               "BINRAT_TELEGRAM_UI_V2_ENABLED": "true",
               "BINRAT_TELEGRAM_MEDIA_ENABLED": "true",
-              "BINRAT_RELEASE_SHA": "${GITHUB_SHA}"
+              "BINRAT_RELEASE_SHA": "${PREVIEW_APP_SHA}"
             }
           }
           JSON
@@ -136,7 +137,7 @@ jobs:
           pnpm dlx wrangler@4.135.0 secret bulk --config wrangler.preview.jsonc < /tmp/preview-secrets.json
           rm -f /tmp/preview-secrets.json
 
-      - name: Smoke isolated preview and real Rat Trap
+      - name: Smoke isolated preview and independent Mini App surfaces
         shell: bash
         run: |
           set -euo pipefail
@@ -146,7 +147,7 @@ jobs:
               if node <<'NODE'
           const fs=require('fs');
           const h=JSON.parse(fs.readFileSync('/tmp/preview-health.json','utf8'));
-          process.exit(h.ok===true && h.service==='binrat-cloudflare-edge' && h.releaseSha===process.env.GITHUB_SHA ? 0 : 1);
+          process.exit(h.ok===true && h.service==='binrat-cloudflare-edge' && h.releaseSha===process.env.PREVIEW_APP_SHA ? 0 : 1);
           NODE
               then
                 matched=true
@@ -161,11 +162,11 @@ jobs:
             exit 2
           fi
 
-          node <<'NODE' >/tmp/preview-bootstrap-body.json
+          node <<'NODE' >/tmp/preview-base-body.json
           const crypto=require('crypto');
           const fields={
             auth_date:String(Math.floor(Date.now()/1000)),
-            query_id:'binrat-miniapp-preview-smoke',
+            query_id:'binrat-miniapp-preview-v2-smoke',
             user:JSON.stringify({id:Number(process.env.PREVIEW_TESTER_ID),first_name:'BINRAT preview'})
           };
           const check=Object.entries(fields).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>k+'='+v).join('\n');
@@ -174,22 +175,45 @@ jobs:
           process.stdout.write(JSON.stringify({initData:new URLSearchParams({...fields,hash}).toString()}));
           NODE
 
-          curl -fsS --max-time 30 -H 'content-type: application/json'             --data @/tmp/preview-bootstrap-body.json             "${PREVIEW_URL}/api/miniapp/bootstrap" >/tmp/preview-bootstrap.json
+          for surface in hot latest watches; do
+            curl -fsS --max-time 30 -H 'content-type: application/json' \
+              --data @/tmp/preview-base-body.json \
+              "${PREVIEW_URL}/api/miniapp/${surface}" >"/tmp/preview-${surface}.json"
+          done
+
+          node <<'NODE'
+          const fs=require('fs');
+          const hot=JSON.parse(fs.readFileSync('/tmp/preview-hot.json','utf8'));
+          const latest=JSON.parse(fs.readFileSync('/tmp/preview-latest.json','utf8'));
+          const watches=JSON.parse(fs.readFileSync('/tmp/preview-watches.json','utf8'));
+          if(hot?.hotGarbage?.ruleVersion!=='HOT_GARBAGE_PONS_RECURRENCE_V1' || !Array.isArray(hot?.hotGarbage?.candidates)) {
+            console.error(hot); process.exit(2);
+          }
+          if(latest?.chainId!==4663 || !Array.isArray(latest?.launches)) {
+            console.error(latest); process.exit(3);
+          }
+          if(!Array.isArray(watches?.watches)) {
+            console.error(watches); process.exit(4);
+          }
+          console.log(JSON.stringify({
+            hotCandidates:hot.hotGarbage.candidates.length,
+            latestLaunches:latest.launches.length,
+            watches:watches.watches.length
+          }));
+          NODE
 
           node <<'NODE' >/tmp/preview-rat-trap-body.json
           const fs=require('fs');
-          const boot=JSON.parse(fs.readFileSync('/tmp/preview-bootstrap.json','utf8'));
-          if(boot?.rats?.chainId!==4663 || !Array.isArray(boot?.rats?.candidates) || !Array.isArray(boot?.latestLaunches)) {
-            console.error(boot); process.exit(2);
-          }
-          const candidate=boot.rats.candidates.find(x=>/^[0-9a-f]{64}$/i.test(String(x?.latestLaunch?.launchId||'')));
-          const launchId=candidate?.latestLaunch?.launchId || boot.latestLaunches.find(x=>/^[0-9a-f]{64}$/i.test(String(x?.launchId||'')))?.launchId;
-          if(!launchId) process.exit(3);
-          const original=JSON.parse(fs.readFileSync('/tmp/preview-bootstrap-body.json','utf8'));
-          process.stdout.write(JSON.stringify({initData:original.initData,launchId}));
+          const latest=JSON.parse(fs.readFileSync('/tmp/preview-latest.json','utf8'));
+          const launch=latest.launches.find(x=>/^[0-9a-f]{64}$/i.test(String(x?.launchId||'')));
+          if(!launch) process.exit(3);
+          const original=JSON.parse(fs.readFileSync('/tmp/preview-base-body.json','utf8'));
+          process.stdout.write(JSON.stringify({initData:original.initData,launchId:launch.launchId}));
           NODE
 
-          curl -fsS --max-time 45 -H 'content-type: application/json'             --data @/tmp/preview-rat-trap-body.json             "${PREVIEW_URL}/api/miniapp/rat-trap" >/tmp/preview-rat-trap.json
+          curl -fsS --max-time 45 -H 'content-type: application/json' \
+            --data @/tmp/preview-rat-trap-body.json \
+            "${PREVIEW_URL}/api/miniapp/rat-trap" >/tmp/preview-rat-trap.json
 
           node <<'NODE'
           const fs=require('fs');
