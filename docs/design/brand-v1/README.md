@@ -46,14 +46,13 @@ See `TYPOGRAPHY.md`.
 
 The Rat is one recurring individual character, not a theme.
 
-A later Rat Canon gate must pin one exact master source and its allowed derivatives before new generative mascot production is accepted.
+Rat Zero is frozen at `docs/design/brand-v1/canon/rat-zero.jpg` and governed by `RAT_CANON.md`.
 
-Until then:
-
-- do not redesign the Rat;
+- character identity comes from Rat Zero;
+- world / lighting / pixel-language comes from the current approved scoped raster donor;
 - do not create generic vector/SVG mascot replacements;
-- do not alter defining face/silhouette/cyber-eye identity;
-- prefer existing owner-approved raster donors and hash-pinned assets;
+- do not mirror asymmetric identity marks to the wrong side;
+- new poses are candidates until side-by-side identity review passes;
 - when uncertain, preserve rather than reinterpret.
 
 ### Raster-world rule
@@ -76,7 +75,6 @@ Public-copy hierarchy:
 
 The following require Brand V1 gates rather than ad-hoc decisions:
 
-- exact Rat Zero master asset;
 - BINRAT wordmark geometry;
 - rat-head/avatar mark;
 - final palette/token promotion;
