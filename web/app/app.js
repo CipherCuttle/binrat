@@ -5,9 +5,10 @@ const state = {
   latest: null,
   watches: [],
   view: 'home',
-  viewStack: [],
-  indexSurfaceReady: false
+  viewStack: []
 };
+const CACHE_PREFIX='binrat-miniapp-read-v1:';
+const CACHE_MAX_AGE_MS=60*60*1000;
 const byId = id => document.getElementById(id);
 const el = (tag, className, text) => {
   const node=document.createElement(tag);
@@ -15,6 +16,25 @@ const el = (tag, className, text) => {
   if(text!==undefined) node.textContent=text;
   return node;
 };
+
+function cacheWrite(key,value) {
+  try {
+    localStorage.setItem(CACHE_PREFIX+key,JSON.stringify({savedAt:Date.now(),value}));
+  } catch {}
+}
+function cacheRead(key) {
+  try {
+    const parsed=JSON.parse(localStorage.getItem(CACHE_PREFIX+key)||'null');
+    const age=Date.now()-Number(parsed?.savedAt);
+    if(!parsed?.value || !Number.isFinite(age) || age<0 || age>CACHE_MAX_AGE_MS) return null;
+    return parsed.value;
+  } catch {
+    return null;
+  }
+}
+function markStale(root) {
+  root.prepend(el('div','panel','Rat lost the scent. Showing the last verified snapshot from this device.'));
+}
 
 function syncTelegramBackButton() {
   const back=tg?.BackButton;
@@ -80,11 +100,6 @@ function surfaceError(root,message,retry) {
   button.addEventListener('click',retry);
   root.append(panel,button);
 }
-function markIndexReady() {
-  state.indexSurfaceReady=true;
-  byId('source-badge').textContent='LIVE';
-}
-
 function renderHot(hotGarbage) {
   state.hot=hotGarbage;
   const root=byId('hot-list');
@@ -362,11 +377,17 @@ async function loadHot() {
   try {
     const {hotGarbage}=await api('/api/miniapp/hot',{});
     renderHot(hotGarbage);
-    markIndexReady();
-    return true;
+    cacheWrite('hot',hotGarbage);
+    return 'live';
   } catch {
+    const cached=cacheRead('hot');
+    if(cached) {
+      renderHot(cached);
+      markStale(root);
+      return 'stale';
+    }
     surfaceError(root,'Rat lost the scent. Hot Garbage is unavailable right now.',loadHot);
-    return false;
+    return 'failed';
   }
 }
 
@@ -376,11 +397,17 @@ async function loadLatest() {
   try {
     const data=await api('/api/miniapp/latest',{});
     renderLatest(data);
-    markIndexReady();
-    return true;
+    cacheWrite('latest',data);
+    return 'live';
   } catch {
+    const cached=cacheRead('latest');
+    if(cached) {
+      renderLatest(cached);
+      markStale(root);
+      return 'stale';
+    }
     surfaceError(root,'Rat lost the scent. New Drops are unavailable right now.',loadLatest);
-    return false;
+    return 'failed';
   }
 }
 
@@ -410,8 +437,10 @@ async function start() {
     return;
   }
 
-  const [hotOk,latestOk]=await Promise.all([loadHot(),loadLatest(),loadWatches()]).then(([hot,latest])=>[hot,latest]);
-  if(!hotOk && !latestOk) byId('source-badge').textContent='QUIET';
+  const [hotState,latestState]=await Promise.all([loadHot(),loadLatest(),loadWatches()]).then(([hot,latest])=>[hot,latest]);
+  if(hotState==='live' || latestState==='live') byId('source-badge').textContent='LIVE';
+  else if(hotState==='stale' || latestState==='stale') byId('source-badge').textContent='STALE';
+  else byId('source-badge').textContent='QUIET';
 
   const params=new URL(location.href).searchParams;
   const requestedCase=params.get('case');
