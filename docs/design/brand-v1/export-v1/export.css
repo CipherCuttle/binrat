@@ -1,0 +1,150 @@
+@font-face {
+  font-family: "Geist Export";
+  src: url("https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/Geist/webfonts/Geist%5Bwght%5D.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Geist Mono Export";
+  src: url("https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/GeistMono/webfonts/GeistMono%5Bwght%5D.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+:root {
+  --black:#101210;
+  --asphalt:#161916;
+  --panel:#1c201c;
+  --panel-hi:#242a24;
+  --bone:#e4ddcc;
+  --paper:#cec6b5;
+  --muted:#93978d;
+  --orange:#cf9567;
+  --green:#a8b795;
+  --line:#363c34;
+  --line-hi:#596154;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; background:#070807; color:var(--bone); }
+body { font-family:"Geist Export",system-ui,sans-serif; }
+.export-root { display:grid; gap:40px; padding:40px; }
+.export-frame { position:relative; overflow:hidden; flex:none; }
+.dark-context { background:var(--black); color:var(--bone); }
+.light-context { background:var(--bone); color:var(--black); }
+.lockup { display:flex; align-items:center; }
+.rat-mark { display:block; object-fit:cover; flex:none; }
+.canonical-wordmark {
+  font-family:"Geist Export",system-ui,sans-serif;
+  font-weight:800;
+  line-height:.82;
+  letter-spacing:-.075em;
+  color:inherit;
+}
+.mono-tag,.mono-label,.panel-kicker,.panel-note {
+  font-family:"Geist Mono Export",monospace;
+}
+.mono-tag { font-weight:520; letter-spacing:.055em; color:var(--muted); }
+.mono-label { font-size:13px; line-height:1.35; font-weight:560; letter-spacing:.08em; }
+.accent { color:var(--orange); }
+
+.logo-horizontal { width:1200px; height:320px; display:grid; place-items:center; }
+.lockup-large { gap:34px; }
+.lockup-large .rat-mark { width:142px; height:142px; border-radius:28px; }
+.lockup-large .canonical-wordmark { font-size:132px; }
+
+.wordmark-only { width:1000px; height:280px; display:grid; place-items:center; }
+.wordmark-only .canonical-wordmark { font-size:168px; }
+
+.x-header { width:1500px; height:500px; }
+.x-header::before,
+.og-card::before,
+.pressure-board::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(#ffffff04 1px, transparent 1px),
+    linear-gradient(90deg,#ffffff04 1px, transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+.x-safe { position:absolute; inset:70px 160px; display:flex; align-items:center; }
+.header-lockup { gap:32px; position:relative; z-index:2; }
+.header-lockup .rat-mark { width:168px; height:168px; border-radius:32px; }
+.header-lockup .canonical-wordmark { font-size:126px; }
+.header-lockup .mono-tag { margin-top:22px; font-size:15px; }
+.evidence-rule { position:absolute; left:160px; right:160px; bottom:68px; height:1px; background:var(--line-hi); }
+.evidence-rule::before { content:""; display:block; width:176px; height:3px; background:var(--orange); transform:translateY(-1px); }
+
+.og-card { width:1200px; height:630px; padding:52px 58px 48px; }
+.og-topline,.og-footer { position:relative; z-index:2; color:var(--orange); }
+.og-main { position:relative; z-index:2; height:455px; display:flex; flex-direction:column; justify-content:center; }
+.og-lockup { gap:22px; margin-bottom:42px; }
+.og-lockup .rat-mark { width:102px; height:102px; border-radius:20px; }
+.og-lockup .canonical-wordmark { font-size:91px; }
+.og-copy h1 { margin:0; max-width:930px; font:790 72px/.9 "Geist Export"; letter-spacing:-.06em; }
+.og-copy p { margin:25px 0 0; max-width:760px; color:var(--paper); font:500 23px/1.35 "Geist Export"; letter-spacing:-.02em; }
+.og-footer { color:var(--muted); }
+
+.pressure-board { width:1800px; height:1600px; background:var(--black); color:var(--bone); padding:52px; position:relative; overflow:hidden; }
+.pressure-header { position:relative; z-index:2; height:130px; display:flex; justify-content:space-between; gap:40px; align-items:flex-start; border-bottom:1px solid var(--line); }
+.pressure-header h1 { margin:10px 0 0; font:780 54px/.95 "Geist Export"; letter-spacing:-.055em; }
+.pressure-grid { position:relative; z-index:2; margin-top:30px; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:390px 450px 450px; gap:24px; }
+.pressure-panel { position:relative; overflow:hidden; border:1px solid var(--line); padding:28px; }
+.panel-kicker { font-size:12px; font-weight:650; letter-spacing:.12em; color:var(--orange); }
+.panel-note { font-size:10px; color:var(--muted); line-height:1.4; }
+
+.avatar-panel .avatar-row { height:250px; display:flex; align-items:center; justify-content:center; gap:72px; }
+.avatar-circle { overflow:hidden; border-radius:50%; flex:none; border:1px solid rgba(228,221,204,.16); background:var(--panel); }
+.avatar-circle img { width:100%; height:100%; display:block; object-fit:cover; }
+.avatar-circle.a128 { width:128px; height:128px; }
+.avatar-circle.a48 { width:48px; height:48px; }
+.avatar-circle.a32 { width:32px; height:32px; }
+
+.x-context { padding:0; }
+.x-context .panel-kicker { position:absolute; z-index:5; top:22px; left:26px; }
+.mock-x-header { height:220px; padding:58px 42px 24px; background:var(--black); border-bottom:1px solid var(--line); }
+.mock-x-lockup { gap:18px; }
+.mock-x-lockup .rat-mark { width:88px; height:88px; border-radius:18px; }
+.mock-x-lockup .canonical-wordmark { font-size:68px; }
+.mock-x-lockup .mono-tag { margin-top:10px; font-size:9px; }
+.mock-x-profile { height:168px; background:var(--asphalt); display:flex; align-items:center; gap:24px; padding:38px 38px 24px 172px; position:relative; }
+.avatar-circle.profile { position:absolute; width:118px; height:118px; left:36px; top:-50px; border:6px solid var(--asphalt); }
+.profile-lines { display:grid; gap:6px; }
+.profile-lines b { font-size:30px; letter-spacing:-.04em; }
+.profile-lines span { color:var(--muted); font-size:9px; }
+
+.telegram-context { background:var(--asphalt); }
+.telegram-row { margin:30px 0 18px; display:flex; align-items:center; gap:16px; }
+.avatar-circle.tg { width:66px; height:66px; }
+.tg-copy { display:grid; gap:4px; }
+.tg-copy b { font-size:22px; }
+.tg-copy span { color:var(--muted); font-size:9px; }
+.telegram-card-wrap { width:690px; height:300px; overflow:hidden; border-radius:18px; border:1px solid var(--line); background:var(--panel); }
+.telegram-card-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+
+.og-context { color:var(--black); }
+.og-context .panel-kicker,.mobile-context .panel-kicker { color:var(--orange); }
+.og-mini { margin-top:28px; width:700px; height:300px; padding:30px; display:grid; align-content:center; border:1px solid var(--line); }
+.og-mini-lockup { gap:15px; }
+.og-mini-lockup .rat-mark { width:72px; height:72px; border-radius:14px; }
+.og-mini-lockup .canonical-wordmark { font-size:60px; }
+.og-mini-copy { margin-top:36px; font-size:31px; font-weight:750; letter-spacing:-.045em; }
+.url-lines { display:grid; gap:4px; margin-top:18px; }
+.url-lines b { font-size:18px; }
+.url-lines span { font-size:13px; color:var(--muted); }
+
+.mobile-context { color:var(--black); display:grid; grid-template-columns:1fr 390px; gap:20px; align-items:start; }
+.mobile-context .panel-kicker { padding-top:4px; }
+.phone-shell { width:390px; height:382px; overflow:hidden; background:var(--paper); border:1px solid var(--line-hi); box-shadow:10px 10px 0 rgba(16,18,16,.12); }
+.phone-top { height:44px; padding:14px 14px 0; font-size:9px; color:var(--muted); }
+.phone-shell img { width:338px; height:338px; object-fit:cover; display:block; margin:0 auto; }
+
+.page-contexts { background:var(--panel); }
+.page-pair { margin-top:34px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.page-swatch { height:280px; display:grid; place-items:center; border:1px solid var(--line); }
+.context-lockup { gap:14px; }
+.context-lockup .rat-mark { width:72px; height:72px; border-radius:14px; }
+.context-lockup .canonical-wordmark { font-size:58px; }
+.page-contexts .panel-note { margin-top:24px; }
