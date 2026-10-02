@@ -221,3 +221,57 @@ test('Case Model rejects malformed recurrence claims below the factual threshold
     /BINRAT_CASE_FUNDING_RECURRENCE_INVALID/
   );
 });
+
+
+test('Case Model rejects internally inconsistent Replay and funding sibling claims',async()=>{
+  await assert.rejects(
+    buildBinratCaseModel({
+      current:current(),
+      asOfBlock:1000n,
+      replay:replay({targetLaunchKnown:false})
+    }),
+    /BINRAT_CASE_REPLAY_TARGET_NOT_KNOWN/
+  );
+
+  await assert.rejects(
+    buildBinratCaseModel({
+      current:current(),
+      asOfBlock:1000n,
+      funding:funding({
+        sameFundingSource:{
+          label:'SAME FUNDING SOURCE',
+          sourceAddress:addr(8),
+          distinctDeployersAtLeast:2,
+          distinctLaunchesAtLeast:3,
+          relatedLaunches:[
+            {launchId:'c'.repeat(64),deployer:addr(3),launchBlock:'800',transferBlock:'700',valueWei:'1'},
+            {launchId:'d'.repeat(64),deployer:addr(4),launchBlock:'850',transferBlock:'750',valueWei:'2'},
+            {launchId,deployer:addr(2),launchBlock:'950',transferBlock:'900',valueWei:'3'}
+          ]
+        }
+      })
+    }),
+    /BINRAT_CASE_FUNDING_SOURCE_MISMATCH/
+  );
+
+  await assert.rejects(
+    buildBinratCaseModel({
+      current:current(),
+      asOfBlock:1000n,
+      funding:funding({
+        sameFundingSource:{
+          label:'SAME FUNDING SOURCE',
+          sourceAddress:addr(9),
+          distinctDeployersAtLeast:3,
+          distinctLaunchesAtLeast:3,
+          relatedLaunches:[
+            {launchId:'c'.repeat(64),deployer:addr(3),launchBlock:'800',transferBlock:'700',valueWei:'1'},
+            {launchId:'d'.repeat(64),deployer:addr(3),launchBlock:'850',transferBlock:'750',valueWei:'2'},
+            {launchId,deployer:addr(2),launchBlock:'950',transferBlock:'900',valueWei:'3'}
+          ]
+        }
+      })
+    }),
+    /BINRAT_CASE_FUNDING_RECURRENCE_OVERCLAIM/
+  );
+});
