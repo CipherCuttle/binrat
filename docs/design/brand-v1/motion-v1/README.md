@@ -67,9 +67,11 @@ Reduced motion does **not** create another video. It resolves immediately to the
 
 Verification proves that:
 
-- the static reduced-motion asset is exactly 1200×675;
+- the reduced-motion asset is the exact already-approved `rat-found-wide-1200x675.png` bytes;
 - its SHA-256 matches the existing approved social-proof manifest;
 - all literal explanation/evidence remains present without travel, settle, Rat movement or ambient motion.
+
+The current frozen social manifest declares this asset as 1200×675, while FFmpeg 6.1 reports the committed PNG stream as 1200×676. This motion slice does not rewrite upstream Brand V1 proof metadata. It records both declared and observed dimensions in the motion manifest and treats the approved source hash as authority.
 
 This avoids a redundant large binary while making the reduced-motion contract stronger: the fallback is literally the frozen truthful composition, not a separately encoded approximation.
 
