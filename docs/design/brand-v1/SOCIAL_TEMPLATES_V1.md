@@ -143,3 +143,93 @@ For each family:
 - no claim becomes stronger due to visual emphasis.
 
 A template that only works with one exact sentence is not reusable and fails.
+
+
+## Internal visual review — 2026-10-02
+
+Status: **CANDIDATE PASS / OWNER VISUAL APPROVAL PENDING**
+
+The six rendered proofs were reviewed at wide and square ratios.
+
+### RECEIPT
+
+Candidate PASS.
+
+Strengths:
+
+- strongest evidence-first format;
+- clear separation between feral headline and literal receipt;
+- paper/bone evidence panel reads immediately as a retained artifact without becoming fake terminal chrome;
+- square and wide both preserve hierarchy.
+
+Watch:
+
+- avoid filling every row just because space exists;
+- PARTIAL / UNKNOWN / MISSING must remain visually honest rather than being hidden for aesthetics.
+
+### CASE FILE
+
+Candidate PASS.
+
+Strengths:
+
+- denser than RECEIPT without becoming a terminal screenshot;
+- literal narrative remains readable before the structured facts;
+- explicit `PATTERN · NOT A VERDICT` boundary survives both ratios;
+- works without needing large Rat artwork.
+
+Watch:
+
+- do not let future cases expand beyond a few high-value rows;
+- deeper evidence belongs behind the share card, not squeezed into it.
+
+### RAT FOUND SOMETHING
+
+Candidate PASS after one bounded repair.
+
+Initial issue:
+
+- wide source metadata drifted over the Rat artwork and lost contrast.
+
+Repair:
+
+- footer/evidence source constrained to the dark information side;
+- no Rat art, copy semantics or core composition changed.
+
+Strengths:
+
+- strongest scroll-stop format;
+- Rat Zero remains the same individual;
+- headline is feral while the explanation immediately states the factual basis;
+- evidence strip prevents the illustration from becoming unsupported mascot hype.
+
+Watch:
+
+- use this format selectively; if every post is character-dominant, the Rat becomes decoration rather than a signal.
+
+## System-level review
+
+PASS:
+
+- canonical single-color wordmark preserved;
+- Geist Sans / Mono roles remain distinct;
+- no custom logo glyphs;
+- no generic crypto gradient/neon treatment;
+- no fabricated live evidence;
+- no BUY/SELL framing;
+- no unsupported human-identity claim;
+- same template system survives 1200×675 and 1080×1080.
+
+The proof workflow now serializes runs to prevent stale concurrent artifact pushes.
+
+## Freeze gate
+
+Do **not** mark these social templates globally frozen until the owner visually approves the rendered proof family.
+
+On owner approval, promote:
+
+- RECEIPT;
+- CASE FILE;
+- RAT FOUND SOMETHING;
+
+to Brand V1 canonical social composition families and then build platform/export presets on top of them.
