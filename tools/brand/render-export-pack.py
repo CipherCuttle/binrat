@@ -17,10 +17,10 @@ TEMPLATE_DIR = ROOT / "docs/design/brand-v1/export-v1"
 RAT_ZERO = ROOT / "docs/design/brand-v1/canon/rat-zero.jpg"
 SOCIAL_PROOFS = ROOT / "docs/design/brand-v1/proofs/social-v1"
 
-GENERATOR_ID = "binrat.brand-export/1.0.0"
+GENERATOR_ID = "binrat.brand-export/1.1.0"
 GENERATION_COMMAND = "python tools/brand/render-export-pack.py"
 AUTHORITY_BRANCH = "design/binrat-brand-system-v1"
-AUTHORITY_COMMIT = "25a54278e6a5d8eb6f5a568e9e8f05d39ea21a4c"
+AUTHORITY_COMMIT = "770c7aa8741236ee5d8fc8ddd6411bc2addfdade"
 GEIST_COMMIT = "10dc7658f13c38a474cde201bb09a4617267545b"
 GEIST_SANS_URL = f"https://raw.githubusercontent.com/vercel/geist-font/{GEIST_COMMIT}/fonts/Geist/webfonts/Geist%5Bwght%5D.woff2"
 GEIST_MONO_URL = f"https://raw.githubusercontent.com/vercel/geist-font/{GEIST_COMMIT}/fonts/GeistMono/webfonts/GeistMono%5Bwght%5D.woff2"
@@ -36,6 +36,8 @@ REQUIRED_AUTHORITY_DOCS = [
     "docs/design/brand-v1/LOGO_LOCKUP.md",
     "docs/design/brand-v1/WORDMARK_PROOF_V1.md",
     "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md",
+    "docs/design/brand-v1/PALETTE.md",
+    "docs/design/brand-v1/tokens.json",
     "docs/PRODUCT_LANGUAGE.md",
     "docs/PHILOSOPHY.md",
 ]
@@ -121,7 +123,7 @@ def make_rat_derivatives() -> dict[str, Path]:
 
     shutil.copyfile(outputs["avatar-32"], logo / "favicon-candidate-32.png")
     shutil.copyfile(outputs["avatar-48"], logo / "favicon-candidate-48.png")
-    shutil.copyfile(outputs["avatar-512"], xdir / "avatar-512.png")
+    save_png(avatar_source.resize((400, 400), Image.Resampling.LANCZOS), xdir / "avatar-400.png")
     shutil.copyfile(outputs["avatar-512"], telegram / "profile-512.png")
     return outputs
 
@@ -261,6 +263,8 @@ def build_manifest() -> dict[str, Any]:
     logo_doc = "docs/design/brand-v1/LOGO_LOCKUP.md"
     type_doc = "docs/design/brand-v1/TYPOGRAPHY.md"
     social_doc = "docs/design/brand-v1/SOCIAL_TEMPLATES_V1.md"
+    palette_doc = "docs/design/brand-v1/PALETTE.md"
+    token_doc = "docs/design/brand-v1/tokens.json"
     language_doc = "docs/PRODUCT_LANGUAGE.md"
     template_html = "docs/design/brand-v1/export-v1/index.html"
     template_css = "docs/design/brand-v1/export-v1/export.css"
@@ -271,13 +275,13 @@ def build_manifest() -> dict[str, Any]:
         ("exports/logo/canonical-horizontal-dark-1200x320.png", "canonical-horizontal-dark", "Opaque Brand V1 near-black proof background."),
         ("exports/logo/canonical-horizontal-light-1200x320.png", "canonical-horizontal-light", "Opaque Brand V1 bone/paper proof background."),
     ]:
-        records.append(record(name, "canonical horizontal lockup", rel, [rat, logo_doc, type_doc, template_html, template_css], ["web", "social headers", "editorial"], background, "canonical", include_fonts=True))
+        records.append(record(name, "canonical horizontal lockup", rel, [rat, logo_doc, type_doc, palette_doc, token_doc, template_html, template_css], ["web", "social headers", "editorial"], background, "canonical", include_fonts=True))
 
     for rel, name, background in [
         ("exports/logo/wordmark-dark-1000x280.png", "wordmark-dark", "Bone wordmark on near-black proof background; use where dark-context contrast is guaranteed."),
         ("exports/logo/wordmark-light-1000x280.png", "wordmark-light", "Near-black wordmark on bone/paper proof background; use where light-context contrast is guaranteed."),
     ]:
-        records.append(record(name, "single-color BINRAT wordmark", rel, [logo_doc, type_doc, template_html, template_css], ["web", "social", "editorial"], background, "canonical", include_fonts=True))
+        records.append(record(name, "single-color BINRAT wordmark", rel, [logo_doc, type_doc, palette_doc, token_doc, template_html, template_css], ["web", "social", "editorial"], background, "canonical", include_fonts=True))
 
     for size in [512, 256, 128, 64, 48]:
         records.append(record(f"rat-avatar-{size}", "Rat Zero avatar crop", f"exports/logo/rat-avatar-{size}.png", [rat], ["profile", "social", "web"], "Square raster crop; platform may apply circular mask. Never mirror.", "canonical"))
@@ -285,8 +289,8 @@ def build_manifest() -> dict[str, Any]:
     records.append(record("favicon-candidate-32", "favicon candidate", "exports/logo/favicon-candidate-32.png", [rat], ["browser favicon"], "Browser may mask/resample; no simplification authorized.", "candidate"))
     records.append(record("favicon-candidate-48", "favicon candidate", "exports/logo/favicon-candidate-48.png", [rat], ["browser favicon", "compact UI"], "Browser may mask/resample; no simplification authorized.", "candidate"))
 
-    records.append(record("x-avatar-512", "X-style profile avatar", "exports/x/avatar-512.png", [rat], ["X profile"], "Upload square; validate under circular presentation crop.", "canonical"))
-    records.append(record("x-header-1500x500", "X-style header/banner preset", "exports/x/header-1500x500.png", [rat, logo_doc, type_doc, language_doc, template_html, template_css], ["X-style profile header"], "Platform/header crop may vary by viewport; key lockup content stays inside central safe area.", "candidate", include_fonts=True))
+    records.append(record("x-avatar-400", "X profile avatar", "exports/x/avatar-400.png", [rat], ["X profile"], "Official X recommended profile dimensions: 400×400. Upload square; validate under circular presentation crop.", "canonical"))
+    records.append(record("x-header-1500x500", "X-style header/banner preset", "exports/x/header-1500x500.png", [rat, logo_doc, type_doc, palette_doc, token_doc, language_doc, template_html, template_css], ["X-style profile header"], "Platform/header crop may vary by viewport; key lockup content stays inside central safe area.", "candidate", include_fonts=True))
     records.append(record("telegram-profile-512", "Telegram profile avatar", "exports/telegram/profile-512.png", [rat], ["Telegram profile"], "Upload square; Telegram presents circular crop.", "canonical"))
     records.append(record("default-og-1200x630", "default OpenGraph preview", "exports/opengraph/default-og-1200x630.png", [rat, logo_doc, type_doc, language_doc, template_html, template_css], ["OpenGraph", "link unfurl"], "Opaque dark proof background; no live claims or dynamic values.", "candidate", include_fonts=True))
 
@@ -300,7 +304,7 @@ def build_manifest() -> dict[str, Any]:
     ]
     for key, role, filename in social_map:
         source = f"docs/design/brand-v1/proofs/social-v1/{filename}"
-        records.append(record(key, role, f"exports/generic-social/{filename}", [source, social_doc, language_doc], ["generic social", "editorial share"], "Opaque deterministic export from approved Social V1 proof; one extra bottom capture row is removed when present. Fixture is explicitly DEMO / NON-LIVE.", "canonical"))
+        records.append(record(key, role, f"exports/generic-social/{filename}", [source, social_doc, palette_doc, token_doc, language_doc], ["generic social", "editorial share"], "Opaque deterministic export from approved Social V1 proof; one extra bottom capture row is removed when present. Fixture is explicitly DEMO / NON-LIVE.", "canonical"))
 
     platform_copies = [
         ("x-post-receipt-wide", "X representative RECEIPT post", "exports/x/post-receipt-wide-1200x675.png", "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png", ["X post"]),
@@ -311,7 +315,7 @@ def build_manifest() -> dict[str, Any]:
     for name, role, rel, source, surfaces in platform_copies:
         records.append(record(name, role, rel, [source, social_doc, language_doc], surfaces, "Deterministic export of approved Social V1 proof; one extra bottom capture row is removed when present. Fixture remains DEMO / NON-LIVE.", "canonical"))
 
-    records.append(record("pressure-tests", "multi-context diagnostic contact sheet", "exports/proofs/pressure-tests-1800x1600.png", [rat, logo_doc, social_doc, language_doc, template_html, template_css, "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png", "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png"], ["review only"], "Diagnostic only; simulates circular avatar crops, X-style header/profile, Telegram card, OG preview, mobile feed, and dark/light page contexts.", "candidate", include_fonts=True))
+    records.append(record("pressure-tests", "multi-context diagnostic contact sheet", "exports/proofs/pressure-tests-1800x1600.png", [rat, logo_doc, social_doc, palette_doc, token_doc, language_doc, template_html, template_css, "docs/design/brand-v1/proofs/social-v1/receipt-square-1080.png", "docs/design/brand-v1/proofs/social-v1/case-file-wide-1200x675.png"], ["review only"], "Diagnostic only; simulates circular avatar crops, X-style header/profile, Telegram card, OG preview, mobile feed, and dark/light page contexts.", "candidate", include_fonts=True))
 
     return {
         "schemaVersion": "binrat.brand-export/1",
