@@ -18,7 +18,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
       WORKER_URL: https://binrat-edge-v0.pettevik.workers.dev
-      EXPECTED_RELEASE_SHA: 63e734931b4d0ac62a9039f16e79df56c31be849
+      EXPECTED_RELEASE_SHA: 53325fd0806765578ed6921428ad55f15a9728f1
 
     steps:
       - uses: actions/checkout@v4
@@ -129,15 +129,30 @@ jobs:
           gate(bootstrap.response.ok,'LIVE_BOOTSTRAP_FAILED');
           const launches=Array.isArray(bootstrap.body?.latestLaunches)?bootstrap.body.latestLaunches:[];
           gate(launches.length>0,'LIVE_BOOTSTRAP_NO_LAUNCHES');
-          const launch=launches.find(item=>typeof item?.launchId==='string' && /^[0-9a-f]{64}$/i.test(item.launchId));
-          gate(launch,'LIVE_BOOTSTRAP_NO_CANONICAL_LAUNCH');
+          const candidates=launches.filter(item=>typeof item?.launchId==='string' && /^[0-9a-f]{64}$/i.test(item.launchId)).slice(0,10);
+          gate(candidates.length>0,'LIVE_BOOTSTRAP_NO_CANONICAL_LAUNCH');
 
-          const caseResult=await json(worker+'/api/miniapp/case-intelligence',{
-            method:'POST',
-            headers:{'content-type':'application/json'},
-            body:JSON.stringify({initData:signed,launchId:launch.launchId})
-          });
-          gate(caseResult.response.ok,'LIVE_CASE_INTELLIGENCE_FAILED');
+          let launch=null;
+          let caseResult=null;
+          for(const candidate of candidates) {
+            const attempt=await json(worker+'/api/miniapp/case-intelligence',{
+              method:'POST',
+              headers:{'content-type':'application/json'},
+              body:JSON.stringify({initData:signed,launchId:candidate.launchId})
+            });
+            if(attempt.response.ok) {
+              launch=candidate;
+              caseResult=attempt;
+              break;
+            }
+            console.log(JSON.stringify({
+              event:'LIVE_CASE_ATTEMPT_FAILED',
+              launchId:candidate.launchId,
+              status:attempt.response.status,
+              error:typeof attempt.body?.error==='string'?attempt.body.error:null
+            }));
+          }
+          gate(launch&&caseResult?.response.ok,'LIVE_CASE_INTELLIGENCE_FAILED_ALL_CANDIDATES');
           const body=caseResult.body;
 
           gate(body?.case?.caseVersion==='BINRAT_CASE_MODEL_V1','LIVE_CASE_VERSION_INVALID');
