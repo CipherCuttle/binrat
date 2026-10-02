@@ -70,7 +70,7 @@ def validate_page(page):
                 outside,
                 overflow:[getComputedStyle(el).overflowX,getComputedStyle(el).overflowY],
                 actionCount:el.querySelectorAll(".action").length,
-                text:el.innerText,
+                text:el.textContent || "",
                 coverage:el.dataset.coverage,
                 sourceState:el.dataset.sourceState,
                 proofFont,
