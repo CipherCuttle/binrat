@@ -10,10 +10,10 @@ This guide does not redesign BINRAT. It explains how to use the deterministic ex
 
 Use the existing export closest to the target surface. Do not redraw or rebuild the identity in Canva/Figma/Photoshop just because a destination has a different upload dialog.
 
-- **Profile/avatar:** use a Rat Zero avatar export. Upload the square file and allow the platform to apply its circular mask.
+- **Profile/avatar:** use a Rat Zero avatar export. For X use `exports/x/avatar-400.png`; otherwise use the closest canonical square size and allow the platform to apply its circular mask.
 - **Horizontal brand mark:** use the canonical horizontal dark/light export whose background assumption matches the destination.
 - **Wordmark only:** use the single-color wordmark dark/light export. Do not split \`BIN\` and \`RAT\` by color.
-- **X-style header:** use the candidate header preset as-is until a platform-specific crop forces a new bounded preset.
+- **X header:** use `exports/x/header-1500x500.png`. X currently recommends 1500×500 and warns that roughly 60px may crop from the top and bottom across displays; keep essential content inside the encoded safe area.
 - **Telegram profile:** use \`exports/telegram/profile-512.png\`.
 - **OpenGraph:** use \`exports/opengraph/default-og-1200x630.png\` as the static default preview.
 - **Social cards:** choose only **RECEIPT**, **CASE FILE**, or **RAT FOUND SOMETHING**. The generic social exports are the approved demo/non-live reference outputs for those families.
