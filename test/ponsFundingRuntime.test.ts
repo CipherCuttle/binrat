@@ -292,3 +292,49 @@ test('funding migration is additive and idempotent', async () => {
     db.close();
   }
 });
+
+
+test('canonical funding evidence mismatch aborts fail-closed and is never downgraded to scan backoff', async () => {
+  const db=new D1CompatDatabase();
+  await db.exec(D1_SCHEMA_SQL);
+  const store=new D1Store(db,4663);
+  const value=launch({id:'5',block:110,token:9,pool:10,deployer:61});
+  try {
+    await store.putLaunch(value);
+    await store.commitCheckpoint({blockNumber:120n,blockHash:hash(120),guardBlockNumber:null,guardBlockHash:null});
+    await putHealthyRuntime(db,20);
+    const base=sourceFor({
+      launches:new Map([[value.creator,{source:addr(92),transferBlock:105,valueWei:4_000n}]])
+    });
+    const source:PonsFundingSource={
+      ...base,
+      async getBlockPoint(blockNumber) {
+        const point=await base.getBlockPoint(blockNumber);
+        return blockNumber===value.blockNumber
+          ? {...point,blockHash:hash(Number(blockNumber)+999)}
+          : point;
+      }
+    };
+
+    const result=await runCloudflarePonsFundingCycle(
+      {
+        DB:db,
+        BINRAT_PONS_FUNDING_ENABLED:'true',
+        BINRAT_PONS_FUNDING_MAX_PER_CYCLE:'1'
+      },
+      {kind:'PONS_FUNDING_CYCLE',cycleId:'reorg',enqueuedAtMs:20},
+      {now:()=>20,ponsFundingSource:source}
+    );
+    assert.equal(result.status,'RETRY');
+
+    const scans=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_scan_state')
+      .first<{n:number}>();
+    const receipts=await db.prepare('SELECT COUNT(*) AS n FROM pons_funding_receipts')
+      .first<{n:number}>();
+    assert.equal(Number(scans?.n??0),0);
+    assert.equal(Number(receipts?.n??0),0);
+  } finally {
+    store.close();
+    db.close();
+  }
+});
