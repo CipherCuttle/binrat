@@ -81,6 +81,8 @@ When binding real data, missing evidence remains \`UNKNOWN\`, \`PARTIAL\`, \`UNV
 
 Platform UI may crop or mask uploads differently across devices. Check the final surface, not only the source PNG.
 
+The frozen Social V1 browser-capture proofs currently contain one extra bottom raster row (wide: 1200×676; square: 1080×1081) despite their declared 1200×675 / 1080×1080 targets. The export pipeline removes only that extra bottom row, deterministically, when producing distribution assets. Source proofs are not modified. `exports/manifest.json` records the final output dimensions and hashes.
+
 The export system includes one diagnostic contact sheet covering:
 
 - tiny circular avatar;
