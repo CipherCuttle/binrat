@@ -33,6 +33,13 @@ with sync_playwright() as p:
     page.goto(HTML.as_uri(), wait_until="networkidle")
     page.evaluate("document.fonts.ready")
 
+    # Brand invariant: canonical wordmark remains one flat bone color.
+    brand_colors = page.locator(".brand strong").evaluate_all(
+        "els => [...new Set(els.map(el => getComputedStyle(el).color))]"
+    )
+    if brand_colors != ["rgb(228, 221, 204)"]:
+        raise SystemExit(f"wordmark color drift: {brand_colors}")
+
     outputs={}
     for template, ratio, filename in TARGETS:
         locator=page.locator(f'[data-template="{template}"][data-ratio="{ratio}"]')
