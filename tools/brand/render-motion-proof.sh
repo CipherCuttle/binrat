@@ -8,13 +8,13 @@ OUT="$ROOT/docs/design/brand-v1/proofs/motion-v1"
 RAT="$SRC/rat-found-wide-1200x675.png"
 RECEIPT="$SRC/receipt-wide-1200x675.png"
 MOTION="$OUT/found-something-v1.mp4"
-REDUCED="$OUT/found-something-v1-reduced.mp4"
 
 command -v ffmpeg >/dev/null
 command -v ffprobe >/dev/null
 test -s "$RAT"
 test -s "$RECEIPT"
 mkdir -p "$OUT"
+rm -f "$OUT/found-something-v1-reduced.mp4"
 
 ffmpeg -hide_banner -loglevel error -y \
   -loop 1 -framerate 30 -t 6.4 -i "$RAT" \
@@ -41,20 +41,13 @@ ffmpeg -hide_banner -loglevel error -y \
   -threads 1 -x264-params "keyint=192:min-keyint=192:scenecut=0" \
   -movflags +faststart "$MOTION"
 
-ffmpeg -hide_banner -loglevel error -y \
-  -loop 1 -framerate 30 -t 4.8 -i "$RAT" \
-  -vf "pad=1200:676:0:0:color=0x060606" \
-  -an -r 30 -t 4.8 \
-  -c:v libx264 -preset medium -qp 0 -pix_fmt yuv420p \
-  -threads 1 -g 1 \
-  -movflags +faststart "$REDUCED"
-
-python - "$OUT" <<'PY'
+python - "$OUT" "$RAT" <<'PY'
 from __future__ import annotations
 import hashlib, json, pathlib, subprocess, sys
 
 out = pathlib.Path(sys.argv[1])
-files = ["found-something-v1.mp4", "found-something-v1-reduced.mp4"]
+reduced_source = pathlib.Path(sys.argv[2])
+motion = out / "found-something-v1.mp4"
 
 def sha256(path: pathlib.Path) -> str:
     h = hashlib.sha256()
@@ -84,17 +77,22 @@ manifest = {
     "render": "bash tools/brand/render-motion-proof.sh",
     "verify": "bash tools/brand/verify-motion-proof.sh",
     "ffmpeg": subprocess.check_output(["ffmpeg", "-version"], text=True).splitlines()[0],
-    "outputs": {},
+    "reducedMotion": {
+        "mode": "static-source",
+        "path": "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+        "sha256": sha256(reduced_source),
+        "note": "No duplicate video: reduced motion resolves immediately to the already-approved final static composition.",
+    },
+    "outputs": {
+        "found-something-v1.mp4": {
+            "bytes": motion.stat().st_size,
+            "sha256": sha256(motion),
+            "probe": probe(motion),
+        }
+    },
 }
-for name in files:
-    p = out / name
-    manifest["outputs"][name] = {
-        "bytes": p.stat().st_size,
-        "sha256": sha256(p),
-        "probe": probe(p),
-    }
 
 (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 PY
 
-printf 'Rendered %s\nRendered %s\n' "$MOTION" "$REDUCED"
+printf 'Rendered %s\n' "$MOTION"
