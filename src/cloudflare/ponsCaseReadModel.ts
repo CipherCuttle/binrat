@@ -41,11 +41,25 @@ interface CurrentLaunchRow {
   block_hash:Hex;
 }
 
+export interface BinratPonsCaseBundle {
+  caseModel:BinratCaseModel;
+  trashTrail:ReturnType<typeof buildTrashTrailPresentation>;
+  replay:Awaited<ReturnType<typeof readPonsReplaySnapshot>>;
+}
+
 export async function readBinratPonsCase(
   db:D1DatabaseLike,
   blockSource:BinratPonsCaseBlockPointReader,
   options:ReadBinratPonsCaseOptions
 ):Promise<BinratCaseModel> {
+  return (await readBinratPonsCaseBundle(db,blockSource,options)).caseModel;
+}
+
+export async function readBinratPonsCaseBundle(
+  db:D1DatabaseLike,
+  blockSource:BinratPonsCaseBlockPointReader,
+  options:ReadBinratPonsCaseOptions
+):Promise<BinratPonsCaseBundle> {
   if(!/^[0-9a-f]{64}$/i.test(options.currentLaunchId)) {
     throw new Error('BINRAT_CASE_ADAPTER_LAUNCH_ID_INVALID');
   }
@@ -96,7 +110,7 @@ export async function readBinratPonsCase(
 
   const current=buildCurrentLaunch(currentRow,replay.targetLaunch.tokenIdentity);
 
-  return buildBinratCaseModel({
+  const caseModel=await buildBinratCaseModel({
     current,
     asOfBlock:options.asOfBlock,
     trashTrail:{
@@ -119,6 +133,8 @@ export async function readBinratPonsCase(
     },
     funding
   });
+
+  return {caseModel,trashTrail,replay};
 }
 
 function assertSiblingAgreement(input:{
