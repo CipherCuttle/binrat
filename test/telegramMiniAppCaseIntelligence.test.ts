@@ -173,7 +173,21 @@ test('authenticated Case endpoint returns one assembled read-only Case pinned to
         handoffs:Array<{kind:string}>;
         coverage:{trashTrail:string;replay:string;funding:string};
         caseDigest:string;
-      }
+      };
+      trashTrail:{
+        presentationVersion:string;
+        summary:{previousLaunches:number;coverageText:string};
+        launches:Array<unknown>;
+      };
+      replay:{
+        replayVersion:string;
+        semantics:string;
+        asOfBlock:string;
+        targetLaunchKnown:boolean;
+        targetLaunch:{launchId:string}|null;
+        previousLaunches:Array<unknown>;
+        outputDigest:string;
+      };
     };
 
     assert.equal(body.case.caseVersion,'BINRAT_CASE_MODEL_V1');
@@ -190,6 +204,17 @@ test('authenticated Case endpoint returns one assembled read-only Case pinned to
     assert.equal(body.case.coverage.replay,'AVAILABLE');
     assert.equal(body.case.coverage.funding,'NO_POSITIVE_FACT');
     assert.match(body.case.caseDigest,/^[0-9a-f]{64}$/);
+
+    assert.equal(body.trashTrail.presentationVersion,'BINRAT_PONS_TRASH_TRAIL_PRESENTATION_V1');
+    assert.equal(body.trashTrail.summary.previousLaunches,0);
+    assert.deepEqual(body.trashTrail.launches,[]);
+    assert.equal(body.replay.replayVersion,'BINRAT_PONS_REPLAY_LAB_V1');
+    assert.equal(body.replay.semantics,'KNOWABLE_AS_OF_BLOCK');
+    assert.equal(body.replay.asOfBlock,'220');
+    assert.equal(body.replay.targetLaunchKnown,true);
+    assert.equal(body.replay.targetLaunch?.launchId,current.launchId);
+    assert.deepEqual(body.replay.previousLaunches,[]);
+    assert.match(body.replay.outputDigest,/^[0-9a-f]{64}$/);
 
     assert.equal(calls.get('200'),1);
     assert.equal(calls.get('220'),3);
