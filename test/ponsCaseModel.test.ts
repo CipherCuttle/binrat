@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildPonsCaseModel } from '../src/pons/caseModel.js';
 
+const transferTxHash = `0x${'44'.repeat(32)}` as `0x${string}`;
+
 const launch = {
   launchId: 'a'.repeat(64),
   token: '0x1111111111111111111111111111111111111111' as const,
@@ -29,7 +31,7 @@ test('Pons case model composes only positive factual reasons in deterministic or
     funding: {
       currentFunding: {
         sourceAddress: '0x3333333333333333333333333333333333333333',
-        transferTxHash: `0x${'44'.repeat(32)}`,
+        transferTxHash,
         transferBlock: '78000000',
         transferTimestampMs: 1_800_000_000_000,
         valueWei: '1000000000000000'
@@ -106,7 +108,7 @@ test('funding without recurrence is preserved as positive evidence but does not 
     funding: {
       currentFunding: {
         sourceAddress: '0x3333333333333333333333333333333333333333',
-        transferTxHash: `0x${'44'.repeat(32)}`,
+        transferTxHash,
         transferBlock: '78000000',
         transferTimestampMs: 1_800_000_000_000,
         valueWei: '1000000000000000'
@@ -138,7 +140,7 @@ test('case model rejects a recurrence source that disagrees with the current fun
     funding: {
       currentFunding: {
         sourceAddress: '0x3333333333333333333333333333333333333333',
-        transferTxHash: `0x${'44'.repeat(32)}`,
+        transferTxHash,
         transferBlock: '78000000',
         transferTimestampMs: 1_800_000_000_000,
         valueWei: '1000000000000000'
@@ -166,4 +168,37 @@ test('case model rejects a Replay receipt when Replay is unavailable', () => {
       receiptId: `binrat-pons-replay:${'c'.repeat(64)}`
     }
   }), /PONS_CASE_REPLAY_RECEIPT_WITHOUT_AVAILABILITY/);
+});
+
+
+test('case model rejects funding recurrence without a current-launch funding receipt', () => {
+  assert.throws(() => buildPonsCaseModel({
+    launch,
+    funding: {
+      currentFunding: null,
+      sameFundingSource: {
+        sourceAddress: '0x3333333333333333333333333333333333333333',
+        distinctDeployersAtLeast: 2,
+        distinctLaunchesAtLeast: 2
+      },
+      recurrenceCoverage: {
+        status: 'COMPLETE',
+        verifiedReceipts: 2,
+        truncated: false
+      }
+    }
+  }), /PONS_CASE_FUNDING_RECURRENCE_WITHOUT_CURRENT/);
+});
+
+test('case model rejects internally inconsistent history coverage', () => {
+  assert.throws(() => buildPonsCaseModel({
+    launch,
+    history: {
+      previousLaunches: 2,
+      launchesWithAnyMemory: 2,
+      launchesWithFullMemory: 2,
+      launchesPendingMemory: 1,
+      launchesStillImmature: 0
+    }
+  }), /PONS_CASE_HISTORY_COUNT_OVERFLOW/);
 });
