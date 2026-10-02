@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "binrat.roadmap-v2-proof/1",
+  "status": "PASS",
+  "implementationCommit": "6ef5667e827e7d63bba62c05e299983d3968c153",
+  "brandAuthority": "0343d3815e509c45ef6b4991a7f8d438e2f4deb1",
+  "ratZeroSha256": "43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+  "sequence": ["SNIFF", "REMEMBER", "INVESTIGATE", "WATCH", "CONNECT", "AUTONOMOUS RAT"],
+  "checks": [
+    "single active stage",
+    "no horizontal overflow at desktop, laptop, narrow and short mobile",
+    "no console errors",
+    "no permanent animation",
+    "reduced motion preserves stateful scene and literal evidence tag",
+    "active scene structural layer count <= 6",
+    "no pictorial SVG, canvas, CSS rat, or donor image"
+  ],
+  "proofs": {
+    "beforeSniffDesktop": "sha256:70ba9c359412ad96576c757d92dccba106fefab2272147814ea4c9bc51043df1",
+    "afterAutonomousDesktop": "sha256:0e9792b3dc3a96e02acd4d7e3bfd8be93cc772e29952178af6a32a4c4a3859fe",
+    "laptop": "sha256:c558b151f52530cba51caca9750295205d82d616aace54638d0d1044bf1b16f8",
+    "mobile": "sha256:614012d26c5432e6e300ed88234c4e6696995bba212b317d1664a4722e8e2825",
+    "mobileShort": "sha256:4d61c2c945b46039f010ca4d81cbd8bb048db193f98e43ed4aec13e52b0ddc6e",
+    "reducedMotion": "sha256:5e77fcf9b5a6c8834be588f54145aad147998ca4537d62fc9602ac8ad4d81411"
+  }
+}
