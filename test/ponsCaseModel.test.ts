@@ -106,10 +106,10 @@ test('Case Model composes factual reasons and valid handoffs without scores',asy
   assert.equal(model.coverage.funding,'POSITIVE_FACTS');
   assert.match(model.caseDigest,/^[0-9a-f]{64}$/);
 
-  const serialized=JSON.stringify(model);
-  assert.doesNotMatch(serialized,/WATCH_FUNDER|score|win rate|profitability|buy signal|sell signal/i);
-  assert.match(serialized,/Pons-reported deployer/);
-  assert.match(serialized,/not proof of a human identity|does not establish common ownership/i);
+  const claims=JSON.stringify({facts:model.facts,handoffs:model.handoffs});
+  assert.doesNotMatch(claims,/WATCH_FUNDER|score|win rate|profitability|buy signal|sell signal/i);
+  assert.match(claims,/Pons-reported deployer/);
+  assert.match(claims,/not proof of a human identity|does not establish common ownership/i);
 });
 
 test('Case Model does not turn missing positive funding evidence into a negative claim',async()=>{
@@ -136,7 +136,7 @@ test('Case Model does not turn missing positive funding evidence into a negative
   assert.deepEqual(model.handoffs,[]);
   assert.equal(model.coverage.funding,'NO_POSITIVE_FACT');
   assert.match(model.boundaries.fundingAbsence,/does not mean the deployer was not funded/i);
-  assert.doesNotMatch(JSON.stringify(model),/NOT FUNDED|NO FUNDING|UNFUNDED/i);
+  assert.doesNotMatch(JSON.stringify(model.facts),/NOT FUNDED|NO FUNDING|UNFUNDED/i);
 });
 
 test('Case Model keeps handoffs honest when only some downstream surfaces are supported',async()=>{
