@@ -20,10 +20,12 @@ export function activationGateError(mode, context) {
   if (!parseActivationMode(mode)) return 'ACTIVATION_MODE_INVALID';
   const permittedRefs = mode === ACTIVATION_MODE.TEXT_PRIVATE
     ? ['refs/heads/feat/binrat-robinhood-live-rat-v1']
-    : ['refs/heads/feat/binrat-telegram-ux-v2','refs/heads/codex/telegram-as-code-private-v2','refs/heads/feat/binrat-telegram-messaging-v1','refs/heads/fix/binrat-4663-surface-authority-v1'];
+    : ['refs/heads/feat/binrat-telegram-ux-v2','refs/heads/codex/telegram-as-code-private-v2','refs/heads/feat/binrat-telegram-messaging-v1','refs/heads/fix/binrat-4663-surface-authority-v1','refs/heads/ops/binrat-case-surface-private-preview-v1'];
   if (!permittedRefs.includes(context.ref)) return 'REF_NOT_CONTROLLED_RAT_BRANCH';
   if (mode === ACTIVATION_MODE.TELEGRAM_UI_V2_PRIVATE) {
-    if (context.eventName !== 'workflow_dispatch') return 'TELEGRAM_UI_V2_DISPATCH_ONLY';
+    const previewPush = context.eventName === 'push' &&
+      context.ref === 'refs/heads/ops/binrat-case-surface-private-preview-v1';
+    if (context.eventName !== 'workflow_dispatch' && !previewPush) return 'TELEGRAM_UI_V2_DISPATCH_ONLY';
     if (context.confirmation !== UI_V2_CONFIRMATION) return 'TELEGRAM_UI_V2_CONFIRMATION_REQUIRED';
     if (!/^[0-9a-f]{40}$/.test(context.reviewedSha ?? '') || context.reviewedSha !== context.githubSha) {
       return 'TELEGRAM_UI_V2_REVIEWED_SHA_MISMATCH';

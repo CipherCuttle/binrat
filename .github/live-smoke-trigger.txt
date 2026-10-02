@@ -1,0 +1,4 @@
+Trigger read-only live Case surface smoke against the already-active private preview release 63e734931b4d0ac62a9039f16e79df56c31be849.
+Retry after smoke harness fix.
+Retry against corrected private preview release 53325fd0806765578ed6921428ad55f15a9728f1.
+Retry with deployed tester resolution parity.
