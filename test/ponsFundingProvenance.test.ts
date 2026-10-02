@@ -284,7 +284,9 @@ test('Alchemy candidate locator is bounded to newest direct external native inbo
   assert.equal(candidate.blockNumber,123n);
   assert.equal(candidate.valueWei,16n);
 
-  const params=(requestBody?.params as Array<Record<string,unknown>>)?.[0];
+  assert.ok(requestBody);
+  const body=requestBody as Record<string,unknown>;
+  const params=(body.params as Array<Record<string,unknown>>)?.[0];
   assert.deepEqual(params,{
     fromBlock:'0x0',
     toBlock:'0x7c',
