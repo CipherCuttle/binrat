@@ -74,6 +74,16 @@ For authored pictorial BINRAT environments, inherit the current roadmap rule:
 
 DOM/CSS may lay out, mask, dim, illuminate and animate raster layers. It should not procedurally redraw rooms, rats, terminals, pipes, paper, props or scene hardware as pictorial substitutes.
 
+### Social composition
+
+Canonical Brand V1 social families are frozen:
+
+- **RECEIPT**
+- **CASE FILE**
+- **RAT FOUND SOMETHING**
+
+See `SOCIAL_TEMPLATES_V1.md`.
+
 ### Voice
 
 Inherit `docs/PRODUCT_LANGUAGE.md` without creating a parallel social-media dialect.
@@ -87,7 +97,6 @@ Public-copy hierarchy:
 The following require Brand V1 gates rather than ad-hoc decisions:
 
 - final palette/token promotion;
-- social post composition families;
 - X / Telegram / OpenGraph export templates;
 - motion grammar outside already-approved scoped implementations;
 - exact Geist Pixel variant(s);
