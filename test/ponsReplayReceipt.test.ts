@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { buildProvenanceFact } from '../src/intelligence/provenance.js';
+import { sha256Hex } from '../src/evidence/canonical.js';
 import { buildPonsCurveOutcomeCapabilityReceipt, NATIVE_QUOTE } from '../src/pons/outcomeCapability.js';
 import { buildPonsOutcomeObservationReceipt } from '../src/pons/outcomeReceipts.js';
 import { buildPonsReplaySnapshot } from '../src/pons/replayLab.js';
@@ -146,4 +147,48 @@ test('Replay receipt supports launch-only snapshots without inventing evidence r
   assert.deepEqual(collectEvidenceRefs(snapshot),[]);
   assert.deepEqual(receipt.evidenceRefs,[]);
   await verifyPonsReplayReceipt(snapshot,receipt);
+});
+
+
+test('portable verifier rejects self-consistent future evidence beyond the replay boundary',async()=>{
+  const snapshot=await richSnapshot();
+
+  const futureIdentityCore={
+    ...snapshot,
+    targetLaunch:{
+      ...snapshot.targetLaunch!,
+      tokenIdentity:{
+        ...snapshot.targetLaunch!.tokenIdentity!,
+        observedBlock:'250'
+      }
+    }
+  };
+  const {outputDigest:_identityDigest,...identityCore}=futureIdentityCore;
+  const futureIdentity={
+    ...identityCore,
+    outputDigest:await sha256Hex(identityCore)
+  };
+  await assert.rejects(
+    buildPonsReplayReceipt(futureIdentity),
+    /PONS_REPLAY_RECEIPT_FUTURE_IDENTITY/
+  );
+
+  const futureOutcomeCore={
+    ...snapshot,
+    targetLaunch:{
+      ...snapshot.targetLaunch!,
+      observations:snapshot.targetLaunch!.observations.map((item)=>item.observationId
+        ? {...item,observedBlock:'250'}
+        : item)
+    }
+  };
+  const {outputDigest:_outcomeDigest,...outcomeCore}=futureOutcomeCore;
+  const futureOutcome={
+    ...outcomeCore,
+    outputDigest:await sha256Hex(outcomeCore)
+  };
+  await assert.rejects(
+    buildPonsReplayReceipt(futureOutcome),
+    /PONS_REPLAY_RECEIPT_FUTURE_OUTCOME/
+  );
 });
