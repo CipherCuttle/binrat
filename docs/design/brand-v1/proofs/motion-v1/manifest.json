@@ -25,8 +25,8 @@
   },
   "outputs": {
     "found-something-v1.mp4": {
-      "bytes": 452774,
-      "sha256": "dce0b5e225f5b8a8bc8e95d4a7619d211192d17a9312e7664386a80e360d91f4",
+      "bytes": 391065,
+      "sha256": "9bcc12723208b2dcd232edb56dbcd614e68b27d91e2ca3fe0aeb77b143d0fece",
       "probe": {
         "programs": [],
         "streams": [
