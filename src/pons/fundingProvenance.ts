@@ -184,7 +184,7 @@ export class AlchemyPonsFundingSource implements PonsFundingSource {
             excludeZeroValue: true,
             withMetadata: false,
             order: 'desc',
-            maxCount: '0x1'
+            maxCount: '0x5'
           }]
         })
       });
@@ -198,7 +198,9 @@ export class AlchemyPonsFundingSource implements PonsFundingSource {
 
     const payload = await response.json() as AlchemyTransferResponse;
     if (payload.error) throw new Error('PONS_FUNDING_TRANSFERS_RPC_ERROR');
-    const transfer = payload.result?.transfers?.[0];
+    const transfer = payload.result?.transfers?.find(
+      (item) => String(item.from ?? '').toLowerCase() !== deployer.toLowerCase()
+    );
     if (!transfer) return null;
 
     const from = String(transfer.from ?? '').toLowerCase() as Hex;
@@ -286,6 +288,9 @@ export async function buildPonsPrelaunchNativeInboundReceipt(input: {
 }): Promise<PonsPrelaunchNativeInboundReceipt> {
   validateLaunch(input.launch);
   assertAddress(input.sourceAddress, 'PONS_FUNDING_SOURCE_INVALID');
+  if (input.sourceAddress.toLowerCase()===input.launch.deployer.toLowerCase()) {
+    throw new Error('PONS_FUNDING_SOURCE_IS_DEPLOYER');
+  }
   assertHash(input.transferTxHash, 'PONS_FUNDING_TX_HASH_INVALID');
   assertHash(input.transferBlockHash, 'PONS_FUNDING_TRANSFER_BLOCK_HASH_INVALID');
   if (input.transferBlock < 0n || input.transferBlock >= input.launch.blockNumber) {
