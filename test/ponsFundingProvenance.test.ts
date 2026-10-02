@@ -230,6 +230,22 @@ test('same funding source projection requires at least two distinct deployers an
   assert.equal(projected[0]?.distinctLaunches,3);
 });
 
+test('self-transfer cannot become funding evidence', async () => {
+  const value=launch('4',addr(42),200);
+  await assert.rejects(
+    buildPonsPrelaunchNativeInboundReceipt({
+      launch:value,
+      sourceAddress:value.deployer,
+      transferTxHash:hash(31),
+      transferBlock:190n,
+      transferBlockHash:hash(190),
+      transferTimestampMs:190_000,
+      valueWei:10n
+    }),
+    /PONS_FUNDING_SOURCE_IS_DEPLOYER/
+  );
+});
+
 test('different source addresses never collapse into a funding cluster', async () => {
   const first=await buildPonsPrelaunchNativeInboundReceipt({
     launch:launch('2',addr(20),200),
@@ -262,6 +278,13 @@ test('Alchemy candidate locator is bounded to newest direct external native inbo
       id:1,
       result:{
         transfers:[{
+          blockNum:'0x7a',
+          hash:hash(699),
+          from:addr(71),
+          to:addr(71),
+          category:'external',
+          rawContract:{value:'0x9',address:null}
+        },{
           blockNum:'0x7b',
           hash:hash(700),
           from:addr(70),
@@ -295,6 +318,6 @@ test('Alchemy candidate locator is bounded to newest direct external native inbo
     excludeZeroValue:true,
     withMetadata:false,
     order:'desc',
-    maxCount:'0x1'
+    maxCount:'0x5'
   });
 });
