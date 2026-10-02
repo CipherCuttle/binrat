@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "binrat.social-proof/1",
+  "status": "REVIEW_REQUIRED",
+  "fixture": "DEMO / NON-LIVE",
+  "templates": [
+    "receipt",
+    "case-file",
+    "rat-found"
+  ],
+  "ratios": {
+    "wide": [
+      1200,
+      675
+    ],
+    "square": [
+      1080,
+      1080
+    ]
+  },
+  "outputs": {
+    "receipt-wide-1200x675.png": {
+      "width": 1200,
+      "height": 675,
+      "bytes": 59780,
+      "sha256": "bfebd161f7ca5bfcab6ac764bc7a473f152f5d49d4aa539d6cf36fa18722a6c0"
+    },
+    "case-file-wide-1200x675.png": {
+      "width": 1200,
+      "height": 675,
+      "bytes": 67162,
+      "sha256": "16a089f15174d23912ee719fddebb2d8ee15a9bbab6bd7d17e26405c321435f9"
+    },
+    "rat-found-wide-1200x675.png": {
+      "width": 1200,
+      "height": 675,
+      "bytes": 691121,
+      "sha256": "0bcca2b79b8d88f6bfff963606b2f2d628aeb020c50ea539d1964705b1bcc406"
+    },
+    "receipt-square-1080.png": {
+      "width": 1080,
+      "height": 1080,
+      "bytes": 66978,
+      "sha256": "becde4002883781f970816fc24a80da2d21cdbf9555db05601f3b923fa33e19f"
+    },
+    "case-file-square-1080.png": {
+      "width": 1080,
+      "height": 1080,
+      "bytes": 69813,
+      "sha256": "5567fdb403612472d4a7619b7d628b6d3ee00a48441d4491de997acc0bcdd822"
+    },
+    "rat-found-square-1080.png": {
+      "width": 1080,
+      "height": 1080,
+      "bytes": 594424,
+      "sha256": "59a10a804ba8effa570fb1ca8e3a150ba69193da035786d48078dac126d274aa"
+    }
+  },
+  "note": "All proof values are demo-only. Templates inherit canonical Rat Zero and Geist brand contracts."
+}
