@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "binrat.identity-proof/1",
+  "source": {
+    "path": "docs/design/brand-v1/canon/rat-zero.jpg",
+    "dimensions": [
+      1536,
+      1536
+    ],
+    "sha256": "43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+    "mirrored": false
+  },
+  "crops": {
+    "profile": [
+      350,
+      180,
+      1230,
+      1060
+    ],
+    "avatar": [
+      420,
+      215,
+      1180,
+      975
+    ]
+  },
+  "resampling": "Pillow LANCZOS for downscale; NEAREST only for enlarged contact-sheet inspection",
+  "outputs": {
+    "docs/design/brand-v1/proofs/identity-v1/rat-zero-reference-768.jpg": {
+      "bytes": 288758,
+      "sha256": "efa1e2d82007aedc96cbd4c35bd71944f52d8f8e305628e6a45576b1ace29f80"
+    },
+    "docs/design/brand-v1/proofs/identity-v1/rat-profile-512.png": {
+      "bytes": 468994,
+      "sha256": "d89c2a1b1bf1be16c291d130275b009f52c1482f19e35e1f74dbef115d6e58d8"
+    },
+    "docs/design/brand-v1/proofs/identity-v1/rat-avatar-128.png": {
+      "bytes": 39880,
+      "sha256": "69ef48888d5ab2ba5dcffdd4a4f8fd75053d6aacd87b24debfbe030921888493"
+    },
+    "docs/design/brand-v1/proofs/identity-v1/rat-avatar-48.png": {
+      "bytes": 6251,
+      "sha256": "5334193e94690f0076ad01f92dd2ca8988264c979139a279557a13c9c4cd9b85"
+    },
+    "docs/design/brand-v1/proofs/identity-v1/rat-avatar-32.png": {
+      "bytes": 3044,
+      "sha256": "aebfdb9b5d3d621ec233e6cc67872c01294c75712057330816aaef31f2fe1d83"
+    },
+    "docs/design/brand-v1/proofs/identity-v1/rat-mono-128.png": {
+      "bytes": 5009,
+      "sha256": "6a5edb57ba19246be176763be96da987723c991fa0ce9f09d74aa5b16fd86041"
+    },
+    "docs/design/brand-v1/proofs/identity-v1/identity-contact-sheet.png": {
+      "bytes": 1281128,
+      "sha256": "45a1ae9e6ce83175b75cf942f02781984b2c2b0b379fc95e1811161c3caa8746"
+    }
+  },
+  "verdict": "REVIEW_REQUIRED",
+  "note": "No asset in this proof is a new mascot or new pose. All are deterministic Rat Zero derivatives."
+}
