@@ -1,3 +1,4 @@
+@import url("../brand-tokens.css");
 @font-face {
   font-family: "Geist Export";
   src: url("https://raw.githubusercontent.com/vercel/geist-font/10dc7658f13c38a474cde201bb09a4617267545b/fonts/Geist/webfonts/Geist%5Bwght%5D.woff2") format("woff2");
@@ -13,17 +14,17 @@
   font-display: block;
 }
 :root {
-  --black:#101210;
-  --asphalt:#161916;
-  --panel:#1c201c;
-  --panel-hi:#242a24;
-  --bone:#e4ddcc;
-  --paper:#cec6b5;
-  --muted:#93978d;
-  --orange:#cf9567;
-  --green:#a8b795;
-  --line:#363c34;
-  --line-hi:#596154;
+  --black:var(--br-ink);
+  --asphalt:var(--br-asphalt);
+  --panel:var(--br-panel);
+  --panel-hi:var(--br-panel-high);
+  --bone:var(--br-bone);
+  --paper:var(--br-paper);
+  --muted:var(--br-muted);
+  --orange:var(--br-copper);
+  --green:var(--br-oxidized-mint);
+  --line:var(--br-line);
+  --line-hi:var(--br-line-high);
 }
 * { box-sizing:border-box; }
 html,body { margin:0; background:#070807; color:var(--bone); }
