@@ -29,7 +29,7 @@
       "proof": "DEMO / NON-LIVE",
       "family": "receipt",
       "receiptId": "DEMO-R012",
-      "headline": "SAME DEPLOYER. TWELVE LAUNCHES.",
+      "headline": "SAME DEPLOYER. TWELVE LAUNCHES. AGAIN.",
       "literalExplanation": "This source-reported demo deployer appears across 12 retained demo launches. Coverage is partial, so recurrence stays a pattern, not a verdict.",
       "deployer": "DEMO_0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
       "observation": "12 retained demo launches",
@@ -176,7 +176,7 @@
       "proof": "DEMO / NON-LIVE",
       "family": "case-file",
       "caseId": "DEMO-CUNK",
-      "headline": "THE TRAIL STOPS WHERE COVERAGE STOPS.",
+      "headline": "TWELVE LAUNCHES. SAME TRAIL. KEEP DIGGING.",
       "literalSummary": "This fixture deliberately ends at the boundary of the demo index. Anything before that point remains unknown.",
       "facts": [
         {
