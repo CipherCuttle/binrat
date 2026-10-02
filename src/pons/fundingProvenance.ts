@@ -221,7 +221,7 @@ export async function readPonsPrelaunchNativeInbound(
 
   await source.assertAuthority();
   const launchPoint = await source.getBlockPoint(launch.blockNumber);
-  if (launchPoint.blockHash !== launch.blockHash.toLowerCase()) {
+  if (launchPoint.blockHash.toLowerCase() !== launch.blockHash.toLowerCase()) {
     throw new Error('PONS_FUNDING_LAUNCH_REORG');
   }
 
@@ -233,9 +233,9 @@ export async function readPonsPrelaunchNativeInbound(
 
   const tx = await source.getTransaction(candidate.txHash);
   if (
-    tx.hash !== candidate.txHash.toLowerCase() ||
-    tx.from !== candidate.from.toLowerCase() ||
-    tx.to !== launch.deployer.toLowerCase() ||
+    tx.hash.toLowerCase() !== candidate.txHash.toLowerCase() ||
+    tx.from.toLowerCase() !== candidate.from.toLowerCase() ||
+    tx.to?.toLowerCase() !== launch.deployer.toLowerCase() ||
     tx.valueWei !== candidate.valueWei ||
     tx.blockNumber !== candidate.blockNumber
   ) {
@@ -246,10 +246,10 @@ export async function readPonsPrelaunchNativeInbound(
   const transferPoint = await source.getBlockPoint(tx.blockNumber);
   const launchAgain = await source.getBlockPoint(launch.blockNumber);
   const transferAgain = await source.getBlockPoint(tx.blockNumber);
-  if (launchAgain.blockHash !== launchPoint.blockHash) {
+  if (launchAgain.blockHash.toLowerCase() !== launchPoint.blockHash.toLowerCase()) {
     throw new Error('PONS_FUNDING_LAUNCH_REORG_DURING_READ');
   }
-  if (transferAgain.blockHash !== transferPoint.blockHash) {
+  if (transferAgain.blockHash.toLowerCase() !== transferPoint.blockHash.toLowerCase()) {
     throw new Error('PONS_FUNDING_TRANSFER_REORG_DURING_READ');
   }
 
