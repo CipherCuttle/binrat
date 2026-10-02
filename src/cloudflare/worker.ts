@@ -362,13 +362,18 @@ async function miniAppCaseIntelligence(
     }
 
     const checkpoint = await env.DB.prepare(
-      'SELECT block_number FROM chain_checkpoints WHERE chain_id=? LIMIT 1'
-    ).bind(ROBINHOOD_CHAIN_ID).first<{block_number:string}>();
-    if (!checkpoint || !/^(0|[1-9]\d*)$/.test(checkpoint.block_number)) {
+      'SELECT block_number,block_hash FROM chain_checkpoints WHERE chain_id=? LIMIT 1'
+    ).bind(ROBINHOOD_CHAIN_ID).first<{block_number:string;block_hash:string}>();
+    if (
+      !checkpoint ||
+      !/^(0|[1-9]\d*)$/.test(checkpoint.block_number) ||
+      !/^0x[0-9a-f]{64}$/i.test(checkpoint.block_hash)
+    ) {
       throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_MISSING');
     }
 
     const asOfBlock = BigInt(checkpoint.block_number);
+    const pinnedHash = checkpoint.block_hash.toLowerCase();
     const blockSource = deps.ponsCaseBlockSource ?? (() => {
       const archiveRpcUrl = resolveRobinhoodArchiveRpcUrl(env);
       return new RpcPonsOutcomeObservationSource({
@@ -377,12 +382,39 @@ async function miniAppCaseIntelligence(
       });
     })();
 
+    const beforePoint = await blockSource.getBlockPoint(asOfBlock);
+    if (
+      beforePoint.blockNumber !== asOfBlock ||
+      beforePoint.blockHash.toLowerCase() !== pinnedHash
+    ) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG');
+    }
+
     const caseModel = await readBinratPonsCase(env.DB, blockSource, {
       currentLaunchId: body.launchId.toLowerCase(),
       asOfBlock,
       maxPreviousLaunches: 25,
       maxRelatedFundingLaunches: 25
     });
+
+    const afterCheckpoint = await env.DB.prepare(
+      'SELECT block_number,block_hash FROM chain_checkpoints WHERE chain_id=? LIMIT 1'
+    ).bind(ROBINHOOD_CHAIN_ID).first<{block_number:string;block_hash:string}>();
+    if (
+      !afterCheckpoint ||
+      afterCheckpoint.block_number !== checkpoint.block_number ||
+      afterCheckpoint.block_hash.toLowerCase() !== pinnedHash
+    ) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_DRIFT');
+    }
+
+    const afterPoint = await blockSource.getBlockPoint(asOfBlock);
+    if (
+      afterPoint.blockNumber !== asOfBlock ||
+      afterPoint.blockHash.toLowerCase() !== pinnedHash
+    ) {
+      throw new Error('BINRAT_CASE_ENDPOINT_CHECKPOINT_REORG_DURING_READ');
+    }
 
     return json(200, { case: caseModel });
   } catch (error) { return miniAppError(error); }
