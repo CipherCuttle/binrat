@@ -33,7 +33,8 @@ ffmpeg -hide_banner -loglevel error -y \
       enable='between(t,3.10,5.17)':
       format=auto[c];
     [endsrc]format=rgba,fade=t=in:st=5.05:d=0.35:alpha=1[end];
-    [c][end]overlay=x=0:y=0:enable='gte(t,5.05)':format=auto[out]
+    [c][end]overlay=x=0:y=0:enable='gte(t,5.05)':format=auto[scene];
+    [scene]pad=1200:676:0:0:color=0x060606[out]
   " \
   -map "[out]" -an -r 30 -t 6.4 \
   -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
@@ -42,6 +43,7 @@ ffmpeg -hide_banner -loglevel error -y \
 
 ffmpeg -hide_banner -loglevel error -y \
   -loop 1 -framerate 30 -t 4.8 -i "$RAT" \
+  -vf "pad=1200:676:0:0:color=0x060606" \
   -an -r 30 -t 4.8 \
   -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
   -threads 1 -x264-params "keyint=144:min-keyint=144:scenecut=0" \
