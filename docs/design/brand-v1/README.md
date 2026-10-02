@@ -55,6 +55,17 @@ Rat Zero is frozen at `docs/design/brand-v1/canon/rat-zero.jpg` and governed by 
 - new poses are candidates until side-by-side identity review passes;
 - when uncertain, preserve rather than reinterpret.
 
+### Logo / lockup
+
+The canonical Brand V1 identity is frozen:
+
+- Rat mark → deterministic Rat Zero crop;
+- wordmark → single-color heavy Geist Sans `BINRAT`;
+- primary lockup → Rat Zero left + wordmark right;
+- optional contextual metadata → detachable Geist Mono evidence tab.
+
+See `LOGO_LOCKUP.md` and `WORDMARK_PROOF_V1.md`.
+
 ### Raster-world rule
 
 For authored pictorial BINRAT environments, inherit the current roadmap rule:
@@ -75,8 +86,6 @@ Public-copy hierarchy:
 
 The following require Brand V1 gates rather than ad-hoc decisions:
 
-- BINRAT wordmark geometry;
-- rat-head/avatar mark;
 - final palette/token promotion;
 - social post composition families;
 - X / Telegram / OpenGraph export templates;
