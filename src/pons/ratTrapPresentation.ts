@@ -154,8 +154,25 @@ function coverageText(summary:{
 
 function launchLabel(launch:PonsRatTrapLaunchProjection):string {
   const receiptSymbol=launch.tokenIdentity?.symbol.trim() ?? '';
-  if(receiptSymbol) return receiptSymbol.startsWith('
+  if(receiptSymbol) return receiptSymbol.startsWith('$') ? receiptSymbol : '$' + receiptSymbol;
+  const receiptName=launch.tokenIdentity?.name.trim() ?? '';
+  if(receiptName) return receiptName;
+  const symbol=launch.symbol.trim();
+  if(symbol) return symbol.startsWith('$') ? symbol : '$' + symbol;
+  const name=launch.name.trim();
+  if(name) return name;
+  return shortAddress(launch.token);
+}
 
+function launchLabelSource(
+  launch:PonsRatTrapLaunchProjection
+):'PERSISTED_TOKEN_IDENTITY'|'CANONICAL_LAUNCH'|'TOKEN_ADDRESS' {
+  if(launch.tokenIdentity && (launch.tokenIdentity.symbol.trim() || launch.tokenIdentity.name.trim())) {
+    return 'PERSISTED_TOKEN_IDENTITY';
+  }
+  if(launch.symbol.trim() || launch.name.trim()) return 'CANONICAL_LAUNCH';
+  return 'TOKEN_ADDRESS';
+}
 function quoteLabel(asset:PonsRatTrapQuoteAsset):string {
   if(asset.kind==='NATIVE_ETH') return 'ETH est. FDV';
   return `quote tokens (${shortAddress(asset.address)}) est. FDV`;
