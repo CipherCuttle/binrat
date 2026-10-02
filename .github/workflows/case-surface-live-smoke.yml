@@ -1,0 +1,123 @@
+name: case-surface-live-smoke
+
+on:
+  push:
+    branches:
+      - ops/binrat-case-surface-private-preview-v1
+
+permissions:
+  contents: read
+
+jobs:
+  live-smoke:
+    if: ${{ contains(github.event.head_commit.message, '[smoke-private-case-surface]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TESTER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID }}
+      TESTER_ID_FALLBACK: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
+      WORKER_URL: https://binrat-edge-v0.pettevik.workers.dev
+      EXPECTED_RELEASE_SHA: 63e734931b4d0ac62a9039f16e79df56c31be849
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Read-only live Case surface smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const { createHmac } = require('node:crypto');
+
+          const worker = process.env.WORKER_URL;
+          const token = process.env.TELEGRAM_BOT_TOKEN?.trim() || '';
+          const tester = (process.env.TESTER_ID?.trim() || process.env.TESTER_ID_FALLBACK?.trim() || '');
+          const expectedSha = process.env.EXPECTED_RELEASE_SHA;
+
+          function gate(ok, code) {
+            if (!ok) throw new Error(code);
+          }
+          async function json(url, init) {
+            const response = await fetch(url, {...init, signal:AbortSignal.timeout(20_000)});
+            const body = await response.json().catch(()=>null);
+            return {response,body};
+          }
+          function initData() {
+            gate(/^\d{4,17}$/.test(tester),'TESTER_ID_INVALID');
+            gate(token.length>0,'TELEGRAM_TOKEN_MISSING');
+            const fields={
+              auth_date:String(Math.floor(Date.now()/1000)),
+              query_id:'binrat-live-case-smoke',
+              user:JSON.stringify({id:Number(tester),first_name:'BINRAT live Case smoke'})
+            };
+            const check=Object.entries(fields).sort(([a],[b])=>a.localeCompare(b))
+              .map(([key,value])=>key+'='+value).join('\n');
+            const secret=createHmac('sha256','WebAppData').update(token).digest();
+            const hash=createHmac('sha256',secret).update(check).digest('hex');
+            return new URLSearchParams({...fields,hash}).toString();
+          }
+
+          const health=await json(worker+'/health');
+          gate(health.response.ok && health.body?.ok===true,'LIVE_HEALTH_FAILED');
+          gate(health.body.releaseSha===expectedSha,'LIVE_RELEASE_SHA_MISMATCH');
+
+          const appResponse=await fetch(worker+'/app/app.js',{signal:AbortSignal.timeout(20_000)});
+          const app=await appResponse.text();
+          gate(appResponse.ok,'LIVE_APP_ASSET_FAILED');
+          gate(app.includes('/api/miniapp/case-intelligence'),'LIVE_APP_CASE_ENDPOINT_MISSING');
+          gate(app.includes('renderCaseWhy'),'LIVE_APP_WHY_MISSING');
+          gate(app.includes('renderCaseTrashTrail'),'LIVE_APP_TRASH_TRAIL_MISSING');
+          gate(app.includes('renderCaseReplay'),'LIVE_APP_REPLAY_MISSING');
+          gate(!app.includes("/api/miniapp/trash-trail"),'LIVE_APP_STANDALONE_TRAIL_REGRESSION');
+
+          const signed=initData();
+          const bootstrap=await json(worker+'/api/miniapp/bootstrap',{
+            method:'POST',
+            headers:{'content-type':'application/json'},
+            body:JSON.stringify({initData:signed})
+          });
+          gate(bootstrap.response.ok,'LIVE_BOOTSTRAP_FAILED');
+          const launches=Array.isArray(bootstrap.body?.latestLaunches)?bootstrap.body.latestLaunches:[];
+          gate(launches.length>0,'LIVE_BOOTSTRAP_NO_LAUNCHES');
+          const launch=launches.find(item=>typeof item?.launchId==='string' && /^[0-9a-f]{64}$/i.test(item.launchId));
+          gate(launch,'LIVE_BOOTSTRAP_NO_CANONICAL_LAUNCH');
+
+          const caseResult=await json(worker+'/api/miniapp/case-intelligence',{
+            method:'POST',
+            headers:{'content-type':'application/json'},
+            body:JSON.stringify({initData:signed,launchId:launch.launchId})
+          });
+          gate(caseResult.response.ok,'LIVE_CASE_INTELLIGENCE_FAILED');
+          const body=caseResult.body;
+
+          gate(body?.case?.caseVersion==='BINRAT_CASE_MODEL_V1','LIVE_CASE_VERSION_INVALID');
+          gate(body?.case?.current?.launchId===launch.launchId.toLowerCase(),'LIVE_CASE_TARGET_MISMATCH');
+          gate(typeof body?.case?.asOfBlock==='string','LIVE_CASE_BLOCK_MISSING');
+          gate(body?.trashTrail?.presentationVersion==='BINRAT_PONS_TRASH_TRAIL_PRESENTATION_V1','LIVE_TRAIL_VERSION_INVALID');
+          gate(body?.replay?.replayVersion==='BINRAT_PONS_REPLAY_LAB_V1','LIVE_REPLAY_VERSION_INVALID');
+          gate(body?.replay?.semantics==='KNOWABLE_AS_OF_BLOCK','LIVE_REPLAY_SEMANTICS_INVALID');
+          gate(body?.replay?.targetLaunchId===launch.launchId.toLowerCase(),'LIVE_REPLAY_TARGET_MISMATCH');
+          gate(body?.replay?.asOfBlock===body.case.asOfBlock,'LIVE_REPLAY_BLOCK_MISMATCH');
+          gate(body?.replay?.targetLaunchKnown===true,'LIVE_REPLAY_TARGET_NOT_KNOWN');
+          gate(Array.isArray(body?.case?.facts),'LIVE_CASE_FACTS_INVALID');
+          gate(Array.isArray(body?.case?.handoffs),'LIVE_CASE_HANDOFFS_INVALID');
+          gate(Array.isArray(body?.trashTrail?.launches),'LIVE_TRAIL_LAUNCHES_INVALID');
+          gate(Array.isArray(body?.replay?.previousLaunches),'LIVE_REPLAY_PREVIOUS_INVALID');
+
+          console.log(JSON.stringify({
+            status:'LIVE_CASE_SURFACE_SMOKE_PASS',
+            releaseSha:health.body.releaseSha,
+            launchId:launch.launchId,
+            asOfBlock:body.case.asOfBlock,
+            factKinds:body.case.facts.map(item=>item.kind),
+            handoffs:body.case.handoffs.map(item=>item.kind),
+            trashTrailPrevious:body.trashTrail.summary?.previousLaunches ?? null,
+            replayPrevious:body.replay.previousLaunches.length,
+            fundingCoverage:body.case.coverage?.funding ?? null
+          },null,2));
+          NODE
