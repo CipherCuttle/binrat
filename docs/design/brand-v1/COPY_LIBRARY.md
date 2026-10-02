@@ -34,12 +34,26 @@ Canonical role language remains source-bounded. Never silently upgrade:
 
 For live/generated copy, values in braces are data slots, not sample facts.
 
+### Social-card renderer compatibility
+
+For the three canonical rendered social families, the production renderer is stricter than the broader copy library. Treat these as **hard card-envelope rules**, not general X/Telegram/Web copy limits:
+
+| Family | Headline hard max | Literal hard max | Fact rows | Allowed rendered CTA labels |
+| --- | ---: | ---: | ---: | --- |
+| RECEIPT | 38 chars | 170 chars | — | `OPEN RECEIPTS →`, `OPEN CASE →`, `DIG DEEPER →` |
+| CASE FILE | 42 chars | 200 chars | 3–5 | `OPEN RECEIPTS →`, `OPEN CASE →`, `DIG DEEPER →` |
+| RAT FOUND SOMETHING | 24 chars | 150 chars | — | `OPEN RECEIPTS →`, `OPEN CASE →`, `DIG DEEPER →` |
+
+The wider CTA library later in this document remains valid for other product surfaces. It is **not** an allowlist for these rendered social cards.
+
+Machine-readable mirror: `copy-fixtures.json.social_card_contract`. Compatibility target: `binrat.social/1`.
+
 ---
 
 ## 1. RECEIPT posts
 
 **Structural formula:** short feral finding → one literal observation → evidence state + source → one action.  
-**Max recommended length:** headline 4 words; literal line 160 characters; full post/card body ~320 characters before metadata.  
+**Max recommended length:** headline 4 words; target literal line ≤160 characters. **Rendered social-card hard max:** headline 38 characters; literal 170 characters. Full post/card body remains ~320 characters before metadata.  
 **Evidence boundary:** one retained finding only. State exactly what was observed or derived and expose source/coverage. Do not turn recurrence, similarity, or visual prominence into a verdict.  
 **Forbidden:** “smart money,” “rugger,” “safe,” “good buy,” “alpha,” “this wallet knows,” unsupported creator/human identity, hidden PARTIAL/MISSING coverage.
 
@@ -51,30 +65,30 @@ Examples:
 
 2. **THE RAT KEPT THIS.**  
    {artifact_type} was observed for {launch_id} at {observed_at}.  
-   **OBSERVED · {coverage}** · Source →
+   **OBSERVED · {coverage}** · OPEN RECEIPTS →
 
 3. **SAME SCRAP. NEW BAG.**  
    The same {field_name} value appears in {match_count} indexed launches.  
-   **PATTERN · {coverage}** · Compare receipts →
+   **PATTERN · {coverage}** · OPEN RECEIPTS →
 
 4. **FOUND A RECEIPT.**  
    BINRAT retained the launch-time {artifact_type} before the current change.  
-   **OBSERVED · {coverage}** · View snapshot →
+   **OBSERVED · {coverage}** · OPEN RECEIPTS →
 
 5. **THIS ONE REPEATS.**  
    {observable_name} matches {match_count} earlier retained observations.  
-   **DERIVED · {coverage}** · Inspect matches →
+   **DERIVED · {coverage}** · OPEN RECEIPTS →
 
 6. **NOTED. BAGGED.**  
    The source reported deployer {address_short} for launch {launch_id}.  
-   **OBSERVED · {coverage}** · Open receipt →
+   **OBSERVED · {coverage}** · OPEN RECEIPTS →
 
 ---
 
 ## 2. CASE FILE posts
 
-**Structural formula:** case headline → literal case summary → 2–4 high-value facts → explicit claim boundary → source/action.  
-**Max recommended length:** headline 5 words; narrative 220 characters; 4 fact rows maximum on share cards.  
+**Structural formula:** case headline → literal case summary → 3–5 high-value facts → explicit claim boundary → source/action.  
+**Rendered social-card hard max:** headline 42 characters; narrative 200 characters; 3–5 fact rows. For non-card prose, use the broader surface-specific limits later in this library.  
 **Evidence boundary:** compress an investigation without inventing connective tissue. Related observations may be a PATTERN; they are not automatically one actor, one intent, or one outcome.  
 **Forbidden:** “case closed” when evidence is partial, criminal/scam labels from recurrence, creator attribution not supplied by source, outcome claims without outcome coverage.
 
@@ -82,34 +96,34 @@ Examples:
 
 1. **SAME DEPLOYER. FIVE LAUNCHES.**  
    This source-reported deployer recurs across {launch_count} retained launches. Outcomes are shown only where covered.  
-   **PATTERN · NOT A VERDICT** · Open Case File →
+   **PATTERN · NOT A VERDICT** · OPEN CASE →
 
 2. **THE TRAIL IS LONGER.**  
    This launch connects to {related_count} earlier receipts through {relationship_type}.  
-   **DERIVED · {coverage}** · Follow Trash Trail →
+   **DERIVED · {coverage}** · DIG DEEPER →
 
 3. **THREE RECEIPTS. ONE CASE.**  
    BINRAT grouped {receipt_count} source-backed observations for this launch.  
-   **{coverage}** · Inspect evidence →
+   **{coverage}** · OPEN CASE →
 
 4. **THE STORY CHANGED.**  
    A retained launch-time artifact differs from the currently observed version.  
-   **OBSERVED · {coverage}** · Compare snapshots →
+   **OBSERVED · {coverage}** · DIG DEEPER →
 
 5. **WE HAVE PART OF IT.**  
    The case contains {known_count} supported findings; {missing_count} requested evidence areas remain unavailable.  
-   **PARTIAL** · See gaps →
+   **PARTIAL** · OPEN CASE →
 
 6. **GIVE IT A CASE.**  
    BINRAT traced the available history for {case_subject} and kept each supporting receipt separate.  
-   **{coverage}** · Open Case File →
+   **{coverage}** · OPEN CASE →
 
 ---
 
 ## 3. RAT FOUND SOMETHING posts
 
 **Structural formula:** 1–3 word character headline → immediate literal finding → one evidence strip → one action.  
-**Max recommended length:** headline 3 words; explanation 150 characters; one evidence strip only.  
+**Max recommended length:** headline 1–3 words. **Rendered social-card hard max:** headline 24 characters; explanation 150 characters; one evidence strip only.  
 **Evidence boundary:** this is the most expressive format, so the literal line must immediately identify exactly what was found. “Something” may be a receipt, recurrence, difference, missing source, or other bounded observation—not “a gem.”  
 **Forbidden:** “alpha found,” “ape this,” “winner,” “next 100x,” “caught a scammer,” suspense that withholds the literal finding.
 
@@ -117,27 +131,27 @@ Examples:
 
 1. **FOUND SOMETHING.**  
    This exact deployer appears in {launch_count} retained launches.  
-   **PATTERN · {coverage}** · Open trail →
+   **PATTERN · {coverage}** · OPEN CASE →
 
 2. **SMELLS FAMILIAR.**  
    {observable_name} matches an earlier retained observation.  
-   **DERIVED · {coverage}** · Compare →
+   **DERIVED · {coverage}** · DIG DEEPER →
 
 3. **RAT GOT PAPER.**  
    A launch-time {artifact_type} is retained for this case.  
-   **OBSERVED · {coverage}** · See receipt →
+   **OBSERVED · {coverage}** · OPEN RECEIPTS →
 
 4. **TRASH MOVED.**  
    The current {artifact_type} differs from the retained launch-time version.  
-   **OBSERVED · {coverage}** · Replay →
+   **OBSERVED · {coverage}** · DIG DEEPER →
 
 5. **HOLE IN THE BAG.**  
    {evidence_area} could not be verified from the available source.  
-   **MISSING** · See coverage →
+   **MISSING** · OPEN CASE →
 
 6. **SAME TRACKS.**  
    {match_count} launches share the same observed {field_name}.  
-   **PATTERN · {coverage}** · Inspect matches →
+   **PATTERN · {coverage}** · OPEN RECEIPTS →
 
 ---
 
@@ -528,6 +542,8 @@ Examples:
 ---
 
 ## 16. CTA variants
+
+These are **general product-surface CTA families**. They are not the rendered-social-card allowlist; RECEIPT / CASE FILE / RAT FOUND SOMETHING cards accept only `OPEN RECEIPTS →`, `OPEN CASE →`, or `DIG DEEPER →` as defined above.
 
 **Structural formula:** one concrete verb + canonical product object.  
 **Max recommended length:** 2–4 words preferred; 28 characters maximum for primary buttons where practical.  

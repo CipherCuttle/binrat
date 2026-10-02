@@ -1,7 +1,8 @@
 # BINRAT Brand V1 — Banned Language
 
 **Status:** lint/reference companion to `COPY_LIBRARY.md`  
-**Machine-readable authority:** `copy-fixtures.json`
+**Machine-readable authority:** `copy-fixtures.json`  
+**Executable validation:** `node tools/brand/validate-copy-library.mjs`
 
 This file exists to catch public-copy drift before it becomes product truth.
 
@@ -262,7 +263,7 @@ Preferred action families:
 
 ## 10. Suggested lint behavior
 
-Use `copy-fixtures.json` as the machine-readable source.
+Use `copy-fixtures.json` as the machine-readable source. Regex `pattern` values are JavaScript `RegExp` source strings after JSON parsing; they must not carry an extra escaping layer. `validate-copy-library.mjs` compiles every pattern and proves representative positive/negative probes.
 
 Recommended severities:
 

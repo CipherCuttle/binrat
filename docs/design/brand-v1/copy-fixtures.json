@@ -69,49 +69,49 @@
     {
       "id": "trade_imperative",
       "severity": "ERROR",
-      "pattern": "\\\\b(?:buy|sell|ape|exit|load up|get in)\\\\b.{0,28}\\\\b(?:now|this|token|coin|launch)?\\\\b",
+      "pattern": "\\b(?:buy|sell|ape|exit|load up|get in)\\b.{0,28}\\b(?:now|this|token|coin|launch)?\\b",
       "note": "Apply only to BINRAT-authored imperative copy; quoted/source content is excluded."
     },
     {
       "id": "financial_guarantee",
       "severity": "ERROR",
-      "pattern": "\\\\bguarantee(?:d|s)?\\\\b.{0,40}\\\\b(?:return|yield|apy|listing|price|profit)",
+      "pattern": "\\bguarantee(?:d|s)?\\b.{0,40}\\b(?:return|yield|apy|listing|price|profit)",
       "note": "No guarantee language."
     },
     {
       "id": "safe_rug_verdict",
       "severity": "ERROR",
-      "pattern": "\\\\b(?:safe|rug)\\\\s*(?:score|rating|verdict)?\\\\b",
+      "pattern": "\\b(?:safe|rug)\\s*(?:score|rating|verdict)?\\b",
       "note": "Context-aware exclusion required for documentation saying BINRAT does not issue these."
     },
     {
       "id": "unrestricted_autonomy",
       "severity": "ERROR",
-      "pattern": "\\\\b(?:fully|completely|unrestricted)\\\\s+autonomous\\\\b|\\\\btrades? for you\\\\b",
+      "pattern": "\\b(?:fully|completely|unrestricted)\\s+autonomous\\b|\\btrades? for you\\b",
       "note": "Autonomy must remain scoped and attributable."
     },
     {
       "id": "generic_ai_alpha",
       "severity": "ERROR",
-      "pattern": "\\\\b(?:ai[- ]powered|ai driven|powered by ai)\\\\b.{0,40}\\\\b(?:alpha|intelligence|insight|trading)\\\\b",
+      "pattern": "\\b(?:ai[- ]powered|ai driven|powered by ai)\\b.{0,40}\\b(?:alpha|intelligence|insight|trading)\\b",
       "note": "Generic startup/crypto overclaim."
     },
     {
       "id": "identity_overreach",
       "severity": "WARN",
-      "pattern": "\\\\b(?:same person|same team|same dev|their other launches|this founder)\\\\b",
+      "pattern": "\\b(?:same person|same team|same dev|their other launches|this founder)\\b",
       "note": "Requires separate identity evidence; deployer recurrence is insufficient."
     },
     {
       "id": "intent_overreach",
       "severity": "WARN",
-      "pattern": "\\\\b(?:trying to|planning to|wants to|dumping on|baiting buyers|hiding)\\\\b",
+      "pattern": "\\b(?:trying to|planning to|wants to|dumping on|baiting buyers|hiding)\\b",
       "note": "Observable behavior does not establish motive."
     },
     {
       "id": "coverage_erasure",
       "severity": "WARN",
-      "pattern": "\\\\b(?:all clear|looks clean|nothing suspicious|no history|complete history)\\\\b",
+      "pattern": "\\b(?:all clear|looks clean|nothing suspicious|no history|complete history)\\b",
       "note": "Require explicit supported scope and evidence basis."
     }
   ],
@@ -228,8 +228,10 @@
     },
     "case_file_post": {
       "headline_words": 5,
-      "literal_chars": 220,
-      "fact_rows": 4
+      "literal_chars": 200,
+      "fact_rows": 4,
+      "fact_rows_min": 3,
+      "fact_rows_max": 5
     },
     "rat_found_something": {
       "headline_words": 3,
@@ -402,5 +404,47 @@
     "COMPLETE must always name or inherit an explicit supported scope.",
     "No-match claims must identify the searched/indexed scope when global absence could be inferred.",
     "Feral headlines must be followed by a literal finding when published as standalone public copy."
-  ]
+  ],
+  "social_card_contract": {
+    "schema_version": "binrat.social/1",
+    "note": "Hard compatibility envelope for canonical rendered social cards. Broader CTA/copy guidance elsewhere in this file applies to other product surfaces.",
+    "coverage_states": [
+      "COMPLETE",
+      "PARTIAL",
+      "UNKNOWN",
+      "MISSING"
+    ],
+    "evidence_states": [
+      "OBSERVED",
+      "DERIVED",
+      "PATTERN",
+      "UNKNOWN",
+      "COMPLETE",
+      "PARTIAL",
+      "UNVERIFIED",
+      "MISSING"
+    ],
+    "cta_labels": [
+      "OPEN RECEIPTS →",
+      "OPEN CASE →",
+      "DIG DEEPER →"
+    ],
+    "families": {
+      "receipt": {
+        "headline_chars": 38,
+        "literal_chars": 170
+      },
+      "case-file": {
+        "headline_chars": 42,
+        "literal_chars": 200,
+        "fact_rows_min": 3,
+        "fact_rows_max": 5
+      },
+      "rat-found": {
+        "headline_chars": 24,
+        "literal_chars": 150,
+        "evidence_strips": 1
+      }
+    }
+  }
 }
