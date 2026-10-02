@@ -12,7 +12,7 @@ export class D1PonsFundingStore implements PonsFundingStore {
   constructor(private readonly db:D1DatabaseLike) {}
 
   async listPending(limit:number):Promise<PonsFundingLaunch[]> {
-    const result=await this.db.prepare(\`
+    const result=await this.db.prepare(`
       WITH checkpoint AS (
         SELECT CAST(block_number AS INTEGER) AS tip
         FROM chain_checkpoints WHERE chain_id=4663 LIMIT 1
@@ -30,7 +30,7 @@ export class D1PonsFundingStore implements PonsFundingStore {
         )
       ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC
       LIMIT ?
-    \`).bind(limit).all<{
+    `).bind(limit).all<{
       launch_id:string;
       creator:Hex;
       block_number:string;
@@ -54,13 +54,13 @@ export class D1PonsFundingStore implements PonsFundingStore {
       blockHash:receipt.launchBlockHash
     });
     const payload=canonicalJson(receipt);
-    const result=await this.db.prepare(\`
+    const result=await this.db.prepare(`
       INSERT OR IGNORE INTO pons_funding_receipts (
         funding_id,funding_version,chain_id,launch_id,deployer,launch_block,launch_block_hash,
         source_address,transfer_tx_hash,transfer_block,transfer_block_hash,transfer_timestamp_ms,
         value_wei,evidence_digest,payload_json
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    \`).bind(
+    `).bind(
       receipt.fundingId,receipt.fundingVersion,receipt.chainId,receipt.launchId,receipt.deployer,
       receipt.launchBlock.toString(),receipt.launchBlockHash,receipt.sourceAddress,receipt.transferTxHash,
       receipt.transferBlock.toString(),receipt.transferBlockHash,receipt.transferTimestampMs,
@@ -68,18 +68,18 @@ export class D1PonsFundingStore implements PonsFundingStore {
     ).run();
     if (changes(result)===1) return 'INSERTED';
 
-    const existing=await this.db.prepare(\`
+    const existing=await this.db.prepare(`
       SELECT funding_id,evidence_digest,payload_json
       FROM pons_funding_receipts
       WHERE funding_id=? OR launch_id=?
       LIMIT 1
-    \`).bind(receipt.fundingId,receipt.launchId)
+    `).bind(receipt.fundingId,receipt.launchId)
       .first<{funding_id:string;evidence_digest:string;payload_json:string}>();
     if (!existing ||
         existing.funding_id!==receipt.fundingId ||
         existing.evidence_digest!==receipt.evidenceDigest ||
         existing.payload_json!==payload) {
-      throw new Error(\`PONS_FUNDING_CONFLICT:\${receipt.launchId}\`);
+      throw new Error(`PONS_FUNDING_CONFLICT:${receipt.launchId}`);
     }
     return 'DUPLICATE';
   }
@@ -92,11 +92,11 @@ export class D1PonsFundingStore implements PonsFundingStore {
       throw new Error('PONS_FUNDING_SCAN_TIME_INVALID');
     }
     await this.assertLaunchAuthority(launch);
-    const result=await this.db.prepare(\`
+    const result=await this.db.prepare(`
       INSERT OR IGNORE INTO pons_funding_scan_state (
         launch_id,chain_id,deployer,launch_block,launch_block_hash,status,checked_at_ms
       ) VALUES (?,4663,?,?,?,'NO_MATCH',?)
-    \`).bind(
+    `).bind(
       launch.launchId,
       launch.deployer.toLowerCase(),
       launch.blockNumber.toString(),
@@ -105,12 +105,12 @@ export class D1PonsFundingStore implements PonsFundingStore {
     ).run();
     if (changes(result)===1) return 'INSERTED';
 
-    const existing=await this.db.prepare(\`
+    const existing=await this.db.prepare(`
       SELECT deployer,launch_block,launch_block_hash,status
       FROM pons_funding_scan_state
       WHERE launch_id=?
       LIMIT 1
-    \`).bind(launch.launchId).first<{
+    `).bind(launch.launchId).first<{
       deployer:string;
       launch_block:string;
       launch_block_hash:string;
@@ -121,18 +121,18 @@ export class D1PonsFundingStore implements PonsFundingStore {
         existing.launch_block!==launch.blockNumber.toString() ||
         existing.launch_block_hash!==launch.blockHash.toLowerCase() ||
         existing.status!=='NO_MATCH') {
-      throw new Error(\`PONS_FUNDING_SCAN_CONFLICT:\${launch.launchId}\`);
+      throw new Error(`PONS_FUNDING_SCAN_CONFLICT:${launch.launchId}`);
     }
     return 'DUPLICATE';
   }
 
   private async assertLaunchAuthority(launch:PonsFundingLaunch):Promise<void> {
-    const row=await this.db.prepare(\`
+    const row=await this.db.prepare(`
       SELECT creator,block_number,block_hash
       FROM launches
       WHERE chain_id=4663 AND source='PONS_V2' AND launch_id=?
       LIMIT 1
-    \`).bind(launch.launchId).first<{
+    `).bind(launch.launchId).first<{
       creator:string;
       block_number:string;
       block_hash:string;
@@ -141,7 +141,7 @@ export class D1PonsFundingStore implements PonsFundingStore {
         row.creator.toLowerCase()!==launch.deployer.toLowerCase() ||
         row.block_number!==launch.blockNumber.toString() ||
         row.block_hash.toLowerCase()!==launch.blockHash.toLowerCase()) {
-      throw new Error(\`PONS_FUNDING_LAUNCH_AUTHORITY_MISMATCH:\${launch.launchId}\`);
+      throw new Error(`PONS_FUNDING_LAUNCH_AUTHORITY_MISMATCH:${launch.launchId}`);
     }
   }
 }
