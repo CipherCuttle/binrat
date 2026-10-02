@@ -1,0 +1,46 @@
+:root {
+  /* BINRAT Brand V1 primitives */
+  --br-ink: #101210;
+  --br-asphalt: #161916;
+  --br-panel: #1c201c;
+  --br-panel-high: #242a24;
+  --br-dumpster: #263b35;
+  --br-dumpster-high: #405a4a;
+  --br-bone: #e4ddcc;
+  --br-paper: #cec6b5;
+  --br-muted: #93978d;
+  --br-copper: #cf9567;
+  --br-rat-eye: #ff3948;
+  --br-oxidized-mint: #a8b795;
+  --br-bruise: #9a8aa2;
+  --br-line: #363c34;
+  --br-line-high: #596154;
+
+  /* Brand V1 semantic aliases */
+  --br-bg-canvas: var(--br-ink);
+  --br-bg-subtle: var(--br-asphalt);
+  --br-bg-panel: var(--br-panel);
+  --br-bg-raised: var(--br-panel-high);
+  --br-bg-branded: var(--br-dumpster);
+
+  --br-text-primary: var(--br-bone);
+  --br-text-secondary: var(--br-paper);
+  --br-text-muted: var(--br-muted);
+  --br-text-on-paper: var(--br-ink);
+
+  --br-accent-attention: var(--br-copper);
+  --br-focus: var(--br-copper);
+  --br-character-eye: var(--br-rat-eye);
+
+  --br-evidence-observed: var(--br-oxidized-mint);
+  --br-evidence-complete: var(--br-oxidized-mint);
+  --br-evidence-partial: var(--br-copper);
+  --br-evidence-noted: var(--br-copper);
+  --br-evidence-unknown: var(--br-bruise);
+  --br-evidence-unverified: var(--br-bruise);
+  --br-evidence-missing: var(--br-bone);
+
+  --br-border-subtle: var(--br-line);
+  /* Decorative only: not sufficient as the sole accessibility-critical boundary. */
+  --br-border-decorative-strong: var(--br-line-high);
+}
