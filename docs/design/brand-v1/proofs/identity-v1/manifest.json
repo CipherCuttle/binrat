@@ -17,10 +17,10 @@
       1060
     ],
     "avatar": [
-      420,
-      215,
-      1180,
-      975
+      465,
+      235,
+      1105,
+      875
     ]
   },
   "resampling": "Pillow LANCZOS for downscale; NEAREST only for enlarged contact-sheet inspection",
@@ -34,24 +34,24 @@
       "sha256": "d89c2a1b1bf1be16c291d130275b009f52c1482f19e35e1f74dbef115d6e58d8"
     },
     "docs/design/brand-v1/proofs/identity-v1/rat-avatar-128.png": {
-      "bytes": 39880,
-      "sha256": "69ef48888d5ab2ba5dcffdd4a4f8fd75053d6aacd87b24debfbe030921888493"
+      "bytes": 38970,
+      "sha256": "db91ead6cc65c770e5f43fc2339fa838f94ef51e6abe823dc68dbcc300fd0e1c"
     },
     "docs/design/brand-v1/proofs/identity-v1/rat-avatar-48.png": {
-      "bytes": 6251,
-      "sha256": "5334193e94690f0076ad01f92dd2ca8988264c979139a279557a13c9c4cd9b85"
+      "bytes": 6155,
+      "sha256": "fb54dbba0ec873daa0af533baa8e151923272f2685e7113835d30879b7ef3db0"
     },
     "docs/design/brand-v1/proofs/identity-v1/rat-avatar-32.png": {
-      "bytes": 3044,
-      "sha256": "aebfdb9b5d3d621ec233e6cc67872c01294c75712057330816aaef31f2fe1d83"
+      "bytes": 2997,
+      "sha256": "f38aebb0e8f7389a2b8397b8ae407f66c951d2bc9c3fd7529bed46cebd5474f5"
     },
     "docs/design/brand-v1/proofs/identity-v1/rat-mono-128.png": {
-      "bytes": 5009,
-      "sha256": "6a5edb57ba19246be176763be96da987723c991fa0ce9f09d74aa5b16fd86041"
+      "bytes": 4815,
+      "sha256": "6802499b7fb2a541a247fd6e5c9e125e0b8748e8c18a3de60801728c06e3b7fe"
     },
     "docs/design/brand-v1/proofs/identity-v1/identity-contact-sheet.png": {
-      "bytes": 1281128,
-      "sha256": "45a1ae9e6ce83175b75cf942f02781984b2c2b0b379fc95e1811161c3caa8746"
+      "bytes": 1279377,
+      "sha256": "3e1edc7f83c2e3c3e2165b37774f0f966fb6479a1b34998a0d85c05bf07502c8"
     }
   },
   "verdict": "REVIEW_REQUIRED",
