@@ -12,7 +12,7 @@ This proof only moves already-approved Brand V1 raster proofs:
 
 Those source cards are demo/non-live evidence fixtures. This motion proof inherits that limitation. It must never be presented as a live finding.
 
-No Rat redraw, vector reconstruction, procedural room art or generated cyberpunk background is introduced.
+No Rat redraw, vector reconstruction, procedural room art or generated cyberpunk background is introduced. Neutral canvas/pad pixels use Brand V1 Ink `#101210`; motion does not introduce an independent near-black.
 
 ## Choreography
 
