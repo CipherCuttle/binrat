@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "binrat.rat-canon/1",
+  "status": "FROZEN_IDENTITY_AUTHORITY",
+  "approvedAt": "2026-10-02",
+  "identityAnchor": {
+    "path": "docs/design/brand-v1/canon/rat-zero.jpg",
+    "gitBlobSha1": "f4c263e20144ccf47ab06a90ff34c1d4865d5c27",
+    "byteSize": 535609,
+    "source": {
+      "branch": "integration/binrat-r5-approved-20260927",
+      "path": "prototype/g3a/public/rat-original.jpg",
+      "gitBlobSha1": "f4c263e20144ccf47ab06a90ff34c1d4865d5c27"
+    }
+  },
+  "worldStyleAnchor": {
+    "authority": "docs/design/roadmap-v1/README.md",
+    "sourceName": "gritty_binrat_roadmap_neon_sewer_network.png",
+    "width": 1448,
+    "height": 1086,
+    "sha256": "95becddb235c825b591b8b454fbd0726d8adcfd2ddb13066446113a3ad613849"
+  },
+  "derivativePolicy": {
+    "deterministicCropResizeMask": "ALLOWED",
+    "newPose": "CANDIDATE_REQUIRES_REVIEW",
+    "horizontalMirror": "FORBIDDEN_WHEN_ASYMMETRY_MOVES",
+    "genericVectorRedraw": "FORBIDDEN",
+    "photorealisticReinterpretation": "FORBIDDEN",
+    "automaticPixelationAsIdentityFix": "FORBIDDEN"
+  }
+}
