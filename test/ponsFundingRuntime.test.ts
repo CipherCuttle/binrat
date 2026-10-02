@@ -15,10 +15,10 @@ import type {
 import { D1CompatDatabase } from './support/d1Compat.js';
 
 function addr(n:number):Hex {
-  return \`0x\${n.toString(16).padStart(40,'0')}\` as Hex;
+  return `0x${n.toString(16).padStart(40,'0')}` as Hex;
 }
 function hash(n:number):Hex {
-  return \`0x\${n.toString(16).padStart(64,'0')}\` as Hex;
+  return `0x${n.toString(16).padStart(64,'0')}` as Hex;
 }
 function launch(input:{id:string;block:number;token:number;pool:number;deployer:number}):LaunchObserved {
   return {
