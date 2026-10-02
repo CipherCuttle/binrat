@@ -266,9 +266,10 @@ function assertHistory(history: PonsCaseHistoryInput): void {
   }
   if (
     history.launchesWithAnyMemory > history.previousLaunches ||
-    history.launchesWithFullMemory > history.previousLaunches ||
+    history.launchesWithFullMemory > history.launchesWithAnyMemory ||
     history.launchesPendingMemory > history.previousLaunches ||
-    history.launchesStillImmature > history.previousLaunches
+    history.launchesStillImmature > history.previousLaunches ||
+    history.launchesWithAnyMemory + history.launchesPendingMemory + history.launchesStillImmature > history.previousLaunches
   ) {
     throw new Error('PONS_CASE_HISTORY_COUNT_OVERFLOW');
   }
@@ -277,6 +278,9 @@ function assertHistory(history: PonsCaseHistoryInput): void {
 function assertFunding(funding: PonsCaseFundingInput): void {
   if (!Number.isSafeInteger(funding.recurrenceCoverage.verifiedReceipts) || funding.recurrenceCoverage.verifiedReceipts < 0) {
     throw new Error('PONS_CASE_FUNDING_COVERAGE_INVALID');
+  }
+  if ((funding.recurrenceCoverage.status === 'PARTIAL') !== funding.recurrenceCoverage.truncated) {
+    throw new Error('PONS_CASE_FUNDING_COVERAGE_STATE_INVALID');
   }
   if (funding.currentFunding) {
     assertAddress(funding.currentFunding.sourceAddress, 'PONS_CASE_FUNDING_SOURCE_INVALID');
@@ -288,6 +292,9 @@ function assertFunding(funding: PonsCaseFundingInput): void {
     }
   }
   if (funding.sameFundingSource) {
+    if (!funding.currentFunding) {
+      throw new Error('PONS_CASE_FUNDING_RECURRENCE_WITHOUT_CURRENT');
+    }
     assertAddress(funding.sameFundingSource.sourceAddress, 'PONS_CASE_FUNDING_RECURRENCE_SOURCE_INVALID');
     if (
       !Number.isSafeInteger(funding.sameFundingSource.distinctDeployersAtLeast) ||
@@ -297,8 +304,10 @@ function assertFunding(funding: PonsCaseFundingInput): void {
     ) {
       throw new Error('PONS_CASE_FUNDING_RECURRENCE_COUNT_INVALID');
     }
+    if (funding.recurrenceCoverage.verifiedReceipts < funding.sameFundingSource.distinctLaunchesAtLeast) {
+      throw new Error('PONS_CASE_FUNDING_RECURRENCE_COVERAGE_INVALID');
+    }
     if (
-      funding.currentFunding &&
       normalizeHex(funding.currentFunding.sourceAddress) !== normalizeHex(funding.sameFundingSource.sourceAddress)
     ) {
       throw new Error('PONS_CASE_FUNDING_SOURCE_MISMATCH');
