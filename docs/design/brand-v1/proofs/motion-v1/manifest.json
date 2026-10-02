@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "binrat.motion-proof/1",
+  "status": "PROTOTYPE_NOT_CANON",
+  "fixture": "DEMO / NON-LIVE",
+  "sources": [
+    "docs/design/brand-v1/proofs/social-v1/rat-found-wide-1200x675.png",
+    "docs/design/brand-v1/proofs/social-v1/receipt-wide-1200x675.png"
+  ],
+  "render": "bash tools/brand/render-motion-proof.sh",
+  "verify": "bash tools/brand/verify-motion-proof.sh",
+  "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "outputs": {
+    "found-something-v1.mp4": {
+      "bytes": 452774,
+      "sha256": "dce0b5e225f5b8a8bc8e95d4a7619d211192d17a9312e7664386a80e360d91f4",
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1200,
+            "height": 676,
+            "pix_fmt": "yuv420p",
+            "avg_frame_rate": "30/1"
+          }
+        ],
+        "format": {
+          "duration": "6.400000"
+        }
+      }
+    },
+    "found-something-v1-reduced.mp4": {
+      "bytes": 42421054,
+      "sha256": "1bc652523fb04ec6f216c64d0156abab36730233c0afb56faf27e93165c18832",
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1200,
+            "height": 676,
+            "pix_fmt": "yuv420p",
+            "avg_frame_rate": "30/1"
+          }
+        ],
+        "format": {
+          "duration": "4.800000"
+        }
+      }
+    }
+  }
+}
