@@ -66,6 +66,17 @@ The canonical Brand V1 identity is frozen:
 
 See `LOGO_LOCKUP.md` and `WORDMARK_PROOF_V1.md`.
 
+### Palette
+
+The canonical Brand V1 color system is frozen in `PALETTE.md`, `tokens.json` and `brand-tokens.css`.
+
+- dark neutrals + Bone/Paper own hierarchy;
+- Copper means attention/discovery, never recommendation;
+- Rat Eye red is a character/error/destructive cue, never a risk score;
+- Mint/Bruise evidence colors require literal state labels;
+- Paper uses Ink for normal-sized evidence text;
+- `Line High` is decorative and must not be the sole accessibility-critical boundary.
+
 ### Raster-world rule
 
 For authored pictorial BINRAT environments, inherit the current roadmap rule:
@@ -96,7 +107,6 @@ Public-copy hierarchy:
 
 The following require Brand V1 gates rather than ad-hoc decisions:
 
-- final palette/token promotion;
 - X / Telegram / OpenGraph export templates;
 - motion grammar outside already-approved scoped implementations;
 - exact Geist Pixel variant(s);
