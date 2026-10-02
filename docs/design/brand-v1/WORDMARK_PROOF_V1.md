@@ -51,3 +51,52 @@ The core word `BINRAT` must stand on its own.
 `docs/design/brand-v1/proofs/wordmark-v1/wordmark-contact-sheet.png`
 
 The proof intentionally uses remote font files pinned to an immutable Vercel Geist commit instead of committing font binaries into BINRAT.
+
+
+## Review recommendation — 2026-10-02
+
+Rendered proof: `docs/design/brand-v1/proofs/wordmark-v1/wordmark-contact-sheet.png`
+
+### A — PURE
+
+**RECOMMEND AS CORE LOCKUP CANDIDATE.**
+
+Why:
+
+- survives the 64px navigation pressure test cleanly;
+- Rat Zero carries the distinctive character, so the wordmark does not need gimmicks;
+- Geist gives the name a modern, compact shape without fighting the raster artwork;
+- remains flexible for social, web, Telegram and editorial use;
+- does not require tagline or metadata to remain recognizable.
+
+Risk: the wordmark alone is intentionally neutral. Distinctiveness comes from the Rat + evidence system, not custom letter surgery.
+
+### B — RECEIPT
+
+**KEEP AS SECONDARY LOCKUP GRAMMAR, NOT PRIMARY LOGO.**
+
+The detachable Mono receipt tab works well as campaign/product metadata. It should remain optional so the brand does not depend on `RECEIPTS > SCORES` being permanently attached to the name.
+
+Useful pattern:
+
+`[Rat Zero] BINRAT [optional evidence tab]`
+
+### C — SPLIT
+
+**REJECT AS CORE IDENTITY.**
+
+The orange `RAT` accent adds immediate visual memory but creates an avoidable meme-token / promotional feel and competes with the evidence color system. It is not needed because Rat Zero already supplies the mnemonic.
+
+The accent treatment may still appear in ordinary campaign typography when justified, but it should not define the canonical wordmark.
+
+## Proposed freeze
+
+Pending explicit owner approval:
+
+- canonical core lockup → **A / PURE**;
+- core wordmark → unmodified Geist Sans `BINRAT`, heavy weight, tight tracking;
+- canonical avatar/mark → Rat Zero deterministic crop;
+- optional evidence metadata → B-style detachable Geist Mono tab;
+- C-style split-color wordmark → not canonical.
+
+No custom glyph drawing or pictorial vector mark is proposed.
