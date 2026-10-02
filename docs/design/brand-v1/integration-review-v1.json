@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "binrat.brand-integration-review/1",
+  "reviewedAt": "2026-10-02",
+  "status": "PASS_READY_FOR_COMPOSITION",
+  "mergeAuthorized": false,
+  "deployAuthorized": false,
+  "authority": {
+    "branch": "design/binrat-brand-system-v1",
+    "sha": "770c7aa8741236ee5d8fc8ddd6411bc2addfdade"
+  },
+  "workers": {
+    "exportPack": {
+      "branch": "design/binrat-export-pack-v1",
+      "sha": "de0fa94edbe4412054fc6bbd388f7c66165fc747",
+      "proofRun": 37042445567,
+      "proofConclusion": "success"
+    },
+    "socialProduction": {
+      "branch": "design/binrat-social-production-v1",
+      "sha": "568b0a3c7214e3252e3c7278ba35c2c382955814",
+      "proofRun": 37041076350,
+      "proofConclusion": "success"
+    },
+    "motionIdentity": {
+      "branch": "design/binrat-motion-identity-v1",
+      "sha": "c92b2d4feed2c6ebc5d4a42a57e5f57e10cfda53",
+      "proofRun": 37051994592,
+      "proofConclusion": "success",
+      "boundedFix": "motion neutral canvas/pad aligned from 0x060606 to Brand V1 Ink #101210"
+    },
+    "copyLibrary": {
+      "branch": "design/binrat-copy-library-v1",
+      "sha": "91cee9f12563f2d4286736155400910ad1ca1cb5",
+      "proofRun": 37042531038,
+      "proofConclusion": "success"
+    }
+  },
+  "findings": {
+    "critical": [],
+    "high": [],
+    "resolved": [
+      {
+        "severity": "high",
+        "area": "motion/palette",
+        "finding": "motion proof introduced pre-freeze near-black 0x060606",
+        "resolution": "changed neutral motion canvas/pad to Brand V1 Ink #101210 and reran dedicated motion proof successfully"
+      }
+    ],
+    "integrationConditions": [
+      "compose from current Brand V1 authority",
+      "rerun canonical Social V1 proof after Social Production composition",
+      "regenerate Export Pack last from composed sources",
+      "keep platform candidates candidate until real-surface validation",
+      "no merge or deploy without explicit owner authorization"
+    ]
+  }
+}
