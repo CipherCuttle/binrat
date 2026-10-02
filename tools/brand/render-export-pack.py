@@ -326,6 +326,19 @@ def verify_manifest() -> None:
     if manifest.get("schemaVersion") != "binrat.brand-export/1":
         raise SystemExit("unexpected manifest schema")
 
+    records = manifest.get("records", [])
+    if len(records) != 27:
+        raise SystemExit(f"unexpected manifest record count: {len(records)} != 27")
+    names = [rec.get("name") for rec in records]
+    paths = [rec.get("path") for rec in records]
+    if len(names) != len(set(names)):
+        raise SystemExit("duplicate manifest record name")
+    if len(paths) != len(set(paths)):
+        raise SystemExit("duplicate manifest output path")
+    for rel in paths:
+        if not isinstance(rel, str) or not rel.startswith("exports/") or ".." in Path(rel).parts:
+            raise SystemExit(f"manifest output escaped exports/: {rel!r}")
+
     required = {
         "name", "role", "dimensions", "sourceAssets", "sourceHashes", "outputHash",
         "intendedSurfaces", "backgroundAssumptions", "status", "generation", "path",
