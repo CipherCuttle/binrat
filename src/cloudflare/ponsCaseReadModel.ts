@@ -69,11 +69,13 @@ export async function readBinratPonsCase(
   });
   const trashTrail=buildTrashTrailPresentation(projection);
 
-  const funding=await readPonsFundingRecurrence(db,{
-    currentLaunchId:options.currentLaunchId,
-    asOfBlock:options.asOfBlock,
-    maxRelatedLaunches:options.maxRelatedFundingLaunches
-  });
+  const funding=await hasTable(db,'pons_funding_receipts')
+    ? await readPonsFundingRecurrence(db,{
+        currentLaunchId:options.currentLaunchId,
+        asOfBlock:options.asOfBlock,
+        maxRelatedLaunches:options.maxRelatedFundingLaunches
+      })
+    : null;
 
   const currentRow=await db.prepare(
     "SELECT launch_id,token,creator,name,symbol,block_number,block_hash FROM launches WHERE chain_id=? AND source='PONS_V2' AND launch_id=? LIMIT 1"
@@ -125,7 +127,7 @@ function assertSiblingAgreement(input:{
   row:CurrentLaunchRow;
   replay:Awaited<ReturnType<typeof readPonsReplaySnapshot>>;
   projection:Awaited<ReturnType<typeof readPonsRatTrapProjection>>;
-  funding:Awaited<ReturnType<typeof readPonsFundingRecurrence>>;
+  funding:Awaited<ReturnType<typeof readPonsFundingRecurrence>>|null;
 }):void {
   const expectedLaunch=input.launchId.toLowerCase();
   const expectedBlock=input.asOfBlock.toString();
@@ -136,7 +138,7 @@ function assertSiblingAgreement(input:{
     input.row.launch_id.toLowerCase()!==expectedLaunch ||
     input.replay.targetLaunchId.toLowerCase()!==expectedLaunch ||
     input.projection.currentLaunchId.toLowerCase()!==expectedLaunch ||
-    input.funding.currentLaunchId.toLowerCase()!==expectedLaunch
+    (input.funding!==null && input.funding.currentLaunchId.toLowerCase()!==expectedLaunch)
   ) {
     throw new Error('BINRAT_CASE_ADAPTER_TARGET_MISMATCH');
   }
@@ -144,7 +146,7 @@ function assertSiblingAgreement(input:{
   if(
     input.replay.asOfBlock!==expectedBlock ||
     input.projection.asOfBlock.toString()!==expectedBlock ||
-    input.funding.asOfBlock!==expectedBlock
+    (input.funding!==null && input.funding.asOfBlock!==expectedBlock)
   ) {
     throw new Error('BINRAT_CASE_ADAPTER_BLOCK_MISMATCH');
   }
@@ -237,4 +239,17 @@ class MemoizedBlockPointReader implements BinratPonsCaseBlockPointReader {
 
 function shortAddress(value:string):string {
   return value.length>20?`${value.slice(0,8)}…${value.slice(-6)}`:value;
+}
+
+
+async function hasTable(db:D1DatabaseLike,name:string):Promise<boolean> {
+  if(!/^[a-z0-9_]+$/.test(name)) throw new Error('BINRAT_CASE_ADAPTER_TABLE_NAME_INVALID');
+  const row=await db.prepare(
+    "SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name=?"
+  ).bind(name).first<{n:number}>();
+  const count=Number(row?.n??0);
+  if(!Number.isSafeInteger(count)||count<0||count>1) {
+    throw new Error('BINRAT_CASE_ADAPTER_TABLE_STATE_INVALID:'+name);
+  }
+  return count===1;
 }
