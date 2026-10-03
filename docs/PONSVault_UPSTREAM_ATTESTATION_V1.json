@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "binrat.ponsvault-upstream-attestation/0.1",
+  "attestationVersion": "PONSVault_UPSTREAM_ATTESTATION_V1",
+  "observedOn": "2026-10-03",
+  "observedBlock": 79077877,
+  "chainId": 4663,
+  "status": "FAIL_DEFER_CURRENT_CANDIDATE",
+  "launchAuthorizationEffect": "BLOCKS_UNTIL_REPLACED_OR_REVERIFIED",
+  "scope": "PONSVault Stake & Burn candidate for BINRAT Launch V1",
+  "candidateConclusion": {
+    "selectedFactorySuitableForBinratV1": false,
+    "reason": "The documented current Stake & Burn factory is partner-desk-specific, stamps an immutable payout asset, resolves rewardAsset to GLD, exposes zero vault instances, and is not offered by the current public launch form. This does not establish the intended generic native-ETH Stake & Burn semantics."
+  },
+  "contracts": {
+    "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "ponsVaultLauncher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+    "ponsVaultRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+    "stakeBurnFactory": "0x537483c5B33e2192CfB202d7C50d58975524B047",
+    "stakeBurnBeacon": "0xf72b3b54220a2e64ee87895d570a2c72a00a3fe4",
+    "stakeBurnImplementation": "0xf0453c814cf6a76a8e3507f8fafffe359f28b6cb",
+    "upstreamOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b"
+  },
+  "liveState": {
+    "launcherFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "launcherRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+    "registryOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "stakeBurnFactoryBeacon": "0xf72b3b54220a2e64ee87895d570a2c72a00a3fe4",
+    "stakeBurnFactoryImplementation": "0xf0453c814cf6a76a8e3507f8fafffe359f28b6cb",
+    "stakeBurnFactoryOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "stakeBurnBeaconOwner": "0x537483c5B33e2192CfB202d7C50d58975524B047",
+    "stakeBurnBeaconImplementation": "0xf0453c814cf6a76a8e3507f8fafffe359f28b6cb",
+    "upstreamOwnerCode": "0x",
+    "stakeBurnTemplate": "stake-burn",
+    "stakeBurnVaultCount": 0,
+    "stakeBurnRewardAsset": "0xc9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e",
+    "stakeBurnRewardAssetSymbol": "GLD",
+    "stakeBurnRewardAssetName": "SPDR Gold Trust • Robinhood Token",
+    "stakeBurnRewardAssetDecimals": 18
+  },
+  "sourceProvenance": {
+    "ponsV2Source": "PUBLIC_REPOSITORY_AVAILABLE",
+    "ponsV2Repository": "ponsdotdev/pons-labs",
+    "ponsVaultDocs": "https://www.ponsvault.com/docs",
+    "ponsVaultLaunchForm": "https://www.ponsvault.com/launch",
+    "ponsVaultAdvertisedRepository": "https://github.com/ponsvault/PonsVault",
+    "ponsVaultAdvertisedRepositoryStatus": "HTTP_404",
+    "ponsVaultSourceMatch": "NOT_SATISFIED",
+    "thirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS"
+  },
+  "documentedModel": {
+    "stakeBurnFactoryScope": "HIMGAJRIA_DESK_SPECIFIC_WITH_IMMUTABLE_PAYOUT_ASSET",
+    "publicLaunchFormExposesStakeBurn": false,
+    "publicLaunchFormExposesStaking": true,
+    "vaultsUpgradeableViaSharedBeacon": true,
+    "beaconControlRenounceableAccordingToDocs": true,
+    "genericStakingDocsSayRewardsFollowPairingAsset": true,
+    "stakeBurnMainSiteCopySaysHalfFeesBuyAndBurn": true
+  },
+  "implementationInterfaceEvidence": {
+    "selectors": {
+      "stake(uint256)": "0xa694fc3a",
+      "unstake(uint256)": "0x2e17de78",
+      "claim()": "0x4e71d92d",
+      "pendingRewards(address)": "0x31d7a262",
+      "totalStaked()": "0x817b1cd2",
+      "token()": "0xfc0c546a",
+      "rewardAsset()": "0x0ac6702a",
+      "quoteAsset()": "0xfdf262b7",
+      "TREASURY()": "0x2d2c5565"
+    },
+    "observedStatusString": "PonsV2StakeBurnVault: 50.0% burn, 50.0% CPER to stakers. Distributed: 0 reward. Burned: 0 across 0 runs. Staked: 0.",
+    "statusStringVsFactoryRewardAsset": "UNRESOLVED_CPERS_VS_GLD_DISCREPANCY",
+    "perWalletActiveStakeGetter": "UNRESOLVED",
+    "lockGetterAndSemantics": "UNRESOLVED",
+    "minimumRunGetterAndSemantics": "UNRESOLVED",
+    "factoryCreationCalldata": "UNRESOLVED"
+  },
+  "launcherAttributionEvidence": {
+    "status": "PONS_DEPLOYER_ATTRIBUTION_PRESERVED_IN_OBSERVED_LAUNCHER_EXAMPLES",
+    "examples": [
+      {
+        "symbol": "CLAI",
+        "token": "0x645187382c996cbe752630786164f461ff43180b",
+        "vault": "0x96e5c19717f5e681375b65771dd85628f700eb42",
+        "tokenDeployer": "0x35df6256c2fa5c52ae5741a8d81e7047e20b0e6d"
+      },
+      {
+        "symbol": "SINU",
+        "token": "0x561811590525b528a1aeaa8a63622f83124126fe",
+        "vault": "0x83f6f9189ba41d4d571d47dafe1ee97c7372af9a",
+        "tokenDeployer": "0xb3d873d4d8cced0ee50d7340a50777d2f35dbe9d"
+      },
+      {
+        "symbol": "MIMCREEPZ",
+        "token": "0x804c39e8111b1fcfa4bcd1617bdf5da186e6576b",
+        "vault": "0x5b5f5285e4c8c9613c88b65b1f15a3395b68784f",
+        "tokenDeployer": "0x98d3ffe13184cdedcd0c4ddd894b69cccf627544"
+      }
+    ],
+    "docsVsChainSweepAuthority": "UNRESOLVED"
+  },
+  "requiredNextEvidence": [
+    "Re-evaluate the launch primitive instead of treating 0x5374...B047 as generic Stake & Burn.",
+    "Inspect the public Staking factory as the closest existing PonsVault primitive and verify whether it can satisfy WORKING RAT with native-ETH pairing.",
+    "If Stake & Burn remains mandatory, obtain an authoritative generic factory/source/ABI or explicit upstream support for BINRAT's intended pair and payout asset.",
+    "Do not implement L2 active-stake entitlement against this rejected current Stake & Burn candidate."
+  ],
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "attestationDigest": "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c"
+}
