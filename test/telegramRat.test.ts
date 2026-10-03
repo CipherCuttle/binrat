@@ -13,7 +13,7 @@ const manifest: CapabilityManifest = {
     chainId: 4663,
     rail: 'pons-v2-vault-staking-candidate-v1',
     plan: 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json',
-    planDigest: '55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11',
+    planDigest: '5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae',
     status: 'PLANNING_ONLY',
     historicalArcAuthority: 'HISTORICAL_ONLY_NOT_PONS_AUTHORITY'
   },
