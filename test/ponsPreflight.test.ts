@@ -94,7 +94,7 @@ test('Pons preflight cannot hide unresolved owner inputs or authorize launch', a
   );
 
   const authorized = await fixture(launchPlan);
-  authorized.authorization.launchAuthorized = true as false;
+  authorized.authorization.launchAuthorized = true;
   authorized.receiptDigest = await derivePonsPreflightReceiptDigest(authorized);
   await assert.rejects(
     validatePonsPreflightReceipt(authorized, launchPlan),
