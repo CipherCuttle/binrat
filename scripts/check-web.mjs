@@ -12,7 +12,9 @@ const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 const reactBitsIsland = readFileSync(new URL('../web/react-bits-island.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
 const mascotUrl = new URL('../web/assets/binrat-hero.webp', import.meta.url);
+const roadmapRasterUrl = new URL('../web/assets/roadmap-sniff.webp', import.meta.url);
 const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e9917cb7f2138bd163';
+const expectedRoadmapRasterSha256 = '6aad1c3a02fd031b048adb5d6b9ac389af38c6834c5d782c7fd190f37788d969';
 
 const requiredHtml = [
   'BINRAT',
@@ -22,14 +24,64 @@ const requiredHtml = [
   'HOW HE DIGS',
   'DUMPSTER LEDGER',
   'CLAIM BOUNDARY',
-  'He gets the scraps.',
-  'You get the receipts.',
+  'FOUND SOMETHING.',
+  'OPEN FRESH GARBAGE',
+  'GET THE TELEGRAM RAT',
+  "DON'T TRUST THE RAT. CHECK THE RECEIPT.",
+  'WHY IT SURFACED / RECEIPT-BACKED',
+  'EVERY LAUNCH LOOKS NEW IF YOU FORGET THE OLD TRAIL. THE RAT IS CHECKING.',
+  '02 / TELEGRAM',
+  "DON'T LIVE IN THE TERMINAL.",
+  'Telegram tells you when to come back.',
+  'ADD @BINRATBOT',
+  'SAME PAWS. AGAIN.',
+  'WATCHING THESE PAWS. ✓',
+  'SAME PAWS. NEW LAUNCH.',
+  'NOT A LIVE ALERT',
+  '03 / ROADMAP',
+  'DOWN THE RAT HOLE',
+  "THIS ISN'T",
+  'THE RAT CATCHES THE LAUNCH.',
+  "SITES VANISH. THE TRAIL DOESN'T.",
+  'LEAVE A TRIPWIRE IN THE TRASH.',
+  'POINT THE RATS AT SOMETHING WORTH DIGGING.',
+  'USEFUL WORK EARNS A RECEIPT.',
+  'GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.',
+  'UNBADGED = ROADMAP DIRECTION, NOT A LIVE CLAIM.',
+  'WHY $BINRAT?',
+  '06 / $BINRAT',
+  'THE RAT',
+  'NEEDS A COIN.',
+  '$BINRAT is the culture and coordination layer around BINRAT.',
+  'BANKROLL THE BUILD',
+  'COORDINATE ATTENTION',
+  'COLLATERAL, NOT TRUTH.',
+  'THE TOKEN NEVER GETS TO REWRITE A RECEIPT.',
+  '$BINRAT IS NOT LIVE',
+  'NO OFFICIAL CONTRACT HAS BEEN PUBLISHED',
+  'NO PRIVATE PRESALE',
   './assets/binrat-hero.webp',
+  './assets/roadmap-sniff.webp',
   './share-card.css'
 ];
 
 for (const marker of requiredHtml) {
   if (!html.includes(marker)) throw new Error(`WEB_INVARIANT_MISSING:${marker}`);
+}
+
+const frontdoorOrder = [
+  'id="frontdoor-proof"',
+  'id="garbage"',
+  'id="telegram"',
+  'id="roadmap"',
+  'id="how"',
+  'id="token-status"'
+].map((marker) => html.indexOf(marker));
+if (
+  frontdoorOrder.some((index) => index < 0) ||
+  frontdoorOrder.some((index, position) => position > 0 && index <= frontdoorOrder[position - 1])
+) {
+  throw new Error(`WEB_FRONTDOOR_ORDER_DRIFT:${frontdoorOrder.join(',')}`);
 }
 
 if (!css.includes('--red: #ff2638')) throw new Error('WEB_BRAND_RED_DRIFT');
@@ -52,6 +104,28 @@ if (!dataSource.includes('binrat.latest-launches/0.1')) throw new Error('WEB_LAT
 if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
+if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRONTDOOR_CTA_MISSING');
+if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Error('WEB_TELEGRAM_FIRST_CLASS_CTA_MISSING');
+if (!html.includes('Event-driven. User-requested. No fake urgency. No engagement pings.')) throw new Error('WEB_TELEGRAM_NOTIFICATION_BOUNDARY_MISSING');
+if (!html.includes('A watched reported deployer showed up again.')) throw new Error('WEB_TELEGRAM_DEPLOYER_ALERT_BOUNDARY_MISSING');
+if (!dataSource.includes('fetch("/api/capabilities"')) throw new Error('WEB_CAPABILITY_MANIFEST_SOURCE_MISSING');
+if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('WEB_TOKEN_PRELAUNCH_VALIDATION_MISSING');
+if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('WEB_TOKEN_LAUNCH_GATE_VALIDATION_MISSING');
+if (!dataSource.includes('value.marketingAuthorized !== false')) throw new Error('WEB_TOKEN_MARKETING_GATE_VALIDATION_MISSING');
+if (!app.includes('bootstrapTokenCapabilities')) throw new Error('WEB_TOKEN_RUNTIME_UTILITY_STATUS_MISSING');
+if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('WEB_TOKEN_MANIFEST_LAUNCH_SHAPE_MISSING');
+if (!app.includes('renderTokenLaunchState')) throw new Error('WEB_TOKEN_RUNTIME_PRELAUNCH_STATE_MISSING');
+if (!app.includes('renderTokenLaunchState(manifest.launchAuthorization)')) throw new Error('WEB_TOKEN_MANIFEST_AUTHORITY_NOT_BOUND');
+if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_RUNTIME_STATUS_MISSING');
+if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
+if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');
+if (!app.includes('LEAVE A TRIPWIRE IN THE TRASH.')) throw new Error('WEB_CASE_TO_WATCH_HANDOFF_MISSING');
+if (!app.includes('OPEN TELEGRAM RAT')) throw new Error('WEB_CASE_TO_TELEGRAM_CTA_MISSING');
+if (!app.includes('user-requested monitoring, not a buy or safety signal.')) throw new Error('WEB_CASE_WATCH_BOUNDARY_MISSING');
+if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
+if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
+if (!app.includes('This Pons-reported deployer already appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
+if (!app.includes('PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW')) throw new Error('WEB_FRONTDOOR_FAIL_CLOSED_HISTORY_MISSING');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
 if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
@@ -59,6 +133,11 @@ if (!app.includes('from "./share-card.js"')) throw new Error('WEB_SHARE_CARD_BOU
 if (!app.includes('!["FIXTURE", "LIVE"].includes(feed?.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
 if (app.includes('bag.creator')) throw new Error('WEB_AMBIGUOUS_CREATOR_RENDERING_REINTRODUCED');
+for (const forbidden of ['REPEAT CREATORS', 'CREATOR FILE', 'REPORTED CREATOR', 'reported creator address']) {
+  if (`${html}\n${app}`.includes(forbidden)) throw new Error(`WEB_PUBLIC_CREATOR_ROLE_DRIFT:${forbidden}`);
+}
+if (!html.includes('REPEAT DEPLOYERS')) throw new Error('WEB_REPEAT_DEPLOYER_LABEL_MISSING');
+if (!app.includes('DEPLOYER FILE')) throw new Error('WEB_DEPLOYER_FILE_LABEL_MISSING');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('notedConditions')) throw new Error('WEB_NOTED_CONDITIONS_MAPPING_MISSING');
 if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`')) throw new Error('WEB_BAG_INTELLIGENCE_SOURCE_MISSING');
@@ -72,6 +151,9 @@ if (!reactBitsIsland.includes('React Bits')) throw new Error('WEB_REACT_BITS_DON
 if (!reactBitsIsland.includes('prefers-reduced-motion')) throw new Error('WEB_REDUCED_MOTION_GUARD_MISSING');
 
 if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
+if (!existsSync(roadmapRasterUrl)) throw new Error('WEB_ROADMAP_RASTER_MISSING');
+const roadmapRasterDigest = createHash('sha256').update(readFileSync(roadmapRasterUrl)).digest('hex');
+if (roadmapRasterDigest !== expectedRoadmapRasterSha256) throw new Error(`WEB_ROADMAP_RASTER_DIGEST_DRIFT:${roadmapRasterDigest}`);
 if (statSync(mascotUrl).size !== 256890) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
 const mascotDigest = createHash('sha256').update(readFileSync(mascotUrl)).digest('hex');
 if (mascotDigest !== expectedMascotSha256) throw new Error(`WEB_CANONICAL_MASCOT_DIGEST_DRIFT:${mascotDigest}`);

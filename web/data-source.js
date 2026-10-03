@@ -51,6 +51,9 @@ export async function loadDumpsterLedger() {
   if (
     value?.schemaVersion !== "binrat.dumpster-ledger/0.1" ||
     value.projectionVersion !== "BINRAT_DUMPSTER_LEDGER_V0" ||
+    value.tokenState !== "NOT_LAUNCHED" ||
+    value.launchAuthorization !== "BLOCKED" ||
+    value.marketingAuthorized !== false ||
     value.chainId !== 5042 ||
     !["PRE_LAUNCH_AUTHORITIES_CONFIGURED", "FAIL_CLOSED"].includes(
       value.accountingState,
@@ -376,5 +379,29 @@ export async function loadReplayBundle(bagId) {
     typeof value.receipt?.receiptId !== "string" ||
     !value.receipt.receiptId.startsWith("binrat-replay:")
   ) throw new Error("REPLAY_BUNDLE_INVALID");
+  return value;
+}
+
+
+export async function loadCapabilityManifest() {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  const response = await fetch("/api/capabilities", {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
+  const value = await response.json();
+  if (
+    value?.schemaVersion !== "binrat.capability-manifest/0.1" ||
+    !value.capabilities ||
+    typeof value.capabilities !== "object" ||
+    !value.launchAuthorization ||
+    typeof value.launchAuthorization !== "object" ||
+    typeof value.launchAuthorization.status !== "string" ||
+    typeof value.launchAuthorization.marketingAuthorized !== "boolean" ||
+    typeof value.launchAuthorization.launchAuthorized !== "boolean" ||
+    typeof value.launchAuthorization.tokenState !== "string"
+  ) throw new Error("CAPABILITY_MANIFEST_INVALID");
   return value;
 }

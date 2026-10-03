@@ -1,4 +1,4 @@
-import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
 const grid = document.querySelector("#garbage-grid");
@@ -7,6 +7,7 @@ const drawerContent = document.querySelector("#drawer-content");
 const drawerClose = document.querySelector("#drawer-close");
 const backdrop = document.querySelector("#backdrop");
 const randomBag = document.querySelector("#random-bag");
+const frontdoorProof = document.querySelector("#frontdoor-proof");
 let returnFocus = null;
 let activeDrawerBagId = null;
 let bags = [];
@@ -140,6 +141,8 @@ sectionNav?.addEventListener("click", (event) => {
   if (event.target.closest("a")) sectionNav.open = false;
 });
 
+void bootstrapRoadmapCapabilities();
+void bootstrapTokenCapabilities();
 void bootstrapLedger();
 await bootstrap();
 if (WEB_DATA_SOURCE_MODE === "LIVE") {
@@ -180,12 +183,138 @@ async function bootstrap() {
     available = true;
     applyMode(feed);
     renderLiveRail(feed);
-    randomBag.disabled = bags.length === 0;
+    if (randomBag) randomBag.disabled = bags.length === 0;
     renderIntake();
     renderFeed();
+    void renderFrontdoorProof();
   } catch (error) {
     renderUnavailable(error);
   }
+}
+
+async function bootstrapRoadmapCapabilities() {
+  const rail = document.querySelector("[data-roadmap-status]");
+  const targets = document.querySelectorAll("[data-roadmap-capability]");
+  if (!rail || targets.length === 0) return;
+
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") {
+    rail.dataset.state = "UNAVAILABLE";
+    rail.querySelector("b").textContent = "FIXTURE MODE / STATUS NOT PROMOTED";
+    return;
+  }
+
+  try {
+    const manifest = await loadCapabilityManifest();
+    if (!manifest) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
+    const statuses = roadmapCapabilityStatuses(manifest.capabilities);
+    let applied = 0;
+    for (const target of targets) {
+      const status = statuses[target.dataset.roadmapCapability];
+      if (!status) continue;
+      target.dataset.status = status;
+      applied += 1;
+    }
+    rail.querySelector("b").textContent =
+      applied > 0 ? "RUNTIME CAPABILITY MANIFEST" : "MANIFEST LOADED / NO BADGES RESOLVED";
+  } catch {
+    rail.dataset.state = "UNAVAILABLE";
+    rail.querySelector("b").textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
+  }
+}
+
+async function bootstrapTokenCapabilities() {
+  const rail = document.querySelector(".token-prelaunch-source");
+  const targets = document.querySelectorAll("[data-token-capability]");
+  if (!rail || targets.length === 0) return;
+
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") {
+    rail.textContent = "FIXTURE MODE / STATUS NOT PROMOTED";
+    return;
+  }
+
+  try {
+    const manifest = await loadCapabilityManifest();
+    if (!manifest) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
+    const statuses = roadmapCapabilityStatuses(manifest.capabilities);
+    let applied = 0;
+    for (const target of targets) {
+      const status = statuses[target.dataset.tokenCapability];
+      if (!status) continue;
+      target.dataset.status = status;
+      applied += 1;
+    }
+    renderTokenLaunchState(manifest.launchAuthorization);
+    rail.textContent = applied > 0
+      ? "RUNTIME CAPABILITY MANIFEST"
+      : "RUNTIME MANIFEST / NO UTILITY BADGES RESOLVED";
+  } catch {
+    rail.textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
+    renderTokenLaunchState(null);
+  }
+}
+
+function renderTokenLaunchState(launchAuthorization) {
+  const section = document.querySelector("#token-status");
+  if (!section) return;
+
+  const prelaunch =
+    launchAuthorization?.tokenState === "NOT_LAUNCHED" &&
+    launchAuthorization?.status === "BLOCKED" &&
+    launchAuthorization?.marketingAuthorized === false &&
+    launchAuthorization?.launchAuthorized === false;
+
+  section.dataset.tokenState = prelaunch ? "NOT_LAUNCHED" : "UNVERIFIED";
+  document.querySelector("#token-public-state").textContent =
+    prelaunch ? "$BINRAT IS NOT LIVE." : "TOKEN STATE REQUIRES VERIFIED PUBLICATION";
+  document.querySelector("#token-contract-state").textContent =
+    prelaunch
+      ? "NO OFFICIAL CONTRACT HAS BEEN PUBLISHED"
+      : "NO CONTRACT PROMOTED BY THIS SURFACE";
+  document.querySelector("#token-launch-gate").textContent =
+    prelaunch ? "BLOCKED" : "UNVERIFIED / FAIL CLOSED";
+  document.querySelector("#token-marketing-gate").textContent =
+    prelaunch ? "NOT AUTHORIZED" : "UNVERIFIED / FAIL CLOSED";
+}
+
+function roadmapCapabilityStatuses(capabilities) {
+  const out = {};
+  const pons = capabilities?.robinhoodLiveIntelligenceV1;
+  if (pons?.publicStatus === "PUBLIC_LIVE_BETA" || pons?.publicStatus === "PUBLIC_LIVE") {
+    out.pons_live_intelligence = "LIVE";
+  } else if (pons?.engineeringStatus === "BUILDING") {
+    out.pons_live_intelligence = "BUILDING";
+  }
+
+  const radar = capabilities?.ratRadarV0;
+  if (radar?.currentRailReplacementStatus === "BUILDING_ON_PONS_4663") {
+    out.rat_radar = "BUILDING";
+  } else if (radar?.publicStatus === "PUBLIC_LIVE_BETA") {
+    out.rat_radar = "LIVE";
+  }
+
+  const replay = capabilities?.replayLab;
+  const replayScope = String(replay?.statusScope ?? "");
+  if (
+    replay?.publicStatus === "PUBLIC_LIVE_BETA" &&
+    !replayScope.startsWith("LEGACY_")
+  ) out.replay_lab = "LIVE";
+  else if (replay?.engineeringStatus === "BUILDING") out.replay_lab = "BUILDING";
+
+  const watch = capabilities?.ratWatchV0;
+  if (watch?.currentRailRevalidationRequired === true) out.rat_watch = "BUILDING";
+  else if (
+    watch?.publicStatus === "PUBLIC_LIVE_BETA" ||
+    watch?.deploymentStatus === "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED"
+  ) out.rat_watch = "LIVE";
+
+  const raids = capabilities?.dumpsterRaidsV0;
+  if (raids?.engineeringStatus === "EXPERIMENTAL") out.dumpster_raids = "EXPERIMENT";
+  else if (raids?.engineeringStatus === "PLANNED") out.dumpster_raids = "PLANNED";
+
+  const den = capabilities?.ratDenV0;
+  if (den?.engineeringStatus === "PLANNED") out.rat_den = "PLANNED";
+
+  return out;
 }
 
 async function bootstrapLedger() {
@@ -240,7 +369,7 @@ function renderUnavailable(error) {
   available = false;
   bags = [];
   closeDrawer();
-  randomBag.disabled = true;
+  if (randomBag) randomBag.disabled = true;
   document.body.dataset.mode = "UNAVAILABLE";
   for (const element of document.querySelectorAll("[data-mode-copy]"))
     element.textContent = "INDEX UNAVAILABLE";
@@ -249,6 +378,11 @@ function renderUnavailable(error) {
   latestBag.innerHTML =
     '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
   liveRail.innerHTML = '<span class="live-rail-dot offline" aria-hidden="true"></span><strong>OFFLINE</strong><span>PONS 4663</span><span>LIVE INDEX NOT AVAILABLE</span>';
+  if (frontdoorProof) {
+    frontdoorProof.innerHTML = `
+      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>INDEX UNAVAILABLE</span></div>
+      <div class="proof-empty">The Rat cannot verify a current repeat trail right now. Nothing has been substituted.</div>`;
+  }
   document.querySelector("#feed-count").textContent = "INDEX UNAVAILABLE";
   for (const element of document.querySelectorAll(".filter-button span")) {
     element.textContent = "—";
@@ -263,7 +397,7 @@ function renderIntake() {
   const latest = bags[0];
   if (!latest) {
     latestBag.innerHTML = `<span class="intake-loading">${copy().empty}</span>`;
-    randomBag.disabled = true;
+    if (randomBag) randomBag.disabled = true;
     return;
   }
   latestBag.innerHTML = `<span class="intake-label">LAST INTO THE BIN</span>
@@ -273,6 +407,126 @@ function renderIntake() {
     </button>`;
   const button = latestBag.querySelector("button");
   button.addEventListener("click", () => openBag(latest.id, button));
+}
+
+async function renderFrontdoorProof() {
+  if (!frontdoorProof || !available) return;
+
+  const bag = bags.find((item) => item.priorLaunches > 0) ?? bags[0];
+  if (!bag) {
+    frontdoorProof.innerHTML = `
+      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span></div>
+      <div class="proof-empty">Nothing is in the current Fresh Garbage window. No example launch was substituted.</div>`;
+    return;
+  }
+
+  if (bag.priorLaunches <= 0) {
+    frontdoorProof.innerHTML = `
+      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span></div>
+      <div class="proof-story">
+        <div class="proof-step proof-current"><span>FRESH GARBAGE</span><strong>${escapeHtml(bag.symbol)}</strong><small>${escapeHtml(bag.name)}</small></div>
+        <div class="proof-arrow" aria-hidden="true">→</div>
+        <div class="proof-step proof-signal"><span>THIS WINDOW</span><h3>NO FAMILIAR PAWS YET.</h3><p>No earlier indexed launch is attached to this Pons-reported deployer in the current fast view.</p></div>
+        <div class="proof-arrow" aria-hidden="true">→</div>
+        <div class="proof-step"><span>BOUNDARY</span><p class="proof-scraps-empty">No repeat in current coverage is not proof that no history exists elsewhere.</p></div>
+        <div class="proof-action"><span>NEXT MOVE</span><a class="button primary" href="#garbage">OPEN FRESH GARBAGE <span>↓</span></a></div>
+        <div class="proof-boundary"><span><b>OBSERVED</b> · ${escapeHtml(normalizeCoverage(bag.coverage))} HISTORY</span><span>Nothing inferred about safety, intent, identity or future outcome.</span></div>
+      </div>`;
+    return;
+  }
+
+  const fixtureScraps = Array.isArray(bag.trail)
+    ? bag.trail.slice(0, 3).map((item) => ({
+        symbol: item.symbol,
+        name: "",
+        detail: item.age,
+      }))
+    : [];
+
+  renderFrontdoorProofStory(
+    bag,
+    fixtureScraps,
+    activeMode === "LIVE" && fixtureScraps.length === 0
+      ? "DIGGING UP PRIOR PROJECT NAMES…"
+      : "",
+  );
+
+  if (activeMode !== "LIVE") return;
+
+  try {
+    const file = await loadCreatorFile(bag.reportedCreatorAddress);
+    if (!file || !available) return;
+    const scraps = file.launches
+      .filter(
+        (item) =>
+          item.id !== bag.id &&
+          String(item.token).toLowerCase() !== String(bag.token).toLowerCase(),
+      )
+      .slice(0, 3)
+      .map((item) => ({
+        symbol: item.symbol,
+        name: item.name,
+        detail: `BLK ${item.blockNumber}`,
+      }));
+    renderFrontdoorProofStory(bag, scraps, "");
+  } catch {
+    renderFrontdoorProofStory(
+      bag,
+      [],
+      `${bag.priorLaunches} EARLIER INDEXED LAUNCH${bag.priorLaunches === 1 ? "" : "ES"} · PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW`,
+    );
+  }
+}
+
+function renderFrontdoorProofStory(bag, scraps, scrapsFallback) {
+  if (!frontdoorProof) return;
+  const scrapMarkup = scraps.length
+    ? scraps
+        .map(
+          (item) => `
+            <div class="proof-scrap">
+              <strong>${escapeHtml(item.symbol)}</strong>
+              <span>
+                <small>${escapeHtml(item.name || "PRIOR INDEXED LAUNCH")}</small>
+                ${item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ""}
+              </span>
+            </div>`,
+        )
+        .join("")
+    : `<p class="proof-scraps-empty">${escapeHtml(scrapsFallback || `${bag.priorLaunches} earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"} retained for this reported deployer.`)}</p>`;
+
+  frontdoorProof.innerHTML = `
+    <div class="proof-kicker">
+      <span>WHY IT SURFACED / RECEIPT-BACKED</span>
+      <span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span>
+    </div>
+    <div class="proof-story">
+      <div class="proof-step proof-current">
+        <span>FRESH GARBAGE</span>
+        <strong>${escapeHtml(bag.symbol)}</strong>
+        <small>${escapeHtml(bag.name)}</small>
+      </div>
+      <div class="proof-arrow" aria-hidden="true">→</div>
+      <div class="proof-step proof-signal">
+        <span>THE RAT NOTICED</span>
+        <h3>SMELLS FAMILIAR.</h3>
+        <p>This Pons-reported deployer already appears on <b>${escapeHtml(bag.priorLaunches)}</b> earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"}. You don't start from zero—the older trail is already here.</p>
+      </div>
+      <div class="proof-arrow" aria-hidden="true">→</div>
+      <div class="proof-step">
+        <span>OLDER SCRAPS</span>
+        <div class="proof-scraps">${scrapMarkup}</div>
+      </div>
+      <div class="proof-action">
+        <span>SEE THE OLD TRAIL</span>
+        <button class="button primary" type="button" data-proof-open="${escapeHtml(bag.id)}">DIG DEEPER <span>↗</span></button>
+        <a class="proof-secondary" href="#garbage">SEE ALL FRESH GARBAGE →</a>
+      </div>
+      <div class="proof-boundary">
+        <span><b>PATTERN</b> · ${escapeHtml(normalizeCoverage(bag.coverage))} HISTORY</span>
+        <span>Same reported address only. Not a human identity, safety, profitability or future-outcome claim.</span>
+      </div>
+    </div>`;
 }
 
 function renderFeed() {
@@ -471,7 +725,7 @@ function openBag(idOrBag, origin = document.activeElement) {
         )
         .join("")
     : bag.priorLaunches > 0
-      ? `<div class="empty-trail">${escapeHtml(bag.priorLaunches)} earlier indexed launch${bag.priorLaunches===1?"":"es"} exist for this reported deployer. The fast homepage view does not inline the full trail; Creator File loads it on demand.</div>`
+      ? `<div class="empty-trail">${escapeHtml(bag.priorLaunches)} earlier indexed launch${bag.priorLaunches===1?"":"es"} exist for this reported deployer. The fast homepage view does not inline the full trail; Deployer File loads it on demand.</div>`
       : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
 
   const share = buildShareCardModel(bag);
@@ -500,7 +754,7 @@ function openBag(idOrBag, origin = document.activeElement) {
     </section>
 
     <section class="creator-file-panel rb-card" data-creator-panel>
-      <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>INDEXED HISTORY</span></div>
+      <div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>INDEXED HISTORY</span></div>
       <p class="intel-loading">Opening the reported-address file…</p>
     </section>
 
@@ -528,6 +782,23 @@ function openBag(idOrBag, origin = document.activeElement) {
         <button class="button ghost" type="button" data-copy-post>COPY POST</button>
       </div>
       <div class="share-copy-status" aria-live="polite"></div>
+    </section>
+
+    <section class="case-next-step" aria-label="Next step">
+      <span>08 / NEXT MOVE</span>
+      <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
+      <p>
+        If this reported deployer is worth following, open the Telegram Rat and
+        WATCH the exact address shown at the top of this file. Watch is
+        user-requested monitoring, not a buy or safety signal.
+      </p>
+      <a
+        class="button primary"
+        href="https://t.me/BinratBot"
+        target="_blank"
+        rel="noopener noreferrer"
+        >OPEN TELEGRAM RAT <span>↗</span></a
+      >
     </section>
   `;
 
@@ -569,7 +840,7 @@ async function hydrateBagIntelligence(bag) {
       : '<div class="intel-empty">No between-horizon change can be projected yet.</div>';
     panel.innerHTML = `
       <div class="file-section-heading"><h3>03 / WHAT CHANGED?</h3><span>${escapeHtml(intel.observationCoverage)} OBSERVATION COVERAGE</span></div>
-      <p class="intel-boundary">On-chain snapshots only. Raw pool liquidity is not USD liquidity. The reported creator address is not a claim of human identity.</p>
+      <p class="intel-boundary">On-chain snapshots only. Raw pool liquidity is not USD liquidity. The Pons-reported deployer address is not a claim of human identity.</p>
       <div class="intel-snapshots">${snapshots}</div>
       <div class="intel-changes"><span class="intel-subhead">BETWEEN RECEIPTS</span>${changes}</div>
       <div class="intel-receipt">INTELLIGENCE RECEIPT / ${escapeHtml(intel.receipt.receiptId)}</div>
@@ -602,7 +873,7 @@ async function hydrateCreatorFile(bag) {
         <button class="creator-launch-open" type="button" data-open-creator-launch="${escapeHtml(item.id)}">OPEN CHANGES ↗</button>
       </div>`).join("");
     panel.innerHTML = `
-      <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
+      <div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
       <div class="creator-file-stats">
         <div><span>REPORTED ADDRESS</span><code>${escapeHtml(shortAddress(file.reportedCreatorAddress))}</code></div>
         <div><span>FIRST INDEXED BLOCK</span><b>${escapeHtml(file.firstIndexedBlock)}</b></div>
@@ -611,7 +882,7 @@ async function hydrateCreatorFile(bag) {
       </div>
       <p class="intel-boundary">Same Pons-reported deployer address only. This does not establish common human ownership. Full indexed trail shown; open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
       <div class="creator-launches">${rows}</div>
-      <div class="intel-receipt">CREATOR FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
+      <div class="intel-receipt">DEPLOYER FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
     `;
     for (const image of panel.querySelectorAll("[data-token-image]")) {
       image.addEventListener("error", () => image.remove(), { once: true });
@@ -637,7 +908,7 @@ async function hydrateCreatorFile(bag) {
     window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "creator" } }));
   } catch {
     if (activeDrawerBagId !== bag.id) return;
-    panel.innerHTML = '<div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Creator history projection is not available.</div>';
+    panel.innerHTML = '<div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Deployer history projection is not available.</div>';
   }
 }
 
@@ -660,7 +931,7 @@ async function hydrateReplayLab(bag) {
       <p class="intel-boundary">Deterministic replay of real indexed Pons evidence. Missing 5m / 1h / 24h stages remain missing; nothing is simulated.</p>
       <div class="intel-snapshots">${stages}</div>
       <div class="creator-file-stats">
-        <div><span>CREATOR FILE</span><b>${escapeHtml(replay.creatorFile.indexedLaunchCount)} LAUNCHES</b></div>
+        <div><span>DEPLOYER FILE</span><b>${escapeHtml(replay.creatorFile.indexedLaunchCount)} LAUNCHES</b></div>
         <div><span>OBSERVATION COVERAGE</span><b>${escapeHtml(replay.intelligence.observationCoverage)}</b></div>
         <div><span>AS OF BLOCK</span><b>${escapeHtml(replay.asOfBlock)}</b></div>
         <div><span>HISTORY</span><b>${escapeHtml(replay.historyCoverage)}</b></div>
@@ -710,8 +981,8 @@ function renderObservationSnapshot(snapshot) {
     <article class="intel-snapshot" data-rb-animated>
       <div class="intel-snapshot-head"><strong>+${escapeHtml(snapshot.horizonLabel.toUpperCase())}</strong><span>BLK ${escapeHtml(snapshot.observedBlock)}</span></div>
       <dl>
-        <dt>creator share</dt><dd>${formatBps(snapshot.reportedCreatorShareBps)}</dd>
-        <dt>creator balance</dt><dd>${formatRaw(snapshot.reportedCreatorBalanceRaw)}</dd>
+        <dt>reported deployer share</dt><dd>${formatBps(snapshot.reportedCreatorShareBps)}</dd>
+        <dt>reported deployer balance</dt><dd>${formatRaw(snapshot.reportedCreatorBalanceRaw)}</dd>
         <dt>active liquidity</dt><dd>${formatRaw(snapshot.poolActiveLiquidityRaw)} <small>RAW</small></dd>
         <dt>pool tick</dt><dd>${snapshot.poolTick === null ? "UNKNOWN" : escapeHtml(snapshot.poolTick)}</dd>
       </dl>
@@ -722,8 +993,8 @@ function renderObservedChange(change) {
   const label = {
     POOL_ACTIVE_LIQUIDITY_RAW: "ACTIVE LIQUIDITY / RAW",
     POOL_TICK: "POOL TICK",
-    REPORTED_CREATOR_BALANCE_RAW: "REPORTED CREATOR BALANCE",
-    REPORTED_CREATOR_SHARE_BPS: "REPORTED CREATOR SHARE",
+    REPORTED_CREATOR_BALANCE_RAW: "REPORTED DEPLOYER BALANCE",
+    REPORTED_CREATOR_SHARE_BPS: "REPORTED DEPLOYER SHARE",
   }[change.field] ?? change.field;
   const before = change.field === "REPORTED_CREATOR_SHARE_BPS" ? formatBps(change.before) : formatRaw(change.before);
   const after = change.field === "REPORTED_CREATOR_SHARE_BPS" ? formatBps(change.after) : formatRaw(change.after);
@@ -762,7 +1033,7 @@ function renderShareCard(card) {
         <div class="share-card-kicker">HOT GARBAGE // ${escapeHtml(card.stamp)}</div>
         <h4 class="share-card-symbol">${escapeHtml(card.symbol)}</h4>
         <div class="share-card-metrics">
-          <div class="share-card-metric"><span>REPORTED CREATOR</span><b>${escapeHtml(card.creatorShort)}</b></div>
+          <div class="share-card-metric"><span>REPORTED DEPLOYER</span><b>${escapeHtml(card.creatorShort)}</b></div>
           <div class="share-card-metric"><span>PRIOR BAGS</span><b>${escapeHtml(card.priorLaunches)}</b></div>
           <div class="share-card-metric"><span>COVERAGE</span><b>${escapeHtml(card.coverage)}</b></div>
         </div>
@@ -844,10 +1115,17 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-randomBag.addEventListener("click", () => {
-  if (bags.length === 0) return;
-  const bag = bags[Math.floor(Math.random() * bags.length)];
-  openBag(bag.id, randomBag);
+if (randomBag) {
+  randomBag.addEventListener("click", () => {
+    if (bags.length === 0) return;
+    const bag = bags[Math.floor(Math.random() * bags.length)];
+    openBag(bag.id, randomBag);
+  });
+}
+frontdoorProof?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-proof-open]");
+  if (!button) return;
+  openBag(button.dataset.proofOpen, button);
 });
 
 function normalizeCoverage(value) {
