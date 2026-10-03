@@ -1,10 +1,10 @@
 # BINRAT Domain Cutover V1 Receipt
 
-- Timestamp (UTC): `2026-10-03T00:25:19Z`
+- Timestamp (UTC): `2026-10-03T00:39:00Z`
 - Registrar: Namecheap
 - Domain: `binrat.tech`
 - Operation branch: `ops/binrat-domain-cutover-v1`
-- State: `BLOCKED — ACCOUNT ITSELF LACKS ZONE CREATE AUTHORITY`
+- State: `BLOCKED — TEMPORARY CLOUDFLARE API TOKEN NOT AVAILABLE TO THIS SESSION`
 
 ## Preflight result
 
@@ -30,6 +30,16 @@ pair. The temporary API key was used only in the request process environment;
 it was never written to disk.
 
 ## Cloudflare state
+
+The owner authorized a temporary API token supplied through
+`CLOUDFLARE_API_TOKEN` for this bounded cutover. Before any mutation, both the
+login-shell and non-login-shell command environments were checked without
+printing the value. The variable was absent in both. Consequently,
+`GET /user/tokens/verify`, account enumeration under the temporary token, zone
+creation, registrar delegation, and custom-domain attachment could not be
+performed in this session.
+
+The prior Wrangler OAuth state remains relevant only as historical context:
 
 - Cloudflare OAuth: authenticated as `pettevik@gmail.com`
 - Cloudflare account: `8927d39146b901d0f463b971a1d039e6`
@@ -69,7 +79,7 @@ rollback/reference URL was not modified.
 
 ## Resume gate
 
-Grant the selected Cloudflare account authority to create zones (or use an
-account that already has it), then resume by creating/reusing the
-`binrat.tech` zone. Only after Cloudflare returns its exact nameserver pair may
-the authorized Namecheap delegation change proceed.
+Make the authorized temporary token available to the execution environment as
+`CLOUDFLARE_API_TOKEN`, then resume with its non-mutating token verification
+and exact Worker-account discovery. Only after Cloudflare returns its exact
+nameserver pair may the authorized Namecheap delegation change proceed.
