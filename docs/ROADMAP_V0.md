@@ -25,6 +25,74 @@ This public product state does **not** authorize token launch or token marketing
 
 A capability may be `ENGINEERING_PASS` without being `DEPLOYED` or `PUBLIC_LIVE`.
 
+## TOKEN LAUNCH ACCELERATION + GENESIS FUNNEL — CURRENT OWNER PRIORITY (2026-10-03)
+
+This section is the current token-launch work order and supersedes older launch-roadmap wording where the two conflict. It does **not** itself authorize marketing, signing, broadcast, or launch.
+
+Canonical companion plan:
+[`docs/product/BINRAT_TOKEN_LAUNCH_AND_GENESIS_FUNNEL_V1.md`](./product/BINRAT_TOKEN_LAUNCH_AND_GENESIS_FUNNEL_V1.md).
+
+### Launch V1 target
+
+Keep the irreversible surface deliberately small:
+
+`Pons V2 / Robinhood 4663 -> ETH pair -> existing Stake & Burn candidate -> one WORKING RAT stake tier -> CASE: $BINRAT -> verified web/TG/X facts`
+
+Launch V1 explicitly does **not** wait for FERAL RAT, Rat Bonds, custom RatVault, StonkRat/RWA, governance, Shadow Economy PMF, API token gating, or a finished Substack operation.
+
+The current ArcPad / Arc 5042 launch receipts remain immutable historical evidence but **do not satisfy** the Pons V1 launch-mechanics gate. The capability manifest / launch-gate matrix must gain a reviewed Pons 4663 successor authority before launch; old Arc evidence must never be relabeled as Pons verification.
+
+### Early-supporter / Genesis Rat objective
+
+Early supporters should be rewarded for sustained support and for creating retained BINRAT users, not for raw clicks, purchase size, wash volume, or winning a launch-block race.
+
+Candidate launch-era model:
+
+- active stake at or above the frozen WORKING RAT threshold unlocks the real product tier;
+- early qualifying stake can earn non-transferable **GENESIS RAT** status after a sustained qualification period inside a published Genesis window;
+- Genesis rewards are bounded product/culture benefits: badge/Telegram role, Genesis receipt, share-card identity, temporary Watch-capacity bonus and early experimental access;
+- no extra $BINRAT emissions are required for Genesis;
+- canonical Case/receipt share links may carry referral attribution;
+- referral rewards trigger only after **retained product activation**, not impressions/clicks;
+- referral rewards are product trials/capacity/recognition, capped per principal and period;
+- no promised airdrop or future $BINRAT conversion.
+
+Candidate implementation test parameters are a 30-day Genesis window and 7 continuous qualifying stake days; the launch/supporter manifest must freeze the final values before public marketing.
+
+### Product-led funnel
+
+Primary funnel:
+
+`X / shared receipt -> OPEN CASE -> DIG DEEPER -> WATCH -> ALERT -> RETURN -> SHARE A RECEIPT -> LINK WALLET -> PUT THE RAT TO WORK -> WORKING RAT -> REPEAT`
+
+Telegram is the scout/return loop.  
+X is distribution and receipt sharing.  
+binrat.tech is the canonical product/token-facts surface.  
+Substack is optional depth and must not become a launch blocker.
+
+### Immediate launch train
+
+1. **L0 — authority reconciliation:** preserve Arc history, create Pons V1 successor authority, keep launch/marketing blocked.
+2. **L1 — PonsVault forensic pin:** launcher/registry/Stake & Burn implementation, ABI/codehash, proxy/beacon, upgrade authority and sweep permissions.
+3. **L2 — stake reader:** pinned, fail-closed read of active stake.
+4. **L3 — WORKING RAT:** one stake-backed entitlement only.
+5. **L4 — wallet link:** Telegram principal ↔ Robinhood wallet proof.
+6. **L5 — CASE: $BINRAT:** self-audit launch/vault/stake/graduation receipts.
+7. **L6 — Genesis funnel:** attributable receipt shares, retained activation, sustained-stake qualification, bounded non-transferable rewards.
+8. **L7 — economics:** live-parameter 0/50/100 bps candidate-tax scenarios; no token-price forecast.
+9. **L8 — launch appliance:** one manifest, preflight, arm artifact, verifier, canonical public facts.
+10. **L9 — rehearsal:** no broadcast; prove abort/reconciliation paths.
+11. **L10 — launch:** only after legal/compliance, upstream, immutable-manifest and explicit owner-authority gates pass.
+
+### Launch freeze
+
+Once the exact launch manifest exists, only Critical/High launch/security fixes, factual corrections, and failed-gate repairs may enter the launch branch.
+
+No "while we are here" features.
+
+The owner should be able to run one launch-status command and receive exactly one next action instead of remembering branch/dependency state manually.
+
+
 ## PRODUCT SURFACE V1 — MAKE THE RAT LEGIBLE
 
 This is a bounded presentation lane over existing public evidence capabilities. It does not rewrite the backend, authorize token launch/marketing, activate Holder Gate, or block the parallel legal/compliance authorization lane. The current `web/` frontend remains the production surface until a separately accepted migration.
@@ -690,6 +758,8 @@ Public proof-of-funding and execution surface linking token-related project infl
 The ledger is part of the product trust model: the project can openly use token-related revenue to bankroll development without hiding the mechanism.
 
 ## EARLY FAIR LAUNCH — FUND THE BUILD, SHIP THE UTILITY
+
+**2026-10-03 authority note:** the Pons V2 / Stake & Burn / WORKING RAT / Genesis Funnel plan above is the current launch work order. This older section remains useful doctrine, but any conflicting rail, holder-gate, launch-blocker or incentive wording is superseded by the current launch companion plan.
 
 BINRAT intends to launch `$BINRAT` early, subject to the legal/compliance launch gate in `TOKEN_LAUNCH_DOCTRINE.md`.
 
