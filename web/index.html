@@ -7,12 +7,12 @@
     <meta name="robots" content="noindex,nofollow,noarchive" />
     <meta
       name="description"
-      content="BINRAT sniffs fresh Robinhood/Pons launches, remembers recurring deployer trails, and keeps the receipts. Open Fresh Garbage or add the Telegram Rat."
+      content="BINRAT watches fresh Pons launches, remembers old deployer trails, and shows the receipts when familiar addresses return. Open Fresh Garbage or add the Telegram Rat."
     />
     <meta property="og:title" content="BINRAT — THE RAT FOUND SOMETHING" />
     <meta
       property="og:description"
-      content="Fresh launches hit the dumpster. BINRAT remembers recurring trails and squeaks when familiar paws come back. Don't trust the rat. Check the receipt."
+      content="Every launch looks new if you don't remember the old trails. BINRAT does. Open fresh launches, dig into repeat deployer history, and check the receipts."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./assets/binrat-hero.webp" />
@@ -24,7 +24,7 @@
     <meta name="twitter:title" content="BINRAT — THE RAT FOUND SOMETHING" />
     <meta
       name="twitter:description"
-      content="Fresh launches hit the dumpster. BINRAT remembers recurring trails and keeps the receipts."
+      content="Every launch looks new if you don't remember the old trails. BINRAT does. Dig into repeat deployer history and check the receipts."
     />
     <meta name="twitter:image" content="./assets/binrat-hero.webp" />
     <title>BINRAT — The Rat Found Something</title>
@@ -89,13 +89,12 @@
             THE RAT<span>FOUND SOMETHING.</span><sup>↗</sup>
           </h1>
           <p class="lede">
-            New launches hit the dumpster every day.
-            <strong>BINRAT remembers the trails they leave behind.</strong>
+            Every new launch looks new if you don't remember the old trails.
+            <strong>BINRAT does.</strong>
           </p>
           <p class="sublede">
-            When the same Pons-reported deployer shows up again, the Rat pulls
-            the older receipts so you can decide whether the trail is worth
-            digging.
+            When a Pons-reported deployer shows up again, the Rat pulls the
+            older indexed launches and receipts. You don't start from zero.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#garbage"
@@ -135,7 +134,7 @@
       <section
         id="frontdoor-proof"
         class="shell frontdoor-proof"
-        aria-label="Why this Fresh Garbage finding surfaced"
+        aria-label="Why BINRAT noticed this fresh launch"
         aria-live="polite"
         data-frontdoor-proof
       >
@@ -144,8 +143,104 @@
           <span>CHECKING THE OLD BAGS…</span>
         </div>
         <div class="proof-loading" role="status">
-          RAT IS DIGGING FOR A REPEAT TRAIL…
+          EVERY LAUNCH LOOKS NEW IF YOU FORGET THE OLD TRAIL. THE RAT IS CHECKING.
         </div>
+      </section>
+      <div
+        class="shell intake-strip"
+        id="latest-bag"
+        aria-label="Latest indexed bag"
+      >
+        <span class="intake-label">LAST INTO THE BIN</span
+        ><span class="intake-loading">Loading index receipt…</span>
+      </div>
+      <section
+        id="garbage"
+        class="shell garbage-section"
+        aria-labelledby="feed-title"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01 / THE DUMPSTER</p>
+            <h2 id="feed-title">
+              HOT GARBAGE<span class="heading-dot">.</span>
+            </h2>
+          </div>
+          <p class="section-meta">
+            <span data-mode-copy="status">INDEX CONNECTING</span><br /><span
+              data-mode-copy="detail"
+              >Waiting for a committed checkpoint.</span
+            >
+          </p>
+        </div>
+        <div class="live-rail" id="live-rail" aria-label="Current index status">
+          <span class="live-rail-dot" aria-hidden="true"></span>
+          <strong>CONNECTING</strong>
+          <span>PONS 4663</span>
+          <span>WAITING FOR CHECKPOINT</span>
+        </div>
+        <div class="feed-toolbar">
+          <div class="feed-filters" role="group" aria-label="Filter bags">
+            <button
+              class="filter-button active"
+              data-filter="all"
+              aria-pressed="true"
+            >
+              NEW <span id="all-count">—</span></button
+            ><button
+              class="filter-button"
+              data-filter="repeat"
+              aria-pressed="false"
+            >
+              REPEAT DEPLOYERS <span id="repeat-count">—</span>
+            </button>
+            <button
+              class="filter-button"
+              data-filter="noted"
+              aria-pressed="false"
+            >
+              NOTED <span id="noted-count">—</span>
+            </button>
+            <button
+              class="filter-button"
+              data-filter="socials"
+              aria-pressed="false"
+            >
+              HAS SOCIALS <span id="socials-count">—</span>
+            </button>
+            <button
+              class="filter-button"
+              data-filter="unknown"
+              aria-pressed="false"
+            >
+              UNKNOWN <span id="unknown-count">—</span>
+            </button>
+          </div>
+          <label class="feed-search"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="bag-search"
+              type="search"
+              placeholder="Token / deployer / address"
+              aria-label="Search by ticker, name, token address or Pons-reported deployer address"
+              autocomplete="off"
+              spellcheck="false"
+            /><span class="search-key" aria-hidden="true">/</span></label
+          >
+          <span class="feed-order">NEWEST FIRST ↓</span>
+        </div>
+        <div id="garbage-grid" class="garbage-grid" aria-live="polite"></div>
+        <div class="feed-bottom">
+          <span id="feed-count">Loading bags…</span
+          ><span
+            ><span data-mode-copy="end">WAITING FOR INDEX</span>
+            <span class="tiny-cross">+</span></span
+          >
+        </div>
+        <p class="feed-boundary">
+          Coverage describes the record, never the token. Open a bag to inspect
+          the evidence.
+        </p>
       </section>
       <section
         id="telegram"
@@ -158,8 +253,8 @@
             DON'T LIVE IN THE TERMINAL.<br /><span>THE RAT DOES.</span>
           </h2>
           <p class="telegram-lede">
-            <strong>Telegram tells you when to care.</strong>
-            Web BINRAT shows you everything worth knowing.
+            <strong>Telegram tells you when to come back.</strong>
+            Web BINRAT is where you dig into the trail and receipts.
           </p>
           <p class="telegram-body">
             Find something worth watching. Leave a tripwire. Go do literally
@@ -251,8 +346,8 @@
             </p>
             <div class="roadmap-status-rail" data-roadmap-status>
               <span class="status-dot"></span>
-              <b>CHECKING CAPABILITY MANIFEST</b>
-              <span>/api/capabilities</span>
+              <b>CHECKING WHAT'S LIVE</b>
+              <span>LIVE STATUS / NO FAKE ROADMAP BADGES</span>
             </div>
           </div>
           <figure class="roadmap-raster">
@@ -382,102 +477,6 @@
             >WHY $BINRAT? <span>↓</span></a
           >
         </div>
-      </section>
-      <div
-        class="shell intake-strip"
-        id="latest-bag"
-        aria-label="Latest indexed bag"
-      >
-        <span class="intake-label">LAST INTO THE BIN</span
-        ><span class="intake-loading">Loading index receipt…</span>
-      </div>
-      <section
-        id="garbage"
-        class="shell garbage-section"
-        aria-labelledby="feed-title"
-      >
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">01 / THE DUMPSTER</p>
-            <h2 id="feed-title">
-              HOT GARBAGE<span class="heading-dot">.</span>
-            </h2>
-          </div>
-          <p class="section-meta">
-            <span data-mode-copy="status">INDEX CONNECTING</span><br /><span
-              data-mode-copy="detail"
-              >Waiting for a committed checkpoint.</span
-            >
-          </p>
-        </div>
-        <div class="live-rail" id="live-rail" aria-label="Current index status">
-          <span class="live-rail-dot" aria-hidden="true"></span>
-          <strong>CONNECTING</strong>
-          <span>PONS 4663</span>
-          <span>WAITING FOR CHECKPOINT</span>
-        </div>
-        <div class="feed-toolbar">
-          <div class="feed-filters" role="group" aria-label="Filter bags">
-            <button
-              class="filter-button active"
-              data-filter="all"
-              aria-pressed="true"
-            >
-              NEW <span id="all-count">—</span></button
-            ><button
-              class="filter-button"
-              data-filter="repeat"
-              aria-pressed="false"
-            >
-              REPEAT DEPLOYERS <span id="repeat-count">—</span>
-            </button>
-            <button
-              class="filter-button"
-              data-filter="noted"
-              aria-pressed="false"
-            >
-              NOTED <span id="noted-count">—</span>
-            </button>
-            <button
-              class="filter-button"
-              data-filter="socials"
-              aria-pressed="false"
-            >
-              HAS SOCIALS <span id="socials-count">—</span>
-            </button>
-            <button
-              class="filter-button"
-              data-filter="unknown"
-              aria-pressed="false"
-            >
-              UNKNOWN <span id="unknown-count">—</span>
-            </button>
-          </div>
-          <label class="feed-search"
-            ><span aria-hidden="true">⌕</span
-            ><input
-              id="bag-search"
-              type="search"
-              placeholder="Token / deployer / address"
-              aria-label="Search by ticker, name, token address or Pons-reported deployer address"
-              autocomplete="off"
-              spellcheck="false"
-            /><span class="search-key" aria-hidden="true">/</span></label
-          >
-          <span class="feed-order">NEWEST FIRST ↓</span>
-        </div>
-        <div id="garbage-grid" class="garbage-grid" aria-live="polite"></div>
-        <div class="feed-bottom">
-          <span id="feed-count">Loading bags…</span
-          ><span
-            ><span data-mode-copy="end">WAITING FOR INDEX</span>
-            <span class="tiny-cross">+</span></span
-          >
-        </div>
-        <p class="feed-boundary">
-          Coverage describes the record, never the token. Open a bag to inspect
-          the evidence.
-        </p>
       </section>
       <section
         id="how"
