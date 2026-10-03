@@ -36,30 +36,35 @@ The target launch has:
 
 Project revenue is not hidden. It is part of the design.
 
-## Preferred current launch rail: ArcPad standard launch
+## Preferred current launch rail: Pons V2 + Stake & Burn candidate
 
-Subject to legal/compliance review immediately before launch, the candidate rail is ArcPad's current Arc-mainnet USDC standard creator-rewards path. The dated `LAUNCH_MECHANICS_VERIFICATION_V0` receipt independently established that this variant currently provides:
+The current owner-selected planning direction is **Robinhood Chain 4663 / Pons V2**, with an existing **PonsVault Stake & Burn** template as the Launch V1 economic primitive.
 
-- fixed 1,000,000,000 token supply;
-- no presale;
-- no team allocation;
-- launch directly into a Uniswap V3 pool;
-- an initial position minted to a non-upgradeable locker whose observed runtime exposes no withdrawal, position-transfer, or decrease-liquidity path;
-- an optional same-transaction creator first buy through the new public pool, with privileged first-position ordering that must be disclosed if selected;
-- a creator claim on 50% of collected quote-side USDC fees and an ArcPad treasury route for the other 50%;
-- launch-token-side pool fees routed to the dead address;
-- a temporary 2% per-recipient cap lasting exactly 1,200 blocks, which is not Sybil resistance;
-- an ArcPad launcher-owner power to redirect future creator quote-fee accrual.
+This selection is planning authority only. It does not authorize launch.
 
-The position can move out of range and cease being economically active even though its NFT cannot be withdrawn under the observed runtime. The observed initial mint also leaves sub-token raw-unit dust in the launcher, so BINRAT must not describe the allocation as literally 100% of raw units entering liquidity.
+Launch V1 should minimize custom contract surface:
 
-The canonical receipt is `docs/LAUNCH_MECHANICS_VERIFICATION_V0.json`, summarized in `docs/LAUNCH_MECHANICS_VERIFICATION_V0.md`. ArcPad contract source was not available in a form that could be matched to deployed bytecode; the ArcPad findings are therefore on-chain verified or retained as platform claims, never source-verified.
+- launch $BINRAT through the reviewed Pons/PonsVault path required for the selected vault mechanics;
+- native ETH as the candidate quote/pair asset;
+- one active-stake product tier: **WORKING RAT**;
+- no inflationary $BINRAT staking emissions;
+- Pons native buyback **OFF as the current candidate** unless the final reviewed manifest deliberately changes it;
+- creator tax unresolved until scenario simulation, legal/product review, and immutable-manifest freeze;
+- founder/project opening purchase, if any, must be atomic/publicly disclosed under the selected Pons launch mechanics;
+- no custom RatVault, RWA dividend, Rat Bonds, governance or FERAL tier as Launch V1 blockers.
 
-`docs/BINRAT_LAUNCH_CONFIG_V0.json` binds that receipt to the owner-selected project roles. Treasury is `0xab063A9b53a2Ab832a941aE5890ea05c1672339D`; project/creator fee recipient is `0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866`. They are separate, non-interchangeable owner declarations, not custody or on-chain execution proof. The privileged first buy, private presale, discounted insider round, hidden team allocation, and privileged founder/project launch allocation are all disabled or none. A founder/project ordinary public-market purchase at launch is not planned.
+The Pons launch gate must independently pin and verify the exact live launcher/factory/config, `canLaunch` authority, relevant runtime bytecode/codehashes, PonsVault launcher/registry/template, Stake & Burn implementation, proxy/beacon state, upgrade authority and fee-sweep permissions immediately before launch.
 
-BINRAT must re-verify the live app routing, deployed bytecode, state, fee authority, and current ArcPad terms immediately before launch. Product docs and this dated receipt are not perpetual contract authority.
+Pons configs and upstream deployment state are not perpetual authority. A dated verification receipt and an exact launch manifest are required.
 
-That verification must produce a dated launch-mechanics receipt binding the contract addresses, relevant code/immutability properties, fee routes, liquidity-lock mechanics, source documents, and verification timestamp used for the launch authorization decision.
+### Historical predecessor: ArcPad / Arc 5042
+
+The existing ArcPad launch-mechanics receipt and `BINRAT_LAUNCH_CONFIG_V0` remain immutable historical evidence of the earlier launch design.
+
+They are **not** Pons verification and cannot satisfy the Robinhood/Pons launch gate.
+
+Before launch, the capability manifest and launch-gate matrix must explicitly record the Pons V1 successor authority rather than silently treating the old Arc `SATISFIED` launch-mechanics state as transferable.
+
 
 ## Treasury doctrine
 
@@ -116,18 +121,21 @@ The status model distinguishes:
 
 Candidate early surfaces:
 
-#### Rat Radar depth
-Rat Radar should provide a genuinely useful public watchlist while reserving higher-cost operational depth for eligible holders.
+#### WORKING RAT — active-stake product access
 
-Public users should retain access to exact addresses on a bounded watchlist, sample size/coverage, basic inclusion reasons, and the receipts needed to verify factual claims.
+Launch V1 uses **active verified stake**, not simple wallet balance, as the token/product entitlement primitive.
 
-A wallet that proves control and satisfies a publicly frozen $BINRAT balance threshold may unlock deeper ranking coverage, richer factor decomposition, live activity views, custom filters/cohorts, larger watch capacity, and later API/webhook access.
+FREE users retain useful core Case, receipt, Trash Trail and bounded Watch access.
 
-The holder gate sells depth, speed, scale, filtering, and convenience. It must not hide or rewrite factual receipts.
+A principal that proves control of a Robinhood Chain wallet and has active stake at or above the publicly frozen WORKING RAT threshold may unlock higher-cost product depth such as larger Watch capacity, deeper retained history and advanced alert filtering.
 
-The initial balance threshold may be derived from a percentage of fixed total supply, but the final threshold must be frozen only after distribution and price-sensitivity simulation. The product must describe the actual balance test precisely rather than imply control of a percentage of circulating supply.
+The gate sells depth, speed, scale, filtering and convenience. It must not hide or rewrite factual receipts.
 
-Pre-token Holder Gate V0 keeps eligibility behind a provider interface. Deterministic fixtures may exercise the policy in tests, but production resolves to FREE unless canonical token configuration and a separately reviewed balance source both exist. A configured address or threshold alone is not sufficient to activate HOLDER. Wallet control uses message signing only; it never requests a transaction, gas, approval, transfer, or private key.
+Only one token-backed tier ships for Launch V1. FERAL RAT is post-launch.
+
+The final WORKING RAT threshold must be frozen before token-facing marketing and bound to a versioned access policy. Product capability may fail closed to FREE when current stake cannot be verified; failure must never invent premium authority.
+
+Wallet control uses message signing only; it never requests private keys. Staking transactions, where initiated by the user, remain explicit wallet actions separate from authentication.
 
 #### Rat Watch capacity
 Token holding/locking can unlock additional watch slots, richer alert configuration, or community alert channels.
@@ -211,6 +219,45 @@ The rule is simple:
 > **Degen decides attention. Receipts decide truth.**
 
 Avoid mechanics whose core value proposition is guaranteed yield, promised appreciation, or misleading scarcity.
+
+## Genesis supporters and product-led distribution
+
+Early-supporter rewards should reinforce product use without creating an airdrop-farming economy.
+
+The canonical companion plan is `docs/product/BINRAT_TOKEN_LAUNCH_AND_GENESIS_FUNNEL_V1.md`.
+
+### GENESIS RAT
+
+A linked principal/wallet may earn non-transferable GENESIS RAT status for sustained qualifying active stake during a published launch-era Genesis window.
+
+The candidate implementation test is 7 continuous qualifying days inside the first 30 days after verified public launch. Final values require a frozen supporter manifest before public promotion.
+
+Genesis benefits may include:
+
+- badge / Telegram role;
+- public Genesis receipt;
+- distinct share-card treatment;
+- bounded temporary extra Watch capacity;
+- early access to selected experiments.
+
+Genesis does not provide extra token emissions or factual authority.
+
+### Qualified referrals
+
+BINRAT may attribute canonical Case/receipt share links to a referrer, but rewards trigger only after the referred principal becomes a retained product user.
+
+Do not reward raw clicks, impressions, reposts, wallet creation, token purchase size, or transaction volume.
+
+Candidate referral rewards are product/culture benefits such as a bounded WORKING RAT trial, temporary Watch capacity, beta access or cosmetic recognition.
+
+Referral rewards are capped and do not imply a token airdrop or future conversion into $BINRAT.
+
+### Product-led funnel
+
+`X / receipt -> Case -> Dig -> Watch -> Alert -> Return -> Share -> Link wallet -> Put the Rat to Work`
+
+Token acquisition is deliberately downstream of experiencing the product.
+
 
 ## Marketing doctrine
 
