@@ -15,7 +15,8 @@ const viewports = [
   const browser = await chromium.launch({ headless: true });
   try {
     for (const viewport of viewports) {
-      const page = await browser.newPage({ viewport });
+      const context = await browser.newContext({ viewport });
+      const page = await context.newPage();
       await page.goto(`${baseUrl}/?fixtures=1`, { waitUntil: "networkidle" });
       await page.waitForFunction(() =>
         document.body.dataset.mode === "FIXTURE" &&
@@ -59,7 +60,7 @@ const viewports = [
         path: `${artifactDir}/${viewport.name}-${viewport.width}x${viewport.height}.png`,
         fullPage: true
       });
-      await page.close();
+      await context.close();
     }
   } finally {
     await browser.close();
