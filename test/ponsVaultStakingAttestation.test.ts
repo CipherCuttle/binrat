@@ -3,7 +3,9 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   derivePonsVaultStakingAttestationDigest,
+  PONSVault_STAKING_ATOMIC_DRY_CALLDATA,
   PONSVault_STAKING_ATTESTATION_DIGEST,
+  PONSVault_STAKING_FACTORY_DRY_CALLDATA,
   validatePonsVaultStakingAttestation
 } from '../src/launchConfig/ponsVaultStakingAttestation.js';
 
@@ -80,11 +82,19 @@ test('L1B records both native-ETH dry simulations as successful and non-broadcas
   await validatePonsVaultStakingAttestation(value);
 
   assert.equal(value.factoryCreationEvidence.directNativeEthDryCall.broadcast, false);
+  assert.equal(value.factoryCreationEvidence.directNativeEthDryCall.observedBlock, 79164449);
+  assert.equal(
+    value.factoryCreationEvidence.directNativeEthDryCall.calldata,
+    PONSVault_STAKING_FACTORY_DRY_CALLDATA
+  );
   assert.equal(
     value.factoryCreationEvidence.directNativeEthDryCall.returnedHypotheticalVault,
     '0x757ef16e4ea4c703d3e0cbc77cb61599597974e1'
   );
   assert.equal(value.atomicLaunchSimulation.result, 'SUCCESS');
+  assert.equal(value.atomicLaunchSimulation.observedBlock, 79164449);
+  assert.equal(value.atomicLaunchSimulation.valueWei, '500000000000000');
+  assert.equal(value.atomicLaunchSimulation.calldata, PONSVault_STAKING_ATOMIC_DRY_CALLDATA);
   assert.equal(value.atomicLaunchSimulation.broadcast, false);
   assert.equal(value.atomicLaunchSimulation.template, 'staking');
 });
@@ -102,5 +112,18 @@ test('L1B does not invent a creator-configurable lock or public reward asset lab
   assert.equal(
     value.rewardDeliverySemantics.publicCopyEffect,
     'DO_NOT_LABEL_STAKER_REWARDS_ETH_OR_WETH_UNTIL_FINAL_TRANSFER_HOP_IS_PINNED'
+  );
+});
+
+
+test('L1B simulation replay material cannot drift under a recomputed digest', async () => {
+  const value = await attestation();
+  value.atomicLaunchSimulation.calldata =
+    value.atomicLaunchSimulation.calldata.slice(0, -1) + '1';
+  value.attestationDigest = await derivePonsVaultStakingAttestationDigest(value);
+
+  await assert.rejects(
+    validatePonsVaultStakingAttestation(value),
+    /ATTESTATION_ATOMIC_SIM_INVALID/
   );
 });
