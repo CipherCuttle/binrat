@@ -45,7 +45,7 @@ This selection is planning authority only. It does not authorize launch.
 Launch V1 should minimize custom contract surface:
 
 - launch $BINRAT through the reviewed Pons/PonsVault Staking path required for the selected vault mechanics;
-- native ETH as the candidate quote/pair asset;
+- native ETH as the selected Launch V1 quote/pair asset;
 - one active-stake product tier: **WORKING RAT**;
 - no inflationary $BINRAT staking emissions;
 - Pons native buyback **OFF by owner selection for Launch V1** unless a later separately reviewed manifest deliberately changes it;
