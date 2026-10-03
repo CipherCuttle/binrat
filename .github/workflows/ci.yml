@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
-      BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+      ROBINHOOD_RPC_URL: https://rpc.mainnet.chain.robinhood.com
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -44,8 +44,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:-}" || {
-            echo "BINRAT_ROBINHOOD_ARCHIVE_RPC_URL is not configured"
+          test -n "${ROBINHOOD_RPC_URL:-}" || {
+            echo "ROBINHOOD_RPC_URL is not configured"
             exit 1
           }
           pnpm --silent exec tsx scripts/verify-pons-preflight.ts > pons-preflight-receipt.json
