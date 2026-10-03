@@ -149,8 +149,8 @@ test('canonical Telegram token behavior never projects historical Arc roles as c
   assert.match(reply ?? '', /launch authorization: BLOCKED/);
   assert.doesNotMatch(reply ?? '', new RegExp(BINRAT_TREASURY_ADDRESS));
   assert.doesNotMatch(reply ?? '', new RegExp(BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS));
-  assert.match(reply ?? '', /Treasury: NOT_CONFIGURED/);
-  assert.match(reply ?? '', /Project fee recipient: NOT_CONFIGURED/);
+  assert.match(reply ?? '', /treasury role: NOT_CONFIGURED/);
+  assert.match(reply ?? '', /project fee recipient role: NOT_CONFIGURED/);
   assert.match(reply ?? '', /Holder Gate: TOKEN_AUTHORITY_NOT_CONFIGURED/);
 });
 
