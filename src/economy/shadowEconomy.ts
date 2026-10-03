@@ -92,6 +92,8 @@ export type ShadowInvestigationEvent =
       eventId: string;
       occurredAtMs: number;
       paymentReference: string;
+      amountMinor: number;
+      asset: ShadowPaymentAsset;
     }
   | {
       type: 'ASSIGNED';
@@ -198,9 +200,13 @@ export function applyShadowInvestigationEvent(
     }
     case 'PAYMENT_CONFIRMED': {
       requireState(current, 'QUOTED');
-      if (!current.quote || event.occurredAtMs > current.quote.expiresAtMs) {
+      if (!current.quote || event.occurredAtMs >= current.quote.expiresAtMs) {
         throw new Error('SHADOW_QUOTE_EXPIRED');
       }
+      if (
+        event.amountMinor !== current.quote.amountMinor ||
+        event.asset !== current.quote.asset
+      ) throw new Error('SHADOW_PAYMENT_QUOTE_MISMATCH');
       return {
         ...current,
         state: 'FUNDED',
