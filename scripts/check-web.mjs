@@ -12,6 +12,7 @@ const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 const reactBitsIsland = readFileSync(new URL('../web/react-bits-island.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
 const mascotUrl = new URL('../web/assets/binrat-hero.webp', import.meta.url);
+const roadmapRasterUrl = new URL('../web/assets/roadmap-sniff.webp', import.meta.url);
 const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e9917cb7f2138bd163';
 
 const requiredHtml = [
@@ -36,7 +37,18 @@ const requiredHtml = [
   'WATCHING THESE PAWS. ✓',
   'SAME PAWS. NEW LAUNCH.',
   'NOT A LIVE ALERT',
+  '03 / ROADMAP',
+  'DOWN THE RAT HOLE',
+  "THIS ISN'T",
+  'THE RAT CATCHES THE LAUNCH.',
+  "SITES VANISH. THE TRAIL DOESN'T.",
+  'LEAVE A TRIPWIRE IN THE TRASH.',
+  'POINT THE RATS AT SOMETHING WORTH DIGGING.',
+  'USEFUL WORK EARNS A RECEIPT.',
+  'GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.',
+  'UNBADGED = ROADMAP DIRECTION, NOT A LIVE CLAIM.',
   './assets/binrat-hero.webp',
+  './assets/roadmap-sniff.webp',
   './share-card.css'
 ];
 
@@ -68,6 +80,10 @@ if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRON
 if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Error('WEB_TELEGRAM_FIRST_CLASS_CTA_MISSING');
 if (!html.includes('Event-driven. User-requested. No fake urgency. No engagement pings.')) throw new Error('WEB_TELEGRAM_NOTIFICATION_BOUNDARY_MISSING');
 if (!html.includes('A watched reported deployer showed up again.')) throw new Error('WEB_TELEGRAM_DEPLOYER_ALERT_BOUNDARY_MISSING');
+if (!dataSource.includes('fetch("/api/capabilities"')) throw new Error('WEB_CAPABILITY_MANIFEST_SOURCE_MISSING');
+if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_RUNTIME_STATUS_MISSING');
+if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
+if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');
 if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
 if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
 if (!app.includes('Same Pons-reported deployer appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
@@ -92,6 +108,7 @@ if (!reactBitsIsland.includes('React Bits')) throw new Error('WEB_REACT_BITS_DON
 if (!reactBitsIsland.includes('prefers-reduced-motion')) throw new Error('WEB_REDUCED_MOTION_GUARD_MISSING');
 
 if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
+if (!existsSync(roadmapRasterUrl)) throw new Error('WEB_ROADMAP_RASTER_MISSING');
 if (statSync(mascotUrl).size !== 256890) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
 const mascotDigest = createHash('sha256').update(readFileSync(mascotUrl)).digest('hex');
 if (mascotDigest !== expectedMascotSha256) throw new Error(`WEB_CANONICAL_MASCOT_DIGEST_DRIFT:${mascotDigest}`);

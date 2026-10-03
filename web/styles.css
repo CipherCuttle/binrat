@@ -837,6 +837,219 @@ img {
 .telegram-demo-footer span:last-child {
   text-align: right;
 }
+.roadmap-section {
+  padding-block: 44px 48px;
+  border-top: 1px solid var(--line);
+}
+.roadmap-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(440px, 1.12fr);
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 38px;
+}
+.roadmap-copy h2 {
+  font-family: Plex Condensed, sans-serif;
+  font-size: clamp(48px, 4.8vw, 68px);
+  line-height: 0.91;
+  letter-spacing: -0.035em;
+}
+.roadmap-copy h2 span {
+  color: var(--orange);
+}
+.roadmap-copy > p {
+  max-width: 540px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.8;
+}
+.roadmap-status-rail {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 19px;
+  color: var(--muted);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+}
+.roadmap-status-rail b {
+  color: var(--good);
+  font-weight: 500;
+}
+.roadmap-status-rail[data-state="UNAVAILABLE"] b {
+  color: var(--warn);
+}
+.roadmap-raster {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #4a4840;
+  min-height: 260px;
+  background: #171918;
+}
+.roadmap-raster img {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+  image-rendering: auto;
+}
+.roadmap-raster:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(0deg, #0c0f0ddb, transparent 36%);
+}
+.roadmap-raster figcaption {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: #d8d2c4;
+  font-size: 6px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 3px #000;
+}
+.roadmap-raster figcaption span:last-child {
+  text-align: right;
+  color: var(--muted);
+}
+.roadmap-spine {
+  position: relative;
+  display: grid;
+  gap: 0;
+}
+.roadmap-spine:before {
+  content: "";
+  position: absolute;
+  left: 29px;
+  top: 30px;
+  bottom: 30px;
+  width: 1px;
+  background: #4a5348;
+}
+.roadmap-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 20px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.roadmap-stage:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.roadmap-node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: start center;
+}
+.roadmap-node span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #5b6558;
+  background: var(--black);
+  color: var(--good);
+  font-size: 8px;
+}
+.roadmap-stage-degen .roadmap-node span {
+  color: var(--orange);
+  border-color: #765f4b;
+}
+.roadmap-stage-final .roadmap-node span {
+  color: var(--red);
+  border-color: #704047;
+}
+.roadmap-stage-copy {
+  min-width: 0;
+}
+.roadmap-stage-name {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 7px;
+  letter-spacing: 0.1em;
+}
+.roadmap-stage-copy h3 {
+  font-family: Plex Condensed, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.015em;
+}
+.roadmap-stage-copy > p {
+  max-width: 720px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.75;
+}
+.roadmap-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.roadmap-features > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 25px;
+  padding: 0 8px;
+  border: 1px solid #343b34;
+  color: var(--muted);
+  font-size: 7px;
+  letter-spacing: 0.035em;
+}
+.roadmap-features > span[data-status]:after {
+  content: attr(data-status);
+  padding-left: 6px;
+  border-left: 1px solid #3e463d;
+  color: var(--bone);
+}
+.roadmap-features > span[data-status="LIVE"] {
+  border-color: #53614d;
+}
+.roadmap-features > span[data-status="LIVE"]:after {
+  color: var(--good);
+}
+.roadmap-features > span[data-status="BUILDING"]:after {
+  color: var(--orange);
+}
+.roadmap-features > span[data-status="PLANNED"]:after {
+  color: var(--purple);
+}
+.roadmap-features > span[data-status="EXPERIMENT"]:after {
+  color: var(--warn);
+}
+.roadmap-rat-line {
+  display: block;
+  margin-top: 12px;
+  color: var(--orange);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+}
+.roadmap-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  padding-top: 13px;
+  color: var(--muted);
+  font-size: 6px;
+  letter-spacing: 0.055em;
+}
+.roadmap-footer span:first-child {
+  color: var(--bone);
+}
 .intake-strip {
   display: flex;
   align-items: center;
@@ -1800,6 +2013,13 @@ img {
     gap: 28px;
     grid-template-columns: minmax(0, 0.85fr) minmax(390px, 1.15fr);
   }
+  .roadmap-intro {
+    gap: 28px;
+    grid-template-columns: minmax(0, 0.9fr) minmax(390px, 1.1fr);
+  }
+  .roadmap-copy h2 {
+    font-size: 48px;
+  }
   .telegram-copy h2 {
     font-size: 42px;
   }
@@ -1926,6 +2146,16 @@ img {
     grid-template-columns: 1fr;
     gap: 26px;
     padding-block: 34px;
+  }
+  .roadmap-intro {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .roadmap-copy {
+    max-width: 620px;
+  }
+  .roadmap-raster {
+    max-width: 620px;
   }
   .telegram-copy {
     max-width: 620px;
@@ -2131,6 +2361,46 @@ img {
   .telegram-section {
     gap: 20px;
     padding-block: 30px;
+  }
+  .roadmap-section {
+    padding-block: 30px 34px;
+  }
+  .roadmap-copy h2 {
+    font-size: clamp(40px, 12vw, 54px);
+  }
+  .roadmap-raster,
+  .roadmap-raster img {
+    min-height: 210px;
+  }
+  .roadmap-raster figcaption {
+    display: block;
+  }
+  .roadmap-raster figcaption span:last-child {
+    display: block;
+    margin-top: 4px;
+    text-align: left;
+  }
+  .roadmap-stage {
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+    padding-block: 16px;
+  }
+  .roadmap-spine:before {
+    left: 23px;
+  }
+  .roadmap-node span {
+    width: 30px;
+    height: 30px;
+  }
+  .roadmap-stage-copy h3 {
+    font-size: 21px;
+  }
+  .roadmap-footer {
+    display: block;
+  }
+  .roadmap-footer span {
+    display: block;
+    margin-top: 5px;
   }
   .telegram-copy h2 {
     font-size: clamp(38px, 12vw, 52px);

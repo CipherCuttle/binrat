@@ -378,3 +378,21 @@ export async function loadReplayBundle(bagId) {
   ) throw new Error("REPLAY_BUNDLE_INVALID");
   return value;
 }
+
+
+export async function loadCapabilityManifest() {
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
+  const response = await fetch("/api/capabilities", {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
+  const value = await response.json();
+  if (
+    value?.schemaVersion !== "binrat.capability-manifest/0.1" ||
+    !value.capabilities ||
+    typeof value.capabilities !== "object"
+  ) throw new Error("CAPABILITY_MANIFEST_INVALID");
+  return value;
+}

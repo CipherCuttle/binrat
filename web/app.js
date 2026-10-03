@@ -1,4 +1,4 @@
-import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 
 const grid = document.querySelector("#garbage-grid");
@@ -141,6 +141,7 @@ sectionNav?.addEventListener("click", (event) => {
   if (event.target.closest("a")) sectionNav.open = false;
 });
 
+void bootstrapRoadmapCapabilities();
 void bootstrapLedger();
 await bootstrap();
 if (WEB_DATA_SOURCE_MODE === "LIVE") {
@@ -188,6 +189,73 @@ async function bootstrap() {
   } catch (error) {
     renderUnavailable(error);
   }
+}
+
+async function bootstrapRoadmapCapabilities() {
+  const rail = document.querySelector("[data-roadmap-status]");
+  const targets = document.querySelectorAll("[data-roadmap-capability]");
+  if (!rail || targets.length === 0) return;
+
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") {
+    rail.dataset.state = "UNAVAILABLE";
+    rail.querySelector("b").textContent = "FIXTURE MODE / STATUS NOT PROMOTED";
+    return;
+  }
+
+  try {
+    const manifest = await loadCapabilityManifest();
+    if (!manifest) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
+    const statuses = roadmapCapabilityStatuses(manifest.capabilities);
+    let applied = 0;
+    for (const target of targets) {
+      const status = statuses[target.dataset.roadmapCapability];
+      if (!status) continue;
+      target.dataset.status = status;
+      applied += 1;
+    }
+    rail.querySelector("b").textContent =
+      applied > 0 ? "RUNTIME CAPABILITY MANIFEST" : "MANIFEST LOADED / NO BADGES RESOLVED";
+  } catch {
+    rail.dataset.state = "UNAVAILABLE";
+    rail.querySelector("b").textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
+  }
+}
+
+function roadmapCapabilityStatuses(capabilities) {
+  const out = {};
+  const pons = capabilities?.robinhoodLiveIntelligenceV1;
+  if (pons?.publicStatus === "PUBLIC_LIVE_BETA" || pons?.publicStatus === "PUBLIC_LIVE") {
+    out.pons_live_intelligence = "LIVE";
+  } else if (pons?.engineeringStatus === "BUILDING") {
+    out.pons_live_intelligence = "BUILDING";
+  }
+
+  const radar = capabilities?.ratRadarV0;
+  if (radar?.currentRailReplacementStatus === "BUILDING_ON_PONS_4663") {
+    out.rat_radar = "BUILDING";
+  } else if (radar?.publicStatus === "PUBLIC_LIVE_BETA") {
+    out.rat_radar = "LIVE";
+  }
+
+  const replay = capabilities?.replayLab;
+  if (replay?.publicStatus === "PUBLIC_LIVE_BETA") out.replay_lab = "LIVE";
+  else if (replay?.engineeringStatus === "BUILDING") out.replay_lab = "BUILDING";
+
+  const watch = capabilities?.ratWatchV0;
+  if (watch?.currentRailRevalidationRequired === true) out.rat_watch = "BUILDING";
+  else if (
+    watch?.publicStatus === "PUBLIC_LIVE_BETA" ||
+    watch?.deploymentStatus === "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED"
+  ) out.rat_watch = "LIVE";
+
+  const raids = capabilities?.dumpsterRaidsV0;
+  if (raids?.engineeringStatus === "EXPERIMENTAL") out.dumpster_raids = "EXPERIMENT";
+  else if (raids?.engineeringStatus === "PLANNED") out.dumpster_raids = "PLANNED";
+
+  const den = capabilities?.ratDenV0;
+  if (den?.engineeringStatus === "PLANNED") out.rat_den = "PLANNED";
+
+  return out;
 }
 
 async function bootstrapLedger() {
