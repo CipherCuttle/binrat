@@ -5,8 +5,13 @@ import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 
 const helper = pathToFileURL(new URL('../scripts/case-private-preview-verify.mjs', import.meta.url).pathname).href;
+const versionUrlHelper = pathToFileURL(new URL('../scripts/case-version-url-preview.mjs', import.meta.url).pathname).href;
 function evaluate<T>(expression:string):T {
   const source=`import * as h from ${JSON.stringify(helper)}; console.log(JSON.stringify(${expression}));`;
+  return JSON.parse(execFileSync(process.execPath,['--input-type=module','--eval',source],{encoding:'utf8'}));
+}
+function evaluateVersionUrl<T>(expression:string):T {
+  const source=`import * as h from ${JSON.stringify(versionUrlHelper)}; console.log(JSON.stringify(${expression}));`;
   return JSON.parse(execFileSync(process.execPath,['--input-type=module','--eval',source],{encoding:'utf8'}));
 }
 
@@ -41,6 +46,45 @@ test('funding schema proof is a fixed read-only SELECT and requires every canoni
   ]);
 });
 
+test('Version URL candidate config uses active targets and forces only preview-safe flags off',()=>{
+  const template={name:'binrat-edge-v0',main:'src/cloudflare/worker.ts',assets:{directory:'./web'},compatibility_date:'2026-09-18',
+    d1_databases:[{binding:'DB',database_name:'template-db',database_id:'REPLACE_WITH_D1_DATABASE_ID'}],
+    queues:{producers:[{binding:'SYNC_QUEUE',queue:'template-queue'}],consumers:[{queue:'template-queue'}]},
+    vars:{BINRAT_PUBLIC_SITE_URL:'https://REPLACE_WITH_PUBLIC_SITE'}};
+  const active={resources:{bindings:[
+    {name:'DB',type:'d1',id:'89d74e01-ce7f-44cb-a777-c2a5fa283747',database_name:'production-db'},
+    {name:'SYNC_QUEUE',type:'queue',queue_name:'production-queue'}, {name:'AI',type:'ai'},
+    {name:'BINRAT_PUBLIC_SITE_URL',type:'plain_text',text:'https://binrat.tech'},
+    {name:'UNRELATED',type:'plain_text',text:'preserve-me'},
+    {name:'BINRAT_AUTONOMOUS_RAT_ENABLED',type:'plain_text',text:'true'},
+    {name:'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED',type:'plain_text',text:'true'},
+    {name:'BINRAT_TELEGRAM_UI_V2_ENABLED',type:'plain_text',text:'true'},
+    {name:'BINRAT_TELEGRAM_MEDIA_ENABLED',type:'plain_text',text:'true'},
+    {name:'BINRAT_PONS_FUNDING_ENABLED',type:'plain_text',text:'true'}
+  ]}};
+  const config=evaluateVersionUrl<any>(`h.prepareCandidateConfig(${JSON.stringify(template)},${JSON.stringify(active)},'${sha}')`);
+  assert.equal(config.main,'../src/cloudflare/worker.ts');
+  assert.equal(config.assets.directory,'../web');
+  assert.equal(config.d1_databases[0].database_id,'89d74e01-ce7f-44cb-a777-c2a5fa283747');
+  assert.equal(config.queues.producers[0].queue,'production-queue');
+  assert.equal(config.queues.consumers[0].queue,'production-queue');
+  assert.equal(config.vars.BINRAT_PUBLIC_SITE_URL,'https://binrat.tech');
+  assert.equal(config.vars.UNRELATED,'preserve-me');
+  for(const name of ['BINRAT_AUTONOMOUS_RAT_ENABLED','BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED','BINRAT_TELEGRAM_UI_V2_ENABLED','BINRAT_TELEGRAM_MEDIA_ENABLED','BINRAT_PONS_FUNDING_ENABLED']) assert.equal(config.vars[name],'false');
+  assert.equal(config.vars.BINRAT_RELEASE_SHA,sha);
+});
+
+test('machine-readable version-upload receipts require one secure non-production Version URL',()=>{
+  const id='123e4567-e89b-42d3-a456-426614174000';
+  const url='https://abc123-binrat-edge-v0.pettevik.workers.dev/';
+  const ndjson=`{"type":"wrangler-session","version":1}\n{"type":"version-upload","version":1,"worker_name":"binrat-edge-v0","version_id":"${id}","preview_urls":["${url}"]}`;
+  assert.deepEqual(evaluateVersionUrl(`h.parseVersionUploadReceipt(${JSON.stringify(ndjson)})`),{candidateVersionId:id,versionUrl:url});
+  assert.equal(evaluateVersionUrl(`(()=>{try{h.parseVersionUploadReceipt('{"type":"version-upload","worker_name":"binrat-edge-v0","preview_urls":[]}')}catch(error){return error.message}})()`),'VERSION_UPLOAD_ID_MISSING_OR_AMBIGUOUS');
+  assert.equal(evaluateVersionUrl(`(()=>{try{h.parseVersionUploadReceipt('{"type":"version-upload","worker_name":"binrat-edge-v0","version_id":"${id}","versionId":"223e4567-e89b-42d3-a456-426614174000","preview_urls":["${url}"]}')}catch(error){return error.message}})()`),'VERSION_UPLOAD_ID_MISSING_OR_AMBIGUOUS');
+  assert.deepEqual(evaluateVersionUrl(`h.versionUrlErrors('https://binrat-edge-v0.pettevik.workers.dev/')`),['VERSION_URL_INVALID']);
+  assert.deepEqual(evaluateVersionUrl(`h.versionUrlErrors('http://abc-binrat-edge-v0.pettevik.workers.dev/')`),['VERSION_URL_INVALID']);
+});
+
 test('live smoke rejects Pons and Case authority disagreement',()=>{
   assert.deepEqual(evaluate("h.ponsHealthErrors({ok:true,chainId:4663,indexReady:true,liveCaughtUp:true,runtimeFresh:true,lastSyncError:null})"),[]);
   assert.deepEqual(evaluate("h.ponsHealthErrors({ok:true,chainId:4663,indexReady:true,liveCaughtUp:false,runtimeFresh:true,lastSyncError:null})"),['PONS_NOT_CANONICAL_READY']);
@@ -64,11 +108,19 @@ test('prepared workflows are manual-only and exclude obsolete donor references a
     assert.doesNotMatch(workflow,/ops\/binrat-case-surface-private-preview-v1|f5934950011455061569075fc6111d0022a11629/);
     assert.doesNotMatch(workflow,/telegram:(apply|private-menu|verify)|versions deploy|d1 execute[^\n]*--file/);
   }
-  assert.match(preflight,/deploy --dry-run/);
+  assert.match(preflight,/versions upload/);
+  assert.match(preflight,/WRANGLER_OUTPUT_FILE_PATH/);
+  assert.doesNotMatch(preflight,/\n\s*\.artifacts\/wrangler-version-upload\.ndjson\n/);
+  assert.doesNotMatch(preflight,/versions deploy|wrangler@4\.135\.0 deploy|traffic percentage|d1 migrations?|telegram:(apply|private-menu|verify)|PONS_FUNDING_CYCLE/);
+  assert.doesNotMatch(liveSmoke,/versions upload|versions deploy|wrangler@4\.135\.0 deploy/);
   const harness=readFileSync(new URL('../scripts/case-private-preview-verify.mjs',import.meta.url),'utf8');
   assert.doesNotMatch(harness,/versions','deploy|telegram:apply|telegram:private-menu|--file/);
   assert.match(harness,/appText\.includes\('\/api\/miniapp\/case-intelligence'\)/);
   assert.match(harness,/appText\.includes\('\/api\/miniapp\/trash-trail'\)/);
   assert.match(harness,/appText\.includes\('\/api\/miniapp\/replay'\)/);
   assert.match(harness,/FUNDING_SCHEMA_QUERY_NOT_READ_ONLY/);
+  const versionHarness=readFileSync(new URL('../scripts/case-version-url-preview.mjs',import.meta.url),'utf8');
+  assert.match(versionHarness,/version-upload/);
+  assert.match(versionHarness,/FUNDING_SCHEMA_QUERY_NOT_READ_ONLY/);
+  assert.doesNotMatch(versionHarness,/versions',\s*'deploy|wrangler@4\.135\.0 deploy|telegram:(apply|private-menu|verify)/);
 });
