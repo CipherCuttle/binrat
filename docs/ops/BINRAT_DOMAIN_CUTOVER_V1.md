@@ -1,10 +1,10 @@
 # BINRAT Domain Cutover V1 Receipt
 
-- Timestamp (UTC): `2026-10-03T00:21:00Z`
+- Timestamp (UTC): `2026-10-03T00:25:19Z`
 - Registrar: Namecheap
 - Domain: `binrat.tech`
 - Operation branch: `ops/binrat-domain-cutover-v1`
-- State: `BLOCKED — CLOUDFLARE AUTH`
+- State: `BLOCKED — ACCOUNT ITSELF LACKS ZONE CREATE AUTHORITY`
 
 ## Preflight result
 
@@ -37,10 +37,14 @@ it was never written to disk.
 - Cloudflare zone ID: not created
 - Assigned nameservers: not assigned / not queried
 - Zone activation status: not queried
-- Zone-create attempt: rejected before creation because the OAuth session lacks
-  `com.cloudflare.api.account.zone.create`.
-- Device-login attempt: retained the existing OAuth session and did not grant
-  zone-create scope.
+- Fresh device authorization granted exactly the available minimum OAuth scopes:
+  `user:read`, `account:read`, `zone:read`, `workers:write`,
+  `workers_routes:write`, and `workers_scripts:write`.
+- Zone-create attempt after fresh authorization: rejected before creation with
+  `Requires permission "com.cloudflare.api.account.zone.create" to create zones
+  for the selected account`.
+- Result: the selected Cloudflare account itself lacks zone-create authority;
+  this is not remediable through Wrangler's available OAuth scope selection.
 
 ## Custom domain state
 
@@ -65,7 +69,7 @@ rollback/reference URL was not modified.
 
 ## Resume gate
 
-Reauthorize Wrangler OAuth for the identified Cloudflare account with
-zone-create permission, then resume by creating/reusing the `binrat.tech` zone.
-Only after Cloudflare returns its exact nameserver pair may the authorized
-Namecheap delegation change proceed.
+Grant the selected Cloudflare account authority to create zones (or use an
+account that already has it), then resume by creating/reusing the
+`binrat.tech` zone. Only after Cloudflare returns its exact nameserver pair may
+the authorized Namecheap delegation change proceed.
