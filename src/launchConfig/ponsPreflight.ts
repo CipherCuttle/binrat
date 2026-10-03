@@ -61,7 +61,7 @@ export interface PonsPreflightContractObservation {
 export interface PonsPreflightReceiptV1 {
   schemaVersion: typeof PONS_PREFLIGHT_SCHEMA_VERSION;
   preflightVersion: typeof PONS_PREFLIGHT_VERSION;
-  status: 'UPSTREAM_PASS_EXACT_MANIFEST_BLOCKED';
+  status: 'UPSTREAM_GRAPH_PASS_BASELINE_EXACT_MANIFEST_BLOCKED';
   observedAt: string;
   chainId: typeof PONS_LAUNCH_CHAIN_ID;
   block: {
@@ -184,7 +184,7 @@ export async function validatePonsPreflightReceipt(
   if (
     input.schemaVersion !== PONS_PREFLIGHT_SCHEMA_VERSION ||
     input.preflightVersion !== PONS_PREFLIGHT_VERSION ||
-    input.status !== 'UPSTREAM_PASS_EXACT_MANIFEST_BLOCKED' ||
+    input.status !== 'UPSTREAM_GRAPH_PASS_BASELINE_EXACT_MANIFEST_BLOCKED' ||
     input.chainId !== PONS_LAUNCH_CHAIN_ID ||
     typeof input.observedAt !== 'string' ||
     !/^\d{4}-\d{2}-\d{2}T/.test(input.observedAt)
