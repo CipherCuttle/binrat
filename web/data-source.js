@@ -4,7 +4,7 @@ export const WEB_DATA_SOURCE_MODE =
     ? "FIXTURE"
     : "LIVE";
 
-export async function loadDumpsterFeed() {
+export async function loadDumpsterFeed({ signal } = {}) {
   if (WEB_DATA_SOURCE_MODE === "FIXTURE") {
     const { hotGarbageFixtures } = await import("./fixtures.js");
     return {
@@ -15,8 +15,7 @@ export async function loadDumpsterFeed() {
   }
   const response = await fetch("/api/launches/latest", {
     headers: { accept: "application/json" },
-    cache: "no-store",
-    signal: AbortSignal.timeout(15000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("LIVE_INDEX_NOT_AVAILABLE");
   return adaptLatestLaunches(await response.json());
@@ -26,7 +25,6 @@ export async function loadDumpsterLedger() {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch("/api/dumpster-ledger", {
     headers: { accept: "application/json" },
-    cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("DUMPSTER_LEDGER_NOT_AVAILABLE");
@@ -297,7 +295,6 @@ export async function loadPublicBag(bagId) {
   if (typeof bagId !== "string" || !/^[0-9a-f]{64}$/.test(bagId)) throw new Error("PUBLIC_BAG_ID_INVALID");
   const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}`, {
     headers: { accept: "application/json" },
-    cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("PUBLIC_BAG_NOT_AVAILABLE");
@@ -319,7 +316,6 @@ export async function loadBagIntelligence(bagId) {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`, {
     headers: { accept: "application/json" },
-    cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("BAG_INTELLIGENCE_NOT_AVAILABLE");
@@ -341,7 +337,6 @@ export async function loadCreatorFile(reportedCreatorAddress) {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}`, {
     headers: { accept: "application/json" },
-    cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("CREATOR_FILE_NOT_AVAILABLE");
@@ -363,7 +358,6 @@ export async function loadReplayBundle(bagId) {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch(`/api/bag/${encodeURIComponent(bagId)}/replay`, {
     headers: { accept: "application/json" },
-    cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("REPLAY_BUNDLE_NOT_AVAILABLE");
@@ -387,7 +381,6 @@ export async function loadCapabilityManifest() {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch("/api/capabilities", {
     headers: { accept: "application/json" },
-    cache: "no-store",
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");

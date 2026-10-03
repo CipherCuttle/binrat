@@ -1141,6 +1141,25 @@ img {
 .intake-loading {
   color: var(--muted);
 }
+.read-freshness {
+  margin: 8px 0 0;
+  color: var(--orange);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.read-freshness[hidden] {
+  display: none;
+}
+.feed-loading {
+  grid-column: 1 / -1;
+  min-height: 148px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
 .garbage-section {
   padding-block: 26px 25px;
 }

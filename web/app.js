@@ -1,5 +1,6 @@
 import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
+import { PublicReadPlane, ReadState } from "./read-plane.js";
 
 const grid = document.querySelector("#garbage-grid");
 const drawer = document.querySelector("#drawer");
@@ -14,6 +15,7 @@ let bags = [];
 let activeFilter = "all";
 let activeMode = null;
 let available = false;
+let frontdoorGeneration = 0;
 const initialFragment = location.hash && location.hash !== "#top" ? location.hash : "";
 let initialFragmentPending = Boolean(initialFragment);
 let initialFragmentInterrupted = false;
@@ -144,51 +146,53 @@ sectionNav?.addEventListener("click", (event) => {
 void bootstrapRoadmapCapabilities();
 void bootstrapTokenCapabilities();
 void bootstrapLedger();
-await bootstrap();
-if (WEB_DATA_SOURCE_MODE === "LIVE") {
-  let checking = false;
-  setInterval(async () => {
-    if (document.hidden || checking) return;
-    checking = true;
-    try {
-      const response = await fetch("/api/health", {
-        cache: "no-store",
-        signal: AbortSignal.timeout(10000),
-      });
-      const health = await response.json();
-      if (
-        !response.ok ||
-        !health.ok ||
-        !health.indexReady ||
-        health.chainId !== 4663
-      )
-        throw new Error("LIVE_INDEX_NOT_AVAILABLE");
-      if (!drawer.classList.contains("open")) await bootstrap();
-    } catch (error) {
-      renderUnavailable(error);
-    } finally {
-      checking = false;
-    }
-  }, 15000);
+const readPlane = new PublicReadPlane({
+  loadFeed: loadDumpsterFeed,
+  pollingEnabled: WEB_DATA_SOURCE_MODE === "LIVE",
+  onSnapshot: renderVerifiedSnapshot,
+  onState: renderReadState,
+});
+readPlane.start();
+document.addEventListener("visibilitychange", () => readPlane.visibilityChanged());
+window.addEventListener("pagehide", () => readPlane.stop(), { once: true });
+
+function renderVerifiedSnapshot(feed) {
+  if (feed.mode === "LIVE" && WEB_DATA_SOURCE_MODE !== "LIVE") return;
+  bags = feed.bags;
+  activeMode = feed.mode;
+  available = true;
+  applyMode(feed);
+  renderLiveRail(feed);
+  if (randomBag) randomBag.disabled = bags.length === 0;
+  renderIntake();
+  renderFeed();
+  void renderFrontdoorProof();
 }
 
-async function bootstrap() {
-  try {
-    const feed = await loadDumpsterFeed();
-    if (!["FIXTURE", "LIVE"].includes(feed?.mode))
-      throw new Error("WEB_DATA_SOURCE_NOT_AUTHORIZED");
-    if (!Array.isArray(feed?.bags)) throw new Error("WEB_DATA_SOURCE_INVALID");
-    bags = feed.bags;
-    activeMode = feed.mode;
-    available = true;
-    applyMode(feed);
-    renderLiveRail(feed);
-    if (randomBag) randomBag.disabled = bags.length === 0;
-    renderIntake();
-    renderFeed();
-    void renderFrontdoorProof();
-  } catch (error) {
-    renderUnavailable(error);
+function renderReadState({ state, snapshot }) {
+  document.body.dataset.readState = state;
+  const status = document.querySelector("#read-freshness");
+  if (!status) return;
+  if (state === ReadState.LOADING) {
+    status.hidden = false;
+    status.dataset.state = state;
+    const message = WEB_DATA_SOURCE_MODE === "LIVE"
+      ? "DIGGING THROUGH VERIFIED PONS RECEIPTS…"
+      : "LOADING SYNTHETIC FIXTURES…";
+    status.textContent = message;
+    latestBag.innerHTML = `<span class="intake-loading">${message}</span>`;
+    grid.innerHTML = `<div class="feed-loading">${message}</div>`;
+  } else if (state === ReadState.STALE && snapshot) {
+    status.hidden = false;
+    status.dataset.state = state;
+    const block = snapshot.checkpoint ? ` · BLOCK ${snapshot.checkpoint}` : "";
+    status.textContent = `REFRESH DEGRADED · SHOWING LAST VERIFIED DATA${block}`;
+  } else if (state === ReadState.UNAVAILABLE && !snapshot) {
+    status.hidden = true;
+    renderUnavailable();
+    grid.querySelector("#retry-read-plane")?.addEventListener("click", () => readPlane.retry());
+  } else {
+    status.hidden = true;
   }
 }
 
@@ -365,10 +369,8 @@ function renderUtility(selector, items) {
     : "NONE DECLARED";
 }
 
-function renderUnavailable(error) {
+function renderUnavailable() {
   available = false;
-  bags = [];
-  closeDrawer();
   if (randomBag) randomBag.disabled = true;
   document.body.dataset.mode = "UNAVAILABLE";
   for (const element of document.querySelectorAll("[data-mode-copy]"))
@@ -387,9 +389,8 @@ function renderUnavailable(error) {
   for (const element of document.querySelectorAll(".filter-button span")) {
     element.textContent = "—";
   }
-  grid.innerHTML = `<div class="data-unavailable">DUMPSTER DATA UNAVAILABLE<br/>${copy().unavailable}</div>`;
+  grid.innerHTML = `<div class="data-unavailable">DUMPSTER DATA UNAVAILABLE<br/>${copy().unavailable}<br/><button id="retry-read-plane" type="button">RETRY VERIFIED READ ↻</button></div>`;
   restoreInitialFragment();
-  console.error(error);
 }
 
 function renderIntake() {
@@ -411,6 +412,7 @@ function renderIntake() {
 
 async function renderFrontdoorProof() {
   if (!frontdoorProof || !available) return;
+  const generation = ++frontdoorGeneration;
 
   const bag = bags.find((item) => item.priorLaunches > 0) ?? bags[0];
   if (!bag) {
@@ -455,7 +457,7 @@ async function renderFrontdoorProof() {
 
   try {
     const file = await loadCreatorFile(bag.reportedCreatorAddress);
-    if (!file || !available) return;
+    if (!file || !available || generation !== frontdoorGeneration) return;
     const scraps = file.launches
       .filter(
         (item) =>
@@ -470,10 +472,11 @@ async function renderFrontdoorProof() {
       }));
     renderFrontdoorProofStory(bag, scraps, "");
   } catch {
+    if (generation !== frontdoorGeneration) return;
     renderFrontdoorProofStory(
       bag,
       [],
-      `${bag.priorLaunches} EARLIER INDEXED LAUNCH${bag.priorLaunches === 1 ? "" : "ES"} · PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW`,
+      `${bag.priorLaunches} EARLIER INDEXED LAUNCH${bag.priorLaunches === 1 ? "" : "ES"} · PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW · PRIOR PROJECT NAMES TEMPORARILY UNAVAILABLE`,
     );
   }
 }
