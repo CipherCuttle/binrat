@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "binrat.pons-launch-plan/0.1",
+  "planVersion": "BINRAT_PONS_LAUNCH_PLAN_V1",
+  "frozenOn": "2026-10-03",
+  "status": "PLANNING_ONLY",
+  "chainId": 4663,
+  "launchRail": {
+    "railId": "pons-v2-vault-stake-burn-candidate-v1",
+    "pairAsset": "NATIVE_ETH_CANDIDATE",
+    "ponsFactory": {
+      "address": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "runtimeCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+      "verificationStatus": "OFFICIAL_SOURCE_AND_LIVE_CODEHASH_MATCH"
+    },
+    "ponsVaultLauncher": {
+      "address": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+      "runtimeCodeHash": null,
+      "verificationStatus": "LIVE_CODE_PRESENT_SOURCE_MATCH_PENDING"
+    },
+    "ponsVaultRegistry": {
+      "address": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+      "runtimeCodeHash": "0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f",
+      "verificationStatus": "LIVE_CODEHASH_PINNED_SOURCE_MATCH_PENDING"
+    },
+    "stakeBurnFactory": {
+      "address": "0x537483c5B33e2192CfB202d7C50d58975524B047",
+      "runtimeCodeHash": null,
+      "beacon": "0xf72b3b54220a2e64ee87895d570a2c72a00a3fe4",
+      "vaultImplementation": "0xf0453c814cf6a76a8e3507f8fafffe359f28b6cb",
+      "owner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+      "verificationStatus": "LIVE_STATE_PINNED_SOURCE_MATCH_PENDING"
+    },
+    "ponsNativeBuybackEnabled": "CANDIDATE_FALSE_NOT_FROZEN"
+  },
+  "unresolvedImmutableInputs": {
+    "launchConfigId": null,
+    "expectedEconomics": null,
+    "creatorTaxBps": null,
+    "openingBuyWei": null,
+    "stakeLockPeriodSeconds": null,
+    "minimumFeesBeforeRun": null,
+    "workingRatMinStakeRaw": null
+  },
+  "upstreamRisk": {
+    "ponsVaultPublicSourceStatus": "UNRESOLVED",
+    "ponsVaultThirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS",
+    "stakeBurnUpgradeAuthorityStatus": "ACTIVE_EOA_CONTROL_CHAIN_OBSERVED",
+    "launchMechanicsGate": "BLOCKED_UPSTREAM_VERIFICATION"
+  },
+  "historicalPredecessor": {
+    "chainId": 5042,
+    "launchConfig": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+    "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
+    "authority": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
+  },
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "planDigest": "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+}
