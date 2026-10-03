@@ -121,7 +121,7 @@ test('launch status remains consistent across doctrine and public status surface
   assert.match(roadmap, /BLOCKED.*marketingAuthorized=false.*tokenState=NOT_LAUNCHED/);
   assert.match(doctrine, /marketingAuthorized.*launchAuthorized.*false/);
   assert.match(website, /\$BINRAT IS NOT LIVE\./);
-  assert.match(website, /NO OFFICIAL BINRAT CONTRACT EXISTS/);
+  assert.match(website, /NO OFFICIAL CONTRACT HAS BEEN PUBLISHED/);
   assert.match(telegram, /no official \$BINRAT token is launched yet\./);
   assert.match(dumpster, /tokenState: NOT_LAUNCHED/);
   assert.match(dumpster, /launchAuthorization: BLOCKED/);
