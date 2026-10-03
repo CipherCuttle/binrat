@@ -7,6 +7,7 @@ const drawerContent = document.querySelector("#drawer-content");
 const drawerClose = document.querySelector("#drawer-close");
 const backdrop = document.querySelector("#backdrop");
 const randomBag = document.querySelector("#random-bag");
+const frontdoorProof = document.querySelector("#frontdoor-proof");
 let returnFocus = null;
 let activeDrawerBagId = null;
 let bags = [];
@@ -183,6 +184,7 @@ async function bootstrap() {
     if (randomBag) randomBag.disabled = bags.length === 0;
     renderIntake();
     renderFeed();
+    void renderFrontdoorProof();
   } catch (error) {
     renderUnavailable(error);
   }
@@ -249,6 +251,11 @@ function renderUnavailable(error) {
   latestBag.innerHTML =
     '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
   liveRail.innerHTML = '<span class="live-rail-dot offline" aria-hidden="true"></span><strong>OFFLINE</strong><span>PONS 4663</span><span>LIVE INDEX NOT AVAILABLE</span>';
+  if (frontdoorProof) {
+    frontdoorProof.innerHTML = `
+      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>INDEX UNAVAILABLE</span></div>
+      <div class="proof-empty">The Rat cannot verify a current repeat trail right now. Nothing has been substituted.</div>`;
+  }
   document.querySelector("#feed-count").textContent = "INDEX UNAVAILABLE";
   for (const element of document.querySelectorAll(".filter-button span")) {
     element.textContent = "—";
@@ -273,6 +280,124 @@ function renderIntake() {
     </button>`;
   const button = latestBag.querySelector("button");
   button.addEventListener("click", () => openBag(latest.id, button));
+}
+
+async function renderFrontdoorProof() {
+  if (!frontdoorProof || !available) return;
+
+  const bag = bags.find((item) => item.priorLaunches > 0) ?? bags[0];
+  if (!bag) {
+    frontdoorProof.innerHTML = `
+      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span></div>
+      <div class="proof-empty">Nothing is in the current Fresh Garbage window. No example launch was substituted.</div>`;
+    return;
+  }
+
+  if (bag.priorLaunches <= 0) {
+    frontdoorProof.innerHTML = `
+      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span></div>
+      <div class="proof-story">
+        <div class="proof-step proof-current"><span>FRESH GARBAGE</span><strong>${escapeHtml(bag.symbol)}</strong><small>${escapeHtml(bag.name)}</small></div>
+        <div class="proof-arrow" aria-hidden="true">→</div>
+        <div class="proof-step proof-signal"><span>THIS WINDOW</span><h3>NO FAMILIAR PAWS YET.</h3><p>No earlier indexed launch is attached to this Pons-reported deployer in the current fast view.</p></div>
+        <div class="proof-arrow" aria-hidden="true">→</div>
+        <div class="proof-step"><span>BOUNDARY</span><p class="proof-scraps-empty">No repeat in current coverage is not proof that no history exists elsewhere.</p></div>
+        <div class="proof-action"><span>NEXT MOVE</span><a class="button primary" href="#garbage">OPEN FRESH GARBAGE <span>↓</span></a></div>
+        <div class="proof-boundary"><span><b>OBSERVED</b> · ${escapeHtml(normalizeCoverage(bag.coverage))} HISTORY</span><span>Nothing inferred about safety, intent, identity or future outcome.</span></div>
+      </div>`;
+    return;
+  }
+
+  const fixtureScraps = Array.isArray(bag.trail)
+    ? bag.trail.slice(0, 3).map((item) => ({
+        symbol: item.symbol,
+        name: "",
+        detail: item.age,
+      }))
+    : [];
+
+  renderFrontdoorProofStory(
+    bag,
+    fixtureScraps,
+    activeMode === "LIVE" && fixtureScraps.length === 0
+      ? "DIGGING UP PRIOR PROJECT NAMES…"
+      : "",
+  );
+
+  if (activeMode !== "LIVE") return;
+
+  try {
+    const file = await loadCreatorFile(bag.reportedCreatorAddress);
+    if (!file || !available) return;
+    const scraps = file.launches
+      .filter(
+        (item) =>
+          item.id !== bag.id &&
+          String(item.token).toLowerCase() !== String(bag.token).toLowerCase(),
+      )
+      .slice(0, 3)
+      .map((item) => ({
+        symbol: item.symbol,
+        name: item.name,
+        detail: `BLK ${item.blockNumber}`,
+      }));
+    renderFrontdoorProofStory(bag, scraps, "");
+  } catch {
+    renderFrontdoorProofStory(
+      bag,
+      [],
+      `${bag.priorLaunches} EARLIER INDEXED LAUNCH${bag.priorLaunches === 1 ? "" : "ES"} · PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW`,
+    );
+  }
+}
+
+function renderFrontdoorProofStory(bag, scraps, scrapsFallback) {
+  if (!frontdoorProof) return;
+  const scrapMarkup = scraps.length
+    ? scraps
+        .map(
+          (item) => `
+            <div class="proof-scrap">
+              <strong>${escapeHtml(item.symbol)}</strong>
+              <small>${escapeHtml(item.name || item.detail || "PRIOR INDEXED LAUNCH")}</small>
+              ${item.name && item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ""}
+            </div>`,
+        )
+        .join("")
+    : `<p class="proof-scraps-empty">${escapeHtml(scrapsFallback || `${bag.priorLaunches} earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"} retained for this reported deployer.`)}</p>`;
+
+  frontdoorProof.innerHTML = `
+    <div class="proof-kicker">
+      <span>WHY IT SURFACED / RECEIPT-BACKED</span>
+      <span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span>
+    </div>
+    <div class="proof-story">
+      <div class="proof-step proof-current">
+        <span>FRESH GARBAGE</span>
+        <strong>${escapeHtml(bag.symbol)}</strong>
+        <small>${escapeHtml(bag.name)}</small>
+      </div>
+      <div class="proof-arrow" aria-hidden="true">→</div>
+      <div class="proof-step proof-signal">
+        <span>THE RAT NOTICED</span>
+        <h3>SMELLS FAMILIAR.</h3>
+        <p>Same Pons-reported deployer appears on <b>${escapeHtml(bag.priorLaunches)}</b> earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"}.</p>
+      </div>
+      <div class="proof-arrow" aria-hidden="true">→</div>
+      <div class="proof-step">
+        <span>OLDER SCRAPS</span>
+        <div class="proof-scraps">${scrapMarkup}</div>
+      </div>
+      <div class="proof-action">
+        <span>TRAIL WORTH DIGGING?</span>
+        <button class="button primary" type="button" data-proof-open="${escapeHtml(bag.id)}">DIG DEEPER <span>↗</span></button>
+        <a class="proof-secondary" href="#garbage">SEE ALL FRESH GARBAGE →</a>
+      </div>
+      <div class="proof-boundary">
+        <span><b>PATTERN</b> · ${escapeHtml(normalizeCoverage(bag.coverage))} HISTORY</span>
+        <span>Same reported address only. Not a human identity, safety, profitability or future-outcome claim.</span>
+      </div>
+    </div>`;
 }
 
 function renderFeed() {
@@ -851,6 +976,11 @@ if (randomBag) {
     openBag(bag.id, randomBag);
   });
 }
+frontdoorProof?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-proof-open]");
+  if (!button) return;
+  openBag(button.dataset.proofOpen, button);
+});
 
 function normalizeCoverage(value) {
   return ["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value)

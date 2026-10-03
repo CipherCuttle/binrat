@@ -26,6 +26,8 @@ const requiredHtml = [
   'OPEN FRESH GARBAGE',
   'GET THE TELEGRAM RAT',
   "DON'T TRUST THE RAT. CHECK THE RECEIPT.",
+  'WHY IT SURFACED / RECEIPT-BACKED',
+  'RAT IS DIGGING FOR A REPEAT TRAIL',
   './assets/binrat-hero.webp',
   './share-card.css'
 ];
@@ -55,6 +57,10 @@ if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Err
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
 if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRONTDOOR_CTA_MISSING');
+if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
+if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
+if (!app.includes('Same Pons-reported deployer appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
+if (!app.includes('PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW')) throw new Error('WEB_FRONTDOOR_FAIL_CLOSED_HISTORY_MISSING');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
 if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
