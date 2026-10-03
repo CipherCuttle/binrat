@@ -28,6 +28,14 @@ const requiredHtml = [
   "DON'T TRUST THE RAT. CHECK THE RECEIPT.",
   'WHY IT SURFACED / RECEIPT-BACKED',
   'RAT IS DIGGING FOR A REPEAT TRAIL',
+  '02 / TELEGRAM',
+  "DON'T LIVE IN THE TERMINAL.",
+  'Telegram tells you when to care.',
+  'ADD @BINRATBOT',
+  'SAME PAWS. AGAIN.',
+  'WATCHING THESE PAWS. ✓',
+  'SAME PAWS. NEW LAUNCH.',
+  'NOT A LIVE ALERT',
   './assets/binrat-hero.webp',
   './share-card.css'
 ];
@@ -57,6 +65,9 @@ if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Err
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
 if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRONTDOOR_CTA_MISSING');
+if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Error('WEB_TELEGRAM_FIRST_CLASS_CTA_MISSING');
+if (!html.includes('Event-driven. User-requested. No fake urgency. No engagement pings.')) throw new Error('WEB_TELEGRAM_NOTIFICATION_BOUNDARY_MISSING');
+if (!html.includes('A watched reported deployer showed up again.')) throw new Error('WEB_TELEGRAM_DEPLOYER_ALERT_BOUNDARY_MISSING');
 if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
 if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
 if (!app.includes('Same Pons-reported deployer appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
