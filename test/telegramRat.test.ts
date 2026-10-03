@@ -11,7 +11,7 @@ const manifest: CapabilityManifest = {
   schemaVersion: 'binrat.capability-manifest/0.1',
   currentLaunchPlan: {
     chainId: 4663,
-    rail: 'pons-v2-vault-stake-burn-candidate-v1',
+    rail: 'pons-v2-vault-staking-candidate-v1',
     plan: 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json',
     planDigest: '55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11',
     status: 'PLANNING_ONLY',
