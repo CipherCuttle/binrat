@@ -11,7 +11,7 @@ The project will not pretend the token is appearing only because a fully mature 
 
 The reasons are explicit:
 
-1. **bankroll the build** — disclosed project/creator fee revenue helps fund engineering, infrastructure, research, security, design, distribution, and operations;
+1. **bankroll the build** — later disclosed product revenue can fund engineering, infrastructure, research, security, design, distribution, and operations; Launch V1 trading creator-fee flow is routed to the selected staking vault rather than treated as hidden founder income;
 2. **create a native culture asset** — BINRAT is deliberately memetic and should have a degen/community layer;
 3. **ship utility progressively** — token utility grows as real product capabilities ship;
 4. **coordinate a future evidence network** — later stages can use token collateral for adversarial contribution mechanics.
@@ -28,7 +28,7 @@ The target launch has:
 - one public market;
 - public contract address;
 - public launch mechanics;
-- disclosed creator/project fee route;
+- disclosed creator-fee / staking-vault route;
 - disclosed founder/project purchases, if any;
 - disclosed treasury wallets;
 - no mint/pause/blacklist authority where the selected launch contract provides those guarantees;
@@ -48,12 +48,12 @@ Launch V1 should minimize custom contract surface:
 - native ETH as the candidate quote/pair asset;
 - one active-stake product tier: **WORKING RAT**;
 - no inflationary $BINRAT staking emissions;
-- Pons native buyback **OFF as the current candidate** unless the final reviewed manifest deliberately changes it;
-- creator tax unresolved until scenario simulation, legal/product review, and immutable-manifest freeze;
-- founder/project opening purchase, if any, must be atomic/publicly disclosed under the selected Pons launch mechanics;
+- Pons native buyback **OFF by owner selection for Launch V1** unless a later separately reviewed manifest deliberately changes it;
+- creator tax **0% by owner selection** for Launch V1;
+- founder/project opening purchase is **0 ETH by owner selection**; any later founder/project token purchase must use the ordinary public market and be disclosed;
 - no custom RatVault, RWA dividend, Rat Bonds, governance or FERAL tier as Launch V1 blockers.
 
-The Pons launch gate must independently pin and verify the exact live launcher/factory/config, `canLaunch` authority, relevant runtime bytecode/codehashes, PonsVault launcher/registry/template, Staking factory/beacon/implementation, `stakedOf(address)` behavior, upgrade authority, creator-fee routing and the atomic native-ETH launch path immediately before launch. The current Staking dependency is unaudited and upgradeable through an EOA-controlled factory, so launch authorization also requires explicit acceptance or elimination of that upstream risk.
+The Pons launch gate must independently pin and verify the exact live launcher/factory/config, `canLaunch` authority, relevant runtime bytecode/codehashes, PonsVault launcher/registry/template, Staking factory/beacon/implementation, `stakedOf(address)` behavior, upgrade authority, creator-fee routing and the atomic native-ETH launch path immediately before launch. The current Staking dependency is unaudited and upgradeable through an EOA-controlled factory, so the accepted third-party upgrade risk must remain disclosed and must be freshly rechecked before launch authorization. Acceptance of that dependency does not itself authorize launch.
 
 Pons configs and upstream deployment state are not perpetual authority. A dated verification receipt and an exact launch manifest are required.
 
@@ -264,7 +264,7 @@ Token acquisition is deliberately downstream of experiencing the product.
 Allowed framing:
 
 - "We are fair-launching early."
-- "The project intends to use disclosed creator/project fee revenue to help bankroll development."
+- "The project intends to fund development through disclosed product/project revenue; Launch V1 creator-fee flow follows the published staking-vault route."
 - "Utility will be shipped progressively against a public roadmap."
 - "Some roadmap utility is not built yet."
 - "The token can lose all value."
