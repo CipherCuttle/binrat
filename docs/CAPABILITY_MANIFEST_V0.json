@@ -94,11 +94,11 @@
     },
     "launchMechanicsPonsV1": {
       "engineeringStatus": "BUILDING",
-      "verificationStatus": "BLOCKED_UPSTREAM_VERIFICATION",
+      "verificationStatus": "BLOCKED_UPSTREAM_RISK_ACCEPTANCE",
       "chainId": 4663,
-      "selectedCandidateRail": "pons-v2-vault-stake-burn-candidate-v1",
+      "selectedCandidateRail": "pons-v2-vault-staking-candidate-v1",
       "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-      "planDigest": "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11",
+      "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
       "launchAuthorizationEffect": "BLOCKS_UNTIL_SATISFIED"
     },
     "launchPlanPonsV1": {
@@ -106,7 +106,7 @@
       "publicStatus": "PLANNING_ONLY_NOT_LAUNCH_AUTHORITY",
       "chainId": 4663,
       "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-      "planDigest": "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11",
+      "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
       "launchAuthorizationEffect": "NONE"
     }
   },
@@ -144,7 +144,7 @@
   },
   "launchGateStatus": {
     "matrix": "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
-    "matrixDigest": "d6e1f141af4948632d576567389fa0cae731674ea7c63f975b6a9ec34e01c0ba",
+    "matrixDigest": "91b0f8e791d34fcf8089ba5c08f9dc477dab1b469bb8b1815422920dd2c965d9",
     "statuses": {
       "legal_compliance_artifacts": "BLOCKED_LEGAL",
       "launch_mechanics_verification_receipt": "BLOCKED_UPSTREAM_VERIFICATION",
@@ -157,14 +157,14 @@
       "status_consistency_check": "SATISFIED",
       "allocation_and_privileged_inventory_disclosure": "PARTIAL"
     },
-    "blockingGateCount": 3
+    "blockingGateCount": 5
   },
   "invariant": "Degen can decide attention and priority. It cannot decide what is true.",
   "currentLaunchPlan": {
     "chainId": 4663,
-    "rail": "pons-v2-vault-stake-burn-candidate-v1",
+    "rail": "pons-v2-vault-staking-candidate-v1",
     "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-    "planDigest": "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11",
+    "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
     "status": "PLANNING_ONLY",
     "historicalArcAuthority": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
   }
