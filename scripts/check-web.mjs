@@ -9,6 +9,7 @@ const fixtures = readFileSync(new URL('../web/fixtures.js', import.meta.url), 'u
 const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url), 'utf8');
 const shareCard = readFileSync(new URL('../web/share-card.js', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+const readPlane = readFileSync(new URL('../web/read-plane.js', import.meta.url), 'utf8');
 const reactBitsIsland = readFileSync(new URL('../web/react-bits-island.js', import.meta.url), 'utf8');
 const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.meta.url), 'utf8');
 const mascotUrl = new URL('../web/assets/binrat-hero.webp', import.meta.url);
@@ -130,7 +131,7 @@ if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_B
 if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
 if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
 if (!app.includes('from "./share-card.js"')) throw new Error('WEB_SHARE_CARD_BOUNDARY_BYPASSED');
-if (!app.includes('!["FIXTURE", "LIVE"].includes(feed?.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
+if (!readPlane.includes('["LIVE", "FIXTURE"].includes(feed.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
 if (app.includes('bag.creator')) throw new Error('WEB_AMBIGUOUS_CREATOR_RENDERING_REINTRODUCED');
 for (const forbidden of ['REPEAT CREATORS', 'CREATOR FILE', 'REPORTED CREATOR', 'reported creator address']) {

@@ -152,7 +152,7 @@
         aria-label="Latest indexed bag"
       >
         <span class="intake-label">LAST INTO THE BIN</span
-        ><span class="intake-loading">Loading index receipt…</span>
+        ><span class="intake-loading">DIGGING THROUGH VERIFIED PONS RECEIPTS…</span>
       </div>
       <section
         id="garbage"
@@ -179,6 +179,7 @@
           <span>PONS 4663</span>
           <span>WAITING FOR CHECKPOINT</span>
         </div>
+        <p id="read-freshness" class="read-freshness" role="status" hidden></p>
         <div class="feed-toolbar">
           <div class="feed-filters" role="group" aria-label="Filter bags">
             <button
@@ -229,7 +230,9 @@
           >
           <span class="feed-order">NEWEST FIRST ↓</span>
         </div>
-        <div id="garbage-grid" class="garbage-grid" aria-live="polite"></div>
+        <div id="garbage-grid" class="garbage-grid" aria-live="polite">
+          <div class="feed-loading">DIGGING THROUGH VERIFIED PONS RECEIPTS…</div>
+        </div>
         <div class="feed-bottom">
           <span id="feed-count">Loading bags…</span
           ><span

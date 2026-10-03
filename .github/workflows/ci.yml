@@ -148,7 +148,7 @@ jobs:
 
   frontdoor-browser-smoke:
     name: frontdoor-browser-smoke
-    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-degen-frontdoor-v1' }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1') }}
     needs: [check]
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -187,6 +187,9 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
             BINRAT_FRONTDOOR_URL="http://127.0.0.1:4173" \
             node scripts/check-frontdoor-browser.cjs
+          NODE_PATH="$RUNNER_TEMP/binrat-playwright/node_modules" \
+            BINRAT_FRONTDOOR_URL="http://127.0.0.1:4173" \
+            node scripts/check-read-plane-browser.cjs
       - name: Upload frontdoor screenshots
         if: always()
         uses: actions/upload-artifact@v4
