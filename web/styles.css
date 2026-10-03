@@ -1050,6 +1050,37 @@ img {
 .roadmap-footer span:first-child {
   color: var(--bone);
 }
+.roadmap-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  padding-left: 80px;
+}
+.case-next-step {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #53614d;
+  background: #192019;
+}
+.case-next-step > span {
+  display: block;
+  color: var(--good);
+  font-size: 7px;
+  letter-spacing: 0.075em;
+}
+.case-next-step h3 {
+  margin-top: 7px;
+  font-family: Plex Condensed, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+}
+.case-next-step p {
+  max-width: 720px;
+  margin: 9px 0 14px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.7;
+}
 .intake-strip {
   display: flex;
   align-items: center;
@@ -2397,6 +2428,13 @@ img {
   }
   .roadmap-footer {
     display: block;
+  }
+  .roadmap-actions {
+    flex-direction: column;
+    padding-left: 0;
+  }
+  .roadmap-actions .button {
+    width: 100%;
   }
   .roadmap-footer span {
     display: block;

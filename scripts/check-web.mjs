@@ -48,6 +48,7 @@ const requiredHtml = [
   'USEFUL WORK EARNS A RECEIPT.',
   'GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.',
   'UNBADGED = ROADMAP DIRECTION, NOT A LIVE CLAIM.',
+  'WHY $BINRAT?',
   '06 / $BINRAT',
   'THE RAT',
   'NEEDS A COIN.',
@@ -101,6 +102,9 @@ if (!app.includes('renderTokenPrelaunchState')) throw new Error('WEB_TOKEN_RUNTI
 if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_RUNTIME_STATUS_MISSING');
 if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
 if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');
+if (!app.includes('LEAVE A TRIPWIRE IN THE TRASH.')) throw new Error('WEB_CASE_TO_WATCH_HANDOFF_MISSING');
+if (!app.includes('OPEN TELEGRAM RAT')) throw new Error('WEB_CASE_TO_TELEGRAM_CTA_MISSING');
+if (!app.includes('user-requested monitoring, not a buy or safety signal.')) throw new Error('WEB_CASE_WATCH_BOUNDARY_MISSING');
 if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
 if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
 if (!app.includes('Same Pons-reported deployer appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');

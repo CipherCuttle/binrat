@@ -350,7 +350,7 @@ function renderTokenPrelaunchState(ledger) {
   if (!section) return;
   section.dataset.tokenState = ledger.tokenState;
   document.querySelector("#token-public-state").textContent =
-    ledger.tokenState === "NOT_LAUNCHED" ? "$BINRAT IS NOT LIVE" : "TOKEN STATE UNVERIFIED";
+    ledger.tokenState === "NOT_LAUNCHED" ? "$BINRAT IS NOT LIVE." : "TOKEN STATE UNVERIFIED";
   document.querySelector("#token-contract-state").textContent =
     ledger.tokenState === "NOT_LAUNCHED"
       ? "NO OFFICIAL CONTRACT HAS BEEN PUBLISHED"
@@ -784,6 +784,23 @@ function openBag(idOrBag, origin = document.activeElement) {
         <button class="button ghost" type="button" data-copy-post>COPY POST</button>
       </div>
       <div class="share-copy-status" aria-live="polite"></div>
+    </section>
+
+    <section class="case-next-step" aria-label="Next step">
+      <span>08 / NEXT MOVE</span>
+      <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
+      <p>
+        If this reported deployer is worth following, open the Telegram Rat and
+        WATCH the exact address shown at the top of this file. Watch is
+        user-requested monitoring, not a buy or safety signal.
+      </p>
+      <a
+        class="button primary"
+        href="https://t.me/BinratBot"
+        target="_blank"
+        rel="noopener noreferrer"
+        >OPEN TELEGRAM RAT <span>↗</span></a
+      >
     </section>
   `;
 
