@@ -4,7 +4,7 @@
   "frozenOn": "2026-10-03",
   "chainId": 4663,
   "launchPlanPath": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-  "launchPlanDigest": "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11",
+  "launchPlanDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
   "historicalArcMatrix": {
     "path": "docs/LAUNCH_GATE_MATRIX_V0.json",
     "digest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b",
@@ -19,7 +19,7 @@
         "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json"
       ],
       "evidenceDigests": [
-        "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+        "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae"
       ],
       "liveEvidence": {
         "status": "NOT_SATISFIED",
@@ -35,24 +35,33 @@
       "evidenceArtifacts": [
         "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
         "docs/product/BINRAT_TOKEN_LAUNCH_AND_GENESIS_FUNNEL_V1.md",
-        "docs/TOKEN_LAUNCH_DOCTRINE.md"
+        "docs/TOKEN_LAUNCH_DOCTRINE.md",
+        "docs/PONSVault_UPSTREAM_ATTESTATION_V1.json",
+        "docs/PONSVault_STAKING_ATTESTATION_V1.json"
       ],
       "evidenceDigests": [
-        "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+        "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
+        "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c",
+        "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d"
       ],
       "liveEvidence": {
         "chainId": 4663,
-        "rail": "pons-v2-vault-stake-burn-candidate-v1",
+        "rail": "pons-v2-vault-staking-candidate-v1",
         "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
         "ponsFactoryCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
         "ponsVaultLauncher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
         "ponsVaultRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
-        "stakeBurnFactory": "0x537483c5B33e2192CfB202d7C50d58975524B047",
+        "stakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+        "stakingBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+        "stakingImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+        "rejectedStakeBurnCandidateStatus": "FAIL_DEFER_CURRENT_CANDIDATE",
+        "stakingAttestationStatus": "CONDITIONAL",
         "ponsVaultSourceMatch": "NOT_SATISFIED",
+        "explicitUpstreamRiskAcceptance": "NOT_GRANTED",
         "immutableLaunchInputsFrozen": false
       },
       "verificationDate": "2026-10-03",
-      "exactRemainingRequirement": "Complete L1 PonsVault upstream attestation: source/ABI resolution, deployed bytecode pins, beacon/implementation/owner chain, fee-sweep authority, template semantics, audit status, and launch-time recheck contract.",
+      "exactRemainingRequirement": "Before launch authorization, explicitly accept or eliminate the unaudited shared-beacon/EOA upgrade risk, resolve authoritative PonsVault source/ABI if available, and re-read registry/factory/beacon/implementation/owner plus the atomic Staking launch path against the exact manifest.",
       "blocksLaunchAuthorization": true
     },
     "actual_token_address_and_launch_execution_receipt": {
@@ -62,7 +71,7 @@
         "docs/product/BINRAT_TOKEN_LAUNCH_AND_GENESIS_FUNNEL_V1.md"
       ],
       "evidenceDigests": [
-        "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+        "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae"
       ],
       "liveEvidence": {
         "tokenAddress": null,
@@ -100,18 +109,22 @@
       "evidenceArtifacts": [
         "docs/ROADMAP_V0.md",
         "docs/CAPABILITY_MANIFEST_V0.json",
-        "src/holder/eligibility.ts"
+        "src/holder/eligibility.ts",
+        "docs/PONSVault_STAKING_ATTESTATION_V1.json"
       ],
-      "evidenceDigests": [],
+      "evidenceDigests": [
+        "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d"
+      ],
       "liveEvidence": {
         "freeProductValue": "PASS",
         "entitlementModel": "ACTIVE_STAKE_WORKING_RAT_PLANNED",
-        "stakeSource": "NOT_IMPLEMENTED",
+        "stakeSource": "L1B_STAKED_OF_PINNED_L2_NOT_IMPLEMENTED",
+        "stakeReadSelector": "0xaf500ba3",
         "productionEligibilityActive": false
       },
       "verificationDate": "2026-10-03",
-      "exactRemainingRequirement": "Implement and verify the Robinhood/Pons active-stake source, wallet binding, frozen WORKING RAT threshold and production activation smoke.",
-      "blocksLaunchAuthorization": false
+      "exactRemainingRequirement": "Implement and verify the block-pinned Robinhood/Pons stakedOf(address) source, wallet binding, frozen WORKING RAT threshold and production activation smoke.",
+      "blocksLaunchAuthorization": true
     },
     "rat_watch_live_subscription_and_delivery_smoke": {
       "status": "SATISFIED",
@@ -173,7 +186,7 @@
         "docs/LAUNCH_GATE_MATRIX_PONS_V1.json"
       ],
       "evidenceDigests": [
-        "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+        "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae"
       ],
       "liveEvidence": {
         "currentPlanningChain": 4663,
@@ -193,7 +206,7 @@
         "docs/TOKEN_LAUNCH_DOCTRINE.md"
       ],
       "evidenceDigests": [
-        "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+        "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae"
       ],
       "liveEvidence": {
         "evidenceClass": "OWNER_POLICY",
@@ -205,10 +218,10 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Freeze any opening buy and final Pons allocation semantics in the launch manifest, then verify them against the real launch transaction.",
-      "blocksLaunchAuthorization": false
+      "blocksLaunchAuthorization": true
     }
   },
   "explicitOwnerLaunchAuthorityState": "NOT_GRANTED",
   "launchAuthorization": "BLOCKED",
-  "matrixDigest": "d6e1f141af4948632d576567389fa0cae731674ea7c63f975b6a9ec34e01c0ba"
+  "matrixDigest": "91b0f8e791d34fcf8089ba5c08f9dc477dab1b469bb8b1815422920dd2c965d9"
 }

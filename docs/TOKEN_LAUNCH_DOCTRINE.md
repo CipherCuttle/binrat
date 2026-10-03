@@ -36,15 +36,15 @@ The target launch has:
 
 Project revenue is not hidden. It is part of the design.
 
-## Preferred current launch rail: Pons V2 + Stake & Burn candidate
+## Preferred current launch rail: Pons V2 + public Staking candidate
 
-The current owner-selected planning direction is **Robinhood Chain 4663 / Pons V2**, with an existing **PonsVault Stake & Burn** template as the Launch V1 economic primitive.
+The current owner-selected planning direction is **Robinhood Chain 4663 / Pons V2**, with the public **PonsVault Staking** template as the conditional Launch V1 economic primitive. The previously selected Stake & Burn factory failed L1 and remains historical rejection evidence, not current authority.
 
 This selection is planning authority only. It does not authorize launch.
 
 Launch V1 should minimize custom contract surface:
 
-- launch $BINRAT through the reviewed Pons/PonsVault path required for the selected vault mechanics;
+- launch $BINRAT through the reviewed Pons/PonsVault Staking path required for the selected vault mechanics;
 - native ETH as the candidate quote/pair asset;
 - one active-stake product tier: **WORKING RAT**;
 - no inflationary $BINRAT staking emissions;
@@ -53,7 +53,7 @@ Launch V1 should minimize custom contract surface:
 - founder/project opening purchase, if any, must be atomic/publicly disclosed under the selected Pons launch mechanics;
 - no custom RatVault, RWA dividend, Rat Bonds, governance or FERAL tier as Launch V1 blockers.
 
-The Pons launch gate must independently pin and verify the exact live launcher/factory/config, `canLaunch` authority, relevant runtime bytecode/codehashes, PonsVault launcher/registry/template, Stake & Burn implementation, proxy/beacon state, upgrade authority and fee-sweep permissions immediately before launch.
+The Pons launch gate must independently pin and verify the exact live launcher/factory/config, `canLaunch` authority, relevant runtime bytecode/codehashes, PonsVault launcher/registry/template, Staking factory/beacon/implementation, `stakedOf(address)` behavior, upgrade authority, creator-fee routing and the atomic native-ETH launch path immediately before launch. The current Staking dependency is unaudited and upgradeable through an EOA-controlled factory, so launch authorization also requires explicit acceptance or elimination of that upstream risk.
 
 Pons configs and upstream deployment state are not perpetual authority. A dated verification receipt and an exact launch manifest are required.
 

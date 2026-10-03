@@ -36,7 +36,7 @@ Canonical companion plan:
 
 Keep the irreversible surface deliberately small:
 
-`Pons V2 / Robinhood 4663 -> ETH pair -> existing Stake & Burn candidate -> one WORKING RAT stake tier -> CASE: $BINRAT -> verified web/TG/X facts`
+`Pons V2 / Robinhood 4663 -> ETH pair -> public PonsVault Staking candidate (CONDITIONAL) -> one WORKING RAT stake tier -> CASE: $BINRAT -> verified web/TG/X facts`
 
 Launch V1 explicitly does **not** wait for FERAL RAT, Rat Bonds, custom RatVault, StonkRat/RWA, governance, Shadow Economy PMF, API token gating, or a finished Substack operation.
 
@@ -73,7 +73,7 @@ Substack is optional depth and must not become a launch blocker.
 ### Immediate launch train
 
 1. **L0 — authority reconciliation:** preserve Arc history, create Pons V1 successor authority, keep launch/marketing blocked.
-2. **L1 — PonsVault forensic pin:** launcher/registry/Stake & Burn implementation, ABI/codehash, proxy/beacon, upgrade authority and sweep permissions.
+2. **L1 — PonsVault forensic pin:** preserve the rejected Stake & Burn receipt; pin the current public Staking factory/beacon/implementation, active-stake read, native-ETH launch simulation, upgrade authority and explicit upstream-risk acceptance.
 3. **L2 — stake reader:** pinned, fail-closed read of active stake.
 4. **L3 — WORKING RAT:** one stake-backed entitlement only.
 5. **L4 — wallet link:** Telegram principal ↔ Robinhood wallet proof.
@@ -759,7 +759,7 @@ The ledger is part of the product trust model: the project can openly use token-
 
 ## EARLY FAIR LAUNCH — FUND THE BUILD, SHIP THE UTILITY
 
-**2026-10-03 authority note:** the Pons V2 / Stake & Burn / WORKING RAT / Genesis Funnel plan above is the current launch work order. This older section remains useful doctrine, but any conflicting rail, holder-gate, launch-blocker or incentive wording is superseded by the current launch companion plan.
+**2026-10-03 authority note:** the current launch work order is Pons V2 / public PonsVault Staking (CONDITIONAL) / WORKING RAT / Genesis Funnel. The previously selected Stake & Burn factory failed L1 and is historical evidence only; do not revive it as current launch authority. This older section remains useful doctrine, but any conflicting rail, holder-gate, launch-blocker or incentive wording is superseded by the current launch companion plan.
 
 BINRAT intends to launch `$BINRAT` early, subject to the legal/compliance launch gate in `TOKEN_LAUNCH_DOCTRINE.md`.
 

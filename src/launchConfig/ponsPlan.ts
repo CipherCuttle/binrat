@@ -3,14 +3,14 @@ import { sha256Hex } from '../evidence/canonical.js';
 
 export const PONS_LAUNCH_PLAN_SCHEMA_VERSION = 'binrat.pons-launch-plan/0.1' as const;
 export const PONS_LAUNCH_PLAN_VERSION = 'BINRAT_PONS_LAUNCH_PLAN_V1' as const;
-export const PONS_LAUNCH_PLAN_DIGEST = '55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11' as const;
+export const PONS_LAUNCH_PLAN_DIGEST = '5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae' as const;
 export const PONS_LAUNCH_CHAIN_ID = 4663 as const;
 export const PONS_V2_FACTORY_V1 = '0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e' as const;
 export const PONS_V2_FACTORY_CODE_HASH_V1 =
   '0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84' as const;
 export const PONS_VAULT_LAUNCHER_V1 = '0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA' as const;
 export const PONS_VAULT_REGISTRY_V1 = '0xaA9C86049A258D4A076d3eF367F69C231C9746D5' as const;
-export const PONS_STAKE_BURN_FACTORY_V1 = '0x537483c5B33e2192CfB202d7C50d58975524B047' as const;
+export const PONS_STAKING_FACTORY_V1 = '0x1488473464F2C6E6c5C412f05d805c619322E7EB' as const;
 
 export interface PonsLaunchPlanV1 {
   schemaVersion: typeof PONS_LAUNCH_PLAN_SCHEMA_VERSION;
@@ -42,30 +42,41 @@ export async function validatePonsLaunchPlan(value: unknown): Promise<PonsLaunch
   const pons = record(rail.ponsFactory);
   const launcher = record(rail.ponsVaultLauncher);
   const registry = record(rail.ponsVaultRegistry);
-  const stakeBurn = record(rail.stakeBurnFactory);
+  const staking = record(rail.stakingFactory);
+  if ('stakeBurnFactory' in rail) throw new Error('PONS_LAUNCH_PLAN_STALE_STAKE_BURN_AUTHORITY');
 
   if (
-    rail.railId !== 'pons-v2-vault-stake-burn-candidate-v1' ||
+    rail.railId !== 'pons-v2-vault-staking-candidate-v1' ||
     rail.pairAsset !== 'NATIVE_ETH_CANDIDATE' ||
     checksum(pons.address) !== PONS_V2_FACTORY_V1 ||
     pons.runtimeCodeHash !== PONS_V2_FACTORY_CODE_HASH_V1 ||
     checksum(launcher.address) !== PONS_VAULT_LAUNCHER_V1 ||
     checksum(registry.address) !== PONS_VAULT_REGISTRY_V1 ||
-    checksum(stakeBurn.address) !== PONS_STAKE_BURN_FACTORY_V1 ||
+    checksum(staking.address) !== PONS_STAKING_FACTORY_V1 ||
     rail.ponsNativeBuybackEnabled !== 'CANDIDATE_FALSE_NOT_FROZEN'
   ) throw new Error('PONS_LAUNCH_PLAN_RAIL_INVALID');
 
   const unresolved = record(input.unresolvedImmutableInputs);
+  if ('stakeLockPeriodSeconds' in unresolved || 'minimumFeesBeforeRun' in unresolved) {
+    throw new Error('PONS_LAUNCH_PLAN_STALE_STAKE_BURN_INPUT');
+  }
   for (const key of [
     'launchConfigId','expectedEconomics','creatorTaxBps','openingBuyWei',
-    'stakeLockPeriodSeconds','minimumFeesBeforeRun','workingRatMinStakeRaw'
+    'minimumFeesBeforePayoutWei','workingRatMinStakeRaw'
   ]) if (unresolved[key] !== null) throw new Error('PONS_LAUNCH_PLAN_IMMUTABLES_PREMATURELY_FROZEN');
 
   const risk = record(input.upstreamRisk);
   if (
-    risk.ponsVaultPublicSourceStatus !== 'UNRESOLVED' ||
+    risk.ponsVaultPublicSourceStatus !== 'NOT_SATISFIED' ||
     risk.ponsVaultThirdPartyAuditStatus !== 'NOT_COMPLETED_PER_PUBLIC_DOCS' ||
-    risk.launchMechanicsGate !== 'BLOCKED_UPSTREAM_VERIFICATION'
+    risk.stakingUpgradeAuthorityStatus !== 'ACTIVE_EOA_CONTROL_CHAIN_OBSERVED' ||
+    risk.stakingAttestation !== 'docs/PONSVault_STAKING_ATTESTATION_V1.json' ||
+    risk.stakingAttestationDigest !== 'f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d' ||
+    risk.stakingAttestationStatus !== 'CONDITIONAL' ||
+    risk.rejectedStakeBurnAttestation !== 'docs/PONSVault_UPSTREAM_ATTESTATION_V1.json' ||
+    risk.rejectedStakeBurnAttestationDigest !== '69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c' ||
+    risk.explicitUpstreamRiskAcceptanceRequired !== true ||
+    risk.launchMechanicsGate !== 'BLOCKED_UPSTREAM_RISK_ACCEPTANCE'
   ) throw new Error('PONS_LAUNCH_PLAN_UPSTREAM_RISK_INVALID');
 
   const historical = record(input.historicalPredecessor);

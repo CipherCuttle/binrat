@@ -5,7 +5,7 @@
   "status": "PLANNING_ONLY",
   "chainId": 4663,
   "launchRail": {
-    "railId": "pons-v2-vault-stake-burn-candidate-v1",
+    "railId": "pons-v2-vault-staking-candidate-v1",
     "pairAsset": "NATIVE_ETH_CANDIDATE",
     "ponsFactory": {
       "address": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
@@ -22,13 +22,13 @@
       "runtimeCodeHash": "0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f",
       "verificationStatus": "LIVE_CODEHASH_PINNED_SOURCE_MATCH_PENDING"
     },
-    "stakeBurnFactory": {
-      "address": "0x537483c5B33e2192CfB202d7C50d58975524B047",
+    "stakingFactory": {
+      "address": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
       "runtimeCodeHash": null,
-      "beacon": "0xf72b3b54220a2e64ee87895d570a2c72a00a3fe4",
-      "vaultImplementation": "0xf0453c814cf6a76a8e3507f8fafffe359f28b6cb",
+      "beacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "vaultImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
       "owner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
-      "verificationStatus": "LIVE_STATE_PINNED_SOURCE_MATCH_PENDING"
+      "verificationStatus": "CONDITIONAL_L1B_PINNED_SOURCE_MATCH_PENDING"
     },
     "ponsNativeBuybackEnabled": "CANDIDATE_FALSE_NOT_FROZEN"
   },
@@ -37,15 +37,20 @@
     "expectedEconomics": null,
     "creatorTaxBps": null,
     "openingBuyWei": null,
-    "stakeLockPeriodSeconds": null,
-    "minimumFeesBeforeRun": null,
+    "minimumFeesBeforePayoutWei": null,
     "workingRatMinStakeRaw": null
   },
   "upstreamRisk": {
-    "ponsVaultPublicSourceStatus": "UNRESOLVED",
+    "ponsVaultPublicSourceStatus": "NOT_SATISFIED",
     "ponsVaultThirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS",
-    "stakeBurnUpgradeAuthorityStatus": "ACTIVE_EOA_CONTROL_CHAIN_OBSERVED",
-    "launchMechanicsGate": "BLOCKED_UPSTREAM_VERIFICATION"
+    "stakingUpgradeAuthorityStatus": "ACTIVE_EOA_CONTROL_CHAIN_OBSERVED",
+    "stakingAttestation": "docs/PONSVault_STAKING_ATTESTATION_V1.json",
+    "stakingAttestationDigest": "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d",
+    "stakingAttestationStatus": "CONDITIONAL",
+    "rejectedStakeBurnAttestation": "docs/PONSVault_UPSTREAM_ATTESTATION_V1.json",
+    "rejectedStakeBurnAttestationDigest": "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c",
+    "explicitUpstreamRiskAcceptanceRequired": true,
+    "launchMechanicsGate": "BLOCKED_UPSTREAM_RISK_ACCEPTANCE"
   },
   "historicalPredecessor": {
     "chainId": 5042,
@@ -58,5 +63,5 @@
     "launchAuthorized": false,
     "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
   },
-  "planDigest": "55dcacc142d252bab1410ce8166521cf9a4fe1dd43a8af941eb3220257104c11"
+  "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae"
 }

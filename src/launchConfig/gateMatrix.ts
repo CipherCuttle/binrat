@@ -128,7 +128,11 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
     mechanics.status !== 'BLOCKED_UPSTREAM_VERIFICATION' ||
     mechanics.blocksLaunchAuthorization !== true ||
     mechanics.liveEvidence.chainId !== 4663 ||
-    mechanics.liveEvidence.ponsVaultSourceMatch !== 'NOT_SATISFIED'
+    mechanics.liveEvidence.rail !== 'pons-v2-vault-staking-candidate-v1' ||
+    mechanics.liveEvidence.stakingAttestationStatus !== 'CONDITIONAL' ||
+    mechanics.liveEvidence.rejectedStakeBurnCandidateStatus !== 'FAIL_DEFER_CURRENT_CANDIDATE' ||
+    mechanics.liveEvidence.ponsVaultSourceMatch !== 'NOT_SATISFIED' ||
+    mechanics.liveEvidence.explicitUpstreamRiskAcceptance !== 'NOT_GRANTED'
   ) throw new Error('LAUNCH_GATE_MATRIX_PONS_MECHANICS_BOUNDARY_INVALID');
 
   const execution = gates.actual_token_address_and_launch_execution_receipt as Record<string, any>;
@@ -144,7 +148,9 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
   const holder = gates.rat_radar_free_value_and_holder_gate_smoke as Record<string, any>;
   if (
     holder.status !== 'PARTIAL' ||
-    holder.blocksLaunchAuthorization !== false ||
+    holder.blocksLaunchAuthorization !== true ||
+    holder.liveEvidence.stakeSource !== 'L1B_STAKED_OF_PINNED_L2_NOT_IMPLEMENTED' ||
+    holder.liveEvidence.stakeReadSelector !== '0xaf500ba3' ||
     holder.liveEvidence.productionEligibilityActive !== false
   ) throw new Error('LAUNCH_GATE_MATRIX_HOLDER_BOUNDARY_INVALID');
 
@@ -158,7 +164,7 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
   const allocation = gates.allocation_and_privileged_inventory_disclosure as Record<string, any>;
   if (
     allocation.status !== 'PARTIAL' ||
-    allocation.blocksLaunchAuthorization !== false ||
+    allocation.blocksLaunchAuthorization !== true ||
     allocation.liveEvidence.evidenceClass !== 'OWNER_POLICY'
   ) throw new Error('LAUNCH_GATE_MATRIX_ALLOCATION_BOUNDARY_INVALID');
 
