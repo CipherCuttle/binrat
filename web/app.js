@@ -180,7 +180,7 @@ async function bootstrap() {
     available = true;
     applyMode(feed);
     renderLiveRail(feed);
-    randomBag.disabled = bags.length === 0;
+    if (randomBag) randomBag.disabled = bags.length === 0;
     renderIntake();
     renderFeed();
   } catch (error) {
@@ -240,7 +240,7 @@ function renderUnavailable(error) {
   available = false;
   bags = [];
   closeDrawer();
-  randomBag.disabled = true;
+  if (randomBag) randomBag.disabled = true;
   document.body.dataset.mode = "UNAVAILABLE";
   for (const element of document.querySelectorAll("[data-mode-copy]"))
     element.textContent = "INDEX UNAVAILABLE";
@@ -263,7 +263,7 @@ function renderIntake() {
   const latest = bags[0];
   if (!latest) {
     latestBag.innerHTML = `<span class="intake-loading">${copy().empty}</span>`;
-    randomBag.disabled = true;
+    if (randomBag) randomBag.disabled = true;
     return;
   }
   latestBag.innerHTML = `<span class="intake-label">LAST INTO THE BIN</span>
@@ -844,11 +844,13 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-randomBag.addEventListener("click", () => {
-  if (bags.length === 0) return;
-  const bag = bags[Math.floor(Math.random() * bags.length)];
-  openBag(bag.id, randomBag);
-});
+if (randomBag) {
+  randomBag.addEventListener("click", () => {
+    if (bags.length === 0) return;
+    const bag = bags[Math.floor(Math.random() * bags.length)];
+    openBag(bag.id, randomBag);
+  });
+}
 
 function normalizeCoverage(value) {
   return ["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value)

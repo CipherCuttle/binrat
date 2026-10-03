@@ -22,8 +22,10 @@ const requiredHtml = [
   'HOW HE DIGS',
   'DUMPSTER LEDGER',
   'CLAIM BOUNDARY',
-  'He gets the scraps.',
-  'You get the receipts.',
+  'THE RAT FOUND SOMETHING.',
+  'OPEN FRESH GARBAGE',
+  'GET THE TELEGRAM RAT',
+  "DON'T TRUST THE RAT. CHECK THE RECEIPT.",
   './assets/binrat-hero.webp',
   './share-card.css'
 ];
@@ -52,6 +54,7 @@ if (!dataSource.includes('binrat.latest-launches/0.1')) throw new Error('WEB_LAT
 if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
 if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SHARE_CARD_FIXTURE_STAMP_MISSING');
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
+if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRONTDOOR_CTA_MISSING');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
 if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
