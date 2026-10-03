@@ -138,7 +138,7 @@ test('status consistency validator rejects contradictory token state', async () 
   assert.throws(() => validateCapabilityManifest(manifest), /AUTHORIZATION_ESCALATION/);
 });
 
-test('canonical Telegram token behavior reports configured roles without escalating launch state', async () => {
+test('canonical Telegram token behavior never projects historical Arc roles as current Pons roles', async () => {
   const manifest = await json(MANIFEST_URL) as unknown as CapabilityManifest;
   const reply = await renderRatReply('/token', {
     apiBaseUrl: 'https://binrat.example',
@@ -147,8 +147,10 @@ test('canonical Telegram token behavior reports configured roles without escalat
   });
   assert.match(reply ?? '', /token state: NOT_LAUNCHED/);
   assert.match(reply ?? '', /launch authorization: BLOCKED/);
-  assert.match(reply ?? '', new RegExp(BINRAT_TREASURY_ADDRESS));
-  assert.match(reply ?? '', new RegExp(BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS));
+  assert.doesNotMatch(reply ?? '', new RegExp(BINRAT_TREASURY_ADDRESS));
+  assert.doesNotMatch(reply ?? '', new RegExp(BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS));
+  assert.match(reply ?? '', /Treasury: NOT_CONFIGURED/);
+  assert.match(reply ?? '', /Project fee recipient: NOT_CONFIGURED/);
   assert.match(reply ?? '', /Holder Gate: TOKEN_AUTHORITY_NOT_CONFIGURED/);
 });
 

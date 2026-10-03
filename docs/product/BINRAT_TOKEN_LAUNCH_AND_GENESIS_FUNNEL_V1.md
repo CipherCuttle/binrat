@@ -10,7 +10,7 @@ Launch $BINRAT early enough that the token and product grow together without tur
 
 V1 should be understandable in one breath:
 
-> BINRAT digs through launch trash and keeps the receipts. Put $BINRAT to work by staking it: active stake unlocks a more capable Rat while the selected public PonsVault Staking primitive routes creator-fee rewards according to the verified current vault contract. The dependency remains conditional until its upstream upgrade/audit risk is explicitly accepted.
+> BINRAT digs through launch trash and keeps the receipts. Put $BINRAT to work by staking it: active stake unlocks a more capable Rat while the selected public PonsVault Staking primitive routes creator-fee rewards according to the verified current vault contract. The dependency remains conditional on fresh preflight and exact-manifest verification; its third-party upgrade/audit risk is owner-accepted for this selected dependency but does not authorize launch.
 
 The launch must optimize for low cognitive load:
 
@@ -28,16 +28,18 @@ No custom RatVault, RWA dividend, Rat Bonds, governance, token emissions, or FER
 
 The old ArcPad / Arc 5042 launch receipts and configuration remain historical evidence. They do not authorize a Robinhood Chain 4663 launch and must not be treated as current Pons launch-mechanics authority.
 
-Before $BINRAT can launch, the canonical capability manifest and launch-gate matrix must be reconciled to a new Pons V1 authority. The old Arc receipt stays immutable as historical proof; it is not rewritten to pretend it verified Pons.
+The canonical capability manifest and launch-gate matrix now distinguish current Pons V1 prelaunch authority from historical Arc evidence. The old Arc receipt stays immutable as historical proof; it is not rewritten to pretend it verified Pons.
 
 Current launch-planning target:
 
 - chain: Robinhood Chain 4663;
 - launch rail: Pons V2;
-- quote/pair: native ETH candidate;
+- quote/pair: native ETH selected;
 - vault: public PonsVault Staking candidate (CONDITIONAL);
-- Pons native buyback: OFF candidate unless a later reviewed manifest explicitly changes it;
-- creator tax: unresolved until scenario simulation and legal/product review;
+- Pons native buyback: OFF by owner selection for Launch V1 unless a later separately reviewed manifest explicitly changes it;
+- creator tax: 0% by owner selection for Launch V1;
+- opening/dev buy: 0 ETH by owner selection;
+- no private presale / no discounted insider round / no hidden team allocation;
 - product gate: active stake, not simple wallet balance;
 - launch product tier: one paid/staked tier, **WORKING RAT**.
 

@@ -111,7 +111,7 @@ export function validateLaunchStatusConsistency(
 ): void {
   const root = record(manifest, 'LAUNCH_STATUS_MANIFEST_INVALID');
   const launch = record(root.launchAuthorization, 'LAUNCH_STATUS_MANIFEST_INVALID');
-  const configured = record(root.launchConfiguration, 'LAUNCH_STATUS_MANIFEST_INVALID');
+  const configured = record(root.historicalArcLaunchConfiguration, 'LAUNCH_STATUS_MANIFEST_INVALID');
   if (
     launch.status !== 'BLOCKED' ||
     launch.launchAuthorized !== false ||
@@ -123,7 +123,8 @@ export function validateLaunchStatusConsistency(
     configured.projectFeeRecipientAddress !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS ||
     configured.tokenAddressState !== 'NOT_YET_CREATED' ||
     configured.accountingActive !== false ||
-    configured.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED'
+    configured.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED' ||
+    configured.authorityScope !== 'HISTORICAL_ARC_V0_ROLE_BINDING_ONLY_NOT_CURRENT_PUBLIC_ROLE_SOURCE'
   ) throw new Error('LAUNCH_STATUS_CONTRADICTION');
 }
 

@@ -128,7 +128,14 @@ test('all mandatory gates and explicit owner authority remain required', async (
   const manifest = await json(MANIFEST_URL);
   validateCapabilityManifest(manifest);
   validateLaunchStatusConsistency(config, manifest);
-  assert.equal(manifest.launchConfiguration.configDigest, LAUNCH_CONFIG_DIGEST);
-  assert.equal(manifest.launchConfiguration.authorityScope, 'HISTORICAL_ARC_V0_ROLE_BINDING_ONLY');
+  assert.equal(manifest.historicalArcLaunchConfiguration.configDigest, LAUNCH_CONFIG_DIGEST);
+  assert.equal(
+    manifest.historicalArcLaunchConfiguration.authorityScope,
+    'HISTORICAL_ARC_V0_ROLE_BINDING_ONLY_NOT_CURRENT_PUBLIC_ROLE_SOURCE'
+  );
+  assert.equal(manifest.currentPonsLaunchConfiguration.chainId, 4663);
+  assert.equal(manifest.currentPonsLaunchConfiguration.treasuryAddress, null);
+  assert.equal(manifest.currentPonsLaunchConfiguration.creatorTaxBps, 0);
+  assert.equal(manifest.currentPonsLaunchConfiguration.openingBuyWei, '0');
   assert.equal(manifest.launchAuthorization.status, 'BLOCKED');
 });

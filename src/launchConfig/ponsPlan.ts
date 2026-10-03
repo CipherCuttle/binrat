@@ -3,7 +3,7 @@ import { sha256Hex } from '../evidence/canonical.js';
 
 export const PONS_LAUNCH_PLAN_SCHEMA_VERSION = 'binrat.pons-launch-plan/0.1' as const;
 export const PONS_LAUNCH_PLAN_VERSION = 'BINRAT_PONS_LAUNCH_PLAN_V1' as const;
-export const PONS_LAUNCH_PLAN_DIGEST = '5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae' as const;
+export const PONS_LAUNCH_PLAN_DIGEST = 'f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd' as const;
 export const PONS_LAUNCH_CHAIN_ID = 4663 as const;
 export const PONS_V2_FACTORY_V1 = '0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e' as const;
 export const PONS_V2_FACTORY_CODE_HASH_V1 =
@@ -47,22 +47,39 @@ export async function validatePonsLaunchPlan(value: unknown): Promise<PonsLaunch
 
   if (
     rail.railId !== 'pons-v2-vault-staking-candidate-v1' ||
-    rail.pairAsset !== 'NATIVE_ETH_CANDIDATE' ||
+    rail.pairAsset !== 'NATIVE_ETH_SELECTED' ||
     checksum(pons.address) !== PONS_V2_FACTORY_V1 ||
     pons.runtimeCodeHash !== PONS_V2_FACTORY_CODE_HASH_V1 ||
     checksum(launcher.address) !== PONS_VAULT_LAUNCHER_V1 ||
     checksum(registry.address) !== PONS_VAULT_REGISTRY_V1 ||
     checksum(staking.address) !== PONS_STAKING_FACTORY_V1 ||
-    rail.ponsNativeBuybackEnabled !== 'CANDIDATE_FALSE_NOT_FROZEN'
+    rail.ponsNativeBuybackEnabled !== 'OWNER_SELECTED_FALSE'
   ) throw new Error('PONS_LAUNCH_PLAN_RAIL_INVALID');
 
+  const policy = record(input.ownerSelectedLaunchPolicy);
+  if (
+    policy.evidenceClass !== 'OWNER_POLICY' ||
+    policy.creatorTaxBps !== 0 ||
+    policy.openingBuyWei !== '0' ||
+    policy.privatePresale !== 'NONE' ||
+    policy.discountedInsiderRound !== 'NONE' ||
+    policy.hiddenTeamAllocation !== 'NONE' ||
+    policy.publicMarketOnly !== true ||
+    policy.laterFounderProjectPurchase !== 'ORDINARY_PUBLIC_MARKET_ONLY_DISCLOSED'
+  ) throw new Error('PONS_LAUNCH_PLAN_OWNER_POLICY_INVALID');
+
   const unresolved = record(input.unresolvedImmutableInputs);
-  if ('stakeLockPeriodSeconds' in unresolved || 'minimumFeesBeforeRun' in unresolved) {
-    throw new Error('PONS_LAUNCH_PLAN_STALE_STAKE_BURN_INPUT');
+  if (
+    'stakeLockPeriodSeconds' in unresolved ||
+    'minimumFeesBeforeRun' in unresolved ||
+    'creatorTaxBps' in unresolved ||
+    'openingBuyWei' in unresolved
+  ) {
+    throw new Error('PONS_LAUNCH_PLAN_STALE_OR_RESOLVED_INPUT');
   }
   for (const key of [
-    'launchConfigId','expectedEconomics','creatorTaxBps','openingBuyWei',
-    'minimumFeesBeforePayoutWei','workingRatMinStakeRaw'
+    'launchConfigId','expectedEconomics','minimumFeesBeforePayoutWei','workingRatMinStakeRaw',
+    'treasuryAddress','launchWalletAddress','tokenMetadata'
   ]) if (unresolved[key] !== null) throw new Error('PONS_LAUNCH_PLAN_IMMUTABLES_PREMATURELY_FROZEN');
 
   const risk = record(input.upstreamRisk);
@@ -75,8 +92,9 @@ export async function validatePonsLaunchPlan(value: unknown): Promise<PonsLaunch
     risk.stakingAttestationStatus !== 'CONDITIONAL' ||
     risk.rejectedStakeBurnAttestation !== 'docs/PONSVault_UPSTREAM_ATTESTATION_V1.json' ||
     risk.rejectedStakeBurnAttestationDigest !== '69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c' ||
-    risk.explicitUpstreamRiskAcceptanceRequired !== true ||
-    risk.launchMechanicsGate !== 'BLOCKED_UPSTREAM_RISK_ACCEPTANCE'
+    risk.explicitUpstreamRiskAcceptanceRequired !== false ||
+    risk.ownerUpstreamRiskDecision !== 'ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY' ||
+    risk.launchMechanicsGate !== 'BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST'
   ) throw new Error('PONS_LAUNCH_PLAN_UPSTREAM_RISK_INVALID');
 
   const historical = record(input.historicalPredecessor);
