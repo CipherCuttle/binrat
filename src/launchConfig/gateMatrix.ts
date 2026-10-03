@@ -1,11 +1,8 @@
 import { sha256Hex } from '../evidence/canonical.js';
-import {
-  LAUNCH_CONFIG_DIGEST,
-  LAUNCH_MECHANICS_RECEIPT_DIGEST
-} from './config.js';
+import { PONS_LAUNCH_PLAN_DIGEST } from './ponsPlan.js';
 
-export const LAUNCH_GATE_MATRIX_SCHEMA_VERSION = 'binrat.launch-gate-matrix/0.1' as const;
-export const LAUNCH_GATE_MATRIX_VERSION = 'LAUNCH_GATE_MATRIX_V0' as const;
+export const LAUNCH_GATE_MATRIX_SCHEMA_VERSION = 'binrat.launch-gate-matrix/0.2' as const;
+export const LAUNCH_GATE_MATRIX_VERSION = 'LAUNCH_GATE_MATRIX_PONS_V1' as const;
 
 export const REQUIRED_LAUNCH_GATE_IDS = [
   'legal_compliance_artifacts',
@@ -26,6 +23,7 @@ export type LaunchGateStatus =
   | 'PARTIAL'
   | 'BLOCKED_FUTURE_EVENT'
   | 'BLOCKED_OWNER_INPUT'
+  | 'BLOCKED_UPSTREAM_VERIFICATION'
   | 'BLOCKED_LEGAL';
 
 export interface LaunchGateRecord {
@@ -41,10 +39,15 @@ export interface LaunchGateRecord {
 export interface LaunchGateMatrix {
   schemaVersion: typeof LAUNCH_GATE_MATRIX_SCHEMA_VERSION;
   matrixVersion: typeof LAUNCH_GATE_MATRIX_VERSION;
-  frozenOn: '2026-09-21';
-  chainId: 5042;
-  launchConfigDigest: typeof LAUNCH_CONFIG_DIGEST;
-  launchMechanicsReceiptDigest: typeof LAUNCH_MECHANICS_RECEIPT_DIGEST;
+  frozenOn: '2026-10-03';
+  chainId: 4663;
+  launchPlanPath: 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json';
+  launchPlanDigest: typeof PONS_LAUNCH_PLAN_DIGEST;
+  historicalArcMatrix: {
+    path: 'docs/LAUNCH_GATE_MATRIX_V0.json';
+    digest: string;
+    authority: 'HISTORICAL_ONLY';
+  };
   gates: Record<LaunchGateId, LaunchGateRecord>;
   explicitOwnerLaunchAuthorityState: 'NOT_GRANTED';
   launchAuthorization: 'BLOCKED';
@@ -62,13 +65,20 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
   if (
     input.schemaVersion !== LAUNCH_GATE_MATRIX_SCHEMA_VERSION ||
     input.matrixVersion !== LAUNCH_GATE_MATRIX_VERSION ||
-    input.frozenOn !== '2026-09-21' ||
-    input.chainId !== 5042 ||
-    input.launchConfigDigest !== LAUNCH_CONFIG_DIGEST ||
-    input.launchMechanicsReceiptDigest !== LAUNCH_MECHANICS_RECEIPT_DIGEST ||
+    input.frozenOn !== '2026-10-03' ||
+    input.chainId !== 4663 ||
+    input.launchPlanPath !== 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json' ||
+    input.launchPlanDigest !== PONS_LAUNCH_PLAN_DIGEST ||
     input.explicitOwnerLaunchAuthorityState !== 'NOT_GRANTED' ||
     input.launchAuthorization !== 'BLOCKED'
   ) throw new Error('LAUNCH_GATE_MATRIX_HEADER_INVALID');
+
+  const historical = record(input.historicalArcMatrix, 'LAUNCH_GATE_MATRIX_HISTORY_INVALID');
+  if (
+    historical.path !== 'docs/LAUNCH_GATE_MATRIX_V0.json' ||
+    historical.digest !== 'd244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b' ||
+    historical.authority !== 'HISTORICAL_ONLY'
+  ) throw new Error('LAUNCH_GATE_MATRIX_HISTORY_INVALID');
 
   const gates = record(input.gates, 'LAUNCH_GATE_MATRIX_GATES_INVALID');
   const ids = Object.keys(gates).sort();
@@ -112,6 +122,14 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
     legal.liveEvidence.status !== 'NOT_SATISFIED' ||
     legal.liveEvidence.technicalArtifactsAreNotLegalApproval !== true
   ) throw new Error('LAUNCH_GATE_MATRIX_LEGAL_BOUNDARY_INVALID');
+
+  const mechanics = gates.launch_mechanics_verification_receipt as Record<string, any>;
+  if (
+    mechanics.status !== 'BLOCKED_UPSTREAM_VERIFICATION' ||
+    mechanics.blocksLaunchAuthorization !== true ||
+    mechanics.liveEvidence.chainId !== 4663 ||
+    mechanics.liveEvidence.ponsVaultSourceMatch !== 'NOT_SATISFIED'
+  ) throw new Error('LAUNCH_GATE_MATRIX_PONS_MECHANICS_BOUNDARY_INVALID');
 
   const execution = gates.actual_token_address_and_launch_execution_receipt as Record<string, any>;
   if (
@@ -170,14 +188,19 @@ export function validateLaunchGateStatusConsistency(
   const gateStatus = record(root.launchGateStatus, 'LAUNCH_GATE_MANIFEST_INVALID');
   const statuses = record(gateStatus.statuses, 'LAUNCH_GATE_MANIFEST_INVALID');
   if (
-    gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_V0.json' ||
+    gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_PONS_V1.json' ||
     gateStatus.matrixDigest !== matrix.matrixDigest ||
     launch.status !== 'BLOCKED' ||
     launch.marketingAuthorized !== false ||
     launch.launchAuthorized !== false ||
-    launch.tokenState !== 'NOT_LAUNCHED' ||
-    gateStatus.blockingGateCount !== 2
+    launch.tokenState !== 'NOT_LAUNCHED'
   ) throw new Error('LAUNCH_GATE_STATUS_CONTRADICTION');
+  const expectedBlocking = REQUIRED_LAUNCH_GATE_IDS.filter((id) =>
+    matrix.gates[id].blocksLaunchAuthorization && matrix.gates[id].status !== 'SATISFIED'
+  ).length;
+  if (gateStatus.blockingGateCount !== expectedBlocking) {
+    throw new Error('LAUNCH_GATE_STATUS_CONTRADICTION');
+  }
   for (const id of REQUIRED_LAUNCH_GATE_IDS) {
     if (statuses[id] !== matrix.gates[id].status) {
       throw new Error(`LAUNCH_GATE_STATUS_CONTRADICTION:${id}`);
@@ -190,6 +213,7 @@ const VALID_STATUSES = new Set<LaunchGateStatus>([
   'PARTIAL',
   'BLOCKED_FUTURE_EVENT',
   'BLOCKED_OWNER_INPUT',
+  'BLOCKED_UPSTREAM_VERIFICATION',
   'BLOCKED_LEGAL'
 ]);
 

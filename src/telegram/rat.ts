@@ -7,6 +7,10 @@ import {
 } from '../launchConfig/config.js';
 import { REQUIRED_LAUNCH_GATE_IDS } from '../launchConfig/gateMatrix.js';
 import {
+  PONS_LAUNCH_PLAN_DIGEST,
+  PONS_LAUNCH_CHAIN_ID
+} from '../launchConfig/ponsPlan.js';
+import {
   makeRatAnswerPlan,
   renderRatVoice,
   type RatAnswerPlan,
@@ -32,6 +36,14 @@ export interface CapabilityManifest {
     launchAuthorized: boolean;
     tokenState?: string;
     explicitOwnerLaunchAuthorityState?: string;
+  };
+  currentLaunchPlan?: {
+    chainId: number;
+    rail: string;
+    plan: string;
+    planDigest: string;
+    status: string;
+    historicalArcAuthority: string;
   };
   launchConfiguration?: {
     treasuryAddress: string;
@@ -124,6 +136,17 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
     launch.launchAuthorized !== false ||
     launch.tokenState !== 'NOT_LAUNCHED'
   ) throw new Error('CAPABILITY_MANIFEST_AUTHORIZATION_ESCALATION');
+  if (root.currentLaunchPlan !== undefined) {
+    const plan = record(root.currentLaunchPlan);
+    if (
+      plan.chainId !== PONS_LAUNCH_CHAIN_ID ||
+      plan.rail !== 'pons-v2-vault-stake-burn-candidate-v1' ||
+      plan.plan !== 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json' ||
+      plan.planDigest !== PONS_LAUNCH_PLAN_DIGEST ||
+      plan.status !== 'PLANNING_ONLY' ||
+      plan.historicalArcAuthority !== 'HISTORICAL_ONLY_NOT_PONS_AUTHORITY'
+    ) throw new Error('CAPABILITY_MANIFEST_PONS_PLAN_INVALID');
+  }
   if (root.launchConfiguration !== undefined) {
     const config = record(root.launchConfiguration);
     if (
@@ -139,10 +162,11 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
     const gateStatus = record(root.launchGateStatus);
     const statuses = record(gateStatus.statuses);
     if (
-      gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_V0.json' ||
+      gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_PONS_V1.json' ||
       typeof gateStatus.matrixDigest !== 'string' ||
       !/^[0-9a-f]{64}$/.test(gateStatus.matrixDigest) ||
-      gateStatus.blockingGateCount !== 2
+      !Number.isSafeInteger(gateStatus.blockingGateCount) ||
+      Number(gateStatus.blockingGateCount) < 1
     ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID');
     const ids = Object.keys(statuses).sort();
     if (JSON.stringify(ids) !== JSON.stringify([...REQUIRED_LAUNCH_GATE_IDS].sort())) {
@@ -169,6 +193,7 @@ const VALID_GATE_STATUSES = new Set([
   'PARTIAL',
   'BLOCKED_FUTURE_EVENT',
   'BLOCKED_OWNER_INPUT',
+  'BLOCKED_UPSTREAM_VERIFICATION',
   'BLOCKED_LEGAL'
 ]);
 
