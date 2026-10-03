@@ -23,6 +23,40 @@ jobs:
       - name: Check isolated Product Surface V2
         run: pnpm --dir web-v2 check
 
+  pons-preflight-live-readonly:
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-pons-preflight-v1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ROBINHOOD_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run read-only Pons preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${ROBINHOOD_RPC_URL:-}" || {
+            echo "ROBINHOOD_RPC_URL is not configured"
+            exit 1
+          }
+          pnpm --silent exec tsx scripts/verify-pons-preflight.ts > pons-preflight-receipt.json
+          jq empty pons-preflight-receipt.json
+      - name: Upload Pons preflight receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-preflight-v1
+          path: pons-preflight-receipt.json
+          retention-days: 7
+          if-no-files-found: error
 
   rat-radar-candidate-deploy:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
