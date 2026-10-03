@@ -510,7 +510,7 @@ function renderFrontdoorProofStory(bag, scraps, scrapsFallback) {
       <div class="proof-step proof-signal">
         <span>THE RAT NOTICED</span>
         <h3>SMELLS FAMILIAR.</h3>
-        <p>Same Pons-reported deployer appears on <b>${escapeHtml(bag.priorLaunches)}</b> earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"}.</p>
+        <p>This Pons-reported deployer already appears on <b>${escapeHtml(bag.priorLaunches)}</b> earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"}. You don't start from zero—the older trail is already here.</p>
       </div>
       <div class="proof-arrow" aria-hidden="true">→</div>
       <div class="proof-step">
@@ -518,7 +518,7 @@ function renderFrontdoorProofStory(bag, scraps, scrapsFallback) {
         <div class="proof-scraps">${scrapMarkup}</div>
       </div>
       <div class="proof-action">
-        <span>TRAIL WORTH DIGGING?</span>
+        <span>SEE THE OLD TRAIL</span>
         <button class="button primary" type="button" data-proof-open="${escapeHtml(bag.id)}">DIG DEEPER <span>↗</span></button>
         <a class="proof-secondary" href="#garbage">SEE ALL FRESH GARBAGE →</a>
       </div>
