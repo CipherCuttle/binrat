@@ -2,106 +2,164 @@
 
 ## Objective
 
-Prepare BINRAT's public-facing prelaunch language without launching a token, publishing a contract, opening a presale, or enabling wallet/trading flows.
+Explain why `$BINRAT` exists without launching a token, publishing a contract,
+opening a presale, activating holder utility, enabling wallet/trading flows, or
+promising investment performance.
 
-This document governs presentation only. It does not create token-launch authority.
+This document governs presentation only. It creates no token-launch authority.
 
-## Current canonical status
+## Product-first token thesis
+
+`$BINRAT` is the culture, coordination and optional-capacity layer around BINRAT.
+
+The product must remain useful without the token. Public factual receipts, Case
+history, Trash Trails and evidence authority do not become more or less true for
+a holder.
+
+The intended reasons for a token are:
+
+1. help bankroll continued engineering, data, security, research and operations
+   through disclosed project/creator fee routes;
+2. give the BINRAT community a native culture and coordination asset;
+3. add product capacity progressively as real capabilities ship;
+4. later support bounded evidence-network mechanics such as collateralized
+   submissions, challenges, anti-spam cost and service obligations.
+
+None of those statements is a promise of appreciation, yield or holder return.
+
+## Current canonical presentation state
+
+The public token-facing surface is prelaunch and fail-closed.
 
 - product: **BINRAT**
 - ticker: **$BINRAT**
-- token: **NOT LIVE**
-- contract: **NOT PUBLISHED**
-- presale: **NONE**
+- product/intelligence rail: **Robinhood Chain 4663 / Pons V2**
+- token: **NOT LAUNCHED**
+- official contract: **NOT PUBLISHED**
+- private presale: **NONE**
+- hidden team allocation: **NONE**
 - wallet connection: **NONE**
-- treasury role: **OWNER-CONFIGURED PRE-LAUNCH** — `0xab063A9b53a2Ab832a941aE5890ea05c1672339D`
-- project fee recipient role: **OWNER-CONFIGURED PRE-LAUNCH** — `0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866`
-- production accounting: **DISABLED**
-- Holder Gate: **TOKEN_AUTHORITY_NOT_CONFIGURED**
-- live evidence feed: **NOT ENABLED**
-- consumer shell: fixture-only until the evidence gate authorizes otherwise
+- holder utility: **DISABLED PRELAUNCH**
+- launch authorization: **BLOCKED**
+- token marketing authorization: **NOT AUTHORIZED**
+- factual authority: **UNCHANGED BY TOKEN OWNERSHIP**
 
-The two configured wallets are future role declarations, not a token address, custody proof, observed token role, launch authorization, or evidence of a transaction. Until the canonical BINRAT site and `CipherCuttle/binrat` repository publish the same contract address together, no circulating contract should be treated as an official BINRAT contract.
+The Web surface should derive the current token state from the public fail-closed
+Dumpster Ledger where possible. If that state cannot be verified, the UI must
+show status unavailable / fail closed and must not promote a contract address.
 
-## Primary positioning
+No prelaunch contract, treasury, fee-recipient, deployer or personal-buyer
+address belongs in the token marketing section. Historical Arc role addresses
+are not Pons token-launch authority.
 
-**He gets the scraps. You get the receipts.**
+## Utility horizons
 
-BINRAT is a dumpster rat for Arc. New launches hit the bin; he follows the ArcPad-reported creator address, remembers older bags that are actually present in the evidence, and keeps the receipts.
+### Launch / early
 
-The joke is the rat. The evidence boundary is not a joke.
+Candidate capacity surfaces include:
 
-## X / social bio draft
+- Rat Radar depth;
+- additional Rat Watch capacity;
+- richer filters;
+- API/webhook capacity;
+- Rat Den access when separately authorized.
 
-> 🐀 dumpster rat on Arc // digs through new launches // follows reported creator addresses // keeps receipts // $BINRAT NOT LIVE
+Core receipts remain public.
 
-The exact X handle `@binrat` is **not available for BINRAT branding** as of the 2026-09-17 check; it resolves to an existing account. Do not claim, link, or imply ownership of `@binrat`. A distinct official handle must be selected and verified before public launch materials link to X.
+### Growing utility
 
-## Prelaunch pinned-post draft
+Candidate coordination surfaces include:
 
-> 🐀 BINRAT
->
-> new Arc launches go in the dumpster.
-> the rat follows the ArcPad-reported creator address, remembers old bags, and keeps the receipts.
->
-> no risk score. no buy call. no paid placement.
->
-> $BINRAT IS NOT LIVE.
-> NO CONTRACT PUBLISHED.
-> NO PRESALE.
->
-> he gets the scraps. you get the receipts.
+- Trash Hunts;
+- Dumpster Raids;
+- Bounty Boost;
+- Case Sponsor;
+- Rat Credits;
+- Rat Reputation.
+
+Economic stake can influence attention or capacity. It cannot decide truth.
+
+### Rat network
+
+Later, separately authorized mechanics may include:
+
+- bonded submissions;
+- bonded challenges;
+- anti-spam / Sybil cost;
+- Rat Node bonds.
+
+These require their own engineering, security and compliance gates.
+
+## Fair-launch intent
+
+The intended launch posture is:
+
+- no private presale;
+- no discounted insider round;
+- no hidden team allocation;
+- public launch mechanics;
+- disclosed project/creator fee route;
+- disclosed treasury roles when current Pons roles are actually frozen;
+- disclosed founder/project purchases, if any;
+- no return promise.
+
+Fair access does not mean pretending project revenue does not exist.
+
+## Publication rule
+
+Before independent launch verification, render:
+
+```text
+$BINRAT IS NOT LIVE
+NO OFFICIAL CONTRACT HAS BEEN PUBLISHED
+```
+
+A contract address may appear only after an independently verified launch receipt
+produces publication eligibility and a separately authorized publication step
+updates the canonical surfaces.
+
+A manifest, simulation, old address, copied address, or submitter-provided address
+does not make a contract official.
 
 ## Launch-announcement template
 
 **DO NOT PUBLISH UNTIL EXPLICIT TOKEN-LAUNCH AUTHORITY EXISTS.**
 
-Replace every placeholder only after the launch gate passes and the same address is published to the canonical site and repository in the same release:
+After independent verification and separately authorized publication:
 
-> 🐀 $BINRAT is live on Arc.
->
-> contract: `[CONTRACT_ADDRESS]`
-> canonical site: `[CANONICAL_SITE]`
->
-> if the address does not match both places, it is not the official BINRAT contract.
->
-> the dumpster stays free. the receipts stay public.
+```text
+$BINRAT is live on Robinhood Chain / Pons.
 
-## Launch gate for presentation
+contract: [VERIFIER-DERIVED_CANONICAL_ADDRESS]
+canonical site: [CANONICAL_SITE]
 
-The launch-announcement template remains blocked until all of the following are explicit and current:
+If the address does not match the canonical publication receipt, it is not the
+official BINRAT contract.
 
-1. 72-hour HOT GARBAGE evidence gate has matured and been evaluated;
-2. exact-name/ticker collision sweep has been repeated immediately before launch;
-3. official social handles and canonical site have been verified immediately before launch;
-4. explicit owner token-launch authority exists;
-5. final contract/source has been independently verified;
-6. canonical site and repository are updated with the identical address in one bounded release;
-7. no claim is made about returns, price appreciation, safety, staking yield, guaranteed liquidity, or investment performance.
-
-## Collision note
-
-A preliminary search on 2026-09-17 did not surface an obvious active exact-name BINRAT crypto project on general search or major token-index search results. This is not authoritative proof of global uniqueness and must be repeated immediately before launch.
-
-The exact X handle `@binrat` is already occupied. Product/ticker identity and social-handle availability are separate checks.
+The product stays useful without the coin. The receipts stay public.
+```
 
 ## Prohibited presentation
 
 Do not publish:
 
 - BUY NOW / SELL NOW calls;
-- guaranteed returns or price targets;
-- `100x` / moon promises;
+- guaranteed returns, APY, yield or price targets;
+- "100x" / moon promises;
 - presale language while presale status is NONE;
-- a contract address before explicit launch authority;
-- links to an unverified social account;
+- a contract address before independent verification and publication authority;
 - fake holder utility;
-- fake live-feed screenshots;
-- wallet-connect prompts before wallet functionality is deliberately authorized;
-- language implying BINRAT certifies a token as safe.
+- fake scarcity or fake urgency;
+- fake live screenshots;
+- wallet-connect prompts before deliberately authorized wallet functionality;
+- language implying token ownership can change evidence truth.
 
 ## Permanent boundary
 
-BINRAT's evidence layer remains useful without owning `$BINRAT`.
+The token may fund BINRAT.
 
-Token branding and distribution must never change the factual evidence shown for a launch.
+The token may coordinate BINRAT.
+
+The token may make BINRAT more fun.
+
+**The token never gets to rewrite a receipt.**

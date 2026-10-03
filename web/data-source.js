@@ -51,6 +51,9 @@ export async function loadDumpsterLedger() {
   if (
     value?.schemaVersion !== "binrat.dumpster-ledger/0.1" ||
     value.projectionVersion !== "BINRAT_DUMPSTER_LEDGER_V0" ||
+    value.tokenState !== "NOT_LAUNCHED" ||
+    value.launchAuthorization !== "BLOCKED" ||
+    value.marketingAuthorized !== false ||
     value.chainId !== 5042 ||
     !["PRE_LAUNCH_AUTHORITIES_CONFIGURED", "FAIL_CLOSED"].includes(
       value.accountingState,

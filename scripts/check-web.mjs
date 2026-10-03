@@ -48,6 +48,17 @@ const requiredHtml = [
   'USEFUL WORK EARNS A RECEIPT.',
   'GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.',
   'UNBADGED = ROADMAP DIRECTION, NOT A LIVE CLAIM.',
+  '06 / $BINRAT',
+  'THE RAT',
+  'NEEDS A COIN.',
+  '$BINRAT is the culture and coordination layer around BINRAT.',
+  'BANKROLL THE BUILD',
+  'COORDINATE ATTENTION',
+  'COLLATERAL, NOT TRUTH.',
+  'THE TOKEN NEVER GETS TO REWRITE A RECEIPT.',
+  '$BINRAT IS NOT LIVE',
+  'NO OFFICIAL CONTRACT HAS BEEN PUBLISHED',
+  'NO PRIVATE PRESALE',
   './assets/binrat-hero.webp',
   './assets/roadmap-sniff.webp',
   './share-card.css'
@@ -82,6 +93,11 @@ if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Erro
 if (!html.includes('Event-driven. User-requested. No fake urgency. No engagement pings.')) throw new Error('WEB_TELEGRAM_NOTIFICATION_BOUNDARY_MISSING');
 if (!html.includes('A watched reported deployer showed up again.')) throw new Error('WEB_TELEGRAM_DEPLOYER_ALERT_BOUNDARY_MISSING');
 if (!dataSource.includes('fetch("/api/capabilities"')) throw new Error('WEB_CAPABILITY_MANIFEST_SOURCE_MISSING');
+if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('WEB_TOKEN_PRELAUNCH_VALIDATION_MISSING');
+if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('WEB_TOKEN_LAUNCH_GATE_VALIDATION_MISSING');
+if (!dataSource.includes('value.marketingAuthorized !== false')) throw new Error('WEB_TOKEN_MARKETING_GATE_VALIDATION_MISSING');
+if (!app.includes('bootstrapTokenCapabilities')) throw new Error('WEB_TOKEN_RUNTIME_UTILITY_STATUS_MISSING');
+if (!app.includes('renderTokenPrelaunchState')) throw new Error('WEB_TOKEN_RUNTIME_PRELAUNCH_STATE_MISSING');
 if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_RUNTIME_STATUS_MISSING');
 if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
 if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');

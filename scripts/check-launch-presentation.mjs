@@ -3,16 +3,28 @@ import { readFileSync } from 'node:fs';
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../web/launch-presentation.css', import.meta.url), 'utf8');
 const launchDoc = readFileSync(new URL('../docs/LAUNCH_PRESENTATION_V0.md', import.meta.url), 'utf8');
+const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url), 'utf8');
+const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 
 const requiredHtml = [
-  '$BINRAT IS NOT LIVE.',
-  'NO CONTRACT PUBLISHED',
-  'NO PRESALE',
+  'THE RAT',
+  'NEEDS A COIN.',
+  '$BINRAT is the culture and coordination layer around BINRAT.',
+  'BANKROLL THE BUILD',
+  'NATIVE CULTURE ASSET',
+  'COORDINATE ATTENTION',
+  'GROW THE EVIDENCE NETWORK',
+  'CULTURE + CAPACITY.',
+  'POINT THE PACK.',
+  'COLLATERAL, NOT TRUTH.',
+  'THE TOKEN NEVER GETS TO REWRITE A RECEIPT.',
+  '$BINRAT IS NOT LIVE',
+  'NO OFFICIAL CONTRACT HAS BEEN PUBLISHED',
+  'NO PRIVATE PRESALE',
   'NO WALLET CONNECTION',
-  '0xab063A9b53a2Ab832a941aE5890ea05c1672339D',
-  '0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866',
-  'ACCOUNTING OFF · HOLDER GATE OFF · LAUNCH BLOCKED',
-  'TOKEN STATUS',
+  'DISABLED PRELAUNCH',
+  'NOT AUTHORIZED',
+  'TOKEN DOES NOT CHANGE FACTS',
   'og:title',
   'og:description',
   'twitter:card',
@@ -28,21 +40,33 @@ if (!css.includes('.anti-scam-strip')) throw new Error('LAUNCH_ANTI_SCAM_STYLE_M
 if (!launchDoc.includes('DO NOT PUBLISH UNTIL EXPLICIT TOKEN-LAUNCH AUTHORITY EXISTS.')) {
   throw new Error('LAUNCH_AUTHORITY_GATE_MISSING');
 }
-if (!launchDoc.includes('NOT LIVE') || !launchDoc.includes('NOT PUBLISHED') || !launchDoc.includes('presale: **NONE**')) {
+if (!launchDoc.includes('Robinhood Chain 4663 / Pons V2')) throw new Error('LAUNCH_PONS_AUTHORITY_MISSING');
+if (!launchDoc.includes('NOT LAUNCHED') || !launchDoc.includes('NOT PUBLISHED') || !launchDoc.includes('private presale: **NONE**')) {
   throw new Error('LAUNCH_STATUS_DOC_DRIFT');
 }
+if (!launchDoc.includes('The token never gets to rewrite a receipt.')) throw new Error('LAUNCH_TRUTH_BOUNDARY_MISSING');
+if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('LAUNCH_RUNTIME_TOKEN_STATE_NOT_FAIL_CLOSED');
+if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('LAUNCH_RUNTIME_AUTHORITY_NOT_FAIL_CLOSED');
+if (!app.includes('renderTokenPrelaunchState')) throw new Error('LAUNCH_RUNTIME_PRESENTATION_NOT_BOUND');
 
-const prelaunchCorpus = `${html}\n${launchDoc}`;
-const allowedAuthorities = new Set([
-  '0xab063A9b53a2Ab832a941aE5890ea05c1672339D',
-  '0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866'
-]);
-for (const address of prelaunchCorpus.match(/0x[0-9a-fA-F]{40}/g) ?? []) {
-  if (!allowedAuthorities.has(address)) throw new Error('LAUNCH_CONTRACT_ADDRESS_PUBLISHED_EARLY');
-}
+const tokenStart = html.indexOf('id="token-status"');
+const tokenEnd = html.indexOf('id="boundary"', tokenStart);
+if (tokenStart < 0 || tokenEnd < 0) throw new Error('LAUNCH_TOKEN_SECTION_NOT_FOUND');
+const tokenSection = html.slice(tokenStart, tokenEnd);
 
-for (const prohibited of ['BUY NOW', 'PRESALE OPEN', 'GUARANTEED RETURNS', '100X GUARANTEED']) {
-  if (html.toUpperCase().includes(prohibited)) throw new Error(`LAUNCH_PRESENTATION_PROHIBITED:${prohibited}`);
+if (/0x[0-9a-fA-F]{40}/.test(tokenSection)) throw new Error('LAUNCH_PRELAUNCH_ADDRESS_EXPOSED_IN_TOKEN_SECTION');
+if (/0x[0-9a-fA-F]{40}/.test(launchDoc)) throw new Error('LAUNCH_PRELAUNCH_ADDRESS_EXPOSED_IN_PRESENTATION_DOC');
+
+for (const prohibited of [
+  'BUY NOW',
+  'PRESALE OPEN',
+  'GUARANTEED RETURNS',
+  '100X GUARANTEED',
+  'GUARANTEED APY',
+  'PRICE WILL',
+  'NUMBER GO UP'
+]) {
+  if (tokenSection.toUpperCase().includes(prohibited)) throw new Error(`LAUNCH_PRESENTATION_PROHIBITED:${prohibited}`);
 }
 
 console.log('BINRAT launch-presentation invariants: PASS');

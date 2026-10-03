@@ -142,6 +142,7 @@ sectionNav?.addEventListener("click", (event) => {
 });
 
 void bootstrapRoadmapCapabilities();
+void bootstrapTokenCapabilities();
 void bootstrapLedger();
 await bootstrap();
 if (WEB_DATA_SOURCE_MODE === "LIVE") {
@@ -221,6 +222,35 @@ async function bootstrapRoadmapCapabilities() {
   }
 }
 
+async function bootstrapTokenCapabilities() {
+  const rail = document.querySelector(".token-prelaunch-source");
+  const targets = document.querySelectorAll("[data-token-capability]");
+  if (!rail || targets.length === 0) return;
+
+  if (WEB_DATA_SOURCE_MODE !== "LIVE") {
+    rail.textContent = "FIXTURE MODE / STATUS NOT PROMOTED";
+    return;
+  }
+
+  try {
+    const manifest = await loadCapabilityManifest();
+    if (!manifest) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
+    const statuses = roadmapCapabilityStatuses(manifest.capabilities);
+    let applied = 0;
+    for (const target of targets) {
+      const status = statuses[target.dataset.tokenCapability];
+      if (!status) continue;
+      target.dataset.status = status;
+      applied += 1;
+    }
+    rail.textContent = applied > 0
+      ? "RUNTIME CAPABILITY MANIFEST"
+      : "MANIFEST LOADED / NO UTILITY BADGES RESOLVED";
+  } catch {
+    rail.textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
+  }
+}
+
 function roadmapCapabilityStatuses(capabilities) {
   const out = {};
   const pons = capabilities?.robinhoodLiveIntelligenceV1;
@@ -294,14 +324,41 @@ async function bootstrapLedger() {
     renderUtility("#ledger-shipped", ledger.utilityStatus.shipped);
     renderUtility("#ledger-building", ledger.utilityStatus.building);
     renderUtility("#ledger-planned", ledger.utilityStatus.planned);
+    renderTokenPrelaunchState(ledger);
   } catch (error) {
     section.dataset.ledgerState = "FAIL_CLOSED";
     document.querySelector("#ledger-funding-status").textContent =
       "PUBLIC LEDGER UNAVAILABLE / FAIL CLOSED";
     document.querySelector("#ledger-explanation").textContent =
       "The funding projection could not be verified. No wallet or balance is being presented as production truth.";
+    const tokenSection = document.querySelector("#token-status");
+    if (tokenSection) tokenSection.dataset.tokenState = "UNVERIFIED";
+    const tokenPublicState = document.querySelector("#token-public-state");
+    const tokenContractState = document.querySelector("#token-contract-state");
+    const tokenLaunchGate = document.querySelector("#token-launch-gate");
+    const tokenMarketingGate = document.querySelector("#token-marketing-gate");
+    if (tokenPublicState) tokenPublicState.textContent = "TOKEN STATUS UNAVAILABLE";
+    if (tokenContractState) tokenContractState.textContent = "NO CONTRACT PROMOTED BY THIS SURFACE";
+    if (tokenLaunchGate) tokenLaunchGate.textContent = "UNVERIFIED / FAIL CLOSED";
+    if (tokenMarketingGate) tokenMarketingGate.textContent = "UNVERIFIED / FAIL CLOSED";
     console.error(error);
   }
+}
+
+function renderTokenPrelaunchState(ledger) {
+  const section = document.querySelector("#token-status");
+  if (!section) return;
+  section.dataset.tokenState = ledger.tokenState;
+  document.querySelector("#token-public-state").textContent =
+    ledger.tokenState === "NOT_LAUNCHED" ? "$BINRAT IS NOT LIVE" : "TOKEN STATE UNVERIFIED";
+  document.querySelector("#token-contract-state").textContent =
+    ledger.tokenState === "NOT_LAUNCHED"
+      ? "NO OFFICIAL CONTRACT HAS BEEN PUBLISHED"
+      : "OFFICIAL CONTRACT STATE UNVERIFIED";
+  document.querySelector("#token-launch-gate").textContent =
+    ledger.launchAuthorization === "BLOCKED" ? "BLOCKED" : "UNVERIFIED";
+  document.querySelector("#token-marketing-gate").textContent =
+    ledger.marketingAuthorized === false ? "NOT AUTHORIZED" : "UNVERIFIED";
 }
 
 function renderUtility(selector, items) {
