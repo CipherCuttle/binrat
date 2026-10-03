@@ -146,8 +146,6 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
       plan.status !== 'PLANNING_ONLY' ||
       plan.historicalArcAuthority !== 'HISTORICAL_ONLY_NOT_PONS_AUTHORITY'
     ) throw new Error('CAPABILITY_MANIFEST_PONS_PLAN_INVALID');
-  } else {
-    throw new Error('CAPABILITY_MANIFEST_PONS_PLAN_MISSING');
   }
   if (root.launchConfiguration !== undefined) {
     const config = record(root.launchConfiguration);
