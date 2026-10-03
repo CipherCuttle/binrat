@@ -44,7 +44,7 @@ test('canonical Pons V1 gate matrix is complete, digested, and blocks on upstrea
 
   const manifest = await json(MANIFEST_URL);
   validateLaunchGateStatusConsistency(validated, manifest);
-  assert.equal(manifest.launchGateStatus.blockingGateCount, 3);
+  assert.equal(manifest.launchGateStatus.blockingGateCount, 5);
 });
 
 test('Arc 5042 matrix remains historical evidence and cannot become current Pons authority', async () => {
@@ -90,13 +90,27 @@ test('future Pons token execution cannot satisfy without token, transaction, blo
   assert.equal(gate.blocksLaunchAuthorization, true);
 });
 
+test('final allocation and Working Rat readiness both count as launch blockers', async () => {
+  const matrix = validateLaunchGateMatrix(await json(MATRIX_URL));
+  assert.equal(
+    matrix.gates.rat_radar_free_value_and_holder_gate_smoke.blocksLaunchAuthorization,
+    true
+  );
+  assert.equal(
+    matrix.gates.allocation_and_privileged_inventory_disclosure.blocksLaunchAuthorization,
+    true
+  );
+});
+
 test('Working Rat remains partial until a reviewed active-stake source exists', async () => {
   const matrix = validateLaunchGateMatrix(await json(MATRIX_URL));
   const holder = matrix.gates.rat_radar_free_value_and_holder_gate_smoke;
   assert.equal(holder.status, 'PARTIAL');
   assert.equal(holder.liveEvidence.entitlementModel, 'ACTIVE_STAKE_WORKING_RAT_PLANNED');
-  assert.equal(holder.liveEvidence.stakeSource, 'NOT_IMPLEMENTED');
+  assert.equal(holder.liveEvidence.stakeSource, 'L1B_STAKED_OF_PINNED_L2_NOT_IMPLEMENTED');
+  assert.equal(holder.liveEvidence.stakeReadSelector, '0xaf500ba3');
   assert.equal(holder.liveEvidence.productionEligibilityActive, false);
+  assert.equal(holder.blocksLaunchAuthorization, true);
 });
 
 test('all mandatory gates and explicit owner authority remain required', async () => {
