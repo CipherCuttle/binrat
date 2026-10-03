@@ -4,7 +4,7 @@
   "frozenOn": "2026-10-03",
   "chainId": 4663,
   "launchPlanPath": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-  "launchPlanDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
+  "launchPlanDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
   "historicalArcMatrix": {
     "path": "docs/LAUNCH_GATE_MATRIX_V0.json",
     "digest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b",
@@ -40,7 +40,7 @@
         "docs/PONSVault_STAKING_ATTESTATION_V1.json"
       ],
       "evidenceDigests": [
-        "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
+        "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
         "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c",
         "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d"
       ],
@@ -57,11 +57,11 @@
         "rejectedStakeBurnCandidateStatus": "FAIL_DEFER_CURRENT_CANDIDATE",
         "stakingAttestationStatus": "CONDITIONAL",
         "ponsVaultSourceMatch": "NOT_SATISFIED",
-        "explicitUpstreamRiskAcceptance": "NOT_GRANTED",
+        "explicitUpstreamRiskAcceptance": "ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY",
         "immutableLaunchInputsFrozen": false
       },
       "verificationDate": "2026-10-03",
-      "exactRemainingRequirement": "Before launch authorization, explicitly accept or eliminate the unaudited shared-beacon/EOA upgrade risk, resolve authoritative PonsVault source/ABI if available, and re-read registry/factory/beacon/implementation/owner plus the atomic Staking launch path against the exact manifest.",
+      "exactRemainingRequirement": "Before launch authorization, preserve disclosure of the accepted third-party upgrade risk, resolve authoritative PonsVault source/ABI if available, and freshly re-read registry/factory/beacon/implementation/owner plus canLaunch and the atomic Staking launch path against the exact reviewed manifest.",
       "blocksLaunchAuthorization": true
     },
     "actual_token_address_and_launch_execution_receipt": {
@@ -213,15 +213,16 @@
         "privatePresale": "NO",
         "discountedInsiderRound": "NO",
         "hiddenTeamAllocation": "NO",
-        "openingBuy": "UNRESOLVED",
-        "postLaunchOnChainVerification": "REQUIRED_NOT_YET_AVAILABLE"
+        "openingBuy": "ZERO_ETH_OWNER_SELECTED",
+        "postLaunchOnChainVerification": "REQUIRED_NOT_YET_AVAILABLE",
+        "creatorTaxBps": 0
       },
       "verificationDate": "2026-10-03",
-      "exactRemainingRequirement": "Freeze any opening buy and final Pons allocation semantics in the launch manifest, then verify them against the real launch transaction.",
+      "exactRemainingRequirement": "Bind the owner-selected 0% creator tax, 0 ETH opening buy, no private presale/discounted round/hidden team allocation into the final manifest, then verify those semantics against the real launch transaction.",
       "blocksLaunchAuthorization": true
     }
   },
   "explicitOwnerLaunchAuthorityState": "NOT_GRANTED",
   "launchAuthorization": "BLOCKED",
-  "matrixDigest": "91b0f8e791d34fcf8089ba5c08f9dc477dab1b469bb8b1815422920dd2c965d9"
+  "matrixDigest": "8d49c8c7c5941858b7fe15e20273c6774df0b8baf30738863c816010d0a0298d"
 }
