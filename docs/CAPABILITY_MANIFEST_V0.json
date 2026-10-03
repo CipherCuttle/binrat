@@ -6,11 +6,11 @@
     "philosophy": "docs/PHILOSOPHY.md",
     "tokenLaunch": "docs/TOKEN_LAUNCH_DOCTRINE.md",
     "launchMechanicsReceipt": "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
-    "launchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
     "launchExecutionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
     "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
     "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md",
-    "currentLaunchPlan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json"
+    "currentLaunchPlan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
+    "historicalArcLaunchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json"
   },
   "capabilities": {
     "intelligenceV1": {
@@ -37,9 +37,9 @@
       "publicStatus": "PRE_LAUNCH_TRANSPARENCY_LIVE",
       "endpoint": "/api/dumpster-ledger",
       "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
-      "productionFundingAuthority": "PRELAUNCH_AUTHORITIES_CONFIGURED",
+      "productionFundingAuthority": "CURRENT_PONS_WALLET_ROLES_NOT_CONFIGURED",
       "productionAccountingActive": false,
-      "configuredWalletCount": 2
+      "configuredWalletCount": 0
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",
@@ -69,7 +69,7 @@
       "publicStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
       "walletAuthStatus": "DISABLED_BY_DEFAULT",
       "productionHolderEligibilityActive": false,
-      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY"
+      "configuredAuthorityDisplay": "NO_CURRENT_PONS_WALLET_AUTHORITY"
     },
     "launchMechanicsV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -94,11 +94,11 @@
     },
     "launchMechanicsPonsV1": {
       "engineeringStatus": "BUILDING",
-      "verificationStatus": "BLOCKED_UPSTREAM_RISK_ACCEPTANCE",
+      "verificationStatus": "BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST",
       "chainId": 4663,
       "selectedCandidateRail": "pons-v2-vault-staking-candidate-v1",
       "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-      "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
+      "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
       "launchAuthorizationEffect": "BLOCKS_UNTIL_SATISFIED"
     },
     "launchPlanPonsV1": {
@@ -106,19 +106,9 @@
       "publicStatus": "PLANNING_ONLY_NOT_LAUNCH_AUTHORITY",
       "chainId": 4663,
       "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-      "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
+      "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
       "launchAuthorizationEffect": "NONE"
     }
-  },
-  "launchConfiguration": {
-    "configVersion": "BINRAT_LAUNCH_CONFIG_V0",
-    "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
-    "treasuryAddress": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D",
-    "projectFeeRecipientAddress": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866",
-    "tokenAddressState": "NOT_YET_CREATED",
-    "accountingActive": false,
-    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
-    "authorityScope": "HISTORICAL_ARC_V0_ROLE_BINDING_ONLY"
   },
   "launchAuthorization": {
     "status": "BLOCKED",
@@ -144,7 +134,7 @@
   },
   "launchGateStatus": {
     "matrix": "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
-    "matrixDigest": "91b0f8e791d34fcf8089ba5c08f9dc477dab1b469bb8b1815422920dd2c965d9",
+    "matrixDigest": "8d49c8c7c5941858b7fe15e20273c6774df0b8baf30738863c816010d0a0298d",
     "statuses": {
       "legal_compliance_artifacts": "BLOCKED_LEGAL",
       "launch_mechanics_verification_receipt": "BLOCKED_UPSTREAM_VERIFICATION",
@@ -164,8 +154,34 @@
     "chainId": 4663,
     "rail": "pons-v2-vault-staking-candidate-v1",
     "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-    "planDigest": "5928ee304c57af6814eb97277bd59700d0cf2a530d90c4c6abf5cbbe5c0039ae",
+    "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
     "status": "PLANNING_ONLY",
     "historicalArcAuthority": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
+  },
+  "historicalArcLaunchConfiguration": {
+    "configVersion": "BINRAT_LAUNCH_CONFIG_V0",
+    "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+    "treasuryAddress": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D",
+    "projectFeeRecipientAddress": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866",
+    "tokenAddressState": "NOT_YET_CREATED",
+    "accountingActive": false,
+    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+    "authorityScope": "HISTORICAL_ARC_V0_ROLE_BINDING_ONLY_NOT_CURRENT_PUBLIC_ROLE_SOURCE"
+  },
+  "currentPonsLaunchConfiguration": {
+    "authorityScope": "CURRENT_PONS_V1_PRELAUNCH",
+    "chainId": 4663,
+    "treasuryAddress": null,
+    "launchWalletAddress": null,
+    "creatorFeeRecipientAddress": null,
+    "tokenAddressState": "NOT_YET_CREATED",
+    "accountingActive": false,
+    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+    "creatorTaxBps": 0,
+    "openingBuyWei": "0",
+    "privatePresale": "NONE",
+    "discountedInsiderRound": "NONE",
+    "hiddenTeamAllocation": "NONE",
+    "walletRoleStatus": "UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC"
   }
 }
