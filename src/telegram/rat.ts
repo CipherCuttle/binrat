@@ -140,7 +140,7 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
     const plan = record(root.currentLaunchPlan);
     if (
       plan.chainId !== PONS_LAUNCH_CHAIN_ID ||
-      plan.rail !== 'pons-v2-vault-stake-burn-candidate-v1' ||
+      plan.rail !== 'pons-v2-vault-staking-candidate-v1' ||
       plan.plan !== 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json' ||
       plan.planDigest !== PONS_LAUNCH_PLAN_DIGEST ||
       plan.status !== 'PLANNING_ONLY' ||
