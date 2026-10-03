@@ -9,6 +9,7 @@ import { D1RatRadarStore } from '../src/cloudflare/ratRadarStore.js';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { D1Store } from '../src/cloudflare/d1Store.js';
 import { D1SyncLeaseStore } from '../src/cloudflare/syncLease.js';
+import { buildPublicSnapshot, publicStatus, publishPublicSnapshot, readPublicSnapshot } from '../src/cloudflare/publicSnapshot.js';
 import type {
   D1DatabaseLike,
   D1PreparedStatementLike,
@@ -503,6 +504,9 @@ test('Pons partial slice retains the previous verified runtime boundary until it
       lastObservationError:null,
       updatedAtMs:100_000
     });
+    const initialSnapshot=await buildPublicSnapshot({schemaVersion:'binrat.latest-launches/0.1',chainId:4663,
+      sourceCheckpoint:previousTarget.toString(),checkpointBlockHash:hash(previousTarget),historyCoverage:'PARTIAL',launches:[]});
+    await publishPublicSnapshot(db,initialSnapshot,100_000);
 
     const first=await runCloudflarePonsSyncCycle(
       {DB:db,BINRAT_PONS_MAX_BATCH_BLOCKS:'512'},
@@ -516,6 +520,7 @@ test('Pons partial slice retains the previous verified runtime boundary until it
     assert.equal(retained?.updatedAtMs,100_000);
     const partialCheckpoint=await store.getCheckpoint();
     assert.equal(partialCheckpoint?.blockNumber,previousTarget+512n);
+    assert.equal((await readPublicSnapshot(db))?.feedDigest,initialSnapshot.feedDigest);
 
     const second=await runCloudflarePonsSyncCycle(
       {DB:db,BINRAT_PONS_MAX_BATCH_BLOCKS:'512'},
@@ -527,6 +532,24 @@ test('Pons partial slice retains the previous verified runtime boundary until it
     assert.equal(advanced?.targetBlock,latestTarget);
     assert.equal(advanced?.liveCaughtUp,true);
     assert.equal(advanced?.updatedAtMs,121_000);
+    const published=await readPublicSnapshot(db);
+    assert.equal(published?.checkpointBlock,latestTarget.toString());
+    assert.notEqual(published?.feedDigest,initialSnapshot.feedDigest);
+
+    source.getHeadBlockNumber=async()=>{throw Object.assign(new Error('temporary RPC failure'),{name:'TimeoutError'});};
+    const failed=await runCloudflarePonsSyncCycle(
+      {DB:db},
+      {kind:'PONS_SYNC_CYCLE',cycleId:'pons-public-snapshot-retain-after-failure',enqueuedAtMs:122_000},
+      {now:()=>122_000,ponsLaunchSource:source}
+    );
+    assert.equal(failed.status,'RETRY');
+    assert.equal((await readPublicSnapshot(db))?.feedDigest,published?.feedDigest);
+    assert.equal((await publicStatus(db,122_000,180_000)).state,'STALE_VERIFIED');
+    const deepHealth=await (await import('../src/cloudflare/worker.js')).default.fetch(
+      new Request('https://binrat.example/api/health'),{DB:db}
+    );
+    assert.equal(deepHealth.status,200);
+    assert.equal((await readPublicSnapshot(db))?.feedDigest,published?.feedDigest);
   } finally { store.close(); db.close(); }
 });
 

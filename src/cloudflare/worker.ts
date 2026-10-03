@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { executeAutonomousCommand, handleAutonomousCommand, parseAutonomousCommand, renderLegacyAutonomousOutcome } from '../autonomous/telegram.js';
 import type { AutonomousOutcome } from '../autonomous/outcome.js';
-import { discoverRats, latestPonsLaunches, latestPonsLaunchSnapshot, loadRatsSnapshot } from '../autonomous/rats.js';
+import { discoverRats, latestPonsLaunches, loadRatsSnapshot } from '../autonomous/rats.js';
 import { why } from '../autonomous/evidence.js';
 import { listWatches } from '../autonomous/watches.js';
 import { robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
@@ -43,6 +43,9 @@ import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from 
 import { D1RatWatchStore } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
+import { publicStatus, readPublicSnapshot } from './publicSnapshot.js';
+import { readCreatorSummary } from './creatorSummaryReadModel.js';
+import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { D1TelegramLedger } from './telegramLedger.js';
 import {
   D1HolderAuthStore,
@@ -454,16 +457,25 @@ export async function handleBinratApiRequest(
   try {
     if (pathname === '/api/capabilities') return capabilities(env);
     if (pathname === '/api/health') return health(env);
+    if (pathname === '/api/status') {
+      const status = await publicStatus(env.DB,deps.now(),maxStatusAgeMs(env));
+      return publicJson(request,200,status,await sha256Hex(status),
+        'public, max-age=5, s-maxage=5, must-revalidate');
+    }
     if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
     if (pathname === '/api/launches/latest') {
-      const snapshot = await latestPonsLaunchSnapshot(env.DB,deps.now(),20);
-      return json(200,{
-        schemaVersion:'binrat.latest-launches/0.1',
-        chainId:ROBINHOOD_CHAIN_ID,
-        sourceCheckpoint:snapshot.sourceCheckpoint,
-        historyCoverage:'PARTIAL',
-        launches:snapshot.launches
-      });
+      const published = await readPublicSnapshot(env.DB);
+      if (!published) return json(503,{ ready:false,reason:'NO_VERIFIED_SNAPSHOT' });
+      return publicJson(request,200,published.snapshot,published.feedDigest,
+        'public, max-age=15, s-maxage=60, stale-while-revalidate=300, stale-if-error=86400');
+    }
+    if (pathname.startsWith('/api/creator/') && pathname.endsWith('/summary')) {
+      const creator=pathname.slice('/api/creator/'.length,-'/summary'.length).toLowerCase();
+      if (!/^0x[0-9a-f]{40}$/.test(creator)) return json(400,{error:'CREATOR_ADDRESS_INVALID'});
+      const summary=await readCreatorSummary(env.DB,creator);
+      if (!summary) return json(404,{error:'CREATOR_NOT_INDEXED'});
+      return publicJson(request,200,summary,await sha256Hex(summary),
+        'public, max-age=15, s-maxage=60, stale-while-revalidate=300, stale-if-error=86400');
     }
 
     const ready = await readyContext(env);
@@ -550,7 +562,8 @@ export async function handleBinratApiRequest(
     }
 
     if (pathname.startsWith('/api/creator/')) {
-      const creator = pathname.slice('/api/creator/'.length).toLowerCase();
+      const creatorPath = pathname.slice('/api/creator/'.length).toLowerCase();
+      const creator = creatorPath;
       if (!/^0x[0-9a-f]{40}$/.test(creator)) return json(400, { error: 'CREATOR_ADDRESS_INVALID' });
       const creatorFile = await projectCreatorFile(feed, creator);
       return creatorFile ? json(200, creatorFile) : json(404, { error: 'CREATOR_NOT_INDEXED' });
@@ -1608,4 +1621,26 @@ function json(status: number, value: unknown): Response {
       'x-content-type-options': 'nosniff'
     }
   });
+}
+
+async function publicJson(
+  request:Request,
+  status:number,
+  value:unknown,
+  digest:string,
+  cacheControl:string
+):Promise<Response> {
+  const etag=`"${digest}"`;
+  const headers={
+    'cache-control':cacheControl,
+    'etag':etag,
+    'x-content-type-options':'nosniff'
+  };
+  const condition=request.headers.get('if-none-match');
+  if (condition && condition.split(',').some((item)=>item.trim()==='*'||item.trim().replace(/^W\//,'')===etag)) {
+    return new Response(null,{status:304,headers});
+  }
+  // Validate canonical serializability before an edge cache stores the response.
+  canonicalJson(value);
+  return Response.json(value,{status,headers});
 }

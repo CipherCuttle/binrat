@@ -37,6 +37,8 @@ import { D1PonsFundingStore } from './ponsFundingStore.js';
 import { D1Store } from './d1Store.js';
 import { D1SyncLeaseStore } from './syncLease.js';
 import type { D1DatabaseLike } from './d1Types.js';
+import { latestPonsLaunchSnapshot } from '../autonomous/rats.js';
+import { buildPublicSnapshot, publishPublicSnapshot } from './publicSnapshot.js';
 
 export interface SyncQueueProducerLike {
   send(body: BinratSyncMessage): Promise<unknown>;
@@ -704,6 +706,17 @@ export async function runCloudflarePonsSyncCycle(
       observationReady: false, historyBackfillComplete: false, historyBackfillTargetBlock: null,
       lastSyncError: null, lastHistoryError: null, lastObservationError: null, updatedAtMs
     });
+    // Publish only at a completed verified Pons synchronization point. The
+    // public snapshot is one atomic row; a failed build/write retains its prior value.
+    if (liveCaughtUp && report.targetBlock !== null && after?.blockNumber === report.targetBlock) {
+      const latest = await latestPonsLaunchSnapshot(env.DB,updatedAtMs,20);
+      const snapshot = await buildPublicSnapshot({
+        schemaVersion:'binrat.latest-launches/0.1',chainId:ROBINHOOD_CHAIN_ID,
+        sourceCheckpoint:latest.sourceCheckpoint,checkpointBlockHash:latest.checkpointBlockHash,
+        historyCoverage:'PARTIAL',launches:latest.launches
+      });
+      await publishPublicSnapshot(env.DB,snapshot,updatedAtMs);
+    }
     return { status: 'SUCCESS', liveCaughtUp };
   } catch (error) {
     const code = reportSyncFailure(message.cycleId, 'RUNTIME_D1', error);
