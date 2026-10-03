@@ -10,7 +10,7 @@ import {
   PONS_STAKING_IMPLEMENTATION_V1,
   PONS_VAULT_UPSTREAM_OWNER_V1,
   registryStakingFactoryCalldata,
-  unresolvedExactManifestInputs,
+  unresolvedExactLaunchSimulationInputs,
   validatePonsPreflightReceipt
 } from '../src/launchConfig/ponsPreflight.js';
 import {
@@ -39,15 +39,13 @@ test('registry staking lookup is fixed bytes32 and exact manifest inputs remain 
     `0x9aeb4297${'7374616b696e67'.padEnd(64, '0')}`
   );
   assert.deepEqual(
-    unresolvedExactManifestInputs(await plan()).sort(),
+    unresolvedExactLaunchSimulationInputs(await plan()).sort(),
     [
       'expectedEconomics',
       'launchConfigId',
       'launchWalletAddress',
       'minimumFeesBeforePayoutWei',
       'tokenMetadata',
-      'treasuryAddress',
-      'workingRatMinStakeRaw'
     ].sort()
   );
 });
@@ -105,7 +103,7 @@ test('Pons preflight cannot hide unresolved owner inputs or authorize launch', a
 });
 
 async function fixture(launchPlan: Awaited<ReturnType<typeof plan>>): Promise<any> {
-  const missingInputs = unresolvedExactManifestInputs(launchPlan);
+  const missingInputs = unresolvedExactLaunchSimulationInputs(launchPlan);
   const value: any = {
     schemaVersion: PONS_PREFLIGHT_SCHEMA_VERSION,
     preflightVersion: PONS_PREFLIGHT_VERSION,
