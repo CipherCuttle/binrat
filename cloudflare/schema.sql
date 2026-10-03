@@ -24,6 +24,12 @@ CREATE TABLE IF NOT EXISTS launches (
 );
 CREATE INDEX IF NOT EXISTS idx_launches_chain_block ON launches(chain_id, block_number);
 CREATE INDEX IF NOT EXISTS idx_launches_creator_order ON launches(chain_id, creator, block_number, log_index);
+CREATE INDEX IF NOT EXISTS idx_launches_chain_source_block_numeric
+  ON launches(chain_id, source, CAST(block_number AS INTEGER), log_index, launch_id);
+CREATE INDEX IF NOT EXISTS idx_launches_chain_block_numeric
+  ON launches(chain_id, CAST(block_number AS INTEGER));
+CREATE INDEX IF NOT EXISTS idx_launches_chain_source_creator_block_numeric
+  ON launches(chain_id, source, creator, CAST(block_number AS INTEGER), log_index, launch_id);
 
 CREATE TABLE IF NOT EXISTS pons_outcome_receipts (
   observation_id TEXT PRIMARY KEY,
@@ -173,6 +179,16 @@ CREATE TABLE IF NOT EXISTS chain_checkpoints (
   block_hash TEXT NOT NULL,
   guard_block_number TEXT,
   guard_block_hash TEXT
+);
+
+CREATE TABLE IF NOT EXISTS binrat_public_snapshots (
+  chain_id INTEGER PRIMARY KEY CHECK(chain_id = 4663),
+  checkpoint_block TEXT NOT NULL,
+  checkpoint_block_hash TEXT NOT NULL,
+  feed_digest TEXT NOT NULL,
+  snapshot_json TEXT NOT NULL,
+  verified_at_ms INTEGER NOT NULL,
+  publication_version INTEGER NOT NULL CHECK(publication_version > 0)
 );
 
 -- A failing CHECK inside D1 batch() aborts and rolls back the whole batch.

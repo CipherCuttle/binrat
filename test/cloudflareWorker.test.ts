@@ -5,6 +5,8 @@ import worker from '../src/cloudflare/worker.js';
 import { D1_SCHEMA_SQL } from '../src/cloudflare/d1Schema.js';
 import { D1RuntimeStateStore } from '../src/cloudflare/runtimeState.js';
 import { D1Store } from '../src/cloudflare/d1Store.js';
+import { latestPonsLaunchSnapshot } from '../src/autonomous/rats.js';
+import { buildPublicSnapshot, publishPublicSnapshot } from '../src/cloudflare/publicSnapshot.js';
 import { deriveEventId, deriveLaunchId } from '../src/core/identity.js';
 import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { buildProvenanceFact } from '../src/intelligence/provenance.js';
@@ -62,6 +64,9 @@ test('D1 launch count through checkpoint is exact without loading the full launc
     }
     assert.equal(await store.countLaunchesThroughBlock(100n),2);
     assert.equal(await store.countLaunchesThroughBlock(101n),3);
+    const plan=await db.prepare(`EXPLAIN QUERY PLAN SELECT COUNT(*) AS n FROM launches
+      WHERE chain_id=? AND CAST(block_number AS INTEGER)<=CAST(? AS INTEGER)`).bind(4663,'101').all<{detail:string}>();
+    assert.ok(plan.results?.some((row)=>row.detail.includes('idx_launches_chain_block_numeric')));
   } finally { store.close(); db.close(); }
 });
 
@@ -283,6 +288,10 @@ test('bounded latest-launch API exposes the newest canonical 4663 launches witho
     await runtime.put({sourceVerified:true,liveCaughtUp:true,headBlock:122n,targetBlock:120n,
       observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:null,
       lastHistoryError:null,lastObservationError:null,updatedAtMs:now});
+
+    const latest=await latestPonsLaunchSnapshot(db,now,20);
+    await publishPublicSnapshot(db,await buildPublicSnapshot({schemaVersion:'binrat.latest-launches/0.1',
+      chainId:4663,...latest,historyCoverage:'PARTIAL'}),now);
 
     const response=await worker.fetch(new Request('https://binrat.example/api/launches/latest'),{DB:db});
     assert.equal(response.status,200);
