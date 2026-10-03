@@ -66,7 +66,9 @@ test('investigation lifecycle requires real funding before assignment and submis
     type:'PAYMENT_CONFIRMED',
     eventId:'evt:paid',
     occurredAtMs:1200,
-    paymentReference:'payment:fixture-1'
+    paymentReference:'payment:fixture-1',
+    amountMinor:2500,
+    asset:'USDC'
   });
   const assigned=applyShadowInvestigationEvent(funded,{
     type:'ASSIGNED',
@@ -122,8 +124,10 @@ test('expired quotes cannot silently become funded jobs',()=>{
   assert.throws(()=>applyShadowInvestigationEvent(quoted,{
     type:'PAYMENT_CONFIRMED',
     eventId:'evt:p2',
-    occurredAtMs:1201,
-    paymentReference:'payment:late'
+    occurredAtMs:1200,
+    paymentReference:'payment:late',
+    amountMinor:1000,
+    asset:'FIAT'
   }),/SHADOW_QUOTE_EXPIRED/);
 });
 
@@ -152,4 +156,43 @@ test('evidence claims preserve source class and never auto-promote into canonica
     statement:'Same funding source.',
     refs:[]
   }),/SHADOW_EVIDENCE_REF_REQUIRED/);
+});
+
+
+test('payment confirmation must match the exact quoted amount and asset',()=>{
+  const created=createShadowInvestigation({
+    requestId:'req:3',
+    principalId:'tg:77',
+    chainId:4663,
+    launchId,
+    kind:'PREVIOUS_PROJECTS',
+    question:'Find prior projects supported by retained evidence.',
+    nowMs:1000
+  });
+  const quoted=applyShadowInvestigationEvent(created,{
+    type:'QUOTE_ISSUED',
+    eventId:'evt:q3',
+    occurredAtMs:1100,
+    amountMinor:1500,
+    asset:'USDC',
+    expiresAtMs:5000
+  });
+
+  assert.throws(()=>applyShadowInvestigationEvent(quoted,{
+    type:'PAYMENT_CONFIRMED',
+    eventId:'evt:p3',
+    occurredAtMs:1200,
+    paymentReference:'payment:wrong',
+    amountMinor:1499,
+    asset:'USDC'
+  }),/SHADOW_PAYMENT_QUOTE_MISMATCH/);
+
+  assert.throws(()=>applyShadowInvestigationEvent(quoted,{
+    type:'PAYMENT_CONFIRMED',
+    eventId:'evt:p4',
+    occurredAtMs:1200,
+    paymentReference:'payment:wrong-asset',
+    amountMinor:1500,
+    asset:'FIAT'
+  }),/SHADOW_PAYMENT_QUOTE_MISMATCH/);
 });
