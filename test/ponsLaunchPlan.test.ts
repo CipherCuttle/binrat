@@ -53,3 +53,15 @@ test('rejected Stake & Burn inputs cannot reappear as current immutable Staking 
   assert.equal('minimumFeesBeforeRun' in value.unresolvedImmutableInputs, false);
   assert.equal(value.unresolvedImmutableInputs.minimumFeesBeforePayoutWei, null);
 });
+
+test('stale Stake & Burn fields cannot coexist with current Staking authority', async () => {
+  const value = await plan();
+  value.launchRail.stakeBurnFactory = { address: '0x537483c5B33e2192CfB202d7C50d58975524B047' };
+  value.planDigest = await derivePonsLaunchPlanDigest(value);
+  await assert.rejects(validatePonsLaunchPlan(value), /STALE_STAKE_BURN_AUTHORITY/);
+
+  const staleInput = await plan();
+  staleInput.unresolvedImmutableInputs.stakeLockPeriodSeconds = null;
+  staleInput.planDigest = await derivePonsLaunchPlanDigest(staleInput);
+  await assert.rejects(validatePonsLaunchPlan(staleInput), /STALE_STAKE_BURN_INPUT/);
+});
