@@ -1,7 +1,7 @@
 # BINRAT ROADMAP
 
 Status: **canonical future-product authority**  
-Current capability/deployment status: `docs/CAPABILITY_MANIFEST_V0.json`  
+Current capability/deployment status: runtime `/api/capabilities` backed by `CAPABILITY_MANIFEST_JSON`  
 Language: `docs/PRODUCT_LANGUAGE.md`  
 Principles: `docs/PHILOSOPHY.md`
 

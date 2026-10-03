@@ -238,7 +238,11 @@ function roadmapCapabilityStatuses(capabilities) {
   }
 
   const replay = capabilities?.replayLab;
-  if (replay?.publicStatus === "PUBLIC_LIVE_BETA") out.replay_lab = "LIVE";
+  const replayScope = String(replay?.statusScope ?? "");
+  if (
+    replay?.publicStatus === "PUBLIC_LIVE_BETA" &&
+    !replayScope.startsWith("LEGACY_")
+  ) out.replay_lab = "LIVE";
   else if (replay?.engineeringStatus === "BUILDING") out.replay_lab = "BUILDING";
 
   const watch = capabilities?.ratWatchV0;

@@ -14,6 +14,7 @@ const brandAssetReceipt = readFileSync(new URL('../docs/BRAND_ASSET.md', import.
 const mascotUrl = new URL('../web/assets/binrat-hero.webp', import.meta.url);
 const roadmapRasterUrl = new URL('../web/assets/roadmap-sniff.webp', import.meta.url);
 const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e9917cb7f2138bd163';
+const expectedRoadmapRasterSha256 = '6aad1c3a02fd031b048adb5d6b9ac389af38c6834c5d782c7fd190f37788d969';
 
 const requiredHtml = [
   'BINRAT',
@@ -109,6 +110,8 @@ if (!reactBitsIsland.includes('prefers-reduced-motion')) throw new Error('WEB_RE
 
 if (!existsSync(mascotUrl)) throw new Error('WEB_CANONICAL_MASCOT_MISSING');
 if (!existsSync(roadmapRasterUrl)) throw new Error('WEB_ROADMAP_RASTER_MISSING');
+const roadmapRasterDigest = createHash('sha256').update(readFileSync(roadmapRasterUrl)).digest('hex');
+if (roadmapRasterDigest !== expectedRoadmapRasterSha256) throw new Error(`WEB_ROADMAP_RASTER_DIGEST_DRIFT:${roadmapRasterDigest}`);
 if (statSync(mascotUrl).size !== 256890) throw new Error('WEB_CANONICAL_MASCOT_SIZE_DRIFT');
 const mascotDigest = createHash('sha256').update(readFileSync(mascotUrl)).digest('hex');
 if (mascotDigest !== expectedMascotSha256) throw new Error(`WEB_CANONICAL_MASCOT_DIGEST_DRIFT:${mascotDigest}`);
