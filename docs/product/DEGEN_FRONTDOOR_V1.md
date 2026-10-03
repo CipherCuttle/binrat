@@ -518,7 +518,61 @@ This contract is accepted when:
 - backend/evidence boundaries remain unchanged;
 - no deploy, merge, token launch, wallet action or capability activation is authorized.
 
-## 13. Next bounded implementation slice
+## 13. Cold-user comprehension gate
+
+Before this frontdoor is considered done, a cold user must be able to recover the product model without reading internal documentation.
+
+### 5-second test
+
+The user should understand:
+
+> **BINRAT remembers old launch trails so a new launch does not start from zero.**
+
+They should see two obvious next actions:
+
+- open Fresh Garbage;
+- get the Telegram Rat.
+
+### 10-second test
+
+The user should be able to explain, in their own words:
+
+> **BINRAT watches fresh launches, remembers earlier launches tied to the same Pons-reported deployer, and shows the receipts.**
+
+Failure states:
+
+- “It is just a crypto dashboard.”
+- “It tells me what to buy.”
+- “I have no idea why the old launches matter.”
+
+### 30-second test
+
+The user should understand:
+
+- Web BINRAT = investigate the trail and receipts;
+- Telegram = tell me when a watched trail moves again;
+- roadmap = where the Rat is going, not a promise calendar;
+- $BINRAT = product/culture/coordination layer, not evidence authority.
+
+The information hierarchy must be:
+
+```
+HERO
+↓
+ONE REAL / CURRENT PROOF STORY
+↓
+FRESH GARBAGE / PRODUCT
+↓
+TELEGRAM RETENTION LOOP
+↓
+ROADMAP
+↓
+METHOD / RECEIPTS / TOKEN DETAIL
+```
+
+Do not put roadmap fantasy ahead of demonstrating current product value.
+
+## 14. Next bounded implementation slice
 
 After this contract is accepted, implement only:
 
