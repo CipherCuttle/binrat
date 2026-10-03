@@ -29,10 +29,10 @@ const requiredHtml = [
   'GET THE TELEGRAM RAT',
   "DON'T TRUST THE RAT. CHECK THE RECEIPT.",
   'WHY IT SURFACED / RECEIPT-BACKED',
-  'RAT IS DIGGING FOR A REPEAT TRAIL',
+  'EVERY LAUNCH LOOKS NEW IF YOU FORGET THE OLD TRAIL. THE RAT IS CHECKING.',
   '02 / TELEGRAM',
   "DON'T LIVE IN THE TERMINAL.",
-  'Telegram tells you when to care.',
+  'Telegram tells you when to come back.',
   'ADD @BINRATBOT',
   'SAME PAWS. AGAIN.',
   'WATCHING THESE PAWS. ✓',
@@ -67,6 +67,21 @@ const requiredHtml = [
 
 for (const marker of requiredHtml) {
   if (!html.includes(marker)) throw new Error(`WEB_INVARIANT_MISSING:${marker}`);
+}
+
+const frontdoorOrder = [
+  'id="frontdoor-proof"',
+  'id="garbage"',
+  'id="telegram"',
+  'id="roadmap"',
+  'id="how"',
+  'id="token-status"'
+].map((marker) => html.indexOf(marker));
+if (
+  frontdoorOrder.some((index) => index < 0) ||
+  frontdoorOrder.some((index, position) => position > 0 && index <= frontdoorOrder[position - 1])
+) {
+  throw new Error(`WEB_FRONTDOOR_ORDER_DRIFT:${frontdoorOrder.join(',')}`);
 }
 
 if (!css.includes('--red: #ff2638')) throw new Error('WEB_BRAND_RED_DRIFT');
@@ -109,7 +124,7 @@ if (!app.includes('OPEN TELEGRAM RAT')) throw new Error('WEB_CASE_TO_TELEGRAM_CT
 if (!app.includes('user-requested monitoring, not a buy or safety signal.')) throw new Error('WEB_CASE_WATCH_BOUNDARY_MISSING');
 if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
 if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
-if (!app.includes('Same Pons-reported deployer appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
+if (!app.includes('This Pons-reported deployer already appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
 if (!app.includes('PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW')) throw new Error('WEB_FRONTDOOR_FAIL_CLOSED_HISTORY_MISSING');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
