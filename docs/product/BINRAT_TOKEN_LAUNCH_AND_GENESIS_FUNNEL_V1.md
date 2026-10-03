@@ -10,7 +10,7 @@ Launch $BINRAT early enough that the token and product grow together without tur
 
 V1 should be understandable in one breath:
 
-> BINRAT digs through launch trash and keeps the receipts. Put $BINRAT to work by staking it: active stake unlocks a more capable Rat while the selected Pons Stake & Burn vault routes its real protocol fee mechanics according to the verified vault contract.
+> BINRAT digs through launch trash and keeps the receipts. Put $BINRAT to work by staking it: active stake unlocks a more capable Rat while the selected public PonsVault Staking primitive routes creator-fee rewards according to the verified current vault contract. The dependency remains conditional until its upstream upgrade/audit risk is explicitly accepted.
 
 The launch must optimize for low cognitive load:
 
@@ -35,7 +35,7 @@ Current launch-planning target:
 - chain: Robinhood Chain 4663;
 - launch rail: Pons V2;
 - quote/pair: native ETH candidate;
-- vault: existing PonsVault Stake & Burn candidate;
+- vault: public PonsVault Staking candidate (CONDITIONAL);
 - Pons native buyback: OFF candidate unless a later reviewed manifest explicitly changes it;
 - creator tax: unresolved until scenario simulation and legal/product review;
 - product gate: active stake, not simple wallet balance;
@@ -77,7 +77,7 @@ There are three separate reward channels.
 
 ### A. Protocol-native stake economics
 
-If the reviewed PonsVault Stake & Burn implementation is selected, early stakers naturally participate in the vault's verified fee mechanics while they remain staked.
+If the reviewed PonsVault Staking implementation is selected, early stakers participate in the vault's verified creator-fee reward mechanics while they remain staked. For the native-ETH path, BINRAT copy must follow the verified native quote semantics rather than generic WETH wording.
 
 BINRAT does not add inflationary $BINRAT staking emissions in V1.
 
@@ -304,7 +304,7 @@ No address should be manually copied into several public channels.
 
 ### L1 — PonsVault forensic pin
 
-- exact launcher / registry / Stake & Burn implementation;
+- rejected Stake & Burn attestation + exact launcher / registry / current Staking factory / beacon / implementation;
 - ABI;
 - bytecode / codehash;
 - proxy / beacon implementation;
@@ -316,9 +316,11 @@ No address should be manually copied into several public channels.
 
 Pure read-only adapter:
 
-`wallet -> verified active vault stake at pinned block`
+`wallet -> verified active Staking-vault stake via stakedOf(address) at pinned block`
 
 Fail closed on unknown chain/vault/code/reorg/staleness.
+
+Genesis sustained qualification must be observed by BINRAT over time. Do not infer continuity from an upstream lock period: the current Staking factory creation payload does not expose a creator-set lock field.
 
 ### L3 — WORKING RAT entitlement
 
