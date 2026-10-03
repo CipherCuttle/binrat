@@ -45,13 +45,30 @@ export interface CapabilityManifest {
     status: string;
     historicalArcAuthority: string;
   };
-  launchConfiguration?: {
+  currentPonsLaunchConfiguration?: {
+    authorityScope: string;
+    chainId: number;
+    treasuryAddress: string | null;
+    launchWalletAddress: string | null;
+    creatorFeeRecipientAddress: string | null;
+    tokenAddressState: string;
+    accountingActive: boolean;
+    holderGateStatus: string;
+    creatorTaxBps: number;
+    openingBuyWei: string;
+    privatePresale: string;
+    discountedInsiderRound: string;
+    hiddenTeamAllocation: string;
+    walletRoleStatus: string;
+  };
+  historicalArcLaunchConfiguration?: {
     treasuryAddress: string;
     projectFeeRecipientAddress: string;
     tokenAddressState: string;
     accountingActive: boolean;
     holderGateStatus: string;
     configDigest?: string;
+    authorityScope?: string;
   };
   launchGateStatus?: {
     matrix: string;
@@ -147,16 +164,36 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
       plan.historicalArcAuthority !== 'HISTORICAL_ONLY_NOT_PONS_AUTHORITY'
     ) throw new Error('CAPABILITY_MANIFEST_PONS_PLAN_INVALID');
   }
-  if (root.launchConfiguration !== undefined) {
-    const config = record(root.launchConfiguration);
+  if (root.historicalArcLaunchConfiguration !== undefined) {
+    const historical = record(root.historicalArcLaunchConfiguration);
     if (
-      config.configDigest !== LAUNCH_CONFIG_DIGEST ||
-      config.treasuryAddress !== BINRAT_TREASURY_ADDRESS ||
-      config.projectFeeRecipientAddress !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS ||
-      config.tokenAddressState !== 'NOT_YET_CREATED' ||
-      config.accountingActive !== false ||
-      config.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED'
-    ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_CONFIG_INVALID');
+      historical.configDigest !== LAUNCH_CONFIG_DIGEST ||
+      historical.treasuryAddress !== BINRAT_TREASURY_ADDRESS ||
+      historical.projectFeeRecipientAddress !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS ||
+      historical.tokenAddressState !== 'NOT_YET_CREATED' ||
+      historical.accountingActive !== false ||
+      historical.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED' ||
+      historical.authorityScope !== 'HISTORICAL_ARC_V0_ROLE_BINDING_ONLY_NOT_CURRENT_PUBLIC_ROLE_SOURCE'
+    ) throw new Error('CAPABILITY_MANIFEST_HISTORICAL_ARC_CONFIG_INVALID');
+  }
+  if (root.currentLaunchPlan !== undefined) {
+    const current = record(root.currentPonsLaunchConfiguration);
+    if (
+      current.authorityScope !== 'CURRENT_PONS_V1_PRELAUNCH' ||
+      current.chainId !== PONS_LAUNCH_CHAIN_ID ||
+      current.treasuryAddress !== null ||
+      current.launchWalletAddress !== null ||
+      current.creatorFeeRecipientAddress !== null ||
+      current.tokenAddressState !== 'NOT_YET_CREATED' ||
+      current.accountingActive !== false ||
+      current.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED' ||
+      current.creatorTaxBps !== 0 ||
+      current.openingBuyWei !== '0' ||
+      current.privatePresale !== 'NONE' ||
+      current.discountedInsiderRound !== 'NONE' ||
+      current.hiddenTeamAllocation !== 'NONE' ||
+      current.walletRoleStatus !== 'UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC'
+    ) throw new Error('CAPABILITY_MANIFEST_CURRENT_PONS_CONFIG_INVALID');
   }
   if (root.launchGateStatus !== undefined) {
     const gateStatus = record(root.launchGateStatus);
@@ -248,10 +285,10 @@ function staticPlan(
         launchAuthorization: launch.status,
         marketingAuthorized: boolLabel(launch.marketingAuthorized),
         launchAuthorized: boolLabel(launch.launchAuthorized),
-        treasury: manifest.launchConfiguration?.treasuryAddress ?? 'NOT_CONFIGURED',
-        projectFeeRecipient: manifest.launchConfiguration?.projectFeeRecipientAddress ?? 'NOT_CONFIGURED',
-        tokenAddressState: manifest.launchConfiguration?.tokenAddressState ?? 'UNKNOWN',
-        holderGateStatus: manifest.launchConfiguration?.holderGateStatus ?? 'UNKNOWN',
+        treasury: manifest.currentPonsLaunchConfiguration?.treasuryAddress ?? 'NOT_CONFIGURED',
+        projectFeeRecipient: manifest.currentPonsLaunchConfiguration?.creatorFeeRecipientAddress ?? 'NOT_CONFIGURED',
+        tokenAddressState: manifest.currentPonsLaunchConfiguration?.tokenAddressState ?? 'UNKNOWN',
+        holderGateStatus: manifest.currentPonsLaunchConfiguration?.holderGateStatus ?? 'UNKNOWN',
         tokenMessage: tokenState === 'NOT_LAUNCHED'
           ? 'no official $BINRAT token is launched yet.'
           : 'reporting the canonical manifest state only.',
