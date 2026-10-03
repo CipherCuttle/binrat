@@ -43,6 +43,7 @@ export async function validatePonsLaunchPlan(value: unknown): Promise<PonsLaunch
   const launcher = record(rail.ponsVaultLauncher);
   const registry = record(rail.ponsVaultRegistry);
   const staking = record(rail.stakingFactory);
+  if ('stakeBurnFactory' in rail) throw new Error('PONS_LAUNCH_PLAN_STALE_STAKE_BURN_AUTHORITY');
 
   if (
     rail.railId !== 'pons-v2-vault-staking-candidate-v1' ||
@@ -56,6 +57,9 @@ export async function validatePonsLaunchPlan(value: unknown): Promise<PonsLaunch
   ) throw new Error('PONS_LAUNCH_PLAN_RAIL_INVALID');
 
   const unresolved = record(input.unresolvedImmutableInputs);
+  if ('stakeLockPeriodSeconds' in unresolved || 'minimumFeesBeforeRun' in unresolved) {
+    throw new Error('PONS_LAUNCH_PLAN_STALE_STAKE_BURN_INPUT');
+  }
   for (const key of [
     'launchConfigId','expectedEconomics','creatorTaxBps','openingBuyWei',
     'minimumFeesBeforePayoutWei','workingRatMinStakeRaw'
