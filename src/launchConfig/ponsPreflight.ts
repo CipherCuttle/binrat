@@ -153,7 +153,7 @@ export function decodeCanLaunchProbe(data: Hex): { canLaunch: boolean; reason: H
   return { canLaunch, reason };
 }
 
-export function unresolvedExactManifestInputs(plan: PonsLaunchPlanV1): string[] {
+export function unresolvedExactLaunchSimulationInputs(plan: PonsLaunchPlanV1): string[] {
   const raw = plan.unresolvedImmutableInputs;
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return ['unresolvedImmutableInputs'];
@@ -163,8 +163,6 @@ export function unresolvedExactManifestInputs(plan: PonsLaunchPlanV1): string[] 
     'launchConfigId',
     'expectedEconomics',
     'minimumFeesBeforePayoutWei',
-    'workingRatMinStakeRaw',
-    'treasuryAddress',
     'launchWalletAddress',
     'tokenMetadata'
   ].filter((key) => unresolved[key] === null || unresolved[key] === undefined);
@@ -259,7 +257,7 @@ export async function validatePonsPreflightReceipt(
     input.exactManifestSimulation,
     'PONS_PREFLIGHT_EXACT_SIM_INVALID'
   );
-  const expectedMissing = unresolvedExactManifestInputs(plan);
+  const expectedMissing = unresolvedExactLaunchSimulationInputs(plan);
   if (
     exact.status !== 'BLOCKED_OWNER_INPUTS' ||
     exact.broadcast !== false ||
