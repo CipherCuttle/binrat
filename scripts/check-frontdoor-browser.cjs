@@ -23,7 +23,7 @@ const viewports = [
         document.querySelectorAll("[data-bag-id]").length > 0
       );
 
-      assert.equal((await page.locator("#hero-title").innerText()).replace(/\s+/g, " ").trim(), "THE RAT FOUND SOMETHING.");
+      assert.equal((await page.locator("#hero-title").innerText()).replace(/↗/g, "").replace(/\s+/g, " ").trim(), "THE RAT FOUND SOMETHING.");
       assert.match(await page.locator(".hero .lede").innerText(), /Every new launch looks new/i);
       assert.match(await page.locator(".hero .lede").innerText(), /BINRAT does/i);
       assert.match(await page.locator(".hero .sublede").innerText(), /You don't start from zero/i);
