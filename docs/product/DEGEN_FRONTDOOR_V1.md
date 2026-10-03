@@ -572,16 +572,20 @@ METHOD / RECEIPTS / TOKEN DETAIL
 
 Do not put roadmap fantasy ahead of demonstrating current product value.
 
-## 14. Next bounded implementation slice
+## 14. Next bounded verification slice
 
-After this contract is accepted, implement only:
+The presentation pieces now exist. Do not widen the feature surface.
 
-1. **hero/frontdoor hierarchy;**
-2. **one Fresh Garbage → Dig Deeper proof story;**
-3. **Telegram first-class section / CTA.**
+Next:
 
-Then stop and review the rendered product before spending time on the full roadmap or token section.
+1. get the exact frontdoor head green in CI;
+2. run the rendered browser smoke;
+3. perform one hostile 5 / 10 / 30-second comprehension review;
+4. fix only comprehension blockers or Critical/High presentation regressions;
+5. stop.
 
-The smallest experiment is:
+Typography convergence to frozen Brand V1 (Geist Sans / Geist Mono) is a separate presentation cleanup unless existing assets make it a no-risk mechanical substitution.
 
-> **Can F1–F3 make a cold user understand why BINRAT is interesting without changing the underlying intelligence system?**
+The smallest experiment is now:
+
+> **Can a cold user recover the product model from the rendered page without being taught BINRAT first?**
