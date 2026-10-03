@@ -600,12 +600,21 @@ img {
   font-size: 11px;
   font-weight: 500;
 }
+.proof-scrap > span {
+  min-width: 0;
+}
 .proof-scrap small {
+  display: block;
   color: var(--muted);
   font-size: 7px;
+  line-height: 1.45;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.proof-scrap small + small {
+  margin-top: 2px;
+  color: #73786f;
 }
 .proof-scraps-empty {
   color: var(--muted);

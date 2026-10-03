@@ -359,8 +359,10 @@ function renderFrontdoorProofStory(bag, scraps, scrapsFallback) {
           (item) => `
             <div class="proof-scrap">
               <strong>${escapeHtml(item.symbol)}</strong>
-              <small>${escapeHtml(item.name || item.detail || "PRIOR INDEXED LAUNCH")}</small>
-              ${item.name && item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ""}
+              <span>
+                <small>${escapeHtml(item.name || "PRIOR INDEXED LAUNCH")}</small>
+                ${item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ""}
+              </span>
             </div>`,
         )
         .join("")
