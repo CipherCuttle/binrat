@@ -28,7 +28,7 @@ import {
   PONS_STAKING_IMPLEMENTATION_V1,
   PONS_VAULT_UPSTREAM_OWNER_V1,
   registryStakingFactoryCalldata,
-  unresolvedExactManifestInputs,
+  unresolvedExactLaunchSimulationInputs,
   validatePonsPreflightReceipt,
   type PonsPreflightContractObservation,
   type PonsPreflightReceiptV1
@@ -166,7 +166,7 @@ expectAddress(
 );
 if (stakedRaw > totalStakedRaw) fail('stake canary stakedOf > totalStaked');
 
-const missingInputs = unresolvedExactManifestInputs(plan);
+const missingInputs = unresolvedExactLaunchSimulationInputs(plan);
 if (missingInputs.length === 0) {
   throw new Error(
     'PONS_PREFLIGHT_EXACT_SIM_REQUIRED: owner inputs are complete; this baseline preflight must not substitute for the exact-manifest rehearsal'
