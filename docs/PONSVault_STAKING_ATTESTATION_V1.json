@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "binrat.ponsvault-staking-attestation/0.1",
+  "attestationVersion": "PONSVault_STAKING_ATTESTATION_V1",
+  "observedOn": "2026-10-03",
+  "observedBlock": 79164449,
+  "observedBlockHash": "0x44cb1a70c57335e94ce553d601c581913bc784eebb78b1d104e31f7b4bdffe25",
+  "chainId": 4663,
+  "status": "CONDITIONAL",
+  "launchAuthorizationEffect": "NO_AUTHORIZATION_CHANGE",
+  "scope": "PONSVault public Staking candidate for BINRAT Launch V1",
+  "candidateConclusion": {
+    "conditionallySuitableForBinratV1": true,
+    "unconditionalPass": false,
+    "reason": "The current public Staking primitive is registry-wired, supports native-ETH quote vaults, exposes stakedOf(address), and composes with the live PonsVault launcher in read-only simulation. It remains third-party upgradeable and source/audit-incomplete, while the exact current atomic creator-fee-to-vault hop and the final native reward transfer asset are not fully pinned."
+  },
+  "contracts": {
+    "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "ponsVaultLauncher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+    "ponsVaultRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+    "stakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+    "stakingImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "upstreamOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b"
+  },
+  "liveState": {
+    "registryTemplate": "staking",
+    "registryTemplateLookupSelector": "0x0a631576",
+    "registryStakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "registryOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "stakingFactoryBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+    "stakingFactoryImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "stakingFactoryOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "stakingBeaconOwner": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeaconImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "upstreamOwnerCode": "0x",
+    "upgradeControlTerminatesAtEoa": true
+  },
+  "factoryCreationEvidence": {
+    "selector": "0xd7d7d551",
+    "shape": "createVault(address token,address quoteAsset,bytes config)",
+    "configShape": "abi.encode(uint256 minimumFeesBeforePayout)",
+    "creatorSelectedLockFieldPresent": false,
+    "historicalTransaction": "0x300335cd71201b787ba59b98561fcf337e2e26c3172b557590959d9d37751d46",
+    "historicalConfigValueRaw": "25000000000000000",
+    "directNativeEthDryCall": {
+      "token": "0x645187382c996cbe752630786164f461ff43180b",
+      "caller": "0x35df6256c2fa5c52ae5741a8d81e7047e20b0e6d",
+      "quoteAsset": "0x0000000000000000000000000000000000000000",
+      "minimumFeesBeforePayoutRaw": "100000000000000000",
+      "returnedHypotheticalVault": "0x757ef16e4ea4c703d3e0cbc77cb61599597974e1",
+      "broadcast": false
+    }
+  },
+  "atomicLaunchSimulation": {
+    "launcher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+    "selector": "0x969e6741",
+    "fixtureSourceTransaction": "0x30aa4930d0572dbffd67de63d2a01a24ca426098a75ba304ad89b17a081a4f98",
+    "template": "staking",
+    "caller": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "vaultConfigMinimumFeesBeforePayoutRaw": "100000000000000000",
+    "returnedHypotheticalToken": "0x0d5afa91c20be6df39b2e970b3737c68b70a358d",
+    "returnedHypotheticalVault": "0x757ef16e4ea4c703d3e0cbc77cb61599597974e1",
+    "broadcast": false,
+    "result": "SUCCESS"
+  },
+  "implementationInterfaceEvidence": {
+    "selectors": {
+      "stake(uint256)": "0xa694fc3a",
+      "unstake(uint256)": "0x2e17de78",
+      "claim()": "0x4e71d92d",
+      "pendingRewards(address)": "0x31d7a262",
+      "totalStaked()": "0x817b1cd2",
+      "stakedOf(address)": "0xaf500ba3",
+      "token()": "0xfc0c546a",
+      "quoteAsset()": "0xfdf262b7",
+      "config()": "0x79502c55"
+    },
+    "perWalletActiveStakeGetter": "stakedOf(address)",
+    "activeStakeReadSuitableForL2": true
+  },
+  "nativeEthExamples": [
+    {
+      "symbol": "CLAI",
+      "token": "0x645187382c996cbe752630786164f461ff43180b",
+      "vault": "0x96e5c19717f5e681375b65771dd85628f700eb42",
+      "quoteAsset": "0x0000000000000000000000000000000000000000",
+      "staker": "0x35df6256c2fa5c52ae5741a8d81e7047e20b0e6d",
+      "totalStakedRaw": "206422751238216967",
+      "stakedOfRaw": "206422751238216967",
+      "configRaw": "100000000000000000"
+    },
+    {
+      "symbol": "SINU",
+      "token": "0x561811590525b528a1aeaa8a63622f83124126fe",
+      "vault": "0x83f6f9189ba41d4d571d47dafe1ee97c7372af9a",
+      "quoteAsset": "0x0000000000000000000000000000000000000000",
+      "staker": "0xb3d873d4d8cced0ee50d7340a50777d2f35dbe9d",
+      "totalStakedRaw": "1931511547768569834",
+      "stakedOfRaw": "1931511547768569834",
+      "configRaw": "100000000000000000",
+      "pendingRewardsFirstComponentRaw": "1365978739483",
+      "claimDryReturnFirstComponentRaw": "1365978739483"
+    }
+  ],
+  "rewardDeliverySemantics": {
+    "nativeQuoteSupport": "CONFIRMED",
+    "nativeQuoteEvidence": "quoteAsset() == address(0) on live CLAI and SINU vaults",
+    "claimAccounting": "CONFIRMED_NONZERO_ON_SINU",
+    "publicDocsRewardLabel": "WETH",
+    "minedFinalTransferAsset": "UNRESOLVED_IN_CURRENT_PASS",
+    "classification": "NATIVE_QUOTE_ACCOUNTING_CONFIRMED_FINAL_TRANSFER_ASSET_NOT_PINNED",
+    "publicCopyEffect": "DO_NOT_LABEL_STAKER_REWARDS_ETH_OR_WETH_UNTIL_FINAL_TRANSFER_HOP_IS_PINNED"
+  },
+  "feeRoutingSemantics": {
+    "ponsV2SourceCommit": "44a3db9193c365f6c25cf0d4c2efc396e6de0df5",
+    "ponsV2CreatorFeeModel": "QUOTE_FEE_CREATOR_SHARE_PLUS_CREATOR_TAX_CREDITED_TO_CREATOR_FEE_RECIPIENT",
+    "liveStakingRewardAccrualObserved": true,
+    "currentAtomicLauncherStakingMinedExemplarFound": false,
+    "currentAtomicLauncherStakingDrySimulation": "SUCCESS",
+    "exactCurrentAtomicCreatorFeeRecipientAndSweepHop": "NOT_FULLY_PINNED",
+    "classification": "SUPPORTED_BUT_CONDITIONAL"
+  },
+  "lockSemantics": {
+    "creatorSelectedLockFieldInCurrentFactoryPayload": false,
+    "commonLockGetterProbe": {
+      "lockPeriod()": "REVERT",
+      "lockDuration()": "REVERT"
+    },
+    "stakeAndUnstakeObservedOnLiveVaults": true,
+    "classification": "NO_CREATOR_SELECTED_LOCK_PROVEN_EXACT_INTERNAL_LOCK_RULE_UNRESOLVED",
+    "genesisEffect": "DO_NOT_DEPEND_ON_CONTRACT_LOCK; MEASURE_SUSTAINED_STAKE_IN_BINRAT"
+  },
+  "sourceProvenance": {
+    "ponsV2Source": "PUBLIC_REPOSITORY_AVAILABLE",
+    "ponsV2Repository": "ponsdotdev/pons-labs",
+    "ponsV2PinnedCommit": "44a3db9193c365f6c25cf0d4c2efc396e6de0df5",
+    "ponsVaultDocs": "https://www.ponsvault.com/docs",
+    "ponsVaultImplementationSourceMatch": "NOT_ESTABLISHED",
+    "thirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS"
+  },
+  "riskAcceptance": {
+    "vaultPrincipalCustody": "THIRD_PARTY_UPGRADEABLE_BEACON",
+    "sharedImplementation": true,
+    "upstreamControl": "EOA_OWNED_FACTORY_CONTROLS_BEACON",
+    "principalRecoverabilityUnderObservedNormalUnstake": "SUPPORTED_BY_LIVE_HISTORY",
+    "residualRisk": "MUST_BE_DISCLOSED_AND_EXPLICITLY_ACCEPTED_BEFORE_READY_TO_ARM"
+  },
+  "conditions": [
+    "Re-read registry -> staking factory -> beacon -> implementation -> owners immediately before launch arming and fail closed on drift.",
+    "Pin the final claim transfer asset before public copy names staker rewards ETH or WETH.",
+    "Before READY_TO_ARM, pin the current atomic creator-fee-recipient/sweep route into the Staking vault or obtain authoritative source/ABI evidence for that exact hop.",
+    "Disclose and explicitly accept third-party beacon upgrade/principal-custody risk.",
+    "Do not rely on a PonsVault contract lock for Genesis; use BINRAT-observed sustained stake instead."
+  ],
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "attestationDigest": "9303473200b52c078ce5fce20501a11472e7db7696cef8e4d13603a512a0c720"
+}
