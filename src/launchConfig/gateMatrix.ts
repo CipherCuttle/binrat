@@ -132,7 +132,7 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
     mechanics.liveEvidence.stakingAttestationStatus !== 'CONDITIONAL' ||
     mechanics.liveEvidence.rejectedStakeBurnCandidateStatus !== 'FAIL_DEFER_CURRENT_CANDIDATE' ||
     mechanics.liveEvidence.ponsVaultSourceMatch !== 'NOT_SATISFIED' ||
-    mechanics.liveEvidence.explicitUpstreamRiskAcceptance !== 'NOT_GRANTED'
+    mechanics.liveEvidence.explicitUpstreamRiskAcceptance !== 'ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY'
   ) throw new Error('LAUNCH_GATE_MATRIX_PONS_MECHANICS_BOUNDARY_INVALID');
 
   const execution = gates.actual_token_address_and_launch_execution_receipt as Record<string, any>;
@@ -165,7 +165,12 @@ export function validateLaunchGateMatrix(value: unknown): LaunchGateMatrix {
   if (
     allocation.status !== 'PARTIAL' ||
     allocation.blocksLaunchAuthorization !== true ||
-    allocation.liveEvidence.evidenceClass !== 'OWNER_POLICY'
+    allocation.liveEvidence.evidenceClass !== 'OWNER_POLICY' ||
+    allocation.liveEvidence.creatorTaxBps !== 0 ||
+    allocation.liveEvidence.openingBuy !== 'ZERO_ETH_OWNER_SELECTED' ||
+    allocation.liveEvidence.privatePresale !== 'NO' ||
+    allocation.liveEvidence.discountedInsiderRound !== 'NO' ||
+    allocation.liveEvidence.hiddenTeamAllocation !== 'NO'
   ) throw new Error('LAUNCH_GATE_MATRIX_ALLOCATION_BOUNDARY_INVALID');
 
   if (typeof input.matrixDigest !== 'string' || !/^[0-9a-f]{64}$/.test(input.matrixDigest)) {
