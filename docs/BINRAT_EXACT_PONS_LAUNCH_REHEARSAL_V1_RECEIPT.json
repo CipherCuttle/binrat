@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "binrat.pons-launch-rehearsal/1.0",
+  "status": "BLOCKED_OWNER_INPUTS",
+  "chainId": 4663,
+  "pinnedBlock": {
+    "number": "79447264",
+    "hash": "0x391bc68a311db5e87bba05bbb238dac0bc5d56f0f03df9a5c786638e3cb0b681"
+  },
+  "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+  "preflight": {
+    "status": "UPSTREAM_GRAPH_PASS_BASELINE_EXACT_MANIFEST_BLOCKED",
+    "digest": "90eb1185b7bc515a3c829e8f27326344e109ff7c4cf001dfeecc73825c81f14b",
+    "observedAt": "2026-10-03T22:41:51.767Z",
+    "context": {
+      "launcherPonsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "launcherRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+      "registryStakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "stakingFactoryBeacon": "0xEf9f80D2F51Ec6AEcaB284e778f328e9F0982a6f",
+      "stakingFactoryImplementation": "0xC8e0a4fE58918c47F66CF630c6A7205741C11FD4",
+      "launcherCanLaunch": true,
+      "launcherCanLaunchReason": "0x"
+    }
+  },
+  "abi": {
+    "classification": "PINNED_PRODUCTION_UI_ABI",
+    "sourceSurface": "https://www.ponsvault.com/launch",
+    "deploymentIdentifier": "dpl_3GqtGP7hXYxb4sBTYSiwpaGPMHsb",
+    "bundleSha256": "580d679b7163dbfae91300ea0b2c7c9ba8dd8f8e9268c8383660f351c60a7b53",
+    "canonicalSignature": "launchWithVault((string,string,string,string,(string,string,string,string,string),address,uint16,bool,bytes32,bytes32),uint256,address,bytes32,bytes)",
+    "selector": "0x969e6741"
+  },
+  "runtime": {
+    "launcherCodeHash": "0x5a6baeade01d8119231385e1a6f38c50388b2f30063d3c6c3e5736e590ad12a0",
+    "evidenceBlock": "79428213"
+  },
+  "selectedLauncher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+  "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+  "registry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+  "stakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+  "stakingBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+  "stakingImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+  "launchWalletAddress": null,
+  "metadataDigest": null,
+  "creatorFeeRecipient": null,
+  "creatorTaxBps": 0,
+  "buybackEnabled": false,
+  "expectedEconomics": null,
+  "salt": null,
+  "launchConfigId": null,
+  "pairToken": "0x0000000000000000000000000000000000000000",
+  "templateId": "0x7374616b696e6700000000000000000000000000000000000000000000000000",
+  "minimumFeesBeforePayoutRaw": null,
+  "vaultConfig": null,
+  "openingBuyWei": "0",
+  "transactionValueWei": null,
+  "calldataHash": null,
+  "hypotheticalToken": null,
+  "hypotheticalVault": null,
+  "sourceRuntimeBinding": "UNRESOLVED",
+  "signing": false,
+  "broadcast": false,
+  "launchAuthorized": false,
+  "missingInputs": [
+    "launchWalletAddress",
+    "name",
+    "symbol",
+    "logo",
+    "description",
+    "socials.twitter",
+    "socials.telegram",
+    "socials.discord",
+    "socials.website",
+    "socials.farcaster",
+    "creatorFeeRecipient",
+    "expectedEconomics",
+    "salt",
+    "launchConfigId",
+    "minimumFeesBeforePayoutWei",
+    "transactionValueWei"
+  ]
+}
