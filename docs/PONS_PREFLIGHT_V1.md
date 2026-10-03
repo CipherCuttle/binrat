@@ -49,17 +49,17 @@ After one reviewed live receipt, a separate bounded pinning change may promote t
 
 ## Exact launch simulation boundary
 
-The current launch plan intentionally leaves these owner inputs unresolved:
+The current launch plan intentionally leaves several owner inputs unresolved. The exact Pons launch-call simulation is blocked only by inputs that materially affect that call or its assertions:
 
 - `launchConfigId`;
 - `expectedEconomics`;
 - `minimumFeesBeforePayoutWei`;
-- `workingRatMinStakeRaw`;
-- `treasuryAddress`;
 - `launchWalletAddress`;
 - `tokenMetadata`.
 
-Therefore V1 reports:
+`workingRatMinStakeRaw` and `treasuryAddress` remain required before the final launch manifest/authorization, but they do not artificially block an atomic Pons Staking launch simulation.
+
+Therefore V1 currently reports:
 
 `exactManifestSimulation.status = BLOCKED_OWNER_INPUTS`
 
