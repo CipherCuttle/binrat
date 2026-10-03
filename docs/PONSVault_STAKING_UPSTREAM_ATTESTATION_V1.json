@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "binrat.ponsvault-staking-upstream-attestation/0.1",
+  "attestationVersion": "PONSVault_STAKING_UPSTREAM_ATTESTATION_V1",
+  "observedOn": "2026-10-03",
+  "observedBlock": 79154923,
+  "chainId": 4663,
+  "status": "CONDITIONAL",
+  "launchAuthorizationEffect": "BLOCKS_UNTIL_EXPLICIT_UPSTREAM_RISK_ACCEPTANCE_AND_CANONICAL_RAIL_REBIND",
+  "scope": "PONSVault public Staking candidate for BINRAT Launch V1",
+  "candidateConclusion": {
+    "selectedStakingPrimitiveSuitableForL2": true,
+    "launchSafeWithoutExplicitRiskAcceptance": false,
+    "reason": "The current Staking factory is live in the registry, supports native-ETH quote vault creation, exposes a stable per-wallet stakedOf(address) read through live ETH-paired exemplars, and composes successfully through the current PonsVault launcher in eth_call. Launch remains conditional because the vault implementation is unaudited, source matching is unavailable, and the shared beacon remains upgradeable through an EOA-controlled factory."
+  },
+  "contracts": {
+    "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "ponsFeeEscrow": "0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e",
+    "ponsVaultLauncher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+    "ponsVaultRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+    "stakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+    "stakingImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "upstreamOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b"
+  },
+  "liveState": {
+    "registryTemplate": "staking",
+    "registryStakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingFactoryBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+    "stakingFactoryImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "stakingFactoryOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "stakingBeaconOwner": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeaconImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "upstreamOwnerCode": "0x",
+    "stakingVaultCountCurrentFactory": 1
+  },
+  "factoryCreationEvidence": {
+    "selector": "0xd7d7d551",
+    "signature": "createVault(address,address,bytes)",
+    "historicalTransaction": "0x300335cd71201b787ba59b98561fcf337e2e26c3172b557590959d9d37751d46",
+    "historicalToken": "0xdf928a91e0f2cab7fe14e78cc79babba02d0d403",
+    "historicalQuoteAsset": "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
+    "historicalConfigDecoded": {
+      "minimumFeesBeforePayoutRaw": "25000000000000000",
+      "minimumFeesBeforePayoutQuoteUnits": "0.025"
+    },
+    "currentConfigShape": "ABI_ENCODED_SINGLE_UINT256_MINIMUM_FEES_BEFORE_PAYOUT",
+    "creatorSetLockPeriodFieldPresent": false
+  },
+  "readInterfaceEvidence": {
+    "selectors": {
+      "stake(uint256)": "0xa694fc3a",
+      "unstake(uint256)": "0x2e17de78",
+      "claim()": "0x4e71d92d",
+      "pendingRewards(address)": "0x31d7a262",
+      "stakedOf(address)": "0xaf500ba3",
+      "totalStaked()": "0x817b1cd2",
+      "token()": "0xfc0c546a",
+      "quoteAsset()": "0xfdf262b7"
+    },
+    "perWalletActiveStakeGetter": "stakedOf(address)",
+    "workingRatReadStatus": "READY_FOR_L2_FAIL_CLOSED_READER",
+    "lockSemantics": "CURRENT_FACTORY_CREATION_CONFIG_HAS_NO_CREATOR_SET_LOCK_FIELD",
+    "genesisContinuousStakeMustBeObservedByBinrat": true
+  },
+  "nativeEthEvidence": {
+    "clai": {
+      "token": "0x645187382c996cbe752630786164f461ff43180b",
+      "vault": "0x96e5c19717f5e681375b65771dd85628f700eb42",
+      "beacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "quoteAsset": "0x0000000000000000000000000000000000000000",
+      "staker": "0x35df6256c2fa5c52ae5741a8d81e7047e20b0e6d",
+      "stakedRaw": "206422751238216967",
+      "nativeFeeEscrowBalanceRaw": "4607001699999999"
+    },
+    "sinu": {
+      "token": "0x561811590525b528a1aeaa8a63622f83124126fe",
+      "vault": "0x83f6f9189ba41d4d571d47dafe1ee97c7372af9a",
+      "beacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "quoteAsset": "0x0000000000000000000000000000000000000000",
+      "staker": "0xb3d873d4d8cced0ee50d7340a50777d2f35dbe9d",
+      "stakedRaw": "1931511547768569834",
+      "observedStatus": "PonsV2StakingVault: 1000121000000000000 quote distributed across 1 runs. Staked: 1931511547768569834.",
+      "pendingRewardsNativeRaw": "1365978739483"
+    },
+    "nativeRewardConclusion": "ETH_PAIRED_VAULTS_USE_NATIVE_QUOTE_ACCOUNTING; CURRENT_RUNTIME_CLAIMS_NATIVE_ESCROW_FOR_ZERO_QUOTE_ASSET",
+    "publicCopyMismatch": "DOCS_SAY_WETH_WHILE_CURRENT_LAUNCH_FORM_SAYS_ETH"
+  },
+  "stakeUnstakeEvidence": {
+    "sinuStakeTransaction": "0x74ebc04334fdc13396ffbfbf12a1d4954e154ea0a2ed7dce4bf9d1785695ddac",
+    "sinuStakeBlock": 74679695,
+    "sinuFirstUnstakeTransaction": "0xa6b6c3cd66db10bcb3aac32e1da5c05065b4d4169a63dd36dfbe710964cd5aa3",
+    "sinuFirstUnstakeBlock": 74749748,
+    "elapsedSecondsBetweenObservedStakeAndFirstUnstake": 7045,
+    "interpretation": "DO_NOT_INFER_A_CREATOR_CONFIGURABLE_LOCK_FROM_DOCS; CURRENT_FACTORY_PAYLOAD_DOES_NOT_CARRY_ONE"
+  },
+  "atomicLauncherSimulation": {
+    "status": "PASS_NO_STATE_CHANGE",
+    "method": "eth_call",
+    "sourceSuccessfulLauncherTransaction": "0x30aa4930d0572dbffd67de63d2a01a24ca426098a75ba304ad89b17a081a4f98",
+    "mutations": [
+      "templateId rwa -> staking",
+      "vault config -> abi.encode(uint256(0.1 ether))",
+      "Pons launch salt -> simulation-only fresh 0x11...11"
+    ],
+    "pairAsset": "NATIVE_ETH",
+    "returnedHypotheticalToken": "0x678a6162e940f90e607d4ea52691fb359bd5591d",
+    "returnedHypotheticalVault": "0x757ef16e4ea4c703d3e0cbc77cb61599597974e1"
+  },
+  "feeRoutingEvidence": {
+    "ponsSourceRepository": "ponsdotdev/pons-labs",
+    "ponsSourceCommit": "44a3db9193c365f6c25cf0d4c2efc396e6de0df5",
+    "curveCreatorAmountIncludesBaseCreatorBucketAndCreatorTax": true,
+    "creatorTaxBypassesProtocolAndBuybackSplit": true,
+    "ponsVaultLauncherRole": "ROUTES_CREATOR_FEE_RECIPIENT_TO_ATTACHED_VAULT",
+    "launchTimeBuybackEnabledCandidate": "UNRESOLVED_FINAL_MANIFEST_INPUT"
+  },
+  "sourceAndSecurity": {
+    "ponsV2SourceStatus": "PUBLIC_REPOSITORY_AVAILABLE",
+    "ponsVaultAdvertisedSourceStatus": "NOT_INDEPENDENTLY_RESOLVED",
+    "ponsVaultThirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS",
+    "sharedBeaconUpgradeable": true,
+    "upgradeAuthorityStatus": "ACTIVE_EOA_CONTROL_CHAIN_OBSERVED",
+    "historicalFactoryUpgradeTransaction": "0x1b23d74fb6bd73a6b1e7e9480197445d0bd6638216dd4737cc9cad19e49c12fa",
+    "launchTimeRecheckRequired": [
+      "registry staking factory",
+      "factory beacon",
+      "factory implementation",
+      "factory owner",
+      "beacon implementation",
+      "owner code",
+      "stakedOf selector behavior",
+      "atomic launcher simulation"
+    ]
+  },
+  "requiredNextEvidence": [
+    "Rebind the canonical BINRAT Launch V1 rail from rejected Stake & Burn to conditional public Staking.",
+    "Implement L2 as a block-pinned fail-closed stakedOf(address) reader bound to token, vault, beacon and implementation.",
+    "Freeze and disclose the upstream unaudited/shared-beacon/EOA upgrade risk before launch authorization.",
+    "Resolve public copy to native ETH for native-paired staking; do not repeat generic WETH wording on BINRAT surfaces.",
+    "Do not use an upstream lock period as Genesis proof; BINRAT must observe sustained qualifying stake itself."
+  ],
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "attestationDigest": "86c52726bdf20f1dfe6f482bc75a72c02ef88291c0c0d694b282cd8e22cb59bc"
+}
