@@ -24,6 +24,12 @@ export interface BindingParityOptions {
   controlledRatActivation?: boolean;
   /** Explicit private Telegram UI V2 activation; never a general toggle. */
   controlledTelegramUiV2Activation?: boolean;
+  /**
+   * Exact-version private preview. This is deliberately narrower than an
+   * activation mode: side-effect flags may only move to false and all other
+   * production bindings must retain their targets and values.
+   */
+  privatePreview?: boolean;
 }
 
 const REQUIRED_BINDINGS = ['DB', 'SYNC_QUEUE', 'AI', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET'] as const;
@@ -46,6 +52,13 @@ const ALLOWED_ADDITIONS = new Map<string, Pick<WorkerBinding, 'type' | 'text'>>(
   ['RAT_CANDIDATE_SMOKE_SECRET', { type: 'secret_text' }]
 ]);
 const ALLOWED_VALUE_CHANGES = new Set(['BINRAT_RELEASE_SHA']);
+const PRIVATE_PREVIEW_DEACTIVATION_FLAGS = new Set([
+  'BINRAT_AUTONOMOUS_RAT_ENABLED',
+  'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED',
+  'BINRAT_TELEGRAM_UI_V2_ENABLED',
+  'BINRAT_TELEGRAM_MEDIA_ENABLED',
+  'BINRAT_PONS_FUNDING_ENABLED'
+]);
 
 /**
  * Fail closed before promotion if a candidate loses any active production
@@ -59,8 +72,12 @@ export function verifyWorkerBindingParity(
 ): BindingParityResult {
   const errors: string[] = [];
   const mode = controlledMode(options, errors);
+  const privatePreview = privatePreviewMode(options, mode, errors);
   const activeBindings = bindingMap(active, 'active', errors);
   const candidateBindings = bindingMap(candidate, 'candidate', errors);
+  if (privatePreview && !activeBindings.has('BINRAT_RELEASE_SHA')) {
+    errors.push('ACTIVE_RELEASE_SHA_MISSING');
+  }
   for (const name of REQUIRED_BINDINGS) {
     if (!activeBindings.has(name)) errors.push(`ACTIVE_REQUIRED_BINDING_MISSING:${name}`);
     if (!candidateBindings.has(name)) errors.push(`CANDIDATE_REQUIRED_BINDING_MISSING:${name}`);
@@ -69,10 +86,14 @@ export function verifyWorkerBindingParity(
   for (const [name, before] of activeBindings) {
     const after = candidateBindings.get(name);
     if (!after) { errors.push(`CANDIDATE_BINDING_MISSING:${name}`); continue; }
-    compareBinding(before, after, errors, mode);
+    compareBinding(before, after, errors, mode, privatePreview);
   }
   for (const [name, binding] of candidateBindings) {
     if (!activeBindings.has(name)) {
+      if (privatePreview) {
+        if (!privatePreviewAddition(name, binding)) errors.push(`CANDIDATE_BINDING_UNAUTHORIZED:${name}`);
+        continue;
+      }
       const allowed = ALLOWED_ADDITIONS.get(name);
       if (!controlledAddition(name,binding,mode) && (!allowed || allowed.type !== binding.type ||
           (allowed.text !== undefined && allowed.text !== binding.text))) {
@@ -163,12 +184,14 @@ export function verifyCandidateManifest(config: unknown, options: BindingParityO
   };
   const errors: string[] = [];
   const mode = controlledMode(options, errors);
+  const privatePreview = privatePreviewMode(options, mode, errors);
   if (value.name !== 'binrat-edge-v0') errors.push('WORKER_NAME_MISMATCH');
   if (value.ai?.binding !== 'AI') errors.push('AI_BINDING_MISSING_FROM_MANIFEST');
   if (!Array.isArray(value.triggers?.crons) || value.triggers!.crons.length !== 1 || value.triggers!.crons[0] !== '* * * * *') {
     errors.push('CRON_PARITY_FAILED');
   }
-  if (value.assets?.directory !== './web') errors.push('STATIC_ASSET_MANIFEST_FAILED');
+  const expectedAssetDirectory = privatePreview ? '../web' : './web';
+  if (value.assets?.directory !== expectedAssetDirectory) errors.push('STATIC_ASSET_MANIFEST_FAILED');
   const expectedRat = mode === null ? 'false' : 'true';
   if (value.vars?.BINRAT_AUTONOMOUS_RAT_ENABLED !== expectedRat) {
     errors.push(mode === null ? 'AUTONOMOUS_RAT_NOT_FLAG_OFF' : 'CONTROLLED_RAT_MASTER_NOT_ENABLED');
@@ -202,7 +225,8 @@ function compareBinding(
   before: WorkerBinding,
   after: WorkerBinding,
   errors: string[],
-  mode: 'TEXT' | 'UI_V2' | null
+  mode: 'TEXT' | 'UI_V2' | null,
+  privatePreview: boolean
 ): void {
   if (before.type !== after.type) { errors.push(`BINDING_TYPE_CHANGED:${before.name}`); return; }
   if (before.type === 'd1' && (before.id ?? before.database_id) !== (after.id ?? after.database_id)) {
@@ -216,9 +240,11 @@ function compareBinding(
   const mediaToggle = mode === 'UI_V2' && before.name === 'BINRAT_TELEGRAM_MEDIA_ENABLED' && before.text === 'false' && after.text === 'true';
   const controlledPonsSteadyUpgrade = mode !== null && before.name === 'BINRAT_PONS_MAX_BATCH_BLOCKS' &&
     before.text === '512' && after.text === '1024';
+  const previewSafeDeactivation = privatePreview && PRIVATE_PREVIEW_DEACTIVATION_FLAGS.has(before.name) &&
+    after.text === 'false';
   if (before.type === 'plain_text' && !ALLOWED_VALUE_CHANGES.has(before.name) &&
       !disablesCandidateDiagnostic && !controlledRatToggle && !uiV2Toggle && !mediaToggle &&
-      !controlledPonsSteadyUpgrade && before.text !== after.text) {
+      !controlledPonsSteadyUpgrade && !previewSafeDeactivation && before.text !== after.text) {
     errors.push(`VARIABLE_CHANGED:${before.name}`);
   }
 }
@@ -237,6 +263,20 @@ function controlledAddition(name: string, binding: WorkerBinding, mode: 'TEXT' |
   }
   if (mode === 'UI_V2' && name === 'TELEGRAM_WEBHOOK_SECRET_NEXT') return binding.type === 'secret_text';
   return mode === 'UI_V2' && name === 'RAT_CANDIDATE_ALLOWED_USER_ID' && binding.type === 'secret_text';
+}
+function privatePreviewMode(
+  options: BindingParityOptions,
+  controlled: 'TEXT' | 'UI_V2' | null,
+  errors: string[]
+): boolean {
+  if (options.privatePreview && controlled !== null) {
+    errors.push('PRIVATE_PREVIEW_MODE_AMBIGUOUS');
+    return false;
+  }
+  return options.privatePreview === true;
+}
+function privatePreviewAddition(name: string, binding: WorkerBinding): boolean {
+  return PRIVATE_PREVIEW_DEACTIVATION_FLAGS.has(name) && binding.type === 'plain_text' && binding.text === 'false';
 }
 
 /** A visible whole-bot gate must equal the exact autonomous tester. Secrets are set by the harness. */

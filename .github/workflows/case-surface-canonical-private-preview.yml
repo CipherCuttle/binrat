@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       expected_release_sha:
-        description: Exact reviewed 40-character release SHA; must be a descendant of canonical Case #104.
+        description: Exact reviewed 40-character release SHA; must descend from canonical Case #104.
         required: true
         type: string
-      candidate_version:
-        description: Existing uploaded Worker version UUID to inspect; this workflow never uploads or promotes it.
+      private_tester_id:
+        description: Existing authorized Telegram tester ID, used only for signed read requests.
         required: true
         type: string
 
@@ -16,18 +16,19 @@ permissions:
   contents: read
 
 concurrency:
-  group: binrat-case-canonical-private-preview-read-only
+  group: binrat-case-version-url-private-preview
   cancel-in-progress: false
 
 jobs:
-  preflight:
+  version-url-private-preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       EXPECTED_RELEASE_SHA: ${{ inputs.expected_release_sha }}
-      CANDIDATE_VERSION: ${{ inputs.candidate_version }}
+      PRIVATE_TESTER_ID: ${{ inputs.private_tester_id }}
       CANONICAL_CASE_SHA: 9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3
 
     steps:
@@ -35,6 +36,12 @@ jobs:
         with:
           ref: ${{ inputs.expected_release_sha }}
           fetch-depth: 0
+      - name: Assert reviewed canonical release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_RELEASE_SHA"
+          git merge-base --is-ancestor "$CANONICAL_CASE_SHA" HEAD
       - uses: pnpm/action-setup@v4
         with:
           version: 10.15.0
@@ -44,30 +51,47 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Assert reviewed canonical release
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$EXPECTED_RELEASE_SHA"
-          git merge-base --is-ancestor "$CANONICAL_CASE_SHA" HEAD
-      - name: Full regression gate
+      - name: Full local regression gate
         run: pnpm check
-      - name: Non-deploying Worker bundle gate
+      - name: Prepare exact active-resource candidate config
+        run: node scripts/case-version-url-preview.mjs prepare-config "$EXPECTED_RELEASE_SHA"
+      - name: Local Version upload bundle gate only
         shell: bash
         run: |
           set -euo pipefail
-          cp cloudflare/wrangler.example.jsonc wrangler.jsonc
-          sed -i 's/REPLACE_WITH_D1_DATABASE_ID/00000000-0000-0000-0000-000000000000/g' wrangler.jsonc
-          sed -i 's#https://REPLACE_WITH_PUBLIC_SITE#https://example.invalid#g' wrangler.jsonc
-          pnpm dlx wrangler@4.135.0 deploy --dry-run --outdir .wrangler-case-private-preview-dry-run
-          test -n "$(find .wrangler-case-private-preview-dry-run -type f -print -quit)"
-      - name: Read-only candidate parity and funding schema preflight
-        run: node scripts/case-private-preview-verify.mjs preflight "$EXPECTED_RELEASE_SHA" "$CANDIDATE_VERSION"
-      - name: Upload read-only preflight receipt
+          pnpm dlx wrangler@4.135.0 versions upload \
+            --name binrat-edge-v0 \
+            --config .artifacts/case-version-url-candidate.jsonc \
+            --keep-vars --strict --dry-run \
+            --outdir .artifacts/case-version-url-bundle
+          test -n "$(find .artifacts/case-version-url-bundle -type f -print -quit)"
+      - name: Snapshot current 100-percent production version
+        run: node scripts/case-version-url-preview.mjs snapshot-production "$EXPECTED_RELEASE_SHA"
+      - name: Upload one undeployed candidate Worker Version
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          WRANGLER_OUTPUT_FILE_PATH=.artifacts/wrangler-version-upload.ndjson \
+            pnpm dlx wrangler@4.135.0 versions upload \
+              --name binrat-edge-v0 \
+              --config .artifacts/case-version-url-candidate.jsonc \
+              --keep-vars --strict \
+              --tag "case-version-url-${EXPECTED_RELEASE_SHA:0:12}" \
+              --message "BINRAT exact Version URL private preview ${EXPECTED_RELEASE_SHA}"
+          test -s .artifacts/wrangler-version-upload.ndjson
+      - name: Capture machine-readable upload receipt
+        run: node scripts/case-version-url-preview.mjs capture-upload "$EXPECTED_RELEASE_SHA"
+      - name: Read-only Version URL smoke and zero-traffic proof
+        run: node scripts/case-version-url-preview.mjs version-smoke "$EXPECTED_RELEASE_SHA" "$PRIVATE_TESTER_ID"
+      - name: Upload non-secret Version URL receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: binrat-case-canonical-private-preview-preflight
-          path: .artifacts/
+          name: binrat-case-version-url-private-preview
+          path: |
+            .artifacts/case-version-url-*.json
+            !.artifacts/case-version-url-candidate.jsonc
+            !.artifacts/case-version-url-readonly-d1.jsonc
           retention-days: 30
           if-no-files-found: warn

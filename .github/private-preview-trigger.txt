@@ -1,5 +1,14 @@
-Prepared-only canonical Case private-preview verification.
+Manual-only canonical Case Version-URL private preview.
 
 Canonical Case authority: 9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3 (PR #104).
-The accompanying workflows are manual read-only preflight and smoke gates. They do not deploy,
-promote traffic, apply D1 migrations, configure Telegram, enqueue funding work, or change Rat flags.
+Dispatching the private-preview workflow checks an exact reviewed SHA locally,
+uploads one undeployed Worker Version, and smokes only the Version URL returned
+by Wrangler. It never promotes traffic, deploys production, applies D1
+migrations, configures Telegram, enqueues funding work, or enables Rat/UI/media
+flags. The existing live-smoke workflow remains a distinct, after-promotion
+read-only gate.
+
+The funding provenance migration
+`20261002_pons_funding_provenance_v1.sql` remains a prerequisite to a full
+Version-URL pass. Until separately authorized and applied, the fixed read-only
+schema proof correctly stops at `FUNDING_SCHEMA_MISSING:*`.

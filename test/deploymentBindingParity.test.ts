@@ -83,6 +83,40 @@ test('binding parity fails closed when Workers AI disappears or a target changes
   assert.ok(result.errors.includes('D1_TARGET_CHANGED:DB'));
 });
 
+test('private preview parity permits only explicit safe deactivation and exact release change', () => {
+  const active = version();
+  active.resources!.bindings!.push(
+    { name: 'BINRAT_AUTONOMOUS_RAT_ENABLED', type: 'plain_text', text: 'true' },
+    { name: 'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED', type: 'plain_text', text: 'true' },
+    { name: 'BINRAT_TELEGRAM_UI_V2_ENABLED', type: 'plain_text', text: 'true' },
+    { name: 'BINRAT_TELEGRAM_MEDIA_ENABLED', type: 'plain_text', text: 'true' },
+    { name: 'BINRAT_PONS_FUNDING_ENABLED', type: 'plain_text', text: 'true' }
+  );
+  const candidate = structuredClone(active);
+  for (const name of ['BINRAT_AUTONOMOUS_RAT_ENABLED','BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED',
+    'BINRAT_TELEGRAM_UI_V2_ENABLED','BINRAT_TELEGRAM_MEDIA_ENABLED','BINRAT_PONS_FUNDING_ENABLED']) {
+    candidate.resources!.bindings!.find(binding => binding.name === name)!.text = 'false';
+  }
+  candidate.resources!.bindings!.find(binding => binding.name === 'BINRAT_RELEASE_SHA')!.text = 'reviewed';
+  assert.deepEqual(verifyWorkerBindingParity(active, candidate, { privatePreview: true }), { ok: true, errors: [] });
+
+  const changedDb = structuredClone(candidate);
+  changedDb.resources!.bindings!.find(binding => binding.name === 'DB')!.id = 'other-db';
+  assert.ok(verifyWorkerBindingParity(active, changedDb, { privatePreview: true }).errors.includes('D1_TARGET_CHANGED:DB'));
+
+  const changedQueue = structuredClone(candidate);
+  changedQueue.resources!.bindings!.find(binding => binding.name === 'SYNC_QUEUE')!.queue_name = 'other-queue';
+  assert.ok(verifyWorkerBindingParity(active, changedQueue, { privatePreview: true }).errors.includes('QUEUE_TARGET_CHANGED:SYNC_QUEUE'));
+
+  const changedPlainText = structuredClone(candidate);
+  changedPlainText.resources!.bindings!.find(binding => binding.name === 'RAT_CONVERSATION_ENABLED')!.text = 'false';
+  assert.ok(verifyWorkerBindingParity(active, changedPlainText, { privatePreview: true }).errors.includes('VARIABLE_CHANGED:RAT_CONVERSATION_ENABLED'));
+
+  const unexpected = structuredClone(candidate);
+  unexpected.resources!.bindings!.push({ name: 'UNEXPECTED_PREVIEW_BINDING', type: 'plain_text', text: 'false' });
+  assert.ok(verifyWorkerBindingParity(active, unexpected, { privatePreview: true }).errors.includes('CANDIDATE_BINDING_UNAUTHORIZED:UNEXPECTED_PREVIEW_BINDING'));
+});
+
 test('controlled text Rat activation remains explicit and requires one secret tester with UI/media off', () => {
   const active = version();
   active.resources!.bindings!.push(
@@ -236,6 +270,8 @@ test('visible candidate whole-bot gate must match the exact selected tester', ()
 test('candidate manifest requires known-good bindings and flag-off Pons configuration', () => {
   const pass = verifyCandidateManifest({ name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: './web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', ...provenPonsVars } });
   assert.deepEqual(pass, { ok: true, errors: [] });
+  const privatePreview = { name: 'binrat-edge-v0', ai: { binding: 'AI' }, triggers: { crons: ['* * * * *'] }, assets: { directory: '../web' }, vars: { BINRAT_AUTONOMOUS_RAT_ENABLED: 'false', BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false', BINRAT_TELEGRAM_UI_V2_ENABLED: 'false', BINRAT_TELEGRAM_MEDIA_ENABLED: 'false', ...provenPonsVars } };
+  assert.deepEqual(verifyCandidateManifest(privatePreview, { privatePreview: true }), { ok: true, errors: [] });
   const fail = verifyCandidateManifest({ name: 'binrat-edge-v0', triggers: { crons: [] }, assets: { directory: './web' } });
   assert.equal(fail.ok, false);
   assert.ok(fail.errors.includes('AI_BINDING_MISSING_FROM_MANIFEST'));
