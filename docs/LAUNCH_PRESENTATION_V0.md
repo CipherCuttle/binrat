@@ -44,9 +44,12 @@ The public token-facing surface is prelaunch and fail-closed.
 - token marketing authorization: **NOT AUTHORIZED**
 - factual authority: **UNCHANGED BY TOKEN OWNERSHIP**
 
-The Web surface should derive the current token state from the public fail-closed
-Dumpster Ledger where possible. If that state cannot be verified, the UI must
-show status unavailable / fail closed and must not promote a contract address.
+The Web surface derives token launch/marketing state from runtime
+`/api/capabilities` / `CAPABILITY_MANIFEST_JSON`. The Dumpster Ledger is a
+separate funding/accounting projection and does not own Pons token-launch state.
+
+If runtime launch authority cannot be verified, the token UI fails closed and
+must not promote a contract address.
 
 No prelaunch contract, treasury, fee-recipient, deployer or personal-buyer
 address belongs in the token marketing section. Historical Arc role addresses

@@ -47,7 +47,8 @@ if (!launchDoc.includes('NOT LAUNCHED') || !launchDoc.includes('NOT PUBLISHED') 
 if (!launchDoc.includes('The token never gets to rewrite a receipt.')) throw new Error('LAUNCH_TRUTH_BOUNDARY_MISSING');
 if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('LAUNCH_RUNTIME_TOKEN_STATE_NOT_FAIL_CLOSED');
 if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('LAUNCH_RUNTIME_AUTHORITY_NOT_FAIL_CLOSED');
-if (!app.includes('renderTokenPrelaunchState')) throw new Error('LAUNCH_RUNTIME_PRESENTATION_NOT_BOUND');
+if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('LAUNCH_RUNTIME_AUTHORITY_SHAPE_NOT_BOUND');
+if (!app.includes('renderTokenLaunchState(manifest.launchAuthorization)')) throw new Error('LAUNCH_RUNTIME_PRESENTATION_NOT_BOUND');
 
 const tokenStart = html.indexOf('id="token-status"');
 const tokenEnd = html.indexOf('id="boundary"', tokenStart);

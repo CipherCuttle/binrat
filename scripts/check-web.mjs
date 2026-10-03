@@ -98,7 +98,9 @@ if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error
 if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('WEB_TOKEN_LAUNCH_GATE_VALIDATION_MISSING');
 if (!dataSource.includes('value.marketingAuthorized !== false')) throw new Error('WEB_TOKEN_MARKETING_GATE_VALIDATION_MISSING');
 if (!app.includes('bootstrapTokenCapabilities')) throw new Error('WEB_TOKEN_RUNTIME_UTILITY_STATUS_MISSING');
-if (!app.includes('renderTokenPrelaunchState')) throw new Error('WEB_TOKEN_RUNTIME_PRELAUNCH_STATE_MISSING');
+if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('WEB_TOKEN_MANIFEST_LAUNCH_SHAPE_MISSING');
+if (!app.includes('renderTokenLaunchState')) throw new Error('WEB_TOKEN_RUNTIME_PRELAUNCH_STATE_MISSING');
+if (!app.includes('renderTokenLaunchState(manifest.launchAuthorization)')) throw new Error('WEB_TOKEN_MANIFEST_AUTHORITY_NOT_BOUND');
 if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_RUNTIME_STATUS_MISSING');
 if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
 if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');
@@ -116,6 +118,11 @@ if (!app.includes('from "./share-card.js"')) throw new Error('WEB_SHARE_CARD_BOU
 if (!app.includes('!["FIXTURE", "LIVE"].includes(feed?.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
 if (app.includes('bag.creator')) throw new Error('WEB_AMBIGUOUS_CREATOR_RENDERING_REINTRODUCED');
+for (const forbidden of ['REPEAT CREATORS', 'CREATOR FILE', 'REPORTED CREATOR', 'reported creator address']) {
+  if (`${html}\n${app}`.includes(forbidden)) throw new Error(`WEB_PUBLIC_CREATOR_ROLE_DRIFT:${forbidden}`);
+}
+if (!html.includes('REPEAT DEPLOYERS')) throw new Error('WEB_REPEAT_DEPLOYER_LABEL_MISSING');
+if (!app.includes('DEPLOYER FILE')) throw new Error('WEB_DEPLOYER_FILE_LABEL_MISSING');
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('notedConditions')) throw new Error('WEB_NOTED_CONDITIONS_MAPPING_MISSING');
 if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`')) throw new Error('WEB_BAG_INTELLIGENCE_SOURCE_MISSING');

@@ -243,12 +243,37 @@ async function bootstrapTokenCapabilities() {
       target.dataset.status = status;
       applied += 1;
     }
+    renderTokenLaunchState(manifest.launchAuthorization);
     rail.textContent = applied > 0
       ? "RUNTIME CAPABILITY MANIFEST"
-      : "MANIFEST LOADED / NO UTILITY BADGES RESOLVED";
+      : "RUNTIME MANIFEST / NO UTILITY BADGES RESOLVED";
   } catch {
     rail.textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
+    renderTokenLaunchState(null);
   }
+}
+
+function renderTokenLaunchState(launchAuthorization) {
+  const section = document.querySelector("#token-status");
+  if (!section) return;
+
+  const prelaunch =
+    launchAuthorization?.tokenState === "NOT_LAUNCHED" &&
+    launchAuthorization?.status === "BLOCKED" &&
+    launchAuthorization?.marketingAuthorized === false &&
+    launchAuthorization?.launchAuthorized === false;
+
+  section.dataset.tokenState = prelaunch ? "NOT_LAUNCHED" : "UNVERIFIED";
+  document.querySelector("#token-public-state").textContent =
+    prelaunch ? "$BINRAT IS NOT LIVE." : "TOKEN STATE REQUIRES VERIFIED PUBLICATION";
+  document.querySelector("#token-contract-state").textContent =
+    prelaunch
+      ? "NO OFFICIAL CONTRACT HAS BEEN PUBLISHED"
+      : "NO CONTRACT PROMOTED BY THIS SURFACE";
+  document.querySelector("#token-launch-gate").textContent =
+    prelaunch ? "BLOCKED" : "UNVERIFIED / FAIL CLOSED";
+  document.querySelector("#token-marketing-gate").textContent =
+    prelaunch ? "NOT AUTHORIZED" : "UNVERIFIED / FAIL CLOSED";
 }
 
 function roadmapCapabilityStatuses(capabilities) {
@@ -324,41 +349,14 @@ async function bootstrapLedger() {
     renderUtility("#ledger-shipped", ledger.utilityStatus.shipped);
     renderUtility("#ledger-building", ledger.utilityStatus.building);
     renderUtility("#ledger-planned", ledger.utilityStatus.planned);
-    renderTokenPrelaunchState(ledger);
   } catch (error) {
     section.dataset.ledgerState = "FAIL_CLOSED";
     document.querySelector("#ledger-funding-status").textContent =
       "PUBLIC LEDGER UNAVAILABLE / FAIL CLOSED";
     document.querySelector("#ledger-explanation").textContent =
       "The funding projection could not be verified. No wallet or balance is being presented as production truth.";
-    const tokenSection = document.querySelector("#token-status");
-    if (tokenSection) tokenSection.dataset.tokenState = "UNVERIFIED";
-    const tokenPublicState = document.querySelector("#token-public-state");
-    const tokenContractState = document.querySelector("#token-contract-state");
-    const tokenLaunchGate = document.querySelector("#token-launch-gate");
-    const tokenMarketingGate = document.querySelector("#token-marketing-gate");
-    if (tokenPublicState) tokenPublicState.textContent = "TOKEN STATUS UNAVAILABLE";
-    if (tokenContractState) tokenContractState.textContent = "NO CONTRACT PROMOTED BY THIS SURFACE";
-    if (tokenLaunchGate) tokenLaunchGate.textContent = "UNVERIFIED / FAIL CLOSED";
-    if (tokenMarketingGate) tokenMarketingGate.textContent = "UNVERIFIED / FAIL CLOSED";
     console.error(error);
   }
-}
-
-function renderTokenPrelaunchState(ledger) {
-  const section = document.querySelector("#token-status");
-  if (!section) return;
-  section.dataset.tokenState = ledger.tokenState;
-  document.querySelector("#token-public-state").textContent =
-    ledger.tokenState === "NOT_LAUNCHED" ? "$BINRAT IS NOT LIVE." : "TOKEN STATE UNVERIFIED";
-  document.querySelector("#token-contract-state").textContent =
-    ledger.tokenState === "NOT_LAUNCHED"
-      ? "NO OFFICIAL CONTRACT HAS BEEN PUBLISHED"
-      : "OFFICIAL CONTRACT STATE UNVERIFIED";
-  document.querySelector("#token-launch-gate").textContent =
-    ledger.launchAuthorization === "BLOCKED" ? "BLOCKED" : "UNVERIFIED";
-  document.querySelector("#token-marketing-gate").textContent =
-    ledger.marketingAuthorized === false ? "NOT AUTHORIZED" : "UNVERIFIED";
 }
 
 function renderUtility(selector, items) {
@@ -727,7 +725,7 @@ function openBag(idOrBag, origin = document.activeElement) {
         )
         .join("")
     : bag.priorLaunches > 0
-      ? `<div class="empty-trail">${escapeHtml(bag.priorLaunches)} earlier indexed launch${bag.priorLaunches===1?"":"es"} exist for this reported deployer. The fast homepage view does not inline the full trail; Creator File loads it on demand.</div>`
+      ? `<div class="empty-trail">${escapeHtml(bag.priorLaunches)} earlier indexed launch${bag.priorLaunches===1?"":"es"} exist for this reported deployer. The fast homepage view does not inline the full trail; Deployer File loads it on demand.</div>`
       : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
 
   const share = buildShareCardModel(bag);
@@ -756,7 +754,7 @@ function openBag(idOrBag, origin = document.activeElement) {
     </section>
 
     <section class="creator-file-panel rb-card" data-creator-panel>
-      <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>INDEXED HISTORY</span></div>
+      <div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>INDEXED HISTORY</span></div>
       <p class="intel-loading">Opening the reported-address file…</p>
     </section>
 
@@ -842,7 +840,7 @@ async function hydrateBagIntelligence(bag) {
       : '<div class="intel-empty">No between-horizon change can be projected yet.</div>';
     panel.innerHTML = `
       <div class="file-section-heading"><h3>03 / WHAT CHANGED?</h3><span>${escapeHtml(intel.observationCoverage)} OBSERVATION COVERAGE</span></div>
-      <p class="intel-boundary">On-chain snapshots only. Raw pool liquidity is not USD liquidity. The reported creator address is not a claim of human identity.</p>
+      <p class="intel-boundary">On-chain snapshots only. Raw pool liquidity is not USD liquidity. The Pons-reported deployer address is not a claim of human identity.</p>
       <div class="intel-snapshots">${snapshots}</div>
       <div class="intel-changes"><span class="intel-subhead">BETWEEN RECEIPTS</span>${changes}</div>
       <div class="intel-receipt">INTELLIGENCE RECEIPT / ${escapeHtml(intel.receipt.receiptId)}</div>
@@ -875,7 +873,7 @@ async function hydrateCreatorFile(bag) {
         <button class="creator-launch-open" type="button" data-open-creator-launch="${escapeHtml(item.id)}">OPEN CHANGES ↗</button>
       </div>`).join("");
     panel.innerHTML = `
-      <div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
+      <div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
       <div class="creator-file-stats">
         <div><span>REPORTED ADDRESS</span><code>${escapeHtml(shortAddress(file.reportedCreatorAddress))}</code></div>
         <div><span>FIRST INDEXED BLOCK</span><b>${escapeHtml(file.firstIndexedBlock)}</b></div>
@@ -884,7 +882,7 @@ async function hydrateCreatorFile(bag) {
       </div>
       <p class="intel-boundary">Same Pons-reported deployer address only. This does not establish common human ownership. Full indexed trail shown; open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
       <div class="creator-launches">${rows}</div>
-      <div class="intel-receipt">CREATOR FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
+      <div class="intel-receipt">DEPLOYER FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
     `;
     for (const image of panel.querySelectorAll("[data-token-image]")) {
       image.addEventListener("error", () => image.remove(), { once: true });
@@ -910,7 +908,7 @@ async function hydrateCreatorFile(bag) {
     window.dispatchEvent(new CustomEvent("binrat:drawer-hydrated", { detail: { kind: "creator" } }));
   } catch {
     if (activeDrawerBagId !== bag.id) return;
-    panel.innerHTML = '<div class="file-section-heading"><h3>04 / CREATOR FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Creator history projection is not available.</div>';
+    panel.innerHTML = '<div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>UNAVAILABLE</span></div><div class="intel-empty">Deployer history projection is not available.</div>';
   }
 }
 
@@ -933,7 +931,7 @@ async function hydrateReplayLab(bag) {
       <p class="intel-boundary">Deterministic replay of real indexed Pons evidence. Missing 5m / 1h / 24h stages remain missing; nothing is simulated.</p>
       <div class="intel-snapshots">${stages}</div>
       <div class="creator-file-stats">
-        <div><span>CREATOR FILE</span><b>${escapeHtml(replay.creatorFile.indexedLaunchCount)} LAUNCHES</b></div>
+        <div><span>DEPLOYER FILE</span><b>${escapeHtml(replay.creatorFile.indexedLaunchCount)} LAUNCHES</b></div>
         <div><span>OBSERVATION COVERAGE</span><b>${escapeHtml(replay.intelligence.observationCoverage)}</b></div>
         <div><span>AS OF BLOCK</span><b>${escapeHtml(replay.asOfBlock)}</b></div>
         <div><span>HISTORY</span><b>${escapeHtml(replay.historyCoverage)}</b></div>
@@ -983,8 +981,8 @@ function renderObservationSnapshot(snapshot) {
     <article class="intel-snapshot" data-rb-animated>
       <div class="intel-snapshot-head"><strong>+${escapeHtml(snapshot.horizonLabel.toUpperCase())}</strong><span>BLK ${escapeHtml(snapshot.observedBlock)}</span></div>
       <dl>
-        <dt>creator share</dt><dd>${formatBps(snapshot.reportedCreatorShareBps)}</dd>
-        <dt>creator balance</dt><dd>${formatRaw(snapshot.reportedCreatorBalanceRaw)}</dd>
+        <dt>reported deployer share</dt><dd>${formatBps(snapshot.reportedCreatorShareBps)}</dd>
+        <dt>reported deployer balance</dt><dd>${formatRaw(snapshot.reportedCreatorBalanceRaw)}</dd>
         <dt>active liquidity</dt><dd>${formatRaw(snapshot.poolActiveLiquidityRaw)} <small>RAW</small></dd>
         <dt>pool tick</dt><dd>${snapshot.poolTick === null ? "UNKNOWN" : escapeHtml(snapshot.poolTick)}</dd>
       </dl>
@@ -995,8 +993,8 @@ function renderObservedChange(change) {
   const label = {
     POOL_ACTIVE_LIQUIDITY_RAW: "ACTIVE LIQUIDITY / RAW",
     POOL_TICK: "POOL TICK",
-    REPORTED_CREATOR_BALANCE_RAW: "REPORTED CREATOR BALANCE",
-    REPORTED_CREATOR_SHARE_BPS: "REPORTED CREATOR SHARE",
+    REPORTED_CREATOR_BALANCE_RAW: "REPORTED DEPLOYER BALANCE",
+    REPORTED_CREATOR_SHARE_BPS: "REPORTED DEPLOYER SHARE",
   }[change.field] ?? change.field;
   const before = change.field === "REPORTED_CREATOR_SHARE_BPS" ? formatBps(change.before) : formatRaw(change.before);
   const after = change.field === "REPORTED_CREATOR_SHARE_BPS" ? formatBps(change.after) : formatRaw(change.after);
@@ -1035,7 +1033,7 @@ function renderShareCard(card) {
         <div class="share-card-kicker">HOT GARBAGE // ${escapeHtml(card.stamp)}</div>
         <h4 class="share-card-symbol">${escapeHtml(card.symbol)}</h4>
         <div class="share-card-metrics">
-          <div class="share-card-metric"><span>REPORTED CREATOR</span><b>${escapeHtml(card.creatorShort)}</b></div>
+          <div class="share-card-metric"><span>REPORTED DEPLOYER</span><b>${escapeHtml(card.creatorShort)}</b></div>
           <div class="share-card-metric"><span>PRIOR BAGS</span><b>${escapeHtml(card.priorLaunches)}</b></div>
           <div class="share-card-metric"><span>COVERAGE</span><b>${escapeHtml(card.coverage)}</b></div>
         </div>

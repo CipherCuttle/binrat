@@ -395,7 +395,13 @@ export async function loadCapabilityManifest() {
   if (
     value?.schemaVersion !== "binrat.capability-manifest/0.1" ||
     !value.capabilities ||
-    typeof value.capabilities !== "object"
+    typeof value.capabilities !== "object" ||
+    !value.launchAuthorization ||
+    typeof value.launchAuthorization !== "object" ||
+    typeof value.launchAuthorization.status !== "string" ||
+    typeof value.launchAuthorization.marketingAuthorized !== "boolean" ||
+    typeof value.launchAuthorization.launchAuthorized !== "boolean" ||
+    typeof value.launchAuthorization.tokenState !== "string"
   ) throw new Error("CAPABILITY_MANIFEST_INVALID");
   return value;
 }
