@@ -25,16 +25,27 @@ test('Pons launch plan is deterministic, chain-scoped and fail-closed', async ()
   assert.equal(value.launchRail.railId, 'pons-v2-vault-staking-candidate-v1');
   assert.equal(value.launchRail.stakingFactory.address, '0x1488473464F2C6E6c5C412f05d805c619322E7EB');
   assert.equal(value.upstreamRisk.stakingAttestationStatus, 'CONDITIONAL');
-  assert.equal(value.upstreamRisk.explicitUpstreamRiskAcceptanceRequired, true);
+  assert.equal(value.upstreamRisk.explicitUpstreamRiskAcceptanceRequired, false);
+  assert.equal(
+    value.upstreamRisk.ownerUpstreamRiskDecision,
+    'ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY'
+  );
+  assert.equal(value.ownerSelectedLaunchPolicy.creatorTaxBps, 0);
+  assert.equal(value.ownerSelectedLaunchPolicy.openingBuyWei, '0');
   assert.equal(value.authorization.launchAuthorized, false);
   assert.equal(value.authorization.marketingAuthorized, false);
 });
 
-test('immutable launch inputs cannot be guessed into the planning artifact', async () => {
+test('owner-selected zero tax and zero opening buy are canonical while unresolved inputs stay fail-closed', async () => {
   const value = await plan();
-  value.unresolvedImmutableInputs.creatorTaxBps = 100;
+  value.ownerSelectedLaunchPolicy.creatorTaxBps = 100;
   value.planDigest = await derivePonsLaunchPlanDigest(value);
-  await assert.rejects(validatePonsLaunchPlan(value), /IMMUTABLES_PREMATURELY_FROZEN/);
+  await assert.rejects(validatePonsLaunchPlan(value), /OWNER_POLICY_INVALID/);
+
+  const unresolved = await plan();
+  unresolved.unresolvedImmutableInputs.workingRatMinStakeRaw = '1';
+  unresolved.planDigest = await derivePonsLaunchPlanDigest(unresolved);
+  await assert.rejects(validatePonsLaunchPlan(unresolved), /IMMUTABLES_PREMATURELY_FROZEN/);
 });
 
 test('old Arc launch authority is explicitly historical only', async () => {
@@ -43,7 +54,7 @@ test('old Arc launch authority is explicitly historical only', async () => {
   assert.equal(value.historicalPredecessor.authority, 'HISTORICAL_ONLY_NOT_PONS_AUTHORITY');
   assert.equal(value.upstreamRisk.rejectedStakeBurnAttestation, 'docs/PONSVault_UPSTREAM_ATTESTATION_V1.json');
   assert.equal(value.upstreamRisk.stakingAttestation, 'docs/PONSVault_STAKING_ATTESTATION_V1.json');
-  assert.equal(value.upstreamRisk.launchMechanicsGate, 'BLOCKED_UPSTREAM_RISK_ACCEPTANCE');
+  assert.equal(value.upstreamRisk.launchMechanicsGate, 'BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST');
 });
 
 test('rejected Stake & Burn inputs cannot reappear as current immutable Staking inputs', async () => {
@@ -51,6 +62,8 @@ test('rejected Stake & Burn inputs cannot reappear as current immutable Staking 
   assert.equal('stakeBurnFactory' in value.launchRail, false);
   assert.equal('stakeLockPeriodSeconds' in value.unresolvedImmutableInputs, false);
   assert.equal('minimumFeesBeforeRun' in value.unresolvedImmutableInputs, false);
+  assert.equal('creatorTaxBps' in value.unresolvedImmutableInputs, false);
+  assert.equal('openingBuyWei' in value.unresolvedImmutableInputs, false);
   assert.equal(value.unresolvedImmutableInputs.minimumFeesBeforePayoutWei, null);
 });
 
@@ -63,5 +76,5 @@ test('stale Stake & Burn fields cannot coexist with current Staking authority', 
   const staleInput = await plan();
   staleInput.unresolvedImmutableInputs.stakeLockPeriodSeconds = null;
   staleInput.planDigest = await derivePonsLaunchPlanDigest(staleInput);
-  await assert.rejects(validatePonsLaunchPlan(staleInput), /STALE_STAKE_BURN_INPUT/);
+  await assert.rejects(validatePonsLaunchPlan(staleInput), /STALE_OR_RESOLVED_INPUT/);
 });
