@@ -97,7 +97,7 @@ test('receipt existence cannot authorize launch or marketing', async () => {
       receiptExistenceAuthorizesLaunch: boolean;
     };
   };
-  assert.equal(manifest.capabilities.launchMechanicsV0.launchAuthorizationEffect, 'NONE');
+  assert.equal(manifest.capabilities.launchMechanicsV0.launchAuthorizationEffect, 'NONE_HISTORICAL_ONLY');
   assert.deepEqual(manifest.launchAuthorization, {
     ...manifest.launchAuthorization,
     status: 'BLOCKED',
