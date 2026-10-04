@@ -159,6 +159,7 @@ jobs:
               BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
               BINRAT_TELEGRAM_UI_V2_ENABLED: 'false',
               BINRAT_PONS_OUTCOME_ENABLED: 'true',
+              ROBINHOOD_RPC_URL: 'https://rpc.ordofi.network',
               BINRAT_RELEASE_SHA: sha
             }
           };
