@@ -1,7 +1,10 @@
 import type { D1DatabaseLike } from '../cloudflare/d1Types.js';
-import { sha256Hex } from '../evidence/canonical.js';
+import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { authoritativeCheckpoint, evidenceForLaunch, saveCase } from './evidence.js';
 import { makeReceipt, type DiscoveryReason, type Entity, type EvidenceRef, type Receipt } from './model.js';
+import { buildProvenanceFact } from '../intelligence/provenance.js';
+import type { Hex, LaunchObserved } from '../core/types.js';
+import { verifiedRuntimeTarget, type D1RuntimeState } from '../cloudflare/runtimeState.js';
 
 export const RATS_RULE_VERSION = 'RATS_PONS_DEPLOYER_RECURRENCE_V1' as const;
 const MAX_CANDIDATES = 5;
@@ -69,30 +72,77 @@ export interface LatestPonsLaunch {
 
 interface LatestLaunchRow {
   launch_id: string;
-  token: string;
+  event_id: string;
+  chain_id: number;
+  block_hash: `0x${string}`;
+  source: 'ARCPAD' | 'PONS_V2';
+  launcher: `0x${string}`;
+  log_index: number;
+  pool: `0x${string}`;
+  observed_at_ms: number;
+  token: Hex;
   symbol: string;
   name: string;
   block_number: string;
-  tx_hash: string;
-  creator: string;
+  tx_hash: Hex;
+  creator: Hex;
   image_uri: string;
   website: string;
   twitter: string;
   telegram: string;
   prior_launch_count: number;
+  fact_payload_json: string;
+  fact_id: string;
+  fact_evidence_digest: string;
+}
+
+interface VerifiedSnapshotAnchor {
+  chain_id: number;
+  block_number: string;
+  block_hash: string;
+  source_verified: number;
+  live_caught_up: number;
+  head_block: string | null;
+  target_block: string | null;
+  observation_ready: number;
+  history_backfill_complete: number;
+  history_backfill_target_block: string | null;
+  last_sync_error: string | null;
+  last_history_error: string | null;
+  last_observation_error: string | null;
+  updated_at_ms: number;
 }
 
 export async function latestPonsLaunchSnapshot(
   db: D1DatabaseLike,
   now: number,
   requestedLimit = 20
-): Promise<{ sourceCheckpoint: string; launches: LatestPonsLaunch[] }> {
+): Promise<{ sourceCheckpoint: string; checkpointBlockHash: string; launches: LatestPonsLaunch[] }> {
   const chainId = 4663;
-  const tip = await authoritativeCheckpoint(db, now, chainId);
+  const anchor = await db.prepare(`SELECT c.chain_id,c.block_number,c.block_hash,
+      r.source_verified,r.live_caught_up,r.head_block,r.target_block,r.observation_ready,
+      r.history_backfill_complete,r.history_backfill_target_block,r.last_sync_error,
+      r.last_history_error,r.last_observation_error,r.updated_at_ms
+    FROM chain_checkpoints c JOIN binrat_runtime_state r ON r.chain_id=c.chain_id
+    WHERE c.chain_id=? LIMIT 1`).bind(chainId).first<VerifiedSnapshotAnchor>();
+  if (!anchor || !/^(0|[1-9]\d*)$/.test(anchor.block_number) || !/^0x[0-9a-f]{64}$/.test(anchor.block_hash)) {
+    throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
+  }
+  const runtime: D1RuntimeState = {
+    chainId:anchor.chain_id,sourceVerified:anchor.source_verified===1,liveCaughtUp:anchor.live_caught_up===1,
+    headBlock:anchor.head_block===null?null:BigInt(anchor.head_block),targetBlock:anchor.target_block===null?null:BigInt(anchor.target_block),
+    observationReady:anchor.observation_ready===1,historyBackfillComplete:anchor.history_backfill_complete===1,
+    historyBackfillTargetBlock:anchor.history_backfill_target_block===null?null:BigInt(anchor.history_backfill_target_block),
+    lastSyncError:anchor.last_sync_error,lastHistoryError:anchor.last_history_error,
+    lastObservationError:anchor.last_observation_error,updatedAtMs:anchor.updated_at_ms
+  };
+  const tip = verifiedRuntimeTarget(runtime,BigInt(anchor.block_number),now,180_000);
+  if (tip === null || tip !== BigInt(anchor.block_number)) throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
   const limit = Math.max(1, Math.min(20, requestedLimit));
-  const result = await db.prepare(`SELECT l.launch_id,l.token,l.symbol,l.name,l.block_number,l.tx_hash,l.creator,
+  const result = await db.prepare(`SELECT l.launch_id,l.event_id,l.chain_id,l.block_number,l.block_hash,l.source,l.launcher,l.log_index,
+      l.token,l.symbol,l.name,l.tx_hash,l.creator,l.pool,l.observed_at_ms,
       l.image_uri,l.website,l.twitter,l.telegram,
-      (SELECT COUNT(DISTINCT p.launch_id)
+      (SELECT COUNT(*)
        FROM launches p JOIN provenance_facts pf ON pf.launch_id=p.launch_id AND pf.chain_id=p.chain_id
        WHERE p.chain_id=l.chain_id AND p.source='PONS_V2' AND p.creator=l.creator
          AND CAST(p.block_number AS INTEGER)<=?
@@ -101,6 +151,7 @@ export async function latestPonsLaunchSnapshot(
            OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index<l.log_index)
            OR (CAST(p.block_number AS INTEGER)=CAST(l.block_number AS INTEGER) AND p.log_index=l.log_index AND p.launch_id<l.launch_id)
          )) AS prior_launch_count
+    ,f.fact_id AS fact_id,f.payload_json AS fact_payload_json,f.evidence_digest AS fact_evidence_digest
     FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id
     WHERE l.chain_id=? AND l.source='PONS_V2' AND CAST(l.block_number AS INTEGER)<=?
     ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT ?`)
@@ -118,18 +169,25 @@ export async function latestPonsLaunchSnapshot(
       throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
     }
     // Re-validate the canonical provenance receipt for every launch we expose.
-    const evidence = await evidenceForLaunch(db,row.launch_id,tip,chainId);
-    if (evidence.creator !== row.creator || evidence.blockNumber !== row.block_number) {
+    const launch: LaunchObserved = {
+      launchId:row.launch_id,eventId:row.event_id,chainId:row.chain_id,blockNumber:BigInt(row.block_number),
+      blockHash:row.block_hash,source:row.source,launcher:row.launcher,txHash:row.tx_hash,logIndex:row.log_index,
+      token:row.token,creator:row.creator,pool:row.pool,name:row.name,symbol:row.symbol,
+      imageUri:row.image_uri,website:row.website,twitter:row.twitter,telegram:row.telegram,observedAtMs:row.observed_at_ms
+    };
+    const fact = await buildProvenanceFact(launch);
+    if (row.fact_id !== fact.factId || row.fact_evidence_digest !== fact.evidenceDigest || row.fact_payload_json !== canonicalJson(fact) ||
+        row.creator !== fact.creator || row.block_number !== fact.observedBlock.toString()) {
       throw new Error('LATEST_LAUNCHES_UNAVAILABLE');
     }
     output.push({
       launchId:row.launch_id,token:row.token,symbol:row.symbol,name:row.name,
       blockNumber:row.block_number,txHash:row.tx_hash,deployer:row.creator,
-      priorLaunchCount:Number(row.prior_launch_count),factId:evidence.factId,
+      priorLaunchCount:Number(row.prior_launch_count),factId:fact.factId,
       metadata:{imageUri:row.image_uri,website:row.website,twitter:row.twitter,telegram:row.telegram}
     });
   }
-  return { sourceCheckpoint: tip.toString(), launches: output };
+  return { sourceCheckpoint: tip.toString(), checkpointBlockHash: anchor.block_hash, launches: output };
 }
 
 export async function latestPonsLaunches(

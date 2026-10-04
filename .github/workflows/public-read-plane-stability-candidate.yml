@@ -1,0 +1,332 @@
+# public-read-plane-stability-candidate
+#
+# Manual, candidate-ONLY deployment gate for the public read plane stability
+# candidate. Deploys the EXACT pinned SHA and touches ONLY candidate-named
+# resources. Production (binrat-edge-v0 / binrat-v0 / binrat-sync-v0 /
+# binrat.tech) is never referenced or mutated by this workflow.
+#
+# Run:
+#   gh workflow run public-read-plane-stability-candidate.yml \
+#     --ref integration/binrat-public-read-plane-stability-v1
+#
+# Authority: SHA 2d507045327bd4269a5c0dd4f2050805488f60ee (draft PR #121).
+# Secrets consumed directly from GitHub Actions (never printed):
+#   - BINRAT_CLOUDFLARE_ADMIN_API_TOKEN (D1/queues/workers API scope)
+#   - BINRAT_CLOUDFLARE_ACCOUNT_ID
+#   - BINRAT_ROBINHOOD_ARCHIVE_RPC_URL (candidate-only Pons outcome cycle)
+
+name: public-read-plane-stability-candidate
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-read-plane-stability-candidate
+  cancel-in-progress: false
+
+env:
+  BINRAT_STABILITY_SHA: "2d507045327bd4269a5c0dd4f2050805488f60ee"
+  CANDIDATE_WORKER: "binrat-read-plane-stability-candidate"
+  CANDIDATE_D1: "binrat-read-plane-stability-candidate"
+  CANDIDATE_QUEUE: "binrat-read-plane-stability-candidate-sync"
+  CANDIDATE_CONFIG: "wrangler.stability-candidate.jsonc"
+  WRANGLER_VERSION: "4.135.0"
+  CANDIDATE_URL: "https://binrat-read-plane-stability-candidate.pettevik.workers.dev"
+  PROD_WORKER: "binrat-edge-v0"
+  PROD_D1_NAME: "binrat-v0"
+  PROD_D1_ID: "46814564-1a41-449a-88e5-c1349eed3a27"
+  PROD_QUEUE: "binrat-sync-v0"
+  PROD_DOMAIN: "binrat.tech"
+
+jobs:
+  stability-candidate-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+      BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+
+    steps:
+      - name: Checkout exact stability SHA
+        uses: actions/checkout@v4
+        with:
+          ref: "2d507045327bd4269a5c0dd4f2050805488f60ee"
+          persist-credentials: false
+
+      - name: Authority re-check (HEAD must equal pinned SHA)
+        run: |
+          set -euo pipefail
+          HEAD_SHA="$(git rev-parse HEAD)"
+          echo "AUTHORITY_RECHECK: HEAD=$HEAD_SHA pinned=$BINRAT_STABILITY_SHA"
+          if [ "$HEAD_SHA" != "$BINRAT_STABILITY_SHA" ]; then
+            echo "GUARD_FAIL: AUTHORITY_MISMATCH"
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Provision candidate D1 (create only; never reuse production)
+        run: |
+          set -euo pipefail
+          W() { pnpm dlx "wrangler@$WRANGLER_VERSION" "$@"; }
+          EXISTING="$(W d1 list --json | jq -r --arg n "$CANDIDATE_D1" '.[] | select(.name == $n) | .uuid' | head -n1)"
+          if [ -n "$EXISTING" ]; then
+            echo "D1_ALREADY_EXISTS: candidate-named database found; capturing id (idempotent re-run)."
+            D1_ID="$EXISTING"
+          else
+            echo "D1_NAME_FREE: creating $CANDIDATE_D1 (location weur)."
+            W d1 create "$CANDIDATE_D1" --location weur
+            D1_ID="$(W d1 list --json | jq -r --arg n "$CANDIDATE_D1" '.[] | select(.name == $n) | .uuid' | head -n1)"
+          fi
+          if [ -z "$D1_ID" ]; then echo "GUARD_FAIL: D1_ID_CAPTURE_FAILED"; exit 1; fi
+          if [ "$D1_ID" = "$PROD_D1_ID" ]; then echo "GUARD_FAIL: PRODUCTION_D1_ID"; exit 1; fi
+          echo "CANDIDATE_D1_ID=$D1_ID" >> "$GITHUB_ENV"
+          echo "D1 receipt: name=$CANDIDATE_D1 id=$D1_ID" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Generate candidate wrangler config (candidate-only bindings)
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'EOF'
+          import { writeFileSync } from 'node:fs';
+          const d1Id = process.env.CANDIDATE_D1_ID;
+          const sha = process.env.BINRAT_STABILITY_SHA;
+          if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(d1Id ?? '')) {
+            console.error('GUARD_FAIL: D1_ID_NOT_A_UUID'); process.exit(1);
+          }
+          const cfg = {
+            name: 'binrat-read-plane-stability-candidate',
+            main: 'src/cloudflare/worker.ts',
+            compatibility_date: '2026-09-18',
+            compatibility_flags: ['nodejs_compat'],
+            workers_dev: true,
+            assets: { directory: './web' },
+            d1_databases: [{
+              binding: 'DB',
+              database_name: 'binrat-read-plane-stability-candidate',
+              database_id: d1Id
+            }],
+            triggers: { crons: ['* * * * *'] },
+            queues: {
+              producers: [{ binding: 'SYNC_QUEUE', queue: 'binrat-read-plane-stability-candidate-sync' }],
+              consumers: [{
+                queue: 'binrat-read-plane-stability-candidate-sync',
+                max_batch_size: 1,
+                max_batch_timeout: 1,
+                max_retries: 5,
+                max_concurrency: 1,
+                retry_delay: 30
+              }]
+            },
+            vars: {
+              BINRAT_MAX_STATUS_AGE_MS: '180000',
+              BINRAT_LIVE_LOOKBACK_BLOCKS: '1000',
+              BINRAT_CONFIRMATIONS: '2',
+              BINRAT_MAX_BATCH_BLOCKS: '10000',
+              BINRAT_PONS_MAX_BATCH_BLOCKS: '1024',
+              BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS: '4096',
+              BINRAT_PONS_CATCHUP_MAX_BATCHES: '4',
+              BINRAT_PONS_CATCHUP_WORK_BUDGET_MS: '60000',
+              BINRAT_PONS_NEAR_HEAD_BLOCKS: '2048',
+              BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS: '128',
+              BINRAT_MAX_OBSERVATIONS_PER_SYNC: '1',
+              BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS: '10000',
+              BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE: '4',
+              BINRAT_HOLDER_WALLET_AUTH_ENABLED: 'false',
+              BINRAT_HOLDER_GATE_ENABLED: 'false',
+              TELEGRAM_REPLIES_ENABLED: 'false',
+              RAT_CONVERSATION_ENABLED: 'false',
+              RAT_AI_ENABLED: 'false',
+              RAT_FEEDBACK_ENABLED: 'false',
+              TELEGRAM_MAX_MESSAGES_PER_MINUTE: '12',
+              BINRAT_PUBLIC_SITE_URL: 'https://binrat-read-plane-stability-candidate.pettevik.workers.dev',
+              BINRAT_AUTONOMOUS_RAT_ENABLED: 'false',
+              BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED: 'false',
+              BINRAT_TELEGRAM_MEDIA_ENABLED: 'false',
+              BINRAT_TELEGRAM_UI_V2_ENABLED: 'false',
+              BINRAT_PONS_OUTCOME_ENABLED: 'true',
+              ROBINHOOD_RPC_URL: 'https://rpc.ordofi.network',
+              BINRAT_RELEASE_SHA: sha
+            }
+          };
+          writeFileSync('wrangler.stability-candidate.jsonc', JSON.stringify(cfg, null, 2) + '\n');
+          console.log('CONFIG_WRITTEN: wrangler.stability-candidate.jsonc');
+          EOF
+
+      - name: Fail-closed production guard on generated config
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs';
+          const cfg = JSON.parse(readFileSync('wrangler.stability-candidate.jsonc', 'utf8'));
+          const fail = (code) => { console.error('GUARD_FAIL: ' + code); process.exit(1); };
+          if (cfg.name !== 'binrat-read-plane-stability-candidate') fail('WORKER_NAME_NOT_CANDIDATE');
+          if (cfg.name === 'binrat-edge-v0') fail('PRODUCTION_WORKER_NAME');
+          const dbs = cfg.d1_databases ?? [];
+          if (dbs.length !== 1) fail('EXPECTED_EXACTLY_ONE_D1_BINDING');
+          if (dbs[0].binding !== 'DB') fail('D1_BINDING_MUST_BE_DB');
+          if (dbs[0].database_name === 'binrat-v0') fail('PRODUCTION_D1_NAME');
+          if (dbs[0].database_id === '46814564-1a41-449a-88e5-c1349eed3a27') fail('PRODUCTION_D1_ID');
+          if (dbs[0].database_id !== process.env.CANDIDATE_D1_ID) fail('D1_ID_NOT_CANDIDATE');
+          const producers = cfg.queues?.producers ?? [];
+          const consumers = cfg.queues?.consumers ?? [];
+          if (producers.length !== 1 || consumers.length !== 1) fail('EXPECTED_ONE_QUEUE_PRODUCER_AND_CONSUMER');
+          if (producers[0].queue === 'binrat-sync-v0') fail('PRODUCTION_QUEUE_NAME');
+          if (consumers[0].queue === 'binrat-sync-v0') fail('PRODUCTION_QUEUE_NAME_CONSUMER');
+          if (producers[0].queue !== 'binrat-read-plane-stability-candidate-sync') fail('QUEUE_NOT_CANDIDATE');
+          if (consumers[0].queue !== 'binrat-read-plane-stability-candidate-sync') fail('QUEUE_NOT_CANDIDATE_CONSUMER');
+          if ('ai' in cfg) fail('AI_BINDING_FORBIDDEN');
+          if ('routes' in cfg || 'route' in cfg || 'custom_domains' in cfg) fail('ROUTES_FORBIDDEN');
+          if (cfg.workers_dev !== true) fail('WORKERS_DEV_MUST_BE_TRUE');
+          const raw = readFileSync('wrangler.stability-candidate.jsonc', 'utf8');
+          if (raw.includes('binrat.tech')) fail('PRODUCTION_DOMAIN_REFERENCED');
+          const vars = cfg.vars ?? {};
+          for (const key of [
+            'TELEGRAM_REPLIES_ENABLED', 'RAT_CONVERSATION_ENABLED', 'RAT_FEEDBACK_ENABLED',
+            'BINRAT_AUTONOMOUS_RAT_ENABLED', 'BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED',
+            'BINRAT_TELEGRAM_MEDIA_ENABLED', 'RAT_AI_ENABLED'
+          ]) {
+            if (vars[key] !== 'false') fail('VAR_MUST_BE_FALSE:' + key);
+          }
+          if (vars.BINRAT_PONS_OUTCOME_ENABLED !== 'true') fail('PONS_OUTCOME_NOT_ENABLED');
+          if (vars.BINRAT_RELEASE_SHA !== '2d507045327bd4269a5c0dd4f2050805488f60ee') fail('RELEASE_SHA_MISMATCH');
+          console.log('GUARD_PASS: candidate config is production-free');
+          console.log('  worker=' + cfg.name);
+          console.log('  d1=' + dbs[0].database_name + ' id=' + dbs[0].database_id);
+          console.log('  queue=' + producers[0].queue);
+          console.log('  release_sha=' + vars.BINRAT_RELEASE_SHA);
+          EOF
+
+      - name: Provision candidate queue (create only; never reuse production)
+        run: |
+          set -euo pipefail
+          W() { pnpm dlx "wrangler@$WRANGLER_VERSION" "$@"; }
+          if W queues list | grep -q "$CANDIDATE_QUEUE"; then
+            echo "QUEUE_ALREADY_EXISTS: candidate-named queue found (idempotent re-run)."
+            W queues list | grep "$CANDIDATE_QUEUE" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "QUEUE_NAME_FREE: creating $CANDIDATE_QUEUE."
+            W queues create "$CANDIDATE_QUEUE"
+            W queues list | grep "$CANDIDATE_QUEUE" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Migrations against candidate D1 ONLY (schema + 0001 + 0002, then idempotent repeats)
+        run: |
+          set -euo pipefail
+          W() { pnpm dlx "wrangler@$WRANGLER_VERSION" "$@"; }
+          CFG="--config $CANDIDATE_CONFIG"
+          echo "== [1/5] cloudflare/schema.sql =="
+          W d1 execute DB --remote --yes $CFG --file cloudflare/schema.sql
+          echo "== [2/5] 0001_public_read_snapshot.sql =="
+          W d1 execute DB --remote --yes $CFG --file cloudflare/migrations/0001_public_read_snapshot.sql
+          echo "== [3/5] 0002_launch_numeric_read_indexes.sql =="
+          W d1 execute DB --remote --yes $CFG --file cloudflare/migrations/0002_launch_numeric_read_indexes.sql
+          echo "== [4/5] repeat 0001 (idempotency) =="
+          W d1 execute DB --remote --yes $CFG --file cloudflare/migrations/0001_public_read_snapshot.sql
+          echo "== [5/5] repeat 0002 (idempotency) =="
+          W d1 execute DB --remote --yes $CFG --file cloudflare/migrations/0002_launch_numeric_read_indexes.sql
+          echo "MIGRATIONS_OK: all 5 applications exited 0" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify candidate D1 schema (snapshot table, 3 indexes, launches, no duplicates)
+        run: |
+          set -euo pipefail
+          W() { pnpm dlx "wrangler@$WRANGLER_VERSION" "$@"; }
+          W d1 execute DB --remote --yes --config "$CANDIDATE_CONFIG" --json \
+            --command "SELECT name,type FROM sqlite_master WHERE type IN ('table','index') AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY type,name" \
+            > "$RUNNER_TEMP/schema-verify.json" || true
+          # wrangler --json wraps results; normalize to a flat list of {name,type}
+          jq -r '.. | objects | select(.name? and .type?) | "\(.type) \(.name)"' \
+            "$RUNNER_TEMP/schema-verify.json" | sort -u > "$RUNNER_TEMP/schema-objects.txt"
+          cat "$RUNNER_TEMP/schema-objects.txt"
+          node --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs';
+          const lines = readFileSync(process.env.RUNNER_TEMP + '/schema-objects.txt', 'utf8')
+            .split('\n').filter(Boolean);
+          const fail = (code) => { console.error('SCHEMA_VERIFY_FAIL: ' + code); process.exit(1); };
+          const names = lines.map((l) => l.split(' ')[1]);
+          const dupes = names.filter((n, i) => names.indexOf(n) !== i);
+          if (dupes.length > 0) fail('DUPLICATE_NAMES: ' + dupes.join(','));
+          const has = (type, name) => lines.includes(type + ' ' + name);
+          if (!has('table', 'binrat_public_snapshots')) fail('MISSING_TABLE:binrat_public_snapshots');
+          if (!has('table', 'launches')) fail('MISSING_TABLE:launches');
+          for (const idx of [
+            'idx_launches_chain_source_block_numeric',
+            'idx_launches_chain_block_numeric',
+            'idx_launches_chain_source_creator_block_numeric'
+          ]) {
+            if (!has('index', idx)) fail('MISSING_INDEX:' + idx);
+          }
+          console.log('SCHEMA_VERIFY_OK: binrat_public_snapshots + launches + 3 numeric indexes present, no duplicates');
+          EOF
+          cat "$RUNNER_TEMP/schema-objects.txt" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dry-run deploy (build + packaging check only)
+        run: |
+          set -euo pipefail
+          pnpm dlx "wrangler@$WRANGLER_VERSION" deploy --dry-run --outdir .wrangler-dry-run \
+            --config "$CANDIDATE_CONFIG" 2>&1 | tee "$RUNNER_TEMP/dry-run.log"
+
+      - name: Deploy candidate Worker (explicit --config, workers.dev only)
+        run: |
+          set -euo pipefail
+          pnpm dlx "wrangler@$WRANGLER_VERSION" deploy --config "$CANDIDATE_CONFIG" \
+            2>&1 | tee "$RUNNER_TEMP/deploy.log"
+          VERSION_ID="$(grep -oE 'Current Version ID: [0-9a-f-]{36}' "$RUNNER_TEMP/deploy.log" | head -n1 | awk '{print $4}')"
+          if [ -z "$VERSION_ID" ]; then echo "GUARD_FAIL: VERSION_ID_CAPTURE_FAILED"; exit 1; fi
+          echo "CANDIDATE_VERSION_ID=$VERSION_ID" >> "$GITHUB_ENV"
+          echo "Deploy receipt: worker=$CANDIDATE_WORKER version=$VERSION_ID sha=$BINRAT_STABILITY_SHA" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Set candidate-only secrets (values via stdin, never printed)
+        run: |
+          set -euo pipefail
+          W() { pnpm dlx "wrangler@$WRANGLER_VERSION" "$@"; }
+          if [ -z "${BINRAT_ROBINHOOD_ARCHIVE_RPC_URL:-}" ]; then
+            echo "GUARD_FAIL: BINRAT_ROBINHOOD_ARCHIVE_RPC_URL_MISSING (required for Pons outcome cycle)"
+            exit 1
+          fi
+          printenv BINRAT_ROBINHOOD_ARCHIVE_RPC_URL | W secret put BINRAT_ROBINHOOD_ARCHIVE_RPC_URL --config "$CANDIDATE_CONFIG"
+          SMOKE_SECRET="$(openssl rand -hex 32)"
+          printf '%s\n' "$SMOKE_SECRET" | W secret put RAT_CANDIDATE_SMOKE_SECRET --config "$CANDIDATE_CONFIG"
+          echo "Secrets set on $CANDIDATE_WORKER: BINRAT_ROBINHOOD_ARCHIVE_RPC_URL, RAT_CANDIDATE_SMOKE_SECRET" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Smoke /api/health and /api/status
+        run: |
+          set -euo pipefail
+          echo "== GET $CANDIDATE_URL/api/health =="
+          HTTP_HEALTH="$(curl -fsS -o "$RUNNER_TEMP/health.json" -w '%{http_code}' "$CANDIDATE_URL/api/health")"
+          if [ "$HTTP_HEALTH" != "200" ]; then echo "SMOKE_FAIL: /api/health HTTP $HTTP_HEALTH"; exit 1; fi
+          cat "$RUNNER_TEMP/health.json"; echo
+          echo "== GET $CANDIDATE_URL/api/status =="
+          HTTP_STATUS="$(curl -fsS -o "$RUNNER_TEMP/status.json" -w '%{http_code}' "$CANDIDATE_URL/api/status")"
+          if [ "$HTTP_STATUS" != "200" ]; then echo "SMOKE_FAIL: /api/status HTTP $HTTP_STATUS"; exit 1; fi
+          cat "$RUNNER_TEMP/status.json"; echo
+          jq -e '.schemaVersion == "binrat.public-status/0.1" and .chainId == 4663 and .state == "NO_VERIFIED_SNAPSHOT"' \
+            "$RUNNER_TEMP/status.json" > /dev/null || { echo "SMOKE_FAIL: /api/status schema mismatch"; exit 1; }
+          echo "SMOKE_OK: /api/health 200; /api/status 200 schema=binrat.public-status/0.1 chain=4663 state=NO_VERIFIED_SNAPSHOT" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve gate receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stability-candidate-gate-receipts
+          path: |
+            ${{ runner.temp }}/dry-run.log
+            ${{ runner.temp }}/deploy.log
+            ${{ runner.temp }}/health.json
+            ${{ runner.temp }}/status.json
+          retention-days: 30
+          if-no-files-found: warn

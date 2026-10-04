@@ -870,22 +870,21 @@ async function hydrateCreatorFile(bag) {
         <span>BLK ${escapeHtml(item.blockNumber)}</span>
         <code title="${escapeHtml(item.token)}">${escapeHtml(shortAddress(item.token))}</code>
         <div class="creator-launch-meta">
-          <span>${escapeHtml(item.priorLaunchCount)} PRIOR</span>
           ${renderCreatorLaunchSocials(item)}
         </div>
         <button class="creator-launch-open" type="button" data-open-creator-launch="${escapeHtml(item.id)}">OPEN CHANGES ↗</button>
       </div>`).join("");
     panel.innerHTML = `
-      <div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>${escapeHtml(file.indexedLaunchCount)} INDEXED LAUNCHES</span></div>
+      <div class="file-section-heading"><h3>04 / DEPLOYER FILE</h3><span>LATEST ${escapeHtml(file.launches.length)} VERIFIED LAUNCHES</span></div>
       <div class="creator-file-stats">
         <div><span>REPORTED ADDRESS</span><code>${escapeHtml(shortAddress(file.reportedCreatorAddress))}</code></div>
-        <div><span>FIRST INDEXED BLOCK</span><b>${escapeHtml(file.firstIndexedBlock)}</b></div>
-        <div><span>LAST INDEXED BLOCK</span><b>${escapeHtml(file.lastIndexedBlock)}</b></div>
-        <div><span>HISTORY</span><b>${escapeHtml(file.historyCoverage)}</b></div>
+        <div><span>AS OF BLOCK</span><b>${escapeHtml(file.checkpointBlock)}</b></div>
+        <div><span>COVERAGE</span><b>${escapeHtml(file.coverage.mode)}</b></div>
+        <div><span>OLDER LAUNCHES</span><b>${file.coverage.olderLaunchesOmitted ? "OMITTED" : "NONE"}</b></div>
       </div>
-      <p class="intel-boundary">Same Pons-reported deployer address only. This does not establish common human ownership. Full indexed trail shown; open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
+      <p class="intel-boundary">Same Pons-reported deployer address only. This does not establish common human ownership. Latest verified launches shown; older launches may be omitted. Open any launch to inspect its evidence-bound WHAT CHANGED timeline.</p>
       <div class="creator-launches">${rows}</div>
-      <div class="intel-receipt">DEPLOYER FILE RECEIPT / ${escapeHtml(file.receipt.receiptId)}</div>
+      <div class="intel-receipt">VERIFIED SNAPSHOT DIGEST / ${escapeHtml(file.feedDigest)}</div>
     `;
     for (const image of panel.querySelectorAll("[data-token-image]")) {
       image.addEventListener("error", () => image.remove(), { once: true });

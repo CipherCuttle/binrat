@@ -142,7 +142,7 @@ if (!app.includes('DEPLOYER FILE')) throw new Error('WEB_DEPLOYER_FILE_LABEL_MIS
 if (!app.includes('NOT LIVE EVIDENCE')) throw new Error('WEB_LIVE_EVIDENCE_STAMP_MISSING');
 if (!app.includes('notedConditions')) throw new Error('WEB_NOTED_CONDITIONS_MAPPING_MISSING');
 if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/intelligence`')) throw new Error('WEB_BAG_INTELLIGENCE_SOURCE_MISSING');
-if (!dataSource.includes('fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}`')) throw new Error('WEB_CREATOR_FILE_SOURCE_MISSING');
+if (!dataSource.includes('fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}/summary`')) throw new Error('WEB_CREATOR_FILE_SOURCE_MISSING');
 if (!dataSource.includes('fetch(`/api/bag/${encodeURIComponent(bagId)}/replay`')) throw new Error('WEB_REPLAY_BUNDLE_SOURCE_MISSING');
 if (!app.includes('REPLAY LAB')) throw new Error('WEB_REPLAY_LAB_MISSING');
 if (!app.includes('nothing is simulated')) throw new Error('WEB_REPLAY_BOUNDARY_MISSING');

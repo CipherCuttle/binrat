@@ -335,22 +335,46 @@ export async function loadBagIntelligence(bagId) {
 
 export async function loadCreatorFile(reportedCreatorAddress) {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
-  const response = await fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}`, {
+  const response = await fetch(`/api/creator/${encodeURIComponent(reportedCreatorAddress)}/summary`, {
     headers: { accept: "application/json" },
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("CREATOR_FILE_NOT_AVAILABLE");
   const value = await response.json();
   if (
-    value?.schemaVersion !== "binrat.creator-file/0.1" ||
+    value?.schemaVersion !== "binrat.creator-summary/0.1" ||
     value.chainId !== 4663 ||
     String(value.reportedCreatorAddress).toLowerCase() !== String(reportedCreatorAddress).toLowerCase() ||
-    value.historyCoverage !== "UNVERIFIED" ||
-    !Number.isSafeInteger(value.indexedLaunchCount) ||
+    typeof value.checkpointBlock !== "string" ||
+    typeof value.feedDigest !== "string" ||
+    value.coverage?.mode !== "LATEST_4_VERIFIED_PONS_LAUNCHES" ||
+    value.coverage.olderLaunchesOmitted !== true ||
     !Array.isArray(value.launches) ||
-    typeof value.receipt?.receiptId !== "string"
+    value.launches.some((item) =>
+      typeof item?.launchId !== "string" ||
+      typeof item?.token !== "string" ||
+      typeof item?.symbol !== "string" ||
+      typeof item?.name !== "string" ||
+      typeof item?.blockNumber !== "string" ||
+      item?.metadata === null || typeof item?.metadata !== "object",
+    )
   ) throw new Error("CREATOR_FILE_INVALID");
-  return value;
+  return {
+    schemaVersion: value.schemaVersion,
+    chainId: value.chainId,
+    reportedCreatorAddress: value.reportedCreatorAddress,
+    checkpointBlock: value.checkpointBlock,
+    feedDigest: value.feedDigest,
+    coverage: value.coverage,
+    launches: value.launches.map((item) => ({
+      id: item.launchId,
+      token: item.token,
+      symbol: item.symbol,
+      name: item.name,
+      blockNumber: item.blockNumber,
+      metadata: item.metadata,
+    })),
+  };
 }
 
 
