@@ -1,0 +1,506 @@
+# cloudflare-production-readonly-inspect
+#
+# PURPOSE: Reusable READ-ONLY production inspection broker for CipherCuttle/binrat.
+# Cloudflare credentials are consumed from GitHub Secrets inside Actions and are
+# NEVER printed, uploaded, or written to repo files. Only sanitized inspection
+# results are exposed (JSON artifact + step summary).
+#
+# HARD READ-ONLY CONTRACT (fail-closed, enforced by guards below):
+#   ALLOWED:  GET-only Cloudflare REST reads (worker scripts/deployments/versions/
+#             settings/secrets-names/schedules, custom domains, queues, D1 info),
+#             D1 POST /query with HARDCODED SELECT/PRAGMA statements only,
+#             low-volume HTTP GET smoke against the production site.
+#   FORBIDDEN: any code deployment, secret writes/deletes, var changes, D1
+#             database create/remove, queue create/remove, route/domain/DNS
+#             changes, migrations, and any data-mutating SQL statements.
+#
+# DESIGN RULE: bounded capabilities only. No arbitrary command input, no
+# arbitrary SQL input. This workflow must never become a remote admin shell.
+
+name: cloudflare-production-readonly-inspect
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Bounded read-only inspection selector
+        required: false
+        default: production-preflight
+        type: choice
+        options:
+          - production-preflight
+          - d1-schema
+          - worker-config
+          - all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-production-readonly-inspect
+  cancel-in-progress: false
+
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+  OPERATION: ${{ inputs.operation || 'production-preflight' }}
+  WORKER_NAME: binrat-edge-v0
+  D1_DATABASE_ID: 46814564-1a41-449a-88e5-c1349eed3a27
+  D1_DATABASE_NAME: binrat-v0
+  SITE_BASE: https://binrat.tech
+  INSPECT_DIR: inspect_data
+
+jobs:
+  readonly-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout (for static self-audit)
+        uses: actions/checkout@v4
+
+      - name: Fail-closed credential guard
+        run: |
+          set -euo pipefail
+          [ -n "${CLOUDFLARE_API_TOKEN:-}" ] || { echo "::error::Missing secret BINRAT_CLOUDFLARE_ADMIN_API_TOKEN"; exit 1; }
+          [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ] || { echo "::error::Missing secret BINRAT_CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          echo "Credential names present. Values are never printed, uploaded, or persisted."
+
+      - name: Fail-closed static self-audit (mutation patterns must be absent)
+        run: |
+          set -euo pipefail
+          WF=".github/workflows/cloudflare-production-readonly-inspect.yml"
+          test -f "$WF"
+          # Patterns are fragment-assembled so this audit cannot match its own source.
+          p1="wrangler dep""loy"
+          p2="secret pu""t"
+          p3="secret bu""lk"
+          p4="d1 execu""te"
+          p5="INSER""T "
+          p6="UPDA""TE "
+          p7="DELE""TE "
+          p8="DROP ""TAB""LE"
+          p9="DROP ""IN""DEX"
+          p10="ALTER ""TAB""LE"
+          p11="CREAT""E TAB""LE"
+          p12="CREAT""E IN""DEX"
+          for p in "$p1" "$p2" "$p3" "$p4" "$p5" "$p6" "$p7" "$p8" "$p9" "$p10" "$p11" "$p12"; do
+            if grep -qF -- "$p" "$WF"; then
+              echo "::error::Forbidden mutation pattern detected in workflow source"
+              exit 1
+            fi
+          done
+          echo "Static self-audit passed: no mutation capability present in workflow source."
+
+      - name: Inspect production Worker (GET-only Cloudflare API)
+        run: |
+          set -euo pipefail
+          case "$OPERATION" in
+            production-preflight|worker-config|all) ;;
+            *) echo "Worker inspection skipped for operation '$OPERATION'."; exit 0 ;;
+          esac
+          mkdir -p "$INSPECT_DIR"
+          ACCT="$CLOUDFLARE_ACCOUNT_ID"
+          BASE="https://api.cloudflare.com/client/v4"
+          get() { curl -sS --fail-with-body -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$1"; }
+          get "$BASE/accounts/$ACCT/workers/scripts" > "$INSPECT_DIR/worker_scripts.json"
+          get "$BASE/accounts/$ACCT/workers/scripts/$WORKER_NAME/deployments" > "$INSPECT_DIR/worker_deployments.json"
+          get "$BASE/accounts/$ACCT/workers/scripts/$WORKER_NAME/versions" > "$INSPECT_DIR/worker_versions.json"
+          get "$BASE/accounts/$ACCT/workers/scripts/$WORKER_NAME/settings" > "$INSPECT_DIR/worker_settings.json"
+          get "$BASE/accounts/$ACCT/workers/scripts/$WORKER_NAME/secrets" > "$INSPECT_DIR/worker_secrets.json"
+          get "$BASE/accounts/$ACCT/workers/scripts/$WORKER_NAME/schedules" > "$INSPECT_DIR/worker_schedules.json"
+          get "$BASE/accounts/$ACCT/workers/domains" > "$INSPECT_DIR/worker_domains.json"
+          get "$BASE/accounts/$ACCT/queues" > "$INSPECT_DIR/queues.json"
+          python3 - "$WORKER_NAME" <<'PY'
+          import json, sys
+          worker = sys.argv[1]
+          scripts = json.load(open('inspect_data/worker_scripts.json'))
+          names = [s.get('id') for s in (scripts.get('result') or [])]
+          assert worker in names, f"Worker '{worker}' not found in account scripts: {names}"
+          print(f"Worker '{worker}' present in account.")
+          PY
+          echo "Worker inspection complete (GET-only)."
+
+      - name: Inspect production D1 (hardcoded SELECT/PRAGMA only, runtime-guarded)
+        run: |
+          set -euo pipefail
+          case "$OPERATION" in
+            production-preflight|d1-schema|all) ;;
+            *) echo "D1 inspection skipped for operation '$OPERATION'."; exit 0 ;;
+          esac
+          mkdir -p "$INSPECT_DIR"
+          ACCT="$CLOUDFLARE_ACCOUNT_ID"
+          BASE="https://api.cloudflare.com/client/v4/accounts/$ACCT"
+          curl -sS --fail-with-body -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "$BASE/d1/database" > "$INSPECT_DIR/d1_list.json"
+          curl -sS --fail-with-body -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "$BASE/d1/database/$D1_DATABASE_ID" > "$INSPECT_DIR/d1_info.json"
+          python3 - <<'PY'
+          import json
+          info = json.load(open('inspect_data/d1_info.json'))
+          name = (info.get('result') or {}).get('name')
+          assert name == 'binrat-v0', f"D1 identity mismatch: got '{name}'"
+          print("D1 identity verified: binrat-v0")
+          PY
+          # Runtime fail-closed SQL guard: only SELECT/PRAGMA statements are sent.
+          d1_query() {
+            local sql="$1" out="$2" fatal="$3"
+            case "$sql" in
+              SELECT*|PRAGMA*) ;;
+              *) echo "::error::Refusing non-read-only SQL statement"; exit 1 ;;
+            esac
+            local payload http
+            payload=$(jq -n --arg s "$sql" '{sql:$s}')
+            http=$(curl -sS -o "$out" -w '%{http_code}' -X POST \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$payload" \
+              "$BASE/d1/database/$D1_DATABASE_ID/query")
+            if [ "$http" != "200" ]; then
+              if [ "$fatal" = "fatal" ]; then
+                echo "::error::D1 read query failed (HTTP $http)"
+                exit 1
+              fi
+              echo "Non-fatal D1 query returned HTTP $http (recorded as absent)."
+            fi
+          }
+          d1_query "SELECT name, type, sql FROM sqlite_master WHERE type IN ('table','index') ORDER BY type, name" \
+            "$INSPECT_DIR/d1_sqlite_master.json" fatal
+          d1_query "SELECT COUNT(*) AS row_count FROM launches" \
+            "$INSPECT_DIR/d1_launches_count.json" fatal
+          d1_query "SELECT COUNT(*) AS row_count FROM binrat_public_snapshots" \
+            "$INSPECT_DIR/d1_snapshots_count.json" soft
+          d1_query "PRAGMA table_info(launches)" \
+            "$INSPECT_DIR/d1_launches_pragma.json" fatal
+          echo "D1 read-only inspection complete (SELECT/PRAGMA only)."
+
+      - name: Bounded production HTTP smoke (4 GET requests, no load test)
+        run: |
+          set -euo pipefail
+          case "$OPERATION" in
+            production-preflight|all) ;;
+            *) echo "HTTP smoke skipped for operation '$OPERATION'."; exit 0 ;;
+          esac
+          mkdir -p "$INSPECT_DIR"
+          fetch() {
+            local path="$1" name="$2"
+            local code
+            code=$(curl -sS --max-time 25 \
+              -o "$INSPECT_DIR/http_$name.body" \
+              -D "$INSPECT_DIR/http_$name.hdr" \
+              -w '%{http_code}' \
+              "$SITE_BASE$path") || code="curl_error"
+            printf '%s' "$code" > "$INSPECT_DIR/http_$name.code"
+          }
+          fetch "/api/health" health
+          fetch "/api/status" status
+          fetch "/api/launches/latest" launches_latest
+          fetch "/api/dumpster-ledger" dumpster_ledger
+          echo "HTTP smoke complete (4 requests)."
+
+      - name: Assemble sanitized artifact and step summary
+        run: |
+          set -euo pipefail
+          python3 - "$OPERATION" "$WORKER_NAME" "$D1_DATABASE_ID" <<'PY'
+          import json, os, sys
+
+          operation, worker_name, d1_id = sys.argv[1], sys.argv[2], sys.argv[3]
+          d = 'inspect_data'
+
+          def load(name):
+              path = os.path.join(d, name)
+              if not os.path.exists(path):
+                  return None
+              try:
+                  return json.load(open(path))
+              except Exception:
+                  return None
+
+          def text(name):
+              path = os.path.join(d, name)
+              return open(path).read().strip() if os.path.exists(path) else None
+
+          out = {
+              'operation': operation,
+              'production': {'worker': {}, 'd1': {}, 'queue': {}, 'domain': {}},
+              'schema': {'tables': [], 'indexes': []},
+              'schemaFocus': {},
+              'bindings': {'vars': [], 'secretNames': []},
+              'http': {},
+              'verdict': 'PASS',
+              'verdictReasons': [],
+          }
+
+          # ---- Worker ----
+          scripts = load('worker_scripts.json')
+          if scripts is not None:
+              names = [s.get('id') for s in (scripts.get('result') or [])]
+              out['production']['worker']['present'] = worker_name in names
+
+          deployments = load('worker_deployments.json')
+          if deployments is not None:
+              dres = deployments.get('result')
+              if isinstance(dres, list):
+                  deps = dres
+              elif isinstance(dres, dict):
+                  deps = dres.get('deployments') or []
+              else:
+                  deps = []
+              if deps:
+                  latest = max(deps, key=lambda x: x.get('created_on') or '')
+                  out['production']['worker']['latestDeployment'] = {
+                      'id': latest.get('id'),
+                      'created_on': latest.get('created_on'),
+                      'source': latest.get('source'),
+                      'versions': [
+                          {
+                              'version_id': v.get('version_id'),
+                              'percentage': v.get('percentage'),
+                              'tag': v.get('tag'),
+                              'message': v.get('message'),
+                              'created_on': v.get('created_on'),
+                          }
+                          for v in (latest.get('versions') or [])
+                      ],
+                  }
+              out['production']['worker']['deploymentCount'] = len(deps)
+
+          versions = load('worker_versions.json')
+          if versions is not None:
+              vres_raw = versions.get('result')
+              if isinstance(vres_raw, list):
+                  vres = vres_raw
+              elif isinstance(vres_raw, dict):
+                  vres = vres_raw.get('items') or vres_raw.get('versions') or []
+              else:
+                  vres = []
+              out['production']['worker']['versionCount'] = len(vres)
+              if vres:
+                  latest_v = max(vres, key=lambda x: x.get('created_on') or '')
+                  out['production']['worker']['latestVersion'] = {
+                      'id': latest_v.get('id'),
+                      'created_on': latest_v.get('created_on'),
+                      'tag': latest_v.get('tag'),
+                      'message': latest_v.get('message'),
+                      'source': latest_v.get('source'),
+                  }
+
+          settings = load('worker_settings.json')
+          if settings is not None:
+              s = settings.get('result') or {}
+              vars_list, secret_names, d1_binding, queue_binding, other = [], [], [], [], []
+              for b in (s.get('bindings') or []):
+                  t = b.get('type')
+                  if t == 'plain_text':
+                      vars_list.append({'name': b.get('name'), 'value': b.get('text')})
+                  elif t == 'secret_text':
+                      secret_names.append(b.get('name'))
+                  elif t == 'd1':
+                      d1_binding.append({'name': b.get('name'), 'id': b.get('id')})
+                  elif t == 'queue':
+                      queue_binding.append({'name': b.get('name'), 'queue_name': b.get('queue_name')})
+                  else:
+                      other.append({'type': t, 'name': b.get('name')})
+              out['production']['worker']['compatibilityDate'] = s.get('compatibility_date')
+              out['production']['worker']['compatibilityFlags'] = s.get('compatibility_flags')
+              out['production']['worker']['mainModule'] = s.get('main_module')
+              out['production']['worker']['observability'] = s.get('observability')
+              out['production']['worker']['d1Bindings'] = d1_binding
+              out['production']['worker']['queueBindings'] = queue_binding
+              out['production']['worker']['otherBindings'] = other
+              out['bindings']['vars'] = vars_list
+              out['bindings']['secretNames'] = sorted(set(secret_names))
+
+          secrets = load('worker_secrets.json')
+          if secrets is not None:
+              api_secret_names = sorted({(x.get('name') or '') for x in (secrets.get('result') or []) if x.get('name')})
+              merged = sorted(set(out['bindings']['secretNames']) | set(api_secret_names))
+              out['bindings']['secretNames'] = merged
+
+          schedules = load('worker_schedules.json')
+          if schedules is not None:
+              out['production']['worker']['crons'] = [
+                  s.get('cron') for s in ((schedules.get('result') or {}).get('schedules') or [])
+              ]
+
+          # ---- Domains ----
+          domains = load('worker_domains.json')
+          if domains is not None:
+              mine = [
+                  {'hostname': x.get('hostname'), 'zone_id': x.get('zone_id'), 'id': x.get('id')}
+                  for x in (domains.get('result') or [])
+                  if x.get('service') == worker_name
+              ]
+              out['production']['domain']['customDomains'] = mine
+
+          # ---- Queue ----
+          queues = load('queues.json')
+          if queues is not None:
+              mine = [
+                  {
+                      'queue_id': q.get('queue_id'),
+                      'queue_name': q.get('queue_name'),
+                      'producers': q.get('producers'),
+                      'consumers': q.get('consumers'),
+                  }
+                  for q in (queues.get('result') or [])
+                  if worker_name in json.dumps(q.get('producers') or [])
+                  or worker_name in json.dumps(q.get('consumers') or [])
+              ]
+              out['production']['queue']['boundQueues'] = mine
+
+          # ---- D1 ----
+          d1_info = load('d1_info.json')
+          if d1_info is not None:
+              r = d1_info.get('result') or {}
+              out['production']['d1'] = {
+                  'name': r.get('name'),
+                  'id': r.get('uuid') or r.get('id'),
+                  'created_at': r.get('created_at'),
+                  'version': r.get('version'),
+                  'num_tables': r.get('num_tables'),
+                  'file_size': r.get('file_size'),
+                  'read_replication': r.get('read_replication'),
+              }
+          d1_list = load('d1_list.json')
+          if d1_list is not None:
+              match = [x for x in (d1_list.get('result') or []) if x.get('name') == 'binrat-v0']
+              out['production']['d1']['listMatchId'] = (match[0].get('uuid') if match else None)
+
+          master = load('d1_sqlite_master.json')
+          if master is not None:
+              rows = ((master.get('result') or [{}])[0].get('results')) if master.get('result') else []
+              rows = rows or []
+              tables = sorted(
+                  [
+                      {'name': r.get('name'), 'sql': r.get('sql')}
+                      for r in rows
+                      if r.get('type') == 'table'
+                  ],
+                  key=lambda x: x['name'] or '',
+              )
+              indexes = sorted(
+                  [
+                      {'name': r.get('name'), 'tbl_name': r.get('tbl_name'), 'sql': r.get('sql')}
+                      for r in rows
+                      if r.get('type') == 'index'
+                  ],
+                  key=lambda x: x['name'] or '',
+              )
+              out['schema']['tables'] = tables
+              out['schema']['indexes'] = indexes
+              tnames = {t['name'] for t in tables}
+              inames = {i['name'] for i in indexes}
+              out['schemaFocus'] = {
+                  'has_launches': 'launches' in tnames,
+                  'has_binrat_public_snapshots': 'binrat_public_snapshots' in tnames,
+                  'provenanceOrEvidenceTables': sorted(n for n in tnames if 'provenance' in n or 'evidence' in n),
+                  'runtimeOrCheckpointTables': sorted(n for n in tnames if 'runtime' in n or 'checkpoint' in n or 'lease' in n or 'queue' in n or 'ledger' in n or 'state' in n),
+                  'has_idx_launches_chain_source_block_numeric': 'idx_launches_chain_source_block_numeric' in inames,
+                  'has_idx_launches_chain_block_numeric': 'idx_launches_chain_block_numeric' in inames,
+                  'has_idx_launches_chain_source_creator_block_numeric': 'idx_launches_chain_source_creator_block_numeric' in inames,
+              }
+
+          lc = load('d1_launches_count.json')
+          if lc is not None:
+              res = lc.get('result') or []
+              if res:
+                  out['production']['d1']['launchesRowCount'] = (res[0].get('results') or [{}])[0].get('row_count')
+
+          sc = load('d1_snapshots_count.json')
+          if sc is not None:
+              res = sc.get('result') or []
+              if res:
+                  out['production']['d1']['binratPublicSnapshots'] = {
+                      'exists': True,
+                      'rowCount': (res[0].get('results') or [{}])[0].get('row_count'),
+                  }
+              else:
+                  out['production']['d1']['binratPublicSnapshots'] = {'exists': False}
+          elif os.path.exists(os.path.join(d, 'd1_snapshots_count.json')):
+              out['production']['d1']['binratPublicSnapshots'] = {'exists': False}
+
+          pragma = load('d1_launches_pragma.json')
+          if pragma is not None:
+              res = pragma.get('result') or []
+              if res:
+                  out['production']['d1']['launchesColumns'] = [
+                      {'name': c.get('name'), 'type': c.get('type'), 'pk': c.get('pk')}
+                      for c in (res[0].get('results') or [])
+                  ]
+
+          # ---- HTTP ----
+          for name in ('health', 'status', 'launches_latest', 'dumpster_ledger'):
+              code = text(f'http_{name}.code')
+              if code is None:
+                  continue
+              hdr = text(f'http_{name}.hdr') or ''
+              body = open(os.path.join(d, f'http_{name}.body'), 'rb').read()[:400].decode('utf-8', 'replace') if os.path.exists(os.path.join(d, f'http_{name}.body')) else ''
+              def header(hname):
+                  for line in hdr.splitlines():
+                      if line.lower().startswith(hname.lower() + ':'):
+                          return line.split(':', 1)[1].strip()
+                  return None
+              out['http'][name] = {
+                  'status': code,
+                  'etag': header('etag'),
+                  'cacheControl': header('cache-control'),
+                  'contentType': header('content-type'),
+                  'bodyPrefix': body,
+              }
+
+          # ---- Verdict ----
+          reasons = []
+          if out['production']['worker'].get('present') is False:
+              reasons.append('worker not found')
+          if out['production']['d1'].get('name') not in (None, 'binrat-v0'):
+              reasons.append('d1 identity mismatch')
+          if out['production']['d1'].get('listMatchId') not in (None, d1_id):
+              reasons.append('d1 list id mismatch')
+          health = out['http'].get('health')
+          if health and health.get('status') != '200':
+              reasons.append(f"health status {health.get('status')}")
+          status_ep = out['http'].get('status')
+          if status_ep and status_ep.get('status') != '200':
+              reasons.append(f"status endpoint HTTP {status_ep.get('status')} (recorded, not gating)")
+          out['verdict'] = 'FAIL' if reasons else 'PASS'
+          out['verdictReasons'] = reasons
+
+          with open('cloudflare-production-readonly-inspect.json', 'w') as f:
+              json.dump(out, f, indent=2)
+
+          # ---- Step summary (concise, sanitized) ----
+          lines = ['# Cloudflare production read-only inspection', '']
+          lines.append(f"- Operation: `{operation}` — Verdict: **{out['verdict']}**")
+          if reasons:
+              lines.append(f"- Reasons: {', '.join(reasons)}")
+          w = out['production']['worker']
+          if w:
+              ld = w.get('latestDeployment') or {}
+              lines.append(f"- Worker `{worker_name}` present; latest deployment `{ld.get('id')}` at {ld.get('created_on')}")
+              lines.append(f"- Compatibility date: `{w.get('compatibilityDate')}`; flags: {w.get('compatibilityFlags')}")
+              lines.append(f"- Crons: {w.get('crons')}")
+          d1 = out['production']['d1']
+          if d1:
+              lines.append(f"- D1: `{d1.get('name')}` id `{d1.get('id')}`; launches rows: {d1.get('launchesRowCount')}")
+          sf = out.get('schemaFocus') or {}
+          if sf:
+              lines.append(f"- Tables: {len(out['schema']['tables'])}, indexes: {len(out['schema']['indexes'])}")
+              lines.append(f"- launches: {sf.get('has_launches')}; binrat_public_snapshots: {sf.get('has_binrat_public_snapshots')}")
+              lines.append(f"- 0002 numeric indexes present: source_block={sf.get('has_idx_launches_chain_source_block_numeric')}, block={sf.get('has_idx_launches_chain_block_numeric')}, source_creator_block={sf.get('has_idx_launches_chain_source_creator_block_numeric')}")
+          for k, v in (out.get('http') or {}).items():
+              lines.append(f"- HTTP {k}: status {v.get('status')}, etag {v.get('etag')}, cache-control {v.get('cacheControl')}")
+          lines.append('')
+          lines.append(f"Secret names observed: {', '.join(out['bindings']['secretNames'])}")
+          lines.append('')
+          lines.append('_No secret values are included in this summary or the artifact._')
+          with open(os.environ.get('GITHUB_STEP_SUMMARY', 'step_summary.md'), 'a') as f:
+              f.write('\n'.join(lines) + '\n')
+          PY
+          echo "Artifact assembled."
+
+      - name: Upload sanitized inspection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-production-readonly-inspect
+          path: cloudflare-production-readonly-inspect.json
+          retention-days: 30
