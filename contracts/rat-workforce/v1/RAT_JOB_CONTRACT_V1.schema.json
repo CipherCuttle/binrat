@@ -1,0 +1,544 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "mode",
+    "jobId",
+    "leadRat",
+    "subject",
+    "objective",
+    "authority",
+    "budget",
+    "window"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.rat-job/1"
+    },
+    "mode": {
+      "const": "OFFLINE_REPLAY"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "leadRat": {
+      "const": "SNIFFER"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chainId",
+        "entityType",
+        "entityId"
+      ],
+      "properties": {
+        "chainId": {
+          "const": 4663
+        },
+        "entityType": {
+          "enum": [
+            "WALLET",
+            "CREATOR"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "pattern": "^0x[a-f0-9]{40}$"
+        }
+      }
+    },
+    "objective": {
+      "const": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH"
+    },
+    "authority": {
+      "const": {
+        "research": true,
+        "network": false,
+        "provider": false,
+        "delivery": false,
+        "capital": false
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxToolCalls",
+        "maxHandoffs",
+        "maxModelCalls",
+        "maxCostMicrousd"
+      ],
+      "properties": {
+        "maxToolCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "maxHandoffs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "maxModelCalls": {
+          "const": 0
+        },
+        "maxCostMicrousd": {
+          "const": 0
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromBlock",
+        "toBlock"
+      ],
+      "properties": {
+        "fromBlock": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,19})$"
+        },
+        "toBlock": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,19})$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxToolCalls",
+        "maxHandoffs",
+        "maxModelCalls",
+        "maxCostMicrousd"
+      ],
+      "properties": {
+        "maxToolCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "maxHandoffs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "maxModelCalls": {
+          "const": 0
+        },
+        "maxCostMicrousd": {
+          "const": 0
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolCalls",
+        "handoffs",
+        "modelCalls",
+        "costMicrousd"
+      ],
+      "properties": {
+        "toolCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "handoffs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "modelCalls": {
+          "const": 0
+        },
+        "costMicrousd": {
+          "const": 0
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chainId",
+        "entityType",
+        "entityId"
+      ],
+      "properties": {
+        "chainId": {
+          "const": 4663
+        },
+        "entityType": {
+          "enum": [
+            "WALLET",
+            "CREATOR"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "pattern": "^0x[a-f0-9]{40}$"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "event": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "chainId",
+            "blockNumber",
+            "blockHash",
+            "availableAtBlock",
+            "digest",
+            "kind",
+            "from",
+            "to",
+            "txHash",
+            "valueWei"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+            },
+            "chainId": {
+              "const": 4663
+            },
+            "blockNumber": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "blockHash": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{64}$"
+            },
+            "availableAtBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "kind": {
+              "const": "NATIVE_TRANSFER"
+            },
+            "from": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            },
+            "to": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            },
+            "txHash": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{64}$"
+            },
+            "valueWei": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,77}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "chainId",
+            "blockNumber",
+            "blockHash",
+            "availableAtBlock",
+            "digest",
+            "kind",
+            "recipient",
+            "fromBlock",
+            "toBlock",
+            "complete",
+            "seen"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+            },
+            "chainId": {
+              "const": 4663
+            },
+            "blockNumber": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "blockHash": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{64}$"
+            },
+            "availableAtBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "kind": {
+              "const": "RECIPIENT_WINDOW"
+            },
+            "recipient": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            },
+            "fromBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "toBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "complete": {
+              "type": "boolean"
+            },
+            "seen": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "chainId",
+            "blockNumber",
+            "blockHash",
+            "availableAtBlock",
+            "digest",
+            "kind",
+            "launcher",
+            "creator",
+            "token",
+            "pool",
+            "txHash",
+            "logIndex"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+            },
+            "chainId": {
+              "const": 4663
+            },
+            "blockNumber": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "blockHash": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{64}$"
+            },
+            "availableAtBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "kind": {
+              "const": "PONS_LAUNCH"
+            },
+            "launcher": {
+              "const": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e"
+            },
+            "creator": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            },
+            "token": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            },
+            "pool": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            },
+            "txHash": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{64}$"
+            },
+            "logIndex": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000
+            }
+          }
+        }
+      ]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "subject",
+        "evidenceRefs",
+        "scope"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "NATIVE_TRANSFER_OBSERVED",
+            "RECIPIENT_NOT_SEEN_IN_WINDOW",
+            "PONS_REPORTED_DEPLOYER_LAUNCH",
+            "FUNDING_PRECEDES_LAUNCH"
+          ]
+        },
+        "subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "chainId",
+            "entityType",
+            "entityId"
+          ],
+          "properties": {
+            "chainId": {
+              "const": 4663
+            },
+            "entityType": {
+              "enum": [
+                "WALLET",
+                "CREATOR"
+              ]
+            },
+            "entityId": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            }
+          }
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "scope": {
+          "const": "DECLARED_FIXTURE_WINDOW_ONLY"
+        }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "reason",
+        "findingId"
+      ],
+      "properties": {
+        "decision": {
+          "enum": [
+            "ALERT",
+            "SUPPRESS"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "SUPPORTED_FUTURE_LAUNCH",
+            "NO_SUPPORTED_CHANGE",
+            "PARTIAL_COVERAGE",
+            "BUDGET_EXHAUSTED"
+          ]
+        },
+        "findingId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "tool": {
+      "enum": [
+        "READ_TRANSFER_FIXTURE",
+        "READ_RECIPIENT_WINDOW_FIXTURE",
+        "READ_PONS_LAUNCH_FIXTURE",
+        "BUILD_CASE_DIFF",
+        "DECIDE_ALERT"
+      ]
+    },
+    "authority": {
+      "const": {
+        "research": true,
+        "network": false,
+        "provider": false,
+        "delivery": false,
+        "capital": false
+      }
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "block": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "rat": {
+      "enum": [
+        "RAT_ZERO",
+        "TRIPWIRE",
+        "SNIFFER"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:workforce:v1:RAT_HANDOFF_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "handoffId",
+    "jobId",
+    "fromRat",
+    "toRat",
+    "objective",
+    "subject",
+    "createdAtBlock",
+    "afterBlock",
+    "evidenceRefs",
+    "authority",
+    "remainingBudget"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.rat-handoff/1"
+    },
+    "handoffId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "fromRat": {
+      "const": "SNIFFER"
+    },
+    "toRat": {
+      "const": "RAT_ZERO"
+    },
+    "objective": {
+      "const": "CHECK_FUTURE_PONS_LAUNCH"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chainId",
+        "entityType",
+        "entityId"
+      ],
+      "properties": {
+        "chainId": {
+          "const": 4663
+        },
+        "entityType": {
+          "enum": [
+            "WALLET",
+            "CREATOR"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "pattern": "^0x[a-f0-9]{40}$"
+        }
+      }
+    },
+    "createdAtBlock": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "afterBlock": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+      },
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true
+    },
+    "authority": {
+      "const": {
+        "research": true,
+        "network": false,
+        "provider": false,
+        "delivery": false,
+        "capital": false
+      }
+    },
+    "remainingBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxToolCalls",
+        "maxHandoffs",
+        "maxModelCalls",
+        "maxCostMicrousd"
+      ],
+      "properties": {
+        "maxToolCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "maxHandoffs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "maxModelCalls": {
+          "const": 0
+        },
+        "maxCostMicrousd": {
+          "const": 0
+        }
+      }
+    }
+  }
+}

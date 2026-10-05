@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:workforce:v1:EVAL_CASE_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "evalId",
+    "provenance",
+    "job",
+    "events",
+    "canonicalBlocks",
+    "expected"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.eval-case/1"
+    },
+    "evalId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "provenance": {
+      "const": "SYNTHETIC_OFFLINE_REPLAY"
+    },
+    "job": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/event"
+      },
+      "minItems": 0,
+      "maxItems": 64,
+      "uniqueItems": false
+    },
+    "canonicalBlocks": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 64,
+      "patternProperties": {
+        "^(0|[1-9][0-9]{0,19})$": {
+          "type": "string",
+          "pattern": "^0x[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "alert",
+        "claimKinds",
+        "maxToolCalls",
+        "maxHandoffs"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "DONE",
+            "SLEEPING",
+            "DEGRADED",
+            "EXHAUSTED"
+          ]
+        },
+        "alert": {
+          "enum": [
+            "ALERT",
+            "SUPPRESS"
+          ]
+        },
+        "claimKinds": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "NATIVE_TRANSFER_OBSERVED",
+              "RECIPIENT_NOT_SEEN_IN_WINDOW",
+              "PONS_REPORTED_DEPLOYER_LAUNCH",
+              "FUNDING_PRECEDES_LAUNCH"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "maxToolCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "maxHandoffs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        }
+      }
+    }
+  }
+}

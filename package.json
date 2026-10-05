@@ -28,7 +28,8 @@
     "telegram:verify": "tsx src/telegram/configCli.ts verify",
     "telegram:private-menu-activate": "tsx src/telegram/configCli.ts private-menu-activate",
     "telegram:private-menu-restore": "tsx src/telegram/configCli.ts private-menu-restore",
-    "telegram:smoke": "tsx src/telegram/configCli.ts smoke"
+    "telegram:smoke": "tsx src/telegram/configCli.ts smoke",
+    "workforce:replay": "pnpm build && node scripts/replay-rat-workforce.mjs"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "9.6.0",
     "@types/node": "20.19.43",
+    "ajv": "8.17.1",
     "tsx": "4.20.5",
     "typescript": "5.8.3"
   },

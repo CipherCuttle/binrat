@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:workforce:v1:RAT_JOB_RECEIPT_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provenance",
+    "receiptId",
+    "jobId",
+    "throughBlock",
+    "status",
+    "coverage",
+    "claims",
+    "evidence",
+    "handoffs",
+    "caseDiff",
+    "alert",
+    "usage",
+    "trace",
+    "inputDigest",
+    "competenceDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.rat-job-receipt/1"
+    },
+    "provenance": {
+      "const": "SYNTHETIC_OFFLINE_REPLAY"
+    },
+    "receiptId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "throughBlock": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "status": {
+      "enum": [
+        "DONE",
+        "SLEEPING",
+        "DEGRADED",
+        "EXHAUSTED"
+      ]
+    },
+    "coverage": {
+      "const": "PARTIAL_DECLARED_FIXTURE_WINDOW"
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/claim"
+      },
+      "minItems": 0,
+      "maxItems": 4,
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/event"
+      },
+      "minItems": 0,
+      "maxItems": 64,
+      "uniqueItems": true
+    },
+    "handoffs": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_HANDOFF_V1"
+      },
+      "minItems": 0,
+      "maxItems": 1,
+      "uniqueItems": true
+    },
+    "caseDiff": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeDigest",
+            "afterDigest",
+            "addedClaims",
+            "launchReceipt"
+          ],
+          "properties": {
+            "beforeDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "afterDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "addedClaims": {
+              "type": "array",
+              "items": {
+                "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/claim"
+              },
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true
+            },
+            "launchReceipt": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "version",
+                "findingId",
+                "caseId",
+                "shareId",
+                "chainId",
+                "subject",
+                "timestamp",
+                "epistemicClass",
+                "claim",
+                "evidenceRefs",
+                "coverage",
+                "source",
+                "createdAt"
+              ],
+              "properties": {
+                "version": {
+                  "const": "binrat.finding/1"
+                },
+                "findingId": {
+                  "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+                },
+                "caseId": {
+                  "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+                },
+                "shareId": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{40}$"
+                },
+                "chainId": {
+                  "const": 4663
+                },
+                "subject": {
+                  "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/subject"
+                },
+                "timestamp": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "blockNumber",
+                    "eventTime",
+                    "ingestedAtMs"
+                  ],
+                  "properties": {
+                    "blockNumber": {
+                      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/block"
+                    },
+                    "eventTime": {
+                      "const": null
+                    },
+                    "ingestedAtMs": {
+                      "const": 0
+                    }
+                  }
+                },
+                "epistemicClass": {
+                  "const": "OBSERVED"
+                },
+                "claim": {
+                  "const": "CREATOR_LAUNCH_OBSERVED"
+                },
+                "evidenceRefs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "launchId",
+                      "observationId",
+                      "blockNumber",
+                      "blockHash",
+                      "txHash",
+                      "logIndex",
+                      "creator",
+                      "token",
+                      "factId",
+                      "evidenceDigest",
+                      "ingestedAtMs"
+                    ],
+                    "properties": {
+                      "launchId": {
+                        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+                      },
+                      "observationId": {
+                        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+                      },
+                      "blockNumber": {
+                        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/block"
+                      },
+                      "blockHash": {
+                        "type": "string",
+                        "pattern": "^0x[a-f0-9]{64}$"
+                      },
+                      "txHash": {
+                        "type": "string",
+                        "pattern": "^0x[a-f0-9]{64}$"
+                      },
+                      "logIndex": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "creator": {
+                        "type": "string",
+                        "pattern": "^0x[a-f0-9]{40}$"
+                      },
+                      "token": {
+                        "type": "string",
+                        "pattern": "^0x[a-f0-9]{40}$"
+                      },
+                      "factId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 240
+                      },
+                      "evidenceDigest": {
+                        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+                      },
+                      "ingestedAtMs": {
+                        "const": 0
+                      }
+                    }
+                  },
+                  "minItems": 1,
+                  "maxItems": 1
+                },
+                "coverage": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status",
+                    "scope",
+                    "asOfBlock",
+                    "limit"
+                  ],
+                  "properties": {
+                    "status": {
+                      "const": "PARTIAL"
+                    },
+                    "scope": {
+                      "const": "PONS_V2_INDEXED_LAUNCHES"
+                    },
+                    "asOfBlock": {
+                      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/block"
+                    },
+                    "limit": {
+                      "const": 5
+                    }
+                  }
+                },
+                "source": {
+                  "const": "PONS_V2"
+                },
+                "createdAt": {
+                  "const": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "alert": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/alert"
+    },
+    "usage": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/usage"
+    },
+    "trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "ratId",
+          "tool",
+          "atBlock"
+        ],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 64
+          },
+          "ratId": {
+            "enum": [
+              "RAT_ZERO",
+              "TRIPWIRE",
+              "SNIFFER"
+            ]
+          },
+          "tool": {
+            "enum": [
+              "READ_TRANSFER_FIXTURE",
+              "READ_RECIPIENT_WINDOW_FIXTURE",
+              "READ_PONS_LAUNCH_FIXTURE",
+              "BUILD_CASE_DIFF",
+              "DECIDE_ALERT"
+            ]
+          },
+          "atBlock": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,19})$"
+          }
+        }
+      },
+      "minItems": 0,
+      "maxItems": 64,
+      "uniqueItems": true
+    },
+    "inputDigest": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+    },
+    "competenceDigest": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/hash"
+    }
+  }
+}

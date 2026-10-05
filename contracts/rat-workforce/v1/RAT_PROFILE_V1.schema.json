@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:workforce:v1:RAT_PROFILE_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "ratId",
+    "publicStatus",
+    "executionMode",
+    "objective",
+    "toolRefs",
+    "skillRefs",
+    "refusalRules",
+    "evalRefs",
+    "manifestDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.rat-profile/1"
+    },
+    "ratId": {
+      "enum": [
+        "RAT_ZERO",
+        "TRIPWIRE",
+        "SNIFFER"
+      ]
+    },
+    "publicStatus": {
+      "enum": [
+        "LIVE",
+        "BUILDING",
+        "NEXT"
+      ]
+    },
+    "executionMode": {
+      "const": "OFFLINE_REPLAY"
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "toolRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/reference"
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "uniqueItems": true
+    },
+    "skillRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/reference"
+      },
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "refusalRules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "evalRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

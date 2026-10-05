@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "binrat.eval-case/1",
+  "evalId": "sniffer-funding-to-pons-v1",
+  "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+  "job": {
+    "schemaVersion": "binrat.rat-job/1",
+    "mode": "OFFLINE_REPLAY",
+    "jobId": "offline-sniffer-job-1",
+    "leadRat": "SNIFFER",
+    "subject": {
+      "chainId": 4663,
+      "entityType": "WALLET",
+      "entityId": "0x0000000000000000000000000000000000000007"
+    },
+    "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+    "authority": {
+      "research": true,
+      "network": false,
+      "provider": false,
+      "delivery": false,
+      "capital": false
+    },
+    "budget": {
+      "maxToolCalls": 5,
+      "maxHandoffs": 1,
+      "maxModelCalls": 0,
+      "maxCostMicrousd": 0
+    },
+    "window": {
+      "fromBlock": "90",
+      "toBlock": "130"
+    }
+  },
+  "events": [
+    {
+      "id": "funding-1",
+      "kind": "NATIVE_TRANSFER",
+      "chainId": 4663,
+      "blockNumber": "100",
+      "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000064",
+      "availableAtBlock": "100",
+      "from": "0x0000000000000000000000000000000000000007",
+      "to": "0x000000000000000000000000000000000000002a",
+      "txHash": "0x000000000000000000000000000000000000000000000000000000000000044c",
+      "valueWei": "1000000000000000",
+      "digest": "720759256f852a30b7dfe0d2b788fb64e5ef76856c432cbc1ca7c7538b68b586"
+    },
+    {
+      "id": "recipient-window-1",
+      "kind": "RECIPIENT_WINDOW",
+      "chainId": 4663,
+      "blockNumber": "101",
+      "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000065",
+      "availableAtBlock": "101",
+      "recipient": "0x000000000000000000000000000000000000002a",
+      "fromBlock": "90",
+      "toBlock": "99",
+      "complete": true,
+      "seen": false,
+      "digest": "493f3cb169e35d0d2b15da20312a42c04f0517802160eca2b3609b3135ff8ccc"
+    },
+    {
+      "id": "launch-1",
+      "kind": "PONS_LAUNCH",
+      "chainId": 4663,
+      "blockNumber": "120",
+      "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000078",
+      "availableAtBlock": "125",
+      "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+      "creator": "0x000000000000000000000000000000000000002a",
+      "token": "0x0000000000000000000000000000000000000050",
+      "pool": "0x0000000000000000000000000000000000000051",
+      "txHash": "0x0000000000000000000000000000000000000000000000000000000000000460",
+      "logIndex": 0,
+      "digest": "7f204c6690f14f23a9611d57eb9a7a8d1804b258d69a3546d745d6f292449759"
+    }
+  ],
+  "canonicalBlocks": {
+    "100": "0x0000000000000000000000000000000000000000000000000000000000000064",
+    "101": "0x0000000000000000000000000000000000000000000000000000000000000065",
+    "120": "0x0000000000000000000000000000000000000000000000000000000000000078"
+  },
+  "expected": {
+    "status": "DONE",
+    "alert": "ALERT",
+    "claimKinds": [
+      "NATIVE_TRANSFER_OBSERVED",
+      "RECIPIENT_NOT_SEEN_IN_WINDOW",
+      "PONS_REPORTED_DEPLOYER_LAUNCH",
+      "FUNDING_PRECEDES_LAUNCH"
+    ],
+    "maxToolCalls": 5,
+    "maxHandoffs": 1
+  }
+}

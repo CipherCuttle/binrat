@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "binrat.rat-profile/1",
+  "ratId": "RAT_ZERO",
+  "publicStatus": "LIVE",
+  "executionMode": "OFFLINE_REPLAY",
+  "objective": "Check a handed-off recipient for a later exact Pons-reported deployer match.",
+  "toolRefs": [
+    {
+      "id": "read_pons_launch_fixture-v1",
+      "digest": "e82c62e67efc204767355f09165fb38024afe4968a971046a7896c8cd709fa5d"
+    },
+    {
+      "id": "build_case_diff-v1",
+      "digest": "b81a4d08147e339231d195de1ade9a87dd56f6cf26434ba825f34dd817161001"
+    },
+    {
+      "id": "decide_alert-v1",
+      "digest": "912176c863960ec2cf85c07849cc3250a210c5a9c25b581f7af80d59bcf0753d"
+    }
+  ],
+  "skillRefs": [
+    {
+      "id": "rat_zero-competence-v1",
+      "digest": "e3a552da78209ed3651a2cea0e787c01d42a9ceed26dea1e215b9987c9276cdd"
+    }
+  ],
+  "refusalRules": [
+    "Reject wallet, capital, provider, network and delivery authority.",
+    "Reject unsupported identity and safety claims.",
+    "Stop before exceeding the origin job budget."
+  ],
+  "evalRefs": [
+    "sniffer-funding-to-pons-v1"
+  ],
+  "manifestDigest": "5e2aca69428da3f0a616b5e35e7c71d3310fa599441e69e7875fe6aa81d2ee94"
+}

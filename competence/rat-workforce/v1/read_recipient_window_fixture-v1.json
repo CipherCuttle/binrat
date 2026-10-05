@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "binrat.tool-manifest/1",
+  "id": "read_recipient_window_fixture-v1",
+  "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+  "authority": {
+    "research": true,
+    "network": false,
+    "provider": false,
+    "delivery": false,
+    "capital": false
+  },
+  "effect": "DETERMINISTIC_FIXTURE_ONLY",
+  "charge": {
+    "toolCalls": 1,
+    "modelCalls": 0,
+    "costMicrousd": 0
+  },
+  "manifestDigest": "6153a2d59559628832b41fcbbb8c1a030bc1a065e85206de7b127b2b8a82da37"
+}

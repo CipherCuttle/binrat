@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "binrat.skill-manifest/1",
+  "id": "rat_zero-competence-v1",
+  "ratId": "RAT_ZERO",
+  "objective": "Check a handed-off recipient for a later exact Pons-reported deployer match.",
+  "procedure": [
+    "Consume the typed handoff without widening authority or scope.",
+    "Check later Pons events for an exact recipient/deployer match.",
+    "Build a Case diff referencing admitted transfer and launch evidence."
+  ],
+  "requiredEvidence": [
+    "Canonical fixture block binding and sealed source event.",
+    "Explicit partial coverage and source-reported roles."
+  ],
+  "forbiddenClaims": [
+    "Same human or team.",
+    "Safe token or predicted return.",
+    "Brand-new wallet outside the declared window."
+  ],
+  "evalRefs": [
+    "sniffer-funding-to-pons-v1"
+  ],
+  "manifestDigest": "e3a552da78209ed3651a2cea0e787c01d42a9ceed26dea1e215b9987c9276cdd"
+}
