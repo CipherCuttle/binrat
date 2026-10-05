@@ -33,7 +33,9 @@
     "competence:prepare": "pnpm build && node scripts/eval-rat-competence.mjs prepare",
     "competence:score": "pnpm build && node scripts/eval-rat-competence.mjs score",
     "competence:capture": "pnpm build && node scripts/capture-rat-competence.mjs",
-    "workforce:benchmark": "pnpm build && node scripts/benchmark-workforce.mjs"
+    "workforce:benchmark": "pnpm build && node scripts/benchmark-workforce.mjs",
+    "query:score": "pnpm build && node scripts/eval-next-query.mjs score",
+    "query:prepare": "pnpm build && node scripts/eval-next-query.mjs prepare"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",

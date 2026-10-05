@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:next-query:v1:NEXT_QUERY_OUTPUT_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "taskId",
+    "decision",
+    "queryId",
+    "evidenceRefs",
+    "reasonCodes",
+    "uncertainty",
+    "authorityRequested"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.next-query-output/1"
+    },
+    "taskId": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/id"
+    },
+    "decision": {
+      "enum": [
+        "SELECT",
+        "ABSTAIN"
+      ]
+    },
+    "queryId": {
+      "anyOf": [
+        {
+          "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/id"
+      },
+      "maxItems": 1,
+      "uniqueItems": true
+    },
+    "reasonCodes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "RELATIVE_PRIORITY",
+          "LIMITED_COVERAGE",
+          "INSUFFICIENT_EVIDENCE",
+          "NO_ADMISSIBLE_QUERY"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "uncertainty": {
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ]
+    },
+    "authorityRequested": {
+      "enum": [
+        "NONE",
+        "NETWORK",
+        "PROVIDER",
+        "DELIVERY",
+        "CAPITAL"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "decision": {
+          "const": "SELECT"
+        },
+        "queryId": {
+          "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/id"
+        },
+        "evidenceRefs": {
+          "minItems": 1,
+          "type": "array"
+        }
+      }
+    },
+    {
+      "properties": {
+        "decision": {
+          "const": "ABSTAIN"
+        },
+        "queryId": {
+          "type": "null"
+        },
+        "evidenceRefs": {
+          "maxItems": 0,
+          "type": "array"
+        }
+      }
+    }
+  ]
+}
