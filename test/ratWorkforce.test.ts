@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { canonicalJson, sha256Hex } from '../src/evidence/canonical.js';
 import { assertContract, loadCompetencePack, SCHEMA_NAMES, type SourceEvent } from '../src/workforce/contracts.js';
 import { OfflineBudget, replay, scoreReplay, type EvalCase, type JobReceipt } from '../src/workforce/offline.js';
+import { validateProposal } from '../src/workforce/proposal.js';
+import { scoreComparison } from '../src/workforce/competence.js';
 
 const fixture = (): EvalCase => JSON.parse(readFileSync('test/fixtures/workforce/sniffer-funding-to-pons-v1.json', 'utf8'));
 async function seal<T extends object>(value: T, field = 'digest'): Promise<T> {
@@ -57,6 +59,85 @@ test('funding → typed handoff → later exact Pons deployment → supported Ca
   assert.equal(r.alert.findingId, r.caseDiff!.afterDigest);
 });
 
+test('proposal admission accepts only replay-derived facts and exact typed handoffs', async () => {
+  const f = fixture();
+  // Change all fixture identities to ensure admission follows evidence bindings, not addresses or IDs.
+  f.evalId = 'variation-9'; f.job.jobId = 'job-variation-9';
+  f.events[0]!.id = 'transfer-x'; f.events[1]!.id = 'window-x'; f.events[2]!.id = 'launch-x';
+  const rehash = async (index: number) => { const { digest: _digest, ...body } = f.events[index]!; f.events[index] = { ...body, digest: await sha256Hex(body) } as SourceEvent; };
+  await rehash(0); await rehash(1); await rehash(2);
+  f.job.subject.entityId = '0x0000000000000000000000000000000000000099';
+  const recipient = '0x0000000000000000000000000000000000000088';
+  await editEvent(f, 0, { from: f.job.subject.entityId, to: recipient });
+  await editEvent(f, 1, { recipient }); await editEvent(f, 2, { creator: recipient });
+  const facts = await replay(f);
+  const safe = { schemaVersion: 'binrat.investigator-output/1', caseId: f.evalId, assessment: 'SUPPORTED_CHANGE',
+    claims: facts.claims, handoff: { subject: facts.handoffs[0]!.subject,
+      createdAtBlock: facts.handoffs[0]!.createdAtBlock, afterBlock: facts.handoffs[0]!.afterBlock,
+      evidenceRefs: facts.handoffs[0]!.evidenceRefs }, alert: 'ALERT', authorityRequested: 'NONE' };
+  const admitted = await validateProposal(f, JSON.stringify(safe));
+  assert.equal(admitted.acceptedCaseChanges.length, 2); assert.ok(admitted.acceptedHandoff);
+  assert.equal(admitted.acceptedAlert, 'ALERT'); assert.deepEqual(admitted.rejections, []);
+
+  const hostile = structuredClone(safe);
+  hostile.claims.push({ kind: 'PONS_REPORTED_DEPLOYER_LAUNCH', scope: 'DECLARED_FIXTURE_WINDOW_ONLY',
+    subject: { chainId: 4663, entityType: 'CREATOR', entityId: '0x0000000000000000000000000000000000000001' }, evidenceRefs: ['launch-x'] });
+  hostile.handoff = { ...hostile.handoff!, subject: { ...hostile.handoff!.subject, entityId: '0x0000000000000000000000000000000000000001' } };
+  const rejected = await validateProposal(f, JSON.stringify(hostile));
+  assert.ok(rejected.rejections.some(r => r.artifact === 'CLAIM' && r.evidenceRefs[0] === 'launch-x'));
+  assert.ok(rejected.rejections.some(r => r.artifact === 'HANDOFF' && r.evidenceRefs.join(',') === 'transfer-x,window-x'));
+  assert.equal(rejected.acceptedAlert, null);
+  const authority = await validateProposal(f, JSON.stringify({ ...safe, authorityRequested: 'NETWORK' }));
+  assert.ok(authority.rejections.some(r => r.reason === 'AUTHORITY_REQUEST_DENIED'));
+  assert.equal(authority.acceptedClaims.length, 0);
+  assert.equal((await validateProposal(f, '{"alert":"ALERT","alert":"SUPPRESS"}')).acceptedAlert, null);
+});
+
+test('handoff time is the maximum availability of funding and history, independent of launch availability', async () => {
+  const f = fixture();
+  await editEvent(f, 0, { availableAtBlock: '110' });
+  await editEvent(f, 1, { availableAtBlock: '120' });
+  const launchHash = `0x${BigInt(121).toString(16).padStart(64, '0')}`;
+  f.canonicalBlocks['121'] = launchHash;
+  await editEvent(f, 2, { blockNumber: '121', blockHash: launchHash, availableAtBlock: '125' });
+  const r = await replay(f);
+  assert.equal(r.handoffs[0]!.createdAtBlock, '120');
+  assert.equal(r.handoffs[0]!.afterBlock, '100');
+  assert.equal(r.alert.decision, 'ALERT');
+});
+
+test('frozen captured proposals are checked unchanged against offline derived facts', async () => {
+  const archived = JSON.parse(readFileSync('test/fixtures/workforce/recorded-sniffer-run-7AI6yG.audit.json', 'utf8')) as {
+    comparison: { captures: Array<{ assignmentId: string; rawOutput: string }> };
+    score: { packDigest: string; scores: Array<{ assignmentId: string; caseId: string; gates: Record<string, boolean>;
+      falseAlert: number }> };
+  };
+  const challenges = JSON.parse(readFileSync('test/fixtures/workforce/competence/challenges-v1.json', 'utf8')) as {
+    cases: Array<{ caseId: string; throughBlock?: string; maxHandoffs?: number;
+      edits?: Array<{ index: number; changes: Record<string, unknown> }>; remove?: number[]; duplicate?: number;
+      canonicalOverrides?: Record<string, string> }>;
+  };
+  const captures = new Map(archived.comparison.captures.map(c => [c.assignmentId, c.rawOutput]));
+  assert.equal(captures.size, 26); assert.equal(archived.score.scores.length, 26);
+  for (const score of archived.score.scores) {
+    const scenario = challenges.cases.find(c => c.caseId === score.caseId)!;
+    const f = fixture(); f.evalId = scenario.caseId; f.job.jobId = `job-${scenario.caseId}`;
+    for (const edit of scenario.edits ?? []) await editEvent(f, edit.index, edit.changes);
+    f.events = f.events.filter((_, index) => !scenario.remove?.includes(index));
+    if (scenario.duplicate !== undefined) f.events.splice(scenario.duplicate + 1, 0, structuredClone(f.events[scenario.duplicate]!));
+    Object.assign(f.canonicalBlocks, scenario.canonicalOverrides);
+    if (scenario.maxHandoffs !== undefined) f.job.budget.maxHandoffs = scenario.maxHandoffs;
+    const admission = await validateProposal(f, captures.get(score.assignmentId)!, { throughBlock: scenario.throughBlock });
+    if (!score.gates.supportedClaimsOnly) assert.ok(admission.rejections.some(r => r.artifact === 'CLAIM'));
+    if (!score.gates.handoff) assert.equal(admission.acceptedHandoff, null);
+    if (score.falseAlert > 0) assert.notEqual(admission.acceptedAlert, 'ALERT');
+  }
+  // The archive keeps its raw answers and historical grader output byte-for-byte intact.
+  const plan = await import('../src/workforce/competence.js').then(m => m.prepareComparison());
+  const report = await scoreComparison({ ...archived.comparison, packDigest: plan.packDigest } as never);
+  assert.deepEqual({ ...report, packDigest: archived.score.packDigest }, archived.score);
+});
+
 test('an earlier replay sees no future launch, including future digest errors or expectation changes', async () => {
   const f = fixture(), early = await replay(f, { throughBlock: '101' });
   assert.equal(early.status, 'SLEEPING'); assert.equal(early.alert.decision, 'SUPPRESS');
@@ -78,6 +159,12 @@ test('no-match, previously seen recipient and self-funding never create an alert
   assert.equal((await passes(seen)).handoffs.length, 0);
   const self = fixture(); await editEvent(self, 0, { to: self.job.subject.entityId });
   expected(self, 'DONE', [], 1, 0); assert.equal((await passes(self)).claims.length, 0);
+  const wrongFunder = fixture(); await editEvent(wrongFunder, 0, { from: '0x0000000000000000000000000000000000000099' });
+  const unsupported = { schemaVersion: 'binrat.investigator-output/1', caseId: wrongFunder.evalId,
+    assessment: 'SUPPORTED_CHANGE', claims: [], handoff: null, alert: 'ALERT', authorityRequested: 'NONE' };
+  const denied = await validateProposal(wrongFunder, JSON.stringify(unsupported));
+  assert.notEqual(denied.acceptedAlert, 'ALERT');
+  assert.ok(denied.rejections.some(r => r.artifact === 'ALERT' && r.evidenceRefs.includes('funding-1')));
 });
 
 test('partial or missing recipient history stays degraded; absence is not clean evidence', async () => {
@@ -103,7 +190,21 @@ test('digest tampering, canonical conflicts, wrong chain, reversed chronology an
   (badDigest.events[0] as unknown as { valueWei: string }).valueWei = '2';
   await assert.rejects(replay(badDigest), /DIGEST_MISMATCH/);
   const wrongBlock = fixture(); wrongBlock.canonicalBlocks['120'] = `0x${'f'.repeat(64)}`;
-  await assert.rejects(replay(wrongBlock), /CANONICAL_BLOCK_MISMATCH/);
+  const conflicted = await replay(wrongBlock);
+  assert.equal(conflicted.status, 'DEGRADED'); assert.equal(conflicted.caseDiff, null);
+  assert.deepEqual(conflicted.claims.map(c => c.kind), [...initialKinds]);
+  assert.ok(conflicted.evidence.every(e => e.id !== 'launch-1'));
+  const lateConflict = fixture(), valid = await replay(fixture());
+  const fork = await seal({ ...lateConflict.events[0]!, id: 'fork-after-finding', blockNumber: '129',
+    availableAtBlock: '129', blockHash: `0x${'a'.repeat(64)}` } as SourceEvent);
+  lateConflict.events.push(fork); lateConflict.canonicalBlocks['129'] = `0x${'b'.repeat(64)}`;
+  const validProposal = { schemaVersion: 'binrat.investigator-output/1', caseId: lateConflict.evalId,
+    assessment: 'SUPPORTED_CHANGE', claims: valid.claims, handoff: { subject: valid.handoffs[0]!.subject,
+      createdAtBlock: valid.handoffs[0]!.createdAtBlock, afterBlock: valid.handoffs[0]!.afterBlock,
+      evidenceRefs: valid.handoffs[0]!.evidenceRefs }, alert: 'ALERT', authorityRequested: 'NONE' };
+  const lateRejected = await validateProposal(lateConflict, JSON.stringify(validProposal));
+  assert.equal(lateRejected.acceptedCaseChanges.length, 0); assert.notEqual(lateRejected.acceptedAlert, 'ALERT');
+  assert.ok(lateRejected.rejections.some(r => r.reason === 'CANONICAL_CONFLICT' && r.evidenceRefs.includes('fork-after-finding')));
   const wrongChain = fixture(); await editEvent(wrongChain, 0, { chainId: 5042 });
   await assert.rejects(replay(wrongChain), /CONTRACT_INVALID/);
   const reversed = fixture(); reversed.events = [reversed.events[1]!, reversed.events[0]!, reversed.events[2]!];
