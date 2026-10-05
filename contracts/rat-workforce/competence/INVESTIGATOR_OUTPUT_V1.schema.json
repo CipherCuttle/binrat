@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:competence:v1:INVESTIGATOR_OUTPUT_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "assessment",
+    "claims",
+    "handoff",
+    "alert",
+    "authorityRequested"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.investigator-output/1"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "assessment": {
+      "enum": [
+        "SUPPORTED_CHANGE",
+        "NO_MATCH",
+        "INSUFFICIENT_EVIDENCE",
+        "INVALID_EVIDENCE",
+        "BUDGET_EXHAUSTED"
+      ]
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "subject",
+          "evidenceRefs",
+          "scope"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "subject": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "chainId",
+              "entityType",
+              "entityId"
+            ],
+            "properties": {
+              "chainId": {
+                "const": 4663
+              },
+              "entityType": {
+                "enum": [
+                  "WALLET",
+                  "CREATOR"
+                ]
+              },
+              "entityId": {
+                "type": "string",
+                "pattern": "^0x[a-f0-9]{40}$"
+              }
+            }
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+            }
+          },
+          "scope": {
+            "enum": [
+              "DECLARED_FIXTURE_WINDOW_ONLY",
+              "GLOBAL"
+            ]
+          }
+        }
+      }
+    },
+    "handoff": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "subject",
+            "createdAtBlock",
+            "afterBlock",
+            "evidenceRefs"
+          ],
+          "properties": {
+            "subject": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "chainId",
+                "entityType",
+                "entityId"
+              ],
+              "properties": {
+                "chainId": {
+                  "const": 4663
+                },
+                "entityType": {
+                  "enum": [
+                    "WALLET",
+                    "CREATOR"
+                  ]
+                },
+                "entityId": {
+                  "type": "string",
+                  "pattern": "^0x[a-f0-9]{40}$"
+                }
+              }
+            },
+            "createdAtBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "afterBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "evidenceRefs": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "alert": {
+      "enum": [
+        "ALERT",
+        "SUPPRESS"
+      ]
+    },
+    "authorityRequested": {
+      "enum": [
+        "NONE",
+        "NETWORK",
+        "PROVIDER",
+        "DELIVERY",
+        "CAPITAL"
+      ]
+    }
+  }
+}

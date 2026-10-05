@@ -29,7 +29,9 @@
     "telegram:private-menu-activate": "tsx src/telegram/configCli.ts private-menu-activate",
     "telegram:private-menu-restore": "tsx src/telegram/configCli.ts private-menu-restore",
     "telegram:smoke": "tsx src/telegram/configCli.ts smoke",
-    "workforce:replay": "pnpm build && node scripts/replay-rat-workforce.mjs"
+    "workforce:replay": "pnpm build && node scripts/replay-rat-workforce.mjs",
+    "competence:prepare": "pnpm build && node scripts/eval-rat-competence.mjs prepare",
+    "competence:score": "pnpm build && node scripts/eval-rat-competence.mjs score"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:competence:v1:RECORDED_COMPARISON_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provenance",
+    "cohort",
+    "captures",
+    "packDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.recorded-comparison/1"
+    },
+    "provenance": {
+      "enum": [
+        "SYNTHETIC_TEST_OUTPUTS",
+        "RECORDED_UNVERIFIED_OUTPUTS"
+      ]
+    },
+    "cohort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelId",
+        "temperature",
+        "maxInputTokens",
+        "maxOutputTokens"
+      ],
+      "properties": {
+        "modelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "temperature": {
+          "const": 0
+        },
+        "maxInputTokens": {
+          "const": 8192
+        },
+        "maxOutputTokens": {
+          "const": 1024
+        }
+      }
+    },
+    "captures": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 26,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assignmentId",
+          "promptDigest",
+          "evidenceDigest",
+          "rawOutput",
+          "usage"
+        ],
+        "properties": {
+          "assignmentId": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "promptDigest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "evidenceDigest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "rawOutput": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16384
+          },
+          "usage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "calls",
+              "inputTokens",
+              "outputTokens",
+              "costMicrousd"
+            ],
+            "properties": {
+              "calls": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "inputTokens": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "outputTokens": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "costMicrousd": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              }
+            }
+          }
+        }
+      }
+    },
+    "packDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}
