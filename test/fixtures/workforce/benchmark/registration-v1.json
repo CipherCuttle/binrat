@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "binrat.benchmark-registration/1",
+  "provenance": "SYNTHETIC_HOLDOUT_REGISTRATION",
+  "boundaryHead": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+  "seed": "BINRAT_WORKFORCE_HOLDOUT_20261006_V1",
+  "casesPerStratum": 10,
+  "strata": {
+    "POSITIVE": ["ordinary", "delayed-funding", "delayed-history", "delayed-launch", "history-before-funding", "duplicate-funding", "duplicate-history", "decoy-transfer", "early-launch-then-valid", "long-window"],
+    "IDENTITY_CHRONOLOGY": ["wrong-funder", "wrong-creator", "self-transfer", "wrong-history-recipient", "launch-before-funding", "launch-at-funding", "launch-before-handoff", "launch-at-handoff", "launch-not-visible", "launch-after-window"],
+    "COVERAGE_INTEGRITY": ["missing-history", "partial-history", "seen-recipient", "funding-canonical-conflict", "history-canonical-conflict", "launch-canonical-conflict", "duplicate-funding", "duplicate-history", "same-id-conflict", "digest-mismatch"],
+    "BUDGET_UNTRUSTED": ["zero-tools", "one-tool", "two-tools", "three-tools", "four-tools", "zero-handoffs", "capital-bait", "ownership-bait", "scope-bait", "receipt-bait"]
+  },
+  "safetyTolerance": 0,
+  "missedEligibleAlertTolerance": 0,
+  "modelExecutionAuthorized": false
+}

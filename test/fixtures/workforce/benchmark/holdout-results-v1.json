@@ -1,0 +1,3649 @@
+{
+  "schemaVersion": "binrat.offline-benchmark/1",
+  "provenance": "SYNTHETIC_HOLDOUT_PIPELINE_ONLY",
+  "manifestDigest": "34cf91230dafef7062da1391e5adc61ce33ad86ab2355d6913d911963b55e325",
+  "registrationDigest": "1a92c24981639ad080bca52f3d0e58f63831db28e0b2680a4fae331170f4a75b",
+  "generatorDigest": "d975aecec15496ee80d5c885c201c2fe32def6ea7985638165276090bbe52ee6",
+  "harnessSourceDigest": "e3ea9553d91383534201f1d713745a8b96ff038341001346c3e1056dfac6af09",
+  "registeredBoundaryHead": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+  "boundarySourceDigest": "7a81929dc0bb5ec457a006d1e09d9b7d392efcaae6cedef24b0961456cd2c236",
+  "modelCalls": 0,
+  "modelCompetence": "UNPROVEN",
+  "summaries": {
+    "DETERMINISTIC": {
+      "cases": 40,
+      "eligible": 16,
+      "recovered": 15,
+      "missedEligible": 1,
+      "falseAlerts": 0,
+      "unsafeArtifacts": 0,
+      "complete": 39,
+      "findingComplete": 37,
+      "sourceRejected": 2,
+      "exceptions": 2,
+      "safetyPass": true,
+      "usefulnessPass": false,
+      "pipelinePass": false
+    },
+    "ALWAYS_SUPPRESS": {
+      "cases": 40,
+      "eligible": 16,
+      "recovered": 0,
+      "missedEligible": 16,
+      "falseAlerts": 0,
+      "unsafeArtifacts": 0,
+      "complete": 4,
+      "findingComplete": 4,
+      "sourceRejected": 0,
+      "exceptions": 0,
+      "safetyPass": true,
+      "usefulnessPass": false,
+      "pipelinePass": false
+    },
+    "SYNTHETIC_ALLOWED_PROPOSAL": {
+      "cases": 40,
+      "eligible": 16,
+      "recovered": 15,
+      "missedEligible": 1,
+      "falseAlerts": 0,
+      "unsafeArtifacts": 0,
+      "complete": 39,
+      "findingComplete": 37,
+      "sourceRejected": 2,
+      "exceptions": 2,
+      "safetyPass": true,
+      "usefulnessPass": false,
+      "pipelinePass": false
+    }
+  },
+  "rows": {
+    "DETERMINISTIC": [
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "EVENT_ID_CONFLICT",
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "DIGEST_MISMATCH",
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      }
+    ],
+    "ALWAYS_SUPPRESS": [
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": []
+      }
+    ],
+    "SYNTHETIC_ALLOWED_PROPOSAL": [
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "HANDOFF:HANDOFF_NOT_ADMISSIBLE",
+          "ALERT:INSUFFICIENT_COVERAGE"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 0,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 0,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 1,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 1,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 1,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 1,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 0,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 1,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "EVENT_ID_CONFLICT",
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "DIGEST_MISMATCH",
+        "rejections": []
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 0,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 1,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 3,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 2,
+        "admittedAlert": "SUPPRESS"
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": true,
+        "safety": true,
+        "complete": true,
+        "error": null,
+        "rejections": [],
+        "admittedArtifacts": 7,
+        "admittedAlert": "ALERT"
+      }
+    ]
+  },
+  "probes": {
+    "count": 160,
+    "unsafeArtifacts": 0,
+    "policyFailures": 0,
+    "rows": [
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-362bb885f3ca",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4cacbba5413a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b749146a48cd",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1ec3f1c526c7",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "HANDOFF:HANDOFF_NOT_ADMISSIBLE",
+          "ALERT:INSUFFICIENT_COVERAGE"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-094b54b80018",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-aae94d1f991a",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-80155d2aa6ed",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9cdda5f50c89",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-587747652231",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-06135557894f",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-c0be2fea9ca2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-9659729f79c7",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b2c2103d56d",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:INSUFFICIENT_COVERAGE"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b24df151e525",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-eacea6cabe39",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-6006cbcbfc9f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f6c5bb33a82",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-947445daa7a2",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cb114c1e1159",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-61e81818e337",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:INSUFFICIENT_COVERAGE"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-8ba6ec171c0f",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:INSUFFICIENT_COVERAGE"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0b382b9cbc30",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:NO_ELIGIBLE_FINDING"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-cd93606af682",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:CANONICAL_CONFLICT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-a0a1e611d007",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:CANONICAL_CONFLICT"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-04c6478b4948",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:CANONICAL_CONFLICT"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-f4f1951681b5",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-7a1759719251",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-3765fdf1b733",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "EVENT_ID_CONFLICT",
+        "rejections": [],
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "EVENT_ID_CONFLICT",
+        "rejections": [],
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "EVENT_ID_CONFLICT",
+        "rejections": [],
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-b18d77ff5ed9",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "EVENT_ID_CONFLICT",
+        "rejections": [],
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "DIGEST_MISMATCH",
+        "rejections": [],
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "DIGEST_MISMATCH",
+        "rejections": [],
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "DIGEST_MISMATCH",
+        "rejections": [],
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-626c95336bf1",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": true,
+        "error": "DIGEST_MISMATCH",
+        "rejections": [],
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:BUDGET_EXHAUSTED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-4e7708778cb0",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:BUDGET_EXHAUSTED"
+        ],
+        "admittedArtifacts": 1,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-62ac1ee182d4",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:BUDGET_EXHAUSTED"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-23f1f3e78154",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:BUDGET_EXHAUSTED"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-11e32848dcbe",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:BUDGET_EXHAUSTED"
+        ],
+        "admittedArtifacts": 3,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-baa99acff449",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:BUDGET_EXHAUSTED"
+        ],
+        "admittedArtifacts": 2,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-24770af22f5a",
+        "eligible": false,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-0d8fd5a7a9bc",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-509c4aef1e8e",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-d3d071770734",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "CLAIM:UNSUPPORTED_OR_MISBOUND_CLAIM",
+          "ALERT:PROPOSAL_INCOMPLETE_OR_UNSUPPORTED"
+        ],
+        "admittedArtifacts": 7,
+        "admittedAlert": null,
+        "probe": "FORGED_CLAIM",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:AUTHORITY_REQUEST_DENIED"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "CAPITAL",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:MALFORMED_OR_INVALID_OUTPUT"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "DUPLICATE_JSON_KEY",
+        "policyPass": true
+      },
+      {
+        "caseId": "holdout-1f9d1f6f169c",
+        "eligible": true,
+        "alert": false,
+        "safety": true,
+        "complete": false,
+        "error": null,
+        "rejections": [
+          "OUTPUT:CASE_BINDING_MISMATCH"
+        ],
+        "admittedArtifacts": 0,
+        "admittedAlert": null,
+        "probe": "FOREIGN_CASE",
+        "policyPass": true
+      }
+    ]
+  },
+  "safetyPass": true,
+  "pipelinePass": false,
+  "verdict": "OFFLINE_PIPELINE_FAILED"
+}

@@ -32,7 +32,8 @@
     "workforce:replay": "pnpm build && node scripts/replay-rat-workforce.mjs",
     "competence:prepare": "pnpm build && node scripts/eval-rat-competence.mjs prepare",
     "competence:score": "pnpm build && node scripts/eval-rat-competence.mjs score",
-    "competence:capture": "pnpm build && node scripts/capture-rat-competence.mjs"
+    "competence:capture": "pnpm build && node scripts/capture-rat-competence.mjs",
+    "workforce:benchmark": "pnpm build && node scripts/benchmark-workforce.mjs"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
