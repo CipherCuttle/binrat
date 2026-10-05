@@ -1,0 +1,93 @@
+name: binrat-sniffer-competence-once
+
+on:
+  push:
+    branches: [experiment/binrat-sniffer-gpt41mini-20261005]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-sniffer-gpt41mini-20261005
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: ${{ github.actor == 'CipherCuttle' && github.run_attempt == '1' && github.event.head_commit.message == '[run-binrat-sniffer-20261005] approved $0.26 comparison' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Initialize experiment directory
+        run: printf 'BINRAT_CAPTURE_DIR=%s\n' "$RUNNER_TEMP/binrat-sniffer-capture" >> "$GITHUB_ENV"
+      - name: Check out immutable reviewed experiment source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 46d3ccbcf5c0158ea601f830a89d84e5512ed68b
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Install pinned dependencies and build (no provider secret)
+        run: |
+          test "$(git rev-parse HEAD)" = 46d3ccbcf5c0158ea601f830a89d84e5512ed68b
+          npm install --global pnpm@10.15.0
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm build
+      - name: Prepare and verify the exact approved plan (zero model calls)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { prepareCaptureDirectory } from './dist/src/workforce/capture.js';
+          const config = {
+            schemaVersion: 'binrat.capture-config/1', modelId: 'openai/gpt-4.1-mini',
+            providerSlug: 'openai', responseProvider: 'OpenAI', maxCostMicrousd: 260000,
+            expiresAt: '2026-10-06T18:57:09.510Z',
+            maxPrice: { promptMicrousdPerMillion: 400000, completionMicrousdPerMillion: 1600000 }
+          };
+          const plan = await prepareCaptureDirectory(config, process.env.BINRAT_CAPTURE_DIR);
+          if (plan.planDigest !== '1392c6a092d33d8731f91a5697f5b8ac1014b901acc3165040dc414cb806b1ba') throw new Error('APPROVED_PLAN_MISMATCH');
+          if (Date.now() >= Date.parse(config.expiresAt)) throw new Error('APPROVED_PLAN_EXPIRED');
+          writeFileSync(process.env.BINRAT_CAPTURE_DIR + '/actions-context.json', JSON.stringify({
+            workflowHead: process.env.GITHUB_SHA, runId: process.env.GITHUB_RUN_ID,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            sourceHead: '46d3ccbcf5c0158ea601f830a89d84e5512ed68b', planDigest: plan.planDigest,
+            modelId: config.modelId, provider: config.providerSlug, maximumMicrousd: config.maxCostMicrousd
+          }, null, 2), { flag: 'wx', mode: 0o600 });
+          console.log(JSON.stringify({ planDigest: plan.planDigest, assignments: plan.requests.length,
+            model: config.modelId, provider: config.providerSlug, maximumMicrousd: config.maxCostMicrousd, modelCalls: 0 }));
+          JS
+      - name: Execute the approved comparison once
+        env:
+          BINRAT_EVAL_OPENROUTER_API_KEY: ${{ secrets.BINRAT_EVAL_OPENROUTER_API_KEY }}
+        run: node scripts/capture-rat-competence.mjs run "$BINRAT_CAPTURE_DIR" --execute 1392c6a092d33d8731f91a5697f5b8ac1014b901acc3165040dc414cb806b1ba
+      - name: Audit retained receipts offline
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "$BINRAT_CAPTURE_DIR/run.started.json" ]; then
+            node scripts/capture-rat-competence.mjs audit "$BINRAT_CAPTURE_DIR" > "$BINRAT_CAPTURE_DIR/audit.json"
+          fi
+      - name: Summarize capture and score
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import { existsSync, readFileSync } from 'node:fs';
+          const file = process.env.BINRAT_CAPTURE_DIR + '/audit.json';
+          if (existsSync(file) && readFileSync(file, 'utf8').trim()) {
+            const audit = JSON.parse(readFileSync(file, 'utf8'));
+            console.log(JSON.stringify({ capture: audit.summary, verdict: audit.score.verdict,
+              paired: audit.score.paired, metrics: audit.score.metrics, modelCompetence: audit.score.modelCompetence }, null, 2));
+          } else console.log('No completed audit. Inspect the preceding failure and retained artifacts.');
+          JS
+      - name: Preserve plan, raw receipts and score
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: binrat-sniffer-gpt41mini-${{ github.run_id }}
+          path: ${{ runner.temp }}/binrat-sniffer-capture/
+          retention-days: 30
+          if-no-files-found: warn
