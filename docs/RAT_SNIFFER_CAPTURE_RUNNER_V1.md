@@ -48,10 +48,14 @@ the evaluator's loaded module text, so a source-mode test plan differs from a co
 
 Owner authorization must name the concrete model/provider and approve this plan's **$0.26 maximum reservation**
 before anyone invokes `run`. This repository file or a successful test is not owner authorization.
-Use a fresh dedicated OpenRouter key, no other workloads or BYOK configuration, with a nonresetting limit no
+Use a dedicated OpenRouter key, no concurrent workloads or BYOK configuration, with a nonresetting limit no
 larger than $0.26 and BYOK inclusion enabled. Set it through the process environment
 `BINRAT_EVAL_OPENROUTER_API_KEY`; never put credentials in command arguments, config, receipts or git.
 The runner reads the existing key's limits; it cannot create keys, change limits, buy credits or enable providers.
+Prior non-BYOK spending is allowed; the provider's lifetime cap and remaining-credit checks still apply.
+An already-used key does not grant permission to repeat an earlier experiment. Inspect all existing capture
+directories and provider activity before authorizing another run. Preflight errors identify the failed settings
+without printing the key. A changed runner requires a newly prepared plan; old plans and receipts remain intact.
 
 ```sh
 pnpm competence:capture run /absolute/run-directory --execute EXACT_REVIEWED_PLAN_DIGEST

@@ -71,14 +71,35 @@ test('wrong authorization and expired plans stop before any request or permanent
   await assert.rejects(executeCapture(other, p.planDigest, KEY, mock.send), /EXPIRED/); assert.equal(mock.calls.length, 0);
   assert.ok(plan.planDigest);
 });
-test('fresh nonresetting dedicated capped key is mandatory; preflight never dispatches a model call on failure', async t => {
-  const bad = [ { limit: null }, { limit: 1 }, { limit_reset: 'daily' }, { usage: 0.001 },
+test('nonresetting capped key is mandatory; invalid settings never dispatch a model call', async t => {
+  const bad = [ { limit: null }, { limit: 1 }, { limit_reset: 'daily' }, { usage: -1 }, { usage: 0.27 },
+    { usage: null }, { usage: '0' },
     { byok_usage: 0.001 }, { include_byok_in_limit: false }, { limit_remaining: null } ];
   for (const changes of bad) {
     const { dir, plan } = await sandbox(t), key = keyData(); Object.assign(key.data, changes);
     const mock = transport({ key }); await assert.rejects(executeCapture(dir, plan.planDigest, KEY, mock.send));
     assert.equal(mock.calls.length, 1); assert.ok(mock.calls[0].url.endsWith('/key'));
   }
+});
+test('previously used capped key can complete a new one-shot run without raising its limit', async t => {
+  const { dir, plan } = await sandbox(t), key = keyData();
+  key.data.usage = 0.0282; key.data.limit_remaining = 0.2318;
+  const mock = transport({ key });
+  assert.deepEqual(await executeCapture(dir, plan.planDigest, KEY, mock.send), { attempted: 26, outcome: 'COMPLETE' });
+  assert.equal(mock.calls.filter(c => c.init.method === 'POST').length, 26);
+  assert.equal((await auditCapture(dir)).summary.complete, true);
+  await assert.rejects(executeCapture(dir, plan.planDigest, KEY, mock.send), /EEXIST/);
+  assert.equal(mock.calls.filter(c => c.init.method === 'POST').length, 26);
+});
+test('key preflight identifies failed fields without exposing the credential', async t => {
+  const { dir, plan } = await sandbox(t), key = keyData();
+  key.data.include_byok_in_limit = false;
+  const mock = transport({ key });
+  await assert.rejects(executeCapture(dir, plan.planDigest, KEY, mock.send), error => {
+    assert.match(String(error), /include_byok_in_limit must be true/);
+    assert.ok(!String(error).includes(KEY)); return true;
+  });
+  assert.equal(mock.calls.filter(c => c.init.method === 'POST').length, 0);
 });
 test('successful synthetic capture dispatches once per assignment, durable reservation precedes each POST and audit rederives raw answers', async t => {
   const { dir, plan } = await sandbox(t); let index = 0;
@@ -140,7 +161,7 @@ test('oversized bodies are bounded and credentials echoed by upstream are redact
     assert.equal(receipt.response.truncated || receipt.response.redacted, true);
   }
 });
-test('provider key remaining credit and fresh status are rechecked before later reservations', async t => {
+test('provider key remaining credit is rechecked before later reservations', async t => {
   const { dir, plan } = await sandbox(t); let count = 0;
   const mock = transport({ inspect: (url) => { if (url.endsWith('/key')) count++; } });
   const send = async (url: string, init: RequestInit) => {
