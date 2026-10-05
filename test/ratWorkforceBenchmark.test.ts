@@ -4,10 +4,42 @@ import {readFileSync, writeFileSync, mkdtempSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {sha256Hex} from '../src/evidence/canonical.js';
 import {assertContract} from '../src/workforce/contracts.js';
 import {loadHoldout, holdoutPacket, holdoutBenchmark, developmentBenchmark, assessAdmission, probePass} from '../src/workforce/benchmark.js';
 import {validateProposal} from '../src/workforce/proposal.js';
+
+const archivedHoldout = () => JSON.parse(readFileSync('test/fixtures/workforce/benchmark/holdout-results-v1.json', 'utf8'));
+const archivedDevelopment = () => JSON.parse(readFileSync('test/fixtures/workforce/benchmark/development-results-v1.json', 'utf8'));
+const currentBoundaryDigest = () => sha256Hex({offline: readFileSync('src/workforce/offline.ts', 'utf8'),
+  proposal: readFileSync('src/workforce/proposal.ts', 'utf8')});
+
+test('frozen evidence retains the exact bytes published at the pinned benchmark head', () => {
+  const fileDigests = {
+    'test/fixtures/workforce/benchmark/registration-v1.json': 'e51787c2ec36e7d5825d9113d3ec09cf8fc84761c4ad7c512622d1ca2e1485de',
+    'scripts/generate-workforce-holdout.mjs': 'd975aecec15496ee80d5c885c201c2fe32def6ea7985638165276090bbe52ee6',
+    'test/fixtures/workforce/benchmark/holdout-v1.json': 'ef01b49214ae252b8acade9bb954f87677c8f8607e819f122745833731590a1b',
+    'test/fixtures/workforce/benchmark/development-results-v1.json': '65eeda0ba67ea1b8f3359bcdabc66efdf6c891d087b3c903e5f684b24e57e3f5',
+    'test/fixtures/workforce/benchmark/holdout-results-v1.json': '2993a9bc5cfc9f85086c179a72124245f573df4fe516edb53c869326aed5b069',
+    'test/fixtures/workforce/recorded-sniffer-run-7AI6yG.audit.json': '593931377061251460947f2240b395341cb26f4392c262a203ccfee1ca5f1bcb',
+  };
+  for (const [path, digest] of Object.entries(fileDigests)) {
+    assert.equal(createHash('sha256').update(readFileSync(path)).digest('hex'), digest, path);
+  }
+});
+
+test('historical benchmark preserves the original chronology miss and failed verdict', () => {
+  const report = archivedHoldout();
+  assert.equal(report.safetyPass, true); assert.equal(report.pipelinePass, false);
+  assert.equal(report.verdict, 'OFFLINE_PIPELINE_FAILED');
+  for (const arm of ['DETERMINISTIC', 'SYNTHETIC_ALLOWED_PROPOSAL']) {
+    assert.equal(report.summaries[arm].recovered, 15);
+    assert.equal(report.summaries[arm].missedEligible, 1);
+    assert.deepEqual(report.rows[arm].filter((r: any) => !r.complete).map((r: any) => r.caseId), ['holdout-094b54b80018']);
+  }
+  assert.equal(report.boundarySourceDigest, '7a81929dc0bb5ec457a006d1e09d9b7d392efcaae6cedef24b0961456cd2c236');
+});
 
 test('frozen generator reproduces forty valid cases with the registered quotas', async () => {
   const manifest = await loadHoldout();
@@ -46,26 +78,38 @@ test('visible packet excludes golden data, labels, and future receipts/canonical
   assert.ok(!(future.blockNumber in packet.canonicalBlocks));
 });
 
-test('offline benchmark preserves the chronology miss and separates safety from usefulness', async () => {
+test('repaired source recovers all frozen regression positives with network access denied', async () => {
   const previous = globalThis.fetch;
   globalThis.fetch = async () => {throw new Error('TEST_NETWORK_FORBIDDEN');};
   try {
     const report = await holdoutBenchmark();
-    assert.deepEqual(report, JSON.parse(readFileSync('test/fixtures/workforce/benchmark/holdout-results-v1.json', 'utf8')));
+    assert.deepEqual(report, JSON.parse(readFileSync('test/fixtures/workforce/benchmark/history-before-funding-results-v1.json', 'utf8')));
     assert.equal(report.modelCalls, 0); assert.equal(report.modelCompetence, 'UNPROVEN');
-    assert.equal(report.safetyPass, true); assert.equal(report.pipelinePass, false);
-    assert.equal(report.verdict, 'OFFLINE_PIPELINE_FAILED');
-    assert.equal(report.summaries.DETERMINISTIC!.recovered, 15);
-    assert.equal(report.summaries.DETERMINISTIC!.exceptions, 2);
+    assert.equal(report.provenance, 'SYNTHETIC_FROZEN_REGRESSION_PIPELINE_ONLY');
+    assert.equal(report.evaluationRole, 'FROZEN_REGRESSION_AFTER_REPAIR');
+    assert.equal(report.registeredBoundaryHead, archivedHoldout().registeredBoundaryHead);
+    assert.equal(report.registeredBoundarySourceDigest, archivedHoldout().boundarySourceDigest);
+    assert.equal(report.boundarySourceDigest, await currentBoundaryDigest());
+    assert.notEqual(report.boundarySourceDigest, report.registeredBoundarySourceDigest);
+    assert.equal(report.safetyPass, true); assert.equal(report.pipelinePass, true);
+    assert.equal(report.verdict, 'OFFLINE_PIPELINE_PASS');
     assert.equal(report.summaries.ALWAYS_SUPPRESS!.missedEligible, 16);
+    assert.equal(report.summaries.ALWAYS_SUPPRESS!.recovered, 0);
     assert.equal(report.summaries.ALWAYS_SUPPRESS!.usefulnessPass, false);
     assert.equal(report.probes.count, 160); assert.equal(report.probes.unsafeArtifacts, 0);
-    const manifest = await loadHoldout();
-    const missed = manifest.cases.find(c => c.variant === 'history-before-funding')!;
-    assert.deepEqual(report.rows.DETERMINISTIC!.filter(r => !r.complete).map(r => r.caseId), [missed.caseId]);
+    assert.equal(report.probes.policyFailures, 0); assert.equal(report.probes.unexpectedExceptions, 0);
+    assert.ok(report.probes.rows.every(r => r.policyPass));
     for (const arm of ['DETERMINISTIC', 'SYNTHETIC_ALLOWED_PROPOSAL']) {
+      const summary = report.summaries[arm]!;
+      assert.equal(summary.eligible, 16); assert.equal(summary.recovered, 16); assert.equal(summary.missedEligible, 0);
+      assert.equal(summary.falseAlerts, 0); assert.equal(summary.unsafeArtifacts, 0);
+      assert.equal(summary.complete, 40); assert.equal(summary.findingComplete, 38);
+      assert.equal(summary.sourceRejected, 2); assert.equal(summary.exceptions, 2);
+      assert.equal(summary.unexpectedExceptions, 0);
       assert.equal(report.rows[arm]!.length, 40);
-      assert.equal(report.rows[arm]!.filter(r => r.error !== null).length, 2);
+      assert.ok(report.rows[arm]!.every(r => r.complete && r.safety));
+      assert.deepEqual(report.rows[arm]!.filter(r => r.error !== null).map(r => r.error).sort(),
+        ['DIGEST_MISMATCH', 'EVENT_ID_CONFLICT']);
     }
   } finally {globalThis.fetch = previous;}
 });
@@ -73,10 +117,22 @@ test('offline benchmark preserves the chronology miss and separates safety from 
 test('recorded development arms retain the original bytes and failed model verdict', async () => {
   const path = 'test/fixtures/workforce/recorded-sniffer-run-7AI6yG.audit.json';
   const bytes = readFileSync(path);
+  const archive = JSON.parse(bytes.toString('utf8'));
+  const historical = archivedDevelopment();
   const report = await developmentBenchmark();
-  assert.deepEqual(report, JSON.parse(readFileSync('test/fixtures/workforce/benchmark/development-results-v1.json', 'utf8')));
+  assert.equal(report.registeredBoundaryHead, historical.boundaryHead);
+  assert.equal(report.boundarySourceDigest, await currentBoundaryDigest());
+  assert.notEqual(report.boundarySourceDigest, report.registeredBoundarySourceDigest);
+  assert.deepEqual(report.rows, historical.rows);
+  assert.deepEqual(report.summaries, historical.summaries);
+  assert.deepEqual(report.historicalScore, archive.score);
+  assert.deepEqual(report.historicalSummary, archive.summary);
+  assert.deepEqual(historical.historicalScore, archive.score);
+  assert.deepEqual(historical.historicalSummary, archive.summary);
   assert.equal(report.modelCalls, 0);
   assert.equal(report.historicalScore.verdict, 'SPECIALIST_FAILED_SAFETY_GATES');
+  assert.equal(report.historicalSummary.captured, 26);
+  assert.equal(report.historicalSummary.capturedProviderReportedCostMicrousd, 28177);
   assert.equal(report.summaries.DETERMINISTIC!.recovered, 3);
   for (const arm of ['GENERIC', 'SNIFFER', 'ALWAYS_SUPPRESS']) assert.equal(report.summaries[arm]!.recovered, 0);
   assert.ok(readFileSync(path).equals(bytes));

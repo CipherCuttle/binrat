@@ -112,10 +112,33 @@ export async function replay(input: unknown, options: { throughBlock?: string; r
   const budget = new OfflineBudget(fixture.job, pack);
   const evidence: SourceEvent[] = [], claims: Claim[] = [], handoffs: Handoff[] = [];
   const seen = new Map<string, string>();
+  // Verified, charged reads only; bounded by the V1 input's 64 receipts and tool budget.
+  const pendingHistory: RecipientWindow[] = [];
   let funding: Transfer | null = null, history: RecipientWindow | null = null;
   let diff: JobReceipt['caseDiff'] = null;
   let degraded = false, exhausted = false, lastAvailable = BigInt(fixture.job.window.fromBlock);
   let alert: JobReceipt['alert'] = { decision: 'SUPPRESS', reason: 'NO_SUPPORTED_CHANGE', findingId: null };
+  const admitHistory = async (event: RecipientWindow): Promise<void> => {
+    const transfer = funding;
+    if (!transfer || history || event.recipient !== transfer.to) return;
+    if (BigInt(event.fromBlock) !== BigInt(fixture.job.window.fromBlock) ||
+        BigInt(event.toBlock) !== BigInt(transfer.blockNumber) - 1n) throw new Error('RECIPIENT_WINDOW_INVALID');
+    history = event; evidence.push(event);
+    if (!event.complete) { degraded = true; return; }
+    if (event.seen) return;
+    claims.push(claim('RECIPIENT_NOT_SEEN_IN_WINDOW', wallet(event.recipient), [event.id]));
+    budget.reserveHandoff();
+    const content: Omit<Handoff, 'handoffId'> = {
+      schemaVersion: 'binrat.rat-handoff/1', jobId: fixture.job.jobId, fromRat: 'SNIFFER', toRat: 'RAT_ZERO',
+      objective: 'CHECK_FUTURE_PONS_LAUNCH', subject: creator(transfer.to),
+      createdAtBlock: BigInt(transfer.availableAtBlock) > BigInt(event.availableAtBlock)
+        ? transfer.availableAtBlock : event.availableAtBlock,
+      afterBlock: transfer.blockNumber, evidenceRefs: [transfer.id, event.id],
+      authority: fixture.job.authority, remainingBudget: budget.remaining
+    };
+    const handoff: Handoff = { ...content, handoffId: await sha256Hex(content) };
+    assertContract<Handoff>('RAT_HANDOFF_V1', handoff); handoffs.push(handoff);
+  };
   for (const event of fixture.events) {
     if (BigInt(event.availableAtBlock) > BigInt(throughBlock)) continue;
     if (BigInt(event.availableAtBlock) < lastAvailable || BigInt(event.blockNumber) > BigInt(event.availableAtBlock) ||
@@ -136,26 +159,12 @@ export async function replay(input: unknown, options: { throughBlock?: string; r
         if (event.from !== fixture.job.subject.entityId || event.from === event.to) continue;
         funding = event; evidence.push(event);
         claims.push(claim('NATIVE_TRANSFER_OBSERVED', wallet(event.to), [event.id]));
-      } else if (event.kind === 'RECIPIENT_WINDOW' && funding && !history) {
+        for (const pending of pendingHistory) await admitHistory(pending);
+        pendingHistory.length = 0;
+      } else if (event.kind === 'RECIPIENT_WINDOW' && !history) {
         budget.reserve('SNIFFER', 'READ_RECIPIENT_WINDOW_FIXTURE', event.availableAtBlock);
-        if (event.recipient !== funding.to) continue;
-        if (BigInt(event.fromBlock) !== BigInt(fixture.job.window.fromBlock) ||
-            BigInt(event.toBlock) !== BigInt(funding.blockNumber) - 1n) throw new Error('RECIPIENT_WINDOW_INVALID');
-        history = event; evidence.push(event);
-        if (!event.complete) { degraded = true; continue; }
-        if (event.seen) continue;
-        claims.push(claim('RECIPIENT_NOT_SEEN_IN_WINDOW', wallet(event.recipient), [event.id]));
-        budget.reserveHandoff();
-        const content: Omit<Handoff, 'handoffId'> = {
-          schemaVersion: 'binrat.rat-handoff/1', jobId: fixture.job.jobId, fromRat: 'SNIFFER', toRat: 'RAT_ZERO',
-          objective: 'CHECK_FUTURE_PONS_LAUNCH', subject: creator(funding.to),
-          createdAtBlock: BigInt(funding.availableAtBlock) > BigInt(event.availableAtBlock)
-            ? funding.availableAtBlock : event.availableAtBlock,
-          afterBlock: funding.blockNumber, evidenceRefs: [funding.id, event.id],
-          authority: fixture.job.authority, remainingBudget: budget.remaining
-        };
-        const handoff: Handoff = { ...content, handoffId: await sha256Hex(content) };
-        assertContract<Handoff>('RAT_HANDOFF_V1', handoff); handoffs.push(handoff);
+        if (!funding) pendingHistory.push(event);
+        else await admitHistory(event);
       } else if (event.kind === 'PONS_LAUNCH' && funding && handoffs.length) {
         budget.reserve('RAT_ZERO', 'READ_PONS_LAUNCH_FIXTURE', event.availableAtBlock);
         if (event.creator !== funding.to || BigInt(event.blockNumber) <= BigInt(funding.blockNumber) ||
