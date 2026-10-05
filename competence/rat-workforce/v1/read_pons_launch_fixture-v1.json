@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "binrat.tool-manifest/1",
+  "id": "read_pons_launch_fixture-v1",
+  "tool": "READ_PONS_LAUNCH_FIXTURE",
+  "authority": {
+    "research": true,
+    "network": false,
+    "provider": false,
+    "delivery": false,
+    "capital": false
+  },
+  "effect": "DETERMINISTIC_FIXTURE_ONLY",
+  "charge": {
+    "toolCalls": 1,
+    "modelCalls": 0,
+    "costMicrousd": 0
+  },
+  "manifestDigest": "e82c62e67efc204767355f09165fb38024afe4968a971046a7896c8cd709fa5d"
+}

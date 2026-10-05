@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "binrat.rat-profile/1",
+  "ratId": "SNIFFER",
+  "publicStatus": "NEXT",
+  "executionMode": "OFFLINE_REPLAY",
+  "objective": "Follow an evidenced funder to a recipient; hand off only with scoped recipient evidence.",
+  "toolRefs": [
+    {
+      "id": "read_transfer_fixture-v1",
+      "digest": "de2e7eaa099e8ea4af50680e4324091f523b855f4ecd719d329138cb7148eb98"
+    },
+    {
+      "id": "read_recipient_window_fixture-v1",
+      "digest": "6153a2d59559628832b41fcbbb8c1a030bc1a065e85206de7b127b2b8a82da37"
+    }
+  ],
+  "skillRefs": [
+    {
+      "id": "sniffer-competence-v1",
+      "digest": "8daa8b200326f0204efbcefd88d015545040844f0509a91486608f77f6f72ece"
+    }
+  ],
+  "refusalRules": [
+    "Reject wallet, capital, provider, network and delivery authority.",
+    "Reject unsupported identity and safety claims.",
+    "Stop before exceeding the origin job budget."
+  ],
+  "evalRefs": [
+    "sniffer-funding-to-pons-v1"
+  ],
+  "manifestDigest": "48872f9a512e2a7a1eeb3bb0801da8232fa5e4db77f73483f2d02dd74cc75e05"
+}

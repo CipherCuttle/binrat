@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "binrat.rat-profile/1",
+  "ratId": "TRIPWIRE",
+  "publicStatus": "BUILDING",
+  "executionMode": "OFFLINE_REPLAY",
+  "objective": "Interrupt only for a supported change matching an explicit job condition.",
+  "toolRefs": [
+    {
+      "id": "decide_alert-v1",
+      "digest": "912176c863960ec2cf85c07849cc3250a210c5a9c25b581f7af80d59bcf0753d"
+    }
+  ],
+  "skillRefs": [
+    {
+      "id": "tripwire-competence-v1",
+      "digest": "0dc4856754ce9d30b78394c687ff028e418a0c6d0633f469d13db4458fb80cb9"
+    }
+  ],
+  "refusalRules": [
+    "Reject wallet, capital, provider, network and delivery authority.",
+    "Reject unsupported identity and safety claims.",
+    "Stop before exceeding the origin job budget."
+  ],
+  "evalRefs": [
+    "sniffer-funding-to-pons-v1"
+  ],
+  "manifestDigest": "723f5666efaa0a53864a158670c1152a0f93c6ee84f05405cf461b038193d643"
+}

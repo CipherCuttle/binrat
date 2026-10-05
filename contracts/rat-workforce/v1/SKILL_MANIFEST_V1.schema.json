@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:workforce:v1:SKILL_MANIFEST_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "ratId",
+    "objective",
+    "procedure",
+    "requiredEvidence",
+    "forbiddenClaims",
+    "evalRefs",
+    "manifestDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.skill-manifest/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "ratId": {
+      "enum": [
+        "RAT_ZERO",
+        "TRIPWIRE",
+        "SNIFFER"
+      ]
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "procedure": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "requiredEvidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "forbiddenClaims": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "evalRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

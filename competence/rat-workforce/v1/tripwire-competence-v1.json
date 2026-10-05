@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "binrat.skill-manifest/1",
+  "id": "tripwire-competence-v1",
+  "ratId": "TRIPWIRE",
+  "objective": "Interrupt only for a supported change matching an explicit job condition.",
+  "procedure": [
+    "Check explicit watch scope and event chronology.",
+    "Suppress unsupported, duplicate, degraded or budget-exhausted changes.",
+    "Produce an offline alert decision; never send it."
+  ],
+  "requiredEvidence": [
+    "Canonical fixture block binding and sealed source event.",
+    "Explicit partial coverage and source-reported roles."
+  ],
+  "forbiddenClaims": [
+    "Same human or team.",
+    "Safe token or predicted return.",
+    "Brand-new wallet outside the declared window."
+  ],
+  "evalRefs": [
+    "sniffer-funding-to-pons-v1"
+  ],
+  "manifestDigest": "0dc4856754ce9d30b78394c687ff028e418a0c6d0633f469d13db4458fb80cb9"
+}

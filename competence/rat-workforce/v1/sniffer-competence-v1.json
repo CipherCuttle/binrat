@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "binrat.skill-manifest/1",
+  "id": "sniffer-competence-v1",
+  "ratId": "SNIFFER",
+  "objective": "Follow an evidenced funder to a recipient; hand off only with scoped recipient evidence.",
+  "procedure": [
+    "Read a direct native transfer at the current replay boundary.",
+    "Check only the declared recipient history window; unknown coverage stays unknown.",
+    "Create one typed handoff within the originating job budget."
+  ],
+  "requiredEvidence": [
+    "Canonical fixture block binding and sealed source event.",
+    "Explicit partial coverage and source-reported roles."
+  ],
+  "forbiddenClaims": [
+    "Same human or team.",
+    "Safe token or predicted return.",
+    "Brand-new wallet outside the declared window."
+  ],
+  "evalRefs": [
+    "sniffer-funding-to-pons-v1"
+  ],
+  "manifestDigest": "8daa8b200326f0204efbcefd88d015545040844f0509a91486608f77f6f72ece"
+}
