@@ -122,7 +122,8 @@ export async function replay(input: unknown, options: { throughBlock?: string; r
         BigInt(event.blockNumber) < BigInt(fixture.job.window.fromBlock)) throw new Error('EVENT_CHRONOLOGY_INVALID');
     lastAvailable = BigInt(event.availableAtBlock);
     await assertSeal(event, 'digest');
-    if (fixture.canonicalBlocks[event.blockNumber] !== event.blockHash) throw new Error('CANONICAL_BLOCK_MISMATCH');
+    // A canonical conflict invalidates this receipt, not already verified prefix facts.
+    if (fixture.canonicalBlocks[event.blockNumber] !== event.blockHash) { degraded = true; continue; }
     if (seen.has(event.id)) {
       if (seen.get(event.id) !== event.digest) throw new Error('EVENT_ID_CONFLICT');
       continue;
@@ -147,7 +148,9 @@ export async function replay(input: unknown, options: { throughBlock?: string; r
         budget.reserveHandoff();
         const content: Omit<Handoff, 'handoffId'> = {
           schemaVersion: 'binrat.rat-handoff/1', jobId: fixture.job.jobId, fromRat: 'SNIFFER', toRat: 'RAT_ZERO',
-          objective: 'CHECK_FUTURE_PONS_LAUNCH', subject: creator(funding.to), createdAtBlock: event.availableAtBlock,
+          objective: 'CHECK_FUTURE_PONS_LAUNCH', subject: creator(funding.to),
+          createdAtBlock: BigInt(funding.availableAtBlock) > BigInt(event.availableAtBlock)
+            ? funding.availableAtBlock : event.availableAtBlock,
           afterBlock: funding.blockNumber, evidenceRefs: [funding.id, event.id],
           authority: fixture.job.authority, remainingBudget: budget.remaining
         };
@@ -155,7 +158,8 @@ export async function replay(input: unknown, options: { throughBlock?: string; r
         assertContract<Handoff>('RAT_HANDOFF_V1', handoff); handoffs.push(handoff);
       } else if (event.kind === 'PONS_LAUNCH' && funding && handoffs.length) {
         budget.reserve('RAT_ZERO', 'READ_PONS_LAUNCH_FIXTURE', event.availableAtBlock);
-        if (event.creator !== funding.to || BigInt(event.blockNumber) <= BigInt(handoffs[0]!.createdAtBlock)) continue;
+        if (event.creator !== funding.to || BigInt(event.blockNumber) <= BigInt(funding.blockNumber) ||
+            BigInt(event.blockNumber) <= BigInt(handoffs[0]!.createdAtBlock)) continue;
         const receipt = await launchReceipt(event, throughBlock);
         // Reuse the existing retrospective receipt only now that both observations exist.
         const linked = await buildPonsPrelaunchNativeInboundReceipt({

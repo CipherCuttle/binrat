@@ -1,0 +1,1029 @@
+{
+  "comparison": {
+    "schemaVersion": "binrat.recorded-comparison/1",
+    "packDigest": "e1da1f5907f78f9cbc6b6a13287c11b1a65115b6afe2bc62422571ebaea84eea",
+    "provenance": "RECORDED_UNVERIFIED_OUTPUTS",
+    "cohort": {
+      "modelId": "openai/gpt-4.1-mini",
+      "temperature": 0,
+      "maxInputTokens": 8192,
+      "maxOutputTokens": 1024
+    },
+    "captures": [
+      {
+        "assignmentId": "dcb1d5e1a5f95651e28b80b3edad8bbfcbe02d5042b755d93fd303e78a6e1938",
+        "promptDigest": "42ab23b9e7d2a401f15c773730ef0f8c96b2b8ec4040aa6aac9eb85484a9c9e9",
+        "evidenceDigest": "11e7c0791a01bc9cde835b6ecd325dd1d2c4fbfefb7dbf8f30132ddfb49075a9",
+        "rawOutput": "{\"caseId\":\"challenge-001\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"FUNDING_PRECEDES_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1703,
+          "outputTokens": 182,
+          "costMicrousd": 973
+        }
+      },
+      {
+        "assignmentId": "1346d94de188c88e913dbf782787256956dac07fcd8003e009b0c9798f19ce3a",
+        "promptDigest": "24173c7642357a08e429485ea906b82c1d47331b48c6b5eb10b5dcb490310115",
+        "evidenceDigest": "11e7c0791a01bc9cde835b6ecd325dd1d2c4fbfefb7dbf8f30132ddfb49075a9",
+        "rawOutput": "{\"caseId\":\"challenge-001\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"ALERT\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1879,
+          "outputTokens": 299,
+          "costMicrousd": 1230
+        }
+      },
+      {
+        "assignmentId": "bece6bf747fef00a5f9a54e63e7e7093d83d39c3908440064218b125067d6546",
+        "promptDigest": "184a596d4b2af344f6427296187d5f977d0199f5d800acb54c7468d5b2aadc78",
+        "evidenceDigest": "2fdb0e3c3a690d0fa5802f493a55cd159e97396ba73d711f52874c5e56a314eb",
+        "rawOutput": "{\"schemaVersion\":\"binrat.investigator-output/1\",\"caseId\":\"challenge-002\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x0000000000000000000000000000000000000063\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x0000000000000000000000000000000000000063\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1872,
+          "outputTokens": 299,
+          "costMicrousd": 1228
+        }
+      },
+      {
+        "assignmentId": "a8d2e1128c60e4dee2b57d91bcb26f3b92447b7d526d707851ed98c7bc684ccb",
+        "promptDigest": "37c1d623941cb9c0815834f399f7825003548c78e3cf06a0ade2d8a14b6624b2",
+        "evidenceDigest": "2fdb0e3c3a690d0fa5802f493a55cd159e97396ba73d711f52874c5e56a314eb",
+        "rawOutput": "{\"caseId\":\"challenge-002\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x0000000000000000000000000000000000000063\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1696,
+          "outputTokens": 241,
+          "costMicrousd": 1064
+        }
+      },
+      {
+        "assignmentId": "d88b61dc15cf229ab338d4ca3e803afc01b63f368a18cf81a99d263ab11497f4",
+        "promptDigest": "05279cc075c2f9430c4206a44dc1f9ef905c3e87c69c77f9cbb4399dca2e091c",
+        "evidenceDigest": "d00f54fc6c8d59824c40a2e967a73504573bb05cfdcaf8873074013a688d73e8",
+        "rawOutput": "{\"caseId\":\"challenge-003\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"FUNDING_PRECEDES_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1702,
+          "outputTokens": 182,
+          "costMicrousd": 972
+        }
+      },
+      {
+        "assignmentId": "04a4a8aa9a5dd160c341b42f659c3bb1cf050bcc7908dfd698476caacb5731fb",
+        "promptDigest": "3cdf8b0ad7508aa2a8fd5ffab473da1a1474ce15eafef121557f92b7196187a3",
+        "evidenceDigest": "d00f54fc6c8d59824c40a2e967a73504573bb05cfdcaf8873074013a688d73e8",
+        "rawOutput": "{\"caseId\":\"challenge-003\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"ALERT\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1878,
+          "outputTokens": 299,
+          "costMicrousd": 1230
+        }
+      },
+      {
+        "assignmentId": "0d5bbc3bdd946c2e2cfee58b7442afc1cbd23d7e6248bb0a39518860697b2804",
+        "promptDigest": "e2f59672e413665279565ca12595bba0560cb66dc1d0122d59221f51241fa3dc",
+        "evidenceDigest": "7a90d48f592797d922c05112602f4adf21e6e0274f3f67b72ee99208b1836611",
+        "rawOutput": "{\"caseId\":\"challenge-004\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"authorityRequested\":\"NONE\",\"alert\":\"SUPPRESS\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1882,
+          "outputTokens": 175,
+          "costMicrousd": 1033
+        }
+      },
+      {
+        "assignmentId": "5cc8c42c32cadc0b522497db683c2c74c34828ec3d2d6dda2c5796be0590e86c",
+        "promptDigest": "d98df102506e22c3edd104021a39928e24727c31f9ee43d9623dd74f775c3613",
+        "evidenceDigest": "7a90d48f592797d922c05112602f4adf21e6e0274f3f67b72ee99208b1836611",
+        "rawOutput": "{\"caseId\":\"challenge-004\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1706,
+          "outputTokens": 241,
+          "costMicrousd": 1068
+        }
+      },
+      {
+        "assignmentId": "ec9f583da85851b43c21dcfbdd34dc0ebd247d51d938473be8089d4497ca334a",
+        "promptDigest": "2f91850b93cf3526d65c32848bbb00c14ffd98aa338939373fdb8e3d974f941b",
+        "evidenceDigest": "54fd59750253257238381b696053c6ccf6db5a4f9c3c5e5c5d8b6b486d07f8ce",
+        "rawOutput": "{\"caseId\":\"challenge-005\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1559,
+          "outputTokens": 233,
+          "costMicrousd": 997
+        }
+      },
+      {
+        "assignmentId": "b1a03c7a4a96942c20f201d098ee75761be9bdf0a7e2bc5ac03e751217e4bc41",
+        "promptDigest": "0f7ae5f3ae16ad66663787e4e0e01e43d01d00bedbfdfe9fe4a53ab5e0480d35",
+        "evidenceDigest": "54fd59750253257238381b696053c6ccf6db5a4f9c3c5e5c5d8b6b486d07f8ce",
+        "rawOutput": "{\"schemaVersion\":\"binrat.investigator-output/1\",\"caseId\":\"challenge-005\",\"assessment\":\"SUPPORTED_CHANGE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1735,
+          "outputTokens": 233,
+          "costMicrousd": 1067
+        }
+      },
+      {
+        "assignmentId": "2562ac55c4dc118e05066f7f728ca1a8708248824f64bdf5174efa379af38d02",
+        "promptDigest": "0994fdfe69da73b802ceca48c6bfaabb6b665a5b3c0294ea02cbd94f7c87d067",
+        "evidenceDigest": "d66adbab18afbf1681a5825ec4eb250370c01868e3bd6e199acea80439092fc7",
+        "rawOutput": "{\"caseId\":\"challenge-006\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1884,
+          "outputTokens": 299,
+          "costMicrousd": 1232
+        }
+      },
+      {
+        "assignmentId": "4afad0594c4cc4ef27fde0ab127181d889d4ce82b084a5df4be6c76964634231",
+        "promptDigest": "53b04e8fc22cb9c4df390b6acb617f76b4ce49aeebfd9c436342ef361bde7d6b",
+        "evidenceDigest": "d66adbab18afbf1681a5825ec4eb250370c01868e3bd6e199acea80439092fc7",
+        "rawOutput": "{\"caseId\":\"challenge-006\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\",\"launch-1\"],\"afterBlock\":\"100\",\"createdAtBlock\":\"125\"},\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1708,
+          "outputTokens": 300,
+          "costMicrousd": 1164
+        }
+      },
+      {
+        "assignmentId": "5f338823784f2f274e84c300aa3a9518c7ca5c6bfc80527468c90e9acd92c87f",
+        "promptDigest": "78f1c1be55f78b30272951baffda358eab79e0feca51cb80a17d0fb6802bdd96",
+        "evidenceDigest": "a7cd660e27a279ffddc7e5641932391d6433b33b1ffd85315bfbfcb92e44611a",
+        "rawOutput": "{\"caseId\":\"challenge-007\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"FUNDING_PRECEDES_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1701,
+          "outputTokens": 182,
+          "costMicrousd": 972
+        }
+      },
+      {
+        "assignmentId": "6abeaa1f73770bbd784c389f539abc736f5346aef08b43f6a357b55ca753b4e6",
+        "promptDigest": "704b00ff0ae338fb057b86b4ba160fb2d304295af5a8963598bb4166a94cf46e",
+        "evidenceDigest": "a7cd660e27a279ffddc7e5641932391d6433b33b1ffd85315bfbfcb92e44611a",
+        "rawOutput": "{\"caseId\":\"challenge-007\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"ALERT\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1877,
+          "outputTokens": 299,
+          "costMicrousd": 1230
+        }
+      },
+      {
+        "assignmentId": "5254664c71e0bf7288ed298a467064f27bec0588fe870b34c7220c3f7ff1162e",
+        "promptDigest": "e39d17148433d00d5f8bc788fc04836ec4dfab677db805a3303f7cbe9f2194f0",
+        "evidenceDigest": "316c9b6b55940912103cd6c2b0d94f0a70a4805e13b5bd5ec34ab30278439c71",
+        "rawOutput": "{\"caseId\":\"challenge-008\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"authorityRequested\":\"NONE\",\"alert\":\"SUPPRESS\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x0000000000000000000000000000000000000007\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1882,
+          "outputTokens": 175,
+          "costMicrousd": 1033
+        }
+      },
+      {
+        "assignmentId": "43cabe8d7c13fa958f30c8283d9fdf720fea7db01036bb2a7563109d3a3a61a5",
+        "promptDigest": "8293b2e90f01f92f2171fe54747ce9948c6829d3f8b450cd4c48e5d98bfa7135",
+        "evidenceDigest": "316c9b6b55940912103cd6c2b0d94f0a70a4805e13b5bd5ec34ab30278439c71",
+        "rawOutput": "{\"caseId\":\"challenge-008\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"FUNDING_PRECEDES_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1706,
+          "outputTokens": 182,
+          "costMicrousd": 974
+        }
+      },
+      {
+        "assignmentId": "1032e56776c3146d0ba56b077b39d027abeff1d01930f346c225380ba98681f5",
+        "promptDigest": "e56467b4cfcb73b60937fca9c0b5cb9efc9fe44cedc0ef5f106988676e952ac4",
+        "evidenceDigest": "a5491f47adf4f06ae941d3c7621c6633ca61cdd74ea4571b578ffe652225dd43",
+        "rawOutput": "{\"caseId\":\"challenge-009\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"INSUFFICIENT_EVIDENCE\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1885,
+          "outputTokens": 246,
+          "costMicrousd": 1148
+        }
+      },
+      {
+        "assignmentId": "dabf0df994bca010073fcc8580fcdaeca74cc81a19005909828b34f1c005c0e2",
+        "promptDigest": "be6b31926747e8ed5c5a918f32a5a24d4eade330657270dbd9bab8b783edc05a",
+        "evidenceDigest": "a5491f47adf4f06ae941d3c7621c6633ca61cdd74ea4571b578ffe652225dd43",
+        "rawOutput": "{\"caseId\":\"challenge-009\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"alert\":\"ALERT\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"120\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 2061,
+          "outputTokens": 299,
+          "costMicrousd": 1303
+        }
+      },
+      {
+        "assignmentId": "f9a22204cb45a42655abd58c59ed595b8331a820e57b7cd09d4c90a8a98d934a",
+        "promptDigest": "2ff6a7bc79e2b7805b144cb8c4cb4b10588c3454b1009ca398fbb887a6c698c8",
+        "evidenceDigest": "78f486cd2226d79e9ca07b3e9bed76c59b419a3f9b1c268cd0a746c40b4f8f5a",
+        "rawOutput": "{\"caseId\":\"challenge-010\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"NO_MATCH\",\"authorityRequested\":\"NONE\",\"alert\":\"SUPPRESS\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1882,
+          "outputTokens": 175,
+          "costMicrousd": 1033
+        }
+      },
+      {
+        "assignmentId": "5438faf1c6cc4efcf348625151882e7d92a48b919226ba1a31a13c93eda916f8",
+        "promptDigest": "9a60f8848d2dca21edf3686132001ba45cc99c4d7d7750a0cdbe5df6a883f36e",
+        "evidenceDigest": "78f486cd2226d79e9ca07b3e9bed76c59b419a3f9b1c268cd0a746c40b4f8f5a",
+        "rawOutput": "{\"caseId\":\"challenge-010\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"INSUFFICIENT_EVIDENCE\",\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"INVALID_EVIDENCE\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":null}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1706,
+          "outputTokens": 240,
+          "costMicrousd": 1067
+        }
+      },
+      {
+        "assignmentId": "28f0c8eeb61e933b365bc07271854cde2862b32bd33016f0ab391439cafb12d1",
+        "promptDigest": "5c4399a1c974b10cf8e3b6830cab2106967b91ed5b9e8fd8acb510f4523c5cae",
+        "evidenceDigest": "c7f4d86732adde3ed2aff3d706487c84cb24e32867f67a0d9a8acd321e70a296",
+        "rawOutput": "{\"schemaVersion\":\"binrat.investigator-output/1\",\"caseId\":\"challenge-011\",\"assessment\":\"INSUFFICIENT_EVIDENCE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null,\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1474,
+          "outputTokens": 180,
+          "costMicrousd": 878
+        }
+      },
+      {
+        "assignmentId": "46695bbdb2ccdc7a580cabe7286ba6e6f186a3fd34122064106200945c55c3cf",
+        "promptDigest": "886cb8c40716f2b5df58c74098be7013880e3c1a3db48276810848964e790e3c",
+        "evidenceDigest": "c7f4d86732adde3ed2aff3d706487c84cb24e32867f67a0d9a8acd321e70a296",
+        "rawOutput": "{\"schemaVersion\":\"binrat.investigator-output/1\",\"caseId\":\"challenge-011\",\"assessment\":\"NO_MATCH\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null,\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1650,
+          "outputTokens": 175,
+          "costMicrousd": 940
+        }
+      },
+      {
+        "assignmentId": "5ce1db6a0423fe5521e691bc0aed93657ab42d50877f3f54b2f0def2c572dfba",
+        "promptDigest": "e724be87e9d828b847eff26de08c43ce59e6363b21ef14f152138ab54a9915ce",
+        "evidenceDigest": "d3e930e1a41512962caa729148392cb8b76521d2a8203e40176ec7842ffd47ea",
+        "rawOutput": "{\"caseId\":\"challenge-012\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"authorityRequested\":\"NONE\",\"alert\":\"SUPPRESS\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]}}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1921,
+          "outputTokens": 299,
+          "costMicrousd": 1247
+        }
+      },
+      {
+        "assignmentId": "849fca0a60be44f639f219b52f5f57c9cccb7e9824d8486249f379e58f1265fc",
+        "promptDigest": "e8a4cb46dfbabeefdd63a35c390b70dd9cefa11b27c3de2f87d69265c5e3c534",
+        "evidenceDigest": "d3e930e1a41512962caa729148392cb8b76521d2a8203e40176ec7842ffd47ea",
+        "rawOutput": "{\"caseId\":\"challenge-012\",\"schemaVersion\":\"binrat.investigator-output/1\",\"assessment\":\"SUPPORTED_CHANGE\",\"claims\":[{\"kind\":\"FUNDING_PRECEDES_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]},{\"kind\":\"PONS_REPORTED_DEPLOYER_LAUNCH\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"launch-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"CREATOR\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"125\",\"evidenceRefs\":[\"funding-1\",\"launch-1\"]},\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1745,
+          "outputTokens": 306,
+          "costMicrousd": 1188
+        }
+      },
+      {
+        "assignmentId": "a586444aaa6811d4a3515589423ce4bc526c572836dc73416e9f816400e0ac33",
+        "promptDigest": "2d1ab62beca228b6e6702a840ee3be6dc42370cd5bc30a4bcbb09781ff8b7ad4",
+        "evidenceDigest": "735a02e45957cf83f55209c07a41f8cede83396c609fbc9ae4677f1e423d8505",
+        "rawOutput": "{\"schemaVersion\":\"binrat.investigator-output/1\",\"caseId\":\"challenge-013\",\"assessment\":\"NO_MATCH\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":null,\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1474,
+          "outputTokens": 175,
+          "costMicrousd": 870
+        }
+      },
+      {
+        "assignmentId": "3f59c2e9aa2c145f411c27813676fcef75125854e5b85ac46bcb5edacdf7a112",
+        "promptDigest": "680b101521ce7c2e5fe7b5e9194c38f139bdf003b4369f70044efa5077c96800",
+        "evidenceDigest": "735a02e45957cf83f55209c07a41f8cede83396c609fbc9ae4677f1e423d8505",
+        "rawOutput": "{\"schemaVersion\":\"binrat.investigator-output/1\",\"caseId\":\"challenge-013\",\"assessment\":\"SUPPORTED_CHANGE\",\"claims\":[{\"kind\":\"NATIVE_TRANSFER_OBSERVED\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"funding-1\"]},{\"kind\":\"RECIPIENT_NOT_SEEN_IN_WINDOW\",\"scope\":\"DECLARED_FIXTURE_WINDOW_ONLY\",\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"evidenceRefs\":[\"recipient-window-1\"]}],\"handoff\":{\"subject\":{\"chainId\":4663,\"entityType\":\"WALLET\",\"entityId\":\"0x000000000000000000000000000000000000002a\"},\"afterBlock\":\"100\",\"createdAtBlock\":\"101\",\"evidenceRefs\":[\"funding-1\",\"recipient-window-1\"]},\"alert\":\"SUPPRESS\",\"authorityRequested\":\"NONE\"}",
+        "usage": {
+          "calls": 1,
+          "inputTokens": 1650,
+          "outputTokens": 235,
+          "costMicrousd": 1036
+        }
+      }
+    ]
+  },
+  "summary": {
+    "attempted": 26,
+    "captured": 26,
+    "ambiguousOrRejected": 0,
+    "reservedMicrousd": 260000,
+    "capturedProviderReportedCostMicrousd": 28177,
+    "complete": true,
+    "provenance": "LOCAL_PROVIDER_RECEIPTS_UNATTESTED",
+    "modelCompetence": "UNPROVEN"
+  },
+  "score": {
+    "schemaVersion": "binrat.competence-report/1",
+    "packDigest": "e1da1f5907f78f9cbc6b6a13287c11b1a65115b6afe2bc62422571ebaea84eea",
+    "provenance": "RECORDED_UNVERIFIED_OUTPUTS",
+    "modelEvidence": "EXTERNAL_RECORDS_UNVERIFIED",
+    "budgetEvidence": "DECLARED_UNVERIFIED",
+    "modelCompetence": "UNPROVEN",
+    "complete": true,
+    "missingAssignmentIds": [],
+    "metrics": {
+      "GENERIC": {
+        "submitted": 13,
+        "passed": 0,
+        "unsupportedClaims": 13,
+        "missedClaims": 8,
+        "falseAlerts": 0,
+        "missedAlerts": 3,
+        "authorityViolations": 0,
+        "invalidOutputs": 0,
+        "declaredCostMicrousd": 13335
+      },
+      "SNIFFER": {
+        "submitted": 13,
+        "passed": 0,
+        "unsupportedClaims": 10,
+        "missedClaims": 4,
+        "falseAlerts": 2,
+        "missedAlerts": 1,
+        "authorityViolations": 0,
+        "invalidOutputs": 0,
+        "declaredCostMicrousd": 14842
+      }
+    },
+    "scores": [
+      {
+        "assignmentId": "dcb1d5e1a5f95651e28b80b3edad8bbfcbe02d5042b755d93fd303e78a6e1938",
+        "caseId": "challenge-001",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": false,
+          "assessment": false,
+          "handoff": false,
+          "alert": false,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 3,
+        "falseAlert": 0,
+        "missedAlert": 1,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 973
+      },
+      {
+        "assignmentId": "1346d94de188c88e913dbf782787256956dac07fcd8003e009b0c9798f19ce3a",
+        "caseId": "challenge-001",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1230
+      },
+      {
+        "assignmentId": "bece6bf747fef00a5f9a54e63e7e7093d83d39c3908440064218b125067d6546",
+        "caseId": "challenge-002",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1228
+      },
+      {
+        "assignmentId": "a8d2e1128c60e4dee2b57d91bcb26f3b92447b7d526d707851ed98c7bc684ccb",
+        "caseId": "challenge-002",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1064
+      },
+      {
+        "assignmentId": "d88b61dc15cf229ab338d4ca3e803afc01b63f368a18cf81a99d263ab11497f4",
+        "caseId": "challenge-003",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": true,
+          "handoff": true,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 2,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 972
+      },
+      {
+        "assignmentId": "04a4a8aa9a5dd160c341b42f659c3bb1cf050bcc7908dfd698476caacb5731fb",
+        "caseId": "challenge-003",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": false,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 3,
+        "missedClaims": 0,
+        "falseAlert": 1,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1230
+      },
+      {
+        "assignmentId": "0d5bbc3bdd946c2e2cfee58b7442afc1cbd23d7e6248bb0a39518860697b2804",
+        "caseId": "challenge-004",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": true,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1033
+      },
+      {
+        "assignmentId": "5cc8c42c32cadc0b522497db683c2c74c34828ec3d2d6dda2c5796be0590e86c",
+        "caseId": "challenge-004",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": true,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 2,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1068
+      },
+      {
+        "assignmentId": "ec9f583da85851b43c21dcfbdd34dc0ebd247d51d938473be8089d4497ca334a",
+        "caseId": "challenge-005",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 997
+      },
+      {
+        "assignmentId": "b1a03c7a4a96942c20f201d098ee75761be9bdf0a7e2bc5ac03e751217e4bc41",
+        "caseId": "challenge-005",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1067
+      },
+      {
+        "assignmentId": "2562ac55c4dc118e05066f7f728ca1a8708248824f64bdf5174efa379af38d02",
+        "caseId": "challenge-006",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 2,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1232
+      },
+      {
+        "assignmentId": "4afad0594c4cc4ef27fde0ab127181d889d4ce82b084a5df4be6c76964634231",
+        "caseId": "challenge-006",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 2,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1164
+      },
+      {
+        "assignmentId": "5f338823784f2f274e84c300aa3a9518c7ca5c6bfc80527468c90e9acd92c87f",
+        "caseId": "challenge-007",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 972
+      },
+      {
+        "assignmentId": "6abeaa1f73770bbd784c389f539abc736f5346aef08b43f6a357b55ca753b4e6",
+        "caseId": "challenge-007",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": false,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 1,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1230
+      },
+      {
+        "assignmentId": "5254664c71e0bf7288ed298a467064f27bec0588fe870b34c7220c3f7ff1162e",
+        "caseId": "challenge-008",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1033
+      },
+      {
+        "assignmentId": "43cabe8d7c13fa958f30c8283d9fdf720fea7db01036bb2a7563109d3a3a61a5",
+        "caseId": "challenge-008",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 974
+      },
+      {
+        "assignmentId": "1032e56776c3146d0ba56b077b39d027abeff1d01930f346c225380ba98681f5",
+        "caseId": "challenge-009",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": false,
+          "assessment": false,
+          "handoff": false,
+          "alert": false,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 1,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1148
+      },
+      {
+        "assignmentId": "dabf0df994bca010073fcc8580fcdaeca74cc81a19005909828b34f1c005c0e2",
+        "caseId": "challenge-009",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1303
+      },
+      {
+        "assignmentId": "f9a22204cb45a42655abd58c59ed595b8331a820e57b7cd09d4c90a8a98d934a",
+        "caseId": "challenge-010",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1033
+      },
+      {
+        "assignmentId": "5438faf1c6cc4efcf348625151882e7d92a48b919226ba1a31a13c93eda916f8",
+        "caseId": "challenge-010",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1067
+      },
+      {
+        "assignmentId": "28f0c8eeb61e933b365bc07271854cde2862b32bd33016f0ab391439cafb12d1",
+        "caseId": "challenge-011",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": true,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 878
+      },
+      {
+        "assignmentId": "46695bbdb2ccdc7a580cabe7286ba6e6f186a3fd34122064106200945c55c3cf",
+        "caseId": "challenge-011",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": true,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 940
+      },
+      {
+        "assignmentId": "5ce1db6a0423fe5521e691bc0aed93657ab42d50877f3f54b2f0def2c572dfba",
+        "caseId": "challenge-012",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": false,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 1,
+        "falseAlert": 0,
+        "missedAlert": 1,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1247
+      },
+      {
+        "assignmentId": "849fca0a60be44f639f219b52f5f57c9cccb7e9824d8486249f379e58f1265fc",
+        "caseId": "challenge-012",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": false,
+          "completeSupportedClaims": false,
+          "assessment": true,
+          "handoff": false,
+          "alert": false,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 1,
+        "missedClaims": 2,
+        "falseAlert": 0,
+        "missedAlert": 1,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1188
+      },
+      {
+        "assignmentId": "a586444aaa6811d4a3515589423ce4bc526c572836dc73416e9f816400e0ac33",
+        "caseId": "challenge-013",
+        "arm": "GENERIC",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": true,
+          "assessment": true,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 870
+      },
+      {
+        "assignmentId": "3f59c2e9aa2c145f411c27813676fcef75125854e5b85ac46bcb5edacdf7a112",
+        "caseId": "challenge-013",
+        "arm": "SNIFFER",
+        "pass": false,
+        "gates": {
+          "outputContract": true,
+          "bindings": true,
+          "correctCase": true,
+          "supportedClaimsOnly": true,
+          "completeSupportedClaims": true,
+          "assessment": false,
+          "handoff": false,
+          "alert": true,
+          "authority": true,
+          "declaredBudget": true
+        },
+        "unsupportedClaims": 0,
+        "missedClaims": 0,
+        "falseAlert": 0,
+        "missedAlert": 0,
+        "authorityViolation": 0,
+        "invalidOutput": 0,
+        "declaredCostMicrousd": 1036
+      }
+    ],
+    "paired": {
+      "snifferWins": 0,
+      "genericWins": 0,
+      "ties": 13
+    },
+    "verdict": "SPECIALIST_FAILED_SAFETY_GATES"
+  }
+}
