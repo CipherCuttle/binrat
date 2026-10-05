@@ -152,15 +152,24 @@ async function call(transport: Transport, url: string, apiKey: string, body?: Re
     return { status: response.status, ...result, body: scrubbed, redacted: scrubbed !== result.body };
   } finally { clearTimeout(timer); }
 }
-async function keyLimit(transport: Transport, key: string, cap: number, fresh: boolean) {
+async function keyLimit(transport: Transport, key: string, cap: number) {
   const response = await call(transport, KEY_ENDPOINT, key);
   if (response.status !== 200 || response.truncated || response.redacted) throw new Error('KEY_PREFLIGHT_FAILED');
   const { data } = parseStrictJson(response.body) as { data: Record<string, unknown> };
-  const limit = usdToMicrousd(data.limit), remaining = usdToMicrousd(data.limit_remaining);
-  if (data.limit_reset !== null || data.include_byok_in_limit !== true || limit <= 0 || limit > cap ||
-      remaining <= 0 || remaining > limit || data.byok_usage !== 0 || (fresh && data.usage !== 0)) {
-    throw new Error('DEDICATED_NONRESETTING_CAPPED_KEY_REQUIRED');
-  }
+  const amount = (field: string) => {
+    try { return usdToMicrousd(data[field]); }
+    catch { throw new Error(`KEY_PREFLIGHT_INVALID_FIELD: ${field}`); }
+  };
+  const limit = amount('limit'), remaining = amount('limit_remaining'), usage = amount('usage');
+  const failures = [
+    ...(data.limit_reset !== null ? ['limit_reset must be null'] : []),
+    ...(data.include_byok_in_limit !== true ? ['include_byok_in_limit must be true'] : []),
+    ...(limit <= 0 || limit > cap ? ['limit must be positive and at most the approved cap'] : []),
+    ...(remaining <= 0 || remaining > limit ? ['limit_remaining must be positive and no greater than limit'] : []),
+    ...(usage > limit ? ['usage exceeds limit'] : []),
+    ...(data.byok_usage !== 0 ? ['byok_usage must be zero'] : [])
+  ];
+  if (failures.length) throw new Error(`CAPPED_KEY_SETTINGS_REQUIRED: ${failures.join('; ')}`);
   // Remaining credit rounds down; caps and reported charges round up.
   return { limitMicrousd: limit, remainingMicrousd: Math.min(remaining, Math.floor((data.limit_remaining as number) * 1_000_000)) };
 }
@@ -200,7 +209,7 @@ export async function executeCapture(path: string, authorizationDigest: string, 
   for (const [index, request] of plan.requests.entries()) {
     if (Date.now() >= Date.parse(plan.config.expiresAt)) return { attempted: index, outcome: 'HALTED' };
     // Recheck the dedicated provider cap before each dispatch. No mutations of keys, credits or account config.
-    const keyState = await keyLimit(transport, apiKey, plan.config.maxCostMicrousd, index === 0);
+    const keyState = await keyLimit(transport, apiKey, plan.config.maxCostMicrousd);
     if (keyState.remainingMicrousd < RESERVE || Date.now() >= Date.parse(plan.config.expiresAt)) {
       return { attempted: index, outcome: 'HALTED' };
     }
