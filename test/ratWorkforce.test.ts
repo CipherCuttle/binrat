@@ -25,6 +25,13 @@ async function passes(f: EvalCase): Promise<JobReceipt> {
   return r;
 }
 
+async function historyBeforeFunding(): Promise<EvalCase> {
+  const f = fixture(); f.evalId = 'pending-history-variation'; f.job.jobId = 'job-pending-history-variation';
+  await editEvent(f, 0, { availableAtBlock: '107' });
+  f.events = [f.events[1]!, f.events[0]!, f.events[2]!];
+  return f;
+}
+
 test('seven strict workforce schemas compile; profile/tool/skill seals and bindings validate', async () => {
   assert.equal(SCHEMA_NAMES.length, 7);
   const pack = await loadCompetencePack();
@@ -106,6 +113,98 @@ test('handoff time is the maximum availability of funding and history, independe
   assert.equal(r.alert.decision, 'ALERT');
 });
 
+test('verified history arriving before funding is reconciled once, with deterministic resume', async () => {
+  const f = await historyBeforeFunding(), r = await passes(f);
+  assert.equal(r.handoffs[0]!.createdAtBlock, '107');
+  assert.equal(r.handoffs[0]!.afterBlock, '100');
+  assert.deepEqual(r.handoffs[0]!.evidenceRefs, ['funding-1', 'recipient-window-1']);
+  assert.equal(r.handoffs[0]!.subject.entityType, 'CREATOR');
+  assert.equal(r.handoffs[0]!.remainingBudget.maxToolCalls, 3);
+  assert.deepEqual(r.trace.map(t => [t.tool, t.atBlock]), [
+    ['READ_RECIPIENT_WINDOW_FIXTURE', '101'], ['READ_TRANSFER_FIXTURE', '107'],
+    ['READ_PONS_LAUNCH_FIXTURE', '125'], ['BUILD_CASE_DIFF', '125'], ['DECIDE_ALERT', '125']
+  ]);
+  assert.deepEqual(r.usage, { toolCalls: 5, handoffs: 1, modelCalls: 0, costMicrousd: 0 });
+  for (const throughBlock of ['106', '107']) {
+    const checkpoint = await replay(f, { throughBlock });
+    assert.deepEqual(await replay(f, { resume: checkpoint }), r);
+  }
+});
+
+test('pending history emits no facts or handoff before funding availability and has no lookahead', async () => {
+  const f = await historyBeforeFunding(), early = await replay(f, { throughBlock: '106' });
+  assert.deepEqual(early.claims, []); assert.deepEqual(early.handoffs, []); assert.deepEqual(early.evidence, []);
+  assert.equal(early.caseDiff, null); assert.equal(early.alert.decision, 'SUPPRESS');
+  assert.equal(early.usage.toolCalls, 1); assert.equal(early.trace[0]!.atBlock, '101');
+  const good = await replay(fixture());
+  const raw = JSON.stringify({ schemaVersion: 'binrat.investigator-output/1', caseId: f.evalId,
+    assessment: 'SUPPORTED_CHANGE', claims: good.claims, handoff: {
+      subject: good.handoffs[0]!.subject, afterBlock: '100', createdAtBlock: '107',
+      evidenceRefs: ['funding-1', 'recipient-window-1'] }, alert: 'ALERT', authorityRequested: 'NONE' });
+  const rejected = await validateProposal(f, raw, { throughBlock: '106' });
+  assert.deepEqual(rejected.acceptedClaims, []); assert.deepEqual(rejected.acceptedCaseChanges, []);
+  assert.equal(rejected.acceptedHandoff, null); assert.equal(rejected.acceptedAlert, null);
+  f.events[1]!.digest = 'f'.repeat(64); f.events[2]!.digest = 'e'.repeat(64);
+  f.expected.alert = 'SUPPRESS'; f.expected.claimKinds = [];
+  assert.deepEqual(await replay(f, { throughBlock: '106' }), early);
+});
+
+test('pending history retains exact recipient/window binding and partial/seen rejection', async () => {
+  const wrongRecipient = await historyBeforeFunding();
+  await editEvent(wrongRecipient, 0, { recipient: '0x0000000000000000000000000000000000000099' });
+  const unmatched = await replay(wrongRecipient);
+  assert.deepEqual(unmatched.claims.map(c => c.kind), ['NATIVE_TRANSFER_OBSERVED']);
+  assert.equal(unmatched.handoffs.length, 0); assert.equal(unmatched.alert.decision, 'SUPPRESS');
+  for (const change of [{ fromBlock: '91' }, { toBlock: '98' }]) {
+    const wrongWindow = await historyBeforeFunding(); await editEvent(wrongWindow, 0, change);
+    assert.equal((await replay(wrongWindow, { throughBlock: '106' })).handoffs.length, 0);
+    await assert.rejects(replay(wrongWindow), /RECIPIENT_WINDOW_INVALID/);
+  }
+  for (const change of [{ complete: false }, { seen: true }]) {
+    const f = await historyBeforeFunding(); await editEvent(f, 0, change);
+    const r = await replay(f);
+    assert.deepEqual(r.claims.map(c => c.kind), ['NATIVE_TRANSFER_OBSERVED']);
+    assert.equal(r.handoffs.length, 0); assert.equal(r.caseDiff, null); assert.equal(r.alert.decision, 'SUPPRESS');
+  }
+});
+
+test('pending history duplicates are idempotent and integrity failures retain their behavior', async () => {
+  const f = await historyBeforeFunding(), original = await replay(f);
+  f.events.splice(1, 0, structuredClone(f.events[0]!));
+  const duplicate = await replay(f);
+  assert.deepEqual(duplicate.usage, original.usage); assert.deepEqual(duplicate.trace, original.trace);
+  assert.deepEqual(duplicate.claims, original.claims); assert.deepEqual(duplicate.handoffs, original.handoffs);
+  const conflict = await historyBeforeFunding();
+  conflict.events.splice(1, 0, await seal({ ...conflict.events[0]!, seen: true } as SourceEvent));
+  await assert.rejects(replay(conflict, { throughBlock: '106' }), /EVENT_ID_CONFLICT/);
+  const digest = await historyBeforeFunding(); digest.events[0]!.digest = 'f'.repeat(64);
+  await assert.rejects(replay(digest, { throughBlock: '106' }), /DIGEST_MISMATCH/);
+  const canonical = await historyBeforeFunding(); canonical.canonicalBlocks['101'] = `0x${'f'.repeat(64)}`;
+  const degraded = await replay(canonical);
+  assert.equal(degraded.status, 'DEGRADED'); assert.equal(degraded.handoffs.length, 0);
+  assert.deepEqual(degraded.claims.map(c => c.kind), ['NATIVE_TRANSFER_OBSERVED']);
+  assert.equal(degraded.usage.toolCalls, 1); assert.equal(degraded.alert.decision, 'SUPPRESS');
+});
+
+test('pending history consumes the original budget once and cannot expand bounded work', async () => {
+  for (const calls of [0, 1, 2, 3, 4]) {
+    const f = await historyBeforeFunding(); f.job.budget.maxToolCalls = calls;
+    const r = await replay(f);
+    assert.equal(r.status, 'EXHAUSTED'); assert.equal(r.alert.decision, 'SUPPRESS'); assert.equal(r.caseDiff, null);
+    assert.equal(r.usage.toolCalls, calls);
+    if (calls < 2) { assert.equal(r.handoffs.length, 0); assert.deepEqual(r.claims, []); }
+  }
+  const noHandoff = await historyBeforeFunding(); noHandoff.job.budget.maxHandoffs = 0;
+  const exhausted = await replay(noHandoff);
+  assert.equal(exhausted.status, 'EXHAUSTED'); assert.equal(exhausted.handoffs.length, 0);
+  assert.equal(exhausted.usage.toolCalls, 2);
+  const bounded = await historyBeforeFunding(); bounded.job.budget.maxToolCalls = 64;
+  bounded.events = await Promise.all(Array.from({ length: 64 }, (_, index) =>
+    seal({ ...bounded.events[0]!, id: `pending-${index}` } as SourceEvent)));
+  const r = await replay(bounded);
+  assert.equal(r.usage.toolCalls, 64); assert.deepEqual(r.claims, []); assert.deepEqual(r.handoffs, []);
+});
+
 test('frozen captured proposals are checked unchanged against offline derived facts', async () => {
   const archived = JSON.parse(readFileSync('test/fixtures/workforce/recorded-sniffer-run-7AI6yG.audit.json', 'utf8')) as {
     comparison: { captures: Array<{ assignmentId: string; rawOutput: string }> };
@@ -158,7 +257,7 @@ test('no-match, previously seen recipient and self-funding never create an alert
   expected(seen, 'DONE', ['NATIVE_TRANSFER_OBSERVED'], 2, 0);
   assert.equal((await passes(seen)).handoffs.length, 0);
   const self = fixture(); await editEvent(self, 0, { to: self.job.subject.entityId });
-  expected(self, 'DONE', [], 1, 0); assert.equal((await passes(self)).claims.length, 0);
+  expected(self, 'DONE', [], 2, 0); assert.equal((await passes(self)).claims.length, 0);
   const wrongFunder = fixture(); await editEvent(wrongFunder, 0, { from: '0x0000000000000000000000000000000000000099' });
   const unsupported = { schemaVersion: 'binrat.investigator-output/1', caseId: wrongFunder.evalId,
     assessment: 'SUPPORTED_CHANGE', claims: [], handoff: null, alert: 'ALERT', authorityRequested: 'NONE' };

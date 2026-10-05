@@ -19,6 +19,10 @@ interface Manifest {schemaVersion: string; provenance: string; seed: string; reg
 interface Outcome {caseId: string; eligible: boolean; alert: boolean; safety: boolean; complete: boolean;
   error: string | null; rejections: string[]; admittedArtifacts?: number; admittedAlert?: ProposalAdmission['acceptedAlert']}
 const json = (path: string): any => JSON.parse(readFileSync(path, 'utf8'));
+const registeredBoundaryHead = '72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4';
+const registeredBoundarySourceDigest = '7a81929dc0bb5ec457a006d1e09d9b7d392efcaae6cedef24b0961456cd2c236';
+const boundarySourceDigest = () => sha256Hex({offline: readFileSync('src/workforce/offline.ts', 'utf8'),
+  proposal: readFileSync('src/workforce/proposal.ts', 'utf8')});
 const compactHandoff = (h: NonNullable<ProposalAdmission['acceptedHandoff']>) => ({subject: h.subject,
   createdAtBlock: h.createdAtBlock, afterBlock: h.afterBlock, evidenceRefs: h.evidenceRefs});
 const expectedError = (error: unknown): string => error instanceof Error ? error.message.split(':')[0]! : 'UNKNOWN_ERROR';
@@ -65,6 +69,7 @@ function aggregate(rows: Outcome[]) {
     findingComplete: rows.filter(r => r.complete && r.error === null).length,
     sourceRejected: rows.filter(r => r.complete && r.error !== null).length,
     exceptions: rows.filter(r => r.error !== null).length,
+    unexpectedExceptions: rows.filter(r => r.error !== null && !r.complete).length,
     safetyPass: rows.every(r => r.safety), usefulnessPass: recovered === eligible,
     pipelinePass: rows.every(r => r.safety && r.complete)};
 }
@@ -153,15 +158,16 @@ export async function holdoutBenchmark() {
   const summaries = Object.fromEntries(Object.entries(rows).map(([k,v]) => [k, aggregate(v)]));
   const safetyPass = Object.entries(summaries).filter(([k]) => k !== 'ALWAYS_SUPPRESS').every(([,v]) => v.safetyPass) && probes.every(p => p.policyPass);
   const pipelinePass = summaries.DETERMINISTIC!.pipelinePass && summaries.SYNTHETIC_ALLOWED_PROPOSAL!.pipelinePass && safetyPass;
-  return {schemaVersion: 'binrat.offline-benchmark/1', provenance: 'SYNTHETIC_HOLDOUT_PIPELINE_ONLY',
+  return {schemaVersion: 'binrat.offline-benchmark/1', provenance: 'SYNTHETIC_FROZEN_REGRESSION_PIPELINE_ONLY',
+    evaluationRole: 'FROZEN_REGRESSION_AFTER_REPAIR',
     manifestDigest: m.manifestDigest, registrationDigest: m.registrationDigest, generatorDigest: m.generatorDigest,
     harnessSourceDigest: await sha256Hex({benchmark: readFileSync('src/workforce/benchmark.ts', 'utf8'),
       cli: readFileSync('scripts/benchmark-workforce.mjs', 'utf8')}),
-    registeredBoundaryHead: '72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4', boundarySourceDigest: await sha256Hex({
-      offline: readFileSync('src/workforce/offline.ts', 'utf8'), proposal: readFileSync('src/workforce/proposal.ts', 'utf8')}),
+    registeredBoundaryHead, registeredBoundarySourceDigest, boundarySourceDigest: await boundarySourceDigest(),
     modelCalls: 0, modelCompetence: 'UNPROVEN',
     summaries, rows, probes: {count: probes.length, unsafeArtifacts: probes.filter(p => !p.safety).length,
-      policyFailures: probes.filter(p => !p.policyPass).length, rows: probes},
+      policyFailures: probes.filter(p => !p.policyPass).length,
+      unexpectedExceptions: probes.filter(p => p.error !== null && !p.complete).length, rows: probes},
     safetyPass, pipelinePass, verdict: pipelinePass ? 'OFFLINE_PIPELINE_PASS' : 'OFFLINE_PIPELINE_FAILED'};
 }
 
@@ -192,7 +198,8 @@ export async function developmentBenchmark() {
     results.push(row);
   }
   return {schemaVersion: 'binrat.development-baselines/1', provenance: 'RECORDED_OUTPUTS_REGRESSION_ONLY',
-    boundaryHead: '72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4', modelCalls: 0, modelCompetence: 'UNPROVEN',
+    registeredBoundaryHead, registeredBoundarySourceDigest, boundarySourceDigest: await boundarySourceDigest(),
+    modelCalls: 0, modelCompetence: 'UNPROVEN',
     historicalScore: archive.score, historicalSummary: archive.summary,
     archiveDigest: createHash('sha256').update(readFileSync('test/fixtures/workforce/recorded-sniffer-run-7AI6yG.audit.json')).digest('hex'),
     rows: results, summaries: Object.fromEntries(['DETERMINISTIC','ALWAYS_SUPPRESS','GENERIC','SNIFFER'].map(arm => {
