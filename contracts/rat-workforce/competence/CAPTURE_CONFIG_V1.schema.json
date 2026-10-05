@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:capture-config:1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "modelId", "providerSlug", "responseProvider", "maxCostMicrousd", "expiresAt", "maxPrice"],
+  "properties": {
+    "schemaVersion": { "const": "binrat.capture-config/1" },
+    "modelId": { "type": "string", "pattern": "^(?!openrouter/)[a-z0-9_-]+/[a-z0-9_.-]+$", "maxLength": 150 },
+    "providerSlug": { "type": "string", "pattern": "^[a-z0-9_-]+(/[a-z0-9_-]+)?$", "maxLength": 100 },
+    "responseProvider": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "maxCostMicrousd": { "const": 260000 },
+    "expiresAt": { "type": "string", "minLength": 24, "maxLength": 24 },
+    "maxPrice": {
+      "type": "object", "additionalProperties": false,
+      "required": ["promptMicrousdPerMillion", "completionMicrousdPerMillion"],
+      "properties": {
+        "promptMicrousdPerMillion": { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+        "completionMicrousdPerMillion": { "type": "integer", "minimum": 0, "maximum": 1000000000 }
+      }
+    }
+  }
+}
