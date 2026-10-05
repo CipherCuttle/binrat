@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "binrat.frontdoor-assets/1",
+  "assets": [
+    {
+      "file": "web/assets/crew/rat-zero.jpg",
+      "sha256": "43541a9b469fbe46a9b54dccb227cfb21c7fcfade1d96656410b124ded2d3edc",
+      "authority": "BINRAT RAT SELECT DESKTOP V2",
+      "operation": "byte-identical copy; presentation uses CSS object-fit; no generation or mirroring",
+      "proofSha256": "b3a7a23eb310c2c60b4b37d2dddbaae8777b1de482868e33862508958b8c982f"
+    },
+    {
+      "file": "web/assets/crew/tripwire.png",
+      "sha256": "358edc57dbb1eebd6a5a9c67bb6dff238682ee0cddd1f04ff84aa32d61a884b3",
+      "authority": "BINRAT RAT SELECT DESKTOP V2",
+      "operation": "byte-identical copy; presentation uses CSS object-fit; no generation or mirroring",
+      "proofSha256": "b3a7a23eb310c2c60b4b37d2dddbaae8777b1de482868e33862508958b8c982f"
+    },
+    {
+      "file": "web/assets/crew/sniffer.png",
+      "sha256": "810a180cc7e3fcf4ea82d3b5fccdc234f4aacbe3ebee0fca2b64d282bd8ff0b8",
+      "authority": "BINRAT RAT SELECT DESKTOP V2",
+      "operation": "byte-identical copy; presentation uses CSS object-fit; no generation or mirroring",
+      "proofSha256": "b3a7a23eb310c2c60b4b37d2dddbaae8777b1de482868e33862508958b8c982f"
+    },
+    {
+      "file": "web/assets/fonts/geist-sans.woff2",
+      "sha256": "2ffebe993e969069a9789d15164b7715d42491b5835516c5e3b935d5f81b05f1",
+      "authority": "vercel/geist-font@10dc7658f13c38a474cde201bb09a4617267545b",
+      "operation": "byte-identical donor copy"
+    },
+    {
+      "file": "web/assets/fonts/geist-mono.woff2",
+      "sha256": "afaacc4c5fbba89d2ebf7a02dc4070208540874592a5504d57175782fe893101",
+      "authority": "vercel/geist-font@10dc7658f13c38a474cde201bb09a4617267545b",
+      "operation": "byte-identical donor copy"
+    },
+    {
+      "file": "web/assets/crew/rat-avatar-48.png",
+      "sha256": "fb54dbba0ec873daa0af533baa8e151923272f2685e7113835d30879b7ef3db0",
+      "authority": "Rat Select V2 header/avatar donor from frozen Brand V1",
+      "operation": "byte-identical donor copy"
+    }
+  ]
+}

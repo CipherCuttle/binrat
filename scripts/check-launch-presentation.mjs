@@ -7,28 +7,9 @@ const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 
 const requiredHtml = [
-  'THE RAT',
-  'NEEDS A COIN.',
-  '$BINRAT is the culture and coordination layer around BINRAT.',
-  'BANKROLL THE BUILD',
-  'NATIVE CULTURE ASSET',
-  'COORDINATE ATTENTION',
-  'GROW THE EVIDENCE NETWORK',
-  'CULTURE + CAPACITY.',
-  'POINT THE PACK.',
-  'COLLATERAL, NOT TRUTH.',
-  'THE TOKEN NEVER GETS TO REWRITE A RECEIPT.',
-  '$BINRAT IS NOT LIVE',
-  'NO OFFICIAL CONTRACT HAS BEEN PUBLISHED',
-  'NO PRIVATE PRESALE',
-  'NO WALLET CONNECTION',
-  'DISABLED PRELAUNCH',
-  'NOT AUTHORIZED',
-  'TOKEN DOES NOT CHANGE FACTS',
-  'og:title',
-  'og:description',
-  'twitter:card',
-  './launch-presentation.css'
+  'YOUR RATS CAN.', 'START DIGGING', 'WORKING RAT · PLANNED',
+  'More work never buys a different truth.',
+  'og:title', 'og:description', 'twitter:card', './launch-presentation.css'
 ];
 for (const marker of requiredHtml) {
   if (!html.includes(marker)) throw new Error(`LAUNCH_PRESENTATION_MISSING:${marker}`);
@@ -50,10 +31,9 @@ if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new E
 if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('LAUNCH_RUNTIME_AUTHORITY_SHAPE_NOT_BOUND');
 if (!app.includes('renderTokenLaunchState(manifest.launchAuthorization)')) throw new Error('LAUNCH_RUNTIME_PRESENTATION_NOT_BOUND');
 
-const tokenStart = html.indexOf('id="token-status"');
-const tokenEnd = html.indexOf('id="boundary"', tokenStart);
-if (tokenStart < 0 || tokenEnd < 0) throw new Error('LAUNCH_TOKEN_SECTION_NOT_FOUND');
-const tokenSection = html.slice(tokenStart, tokenEnd);
+// The current frontdoor deliberately omits token promotion; authority remains in the docs/runtime.
+if (html.includes('$BINRAT') || html.includes('id="token-status"')) throw new Error('LAUNCH_UNAUTHORIZED_PUBLIC_TOKEN_PROMOTION');
+const tokenSection = html;
 
 if (/0x[0-9a-fA-F]{40}/.test(tokenSection)) throw new Error('LAUNCH_PRELAUNCH_ADDRESS_EXPOSED_IN_TOKEN_SECTION');
 if (/0x[0-9a-fA-F]{40}/.test(launchDoc)) throw new Error('LAUNCH_PRELAUNCH_ADDRESS_EXPOSED_IN_PRESENTATION_DOC');
