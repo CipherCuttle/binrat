@@ -18,52 +18,12 @@ const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e991
 const expectedRoadmapRasterSha256 = '6aad1c3a02fd031b048adb5d6b9ac389af38c6834c5d782c7fd190f37788d969';
 
 const requiredHtml = [
-  'BINRAT',
-  'HOT GARBAGE',
-  'INDEX CONNECTING',
-  'THE DUMPSTER',
-  'HOW HE DIGS',
-  'DUMPSTER LEDGER',
-  'CLAIM BOUNDARY',
-  'FOUND SOMETHING.',
-  'OPEN FRESH GARBAGE',
-  'GET THE TELEGRAM RAT',
-  "DON'T TRUST THE RAT. CHECK THE RECEIPT.",
-  'WHY IT SURFACED / RECEIPT-BACKED',
-  'EVERY LAUNCH LOOKS NEW IF YOU FORGET THE OLD TRAIL. THE RAT IS CHECKING.',
-  '02 / TELEGRAM',
-  "DON'T LIVE IN THE TERMINAL.",
-  'Telegram tells you when to come back.',
-  'ADD @BINRATBOT',
-  'SAME PAWS. AGAIN.',
-  'WATCHING THESE PAWS. ✓',
-  'SAME PAWS. NEW LAUNCH.',
-  'NOT A LIVE ALERT',
-  '03 / ROADMAP',
-  'DOWN THE RAT HOLE',
-  "THIS ISN'T",
-  'THE RAT CATCHES THE LAUNCH.',
-  "SITES VANISH. THE TRAIL DOESN'T.",
-  'LEAVE A TRIPWIRE IN THE TRASH.',
-  'POINT THE RATS AT SOMETHING WORTH DIGGING.',
-  'USEFUL WORK EARNS A RECEIPT.',
-  'GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.',
-  'UNBADGED = ROADMAP DIRECTION, NOT A LIVE CLAIM.',
-  'WHY $BINRAT?',
-  '06 / $BINRAT',
-  'THE RAT',
-  'NEEDS A COIN.',
-  '$BINRAT is the culture and coordination layer around BINRAT.',
-  'BANKROLL THE BUILD',
-  'COORDINATE ATTENTION',
-  'COLLATERAL, NOT TRUTH.',
-  'THE TOKEN NEVER GETS TO REWRITE A RECEIPT.',
-  '$BINRAT IS NOT LIVE',
-  'NO OFFICIAL CONTRACT HAS BEEN PUBLISHED',
-  'NO PRIVATE PRESALE',
-  './assets/binrat-hero.webp',
-  './assets/roadmap-sniff.webp',
-  './share-card.css'
+  "YOU CAN'T WATCH ALL THIS SHIT.", 'YOUR RATS CAN.', 'START DIGGING', 'MEET THE CREW',
+  'WHAT JUST HIT THE DUMPSTER?', 'PICK THE RAT FOR THE JOB.', 'RAT ZERO', 'TRIPWIRE',
+  'SNIFFER', 'LIVE', 'BUILDING', 'NEXT', 'LOCKED', 'FIND → EMPLOY → LEAVE → RETURN',
+  'FREE RAT DIGS WHEN YOU ASK.', 'WORKING RAT KEEPS DIGGING AFTER YOU LEAVE.',
+  'WORKING RAT · PLANNED', 'TAKE THE RAT WITH YOU.', 'Tripwire job alerts are being built.',
+  'REPEAT DEPLOYERS', 'INDEX CONNECTING', 'THE DUMPSTER', './share-card.css', './frontdoor.css'
 ];
 
 for (const marker of requiredHtml) {
@@ -71,12 +31,8 @@ for (const marker of requiredHtml) {
 }
 
 const frontdoorOrder = [
-  'id="frontdoor-proof"',
-  'id="garbage"',
-  'id="telegram"',
-  'id="roadmap"',
-  'id="how"',
-  'id="token-status"'
+  'id="hero-title"', 'id="fresh-proof"', 'id="crew"', 'id="how"',
+  'id="working-rat"', 'id="telegram"'
 ].map((marker) => html.indexOf(marker));
 if (
   frontdoorOrder.some((index) => index < 0) ||
@@ -107,8 +63,6 @@ if (!shareCard.includes('FIXTURE // NOT LIVE EVIDENCE')) throw new Error('WEB_SH
 if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS');
 if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRONTDOOR_CTA_MISSING');
 if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Error('WEB_TELEGRAM_FIRST_CLASS_CTA_MISSING');
-if (!html.includes('Event-driven. User-requested. No fake urgency. No engagement pings.')) throw new Error('WEB_TELEGRAM_NOTIFICATION_BOUNDARY_MISSING');
-if (!html.includes('A watched reported deployer showed up again.')) throw new Error('WEB_TELEGRAM_DEPLOYER_ALERT_BOUNDARY_MISSING');
 if (!dataSource.includes('fetch("/api/capabilities"')) throw new Error('WEB_CAPABILITY_MANIFEST_SOURCE_MISSING');
 if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('WEB_TOKEN_PRELAUNCH_VALIDATION_MISSING');
 if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('WEB_TOKEN_LAUNCH_GATE_VALIDATION_MISSING');
@@ -121,12 +75,6 @@ if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_
 if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
 if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');
 if (!app.includes('LEAVE A TRIPWIRE IN THE TRASH.')) throw new Error('WEB_CASE_TO_WATCH_HANDOFF_MISSING');
-if (!app.includes('OPEN TELEGRAM RAT')) throw new Error('WEB_CASE_TO_TELEGRAM_CTA_MISSING');
-if (!app.includes('user-requested monitoring, not a buy or safety signal.')) throw new Error('WEB_CASE_WATCH_BOUNDARY_MISSING');
-if (!app.includes('renderFrontdoorProof')) throw new Error('WEB_FRONTDOOR_PROOF_RENDERER_MISSING');
-if (!app.includes('SMELLS FAMILIAR.')) throw new Error('WEB_FRONTDOOR_REPEAT_STORY_MISSING');
-if (!app.includes('This Pons-reported deployer already appears on')) throw new Error('WEB_FRONTDOOR_DEPLOYER_BOUNDARY_MISSING');
-if (!app.includes('PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW')) throw new Error('WEB_FRONTDOOR_FAIL_CLOSED_HISTORY_MISSING');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
 if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
@@ -177,4 +125,19 @@ for (const claim of prohibitedClaims) {
 }
 if (/tone:\s*['"](?:good|warn)['"]/.test(fixtures)) throw new Error('WEB_EVALUATIVE_TONE_REINTRODUCED');
 
+const frontdoor = readFileSync(new URL('../web/frontdoor.js', import.meta.url), 'utf8');
+const frontdoorCss = readFileSync(new URL('../web/frontdoor.css', import.meta.url), 'utf8');
+if (!frontdoor.includes('feed.bags.slice(0, 3)')) throw new Error('WEB_HOME_PROOF_UNBOUNDED');
+if (!frontdoor.includes('FIXTURE · NOT LIVE EVIDENCE')) throw new Error('WEB_HOME_FIXTURE_STAMP_MISSING');
+if (frontdoor.includes('fetch(')) throw new Error('WEB_HOME_BYPASSES_READ_PLANE');
+if (!app.includes('renderFreshCases(feed)') || !app.includes('renderFreshState(')) throw new Error('WEB_HOME_READ_PLANE_BINDING_MISSING');
+if (!app.includes('Persistent jobs are not available yet.')) throw new Error('WEB_CASE_WATCH_AVAILABILITY_MISSING');
+if (html.includes('$BINRAT') || html.includes('token-status') || html.includes('NEEDS A COIN')) throw new Error('WEB_PUBLIC_TOKEN_MARKETING_REINTRODUCED');
+if ((html.match(/class="locked-slot"/g) ?? []).length !== 2) throw new Error('WEB_LOCKED_ROSTER_DRIFT');
+if (!frontdoorCss.includes('"Geist Sans"') || !frontdoorCss.includes('"Geist Mono"')) throw new Error('WEB_GEIST_MISSING');
+const crewReceipt = JSON.parse(readFileSync(new URL('../docs/FRONTDOOR_ASSETS_V1.json', import.meta.url), 'utf8'));
+for (const asset of crewReceipt.assets) {
+  const digest = createHash('sha256').update(readFileSync(new URL(`../${asset.file}`, import.meta.url))).digest('hex');
+  if (digest !== asset.sha256) throw new Error(`WEB_CREW_ASSET_DRIFT:${asset.file}`);
+}
 console.log('BINRAT web invariants: PASS');

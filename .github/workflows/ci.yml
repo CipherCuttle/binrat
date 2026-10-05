@@ -148,7 +148,7 @@ jobs:
 
   frontdoor-browser-smoke:
     name: frontdoor-browser-smoke
-    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1') }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1' || github.head_ref == 'feat/binrat-frontdoor-journey-v1') }}
     needs: [check]
     runs-on: ubuntu-latest
     timeout-minutes: 12

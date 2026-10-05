@@ -1,6 +1,7 @@
 import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 import { PublicReadPlane, ReadState } from "./read-plane.js";
+import { initFrontdoor, renderFreshCases, renderFreshState } from "./frontdoor.js";
 
 const grid = document.querySelector("#garbage-grid");
 const drawer = document.querySelector("#drawer");
@@ -8,14 +9,12 @@ const drawerContent = document.querySelector("#drawer-content");
 const drawerClose = document.querySelector("#drawer-close");
 const backdrop = document.querySelector("#backdrop");
 const randomBag = document.querySelector("#random-bag");
-const frontdoorProof = document.querySelector("#frontdoor-proof");
 let returnFocus = null;
 let activeDrawerBagId = null;
 let bags = [];
 let activeFilter = "all";
 let activeMode = null;
 let available = false;
-let frontdoorGeneration = 0;
 const initialFragment = location.hash && location.hash !== "#top" ? location.hash : "";
 let initialFragmentPending = Boolean(initialFragment);
 let initialFragmentInterrupted = false;
@@ -152,6 +151,7 @@ const readPlane = new PublicReadPlane({
   onSnapshot: renderVerifiedSnapshot,
   onState: renderReadState,
 });
+initFrontdoor({ initialFragment, onOpenCase: openBag, onRetry: () => readPlane.retry(), onNavigate: closeDrawer });
 readPlane.start();
 document.addEventListener("visibilitychange", () => readPlane.visibilityChanged());
 window.addEventListener("pagehide", () => readPlane.stop(), { once: true });
@@ -166,10 +166,11 @@ function renderVerifiedSnapshot(feed) {
   if (randomBag) randomBag.disabled = bags.length === 0;
   renderIntake();
   renderFeed();
-  void renderFrontdoorProof();
+  renderFreshCases(feed);
 }
 
-function renderReadState({ state, snapshot }) {
+function renderReadState({ state, snapshot, status: sourceStatus }) {
+  renderFreshState({ state, snapshot, status: sourceStatus });
   document.body.dataset.readState = state;
   const status = document.querySelector("#read-freshness");
   if (!status) return;
@@ -323,6 +324,7 @@ function roadmapCapabilityStatuses(capabilities) {
 
 async function bootstrapLedger() {
   const section = document.querySelector("#dumpster-ledger");
+  if (!section) return;
   try {
     const ledger = await loadDumpsterLedger();
     if (!ledger) {
@@ -375,16 +377,10 @@ function renderUnavailable() {
   document.body.dataset.mode = "UNAVAILABLE";
   for (const element of document.querySelectorAll("[data-mode-copy]"))
     element.textContent = "INDEX UNAVAILABLE";
-  document.querySelector('[data-mode-copy="header"]').textContent =
-    copy().unavailable;
+
   latestBag.innerHTML =
     '<span class="intake-loading">DUMPSTER DATA UNAVAILABLE</span>';
   liveRail.innerHTML = '<span class="live-rail-dot offline" aria-hidden="true"></span><strong>OFFLINE</strong><span>PONS 4663</span><span>LIVE INDEX NOT AVAILABLE</span>';
-  if (frontdoorProof) {
-    frontdoorProof.innerHTML = `
-      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>INDEX UNAVAILABLE</span></div>
-      <div class="proof-empty">The Rat cannot verify a current repeat trail right now. Nothing has been substituted.</div>`;
-  }
   document.querySelector("#feed-count").textContent = "INDEX UNAVAILABLE";
   for (const element of document.querySelectorAll(".filter-button span")) {
     element.textContent = "—";
@@ -408,128 +404,6 @@ function renderIntake() {
     </button>`;
   const button = latestBag.querySelector("button");
   button.addEventListener("click", () => openBag(latest.id, button));
-}
-
-async function renderFrontdoorProof() {
-  if (!frontdoorProof || !available) return;
-  const generation = ++frontdoorGeneration;
-
-  const bag = bags.find((item) => item.priorLaunches > 0) ?? bags[0];
-  if (!bag) {
-    frontdoorProof.innerHTML = `
-      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span></div>
-      <div class="proof-empty">Nothing is in the current Fresh Garbage window. No example launch was substituted.</div>`;
-    return;
-  }
-
-  if (bag.priorLaunches <= 0) {
-    frontdoorProof.innerHTML = `
-      <div class="proof-kicker"><span>WHY IT SURFACED / RECEIPT-BACKED</span><span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span></div>
-      <div class="proof-story">
-        <div class="proof-step proof-current"><span>FRESH GARBAGE</span><strong>${escapeHtml(bag.symbol)}</strong><small>${escapeHtml(bag.name)}</small></div>
-        <div class="proof-arrow" aria-hidden="true">→</div>
-        <div class="proof-step proof-signal"><span>THIS WINDOW</span><h3>NO FAMILIAR PAWS YET.</h3><p>No earlier indexed launch is attached to this Pons-reported deployer in the current fast view.</p></div>
-        <div class="proof-arrow" aria-hidden="true">→</div>
-        <div class="proof-step"><span>BOUNDARY</span><p class="proof-scraps-empty">No repeat in current coverage is not proof that no history exists elsewhere.</p></div>
-        <div class="proof-action"><span>NEXT MOVE</span><a class="button primary" href="#garbage">OPEN FRESH GARBAGE <span>↓</span></a></div>
-        <div class="proof-boundary"><span><b>OBSERVED</b> · ${escapeHtml(normalizeCoverage(bag.coverage))} HISTORY</span><span>Nothing inferred about safety, intent, identity or future outcome.</span></div>
-      </div>`;
-    return;
-  }
-
-  const fixtureScraps = Array.isArray(bag.trail)
-    ? bag.trail.slice(0, 3).map((item) => ({
-        symbol: item.symbol,
-        name: "",
-        detail: item.age,
-      }))
-    : [];
-
-  renderFrontdoorProofStory(
-    bag,
-    fixtureScraps,
-    activeMode === "LIVE" && fixtureScraps.length === 0
-      ? "DIGGING UP PRIOR PROJECT NAMES…"
-      : "",
-  );
-
-  if (activeMode !== "LIVE") return;
-
-  try {
-    const file = await loadCreatorFile(bag.reportedCreatorAddress);
-    if (!file || !available || generation !== frontdoorGeneration) return;
-    const scraps = file.launches
-      .filter(
-        (item) =>
-          item.id !== bag.id &&
-          String(item.token).toLowerCase() !== String(bag.token).toLowerCase(),
-      )
-      .slice(0, 3)
-      .map((item) => ({
-        symbol: item.symbol,
-        name: item.name,
-        detail: `BLK ${item.blockNumber}`,
-      }));
-    renderFrontdoorProofStory(bag, scraps, "");
-  } catch {
-    if (generation !== frontdoorGeneration) return;
-    renderFrontdoorProofStory(
-      bag,
-      [],
-      `${bag.priorLaunches} EARLIER INDEXED LAUNCH${bag.priorLaunches === 1 ? "" : "ES"} · PROJECT NAMES UNAVAILABLE IN THIS FAST VIEW · PRIOR PROJECT NAMES TEMPORARILY UNAVAILABLE`,
-    );
-  }
-}
-
-function renderFrontdoorProofStory(bag, scraps, scrapsFallback) {
-  if (!frontdoorProof) return;
-  const scrapMarkup = scraps.length
-    ? scraps
-        .map(
-          (item) => `
-            <div class="proof-scrap">
-              <strong>${escapeHtml(item.symbol)}</strong>
-              <span>
-                <small>${escapeHtml(item.name || "PRIOR INDEXED LAUNCH")}</small>
-                ${item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ""}
-              </span>
-            </div>`,
-        )
-        .join("")
-    : `<p class="proof-scraps-empty">${escapeHtml(scrapsFallback || `${bag.priorLaunches} earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"} retained for this reported deployer.`)}</p>`;
-
-  frontdoorProof.innerHTML = `
-    <div class="proof-kicker">
-      <span>WHY IT SURFACED / RECEIPT-BACKED</span>
-      <span>${activeMode === "LIVE" ? "LIVE PONS / 4663" : "FIXTURE / SYNTHETIC"}</span>
-    </div>
-    <div class="proof-story">
-      <div class="proof-step proof-current">
-        <span>FRESH GARBAGE</span>
-        <strong>${escapeHtml(bag.symbol)}</strong>
-        <small>${escapeHtml(bag.name)}</small>
-      </div>
-      <div class="proof-arrow" aria-hidden="true">→</div>
-      <div class="proof-step proof-signal">
-        <span>THE RAT NOTICED</span>
-        <h3>SMELLS FAMILIAR.</h3>
-        <p>This Pons-reported deployer already appears on <b>${escapeHtml(bag.priorLaunches)}</b> earlier indexed launch${bag.priorLaunches === 1 ? "" : "es"}. You don't start from zero—the older trail is already here.</p>
-      </div>
-      <div class="proof-arrow" aria-hidden="true">→</div>
-      <div class="proof-step">
-        <span>OLDER SCRAPS</span>
-        <div class="proof-scraps">${scrapMarkup}</div>
-      </div>
-      <div class="proof-action">
-        <span>SEE THE OLD TRAIL</span>
-        <button class="button primary" type="button" data-proof-open="${escapeHtml(bag.id)}">DIG DEEPER <span>↗</span></button>
-        <a class="proof-secondary" href="#garbage">SEE ALL FRESH GARBAGE →</a>
-      </div>
-      <div class="proof-boundary">
-        <span><b>PATTERN</b> · ${escapeHtml(normalizeCoverage(bag.coverage))} HISTORY</span>
-        <span>Same reported address only. Not a human identity, safety, profitability or future-outcome claim.</span>
-      </div>
-    </div>`;
 }
 
 function renderFeed() {
@@ -787,21 +661,11 @@ function openBag(idOrBag, origin = document.activeElement) {
       <div class="share-copy-status" aria-live="polite"></div>
     </section>
 
-    <section class="case-next-step" aria-label="Next step">
-      <span>08 / NEXT MOVE</span>
+    <section class="case-next-step" aria-label="Future monitoring job">
+      <span>TRIPWIRE · BUILDING</span>
       <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
-      <p>
-        If this reported deployer is worth following, open the Telegram Rat and
-        WATCH the exact address shown at the top of this file. Watch is
-        user-requested monitoring, not a buy or safety signal.
-      </p>
-      <a
-        class="button primary"
-        href="https://t.me/BinratBot"
-        target="_blank"
-        rel="noopener noreferrer"
-        >OPEN TELEGRAM RAT <span>↗</span></a
-      >
+      <p>Tripwire is being built to watch this exact Pons-reported deployer and bring you back when a supported condition changes. Persistent jobs are not available yet.</p>
+      <a class="button ghost" href="#crew-tripwire" data-crew-handoff>BUILDING · SEE THE JOB <span>→</span></a>
     </section>
   `;
 
@@ -1080,6 +944,9 @@ function closeDrawer() {
 }
 
 drawerClose.addEventListener("click", closeDrawer);
+drawerContent.addEventListener("click", (event) => {
+  if (event.target.closest("[data-crew-handoff]")) closeDrawer();
+});
 backdrop.addEventListener("click", closeDrawer);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeDrawer();
@@ -1106,7 +973,8 @@ document.addEventListener("keydown", (event) => {
     !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)
   ) {
     event.preventDefault();
-    search.focus();
+    if (document.querySelector("#dumpster-view").hidden) location.hash = "garbage";
+    requestAnimationFrame(() => search.focus());
   }
   if (
     (event.key === "Enter" || event.key === " ") &&
@@ -1124,11 +992,6 @@ if (randomBag) {
     openBag(bag.id, randomBag);
   });
 }
-frontdoorProof?.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-proof-open]");
-  if (!button) return;
-  openBag(button.dataset.proofOpen, button);
-});
 
 function normalizeCoverage(value) {
   return ["COMPLETE", "PARTIAL", "UNVERIFIED"].includes(value)

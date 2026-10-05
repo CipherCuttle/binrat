@@ -8,3 +8,5 @@ data/*
 *.tsbuildinfo
 .artifacts/
 wrangler.controlled-rat.generated.jsonc
+
+browser-artifacts/

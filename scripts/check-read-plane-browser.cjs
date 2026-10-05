@@ -48,7 +48,7 @@ async function newLivePage(browser, { failInitial = false } = {}) {
       await route.fulfill({ status: 503, contentType: "application/json", body: "{}" });
     }
   });
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await page.goto(`${baseUrl}/#garbage`, { waitUntil: "domcontentloaded" });
   if (!failInitial) await page.locator(`[data-bag-id="${launchId}"]`).waitFor();
   return { context, page, counts, statusQueue, feedQueue };
 }
@@ -63,9 +63,8 @@ async function newLivePage(browser, { failInitial = false } = {}) {
     const h = await newLivePage(browser);
     const { page, counts, statusQueue, feedQueue } = h;
     await page.waitForFunction(() => document.body.dataset.readState === "FRESH_VERIFIED");
-    await page.waitForFunction(() => document.querySelector("#token-public-state")?.innerText === "TOKEN STATE REQUIRES VERIFIED PUBLICATION");
     assert.equal(await page.locator("body").getAttribute("data-read-state"), "FRESH_VERIFIED");
-    assert.equal(await page.locator("#token-public-state").innerText(), "TOKEN STATE REQUIRES VERIFIED PUBLICATION");
+    assert.equal(await page.locator("#token-status").count(), 0, "unapproved token promotion must not be exposed");
     for (let i = 0; i < 3; i += 1) {
       const request = waitForApiRequest(page, "/api/status");
       const response = page.waitForResponse((value) => new URL(value.url()).pathname === "/api/status");
@@ -74,7 +73,7 @@ async function newLivePage(browser, { failInitial = false } = {}) {
       await page.clock.runFor(1);
     }
     assert.equal(counts.feed, 1, "unchanged status digests must not refetch the feed");
-    assert.equal(counts.creator, 1, "unchanged status digests must not refetch creator proof");
+    assert.equal(counts.creator, 0, "homepage summaries must use the existing feed without creator requests");
     await page.locator("#bag-search").fill(token);
     assert.equal(await page.locator("#bag-search").inputValue(), token, "filter is set before refresh");
     await page.locator(`[data-bag-id="${launchId}"]`).click();
@@ -88,7 +87,7 @@ async function newLivePage(browser, { failInitial = false } = {}) {
     assert.equal(await page.locator("body").getAttribute("data-read-state"), "STALE_VERIFIED");
     assert.equal(await page.locator("#drawer").getAttribute("class").then((value) => value.includes("open")), true);
     assert.equal(await page.locator("#bag-search").inputValue(), token);
-    assert.equal(await page.locator("#token-public-state").innerText(), "TOKEN STATE REQUIRES VERIFIED PUBLICATION");
+    assert.equal(await page.locator("#token-status").count(), 0, "unapproved token promotion must not be exposed");
     assert.equal(counts.feed, 1, "status 503 must not refetch feed");
 
     statusQueue.push("timeout");
@@ -104,6 +103,9 @@ async function newLivePage(browser, { failInitial = false } = {}) {
     await page.waitForFunction(() => document.body.dataset.readState === "STALE_VERIFIED");
     assert.equal(counts.feed, 2, "changed digest gets one feed refresh; stale copy remains after invalid refresh");
     assert.equal(await page.locator(".token-symbol").innerText(), "A");
+    assert.match(await page.locator("#home-freshness").innerText(), /Showing last verified launches/);
+    assert.doesNotMatch(await page.locator("#home-freshness").innerText(), /snapshot verified/, "newer status cannot lend its verification timestamp to the retained older feed");
+    assert.equal(await page.locator("#fresh-cases h3").innerText(), "A");
 
     // Force a valid recovery for the same changed digest after the malformed payload.
     feedQueue.push(feed(101, "B"));
@@ -113,8 +115,7 @@ async function newLivePage(browser, { failInitial = false } = {}) {
     await recovery;
     await page.waitForFunction(() => document.body.dataset.readState === "FRESH_VERIFIED");
     assert.equal(await page.locator(".token-symbol").innerText(), "B");
-    await page.waitForFunction(() => document.querySelector("#frontdoor-proof")?.innerText.includes("PRIOR PROJECT NAMES TEMPORARILY UNAVAILABLE"));
-    assert.equal(counts.creator, 3, "initial proof, drawer file, and changed-snapshot proof only");
+    assert.equal(counts.creator, 1, "only an explicitly opened Case may fetch its creator file");
 
     const beforeHidden = counts.status;
     await page.evaluate(() => {

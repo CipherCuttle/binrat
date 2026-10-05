@@ -1,0 +1,134 @@
+@font-face { font-family: "Geist Sans"; src: url("./assets/fonts/geist-sans.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("./assets/fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root { font-family: "Geist Sans", sans-serif; font-size: 16px; --muted: #a7aa9e; }
+[hidden] { display: none !important; }
+code, .eyebrow, .rat-status, .fresh-block { font-family: "Geist Mono", monospace; }
+.site-header { gap: 24px; padding: 12px max(24px, calc((100vw - 1280px)/2)); }
+.brand { font-family: "Geist Sans", sans-serif; font-size: 27px; font-weight: 800; }
+.brand img { width: 40px; height: 40px; }
+.site-header > nav { display: flex; gap: 28px; }
+.site-header > nav a { font-size: 16px; min-height: 44px; display: inline-flex; align-items: center; }
+.site-header > nav a[aria-current] { color: var(--orange); }
+.nav-availability { font-size: 14px; color: var(--muted); margin-left: 6px; }
+.header-telegram { font-size: 14px; min-height: 44px; display: inline-flex; align-items: center; border: 1px solid var(--line); padding: 10px 16px; font-weight: 650; }
+.section-nav { display: none; }
+.eyebrow { font-size: 14px; letter-spacing: .04em; line-height: 1.6; }
+.journey-hero { display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; gap: 56px; padding-block: 72px; }
+.journey-hero h1 { font-family: "Geist Sans", sans-serif; font-size: clamp(42px, 4.5vw, 68px); font-weight: 800; letter-spacing: -.055em; line-height: 1.06; }
+.journey-hero h1 span { display: block; color: var(--orange); margin-top: 12px; }
+.journey-hero .lede { font-family: "Geist Sans", sans-serif; font-size: 18px; line-height: 1.65; max-width: 570px; margin-top: 24px; }
+.journey-hero .hero-actions { margin-block: 24px; flex-wrap: wrap; }
+.journey-hero .hero-actions .button { font-size: 16px; }
+.journey-hero .button.primary { background: var(--orange); color: var(--black); }
+.site-header nav { font-family: "Geist Sans", sans-serif; }
+.drawer h2, .drawer h3, .bag-card h3, .drawer .case-number { font-family: "Geist Sans", sans-serif; }
+.button { font-family: "Geist Sans", sans-serif; min-height: 48px; font-size: 16px; font-weight: 650; padding: 14px 20px; }
+.availability-strip { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-block: 20px; font-size: 14px; line-height: 1.7; }
+.availability-strip b { color: var(--orange); font-weight: 600; }
+.journey-short { color: var(--muted); line-height: 1.7; }
+.journey-short strong { display: block; font-size: 14px; color: var(--bone); }
+.journey-scene { position: relative; overflow: hidden; background: var(--asphalt); border: 1px solid var(--line); }
+.journey-scene img { width: 100%; height: auto; aspect-ratio: 1 / 1.1; object-fit: cover; object-position: 46% 38%; image-rendering: auto; }
+.journey-scene figcaption { padding: 16px; color: var(--muted); font-size: 14px; }
+.journey-section { border-top: 1px solid var(--line); padding-block: 56px; }
+.journey-section h2 { font-family: "Geist Sans", sans-serif; font-size: clamp(28px, 3.2vw, 42px); line-height: 1.14; letter-spacing: -.035em; font-weight: 750; max-width: 900px; }
+.section-explanation { font-size: 18px; line-height: 1.6; color: var(--muted); margin-block: 16px 24px; max-width: 760px; }
+.fresh-cases, .crew-overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.fresh-card, .crew-overview article { border: 1px solid var(--line); padding: 24px; background: var(--asphalt); display: flex; flex-direction: column; gap: 14px; }
+.fresh-card h3, .crew-overview h3 { font-size: 25px; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.fresh-name { color: var(--muted); overflow-wrap: anywhere; }
+.fresh-block, .freshness { font-size: 14px; line-height: 1.6; color: var(--muted); }
+.fresh-reason { line-height: 1.65; flex: 1; }
+.fresh-card .button { margin-top: auto; width: 100%; }
+.fresh-empty { border: 1px solid var(--line); padding: 24px; grid-column: 1 / -1; line-height: 1.6; }
+.fresh-empty .button { margin-top: 16px; }
+.section-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 20px; color: var(--orange); font-weight: 650; }
+.crew-overview p { line-height: 1.65; }
+.crew-overview a { margin-top: auto; }
+.crew-overview .crew-thumb { width: 76px; height: 76px; object-fit: cover; }
+.crew-thumb.tripwire { object-position: 62% 30%; }
+.crew-thumb.sniffer { object-position: 81% 55%; }
+.rat-status { font-size: 14px; color: var(--orange); font-weight: 550; }
+.crew-stage { margin-top: 40px; border: 1px solid var(--line); background: var(--asphalt); }
+.crew-selected { display: grid; grid-template-columns: 1fr 1fr; }
+.crew-portrait { overflow: hidden; background: var(--black); display: grid; align-items: center; }
+.crew-portrait img { width: 100%; height: 100%; max-height: 580px; object-fit: cover; object-position: 46% 36%; image-rendering: auto; }
+[data-rat="tripwire"] .crew-portrait img { object-position: 64% 32%; }
+[data-rat="sniffer"] .crew-portrait img { object-position: 79% 54%; }
+.crew-job { padding: 32px; }
+.crew-job .eyebrow { display: flex; justify-content: space-between; gap: 16px; }
+.crew-job h3 { font-size: clamp(38px, 4vw, 62px); letter-spacing: -.055em; line-height: 1.1; margin-block: 16px; }
+.crew-line { font-size: 24px; display: block; margin-bottom: 16px; }
+.crew-job > p:not(.eyebrow) { line-height: 1.65; }
+.crew-job ol { padding-left: 20px; line-height: 1.7; color: var(--muted); margin-block: 24px; }
+.rat-unavailable { border-top: 1px solid var(--line); padding-top: 20px; font-size: 14px; color: var(--orange); }
+.crew-roster { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.crew-roster > * { background: transparent; border: 0; border-right: 1px solid var(--line); text-align: left; padding: 18px 16px; color: var(--bone); line-height: 1.6; min-width: 0; }
+.crew-roster > :last-child { border-right: 0; }
+.crew-roster button[aria-pressed="true"] { box-shadow: inset 0 -3px var(--orange); background: #cf956710; }
+.crew-roster strong, .crew-roster span { display: block; }
+.crew-roster .roster-role { color: var(--muted); font-size: 14px; }
+.crew-roster .rat-status { margin-top: 4px; }
+.crew-roster .locked-slot { color: var(--muted); }
+.anchor-target { scroll-margin-top: 100px; }
+.den-preview { margin-top: 24px; padding: 24px; border-left: 3px solid var(--orange); background: var(--asphalt); }
+.den-preview h3 { font-size: 24px; margin-bottom: 12px; }
+.den-preview p { line-height: 1.65; max-width: 760px; }
+.loop-steps { list-style: none; padding: 0; margin: 28px 0; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 24px; }
+.loop-steps li { border-top: 2px solid var(--line); padding-top: 18px; }
+.loop-steps strong { font-size: 23px; }
+.loop-steps p { line-height: 1.65; color: var(--muted); margin-top: 10px; }
+.availability-note { font-size: 16px; line-height: 1.7; color: var(--orange); }
+.work-comparison { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.work-comparison article { border: 1px solid var(--line); padding: 28px; }
+.work-comparison h3 { font-size: 26px; }
+.work-comparison p { line-height: 1.7; margin-top: 16px; }
+.truth-line { margin-top: 24px; color: var(--muted); line-height: 1.7; }
+.telegram-return { display: flex; justify-content: space-between; align-items: center; gap: 32px; }
+.telegram-return p { margin-block: 18px 0; font-size: 18px; line-height: 1.65; color: var(--muted); }
+.site-footer { flex-wrap: wrap; gap: 24px; font-family: "Geist Sans", sans-serif; font-size: 14px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 20px; }
+.footer-links a { min-height: 44px; display: inline-flex; align-items: center; }
+.garbage-section h2, .drawer h2, .drawer h3 { font-family: "Geist Sans", sans-serif; }
+.drawer { font-size: 16px; }
+.drawer p { font-size: 16px; line-height: 1.65; }
+.drawer code { font-family: "Geist Mono", monospace; }
+.feed-filters button, .feed-search input { font-size: 14px; min-height: 44px; }
+#dumpster-view { padding-top: 32px; }
+.feed-inspect span { font-size: 14px; }
+@media (max-width: 1100px) {
+  .journey-hero { gap: 28px; }
+  .site-header > nav { gap: 18px; }
+  .crew-roster > * { padding-inline: 10px; }
+}
+@media (max-width: 760px) {
+  html { scroll-padding-top: 90px; }
+  .shell { width: calc(100% - 40px); }
+  .site-header { padding: 12px 20px; gap: 16px; }
+  .site-header > nav, .header-telegram { display: none; }
+  .section-nav { display: block; margin-left: auto; }
+  .section-nav summary { min-height: 44px; display: flex; align-items: center; gap: 14px; font-size: 16px; cursor: pointer; }
+  .section-nav nav { position: absolute; right: 20px; top: 70px; width: min(330px, calc(100vw - 40px)); background: var(--panel); border: 1px solid var(--line); padding: 12px; box-shadow: 0 12px 24px #0008; }
+  .section-nav nav a { display: block; min-height: 48px; padding: 12px; font-size: 16px; }
+  .journey-hero { grid-template-columns: 1fr; gap: 28px; padding-block: 32px; }
+  .journey-hero h1 { font-size: clamp(36px, 10.6vw, 64px); }
+  .journey-hero .lede { font-size: 16px; margin-top: 20px; }
+  .journey-hero .hero-actions { display: grid; grid-template-columns: 1fr; gap: 12px; margin-block: 20px; }
+  .journey-hero .hero-actions .button { justify-content: space-between; }
+  .availability-strip { gap: 8px; display: grid; grid-template-columns: 1fr; }
+  .journey-scene { display: none; }
+  .journey-section { padding-block: 36px; }
+  .section-explanation { font-size: 16px; }
+  .fresh-cases, .crew-overview, .crew-selected, .work-comparison { grid-template-columns: 1fr; }
+  .crew-job { padding: 24px; }
+  .crew-portrait img { max-height: 360px; aspect-ratio: 1.2; }
+  .crew-roster { grid-template-columns: 1fr; }
+  .crew-roster > * { padding: 14px 20px; border-right: 0; border-bottom: 1px solid var(--line); min-height: 74px; }
+  .crew-roster strong { display: inline; margin-right: 12px; }
+  .crew-roster .rat-status { float: right; margin-top: 0; }
+  .loop-steps { grid-template-columns: 1fr 1fr; gap: 24px 20px; }
+  .telegram-return { align-items: flex-start; flex-direction: column; }
+  .telegram-return .button { width: 100%; }
+  .site-footer { padding-block: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

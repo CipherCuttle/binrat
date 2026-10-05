@@ -5,147 +5,94 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#101211" />
     <meta name="robots" content="noindex,nofollow,noarchive" />
-    <meta
-      name="description"
-      content="BINRAT watches fresh Pons launches, remembers old deployer trails, and shows the receipts when familiar addresses return. Open Fresh Garbage or add the Telegram Rat."
-    />
-    <meta property="og:title" content="BINRAT — THE RAT FOUND SOMETHING" />
-    <meta
-      property="og:description"
-      content="Every launch looks new if you don't remember the old trails. BINRAT does. Open fresh launches, dig into repeat deployer history, and check the receipts."
-    />
+    <meta name="description" content="Rat Zero checks fresh Pons launches and shows what BINRAT remembers. Persistent watchers and funding hunters are coming next." />
+    <meta property="og:title" content="BINRAT — YOUR RATS CAN." />
+    <meta property="og:description" content="Find fresh Pons launches. Open a Case. Check the receipts. Rat Zero is live; Tripwire is building; Sniffer is next." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="./assets/binrat-hero.webp" />
-    <meta
-      property="og:image:alt"
-      content="BINRAT digging through a dumpster at dusk"
-    />
+    <meta property="og:image" content="./assets/crew/rat-zero.jpg" />
+    <meta property="og:image:alt" content="Rat Zero, the BINRAT Scout, in his dumpster" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="BINRAT — THE RAT FOUND SOMETHING" />
-    <meta
-      name="twitter:description"
-      content="Every launch looks new if you don't remember the old trails. BINRAT does. Dig into repeat deployer history and check the receipts."
-    />
-    <meta name="twitter:image" content="./assets/binrat-hero.webp" />
-    <title>BINRAT — The Rat Found Something</title>
+    <title>BINRAT — Your Rats Can</title>
     <link rel="icon" type="image/png" href="./assets/favicon.png" />
-    <link
-      rel="preload"
-      href="./assets/fonts/plex-condensed-bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <link rel="preload" href="./assets/fonts/geist-sans.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./evidence-semantics.css" />
     <link rel="stylesheet" href="./share-card.css" />
     <link rel="stylesheet" href="./launch-presentation.css" />
+    <link rel="stylesheet" href="./frontdoor.css" />
   </head>
   <body>
-    <a class="skip-link" href="#garbage">Skip to Fresh Garbage</a>
+    <a class="skip-link" href="#garbage">Skip to Pons launches</a>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="BINRAT home"
-        ><span class="brand-mark">BR<span>↗</span></span
-        ><span
-          >BINRAT<span class="brand-sub">LAUNCH INTELLIGENCE / PONS 4663</span></span
-        ></a
-      >
+      <a class="brand" href="#top" aria-label="BINRAT home"><img src="./assets/crew/rat-avatar-48.png" width="40" height="40" alt="" /><span>BINRAT</span></a>
       <nav aria-label="Primary">
-        <a class="nav-active" href="#garbage">01 / THE DUMPSTER</a
-        ><a href="#telegram">02 / TELEGRAM</a
-        ><a href="#roadmap">03 / ROADMAP</a
-        ><a href="#how">04 / THE METHOD</a
-        ><a href="#dumpster-ledger">05 / THE LEDGER</a
-        ><a href="#token-status">06 / $BINRAT</a>
+        <a href="#garbage" data-nav-destination="dumpster">Dumpster</a>
+        <a href="#crew" data-nav-destination="crew">Crew</a>
+        <a href="#den" data-nav-destination="den">Den <span class="nav-availability">BUILDING</span></a>
       </nav>
+      <a class="header-telegram" href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM ↗</a>
       <details class="section-nav">
-        <summary aria-label="Open section navigation">
-          <span>MAP</span><span aria-hidden="true">↓</span>
-        </summary>
-        <nav aria-label="Section navigation">
-          <a href="#garbage">01 / THE DUMPSTER</a>
-          <a href="#telegram">02 / TELEGRAM</a>
-          <a href="#roadmap">03 / ROADMAP</a>
-          <a href="#how">04 / THE METHOD</a>
-          <a href="#dumpster-ledger">05 / THE LEDGER</a>
-          <a href="#token-status">06 / $BINRAT</a>
+        <summary><span>MENU</span><span aria-hidden="true">↓</span></summary>
+        <nav aria-label="Mobile primary">
+          <a href="#garbage" data-nav-destination="dumpster">Dumpster</a>
+          <a href="#crew" data-nav-destination="crew">Crew</a>
+          <a href="#den" data-nav-destination="den">Den · BUILDING</a>
+          <a href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM ↗</a>
         </nav>
       </details>
-      <div class="network-pill">
-        <span class="status-dot"></span
-        ><b data-mode-copy="header">INDEX CONNECTING</b
-        ><span class="network-id">PONS / 4663</span>
-      </div>
     </header>
     <main id="top">
-      <div class="desk-bar shell">
-        <span>BINRAT TERMINAL <b>/ 001</b></span
-        ><span data-mode-copy="desk">WAITING FOR PUBLIC INDEX</span>
-      </div>
-      <section class="hero shell" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow">FRESH LAUNCHES. OLD TRAILS. ONE NOSY RAT.</p>
-          <h1 id="hero-title">
-            THE RAT<span>FOUND SOMETHING.</span><sup>↗</sup>
-          </h1>
-          <p class="lede">
-            Every new launch looks new if you don't remember the old trails.
-            <strong>BINRAT does.</strong>
-          </p>
-          <p class="sublede">
-            When a Pons-reported deployer shows up again, the Rat pulls the
-            older indexed launches and receipts. You don't start from zero.
-          </p>
-          <div class="hero-actions">
-            <a class="button primary" href="#garbage"
-              >OPEN FRESH GARBAGE <span>↓</span></a
-            ><a
-              class="button ghost"
-              href="https://t.me/BinratBot"
-              target="_blank"
-              rel="noopener noreferrer"
-              >GET THE TELEGRAM RAT <span>↗</span></a
-            >
-          </div>
-          <div class="hero-footnote">
-            <span class="tiny-cross">+</span>
-            <strong>DON'T TRUST THE RAT. CHECK THE RECEIPT.</strong>
-            No score. No buy call. No human identity inference.
-          </div>
+      <section class="journey-hero shell" data-home-section aria-labelledby="hero-title">
+        <div>
+          <h1 id="hero-title">YOU CAN'T WATCH ALL THIS SHIT.<span>YOUR RATS CAN.</span></h1>
+          <p class="lede">Rat Zero checks fresh Pons launches and shows what BINRAT remembers. Persistent watchers and funding hunters are coming next.</p>
+          <div class="hero-actions"><a class="button primary" href="#garbage">START DIGGING <span aria-hidden="true">→</span></a><a class="button ghost" href="#crew">MEET THE CREW</a></div>
+          <div class="availability-strip" aria-label="Rat availability"><span>RAT ZERO · <b>LIVE</b></span><span>TRIPWIRE · <b>BUILDING</b></span><span>SNIFFER · <b>NEXT</b></span></div>
+          <p class="journey-short"><strong>FIND → EMPLOY → LEAVE → RETURN</strong>Find something. Leave a Rat on it. Go away.</p>
         </div>
-        <figure class="mascot-stage">
-          <img
-            src="./assets/binrat-hero.webp"
-            alt="BINRAT, a cyber-eyed rat, digging through a dumpster of discarded token scraps"
-            width="1100"
-            height="1100"
-            fetchpriority="high"
-          />
-          <div class="stage-status">
-            <span>FIELD NOTES / 001</span><span>THE RESIDENT</span>
-          </div>
-          <figcaption class="stage-caption">
-            <span>THE RAT REMEMBERS.<br /><b>THE RECEIPTS STAY.</b></span
-            ><span class="stage-coordinate">PONS<br />4663</span>
-          </figcaption>
-          <span class="stage-corner" aria-hidden="true"></span>
-        </figure>
+        <figure class="journey-scene"><img src="./assets/crew/rat-zero.jpg" width="1536" height="1536" fetchpriority="high" alt="Rat Zero, the approved cyber-eyed Scout, sitting in his dumpster" /><figcaption>RAT ZERO / SCOUT · LIVE</figcaption></figure>
       </section>
-      <section
-        id="frontdoor-proof"
-        class="shell frontdoor-proof"
-        aria-label="Why BINRAT noticed this fresh launch"
-        aria-live="polite"
-        data-frontdoor-proof
-      >
-        <div class="proof-kicker">
-          <span>WHY IT SURFACED / RECEIPT-BACKED</span>
-          <span>CHECKING THE OLD BAGS…</span>
-        </div>
-        <div class="proof-loading" role="status">
-          EVERY LAUNCH LOOKS NEW IF YOU FORGET THE OLD TRAIL. THE RAT IS CHECKING.
-        </div>
+      <section id="fresh-proof" class="shell journey-section" data-home-section aria-labelledby="fresh-title">
+        <h2 id="fresh-title">WHAT JUST HIT THE DUMPSTER?</h2>
+        <p class="section-explanation">Fresh Pons launches. Open one to see what the Rat found.</p>
+        <p id="home-freshness" class="freshness" role="status">Loading Pons launches…</p>
+        <div id="fresh-cases" class="fresh-cases"><p class="fresh-empty">Loading Pons launches…</p></div>
+        <a class="section-link" href="#garbage">OPEN THE DUMPSTER →</a>
       </section>
+      <section id="crew" class="shell journey-section" data-home-section aria-labelledby="crew-title">
+        <h2 id="crew-title">PICK THE RAT FOR THE JOB.</h2>
+        <div class="crew-overview">
+          <article><img class="crew-thumb" src="./assets/crew/rat-avatar-48.png" width="76" height="76" alt="" loading="lazy" /><h3>RAT ZERO</h3><span class="rat-status">SCOUT · LIVE</span><p>Finds fresh Pons launches and checks what BINRAT remembers.</p><a class="section-link" href="#garbage">DIG WITH RAT ZERO →</a></article>
+          <article><img class="crew-thumb tripwire" src="./assets/crew/tripwire.png" width="76" height="76" alt="" loading="lazy" /><h3>TRIPWIRE</h3><span class="rat-status">WATCHER · BUILDING</span><p>Watches a subject and alerts you when a supported condition changes.</p><a class="section-link" href="#crew-tripwire">BUILDING · SEE THE JOB →</a></article>
+          <article><img class="crew-thumb sniffer" src="./assets/crew/sniffer.png" width="76" height="76" alt="" loading="lazy" /><h3>SNIFFER</h3><span class="rat-status">TRAIL HUNTER · NEXT</span><p>Follows an evidenced funder into new wallets and checks whether they later launch on Pons.</p><a class="section-link" href="#crew-sniffer">NEXT · SEE THE JOB →</a></article>
+        </div>
+        <div class="crew-stage" data-crew-detail hidden>
+          <span id="crew-tripwire" class="anchor-target"></span><span id="crew-sniffer" class="anchor-target"></span>
+          <div id="crew-selected" class="crew-selected" aria-live="polite"></div>
+          <div id="crew-roster" class="crew-roster" role="group" aria-label="Choose a Rat to inspect">
+            <button type="button" data-select-rat="rat-zero" aria-pressed="true"><strong>RAT ZERO</strong><span class="rat-status">LIVE</span><span class="roster-role">SCOUT</span></button>
+            <button type="button" data-select-rat="tripwire" aria-pressed="false"><strong>TRIPWIRE</strong><span class="rat-status">BUILDING</span><span class="roster-role">WATCHER</span></button>
+            <button type="button" data-select-rat="sniffer" aria-pressed="false"><strong>SNIFFER</strong><span class="rat-status">NEXT</span><span class="roster-role">TRAIL HUNTER</span></button>
+            <div class="locked-slot"><strong>?????</strong><span class="rat-status">LOCKED</span><span class="roster-role">UNKNOWN</span></div>
+            <div class="locked-slot"><strong>?????</strong><span class="rat-status">LOCKED</span><span class="roster-role">UNKNOWN</span></div>
+          </div>
+        </div>
+        <aside id="den" class="den-preview" data-crew-detail hidden aria-labelledby="den-title"><h3 id="den-title">THE DEN · BUILDING</h3><p>One place to see your Rats, their jobs and what they found. Persistent jobs are being built. Rat Zero can dig now.</p><a class="section-link" href="#garbage">OPEN THE DUMPSTER →</a></aside>
+      </section>
+      <section id="how" class="shell journey-section" data-home-section aria-labelledby="how-title">
+        <h2 id="how-title">FIND SOMETHING.<br />LEAVE A RAT ON IT.<br />GO AWAY.</h2>
+        <ol class="loop-steps"><li><strong>FIND</strong><p>Open a launch. See what BINRAT knows.</p></li><li><strong>EMPLOY</strong><p>Choose a job on the Case. See its limits before it starts.</p></li><li><strong>LEAVE</strong><p>The Rat waits or works. Den shows its status.</p></li><li><strong>RETURN</strong><p>A useful change brings you back to the updated Case.</p></li></ol>
+        <p class="availability-note">Rat Zero is live. Persistent jobs arrive with Tripwire and Sniffer.</p>
+      </section>
+      <section id="working-rat" class="shell journey-section" data-home-section aria-labelledby="working-title">
+        <h2 id="working-title">FREE RAT DIGS WHEN YOU ASK.<br />WORKING RAT KEEPS DIGGING AFTER YOU LEAVE.</h2>
+        <div class="work-comparison"><article><h3>FREE RAT</h3><p>On-demand Rat Zero discovery and supported Case evidence. Open a launch. Inspect the receipts.</p><a class="section-link" href="#garbage">START DIGGING →</a></article><article><h3>WORKING RAT · PLANNED</h3><p>Bounded persistent jobs and workforce capacity. Leave workers on supported subjects and return to findings.</p><p>Availability and capacity limits are not frozen yet.</p></article></div>
+        <p class="truth-line">More work never buys a different truth. The same Case follows the same receipt rules.</p>
+      </section>
+      <section id="telegram" class="shell journey-section telegram-return" data-home-section aria-labelledby="telegram-title">
+        <div><h2 id="telegram-title">TAKE THE RAT WITH YOU.</h2><p>Open BINRAT in Telegram. Tripwire job alerts are being built.</p></div><a class="button primary" href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM <span aria-hidden="true">↗</span></a>
+      </section>
+      <div id="dumpster-view" hidden>
       <div
         class="shell intake-strip"
         id="latest-bag"
@@ -161,9 +108,9 @@
       >
         <div class="section-heading">
           <div>
-            <p class="eyebrow">01 / THE DUMPSTER</p>
+            <p class="eyebrow">THE DUMPSTER</p>
             <h2 id="feed-title">
-              HOT GARBAGE<span class="heading-dot">.</span>
+              FRESH PONS LAUNCHES<span class="heading-dot">.</span>
             </h2>
           </div>
           <p class="section-meta">
@@ -234,7 +181,7 @@
           <div class="feed-loading">DIGGING THROUGH VERIFIED PONS RECEIPTS…</div>
         </div>
         <div class="feed-bottom">
-          <span id="feed-count">Loading bags…</span
+          <span id="feed-count">Loading launches…</span
           ><span
             ><span data-mode-copy="end">WAITING FOR INDEX</span>
             <span class="tiny-cross">+</span></span
@@ -245,530 +192,7 @@
           the evidence.
         </p>
       </section>
-      <section
-        id="telegram"
-        class="shell telegram-section"
-        aria-labelledby="telegram-title"
-      >
-        <div class="telegram-copy">
-          <p class="eyebrow">02 / TELEGRAM SCOUT</p>
-          <h2 id="telegram-title">
-            DON'T LIVE IN THE TERMINAL.<br /><span>THE RAT DOES.</span>
-          </h2>
-          <p class="telegram-lede">
-            <strong>Telegram tells you when to come back.</strong>
-            Web BINRAT is where you dig into the trail and receipts.
-          </p>
-          <p class="telegram-body">
-            Find something worth watching. Leave a tripwire. Go do literally
-            anything else. If that watched Pons-reported deployer launches
-            again, the Rat brings you back to the case.
-          </p>
-          <div class="telegram-actions">
-            <a
-              class="button primary"
-              href="https://t.me/BinratBot"
-              target="_blank"
-              rel="noopener noreferrer"
-              >ADD @BINRATBOT <span>↗</span></a
-            ><a class="button ghost" href="#garbage"
-              >FIND FRESH GARBAGE <span>↓</span></a
-            >
-          </div>
-          <p class="telegram-boundary">
-            Event-driven. User-requested. No fake urgency. No engagement pings.
-          </p>
-          <div class="telegram-loop" aria-label="BINRAT retention loop">
-            <span>DISCOVER</span><b>→</b><span>DIG</span><b>→</b
-            ><span>WATCH</span><b>→</b><span>LEAVE</span><b>→</b
-            ><span>SQUEAK</span><b>→</b><span>OPEN CASE</span>
-          </div>
-        </div>
-        <div
-          class="telegram-demo"
-          aria-label="Example BINRAT Telegram product flow, not a live alert"
-        >
-          <div class="telegram-demo-chrome">
-            <span>@BINRATBOT / PRODUCT FLOW</span
-            ><span>NOT A LIVE ALERT</span>
-          </div>
-          <article class="telegram-card">
-            <div class="telegram-card-meta">
-              <span>01 / DISCOVER</span><span>RATS</span>
-            </div>
-            <strong>SAME PAWS. AGAIN.</strong>
-            <p>
-              A fresh launch shares a Pons-reported deployer with earlier
-              indexed launches.
-            </p>
-            <div class="telegram-card-actions" aria-hidden="true">
-              <span>INVESTIGATE</span><span>WATCH</span>
-            </div>
-          </article>
-          <div class="telegram-transition" aria-hidden="true">
-            <span>WATCH → LEAVE</span><b>↓</b>
-          </div>
-          <article class="telegram-card telegram-card-watch">
-            <div class="telegram-card-meta">
-              <span>02 / TRIPWIRE</span><span>WATCH</span>
-            </div>
-            <strong>WATCHING THESE PAWS. ✓</strong>
-            <p>A future indexed launch will bring you back.</p>
-          </article>
-          <div class="telegram-transition" aria-hidden="true">
-            <span>REAL INDEXED EVENT</span><b>↓</b>
-          </div>
-          <article class="telegram-card telegram-card-alert">
-            <div class="telegram-card-meta">
-              <span>03 / ALERT</span><span>RETURN</span>
-            </div>
-            <strong>SAME PAWS. NEW LAUNCH.</strong>
-            <p>A watched reported deployer showed up again.</p>
-            <div class="telegram-card-actions" aria-hidden="true">
-              <span>INVESTIGATE</span><span>WHY</span>
-            </div>
-          </article>
-          <div class="telegram-demo-footer">
-            <span>OPEN CASE</span
-            ><span>SAME CANONICAL EVIDENCE → WEB FORENSICS</span>
-          </div>
-        </div>
-      </section>
-      <section
-        id="roadmap"
-        class="shell roadmap-section"
-        aria-labelledby="roadmap-title"
-      >
-        <div class="roadmap-intro">
-          <div class="roadmap-copy">
-            <p class="eyebrow">03 / DOWN THE RAT HOLE</p>
-            <h2 id="roadmap-title">THIS ISN'T<br /><span>JUST A SCANNER.</span></h2>
-            <p>
-              The Rat starts by catching launches. Then it remembers, watches,
-              hunts, organizes and eventually takes bounded cases on its own.
-            </p>
-            <div class="roadmap-status-rail" data-roadmap-status>
-              <span class="status-dot"></span>
-              <b>CHECKING WHAT'S LIVE</b>
-              <span>LIVE STATUS / NO FAKE ROADMAP BADGES</span>
-            </div>
-          </div>
-          <figure class="roadmap-raster">
-            <img
-              src="./assets/roadmap-sniff.webp"
-              alt="BINRAT moving through the approved gritty sewer roadmap world"
-              width="665"
-              height="375"
-              loading="lazy"
-              decoding="async"
-            />
-            <figcaption>
-              <span>APPROVED RASTER DONOR / SNIFF</span>
-              <span>STATUS TEXT BELOW IS CANONICAL UI, NOT BAKED ART</span>
-            </figcaption>
-          </figure>
-        </div>
-
-        <div class="roadmap-spine" aria-label="BINRAT product roadmap">
-          <article class="roadmap-stage">
-            <div class="roadmap-node"><span>01</span></div>
-            <div class="roadmap-stage-copy">
-              <span class="roadmap-stage-name">SNIFF</span>
-              <h3>THE RAT CATCHES THE LAUNCH.</h3>
-              <p>Find the launch and preserve the first receipt before the trail gets rewritten.</p>
-              <div class="roadmap-features">
-                <span data-roadmap-capability="pons_live_intelligence">Pons Live Intelligence</span>
-                <span>RATS</span>
-                <span>DIG</span>
-                <span data-roadmap-capability="rat_radar">Rat Radar</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="roadmap-stage">
-            <div class="roadmap-node"><span>02</span></div>
-            <div class="roadmap-stage-copy">
-              <span class="roadmap-stage-name">REMEMBER</span>
-              <h3>SITES VANISH. THE TRAIL DOESN'T.</h3>
-              <p>Keep the history, replay what was knowable at the time, and preserve evidence that later disappears.</p>
-              <div class="roadmap-features">
-                <span>Launch Memory</span>
-                <span>Trash Trails</span>
-                <span data-roadmap-capability="replay_lab">Replay Lab</span>
-                <span>Dead Drops</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="roadmap-stage">
-            <div class="roadmap-node"><span>03</span></div>
-            <div class="roadmap-stage-copy">
-              <span class="roadmap-stage-name">WATCH</span>
-              <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
-              <p>Notice when observed structure moves again without turning alerts into trading recommendations.</p>
-              <div class="roadmap-features">
-                <span data-roadmap-capability="rat_watch">Rat Watch</span>
-                <span>Observation Alerts</span>
-                <span>Trash DNA Tripwires</span>
-                <span>Webhook Alerts</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="roadmap-stage roadmap-stage-degen">
-            <div class="roadmap-node"><span>04</span></div>
-            <div class="roadmap-stage-copy">
-              <span class="roadmap-stage-name">HUNT</span>
-              <h3>POINT THE RATS AT SOMETHING WORTH DIGGING.</h3>
-              <p>Turn curiosity and degen energy into bounded evidence work.</p>
-              <div class="roadmap-features">
-                <span>Trash DNA</span>
-                <span>Trash Hunts</span>
-                <span>Trash Bounties</span>
-                <span data-roadmap-capability="dumpster_raids">Dumpster Raids</span>
-                <span>Feed the Rat</span>
-                <span>Bounty Boost</span>
-                <span>Case Sponsor</span>
-              </div>
-              <strong class="roadmap-rat-line">DEGEN DECIDES ATTENTION. RECEIPTS DECIDE TRUTH.</strong>
-            </div>
-          </article>
-
-          <article class="roadmap-stage">
-            <div class="roadmap-node"><span>05</span></div>
-            <div class="roadmap-stage-copy">
-              <span class="roadmap-stage-name">ORGANIZE</span>
-              <h3>USEFUL WORK EARNS A RECEIPT.</h3>
-              <p>Coordinate contributors without letting money, popularity or token balance buy factual authority.</p>
-              <div class="roadmap-features">
-                <span>Rat Credits</span>
-                <span>Proof of First</span>
-                <span>Rat Reputation</span>
-                <span>Case Files</span>
-                <span>Right of Reply</span>
-                <span data-roadmap-capability="rat_den">Rat Den</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="roadmap-stage roadmap-stage-final">
-            <div class="roadmap-node"><span>06</span></div>
-            <div class="roadmap-stage-copy">
-              <span class="roadmap-stage-name">AUTONOMOUS RAT</span>
-              <h3>GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.</h3>
-              <p>Automation can investigate, replay and distribute evidence. It never becomes evidence authority itself.</p>
-              <div class="roadmap-features">
-                <span>Autonomous Rat</span>
-                <span>Rat Machine</span>
-                <span>Rat Lab</span>
-                <span>Rat API</span>
-                <span>Rat Nodes</span>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <div class="roadmap-footer">
-          <span>NO PROMISE CALENDAR.</span>
-          <span>BADGED FEATURES GET STATUS ONLY FROM THE RUNTIME CAPABILITY MANIFEST.</span>
-          <span>UNBADGED = ROADMAP DIRECTION, NOT A LIVE CLAIM.</span>
-        </div>
-        <div class="roadmap-actions">
-          <a class="button primary" href="#garbage"
-            >OPEN FRESH GARBAGE <span>↓</span></a
-          ><a class="button ghost" href="#token-status"
-            >WHY $BINRAT? <span>↓</span></a
-          >
-        </div>
-      </section>
-      <section
-        id="how"
-        class="shell how-section"
-        aria-labelledby="method-title"
-      >
-        <div class="section-heading compact">
-          <div>
-            <p class="eyebrow">04 / HOW HE DIGS</p>
-            <h2 id="method-title">THE RAT DOES NOT GUESS.</h2>
-          </div>
-          <span class="section-meta method-meta"
-            >OBSERVATION IN.<br />RECEIPT OUT.</span
-          >
-        </div>
-        <div class="process-grid">
-          <article>
-            <div class="process-track">
-              <span>01</span><span aria-hidden="true">→</span>
-            </div>
-            <h3>BAG HITS BIN</h3>
-            <p>
-              Capture the exact launch event, block, transaction, token and
-              Pons-reported deployer address.
-            </p>
-            <span class="process-output">INPUT / LAUNCH EVENT</span>
-          </article>
-          <article>
-            <div class="process-track">
-              <span>02</span><span aria-hidden="true">→</span>
-            </div>
-            <h3>FOLLOW THE SMELL</h3>
-            <p>
-              Link that reported deployer address to earlier Pons launches
-              without pretending it proves a human identity.
-            </p>
-            <span class="process-output">LINK / REPORTED ADDRESS</span>
-          </article>
-          <article>
-            <div class="process-track">
-              <span>03</span><span aria-hidden="true">→</span>
-            </div>
-            <h3>DIG FOR SCRAPS</h3>
-            <p>
-              Collect factual observations: prior outcomes, distribution,
-              metadata and anything still unresolved.
-            </p>
-            <span class="process-output">RECORD / OBSERVATIONS</span>
-          </article>
-          <article>
-            <div class="process-track">
-              <span>04</span><span aria-hidden="true">↗</span>
-            </div>
-            <h3>KEEP THE RECEIPT</h3>
-            <p>
-              Bind the result to evidence and coverage so the joke can never
-              outrank the record underneath it.
-            </p>
-            <span class="process-output">OUTPUT / BOUND EVIDENCE</span>
-          </article>
-        </div>
-      </section>
-      <section
-        id="dumpster-ledger"
-        class="shell ledger-section"
-        aria-labelledby="ledger-title"
-      >
-        <div class="ledger-heading">
-          <div>
-            <p class="eyebrow">05 / DUMPSTER LEDGER</p>
-            <h2 id="ledger-title">FOLLOW THE MONEY.<br />DON'T INVENT IT.</h2>
-          </div>
-          <p id="ledger-explanation">
-            Loading the canonical pre-launch funding state. Missing authority
-            stays missing; fixture money never becomes production truth.
-          </p>
-        </div>
-        <div class="ledger-status-grid" aria-live="polite">
-          <article>
-            <span>FUNDING STATUS</span>
-            <b id="ledger-funding-status">CHECKING AUTHORITY</b>
-          </article>
-          <article>
-            <span>TOKEN STATE</span>
-            <b id="ledger-token-state">NOT_LAUNCHED</b>
-          </article>
-          <article>
-            <span>TREASURY / FEE ROUTES</span>
-            <b id="ledger-wallet-status">2 FUTURE ROLES CONFIGURED / ACCOUNTING OFF</b>
-          </article>
-          <article>
-            <span>MONEY IN</span>
-            <b id="ledger-money-in">0 RAW / 0 ENTRIES</b>
-          </article>
-          <article>
-            <span>MONEY OUT</span>
-            <b id="ledger-money-out">0 RAW / 0 ENTRIES</b>
-          </article>
-          <article>
-            <span>RECEIPTS</span>
-            <b id="ledger-receipt">NO PRODUCTION ENTRIES</b>
-          </article>
-        </div>
-        <div class="ledger-utility-grid">
-          <article>
-            <span>SHIPPED</span>
-            <p id="ledger-shipped">Loading capability manifest…</p>
-          </article>
-          <article>
-            <span>BUILDING</span>
-            <p id="ledger-building">Loading capability manifest…</p>
-          </article>
-          <article>
-            <span>PLANNED / NOT AUTHORIZED</span>
-            <p id="ledger-planned">Loading capability manifest…</p>
-          </article>
-        </div>
-        <p class="ledger-boundary" id="ledger-boundary">
-          Accounting authority is separate from presentation. Unknown intent
-          remains uncategorized.
-        </p>
-      </section>
-      <section
-        id="token-status"
-        class="shell token-status-section"
-        aria-labelledby="token-title"
-        data-token-state="PRELAUNCH"
-      >
-        <div class="token-intro">
-          <p class="eyebrow">06 / $BINRAT</p>
-          <h2 id="token-title">THE RAT<br /><span>NEEDS A COIN.</span></h2>
-          <p class="token-status-lede">
-            <strong>$BINRAT is the culture and coordination layer around BINRAT.</strong>
-            The product stays useful without it. The coin can progressively add
-            capacity, coordinate hunts and bounties, help bankroll the build and,
-            later, support bounded evidence-network mechanics.
-          </p>
-          <p class="token-doctrine">
-            PRODUCT FIRST. COIN SECOND. <strong>THE RECEIPTS NEVER CHANGE.</strong>
-          </p>
-          <div class="token-actions">
-            <a class="button primary" href="#roadmap"
-              >TRACE THE ROADMAP <span>↑</span></a
-            ><a
-              class="button ghost"
-              href="https://t.me/BinratBot"
-              target="_blank"
-              rel="noopener noreferrer"
-              >FOLLOW THE RAT <span>↗</span></a
-            >
-          </div>
-        </div>
-
-        <aside class="token-purpose" aria-label="Why BINRAT has a token">
-          <span class="token-purpose-kicker">WHY A COIN?</span>
-          <div class="token-purpose-grid">
-            <article>
-              <span>01</span><b>BANKROLL THE BUILD</b>
-              <p>Disclosed project and creator-fee revenue can fund engineering, data, security, research and operations.</p>
-            </article>
-            <article>
-              <span>02</span><b>NATIVE CULTURE ASSET</b>
-              <p>BINRAT is deliberately memetic. The rat pack gets a shared culture and coordination asset without buying factual authority.</p>
-            </article>
-            <article>
-              <span>03</span><b>COORDINATE ATTENTION</b>
-              <p>Future holders can get more capacity and help point bounded investigations at things worth digging.</p>
-            </article>
-            <article>
-              <span>04</span><b>GROW THE EVIDENCE NETWORK</b>
-              <p>Later mechanics can use collateral for submissions, challenges, anti-spam costs and Rat Node obligations.</p>
-            </article>
-          </div>
-        </aside>
-
-        <div class="token-horizons">
-          <article class="token-horizon">
-            <div class="token-horizon-head">
-              <div><span>01 / LAUNCH + EARLY</span><h3>CULTURE + CAPACITY.</h3></div>
-              <span class="token-horizon-state">PRELAUNCH / NOT ACTIVE</span>
-            </div>
-            <p>
-              Fair public launch intent. No private presale or hidden team allocation.
-              Core receipts stay public. Optional capacity can grow around the evidence product.
-            </p>
-            <div class="token-utility-chips">
-              <span data-token-capability="rat_radar">Rat Radar depth</span>
-              <span data-token-capability="rat_watch">Rat Watch capacity</span>
-              <span data-token-capability="rat_den">Rat Den</span>
-              <span>Filters / API / webhooks <b>ROADMAP</b></span>
-            </div>
-          </article>
-
-          <article class="token-horizon">
-            <div class="token-horizon-head">
-              <div><span>02 / GROWING UTILITY</span><h3>POINT THE PACK.</h3></div>
-              <span class="token-horizon-state">ROADMAP / STATUS-GATED</span>
-            </div>
-            <p>
-              Degen energy can decide what deserves attention. It cannot decide what is true.
-              Hunts and bounties stay bounded by visible evidence requirements.
-            </p>
-            <div class="token-utility-chips">
-              <span>Trash Hunts <b>ROADMAP</b></span>
-              <span data-token-capability="dumpster_raids">Dumpster Raids</span>
-              <span>Bounty Boost <b>ROADMAP</b></span>
-              <span>Case Sponsor <b>ROADMAP</b></span>
-              <span>Rat Credits / Reputation <b>ROADMAP</b></span>
-            </div>
-          </article>
-
-          <article class="token-horizon">
-            <div class="token-horizon-head">
-              <div><span>03 / RAT NETWORK</span><h3>COLLATERAL, NOT TRUTH.</h3></div>
-              <span class="token-horizon-state">LATER / SEPARATE GATE</span>
-            </div>
-            <p>
-              Future contribution mechanics may use economic stake for Sybil resistance,
-              service obligations and challenge costs. Evidence still decides evidence.
-            </p>
-            <div class="token-utility-chips">
-              <span>Bonded submissions <b>LATER</b></span>
-              <span>Bonded challenges <b>LATER</b></span>
-              <span>Anti-spam / Sybil cost <b>LATER</b></span>
-              <span>Rat Nodes <b>LATER</b></span>
-            </div>
-          </article>
-        </div>
-
-        <div class="token-truth-bar">
-          <span>THE TOKEN MAY FUND BINRAT.</span>
-          <span>THE TOKEN MAY COORDINATE BINRAT.</span>
-          <span>THE TOKEN MAY MAKE BINRAT MORE FUN.</span>
-          <strong>THE TOKEN NEVER GETS TO REWRITE A RECEIPT.</strong>
-        </div>
-
-        <div class="token-prelaunch">
-          <div class="token-prelaunch-head">
-            <div>
-              <span>EXACT CURRENT STATE</span>
-              <h3 id="token-public-state">$BINRAT IS NOT LIVE.</h3>
-            </div>
-            <span class="token-prelaunch-source">CHECKING RUNTIME CAPABILITY MANIFEST</span>
-          </div>
-          <p id="token-contract-state" class="token-contract-state">
-            NO OFFICIAL CONTRACT HAS BEEN PUBLISHED
-          </p>
-          <div class="token-status-grid" aria-label="BINRAT prelaunch status">
-            <div class="token-status-item">
-              <span>LAUNCH</span><b id="token-launch-gate">BLOCKED</b>
-            </div>
-            <div class="token-status-item">
-              <span>MARKETING</span><b id="token-marketing-gate">NOT AUTHORIZED</b>
-            </div>
-            <div class="token-status-item">
-              <span>HOLDER UTILITY</span><b>DISABLED PRELAUNCH</b>
-            </div>
-            <div class="token-status-item">
-              <span>PRESALE</span><b>NO PRIVATE PRESALE</b>
-            </div>
-            <div class="token-status-item">
-              <span>WALLET</span><b>NO WALLET CONNECTION</b>
-            </div>
-            <div class="token-status-item">
-              <span>FACT AUTHORITY</span><b>TOKEN DOES NOT CHANGE FACTS</b>
-            </div>
-          </div>
-          <div class="anti-scam-strip">
-            NO OFFICIAL BINRAT CONTRACT HAS BEEN PUBLISHED. A contract address must
-            come from the independently verified launch/publication receipt before this
-            surface can present it as official.
-          </div>
-          <p class="token-prelaunch-note">
-            Utility badges are populated from the runtime capability manifest when available.
-            Unbadged roadmap utility is not live. No yield, APR, profit, appreciation or permanent access is promised.
-          </p>
-        </div>
-      </section>
-      <section id="boundary" class="shell boundary-section">
-        <div>
-          <p class="eyebrow">CLAIM BOUNDARY</p>
-          <h2>THE JOKE IS THE RAT.<br />THE RECORD IS THE AUTHORITY.</h2>
-        </div>
-        <p>
-          BINRAT reports what he found. It does not prove a token is safe, a
-          reported deployer address belongs to a particular human, or a price
-          will go up. <strong>Missing evidence stays missing.</strong>
-        </p>
-      </section>
+      </div>
     </main>
     <aside
       id="drawer"
@@ -793,13 +217,7 @@
       <div id="drawer-content"></div>
     </aside>
     <div id="backdrop" class="backdrop" hidden></div>
-    <footer class="site-footer shell">
-      <a class="footer-brand" href="#top"
-        >BINRAT<span>THE DUMPSTER / PONS 4663</span></a
-      ><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span
-      ><a href="#top">BACK TO SURFACE ↑</a>
-    </footer>
+    <footer class="site-footer shell"><a class="footer-brand" href="#top">BINRAT</a><div class="footer-links"><a href="#garbage">Dumpster</a><a href="#crew">Crew</a><a href="#den">Den · BUILDING</a><a href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></footer>
     <script type="module" src="./app.js"></script>
-    <script type="module" src="./react-bits-island.js"></script>
   </body>
 </html>
