@@ -31,7 +31,8 @@
     "telegram:smoke": "tsx src/telegram/configCli.ts smoke",
     "workforce:replay": "pnpm build && node scripts/replay-rat-workforce.mjs",
     "competence:prepare": "pnpm build && node scripts/eval-rat-competence.mjs prepare",
-    "competence:score": "pnpm build && node scripts/eval-rat-competence.mjs score"
+    "competence:score": "pnpm build && node scripts/eval-rat-competence.mjs score",
+    "competence:capture": "pnpm build && node scripts/capture-rat-competence.mjs"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
