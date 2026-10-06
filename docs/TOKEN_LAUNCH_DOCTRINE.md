@@ -159,11 +159,7 @@ Before public token-launch marketing or launch execution is authorized, the fina
 
 Technical completion is not legal approval.
 
-The canonical state begins:
-
-- `marketingAuthorized=false`;
-- `launchAuthorized=false`;
-- `tokenState=NOT_LAUNCHED`.
+Canonical pre-launch state: `marketingAuthorized=false, launchAuthorized=false, tokenState=NOT_LAUNCHED`.
 
 Only the proper gate/manifest update backed by evidence may change that state.
 
