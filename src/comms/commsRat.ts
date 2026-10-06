@@ -174,13 +174,16 @@ function activeRank(state: CommsLifecycleState): number | null {
 function isNegatedStatusMatch(text: string, index: number): boolean {
   const prefix = text.slice(Math.max(0, index - 40), index).toLowerCase();
   return (
-    /\b(?:not|never)\s+(?:(?:yet|currently|publicly|actually|being|posted|made|marked|considered|called)\s+){0,3}$/.test(
+    /\b(?:not|never|no)\s+(?:(?:yet|currently|publicly|actually|being|posted|made|marked|considered|called)\s+){0,3}$/.test(
       prefix,
     ) ||
     /\bisn['’]?t\s+(?:(?:yet|currently|publicly|actually|being|posted|made|marked|considered|called)\s+){0,3}$/.test(
       prefix,
     ) ||
-    /\bwithout\s+(?:(?:being|going)\s+){0,2}$/.test(prefix)
+    /\bdoes(?:\s+not|n['’]?t)\s+(?:(?:prove|establish|show|mean|claim)\s+){0,2}(?:(?:a|the|this|that|our|their|his|her|its)\s+)?$/.test(
+      prefix,
+    ) ||
+    /\bwithout\s+(?:(?:being|going|proving|establishing)\s+){0,2}$/.test(prefix)
   );
 }
 
