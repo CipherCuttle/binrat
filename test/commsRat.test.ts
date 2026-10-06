@@ -160,3 +160,27 @@ test('later affirmative live wording still fails after an earlier negated mentio
     violations.some((item) => item.code === 'CAPABILITY_STATUS_UPGRADE'),
   );
 });
+
+test('no live watcher is a negated capability statement', () => {
+  const violations = validateDraftText(
+    'There is no live watcher, scheduler, or collector.',
+    event({ lifecycle: 'ENGINEERING_PASS' }),
+  );
+
+  assert.equal(
+    violations.filter((item) => item.code === 'CAPABILITY_STATUS_UPGRADE').length,
+    0,
+  );
+});
+
+test('does not prove live coverage is a negated capability statement', () => {
+  const violations = validateDraftText(
+    'The offline proof does not prove live coverage.',
+    event({ lifecycle: 'ENGINEERING_PASS' }),
+  );
+
+  assert.equal(
+    violations.filter((item) => item.code === 'CAPABILITY_STATUS_UPGRADE').length,
+    0,
+  );
+});
