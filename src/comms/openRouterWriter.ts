@@ -13,9 +13,12 @@ export const OPENROUTER_COMMS_DRAFT_SCHEMA = {
   additionalProperties: false,
   required: ['schemaVersion', 'x', 'telegram'],
   properties: {
-    schemaVersion: { const: 'binrat.comms-draft/1' },
-    x: { type: 'string', minLength: 1, maxLength: 280 },
-    telegram: { type: 'string', minLength: 1, maxLength: 700 },
+    schemaVersion: {
+      type: 'string',
+      enum: ['binrat.comms-draft/1'],
+    },
+    x: { type: 'string' },
+    telegram: { type: 'string' },
   },
 } as const;
 
