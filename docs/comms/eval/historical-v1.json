@@ -287,57 +287,6 @@
     ]
   },
   {
-    "id": "pr132-persistent-local-job",
-    "source": {
-      "pr": 132,
-      "title": "feat: persist local Rat jobs across restart and prepare return artifacts",
-      "headSha": "4b511a0f54338fff1062b92d2e2db56656b4abf2"
-    },
-    "event": {
-      "id": "pr132-persistent-local-job",
-      "occurredAt": "2026-10-06T08:30:00Z",
-      "type": "FEATURE_CHANGE",
-      "lifecycle": "ENGINEERING_PASS",
-      "visibility": "PUBLIC_OK",
-      "publicAuthorized": false,
-      "headline": "LOCAL RAT JOBS SURVIVE A RESTART.",
-      "summary": "A synthetic funding-watch replay can be persisted in SQLite, reopened, advanced manually and return a Case plus PREPARED_ONLY notification when supported. There is no live collector, background scheduler, provider/model call or Telegram send.",
-      "userValue": 3,
-      "novelty": 2,
-      "repetitionPenalty": 0,
-      "risk": "LOW",
-      "evidence": [
-        {
-          "kind": "PR",
-          "ref": "#132"
-        },
-        {
-          "kind": "COMMIT",
-          "ref": "4b511a0f54338fff1062b92d2e2db56656b4abf2"
-        },
-        {
-          "kind": "DOC",
-          "ref": "docs/RAT_LOCAL_JOB_PROOF_V1.json"
-        }
-      ]
-    },
-    "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": [
-      "#132",
-      "RAT_LOCAL_JOB_PROOF_V1"
-    ],
-    "forbiddenClaims": [
-      {
-        "code": "BACKGROUND_WATCHER",
-        "pattern": "\\b(?:background|live) (?:watcher|scheduler|collector|monitoring)\\b"
-      },
-      {
-        "code": "TELEGRAM_DELIVERED",
-        "pattern": "\\b(?:Telegram|notification) (?:was |is )?(?:sent|delivered)\\b"
-      }
-    ]
-  },
-  {
     "id": "pr131-dataset-proxy-failure",
     "source": {
       "pr": 131,
