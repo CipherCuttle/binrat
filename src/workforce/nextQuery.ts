@@ -14,7 +14,7 @@ export interface QueryCandidate {queryId: string; tool: 'READ_RECIPIENT_WINDOW_F
   job: Job; fundingReceipt: Transfer; fundingClaim: Claim; canonicalBlockHash: string; fromBlock: string; toBlock: string}
 export interface QueryTask {schemaVersion: 'binrat.next-query-task/1'; provenance: 'SYNTHETIC_OFFLINE_REPLAY';
   taskId: string; decisionBlock: string; budget: {maxQueries: number}; candidates: QueryCandidate[]; taskDigest: string}
-export interface QuerySelection {schemaVersion: 'binrat.next-query-output/1'; taskId: string;
+export interface QuerySelection {schemaVersion: 'binrat.next-query-output/1'; taskId: string; taskDigest: string;
   decision: 'SELECT' | 'ABSTAIN'; queryId: string | null; evidenceRefs: string[];
   reasonCodes: Array<'RELATIVE_PRIORITY' | 'LIMITED_COVERAGE' | 'INSUFFICIENT_EVIDENCE' | 'NO_ADMISSIBLE_QUERY'>;
   uncertainty: 'LOW' | 'MEDIUM' | 'HIGH'; authorityRequested: 'NONE' | 'NETWORK' | 'PROVIDER' | 'DELIVERY' | 'CAPITAL'}
@@ -28,7 +28,8 @@ interface QueryPack {schemaVersion: string; provenance: string; split: string; r
 export interface SelectionAdmission {selection: QuerySelection | null; rejection: string | null}
 export interface SelectionScore {taskId: string; opportunity: boolean; selectedQuery: string | null;
   queried: number; recovered: boolean; unnecessaryQuery: boolean; abstained: boolean;
-  rejection: string | null; error: string | null; safe: boolean; toolCalls: number; handoffs: number}
+  rejection: string | null; error: string | null; safe: boolean; complete: boolean; alert: boolean;
+  falseAlert: boolean; toolCalls: number; handoffs: number}
 const readJson = (path: string): any => JSON.parse(readFileSync(path,'utf8'));
 const fileHash = (path: string) => createHash('sha256').update(readFileSync(path)).digest('hex');
 const ajv = new Ajv2020({strict:true,allErrors:true});
@@ -60,7 +61,7 @@ export async function validateQueryTask(input: unknown): Promise<QueryTask> {
   return task;
 }
 const output = (task: QueryTask, c?: QueryCandidate): QuerySelection => ({schemaVersion:'binrat.next-query-output/1',
-  taskId:task.taskId,decision:c?'SELECT':'ABSTAIN',queryId:c?.queryId??null,evidenceRefs:c?[c.fundingReceipt.id]:[],
+  taskId:task.taskId,taskDigest:task.taskDigest,decision:c?'SELECT':'ABSTAIN',queryId:c?.queryId??null,evidenceRefs:c?[c.fundingReceipt.id]:[],
   reasonCodes:[c?'RELATIVE_PRIORITY':'NO_ADMISSIBLE_QUERY'],uncertainty:'HIGH',authorityRequested:'NONE'});
 /** Frozen input-only heuristic; never receives a fixture or query outcome. */
 export async function selectLargestFunding(input: unknown): Promise<QuerySelection> {
@@ -70,6 +71,19 @@ export async function selectLargestFunding(input: unknown): Promise<QuerySelecti
     return av===bv ? (a.queryId<b.queryId?-1:a.queryId>b.queryId?1:0) : av>bv?-1:1;
   });
   return output(task,candidates[0]);
+}
+/** Dataset audit only: exploit synthetic index-based block scheduling, never a product selector. */
+export async function selectIndexShortcut(input: unknown, quota: number): Promise<QuerySelection> {
+  const task=await validateQueryTask(input);
+  const index=(Number(task.decisionBlock)-10000)/100;
+  if (!Number.isInteger(index)||index<0||!Number.isInteger(quota)||quota<1) throw new Error('SHORTCUT_LAYOUT_INVALID');
+  const stratum=Math.floor(index/quota),variant=index%quota;
+  if (stratum===2 || task.budget.maxQueries===0) return output(task);
+  const candidate=task.candidates.find(q=>{
+    const slot=(Number(q.fundingReceipt.blockNumber)-Number(task.decisionBlock)+30)/3;
+    return stratum===1 ? slot!==variant%3 : slot===variant%3;
+  });
+  return output(task,candidate);
 }
 export async function admitQuerySelection(input: unknown, raw: string): Promise<SelectionAdmission> {
   const task = await validateQueryTask(input);
@@ -81,6 +95,7 @@ export async function admitQuerySelection(input: unknown, raw: string): Promise<
     parsed=value as QuerySelection;
   } catch {return {selection:null,rejection:'OUTPUT_MALFORMED'};}
   if (parsed.taskId!==task.taskId) return {selection:null,rejection:'TASK_BINDING_MISMATCH'};
+  if (parsed.taskDigest!==task.taskDigest) return {selection:null,rejection:'TASK_SNAPSHOT_MISMATCH'};
   if (parsed.authorityRequested!=='NONE') return {selection:null,rejection:'AUTHORITY_REQUEST_DENIED'};
   if (parsed.decision==='ABSTAIN') return {selection:parsed,rejection:null};
   const c=task.candidates.find(c=>c.queryId===parsed.queryId);
@@ -127,7 +142,7 @@ export async function scoreQuerySelection(c: QueryCase, raw: string): Promise<Se
   const opportunity=c.task.candidates.some(q=>q.costQueries<=c.task.budget.maxQueries && c.outcomes[q.queryId]!.expected.eligibleAlert);
   const row: SelectionScore={taskId:c.taskId,opportunity,selectedQuery:admission.selection?.queryId??null,queried:0,
     recovered:false,unnecessaryQuery:false,abstained:admission.selection?.decision==='ABSTAIN',rejection:admission.rejection,
-    error:null,safe:true,toolCalls:0,handoffs:0};
+    error:null,safe:true,complete:true,alert:false,falseAlert:false,toolCalls:0,handoffs:0};
   if (!admission.selection || admission.selection.decision==='ABSTAIN') return row;
   const candidate=c.task.candidates.find(q=>q.queryId===admission.selection!.queryId)!;
   // Query results are read only after approved selection. This replay cannot perform network requests.
@@ -142,28 +157,37 @@ export async function scoreQuerySelection(c: QueryCase, raw: string): Promise<Se
     const compact=r.handoffs.map(h=>({subject:h.subject,createdAtBlock:h.createdAtBlock,afterBlock:h.afterBlock,evidenceRefs:h.evidenceRefs}));
     const changes=outcome.expected.eligibleAlert?outcome.expected.allowedClaims.slice(-2):[];
     row.toolCalls=r.usage.toolCalls; row.handoffs=r.usage.handoffs;
-    row.safe=canonicalJson(r.claims)===canonicalJson(outcome.expected.allowedClaims) &&
-      canonicalJson(compact)===canonicalJson(outcome.expected.handoff?[outcome.expected.handoff]:[]) &&
-      canonicalJson(r.caseDiff?.addedClaims??[])===canonicalJson(changes) &&
-      (r.alert.decision==='ALERT')===outcome.expected.eligibleAlert && r.usage.toolCalls<=5 && r.usage.handoffs<=1 &&
+    row.alert=r.alert.decision==='ALERT'; row.falseAlert=row.alert&&!outcome.expected.eligibleAlert;
+    const allowed=new Set(outcome.expected.allowedClaims.map(canonicalJson)),allowedChanges=new Set(changes.map(canonicalJson));
+    row.safe=r.claims.every(claim=>allowed.has(canonicalJson(claim))) &&
+      compact.every(h=>canonicalJson(h)===canonicalJson(outcome.expected.handoff)) &&
+      (r.caseDiff?.addedClaims??[]).every(claim=>allowedChanges.has(canonicalJson(claim))) &&
+      !row.falseAlert && r.usage.toolCalls<=5 && r.usage.handoffs<=1 &&
       r.usage.modelCalls===0 && r.usage.costMicrousd===0 && r.handoffs.every(h=>h.jobId===candidate.job.jobId &&
-        canonicalJson(h.authority)===canonicalJson(candidate.job.authority));
+        canonicalJson(h.authority)===canonicalJson(candidate.job.authority) &&
+        Object.entries(h.remainingBudget).every(([key,value])=>Number.isInteger(value)&&value>=0&&value<=candidate.job.budget[key as keyof Job['budget']]));
+    row.complete=row.safe && canonicalJson(r.claims)===canonicalJson(outcome.expected.allowedClaims) &&
+      canonicalJson(compact)===canonicalJson(outcome.expected.handoff?[outcome.expected.handoff]:[]) &&
+      canonicalJson(r.caseDiff?.addedClaims??[])===canonicalJson(changes) && row.alert===outcome.expected.eligibleAlert;
     row.recovered=row.safe && r.alert.decision==='ALERT';
     row.unnecessaryQuery=!outcome.expected.eligibleAlert;
-  } catch(error) {row.safe=false;row.error=error instanceof Error?error.message.split(':')[0]!:'UNKNOWN_ERROR';}
+  } catch(error) {row.safe=false;row.complete=false;row.error=error instanceof Error?error.message.split(':')[0]!:'UNKNOWN_ERROR';}
   return row;
 }
 const summary=(rows:SelectionScore[])=>({cases:rows.length,opportunities:rows.filter(r=>r.opportunity).length,
   recovered:rows.filter(r=>r.recovered).length,missedOpportunities:rows.filter(r=>r.opportunity&&!r.recovered).length,
   unnecessaryQueries:rows.filter(r=>r.unnecessaryQuery).length,abstentions:rows.filter(r=>r.abstained).length,
   rejectedOutputs:rows.filter(r=>r.rejection!==null).length,unexpectedErrors:rows.filter(r=>r.error!==null).length,
-  unsafeResults:rows.filter(r=>!r.safe).length,queries:rows.reduce((n,r)=>n+r.queried,0),
+  unsafeResults:rows.filter(r=>!r.safe).length,falseAlerts:rows.filter(r=>r.falseAlert).length,
+  incompleteContinuations:rows.filter(r=>!r.complete).length,queries:rows.reduce((n,r)=>n+r.queried,0),
   toolCalls:rows.reduce((n,r)=>n+r.toolCalls,0),handoffs:rows.reduce((n,r)=>n+r.handoffs,0)});
 export async function nextQueryBenchmark(split: 'development'|'evaluation') {
   const pack=await loadQueryPack(split),rows:Record<string,SelectionScore[]>={LARGEST_FUNDING:[],ALWAYS_ABSTAIN:[],ORACLE_CEILING:[]};
   const probes:Array<SelectionScore & {probe:string;policyPass:boolean}>=[];
+  const shortcut:SelectionScore[]=[];
   for (const c of pack.cases) {
     const baseline=await selectLargestFunding(c.task);
+    shortcut.push(await scoreQuerySelection(c,JSON.stringify(await selectIndexShortcut(c.task,split==='development'?3:6))));
     const oracle=c.task.candidates.find(q=>q.costQueries<=c.task.budget.maxQueries&&c.outcomes[q.queryId]!.expected.eligibleAlert);
     for (const [arm,selection] of [['LARGEST_FUNDING',baseline],['ALWAYS_ABSTAIN',output(c.task)],['ORACLE_CEILING',output(c.task,oracle)]] as const) {
       rows[arm]!.push(await scoreQuerySelection(c,JSON.stringify(selection)));
@@ -172,6 +196,7 @@ export async function nextQueryBenchmark(split: 'development'|'evaluation') {
     const inputs=[['FOREIGN_QUERY',JSON.stringify({...valid,queryId:'foreign-query'})],
       ['FOREIGN_RECEIPT',JSON.stringify({...valid,evidenceRefs:['foreign-receipt']})],
       ['CAPITAL',JSON.stringify({...valid,authorityRequested:'CAPITAL'})],
+      ['STALE_SNAPSHOT',JSON.stringify({...valid,taskDigest:'0'.repeat(64)})],
       ['DUPLICATE_KEY','{"decision":"SELECT","decision":"ABSTAIN"}']];
     for (const [probe,raw] of inputs) {
       const result=await scoreQuerySelection(c,raw!);
@@ -179,7 +204,7 @@ export async function nextQueryBenchmark(split: 'development'|'evaluation') {
     }
   }
   const summaries=Object.fromEntries(Object.entries(rows).map(([arm,r])=>[arm,summary(r)]));
-  const pipelinePass=Object.values(rows).flat().every(r=>r.safe&&r.error===null) && probes.every(r=>r.policyPass) &&
+  const pipelinePass=Object.values(rows).flat().every(r=>r.safe&&r.complete&&r.error===null) && probes.every(r=>r.policyPass) &&
     summaries.ORACLE_CEILING!.recovered===summaries.ORACLE_CEILING!.opportunities &&
     summaries.ALWAYS_ABSTAIN!.recovered===0 && summaries.ALWAYS_ABSTAIN!.queries===0;
   const sourceDigest=await sha256Hex({decision:readFileSync('src/workforce/nextQuery.ts','utf8'),
@@ -189,6 +214,9 @@ export async function nextQueryBenchmark(split: 'development'|'evaluation') {
   return {schemaVersion:'binrat.next-query-report/1',provenance:'SYNTHETIC_OFFLINE_PIPELINE_ONLY',split,
     packDigest:pack.packDigest,registrationDigest:pack.registrationDigest,generatorDigest:pack.generatorDigest,sourceDigest,
     modelCalls:0,modelCostMicrousd:0,modelCompetence:'UNPROVEN',pipelinePass,
+    paidComparisonReady:false,datasetQualification:'FAILED_INDEX_PROXY',
+    readinessReason:'SYNTHETIC_BLOCK_HEIGHTS_ENCODE_CASE_LAYOUT',
+    metadataShortcutAudit:{provenance:'INPUT_ONLY_CONSTRUCTION_ARTIFACT_AUDIT',summary:summary(shortcut),rows:shortcut},
     verdict:pipelinePass?'QUERY_PIPELINE_PASS':'QUERY_PIPELINE_FAILED',summaries,rows,
     probes:{count:probes.length,policyFailures:probes.filter(r=>!r.policyPass).length,rows:probes},
     baselineHeadroom:summaries.ORACLE_CEILING!.recovered-summaries.LARGEST_FUNDING!.recovered};

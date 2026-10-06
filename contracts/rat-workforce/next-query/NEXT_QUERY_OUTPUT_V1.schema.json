@@ -11,7 +11,8 @@
     "evidenceRefs",
     "reasonCodes",
     "uncertainty",
-    "authorityRequested"
+    "authorityRequested",
+    "taskDigest"
   ],
   "properties": {
     "schemaVersion": {
@@ -73,6 +74,10 @@
         "DELIVERY",
         "CAPITAL"
       ]
+    },
+    "taskDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     }
   },
   "oneOf": [
