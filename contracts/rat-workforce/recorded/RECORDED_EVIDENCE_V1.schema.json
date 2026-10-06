@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provenance",
+    "job",
+    "recording",
+    "digest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.recorded-evidence/1"
+    },
+    "provenance": {
+      "const": "RECORDED_RPC_RETROSPECTIVE"
+    },
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "mode",
+        "jobId",
+        "leadRat",
+        "subject",
+        "objective",
+        "authority",
+        "budget",
+        "window"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "binrat.recorded-job/1"
+        },
+        "mode": {
+          "const": "OFFLINE_REPLAY"
+        },
+        "jobId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+        },
+        "leadRat": {
+          "const": "SNIFFER"
+        },
+        "subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "chainId",
+            "entityType",
+            "entityId"
+          ],
+          "properties": {
+            "chainId": {
+              "const": 4663
+            },
+            "entityType": {
+              "enum": [
+                "WALLET",
+                "CREATOR"
+              ]
+            },
+            "entityId": {
+              "type": "string",
+              "pattern": "^0x[a-f0-9]{40}$"
+            }
+          }
+        },
+        "objective": {
+          "const": "REPLAY_RECORDED_FUNDING_AND_PONS_LAUNCH"
+        },
+        "authority": {
+          "const": {
+            "research": true,
+            "network": false,
+            "provider": false,
+            "delivery": false,
+            "capital": false
+          }
+        },
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxToolCalls",
+            "maxHandoffs",
+            "maxModelCalls",
+            "maxCostMicrousd"
+          ],
+          "properties": {
+            "maxToolCalls": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 64
+            },
+            "maxHandoffs": {
+              "const": 0
+            },
+            "maxModelCalls": {
+              "const": 0
+            },
+            "maxCostMicrousd": {
+              "const": 0
+            }
+          }
+        },
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fromBlock",
+            "toBlock"
+          ],
+          "properties": {
+            "fromBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            "toBlock": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            }
+          }
+        }
+      }
+    },
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "responses"
+      ],
+      "properties": {
+        "endpoint": {
+          "const": "https://rpc.mainnet.chain.robinhood.com"
+        },
+        "responses": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "request",
+              "response",
+              "receivedAt"
+            ],
+            "properties": {
+              "label": {
+                "enum": [
+                  "chain",
+                  "factoryCode",
+                  "transfer",
+                  "launch",
+                  "transferBlock",
+                  "launchBlock",
+                  "head",
+                  "transferReceipt",
+                  "captureHead"
+                ]
+              },
+              "request": {
+                "type": "object"
+              },
+              "response": {
+                "type": "object"
+              },
+              "receivedAt": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T.*(?:Z|\\+00:00)$",
+                "maxLength": 40
+              }
+            }
+          }
+        }
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

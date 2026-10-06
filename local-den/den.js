@@ -2,12 +2,12 @@ const $ = id => document.getElementById(id);
 const token = document.querySelector('meta[name="binrat-local-token"]').content;
 const phases = { READY:'Ready', WAITING:'Waiting for replay', FOUND:'Found something', EXPIRED:'Replay ended', EXHAUSTED:'Budget spent', CANCELLED:'Cancelled', HALTED:'Halted' };
 const outcomes = { PENDING:'The job is saved. Run the next replay step when you return.', SUPPORTED_FINDING:'A funded recipient later deployed on Pons. The supplied receipts support this change.', NO_FINDING_IN_REPLAY_WINDOW:'No supported launch was found in this synthetic tape. This says nothing about real chain activity.', INCOMPLETE_COVERAGE:'The replay ended with missing history. This cannot be treated as a clean result.', TOOL_BUDGET_EXHAUSTED:'The original replay budget stopped work. No Case or notification was admitted.', LOCAL_STEP_LIMIT:'The local step limit stopped this replay.', OWNER_CANCELLED:'Cancelled. No later replay step will run for this job.', SOURCE_REJECTED:'A source receipt failed validation. The last completed prefix is retained; no retry runs automatically.' };
-const claimLabels = { NATIVE_TRANSFER_OBSERVED:'The supplied transfer funded this recipient.', RECIPIENT_NOT_SEEN_IN_WINDOW:'The recipient was absent from the supplied history window.', PONS_REPORTED_DEPLOYER_LAUNCH:'Pons reported a deployment by this recipient.', FUNDING_PRECEDES_LAUNCH:'Funding and the typed handoff were available before the launch.' };
-const scenarioNames = { 'local-den-finding':'Later launch', 'local-den-no-launch':'No later launch', 'local-den-incomplete-history':'Missing history', 'local-den-exhausted':'Budget stop' };
+const claimLabels = { NATIVE_TRANSFER_OBSERVED:'The supplied transfer funded this recipient.', RECIPIENT_NOT_SEEN_IN_WINDOW:'The recipient was absent from the supplied history window.', PONS_REPORTED_DEPLOYER_LAUNCH:'Pons reported a deployment by this recipient.', FUNDING_PRECEDES_LAUNCH:'The funding transaction occurred before the launch.' };
+const scenarioNames = { 'recorded-pons-funding':'Recorded funding relation', 'local-den-finding':'Later launch', 'local-den-no-launch':'No later launch', 'local-den-incomplete-history':'Missing history', 'local-den-exhausted':'Budget stop' };
 let jobs = [], selected = '', busy = false, stale = true, requestId = null, reloadSession = false;
 const live = message => { $('notice').textContent = message; };
 function text(tag, value, className) { const node = document.createElement(tag); node.textContent = value; if (className) node.className = className; return node; }
-function nextBlock(job) { const cursor = BigInt(job.receipt?.throughBlock ?? '89'); return ['100','101','125','130'].find(block => BigInt(block) > cursor); }
+function nextBlock(job) { const cursor = BigInt(job.receipt?.throughBlock ?? '-1'); return (job.replaySteps ?? ['100','101','125','130']).find(block => BigInt(block) > cursor); }
 function controls() {
   $('start').disabled = busy || stale || jobs.length >= 24;
   $('scenario').disabled = busy || stale;
@@ -30,17 +30,17 @@ function render() {
   const job = jobs.find(item => item.jobId === selected); $('detail').hidden = !job;
   $('case').hidden = true; $('notification').hidden = true; $('receipts').hidden = true;
   if (job) {
-    const verified = job.verification === 'VERIFIED'; $('detail').dataset.phase = verified ? job.phase : 'HALTED';
+    const verified = job.verification === 'VERIFIED'; const recorded = job.mode === 'LOCAL_RECORDED_REPLAY'; $('detail').dataset.phase = verified ? job.phase : 'HALTED';
     $('job-label').textContent = `${scenarioNames[job.evalId] ?? 'FUNDING TRAIL'} · REPLAY ${job.jobId.slice(-8)}`;
     $('detail-title').textContent = verified ? phases[job.phase] : 'Receipts unavailable';
     $('phase').textContent = verified ? job.phase : 'UNVERIFIED';
     $('outcome').textContent = verified ? outcomes[job.outcome] : 'This saved job failed verification. Its source and journal are retained for export; controls are paused.';
     const incomplete = !verified || job.receipt?.status === 'DEGRADED' || job.phase === 'HALTED';
     $('coverage').className = incomplete ? 'coverage warning' : 'coverage';
-    $('coverage').textContent = incomplete ? 'Incomplete or unavailable coverage · synthetic evidence only.' : 'Declared synthetic fixture window only · no live evidence.';
-    $('timeline').replaceChildren(); $('metrics').replaceChildren();
+    $('coverage').textContent = !verified ? 'Saved evidence unavailable or unverified.' : recorded ? 'Provider-reported RPC responses · retrospective · recipient history unavailable.' : incomplete ? 'Incomplete or unavailable coverage · synthetic evidence only.' : 'Declared synthetic fixture window only · no live evidence.';
+    $('timeline').dataset.mode = recorded ? 'recorded' : 'synthetic'; $('timeline').replaceChildren(); $('metrics').replaceChildren();
     if (verified) {
-      for (const [block, name] of [['100','Funding'],['101','History'],['125','Later receipts'],['130','Deadline']]) {
+      for (const [block, name] of (recorded ? [[job.deadlineBlock,'Captured evidence']] : [['100','Funding'],['101','History'],['125','Later receipts'],['130','Deadline']])) {
         const step = text('li', name); step.append(text('small', `Block ${block}`));
         if (job.receipt && BigInt(job.receipt.throughBlock) >= BigInt(block)) step.className = 'complete';
         $('timeline').append(step);
@@ -50,13 +50,13 @@ function render() {
       }
       $('return-note').textContent = job.phase === 'HALTED' ? 'Usage describes the last completed prefix. Failed replay attempts are uncounted. The journal is preserved.' : 'Saved in your local SQLite file. Nothing runs while you are away.';
       if (job.localCase) {
-        $('case').hidden = false; $('claims').replaceChildren();
+        $('case').hidden = false; $('case-provenance').textContent = recorded ? 'RECORDED CASE · RETROSPECTIVE RELATION' : 'SYNTHETIC CASE · SUPPORTED CHANGE'; $('claims').replaceChildren();
         for (const claim of job.localCase.diff.addedClaims) $('claims').append(text('li', `${claimLabels[claim.kind]} Receipts: ${claim.evidenceRefs.join(', ')}.`));
         $('finding-id').textContent = `Finding ${job.localCase.findingId}`;
       }
       if (job.notification) { $('notification').hidden = false; $('notification-text').textContent = job.notification.text; }
       if (job.receipt?.evidence.length) {
-        $('receipts').hidden = false; $('receipt-summary').textContent = `Saved receipts (${job.receipt.evidence.length})`;
+        $('receipts').hidden = false; $('receipt-caption').textContent = recorded ? 'Recorded receipt availability' : 'Synthetic receipt availability'; $('receipt-summary').textContent = `Saved receipts (${job.receipt.evidence.length})`;
         $('receipt-rows').replaceChildren();
         for (const receipt of job.receipt.evidence) {
           const row = text('tr', ''); row.append(text('td', receipt.id), text('td', receipt.blockNumber), text('td', receipt.availableAtBlock)); $('receipt-rows').append(row);
@@ -76,11 +76,11 @@ async function api(path, method = 'GET', data) {
 }
 async function refresh() {
   const data = await api('/api/jobs');
-  if (data.mode !== 'LOCAL_SYNTHETIC_REPLAY' || !Array.isArray(data.jobs) || data.jobs.length > 24 || data.jobs.some(job => {
+  if (!['LOCAL_REPLAY','LOCAL_SYNTHETIC_REPLAY'].includes(data.mode) || !Array.isArray(data.jobs) || data.jobs.length > 24 || data.jobs.some(job => {
     if (!job || typeof job.jobId !== 'string' || !/^[a-zA-Z0-9_:-]{1,100}$/.test(job.jobId)) return true;
     if (job.verification === 'FAILED') return typeof job.error !== 'string';
-    return job.verification !== 'VERIFIED' || job.mode !== 'LOCAL_SYNTHETIC_REPLAY' || !Object.hasOwn(phases,job.phase) ||
-      !Object.hasOwn(outcomes,job.outcome) || !job.budget || !job.usage ||
+    return job.verification !== 'VERIFIED' || !['LOCAL_SYNTHETIC_REPLAY','LOCAL_RECORDED_REPLAY'].includes(job.mode) || !Object.hasOwn(phases,job.phase) ||
+      !Object.hasOwn(outcomes,job.outcome) || !Array.isArray(job.replaySteps) || !job.replaySteps.length || job.replaySteps.length > 32 || job.replaySteps.some(block => typeof block !== 'string' || !/^(0|[1-9][0-9]{0,19})$/.test(block)) || !job.budget || !job.usage ||
       !Number.isInteger(job.usage.toolCalls) || !Number.isInteger(job.budget.maxToolCalls) ||
       job.usage.toolCalls < 0 || job.usage.toolCalls > job.budget.maxToolCalls ||
       !Number.isInteger(job.usage.handoffs) || !Number.isInteger(job.budget.maxHandoffs) ||
@@ -133,4 +133,4 @@ $('export').addEventListener('click', () => {
 $('refresh').addEventListener('click', () => action(async () => {}, 'Saved jobs refreshed.'));
 $('retry').addEventListener('click', () => { if (reloadSession) location.reload(); else action(async () => {}, 'Saved jobs refreshed.'); });
 try { selected = decodeURIComponent(location.hash.startsWith('#job=') ? location.hash.slice(5) : ''); } catch { selected = ''; }
-action(async () => {}, 'Saved Den opened. Synthetic replay only.', Boolean(selected));
+action(async () => {}, 'Saved Den opened. Offline replay only.', Boolean(selected));

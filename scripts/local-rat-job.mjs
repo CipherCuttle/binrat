@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { LocalRatJobs } from '../dist/src/workforce/localJob.js';
 
 // This CLI has no network or delivery adapters; accidental fetches fail closed.
@@ -7,7 +7,7 @@ let store;
 try {
   const [command, ...rest] = process.argv.slice(2);
   const allowed = {
-    create: ['db', 'fixture'], advance: ['db', 'job-id', 'through-block'],
+    create: ['db', 'fixture'], 'import-recorded': ['db', 'bundle'], advance: ['db', 'job-id', 'through-block'],
     inspect: ['db', 'job-id'], cancel: ['db', 'job-id'], export: ['db', 'job-id']
   };
   if (!Object.hasOwn(allowed, command)) throw new Error('LOCAL_COMMAND_INVALID');
@@ -20,8 +20,9 @@ try {
     args[name] = value;
   }
   if (allowed[command].some(name => !args[name])) throw new Error('LOCAL_ARGUMENT_REQUIRED');
-  store = new LocalRatJobs(args.db, { create: command === 'create', readOnly: command === 'inspect' || command === 'export' });
-  const result = command === 'create' ? await store.create(JSON.parse(readFileSync(args.fixture, 'utf8'))) :
+  if (command === 'import-recorded' && statSync(args.bundle).size > 512_000) throw new Error('RECORDED_BUNDLE_TOO_LARGE');
+  store = new LocalRatJobs(args.db, { create: command === 'create' || command === 'import-recorded', readOnly: command === 'inspect' || command === 'export' });
+  const result = command === 'import-recorded' ? await store.createRecorded(JSON.parse(readFileSync(args.bundle, 'utf8'))) : command === 'create' ? await store.create(JSON.parse(readFileSync(args.fixture, 'utf8'))) :
     command === 'advance' ? await store.advance(args['job-id'], args['through-block']) :
     command === 'cancel' ? await store.cancel(args['job-id']) :
     command === 'export' ? store.exportEvidence(args['job-id']) : await store.inspect(args['job-id']);

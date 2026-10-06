@@ -3,37 +3,45 @@ import Database from 'better-sqlite3';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { assertContract } from './contracts.js';
 import { replay, type EvalCase, type JobReceipt } from './offline.js';
+import { assertRecordedSource, replayRecorded, type RecordedSource, type RecordedReceipt } from './recorded.js';
+type LocalSource = EvalCase | RecordedSource;
+type LocalReceipt = JobReceipt | RecordedReceipt;
+const isRecorded = (source: LocalSource): source is RecordedSource => source.schemaVersion === 'binrat.recorded-evidence/1';
+async function validateSource(source: LocalSource) {
+  if (isRecorded(source)) await assertRecordedSource(source);
+  else assertContract<EvalCase>('EVAL_CASE_V1', source);
+}
 
 export const MAX_LOCAL_ADVANCES = 32;
 const APPLICATION_ID = 0x42524c31;
 type Action = { kind: 'CREATE' } | { kind: 'ADVANCE'; throughBlock: string } | { kind: 'CANCEL' };
 export type LocalPhase = 'READY' | 'WAITING' | 'FOUND' | 'EXPIRED' | 'EXHAUSTED' | 'CANCELLED' | 'HALTED';
 export interface LocalSnapshot {
-  schemaVersion: 'binrat.local-rat-job/1'; mode: 'LOCAL_SYNTHETIC_REPLAY'; jobId: string;
+  schemaVersion: 'binrat.local-rat-job/1'; mode: 'LOCAL_SYNTHETIC_REPLAY' | 'LOCAL_RECORDED_REPLAY'; jobId: string;
   sourceDigest: string; revision: number; previousDigest: string | null; digest: string; action: Action;
   phase: LocalPhase; outcome: 'PENDING' | 'SUPPORTED_FINDING' | 'NO_FINDING_IN_REPLAY_WINDOW' |
     'INCOMPLETE_COVERAGE' | 'TOOL_BUDGET_EXHAUSTED' | 'LOCAL_STEP_LIMIT' | 'OWNER_CANCELLED' | 'SOURCE_REJECTED';
-  advances: number; receipt: JobReceipt | null; failure: string | null;
-  localCase: { provenance: 'SYNTHETIC_OFFLINE_REPLAY'; findingId: string; diff: NonNullable<JobReceipt['caseDiff']> } | null;
+  advances: number; receipt: LocalReceipt | null; failure: string | null;
+  localCase: { provenance: 'SYNTHETIC_OFFLINE_REPLAY' | 'RECORDED_RPC_RETROSPECTIVE'; findingId: string; diff: NonNullable<LocalReceipt['caseDiff']> } | null;
   notification: { id: string; state: 'PREPARED_ONLY'; deliveryAuthorized: false; target: 'UNASSIGNED'; text: string } | null;
 }
 const terminal = (phase: LocalPhase): boolean => phase !== 'READY' && phase !== 'WAITING';
 const safeFailure = (error: unknown): string => error instanceof Error && /^[A-Z][A-Z0-9_]{0,100}$/.test(error.message)
   ? error.message : 'REPLAY_VALIDATION_FAILED';
 
-function boundary(source: EvalCase, value: string, previous: LocalSnapshot): void {
+function boundary(source: LocalSource, value: string, previous: LocalSnapshot): void {
   if (typeof value !== 'string' || !/^(0|[1-9][0-9]{0,19})$/.test(value) || BigInt(value) < BigInt(source.job.window.fromBlock) ||
       BigInt(value) > BigInt(source.job.window.toBlock) ||
       (previous.receipt && BigInt(value) < BigInt(previous.receipt.throughBlock))) throw new Error('LOCAL_BOUNDARY_INVALID');
 }
 
-async function transition(source: EvalCase, sourceDigest: string, previous: LocalSnapshot | null, action: Action): Promise<LocalSnapshot> {
+async function transition(source: LocalSource, sourceDigest: string, previous: LocalSnapshot | null, action: Action): Promise<LocalSnapshot> {
   if (!action || typeof action !== 'object' || Array.isArray(action) ||
       !['CREATE', 'ADVANCE', 'CANCEL'].includes(action.kind) ||
       Object.keys(action).sort().join(',') !== (action.kind === 'ADVANCE' ? 'kind,throughBlock' : 'kind') ||
       (action.kind === 'ADVANCE' && typeof action.throughBlock !== 'string')) throw new Error('LOCAL_ACTION_INVALID');
   const state: Omit<LocalSnapshot, 'digest'> = {
-    schemaVersion: 'binrat.local-rat-job/1', mode: 'LOCAL_SYNTHETIC_REPLAY', jobId: source.job.jobId,
+    schemaVersion: 'binrat.local-rat-job/1', mode: isRecorded(source) ? 'LOCAL_RECORDED_REPLAY' : 'LOCAL_SYNTHETIC_REPLAY', jobId: source.job.jobId,
     sourceDigest, revision: previous ? previous.revision + 1 : 0, previousDigest: previous?.digest ?? null, action,
     phase: previous?.phase ?? 'READY', outcome: previous?.outcome ?? 'PENDING', advances: previous?.advances ?? 0,
     receipt: previous?.receipt ?? null, failure: previous?.failure ?? null,
@@ -50,18 +58,18 @@ async function transition(source: EvalCase, sourceDigest: string, previous: Loca
         throw new Error('LOCAL_TRANSITION_INVALID');
       }
       state.advances++;
-      try { state.receipt = await replay(source, { throughBlock: action.throughBlock }); }
+      try { state.receipt = isRecorded(source) ? await replayRecorded(source, action.throughBlock) : await replay(source, { throughBlock: action.throughBlock }); }
       catch (error) { state.phase = 'HALTED'; state.outcome = 'SOURCE_REJECTED'; state.failure = safeFailure(error); }
       if (state.phase !== 'HALTED') {
         const receipt = state.receipt!;
         if (receipt.status === 'EXHAUSTED') { state.phase = 'EXHAUSTED'; state.outcome = 'TOOL_BUDGET_EXHAUSTED'; }
         else if (receipt.alert.decision === 'ALERT' && receipt.caseDiff && receipt.alert.findingId) {
           state.phase = 'FOUND'; state.outcome = 'SUPPORTED_FINDING';
-          state.localCase = { provenance: 'SYNTHETIC_OFFLINE_REPLAY', findingId: receipt.alert.findingId, diff: receipt.caseDiff };
+          state.localCase = { provenance: receipt.provenance, findingId: receipt.alert.findingId, diff: receipt.caseDiff };
           state.notification = {
             id: await sha256Hex({ jobId: source.job.jobId, findingId: receipt.alert.findingId }),
             state: 'PREPARED_ONLY', deliveryAuthorized: false, target: 'UNASSIGNED',
-            text: `Synthetic replay: a funded recipient later deployed on Pons. Finding ${receipt.alert.findingId}. Declared fixture window only.`
+            text: isRecorded(source) ? `Recorded retrospective relation: direct funding preceded a Pons launch. Finding ${receipt.alert.findingId}. No earlier prediction or recipient freshness established.` : `Synthetic replay: a funded recipient later deployed on Pons. Finding ${receipt.alert.findingId}. Declared fixture window only.`
           };
         } else if (action.throughBlock === source.job.window.toBlock) {
           state.phase = 'EXPIRED'; state.outcome = receipt.status === 'DEGRADED' ? 'INCOMPLETE_COVERAGE' : 'NO_FINDING_IN_REPLAY_WINDOW';
@@ -102,7 +110,7 @@ export class LocalRatJobs {
     return (this.db.prepare('SELECT job_id FROM local_rat_jobs ORDER BY rowid DESC LIMIT ?').all(limit) as { job_id: string }[])
       .map(row => row.job_id);
   }
-  private raw(jobId: string): { source: EvalCase; sourceDigest: string; revision: number; journal: LocalSnapshot[] } {
+  private raw(jobId: string): { source: LocalSource; sourceDigest: string; revision: number; journal: LocalSnapshot[] } {
     return this.db.transaction(() => {
       const row = this.db.prepare('SELECT * FROM local_rat_jobs WHERE job_id = ?').get(jobId) as
         { source_json: string; source_digest: string; revision: number } | undefined;
@@ -111,13 +119,13 @@ export class LocalRatJobs {
         { revision: number; snapshot_json: string }[];
       if (entries.length < 1 || entries.length > MAX_LOCAL_ADVANCES + 2 || entries.length !== row.revision + 1 ||
           entries.some((entry, index) => entry.revision !== index)) throw new Error('LOCAL_JOURNAL_INVALID');
-      return { source: JSON.parse(row.source_json) as EvalCase, sourceDigest: row.source_digest, revision: row.revision,
+      return { source: JSON.parse(row.source_json) as LocalSource, sourceDigest: row.source_digest, revision: row.revision,
         journal: entries.map(entry => JSON.parse(entry.snapshot_json) as LocalSnapshot) };
     })();
   }
   private async verified(jobId: string) {
     const data = this.raw(jobId);
-    assertContract<EvalCase>('EVAL_CASE_V1', data.source);
+    await validateSource(data.source);
     if (data.source.job.jobId !== jobId || await sha256Hex(data.source) !== data.sourceDigest) throw new Error('LOCAL_SOURCE_INVALID');
     let previous: LocalSnapshot | null = null;
     for (const stored of data.journal) {
@@ -135,6 +143,12 @@ export class LocalRatJobs {
     if (source.job.subject.entityType !== 'WALLET' || BigInt(source.job.window.fromBlock) > BigInt(source.job.window.toBlock)) {
       throw new Error('LOCAL_JOB_SCOPE_INVALID');
     }
+    return this.insert(source);
+  }
+  async createRecorded(input: unknown): Promise<LocalSnapshot> {
+    return this.insert(await assertRecordedSource(input));
+  }
+  private async insert(source: LocalSource): Promise<LocalSnapshot> {
     const sourceDigest = await sha256Hex(source), snapshot = await transition(source, sourceDigest, null, { kind: 'CREATE' });
     const inserted = this.db.transaction(() => {
       const found = this.db.prepare('SELECT source_digest FROM local_rat_jobs WHERE job_id = ?').get(source.job.jobId) as { source_digest: string } | undefined;
@@ -148,8 +162,12 @@ export class LocalRatJobs {
   async inspect(jobId: string) {
     const data = await this.verified(jobId);
     return { ...data.snapshot, subject: data.source.job.subject, deadlineBlock: data.source.job.window.toBlock,
-      evalId: data.source.evalId,
-      coverage: 'DECLARED_SYNTHETIC_FIXTURE_ONLY', budget: data.source.job.budget,
+      evalId: isRecorded(data.source) ? 'recorded-pons-funding' : data.source.evalId,
+      replaySteps: isRecorded(data.source) ? [data.source.job.window.toBlock] :
+        [...new Set(data.source.events.map(event => event.availableAtBlock))]
+          .filter(block => BigInt(block) >= BigInt(data.source.job.window.fromBlock) && BigInt(block) < BigInt(data.source.job.window.toBlock))
+          .sort((a,b) => BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0).slice(0,31).concat(data.source.job.window.toBlock),
+      coverage: isRecorded(data.source) ? 'PARTIAL_RECORDED_RELATION_NO_RECIPIENT_HISTORY' : 'DECLARED_SYNTHETIC_FIXTURE_ONLY', budget: data.source.job.budget,
       usage: data.snapshot.receipt?.usage ?? { toolCalls: 0, handoffs: 0, modelCalls: 0, costMicrousd: 0 },
       usageScope: data.snapshot.phase === 'HALTED' ? 'LAST_COMPLETED_PREFIX_FAILED_ATTEMPTS_UNCOUNTED' : 'LOGICAL_REPLAY_RESERVATIONS',
       remainingLocalAdvances: MAX_LOCAL_ADVANCES - data.snapshot.advances };
