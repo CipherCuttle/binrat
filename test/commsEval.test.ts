@@ -156,6 +156,34 @@ test('provider failure blocks before editorial averages matter', () => {
   assert.equal(summary.autonomyVerdict, 'BLOCKED_PROVIDER_FAILURE');
 });
 
+test('output-contract failure is distinct from provider failure and keeps usage', () => {
+  const results = cases.map((item) =>
+    evaluateCommsDraftAttempt(
+      item,
+      attempt(
+        item,
+        'Receipt ' + item.requiredReceiptRefs[0],
+        'Receipt ' + item.requiredReceiptRefs[0],
+      ),
+    ),
+  );
+
+  results[4] = failedCommsEvalCase(cases[4], 'MODEL_DRAFT_X_TOO_LONG', {
+    providerCallSucceeded: true,
+    inputTokens: 640,
+    outputTokens: 170,
+    durationMs: 2200,
+    rawOutput: '{"oversized":true}',
+  });
+
+  const summary = summarizeCommsEval(results);
+  assert.equal(summary.providerCallSuccesses, 12);
+  assert.equal(summary.draftContractPasses, 11);
+  assert.equal(summary.autonomyVerdict, 'BLOCKED_OUTPUT_CONTRACT');
+  assert.equal(results[4].rawOutput, '{"oversized":true}');
+  assert.equal(results[4].inputTokens, 640);
+});
+
 test('even a clean >=70% automatic pack still requires manual edit review', () => {
   const results = cases.map((item) =>
     evaluateCommsDraftAttempt(
