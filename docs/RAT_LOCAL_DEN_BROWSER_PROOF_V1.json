@@ -1,0 +1,46 @@
+{
+  "mode": "LOCAL_SYNTHETIC_REPLAY",
+  "viewports": [
+    {
+      "width": 320,
+      "passed": true
+    },
+    {
+      "width": 360,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "passed": true
+    },
+    {
+      "width": 430,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "passed": true
+    },
+    {
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "passed": true
+    }
+  ],
+  "restart": true,
+  "cancel": true,
+  "expiry": true,
+  "incomplete": true,
+  "exhaustion": true,
+  "unavailableRecovery": true,
+  "malformedRecovery": true,
+  "uncertainWriteRecovery": true,
+  "openTabRestartRecovery": true,
+  "newModelCalls": 0,
+  "deliveredNotifications": 0,
+  "baseHead": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+  "newModelCostUSD": "0.000000"
+}

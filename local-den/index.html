@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="binrat-local-token" content="__LOCAL_TOKEN__">
+  <title>BINRAT — Local Den</title>
+  <link rel="icon" href="/rat-avatar.png">
+  <link rel="stylesheet" href="/den.css">
+  <script type="module" src="/den.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the Den</a>
+  <header class="site-header"><a class="brand" href="/"><img src="/rat-avatar.png" width="36" height="36" alt=""><span>BINRAT <small>THE LOCAL DEN</small></span></a><span class="mode">OFFLINE REPLAY</span></header>
+  <main id="main">
+    <section class="intro"><p class="eyebrow">FIND → EMPLOY → LEAVE → RETURN</p><h1>LEAVE THE JOB.<br>KEEP THE RECEIPTS.</h1><p>Start a replay. Leave. Return.</p><p class="scope">Synthetic evidence. Manual steps. No live watcher or sends.</p></section>
+    <p id="notice" role="status" aria-live="polite">Opening the saved Den…</p>
+    <div id="error" role="alert" hidden><span id="error-text"></span> <button id="retry" type="button">Refresh saved jobs</button></div>
+    <div class="den-layout">
+      <section class="start-panel panel" aria-labelledby="start-title">
+        <p class="eyebrow">SNIFFER → RAT ZERO · LOCAL PROOF</p><h2 id="start-title">Follow a funding trail.</h2><p>Follow the demo wallet to a later Pons launch.</p>
+        <dl class="scope-facts"><dt>Demo wallet</dt><dd class="mono" title="0x0000000000000000000000000000000000000007">0x0000…0007</dd><dt>Replay window</dt><dd>Blocks 90–130</dd><dt>Budget</dt><dd>Up to 5 calls · 1 handoff</dd></dl>
+        <form id="start-form"><label for="scenario">Choose a replay scenario</label><select id="scenario" name="scenario"><option value="FINDING">Recipient launches later</option><option value="NO_LAUNCH">No later launch in the tape</option><option value="INCOMPLETE_HISTORY">Recipient history is missing</option><option value="EXHAUSTED">Budget stops the job early</option></select><button id="start" class="primary" type="submit" disabled>Start replay job</button></form>
+        <p class="small">This uses the existing fixture wallet. Watching your own wallet needs a separate live collector.</p>
+      </section>
+      <div class="saved-column">
+        <section class="saved-panel" aria-labelledby="saved-title"><div class="section-heading"><h2 id="saved-title">Your saved jobs</h2><button id="refresh" type="button">Refresh</button></div><p id="empty">No saved jobs yet. Start a replay to try the loop.</p><div id="jobs" role="group" aria-label="Saved replay jobs"></div></section>
+        <section id="detail" class="panel" aria-labelledby="detail-title" tabindex="-1" hidden>
+          <div class="detail-heading"><div><p id="job-label" class="eyebrow"></p><h2 id="detail-title"></h2></div><span id="phase" class="badge"></span></div>
+          <p id="outcome"></p><p id="coverage" class="coverage"></p>
+          <ol id="timeline" class="timeline" aria-label="Replay progress"></ol>
+          <dl id="metrics" class="metrics"></dl>
+          <div class="actions"><button id="advance" class="primary" type="button">Run next replay step</button><button id="cancel" type="button">Cancel this replay job</button><button id="export" type="button">Export saved evidence</button></div>
+          <p id="return-note" class="small">Saved in your local SQLite file. Nothing runs while you are away.</p>
+          <section id="case" class="finding" aria-labelledby="case-title" hidden><p class="eyebrow">SYNTHETIC CASE · SUPPORTED CHANGE</p><h3 id="case-title">Found something.</h3><ul id="claims"></ul><p id="finding-id" class="small mono"></p></section>
+          <section id="notification" class="notification" aria-labelledby="notification-title" hidden><h3 id="notification-title">Return notification</h3><p class="badge">PREPARED ONLY · NOTHING SENT</p><p id="notification-text"></p></section>
+          <details id="receipts" hidden><summary id="receipt-summary">Saved receipts</summary><div class="table-wrap"><table><caption>Synthetic receipt availability</caption><thead><tr><th>Receipt</th><th>Block</th><th>Available at</th></tr></thead><tbody id="receipt-rows"></tbody></table></div></details>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer>THE RAT REMEMBERS. <span>Local prototype · 24 saved jobs maximum · no model spend</span></footer>
+</body>
+</html>

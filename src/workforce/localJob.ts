@@ -97,6 +97,11 @@ export class LocalRatJobs {
     } catch (error) { this.db.close(); throw error; }
   }
   close(): void { this.db.close(); }
+  listJobIds(limit = 24): string[] {
+    if (!Number.isInteger(limit) || limit < 1 || limit > 64) throw new Error('LOCAL_LIST_LIMIT_INVALID');
+    return (this.db.prepare('SELECT job_id FROM local_rat_jobs ORDER BY rowid DESC LIMIT ?').all(limit) as { job_id: string }[])
+      .map(row => row.job_id);
+  }
   private raw(jobId: string): { source: EvalCase; sourceDigest: string; revision: number; journal: LocalSnapshot[] } {
     return this.db.transaction(() => {
       const row = this.db.prepare('SELECT * FROM local_rat_jobs WHERE job_id = ?').get(jobId) as
@@ -143,6 +148,7 @@ export class LocalRatJobs {
   async inspect(jobId: string) {
     const data = await this.verified(jobId);
     return { ...data.snapshot, subject: data.source.job.subject, deadlineBlock: data.source.job.window.toBlock,
+      evalId: data.source.evalId,
       coverage: 'DECLARED_SYNTHETIC_FIXTURE_ONLY', budget: data.source.job.budget,
       usage: data.snapshot.receipt?.usage ?? { toolCalls: 0, handoffs: 0, modelCalls: 0, costMicrousd: 0 },
       usageScope: data.snapshot.phase === 'HALTED' ? 'LAST_COMPLETED_PREFIX_FAILED_ATTEMPTS_UNCOUNTED' : 'LOGICAL_REPLAY_RESERVATIONS',
