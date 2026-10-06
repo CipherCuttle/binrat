@@ -16,7 +16,7 @@ async function publicRead(request){
 }
 let store;
 try{
-  const [command,...rest]=process.argv.slice(2),allowed={init:['db','capture-id'],step:['db'],inspect:['db'],export:['db'],audit:['input'],restore:['db','input']};
+  const [command,...rest]=process.argv.slice(2),allowed={init:['db','capture-id'],'init-consecutive':['db','capture-id'],step:['db'],inspect:['db'],export:['db'],audit:['input'],restore:['db','input']};
   if(!Object.hasOwn(allowed,command))throw new Error('PROSPECTIVE_COMMAND_INVALID');const args={};
   for(let i=0;i<rest.length;i+=2){const key=rest[i]?.slice(2),value=rest[i+1];if(!rest[i]?.startsWith('--')||!allowed[command].includes(key)||!value||Object.hasOwn(args,key))throw new Error('PROSPECTIVE_ARGUMENT_INVALID');args[key]=value;}
   if(allowed[command].some(key=>!args[key]))throw new Error('PROSPECTIVE_ARGUMENT_REQUIRED');
@@ -27,12 +27,13 @@ try{
     if(data.mode!=='UNVERIFIED_PROSPECTIVE_EXPORT'||!Array.isArray(data.calls)||data.calls.length>48)throw new Error('PROSPECTIVE_EXPORT_INVALID');
     result=await auditProspective(JSON.parse(data.manifest.json),data.calls.map(row=>JSON.parse(row.json)));
   }else{
-    store=new ProspectiveJournal(args.db,command==='init'||command==='restore',['inspect','export'].includes(command));
+    store=new ProspectiveJournal(args.db,command==='init'||command==='init-consecutive'||command==='restore',['inspect','export'].includes(command));
     if(command==='restore'){
       if(statSync(args.input).size>12000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
       result=await store.restore(JSON.parse(readFileSync(args.input,'utf8')));
-    }else if(command==='init'){
-      const createdAtMs=Date.now();result=await store.register(await sealCapture({schemaVersion:'binrat.prospective-capture/1',provenance:'PUBLIC_RPC_SHADOW',captureId:args['capture-id'],
+    }else if(command==='init'||command==='init-consecutive'){
+      const createdAtMs=Date.now();result=await store.register(await sealCapture({schemaVersion:command==='init-consecutive'?'binrat.prospective-capture/2':'binrat.prospective-capture/1',
+        ...(command==='init-consecutive'?{discovery:{strategy:'CONSECUTIVE_NUMBERED_BLOCKS',maxBlocks:8}}:{}),provenance:'PUBLIC_RPC_SHADOW',captureId:args['capture-id'],
         funder:PROSPECTIVE_FUNDER,endpoint:PROSPECTIVE_RPC,createdAtMs,expiresAtMs:createdAtMs+86400000,maxRpcCalls:48,historyBlocks:8,maxWindowBlocks:200000,
         authority:{publicRpcRead:true,model:false,delivery:false,capital:false}}));
     }else result=command==='step'?await store.step(publicRead):command==='export'?store.export():await store.inspect(Date.now());

@@ -15,6 +15,17 @@ export interface ProspectiveManifest {
   authority:{ publicRpcRead:true; model:false; delivery:false; capital:false };
   digest:string;
 }
+export interface ConsecutiveManifest extends Omit<ProspectiveManifest,'schemaVersion'> {
+  schemaVersion:'binrat.prospective-capture/2';
+  discovery:{strategy:'CONSECUTIVE_NUMBERED_BLOCKS';maxBlocks:8};
+}
+export type CaptureManifest=ProspectiveManifest|ConsecutiveManifest;
+export interface ConsecutiveCoverage {
+  strategy:'CONSECUTIVE_NUMBERED_BLOCKS'; scope:'TOP_LEVEL_TRANSACTIONS_ONLY';
+  fromBlock:string|null;toBlock:string|null;throughBlock:string|null;
+  valid:boolean;complete:boolean;
+  blocks:{number:string;hash:string;readSequence:number;confirmationSequence:number}[];
+}
 export interface RpcRequest {jsonrpc:'2.0';id:number;method:string;params:unknown[]}
 export interface CaptureCall {
   sequence:number; previousDigest:string; digest:string; startedAtMs:number; completedAtMs:number|null;
@@ -28,8 +39,8 @@ export interface ProspectiveHandoff {
   evidenceSequences:number[]; authority:{research:true;network:false;provider:false;delivery:false;capital:false};
   remainingRpcCalls:number; digest:string;
 }
-type Phase='CREATED'|'SEARCHING'|'COLLECTING_HISTORY'|'HANDOFF_PREPARED'|'WATCHING'|'FOUND'|'INELIGIBLE'|'EXPIRED'|'EXHAUSTED'|'HALTED';
-type Stage='CHAIN'|'CODE'|'INITIAL_HEAD'|'SAMPLE'|'FUNDING_RECEIPT'|'HISTORY'|'FUNDING_RECHECK'|'PRE_HEAD'|'PRE_LOGS'|'HANDOFF_HEAD'|'WATCH_HEAD'|'WATCH_ANCHOR'|'RANGE_START'|'WATCH_LOGS'|'RANGE_ANCHOR'|'LAUNCH_RECEIPT'|'LAUNCH_BLOCK';
+type Phase='CREATED'|'SEARCHING'|'DISCOVERY_COMPLETE'|'COLLECTING_HISTORY'|'HANDOFF_PREPARED'|'WATCHING'|'FOUND'|'INELIGIBLE'|'EXPIRED'|'EXHAUSTED'|'HALTED';
+type Stage='CHAIN'|'CODE'|'INITIAL_HEAD'|'SAMPLE'|'SCAN_HEAD'|'SCAN_ANCHOR'|'SCAN_BLOCK'|'SCAN_CONFIRM'|'FUNDING_RECEIPT'|'HISTORY'|'FUNDING_RECHECK'|'PRE_HEAD'|'PRE_LOGS'|'HANDOFF_HEAD'|'WATCH_HEAD'|'WATCH_ANCHOR'|'RANGE_START'|'WATCH_LOGS'|'RANGE_ANCHOR'|'LAUNCH_RECEIPT'|'LAUNCH_BLOCK';
 type Obj=Record<string,any>;
 export interface ProspectiveState {
   mode:'LOCAL_READ_ONLY_SHADOW'; captureId:string; phase:Phase; stage:Stage; reason:string|null; rpcCalls:number;
@@ -39,32 +50,38 @@ export interface ProspectiveState {
     fundingBlock:string;launchBlock:string;handoffDigest:string;historyScope:string;evidenceSequences:number[];digest:string}|null;
   caseDiff:{provenance:'PUBLIC_RPC_SHADOW';beforeDigest:string;afterDigest:string;addedFacts:string[]}|null;
   notification:{state:'PREPARED_ONLY';deliveryAuthorized:false;id:string;text:string}|null;
-  discoveryCoverage:'SAMPLED_BLOCKS_ONLY'; authentication:'PROVIDER_REPORTED_LOCAL_CLOCK_NOT_EXTERNALLY_ATTESTED';
+  discoveryCoverage:'SAMPLED_BLOCKS_ONLY'|'CONTIGUOUS_NUMBERED_BLOCK_PREFIX';
+  discovery?:ConsecutiveCoverage;
+  authentication:'PROVIDER_REPORTED_LOCAL_CLOCK_NOT_EXTERNALLY_ATTESTED';
   nextRequest:RpcRequest|null; snapshotDigest:string;
 }
 const ajv=new Ajv2020({strict:true});
 const manifestShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V1.schema.json','utf8')));
+const consecutiveShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V2.schema.json','utf8')));
 const handoffShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_HANDOFF_V1.schema.json','utf8')));
 const fail=(code='PROSPECTIVE_RESPONSE_INVALID'):never=>{throw new Error(code)};
 const obj=(v:unknown):Obj=>v&&typeof v==='object'&&!Array.isArray(v)?v as Obj:fail();
 const hex=(v:unknown,n:number):string=>typeof v==='string'&&new RegExp(`^0x[a-f0-9]{${n}}$`).test(v)?v:fail();
 const quantity=(v:unknown):bigint=>typeof v==='string'&&/^0x(?:0|[1-9a-f][0-9a-f]{0,63})$/.test(v)?BigInt(v):fail();
 const q=(n:bigint):string=>`0x${n.toString(16)}`;
-const terminal=(s:ProspectiveState)=>['FOUND','INELIGIBLE','EXPIRED','EXHAUSTED','HALTED'].includes(s.phase);
+const terminal=(s:ProspectiveState)=>['FOUND','DISCOVERY_COMPLETE','INELIGIBLE','EXPIRED','EXHAUSTED','HALTED'].includes(s.phase);
 export const captureTerminal=(s:ProspectiveState)=>terminal(s);
 export async function sealCapture<T extends object>(value:T):Promise<T & {digest:string}> {
   const copy={...value} as Record<string,unknown>;delete copy.digest;return {...value,digest:await sha256Hex(copy)} as T & {digest:string};
 }
-export async function validateProspectiveManifest(input:unknown):Promise<ProspectiveManifest> {
-  if(!manifestShape(input))fail('PROSPECTIVE_MANIFEST_INVALID');
+export async function validateProspectiveManifest(input:unknown):Promise<CaptureManifest> {
+  if(!manifestShape(input)&&!consecutiveShape(input))fail('PROSPECTIVE_MANIFEST_INVALID');
   const m=obj(input);
-  if(Object.keys(m).sort().join(',')!=='authority,captureId,createdAtMs,digest,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion'||
-    m.schemaVersion!=='binrat.prospective-capture/1'||m.provenance!=='PUBLIC_RPC_SHADOW'||m.endpoint!==PROSPECTIVE_RPC||m.funder!==PROSPECTIVE_FUNDER||
+  const v2=m.schemaVersion==='binrat.prospective-capture/2';
+  const keys=v2?'authority,captureId,createdAtMs,digest,discovery,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion':
+    'authority,captureId,createdAtMs,digest,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion';
+  if(Object.keys(m).sort().join(',')!==keys||
+    (!v2&&m.schemaVersion!=='binrat.prospective-capture/1')||m.provenance!=='PUBLIC_RPC_SHADOW'||m.endpoint!==PROSPECTIVE_RPC||m.funder!==PROSPECTIVE_FUNDER||
     typeof m.captureId!=='string'||!/^[a-zA-Z0-9_:-]{1,100}$/.test(m.captureId)||m.maxRpcCalls!==48||m.historyBlocks!==8||m.maxWindowBlocks!==200000||
     !Number.isSafeInteger(m.createdAtMs)||m.createdAtMs<0||m.expiresAtMs!==m.createdAtMs+86400000||
     canonicalJson(m.authority)!==canonicalJson({publicRpcRead:true,model:false,delivery:false,capital:false})||
     (await sealCapture(m)).digest!==m.digest)fail('PROSPECTIVE_MANIFEST_INVALID');
-  return structuredClone(m) as ProspectiveManifest;
+  return structuredClone(m) as CaptureManifest;
 }
 function block(value:unknown,full:boolean):Obj {
   const b=obj(value);hex(b.hash,64);hex(b.parentHash,64);quantity(b.number);
@@ -107,15 +124,23 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
   const s:ProspectiveState={mode:'LOCAL_READ_ONLY_SHADOW',captureId:m.captureId,phase:'CREATED',stage:'CHAIN',reason:null,rpcCalls:0,initialBlock:null,cursor:null,throughBlock:null,
     funding:null,fundingBlock:null,history:[],handoff:null,finding:null,caseDiff:null,notification:null,discoveryCoverage:'SAMPLED_BLOCKS_ONLY',
     authentication:'PROVIDER_REPORTED_LOCAL_CLOCK_NOT_EXTERNALLY_ATTESTED',nextRequest:null,snapshotDigest:''};
+  if(m.schemaVersion==='binrat.prospective-capture/2'){
+    s.discoveryCoverage='CONTIGUOUS_NUMBERED_BLOCK_PREFIX';
+    s.discovery={strategy:'CONSECUTIVE_NUMBERED_BLOCKS',scope:'TOP_LEVEL_TRANSACTIONS_ONLY',fromBlock:null,toBlock:null,throughBlock:null,valid:true,complete:false,blocks:[]};
+  }
   let preHead:Obj|null=null,handoffHead:Obj|null=null,rangeBlock:Obj|null=null,rangeStart:Obj|null=null,rangeLog:Obj|null=null;
+  let scanHead:Obj|null=null,scanBlock:Obj|null=null,scanReadSequence=0,scanCursorTime=0n,scanInitialHash:string|null=null;
   let cursorHash:string|null=null;
+  const discoveryCursor=()=>BigInt(s.discovery!.throughBlock??s.initialBlock!);
   let previousDigest=m.digest,previousTime=m.createdAtMs;
   const request=():RpcRequest|null=>{
     if(terminal(s))return null;let method='',params:unknown[]=[];
     switch(s.stage){
       case 'CHAIN':method='eth_chainId';break;
       case 'CODE':method='eth_getCode';params=[PONS_V2_FACTORY,'latest'];break;
-      case 'INITIAL_HEAD':case 'PRE_HEAD':case 'HANDOFF_HEAD':case 'WATCH_HEAD':method='eth_getBlockByNumber';params=['latest',false];break;
+      case 'INITIAL_HEAD':case 'SCAN_HEAD':case 'PRE_HEAD':case 'HANDOFF_HEAD':case 'WATCH_HEAD':method='eth_getBlockByNumber';params=['latest',false];break;
+      case 'SCAN_ANCHOR':method='eth_getBlockByNumber';params=[q(discoveryCursor()),false];break;
+      case 'SCAN_BLOCK':case 'SCAN_CONFIRM':method='eth_getBlockByNumber';params=[q(discoveryCursor()+1n),s.stage==='SCAN_BLOCK'];break;
       case 'SAMPLE':method='eth_getBlockByNumber';params=['latest',true];break;
       case 'FUNDING_RECEIPT':method='eth_getTransactionReceipt';params=[s.funding!.hash];break;
       case 'HISTORY':method='eth_getBlockByNumber';params=[q(quantity(s.fundingBlock!.number)-8n+BigInt(s.history.length)),true];break;
@@ -151,7 +176,48 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
       switch(s.stage){
         case 'CHAIN':if(quantity(result)!==4663n)fail('PROSPECTIVE_CHAIN_DRIFT');s.stage='CODE';break;
         case 'CODE':if(typeof result!=='string'||keccak256(result as Hex)!==PONS_V2_FACTORY_CODE_HASH)fail('PROSPECTIVE_FACTORY_DRIFT');s.stage='INITIAL_HEAD';break;
-        case 'INITIAL_HEAD':{const b=block(result,false);pointTime(b,c.completedAtMs!);s.initialBlock=quantity(b.number).toString();s.phase='SEARCHING';s.stage='SAMPLE';break;}
+        case 'INITIAL_HEAD':{
+          const b=block(result,false);pointTime(b,c.completedAtMs!);s.initialBlock=quantity(b.number).toString();s.phase='SEARCHING';s.stage='SAMPLE';
+          if(s.discovery){
+            if(quantity(b.number)>99999999999999999991n)fail();
+            s.discovery.fromBlock=(quantity(b.number)+1n).toString();s.discovery.toBlock=(quantity(b.number)+8n).toString();
+            scanInitialHash=b.hash;cursorHash=b.hash;scanCursorTime=quantity(b.timestamp);s.stage='SCAN_HEAD';
+          }break;
+        }
+        case 'SCAN_HEAD':{
+          scanHead=block(result,false);pointTime(scanHead,c.completedAtMs!);
+          if(quantity(scanHead.number)<discoveryCursor())fail('PROSPECTIVE_HEAD_REGRESSED');
+          if(quantity(scanHead.number)===discoveryCursor()&&(scanHead.hash!==cursorHash||quantity(scanHead.timestamp)!==scanCursorTime))fail('PROSPECTIVE_DISCOVERY_CURSOR_REORG');
+          if(quantity(scanHead.number)>BigInt(s.initialBlock!)+BigInt(m.maxWindowBlocks)){s.phase='EXPIRED';s.reason='PARTIAL_DISCOVERY_WINDOW_ENDED';break;}
+          if(quantity(scanHead.number)>discoveryCursor())s.stage='SCAN_ANCHOR';
+          break;
+        }
+        case 'SCAN_ANCHOR':{
+          const b=block(result,false);
+          if(quantity(b.number)!==discoveryCursor()||b.hash!==cursorHash||quantity(b.timestamp)!==scanCursorTime)fail('PROSPECTIVE_DISCOVERY_CURSOR_REORG');
+          s.stage='SCAN_BLOCK';break;
+        }
+        case 'SCAN_BLOCK':{
+          scanBlock=block(result,true);
+          if(quantity(scanBlock.number)!==discoveryCursor()+1n||scanBlock.parentHash!==cursorHash||
+            quantity(scanBlock.timestamp)<scanCursorTime||quantity(scanBlock.timestamp)>quantity(scanHead!.timestamp))fail('PROSPECTIVE_DISCOVERY_GAP_OR_FORK');
+          if(scanBlock.hash===scanInitialHash||s.discovery!.blocks.some(b=>b.hash===scanBlock!.hash))fail('PROSPECTIVE_DISCOVERY_REPEATED_HASH');
+          scanReadSequence=c.sequence;s.stage='SCAN_CONFIRM';break;
+        }
+        case 'SCAN_CONFIRM':{
+          const b=block(result,false);
+          if(b.number!==scanBlock!.number||b.hash!==scanBlock!.hash||b.parentHash!==scanBlock!.parentHash||b.timestamp!==scanBlock!.timestamp||
+            canonicalJson(b.transactions)!==canonicalJson(scanBlock!.transactions.map((tx:Obj)=>tx.hash)))fail('PROSPECTIVE_DISCOVERY_CONFIRMATION_MISMATCH');
+          const coverage=s.discovery!;
+          coverage.blocks.push({number:quantity(b.number).toString(),hash:b.hash,readSequence:scanReadSequence,confirmationSequence:c.sequence});
+          coverage.throughBlock=quantity(b.number).toString();coverage.complete=coverage.throughBlock===coverage.toBlock;
+          cursorHash=b.hash;scanCursorTime=quantity(b.timestamp);
+          const tx=scanBlock!.transactions.find((t:Obj)=>t.from===m.funder&&t.to!==null&&t.to!==t.from&&quantity(t.value)>0n);
+          if(tx){s.funding=tx;s.fundingBlock=scanBlock;s.stage='FUNDING_RECEIPT';s.phase='COLLECTING_HISTORY';}
+          else if(coverage.complete){s.phase='DISCOVERY_COMPLETE';s.reason='NO_QUALIFYING_TRANSFER_IN_DECLARED_TOP_LEVEL_INTERVAL';}
+          else s.stage='SCAN_HEAD';
+          break;
+        }
         case 'SAMPLE':{
           const b=block(result,true);pointTime(b,c.completedAtMs!);const number=quantity(b.number);
           if(number>BigInt(s.initialBlock!)+BigInt(m.maxWindowBlocks)){s.phase='EXPIRED';s.reason='PARTIAL_DISCOVERY_WINDOW_ENDED';break;}
@@ -219,7 +285,7 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
           s.finding=await sealCapture(content);s.caseDiff={provenance:'PUBLIC_RPC_SHADOW',beforeDigest:s.handoff!.digest,afterDigest:s.finding.digest,addedFacts:['PONS_REPORTED_DEPLOYER_LAUNCH','FUNDING_PRECEDES_LAUNCH','LAUNCH_AFTER_LOCAL_HANDOFF']};s.notification={state:'PREPARED_ONLY',deliveryAuthorized:false,id:s.finding.digest,text:'Recorded direct funding, bounded recipient-window absence, then a Pons launch after the prepared handoff. Nothing sent.'};s.phase='FOUND';s.reason='SUPPORTED_LAUNCH_AFTER_LOCAL_HANDOFF';break;
         }
       }
-    }catch(error){if(c!==calls.at(-1))fail('PROSPECTIVE_JOURNAL_INVALID');s.phase='HALTED';s.reason=error instanceof Error&&/^[A-Z][A-Z0-9_]{0,100}$/.test(error.message)?error.message:'PROSPECTIVE_RESPONSE_INVALID';break;}
+    }catch(error){if(c!==calls.at(-1))fail('PROSPECTIVE_JOURNAL_INVALID');if(s.discovery&&s.stage.startsWith('SCAN_')){s.discovery.valid=false;s.discovery.complete=false;}s.phase='HALTED';s.reason=error instanceof Error&&/^[A-Z][A-Z0-9_]{0,100}$/.test(error.message)?error.message:'PROSPECTIVE_RESPONSE_INVALID';break;}
   }
   if(!terminal(s)&&s.rpcCalls===m.maxRpcCalls){s.phase='EXHAUSTED';s.reason='ORIGIN_RPC_BUDGET_EXHAUSTED';}
   if(!terminal(s)&&now!==undefined&&now>m.expiresAtMs){s.phase='EXPIRED';s.reason='WALL_DEADLINE_PARTIAL_COVERAGE';}
