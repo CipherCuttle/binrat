@@ -30,6 +30,8 @@ export interface CommsEvalCase {
 export interface CommsEvalCaseResult {
   id: string;
   source: CommsEvalSource;
+  providerCallSucceeded: boolean;
+  draftContractPass: boolean;
   modelCallSucceeded: boolean;
   decision: CommsDecisionKind | null;
   expectedDecision: CommsDecisionKind;
@@ -43,6 +45,7 @@ export interface CommsEvalCaseResult {
   inputTokens: number | null;
   outputTokens: number | null;
   durationMs: number | null;
+  rawOutput: string | null;
   x: string | null;
   telegram: string | null;
   error: string | null;
@@ -51,6 +54,8 @@ export interface CommsEvalCaseResult {
 export interface CommsEvalSummary {
   schemaVersion: 'binrat.comms-eval-summary/1';
   totalCases: number;
+  providerCallSuccesses: number;
+  draftContractPasses: number;
   modelCallSuccesses: number;
   hardFidelityPasses: number;
   receiptPasses: number;
@@ -63,6 +68,7 @@ export interface CommsEvalSummary {
   manualEditReviewRequired: boolean;
   autonomyVerdict:
     | 'BLOCKED_PROVIDER_FAILURE'
+    | 'BLOCKED_OUTPUT_CONTRACT'
     | 'BLOCKED_UNSUPPORTED_CLAIMS'
     | 'BLOCKED_AUTOMATIC_QUALITY'
     | 'MANUAL_EDIT_REVIEW_REQUIRED';
@@ -138,6 +144,8 @@ export function evaluateCommsDraftAttempt(
   return {
     id: testCase.id,
     source: testCase.source,
+    providerCallSucceeded: true,
+    draftContractPass: true,
     modelCallSucceeded: true,
     decision: attempt.bundle.decision,
     expectedDecision: testCase.expectedDecision,
@@ -151,20 +159,32 @@ export function evaluateCommsDraftAttempt(
     inputTokens: attempt.writerReceipt.usage?.inputTokens ?? null,
     outputTokens: attempt.writerReceipt.usage?.outputTokens ?? null,
     durationMs,
+    rawOutput: null,
     x: attempt.bundle.drafts.x,
     telegram: attempt.bundle.drafts.telegram,
     error: null,
   };
 }
 
+export interface FailedCommsEvalOptions {
+  providerCallSucceeded?: boolean;
+  inputTokens?: number | null;
+  outputTokens?: number | null;
+  durationMs?: number | null;
+  rawOutput?: string | null;
+}
+
 export function failedCommsEvalCase(
   testCase: CommsEvalCase,
   error: string,
-  durationMs: number | null = null,
+  options: FailedCommsEvalOptions = {},
 ): CommsEvalCaseResult {
+  const providerCallSucceeded = options.providerCallSucceeded ?? false;
   return {
     id: testCase.id,
     source: testCase.source,
+    providerCallSucceeded,
+    draftContractPass: false,
     modelCallSucceeded: false,
     decision: null,
     expectedDecision: testCase.expectedDecision,
@@ -175,9 +195,10 @@ export function failedCommsEvalCase(
     forbiddenClaims: [],
     hardFidelityPass: false,
     automaticCandidate: false,
-    inputTokens: null,
-    outputTokens: null,
-    durationMs,
+    inputTokens: options.inputTokens ?? null,
+    outputTokens: options.outputTokens ?? null,
+    durationMs: options.durationMs ?? null,
+    rawOutput: options.rawOutput ?? null,
     x: null,
     telegram: null,
     error,
@@ -187,14 +208,22 @@ export function failedCommsEvalCase(
 export function summarizeCommsEval(
   results: CommsEvalCaseResult[],
 ): CommsEvalSummary {
-  const modelCallSuccesses = results.filter((item) => item.modelCallSucceeded).length;
+  const providerCallSuccesses = results.filter(
+    (item) => item.providerCallSucceeded,
+  ).length;
+  const draftContractPasses = results.filter(
+    (item) => item.draftContractPass,
+  ).length;
+  const modelCallSuccesses = draftContractPasses;
   const hardFidelityPasses = results.filter((item) => item.hardFidelityPass).length;
   const receiptPasses = results.filter((item) => item.receiptPresent).length;
   const automaticCandidates = results.filter((item) => item.automaticCandidate).length;
   const unsupportedClaimFailures = results.filter(
     (item) => item.capabilityUpgradeCount > 0 || item.forbiddenClaims.length > 0,
   ).length;
-  const decisionMismatches = results.filter((item) => !item.decisionMatches).length;
+  const decisionMismatches = results.filter(
+    (item) => item.draftContractPass && !item.decisionMatches,
+  ).length;
   const totalInputTokens = results.reduce(
     (sum, item) => sum + (item.inputTokens ?? 0),
     0,
@@ -209,8 +238,10 @@ export function summarizeCommsEval(
   );
 
   let autonomyVerdict: CommsEvalSummary['autonomyVerdict'];
-  if (modelCallSuccesses !== results.length) {
+  if (providerCallSuccesses !== results.length) {
     autonomyVerdict = 'BLOCKED_PROVIDER_FAILURE';
+  } else if (draftContractPasses !== results.length) {
+    autonomyVerdict = 'BLOCKED_OUTPUT_CONTRACT';
   } else if (unsupportedClaimFailures > 0) {
     autonomyVerdict = 'BLOCKED_UNSUPPORTED_CLAIMS';
   } else if (
@@ -225,6 +256,8 @@ export function summarizeCommsEval(
   return {
     schemaVersion: 'binrat.comms-eval-summary/1',
     totalCases: results.length,
+    providerCallSuccesses,
+    draftContractPasses,
     modelCallSuccesses,
     hardFidelityPasses,
     receiptPasses,
