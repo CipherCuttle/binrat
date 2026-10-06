@@ -14,7 +14,7 @@ Only after those pass do we manually score edit burden and voice.
 
 ## Dataset
 
-historical-v1.json freezes 12 historical PR-backed cases spanning one-shot archive evidence, offline indexed discovery, an expired funding capture, retrospective replay, localhost Den jobs, failed benchmark qualification, a chronology miss, offline workforce contracts, frontdoor candidates, read-only stake facts and blocked launch authority.
+historical-v1.json freezes 12 historical PR-backed cases spanning one-shot archive evidence, offline indexed discovery, an expired funding capture, retrospective replay, localhost Den jobs, failed benchmark qualification, a chronology miss, offline workforce contracts, frontdoor resilience, read-only stake facts, read-only Pons preflight and blocked launch authority.
 
 Every case has an exact source PR/title/head, structured CommsEvent, expected final decision, expected receipt strings and fixture-specific forbidden positive claims.
 
@@ -41,3 +41,5 @@ The eventual autonomy gate is zero unsupported factual upgrades, at least 70% AS
 ## Non-scope
 
 No X/TG/OpenPost publishing, scheduling, merge, deployment, token marketing, launch authority or autonomous public communication is introduced by this evaluation pack.
+
+The forbidden-claim list is intentionally bounded and is not a proof of semantic completeness. Passing automatic checks still requires manual editorial review.
