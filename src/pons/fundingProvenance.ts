@@ -222,26 +222,29 @@ export class AlchemyPonsFundingSource implements PonsFundingSource {
     );
     if (!transfer) return null;
 
-    const from = String(transfer.from ?? '').toLowerCase() as Hex;
-    const to = String(transfer.to ?? '').toLowerCase() as Hex;
-    const txHash = String(transfer.hash ?? '').toLowerCase() as Hex;
-    const blockNumber = parseHexQuantity(transfer.blockNum, 'PONS_FUNDING_TRANSFER_BLOCK_INVALID');
-    const rawValue = transfer.rawContract?.value;
-    const valueWei = parseHexQuantity(rawValue, 'PONS_FUNDING_TRANSFER_VALUE_INVALID');
-
-    assertAddress(from, 'PONS_FUNDING_SOURCE_INVALID');
-    assertAddress(to, 'PONS_FUNDING_TRANSFER_TO_INVALID');
-    assertHash(txHash, 'PONS_FUNDING_TX_HASH_INVALID');
-    if (to !== deployer.toLowerCase()) throw new Error('PONS_FUNDING_TRANSFER_DEPLOYER_MISMATCH');
-    if (transfer.category !== 'external') throw new Error('PONS_FUNDING_TRANSFER_CATEGORY_INVALID');
-    if (transfer.rawContract?.address !== null && transfer.rawContract?.address !== undefined) {
-      throw new Error('PONS_FUNDING_TRANSFER_NOT_NATIVE');
-    }
-    if (valueWei <= 0n) throw new Error('PONS_FUNDING_TRANSFER_VALUE_INVALID');
-    if (blockNumber > throughBlockInclusive) throw new Error('PONS_FUNDING_TRANSFER_AFTER_BOUNDARY');
-
-    return { from, to, txHash, blockNumber, valueWei };
+    const candidate = parsePonsExternalNativeCandidate(transfer);
+    if (candidate.to !== deployer.toLowerCase()) throw new Error('PONS_FUNDING_TRANSFER_DEPLOYER_MISMATCH');
+    if (candidate.blockNumber > throughBlockInclusive) throw new Error('PONS_FUNDING_TRANSFER_AFTER_BOUNDARY');
+    return candidate;
   }
+}
+
+/** Shared native-transfer parsing. Indexed results remain candidate locators only. */
+export function parsePonsExternalNativeCandidate(input: unknown): PonsExternalNativeInboundCandidate {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('PONS_FUNDING_TRANSFER_INVALID');
+  const transfer = input as NonNullable<NonNullable<AlchemyTransferResponse['result']>['transfers']>[number];
+  const from = String(transfer.from ?? '').toLowerCase() as Hex;
+  const to = String(transfer.to ?? '').toLowerCase() as Hex;
+  const txHash = String(transfer.hash ?? '').toLowerCase() as Hex;
+  const blockNumber = parseHexQuantity(transfer.blockNum, 'PONS_FUNDING_TRANSFER_BLOCK_INVALID');
+  const valueWei = parseHexQuantity(transfer.rawContract?.value, 'PONS_FUNDING_TRANSFER_VALUE_INVALID');
+  assertAddress(from, 'PONS_FUNDING_SOURCE_INVALID');
+  assertAddress(to, 'PONS_FUNDING_TRANSFER_TO_INVALID');
+  assertHash(txHash, 'PONS_FUNDING_TX_HASH_INVALID');
+  if (transfer.category !== 'external') throw new Error('PONS_FUNDING_TRANSFER_CATEGORY_INVALID');
+  if (transfer.rawContract?.address !== null && transfer.rawContract?.address !== undefined) throw new Error('PONS_FUNDING_TRANSFER_NOT_NATIVE');
+  if (valueWei <= 0n) throw new Error('PONS_FUNDING_TRANSFER_VALUE_INVALID');
+  return {from, to, txHash, blockNumber, valueWei};
 }
 
 export async function readPonsPrelaunchNativeInbound(

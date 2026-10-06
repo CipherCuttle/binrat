@@ -6,6 +6,15 @@ import { auditProspective, captureTerminal, sealCapture, validateProspectiveMani
 
 export interface RpcAttempt {rawResponse:string;error:string|null}
 export type PublicReadTransport=(request:RpcRequest)=>Promise<RpcAttempt>;
+/** Explicit two-source routing; each injected invocation is one journaled attempt, without retries. */
+export function indexedCaptureTransport(publicReads:PublicReadTransport,indexedReads:PublicReadTransport):PublicReadTransport {
+  return request=>{
+    const copy=structuredClone(request);
+    if(copy.method==='alchemy_getAssetTransfers')return indexedReads(copy);
+    if(!['eth_chainId','eth_getCode','eth_getBlockByNumber','eth_getTransactionReceipt','eth_getLogs'].includes(copy.method))throw new Error('PROSPECTIVE_METHOD_NOT_ALLOWED');
+    return publicReads(copy);
+  };
+}
 const APPLICATION_ID=0x42525031;
 export class ProspectiveJournal {
   private readonly db:Database.Database;
@@ -89,6 +98,7 @@ export class ProspectiveJournal {
       const after=await this.inspect(now());
       // One logical boundary per invocation. Subsequent observation requires an explicit manual step.
       if(captureTerminal(after)||after.phase==='HANDOFF_PREPARED'||
+        (after.stage==='INDEX_HEAD'&&(before.stage==='INDEX_HEAD'||before.stage==='INDEX_CONFIRM'))||
         (after.stage==='SCAN_HEAD'&&(before.stage==='SCAN_HEAD'||before.stage==='SCAN_CONFIRM'))||
         (after.stage==='SAMPLE'&&pending.request.method==='eth_getBlockByNumber'&&pending.request.params[1]===true)||
         (after.stage==='WATCH_HEAD'&&(before.stage==='WATCH_HEAD'||before.stage==='RANGE_ANCHOR')))return after;

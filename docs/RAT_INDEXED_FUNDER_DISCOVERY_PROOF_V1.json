@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "binrat.indexed-discovery-proof/1",
+  "provenance": "SYNTHETIC_TRANSPORT_CONTROL",
+  "baseCommit": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+  "indexedSource": "ALCHEMY_ROBINHOOD_ARCHIVE",
+  "originalRpcBudget": 48,
+  "maximumPagesPerRange": 3,
+  "pageSize": 5,
+  "maxRangeBlocks": 4096,
+  "controls": {
+    "handoffAttempts": 22,
+    "findingAttempts": 29,
+    "secondPageHandoffAttempts": 23,
+    "indexedTestsPassed": 11,
+    "repositoryTestsPassed": 591
+  },
+  "validation": {
+    "typeScript": "PASS",
+    "web": "PASS",
+    "productSurfaceV2": "PASS",
+    "targetedRereview": "PASS",
+    "unchangedInheritedEvidenceContractLockFiles": 34,
+    "savedRealV2Snapshot": "df0faa7fbc00b0e8032753bbbdce5275e323e2178fc054da36b5b4160f4ffc7a"
+  },
+  "review": {
+    "kind": "one hostile self-review and one targeted rereview",
+    "independentReviewer": false,
+    "fixedMediumFindings": [
+      "selected head/range anchor identity",
+      "candidate timestamp lower bound"
+    ],
+    "unresolvedCriticalHigh": 0,
+    "closed": true
+  },
+  "live": {
+    "providerCompatibility": "UNVERIFIED",
+    "providerFreshness": "UNVERIFIED",
+    "providerLatency": "UNVERIFIED",
+    "newRpcCalls": 0,
+    "newModelCalls": 0,
+    "newModelCostUSD": "0.000000",
+    "keylessCliIndexedStep": "BLOCKED_BEFORE_RESERVATION",
+    "delivery": false,
+    "productionActivation": false,
+    "merge": false,
+    "deployment": false
+  },
+  "fileSha256": {
+    "scripts/capture-prospective-rat.mjs": "af70970190dc26bdf21e7a0ba25c094825304ac114249a0ac56dd7a282fdefcb",
+    "src/pons/fundingProvenance.ts": "e35c5ede8e780b0c6a1a837f7c5e966493b90336e9ca12c455aa989f8800b47a",
+    "src/pons/fundingOutgoing.ts": "47757f87693469f5ec81ff34e6bc0573ff047872afbaa2d4a635c0786df9fd37",
+    "src/workforce/prospective.ts": "a91287de49f2d9314b47b4aa2cb38b4ea87d6de93e7af76a8dda729cb664fef2",
+    "src/workforce/prospectiveJournal.ts": "ad6141bf2c6fff1e7154b89ff786e283685acfa38d7c34bb103a298cff9229db",
+    "contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V3.schema.json": "11b768d984b1b7e313a17c2a471999604408a84c2ed5060f365223d479cd96d5",
+    "test/ratIndexedDiscovery.test.ts": "432551c3dfed5872d6bd49df7c7fbaeab0336cd896c80c4922317471c82d1051",
+    "docs/RAT_INDEXED_FUNDER_DISCOVERY_V1.md": "e2a71472bb759757bdec1422729159187a5e7764705fdc75f33e326b8e4a5e3a"
+  }
+}

@@ -36,7 +36,11 @@ try{
         ...(command==='init-consecutive'?{discovery:{strategy:'CONSECUTIVE_NUMBERED_BLOCKS',maxBlocks:8}}:{}),provenance:'PUBLIC_RPC_SHADOW',captureId:args['capture-id'],
         funder:PROSPECTIVE_FUNDER,endpoint:PROSPECTIVE_RPC,createdAtMs,expiresAtMs:createdAtMs+86400000,maxRpcCalls:48,historyBlocks:8,maxWindowBlocks:200000,
         authority:{publicRpcRead:true,model:false,delivery:false,capital:false}}));
-    }else result=command==='step'?await store.step(publicRead):command==='export'?store.export():await store.inspect(Date.now());
+    }else {
+      // V3 has an explicit second source. This keyless CLI must never send its indexed method to public RPC.
+      if(command==='step'&&JSON.parse(store.export().manifest.json).schemaVersion==='binrat.prospective-capture/3')throw new Error('INDEXED_CAPTURE_REQUIRES_EXPLICIT_ARCHIVE_TRANSPORT');
+      result=command==='step'?await store.step(publicRead):command==='export'?store.export():await store.inspect(Date.now());
+    }
   }
   if(result.mode==='LOCAL_READ_ONLY_SHADOW'){const {fundingBlock,history,funding,nextRequest,...summary}=result;result={...summary,funding:funding?{txHash:funding.hash,from:funding.from,to:funding.to,valueWei:BigInt(funding.value).toString(),blockNumber:BigInt(funding.blockNumber).toString()}:null,historyBlocksCaptured:history.length,nextRpc:nextRequest};}
   console.log(JSON.stringify(result,null,2));if(['HALTED','EXHAUSTED'].includes(result.phase))process.exitCode=1;
