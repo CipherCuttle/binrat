@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:PONS_SIGNED_ENVELOPE_V1.schema.json",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.pons-signed-envelope/1"
+    },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "envelopeDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "localSignedTxHash": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{64}$"
+    },
+    "signedTransaction": {
+      "type": "string",
+      "pattern": "^0x02([a-fA-F0-9]{2})+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "manifestDigest",
+    "envelopeDigest",
+    "localSignedTxHash",
+    "signedTransaction",
+    "digest"
+  ],
+  "additionalProperties": false
+}

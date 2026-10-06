@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "binrat.pons-forensic-requirements/1",
+  "stakingRequired": true,
+  "workingRatStatus": "PLANNED",
+  "productionEntitlementActive": false,
+  "questions": [
+    {
+      "id": "source_runtime",
+      "exactReadCallSource": "Match every obtainable authoritative source/compiler/settings to deployed runtime hashes; otherwise document bounded retrieval and reproduce deployed behavior.",
+      "pass": "Exact runtime/compiler/ABI match or independently reproduced deployed behavior plus scoped residual acceptance.",
+      "failBlockBehavior": "Available unmatched source or unknown critical behavior blocks ARMED.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "factory_launcher_registry",
+      "exactReadCallSource": "eth_chainId; pinned eth_getCode/codehash/controllers for all mandatory dependencies and any ERC20 asset; launcher ponsFactory()/registry(); registry factoryByTemplate(bytes32(staking)); Pons factory launchDeployer()/launchForwarder()/memeHook()/feeEscrow()/locker()/graduationExecutor(); independently prove any additional critical path.",
+      "pass": "Exact manifest graph, selectors, codehashes and controllers at the pinned pre-send state and both launch/finalized verification blocks.",
+      "failBlockBehavior": "Any drift or unknown forwarding binding blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "permissions",
+      "exactReadCallSource": "Pinned canLaunch(exact launch wallet) and canLaunch(exact launcher/caller); current launchEnabled and relevant whitelist values.",
+      "pass": "Exact relevant callers permitted; permission semantics independently proven.",
+      "failBlockBehavior": "False or ambiguous caller blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "config_economics",
+      "exactReadCallSource": "Pinned getLaunchConfig(id), previewLaunchEconomics(id,address(0)), launchFee(), snipeTaxStartBps(), snipeTaxSeconds(), hook fee-policy reads; independently reconstruct ten-field hash.",
+      "pass": "Enabled reviewed config and exact full economics/value/anti-snipe match.",
+      "failBlockBehavior": "Drift, missing economics, or zero guard blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "staking_graph",
+      "exactReadCallSource": "Registry lookup; factory beacon()/implementation()/owner(); beacon implementation()/owner(); codehashes and controller code/account type.",
+      "pass": "Exact reviewed chain and all upgrade/controller identities.",
+      "failBlockBehavior": "Unknown or changed authority blocks; known shared upgrades need bounded acceptance.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "creation_abi",
+      "exactReadCallSource": "Disassemble exact deployed factory/launcher selectors; reproduce launchWithVault and createVault call stack in pinned fork/trace.",
+      "pass": "Exact argument layout, config bytes and creation path established.",
+      "failBlockBehavior": "UI ABI alone or uncertain config/recipient encoding blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "prediction",
+      "exactReadCallSource": "Prove deployed token/curve derivation under frozen salt/inputs while perturbing relevant third-party mutable state; repeat factory CREATE nonce advancement.",
+      "pass": "Only independently stable predictions immutable; vault always provisional.",
+      "failBlockBehavior": "Unproven stability requires downgrade and a newly frozen manifest.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "literal_vault_independence",
+      "exactReadCallSource": "Inspect calldata and all resolved role/permission/entitlement/accounting dependencies; prove address-independent creation/binding in trace.",
+      "pass": "No literal predicted vault dependency before BROADCAST.",
+      "failBlockBehavior": "Any dependency blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "token_vault_provenance",
+      "exactReadCallSource": "Execution trace/event/state; actual created-by factory path; launcher vaultOf(actual token); vault token(); curve token()/pairToken(); beacon storage slot.",
+      "pass": "Actual BINRAT token bound to actual expected-path Staking vault.",
+      "failBlockBehavior": "Mismatch CONFIRMED to ABORT/RECONCILE, never VERIFIED/PUBLIC.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "payout_floor",
+      "exactReadCallSource": "Inspect deployed initializer/config decoding and storage; fork test floor-1, floor and selected payout threshold.",
+      "pass": "Exact units and real contract floor proven, selected threshold encoded/stored.",
+      "failBlockBehavior": "UI suggested floor or uncertain threshold blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "lock_period",
+      "exactReadCallSource": "Inspect initializer/config fields and runtime; pinned fork stake, immediate/early/boundary withdrawal and repeated-deposit behavior.",
+      "pass": "Actual lock/no-lock behavior and principal/reward distinction proven.",
+      "failBlockBehavior": "No getter is not proof of no lock; ambiguity blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "principal_safety",
+      "exactReadCallSource": "Pinned fork deposit/withdraw/claim and fee-accrual scenarios using deployed code; verify principal accounting cannot be spent as fees/rewards.",
+      "pass": "Principal preserved, stakedOf/total coherent, all controller powers disclosed.",
+      "failBlockBehavior": "Any unresolved principal or withdrawal behavior blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "asset_semantics",
+      "exactReadCallSource": "Trace real native/ERC20 transfers and balance deltas through fee escrow/locker/sweep/vault/claim; query actual token addresses and accounting getters.",
+      "pass": "Separately establish pair quote, vault quote, fee accounting, reward accounting and claim assets.",
+      "failBlockBehavior": "UNKNOWN critical asset blocks; no inference from website WETH prose.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "deployer_recipient",
+      "exactReadCallSource": "Factory TokenLaunched/getLaunchedToken; launcher event/state and full forwarder trace; inspect initial and future creatorFeeRecipient/controller permissions.",
+      "pass": "Exact creator/deployer/recipient and future role powers match manifest.",
+      "failBlockBehavior": "Any mistaken recipient, attribution or post-launch power blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "creator_fee_sweep",
+      "exactReadCallSource": "Inspect/prove sweep selector/caller checks and redirect flow; pinned fork escrow/locker collection into vault.",
+      "pass": "Expected caller can sweep into correct vault without unauthorized diversion.",
+      "failBlockBehavior": "Receiving funds alone does not prove sweep permission; ambiguity blocks.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "active_stake",
+      "exactReadCallSource": "Pinned canonical vault/token authority, deployed stakedOf(address), quote/total, code/controller hashes, beacon slot and block freshness.",
+      "pass": "Fail-closed reader only; production entitlement remains false.",
+      "failBlockBehavior": "Diagnostic/unbound/stale reads never grant entitlement.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "exact_rehearsal",
+      "exactReadCallSource": "Actual wallet funded; exact approved envelope eth_call at pinned state without overrides; independent exact trace/postcondition evidence.",
+      "pass": "Complete request and critical creation semantics pass, signing/broadcast false.",
+      "failBlockBehavior": "Synthetic overrides/canary success cannot substitute.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    },
+    {
+      "id": "legal",
+      "exactReadCallSource": "Private approval identifier/digest/manifest/scope/conditions/validity/revocation interface.",
+      "pass": "Applicable valid approval for exact configuration and state.",
+      "failBlockBehavior": "BLOCKED_LEGAL remains inaccessible to owner/engineering waiver.",
+      "status": "UNKNOWN_UNTIL_VERIFIED"
+    }
+  ],
+  "launchAuthorized": false
+}

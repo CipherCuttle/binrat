@@ -228,6 +228,8 @@ const receipt = {
   receiptDigest: await derivePonsPreflightReceiptDigest(receiptWithoutDigest)
 } satisfies PonsPreflightReceiptV1;
 
+if ((await client.getBlock({blockNumber})).hash !== block.hash) fail('canonical block changed during preflight');
+
 await validatePonsPreflightReceipt(receipt, plan);
 console.log(JSON.stringify(receipt, null, 2));
 

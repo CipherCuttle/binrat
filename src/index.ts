@@ -8,6 +8,8 @@ export * from './core/identity.js';
 export * from './core/ports.js';
 export * from './evidence/canonical.js';
 export * from './launchMechanics/receipt.js';
+export * from './holder/ponsStakeReader.js';
+export * from './holder/workingRatPolicyBoundary.js';
 export * from './launchConfig/config.js';
 export * from './indexer/syncLaunches.js';
 export * from './intelligence/provenance.js';

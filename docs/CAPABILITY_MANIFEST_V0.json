@@ -120,13 +120,11 @@
     "receiptExistenceAuthorizesLaunch": false,
     "requiredEvidence": [
       "legal_compliance_artifacts",
-      "pons_v1_launch_mechanics_and_vault_upstream_attestation",
-      "actual_token_address_and_launch_execution_receipt",
+      "launch_mechanics_verification_receipt",
       "telegram_doctrine_smoke",
-      "working_rat_active_stake_smoke",
       "rat_watch_live_subscription_and_delivery_smoke",
       "dumpster_ledger_bootstrap",
-      "pons_case_replay_evidence_smoke",
+      "replay_lab_real_evidence_smoke",
       "status_consistency_check",
       "allocation_and_privileged_inventory_disclosure"
     ],
@@ -134,7 +132,7 @@
   },
   "launchGateStatus": {
     "matrix": "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
-    "matrixDigest": "8d49c8c7c5941858b7fe15e20273c6774df0b8baf30738863c816010d0a0298d",
+    "matrixDigest": "e3d1266ec58b311f1a43ad79c7d6845e63ec1b70ad024fe37fc42d19ecc62be5",
     "statuses": {
       "legal_compliance_artifacts": "BLOCKED_LEGAL",
       "launch_mechanics_verification_receipt": "BLOCKED_UPSTREAM_VERIFICATION",
@@ -147,14 +145,15 @@
       "status_consistency_check": "SATISFIED",
       "allocation_and_privileged_inventory_disclosure": "PARTIAL"
     },
-    "blockingGateCount": 5
+    "blockingGateCount": 3,
+    "evaluationPhase": "PRE-ARM"
   },
   "invariant": "Degen can decide attention and priority. It cannot decide what is true.",
   "currentLaunchPlan": {
     "chainId": 4663,
     "rail": "pons-v2-vault-staking-candidate-v1",
     "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-    "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+    "planDigest": "5ce63df38978f60cb293e92c6763a1c9af5dc9e80c890d123c4ecb8bbb09e094",
     "status": "PLANNING_ONLY",
     "historicalArcAuthority": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
   },
@@ -182,6 +181,9 @@
     "privatePresale": "NONE",
     "discountedInsiderRound": "NONE",
     "hiddenTeamAllocation": "NONE",
-    "walletRoleStatus": "UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC"
+    "walletRoleStatus": "UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC",
+    "stakingRequired": true,
+    "workingRatStatus": "PLANNED",
+    "productionEntitlementActive": false
   }
 }

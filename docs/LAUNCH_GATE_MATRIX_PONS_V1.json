@@ -1,10 +1,10 @@
 {
-  "schemaVersion": "binrat.launch-gate-matrix/0.2",
+  "schemaVersion": "binrat.launch-gate-matrix/0.3",
   "matrixVersion": "LAUNCH_GATE_MATRIX_PONS_V1",
   "frozenOn": "2026-10-03",
   "chainId": 4663,
   "launchPlanPath": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
-  "launchPlanDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+  "launchPlanDigest": "5ce63df38978f60cb293e92c6763a1c9af5dc9e80c890d123c4ecb8bbb09e094",
   "historicalArcMatrix": {
     "path": "docs/LAUNCH_GATE_MATRIX_V0.json",
     "digest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b",
@@ -28,7 +28,12 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Counsel-reviewed EU/Swedish classification, offer/marketing obligations, and explicit legal authorization for the final Pons/staking configuration.",
-      "blocksLaunchAuthorization": true
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-ARM",
+        "PRE-BROADCAST",
+        "PRE-PUBLIC"
+      ]
     },
     "launch_mechanics_verification_receipt": {
       "status": "BLOCKED_UPSTREAM_VERIFICATION",
@@ -40,7 +45,7 @@
         "docs/PONSVault_STAKING_ATTESTATION_V1.json"
       ],
       "evidenceDigests": [
-        "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+        "5ce63df38978f60cb293e92c6763a1c9af5dc9e80c890d123c4ecb8bbb09e094",
         "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c",
         "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d"
       ],
@@ -62,7 +67,14 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Before launch authorization, preserve disclosure of the accepted third-party upgrade risk, resolve authoritative PonsVault source/ABI if available, and freshly re-read registry/factory/beacon/implementation/owner plus canLaunch and the atomic Staking launch path against the exact reviewed manifest.",
-      "blocksLaunchAuthorization": true
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-PREFLIGHT",
+        "PRE-ARM",
+        "PRE-BROADCAST",
+        "POST-BROADCAST",
+        "PRE-PUBLIC"
+      ]
     },
     "actual_token_address_and_launch_execution_receipt": {
       "status": "BLOCKED_FUTURE_EVENT",
@@ -82,8 +94,12 @@
         "validationStatus": "INCOMPLETE"
       },
       "verificationDate": "2026-10-03",
-      "exactRemainingRequirement": "After authorization, create a Pons V1 execution receipt binding the actual token/curve/vault, transaction, block/hash, immutable economics, allocation, graduation authority and post-launch verification.",
-      "blocksLaunchAuthorization": true
+      "exactRemainingRequirement": "POST-BROADCAST/PRE-PUBLIC: verify actual token/curve/vault creation semantics, exact transaction, block/hash, economics, assets, allocation and manifest match. No future receipt is needed to arm.",
+      "blocksLaunchAuthorization": false,
+      "requiredAt": [
+        "POST-BROADCAST",
+        "PRE-PUBLIC"
+      ]
     },
     "telegram_doctrine_smoke": {
       "status": "SATISFIED",
@@ -102,7 +118,11 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Repeat doctrine/status smoke after each status-bearing manifest change and immediately before launch authorization.",
-      "blocksLaunchAuthorization": false
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-ARM",
+        "PRE-PUBLIC"
+      ]
     },
     "rat_radar_free_value_and_holder_gate_smoke": {
       "status": "PARTIAL",
@@ -118,13 +138,18 @@
       "liveEvidence": {
         "freeProductValue": "PASS",
         "entitlementModel": "ACTIVE_STAKE_WORKING_RAT_PLANNED",
-        "stakeSource": "L1B_STAKED_OF_PINNED_L2_NOT_IMPLEMENTED",
+        "stakeSource": "L2_COMPOSED_READ_ONLY_PRODUCTION_DISABLED",
         "stakeReadSelector": "0xaf500ba3",
-        "productionEligibilityActive": false
+        "productionEligibilityActive": false,
+        "workingRatStatus": "PLANNED",
+        "stakingRequired": true
       },
       "verificationDate": "2026-10-03",
-      "exactRemainingRequirement": "Implement and verify the block-pinned Robinhood/Pons stakedOf(address) source, wallet binding, frozen WORKING RAT threshold and production activation smoke.",
-      "blocksLaunchAuthorization": true
+      "exactRemainingRequirement": "POST-LAUNCH ONLY: separately authorize principal/wallet binding, threshold, capacity enforcement and entitlement activation. The launch itself must create and verify the Staking vault.",
+      "blocksLaunchAuthorization": false,
+      "requiredAt": [
+        "POST-LAUNCH"
+      ]
     },
     "rat_watch_live_subscription_and_delivery_smoke": {
       "status": "SATISFIED",
@@ -141,7 +166,10 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Preserve current Rat Watch delivery semantics while adding stake-backed capacity; natural future recurrence remains maturity evidence, not a launch blocker.",
-      "blocksLaunchAuthorization": false
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-ARM"
+      ]
     },
     "dumpster_ledger_bootstrap": {
       "status": "SATISFIED",
@@ -159,7 +187,11 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Before production accounting, bind the actual Pons token/vault and effective launch block, then explicitly activate accounting.",
-      "blocksLaunchAuthorization": false
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-ARM",
+        "PRE-PUBLIC"
+      ]
     },
     "replay_lab_real_evidence_smoke": {
       "status": "SATISFIED",
@@ -176,7 +208,10 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Preserve Pons Case/Replay point-in-time evidence semantics; no additional launch-mechanics evidence is inferred from this product proof.",
-      "blocksLaunchAuthorization": false
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-ARM"
+      ]
     },
     "status_consistency_check": {
       "status": "SATISFIED",
@@ -197,7 +232,14 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Re-run consistency checks after any plan/matrix/manifest change; old Arc authority must remain historical-only.",
-      "blocksLaunchAuthorization": false
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-PREFLIGHT",
+        "PRE-ARM",
+        "PRE-BROADCAST",
+        "POST-BROADCAST",
+        "PRE-PUBLIC"
+      ]
     },
     "allocation_and_privileged_inventory_disclosure": {
       "status": "PARTIAL",
@@ -219,10 +261,15 @@
       },
       "verificationDate": "2026-10-03",
       "exactRemainingRequirement": "Bind the owner-selected 0% creator tax, 0 ETH opening buy, no private presale/discounted round/hidden team allocation into the final manifest, then verify those semantics against the real launch transaction.",
-      "blocksLaunchAuthorization": true
+      "blocksLaunchAuthorization": true,
+      "requiredAt": [
+        "PRE-ARM",
+        "POST-BROADCAST",
+        "PRE-PUBLIC"
+      ]
     }
   },
   "explicitOwnerLaunchAuthorityState": "NOT_GRANTED",
   "launchAuthorization": "BLOCKED",
-  "matrixDigest": "8d49c8c7c5941858b7fe15e20273c6774df0b8baf30738863c816010d0a0298d"
+  "matrixDigest": "e3d1266ec58b311f1a43ad79c7d6845e63ec1b70ad024fe37fc42d19ecc62be5"
 }

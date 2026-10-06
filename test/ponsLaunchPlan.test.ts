@@ -25,7 +25,7 @@ test('Pons launch plan is deterministic, chain-scoped and fail-closed', async ()
   assert.equal(value.launchRail.railId, 'pons-v2-vault-staking-candidate-v1');
   assert.equal(value.launchRail.stakingFactory.address, '0x1488473464F2C6E6c5C412f05d805c619322E7EB');
   assert.equal(value.upstreamRisk.stakingAttestationStatus, 'CONDITIONAL');
-  assert.equal(value.upstreamRisk.explicitUpstreamRiskAcceptanceRequired, false);
+  assert.equal(value.upstreamRisk.explicitUpstreamRiskAcceptanceRequired, true);
   assert.equal(
     value.upstreamRisk.ownerUpstreamRiskDecision,
     'ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY'

@@ -44,7 +44,7 @@ test('canonical Pons V1 gate matrix is complete, digested, and blocks on upstrea
 
   const manifest = await json(MANIFEST_URL);
   validateLaunchGateStatusConsistency(validated, manifest);
-  assert.equal(manifest.launchGateStatus.blockingGateCount, 5);
+  assert.equal(manifest.launchGateStatus.blockingGateCount, 3);
 });
 
 test('Arc 5042 matrix remains historical evidence and cannot become current Pons authority', async () => {
@@ -87,14 +87,14 @@ test('future Pons token execution cannot satisfy without token, transaction, blo
   assert.equal(gate.liveEvidence.launchTransaction, null);
   assert.equal(gate.liveEvidence.launchBlock, null);
   assert.equal(gate.liveEvidence.launchBlockHash, null);
-  assert.equal(gate.blocksLaunchAuthorization, true);
+  assert.equal(gate.blocksLaunchAuthorization, false);
 });
 
-test('final allocation and Working Rat readiness both count as launch blockers', async () => {
+test('allocation remains a pre-arm blocker while Working Rat activation is deferred', async () => {
   const matrix = validateLaunchGateMatrix(await json(MATRIX_URL));
   assert.equal(
     matrix.gates.rat_radar_free_value_and_holder_gate_smoke.blocksLaunchAuthorization,
-    true
+    false
   );
   assert.equal(
     matrix.gates.allocation_and_privileged_inventory_disclosure.blocksLaunchAuthorization,
@@ -107,10 +107,10 @@ test('Working Rat remains partial until a reviewed active-stake source exists', 
   const holder = matrix.gates.rat_radar_free_value_and_holder_gate_smoke;
   assert.equal(holder.status, 'PARTIAL');
   assert.equal(holder.liveEvidence.entitlementModel, 'ACTIVE_STAKE_WORKING_RAT_PLANNED');
-  assert.equal(holder.liveEvidence.stakeSource, 'L1B_STAKED_OF_PINNED_L2_NOT_IMPLEMENTED');
+  assert.equal(holder.liveEvidence.stakeSource, 'L2_COMPOSED_READ_ONLY_PRODUCTION_DISABLED');
   assert.equal(holder.liveEvidence.stakeReadSelector, '0xaf500ba3');
   assert.equal(holder.liveEvidence.productionEligibilityActive, false);
-  assert.equal(holder.blocksLaunchAuthorization, true);
+  assert.equal(holder.blocksLaunchAuthorization, false);
 });
 
 test('all mandatory gates and explicit owner authority remain required', async () => {
@@ -121,7 +121,7 @@ test('all mandatory gates and explicit owner authority remain required', async (
   const allSatisfied = structuredClone(matrix);
   for (const id of REQUIRED_LAUNCH_GATE_IDS) allSatisfied.gates[id].status = 'SATISFIED';
   assert.equal(launchAuthorizationEligible(allSatisfied, 'NOT_GRANTED'), false);
-  assert.equal(launchAuthorizationEligible(allSatisfied, 'GRANTED'), true);
+  assert.equal(launchAuthorizationEligible(allSatisfied, 'GRANTED'), false);
 
   // Legacy Arc launch config remains valid only as historical role/accounting evidence.
   const config = await validateLaunchConfig(await json(CONFIG_URL));

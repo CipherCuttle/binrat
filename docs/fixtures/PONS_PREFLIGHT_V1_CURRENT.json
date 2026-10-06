@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "binrat.pons-preflight/0.1",
+  "preflightVersion": "PONS_PREFLIGHT_V1",
+  "status": "UPSTREAM_GRAPH_PASS_BASELINE_EXACT_MANIFEST_BLOCKED",
+  "observedAt": "2026-10-03T22:41:51.767Z",
+  "chainId": 4663,
+  "block": {
+    "number": "79447264",
+    "hash": "0x391bc68a311db5e87bba05bbb238dac0bc5d56f0f03df9a5c786638e3cb0b681"
+  },
+  "plan": {
+    "digest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd"
+  },
+  "contracts": {
+    "ponsFactory": {
+      "address": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "codeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+      "expectedCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+      "status": "MATCH"
+    },
+    "launcher": {
+      "address": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+      "codeHash": "0x5a6baeade01d8119231385e1a6f38c50388b2f30063d3c6c3e5736e590ad12a0",
+      "expectedCodeHash": null,
+      "status": "OBSERVED_BASELINE"
+    },
+    "registry": {
+      "address": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+      "codeHash": "0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f",
+      "expectedCodeHash": "0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f",
+      "status": "MATCH"
+    },
+    "stakingFactory": {
+      "address": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "codeHash": "0xae06892852ab939bbd7a2b845b7f3a15b4a60f3d31f2eb1ff3aefa90ac4a7196",
+      "expectedCodeHash": null,
+      "status": "OBSERVED_BASELINE"
+    },
+    "stakingBeacon": {
+      "address": "0xEf9f80D2F51Ec6AEcaB284e778f328e9F0982a6f",
+      "codeHash": "0xe2acec43371955eacf7fdf055a2680093f081520546eeb337a2aa709e8fdee20",
+      "expectedCodeHash": null,
+      "status": "OBSERVED_BASELINE"
+    },
+    "stakingImplementation": {
+      "address": "0xC8e0a4fE58918c47F66CF630c6A7205741C11FD4",
+      "codeHash": "0x60b9f463c5edaff979833cdb23653a5b0cddf1a13fda6742fb8fbec9844eced1",
+      "expectedCodeHash": null,
+      "status": "OBSERVED_BASELINE"
+    },
+    "upstreamOwner": {
+      "address": "0x897ac30f73Ba92E1EFbC1dF1e67f8b5F4b3ECD2b",
+      "code": "0x",
+      "status": "EOA"
+    }
+  },
+  "graph": {
+    "launcherPonsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "launcherRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+    "registryStakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "registryOwner": "0x897ac30f73Ba92E1EFbC1dF1e67f8b5F4b3ECD2b",
+    "stakingFactoryOwner": "0x897ac30f73Ba92E1EFbC1dF1e67f8b5F4b3ECD2b",
+    "stakingFactoryBeacon": "0xEf9f80D2F51Ec6AEcaB284e778f328e9F0982a6f",
+    "stakingFactoryImplementation": "0xC8e0a4fE58918c47F66CF630c6A7205741C11FD4",
+    "stakingFactoryTemplate": "staking",
+    "stakingFactoryVaultCountRaw": "1",
+    "stakingBeaconOwner": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeaconImplementation": "0xC8e0a4fE58918c47F66CF630c6A7205741C11FD4",
+    "launcherCanLaunch": true,
+    "launcherCanLaunchReason": "0x",
+    "status": "PASS"
+  },
+  "stakeReadCanary": {
+    "vault": "0x96E5c19717F5e681375b65771Dd85628F700eB42",
+    "wallet": "0x35df6256C2fA5C52AE5741A8d81E7047e20b0e6D",
+    "quoteAsset": "0x0000000000000000000000000000000000000000",
+    "stakedRaw": "206422751238216967",
+    "totalStakedRaw": "206422751238216967",
+    "status": "PASS"
+  },
+  "exactManifestSimulation": {
+    "status": "BLOCKED_OWNER_INPUTS",
+    "missingInputs": [
+      "launchConfigId",
+      "expectedEconomics",
+      "minimumFeesBeforePayoutWei",
+      "launchWalletAddress",
+      "tokenMetadata"
+    ],
+    "broadcast": false
+  },
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "receiptDigest": "90eb1185b7bc515a3c829e8f27326344e109ff7c4cf001dfeecc73825c81f14b"
+}
