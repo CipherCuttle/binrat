@@ -1,0 +1,69 @@
+name: binrat-comms-shadow-eval-once-v3
+
+on:
+  push:
+    branches:
+      - experiment/binrat-comms-eval-20261006-v3
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-comms-eval-20261006-v3
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    if: ${{ github.actor == 'CipherCuttle' && github.run_attempt == '1' && github.event.head_commit.message == '[run-binrat-comms-eval-20261006-v3] approved repaired twelve-case shadow eval' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out exact experiment head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Verify one-shot source binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "ef2ef0b8955ab03908588dd94138ad0e3126704b"
+          test "$(git log -1 --format=%s)" = "[run-binrat-comms-eval-20261006-v3] approved repaired twelve-case shadow eval"
+          node --check scripts/run-comms-shadow-eval-once.mjs
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install and verify exact source
+        run: |
+          pnpm install --frozen-lockfile=false
+          pnpm check
+
+      - name: Prepare evaluation artifact
+        run: |
+          mkdir -p "$RUNNER_TEMP/binrat-comms-eval"
+          printf 'BINRAT_COMMS_EVAL_OUTPUT=%s\n' "$RUNNER_TEMP/binrat-comms-eval/report.json" >> "$GITHUB_ENV"
+
+      - name: Execute twelve real repaired shadow drafts
+        env:
+          BINRAT_COMMS_OPENROUTER_API_KEY: ${{ secrets.BINRAT_COMMS_OPENROUTER_API_KEY }}
+          BINRAT_EVAL_OPENROUTER_API_KEY: ${{ secrets.BINRAT_EVAL_OPENROUTER_API_KEY }}
+        run: node scripts/run-comms-shadow-eval-once.mjs
+
+      - name: Preserve evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-comms-eval-20261006-v3-${{ github.run_id }}
+          path: ${{ runner.temp }}/binrat-comms-eval/
+          retention-days: 30
+          if-no-files-found: warn
