@@ -38,13 +38,18 @@ const writer = createOpenRouterCommsWriter({
 
 const results = [];
 for (const testCase of cases) {
+  const startedAt = Date.now();
   try {
     const attempt = await draftCommsEventWithModel(testCase.event, writer);
-    results.push(evaluateCommsDraftAttempt(testCase, attempt));
+    results.push(
+      evaluateCommsDraftAttempt(testCase, attempt, Date.now() - startedAt),
+    );
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'UNKNOWN_COMMS_EVAL_ERROR';
-    results.push(failedCommsEvalCase(testCase, message));
+    results.push(
+      failedCommsEvalCase(testCase, message, Date.now() - startedAt),
+    );
   }
 }
 
