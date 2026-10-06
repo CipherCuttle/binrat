@@ -13,7 +13,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts test/readPlane.test.mjs",
     "web:serve": "node scripts/serve-web.mjs",
-    "web:check": "node --check web/fixtures.js && node --check web/data-source.js && node --check web/share-card.js && node --check web/read-plane.js && node --check web/app.js && node --check web/frontdoor.js && node --check web/react-bits-island.js && node --check web/app/app.js && node scripts/check-web.mjs && node scripts/check-share-card.mjs && node scripts/check-launch-presentation.mjs",
+    "web:check": "node --check web/fixtures.js && node --check web/data-source.js && node --check web/share-card.js && node --check web/read-plane.js && node --check web/app.js && node --check web/frontdoor.js && node --check web/react-bits-island.js && node --check web/app/app.js && node scripts/check-web.mjs && node scripts/check-share-card.mjs && node scripts/check-launch-presentation.mjs && node --check local-den/den.js && node --check scripts/serve-local-den.mjs && node --check scripts/check-local-den-browser.cjs",
     "check": "pnpm build && pnpm test && pnpm web:check",
     "verify:launch-mechanics:rpc": "tsx scripts/verify-launch-mechanics-rpc.ts",
     "backfill": "tsx src/cli.ts backfill",
@@ -36,7 +36,8 @@
     "workforce:benchmark": "pnpm build && node scripts/benchmark-workforce.mjs",
     "query:score": "pnpm build && node scripts/eval-next-query.mjs score",
     "query:prepare": "pnpm build && node scripts/eval-next-query.mjs prepare",
-    "rat:job": "pnpm build && node scripts/local-rat-job.mjs"
+    "rat:job": "pnpm build && node scripts/local-rat-job.mjs",
+    "den:local": "pnpm build && node scripts/serve-local-den.mjs"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
