@@ -1,0 +1,482 @@
+{
+  "schemaVersion": "binrat.local-rat-job-proof/1",
+  "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+  "baseHead": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+  "fixture": "test/fixtures/workforce/sniffer-funding-to-pons-v1.json",
+  "fixtureSha256": "c7ca1e9e1e1b51268da9605249f72ed3caf6667a919fbfef18db71355633d04a",
+  "separateProcesses": true,
+  "newModelCalls": 0,
+  "newModelCostUSD": "0.000000",
+  "deliveredNotifications": 0,
+  "steps": [
+    {
+      "command": "create",
+      "phase": "READY",
+      "revision": 0,
+      "throughBlock": null,
+      "logicalUsage": null
+    },
+    {
+      "command": "advance",
+      "phase": "WAITING",
+      "revision": 1,
+      "throughBlock": "100",
+      "logicalUsage": {
+        "toolCalls": 1,
+        "handoffs": 0,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    },
+    {
+      "command": "inspect",
+      "phase": "WAITING",
+      "revision": 1,
+      "throughBlock": "100",
+      "logicalUsage": {
+        "toolCalls": 1,
+        "handoffs": 0,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    },
+    {
+      "command": "advance",
+      "phase": "WAITING",
+      "revision": 2,
+      "throughBlock": "101",
+      "logicalUsage": {
+        "toolCalls": 2,
+        "handoffs": 1,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    },
+    {
+      "command": "inspect",
+      "phase": "WAITING",
+      "revision": 2,
+      "throughBlock": "101",
+      "logicalUsage": {
+        "toolCalls": 2,
+        "handoffs": 1,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    },
+    {
+      "command": "advance",
+      "phase": "FOUND",
+      "revision": 3,
+      "throughBlock": "125",
+      "logicalUsage": {
+        "toolCalls": 5,
+        "handoffs": 1,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    },
+    {
+      "command": "advance",
+      "phase": "FOUND",
+      "revision": 3,
+      "throughBlock": "125",
+      "logicalUsage": {
+        "toolCalls": 5,
+        "handoffs": 1,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    },
+    {
+      "command": "inspect",
+      "phase": "FOUND",
+      "revision": 3,
+      "throughBlock": "125",
+      "logicalUsage": {
+        "toolCalls": 5,
+        "handoffs": 1,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      }
+    }
+  ],
+  "returned": {
+    "schemaVersion": "binrat.local-rat-job/1",
+    "mode": "LOCAL_SYNTHETIC_REPLAY",
+    "jobId": "offline-sniffer-job-1",
+    "sourceDigest": "ee88b4d48eb064971981ecb223c65d7eee9790553dbf13953658e4a83a1e4206",
+    "revision": 3,
+    "previousDigest": "56212711c72292f18ee77b32e8be142961cc1431f3ce751bf5cb3fb3f2a38c35",
+    "action": {
+      "kind": "ADVANCE",
+      "throughBlock": "125"
+    },
+    "phase": "FOUND",
+    "outcome": "SUPPORTED_FINDING",
+    "advances": 3,
+    "receipt": {
+      "schemaVersion": "binrat.rat-job-receipt/1",
+      "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+      "jobId": "offline-sniffer-job-1",
+      "inputDigest": "21421499185c346ef810b0a0c034a707b4b0d329365da2405d68a05bdc819097",
+      "competenceDigest": "9436598139bfc5d5e7ccdd2a9bcf5d1d01087011c922e978ddda04722b86fb90",
+      "throughBlock": "125",
+      "status": "DONE",
+      "coverage": "PARTIAL_DECLARED_FIXTURE_WINDOW",
+      "claims": [
+        {
+          "kind": "NATIVE_TRANSFER_OBSERVED",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "WALLET",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "evidenceRefs": [
+            "funding-1"
+          ],
+          "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+        },
+        {
+          "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "WALLET",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "evidenceRefs": [
+            "recipient-window-1"
+          ],
+          "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+        },
+        {
+          "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "evidenceRefs": [
+            "launch-1"
+          ],
+          "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+        },
+        {
+          "kind": "FUNDING_PRECEDES_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "evidenceRefs": [
+            "funding-1",
+            "launch-1"
+          ],
+          "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+        }
+      ],
+      "evidence": [
+        {
+          "availableAtBlock": "100",
+          "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000064",
+          "blockNumber": "100",
+          "chainId": 4663,
+          "digest": "720759256f852a30b7dfe0d2b788fb64e5ef76856c432cbc1ca7c7538b68b586",
+          "from": "0x0000000000000000000000000000000000000007",
+          "id": "funding-1",
+          "kind": "NATIVE_TRANSFER",
+          "to": "0x000000000000000000000000000000000000002a",
+          "txHash": "0x000000000000000000000000000000000000000000000000000000000000044c",
+          "valueWei": "1000000000000000"
+        },
+        {
+          "availableAtBlock": "101",
+          "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000065",
+          "blockNumber": "101",
+          "chainId": 4663,
+          "complete": true,
+          "digest": "493f3cb169e35d0d2b15da20312a42c04f0517802160eca2b3609b3135ff8ccc",
+          "fromBlock": "90",
+          "id": "recipient-window-1",
+          "kind": "RECIPIENT_WINDOW",
+          "recipient": "0x000000000000000000000000000000000000002a",
+          "seen": false,
+          "toBlock": "99"
+        },
+        {
+          "availableAtBlock": "125",
+          "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000078",
+          "blockNumber": "120",
+          "chainId": 4663,
+          "creator": "0x000000000000000000000000000000000000002a",
+          "digest": "7f204c6690f14f23a9611d57eb9a7a8d1804b258d69a3546d745d6f292449759",
+          "id": "launch-1",
+          "kind": "PONS_LAUNCH",
+          "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+          "logIndex": 0,
+          "pool": "0x0000000000000000000000000000000000000051",
+          "token": "0x0000000000000000000000000000000000000050",
+          "txHash": "0x0000000000000000000000000000000000000000000000000000000000000460"
+        }
+      ],
+      "handoffs": [
+        {
+          "schemaVersion": "binrat.rat-handoff/1",
+          "jobId": "offline-sniffer-job-1",
+          "fromRat": "SNIFFER",
+          "toRat": "RAT_ZERO",
+          "objective": "CHECK_FUTURE_PONS_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "createdAtBlock": "101",
+          "afterBlock": "100",
+          "evidenceRefs": [
+            "funding-1",
+            "recipient-window-1"
+          ],
+          "authority": {
+            "capital": false,
+            "delivery": false,
+            "network": false,
+            "provider": false,
+            "research": true
+          },
+          "remainingBudget": {
+            "maxCostMicrousd": 0,
+            "maxHandoffs": 0,
+            "maxModelCalls": 0,
+            "maxToolCalls": 3
+          },
+          "handoffId": "564458819ec05df72e17472d00c2f8e0d222e872cf2141b34520f00346223258"
+        }
+      ],
+      "caseDiff": {
+        "beforeDigest": "26990b5543a09ffde532fcabdf77a7a9ce146662b7b5dc312031ea7c151c7226",
+        "afterDigest": "76d964e21a6e24eb4af5ec9302eec4428da26244c0a3ea643348c68444187c7d",
+        "addedClaims": [
+          {
+            "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+            "subject": {
+              "chainId": 4663,
+              "entityType": "CREATOR",
+              "entityId": "0x000000000000000000000000000000000000002a"
+            },
+            "evidenceRefs": [
+              "launch-1"
+            ],
+            "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+          },
+          {
+            "kind": "FUNDING_PRECEDES_LAUNCH",
+            "subject": {
+              "chainId": 4663,
+              "entityType": "CREATOR",
+              "entityId": "0x000000000000000000000000000000000000002a"
+            },
+            "evidenceRefs": [
+              "funding-1",
+              "launch-1"
+            ],
+            "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+          }
+        ],
+        "launchReceipt": {
+          "version": "binrat.finding/1",
+          "chainId": 4663,
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "timestamp": {
+            "blockNumber": "120",
+            "eventTime": null,
+            "ingestedAtMs": 0
+          },
+          "epistemicClass": "OBSERVED",
+          "claim": "CREATOR_LAUNCH_OBSERVED",
+          "evidenceRefs": [
+            {
+              "launchId": "61b29d9577c78528aa9dc80ada64ff31b3e3f18b686ce42442addb0bc5017947",
+              "observationId": "dfa2a2d34c735c0cb558ba55afb0eab82ddad547e847f9dc0a95dfecd9d7c1bb",
+              "blockNumber": "120",
+              "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000078",
+              "txHash": "0x0000000000000000000000000000000000000000000000000000000000000460",
+              "logIndex": 0,
+              "creator": "0x000000000000000000000000000000000000002a",
+              "token": "0x0000000000000000000000000000000000000050",
+              "factId": "binrat-fact:4663:61b29d9577c78528aa9dc80ada64ff31b3e3f18b686ce42442addb0bc5017947",
+              "evidenceDigest": "764e64879966f566df69dbd36bb3010a0d1d67fc44f2a341f3fc435983b7551c",
+              "ingestedAtMs": 0
+            }
+          ],
+          "coverage": {
+            "status": "PARTIAL",
+            "scope": "PONS_V2_INDEXED_LAUNCHES",
+            "asOfBlock": "125",
+            "limit": 5
+          },
+          "source": "PONS_V2",
+          "findingId": "9e962d636c618c426f9906f32e7aaf935cf44648478d8780d5556dfa369d6854",
+          "caseId": "9e962d636c618c426f9906f32e7aaf935cf44648478d8780d5556dfa369d6854",
+          "shareId": "9e962d636c618c426f9906f32e7aaf935cf44648",
+          "createdAt": 0
+        }
+      },
+      "alert": {
+        "decision": "ALERT",
+        "reason": "SUPPORTED_FUTURE_LAUNCH",
+        "findingId": "76d964e21a6e24eb4af5ec9302eec4428da26244c0a3ea643348c68444187c7d"
+      },
+      "usage": {
+        "toolCalls": 5,
+        "handoffs": 1,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      },
+      "trace": [
+        {
+          "sequence": 1,
+          "ratId": "SNIFFER",
+          "tool": "READ_TRANSFER_FIXTURE",
+          "atBlock": "100"
+        },
+        {
+          "sequence": 2,
+          "ratId": "SNIFFER",
+          "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+          "atBlock": "101"
+        },
+        {
+          "sequence": 3,
+          "ratId": "RAT_ZERO",
+          "tool": "READ_PONS_LAUNCH_FIXTURE",
+          "atBlock": "125"
+        },
+        {
+          "sequence": 4,
+          "ratId": "RAT_ZERO",
+          "tool": "BUILD_CASE_DIFF",
+          "atBlock": "125"
+        },
+        {
+          "sequence": 5,
+          "ratId": "RAT_ZERO",
+          "tool": "DECIDE_ALERT",
+          "atBlock": "125"
+        }
+      ],
+      "receiptId": "0ce5c0fd051fdc19229f3812f73daaeba0d33ff225c69dad79e175da3ca65983"
+    },
+    "failure": null,
+    "localCase": {
+      "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+      "findingId": "76d964e21a6e24eb4af5ec9302eec4428da26244c0a3ea643348c68444187c7d",
+      "diff": {
+        "beforeDigest": "26990b5543a09ffde532fcabdf77a7a9ce146662b7b5dc312031ea7c151c7226",
+        "afterDigest": "76d964e21a6e24eb4af5ec9302eec4428da26244c0a3ea643348c68444187c7d",
+        "addedClaims": [
+          {
+            "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+            "subject": {
+              "chainId": 4663,
+              "entityType": "CREATOR",
+              "entityId": "0x000000000000000000000000000000000000002a"
+            },
+            "evidenceRefs": [
+              "launch-1"
+            ],
+            "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+          },
+          {
+            "kind": "FUNDING_PRECEDES_LAUNCH",
+            "subject": {
+              "chainId": 4663,
+              "entityType": "CREATOR",
+              "entityId": "0x000000000000000000000000000000000000002a"
+            },
+            "evidenceRefs": [
+              "funding-1",
+              "launch-1"
+            ],
+            "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+          }
+        ],
+        "launchReceipt": {
+          "version": "binrat.finding/1",
+          "chainId": 4663,
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0x000000000000000000000000000000000000002a"
+          },
+          "timestamp": {
+            "blockNumber": "120",
+            "eventTime": null,
+            "ingestedAtMs": 0
+          },
+          "epistemicClass": "OBSERVED",
+          "claim": "CREATOR_LAUNCH_OBSERVED",
+          "evidenceRefs": [
+            {
+              "launchId": "61b29d9577c78528aa9dc80ada64ff31b3e3f18b686ce42442addb0bc5017947",
+              "observationId": "dfa2a2d34c735c0cb558ba55afb0eab82ddad547e847f9dc0a95dfecd9d7c1bb",
+              "blockNumber": "120",
+              "blockHash": "0x0000000000000000000000000000000000000000000000000000000000000078",
+              "txHash": "0x0000000000000000000000000000000000000000000000000000000000000460",
+              "logIndex": 0,
+              "creator": "0x000000000000000000000000000000000000002a",
+              "token": "0x0000000000000000000000000000000000000050",
+              "factId": "binrat-fact:4663:61b29d9577c78528aa9dc80ada64ff31b3e3f18b686ce42442addb0bc5017947",
+              "evidenceDigest": "764e64879966f566df69dbd36bb3010a0d1d67fc44f2a341f3fc435983b7551c",
+              "ingestedAtMs": 0
+            }
+          ],
+          "coverage": {
+            "status": "PARTIAL",
+            "scope": "PONS_V2_INDEXED_LAUNCHES",
+            "asOfBlock": "125",
+            "limit": 5
+          },
+          "source": "PONS_V2",
+          "findingId": "9e962d636c618c426f9906f32e7aaf935cf44648478d8780d5556dfa369d6854",
+          "caseId": "9e962d636c618c426f9906f32e7aaf935cf44648478d8780d5556dfa369d6854",
+          "shareId": "9e962d636c618c426f9906f32e7aaf935cf44648",
+          "createdAt": 0
+        }
+      }
+    },
+    "notification": {
+      "id": "aa53491277a435da254303ad7f1f6497f7b53539c4c68b04682d20315d9b6374",
+      "state": "PREPARED_ONLY",
+      "deliveryAuthorized": false,
+      "target": "UNASSIGNED",
+      "text": "Synthetic replay: a funded recipient later deployed on Pons. Finding 76d964e21a6e24eb4af5ec9302eec4428da26244c0a3ea643348c68444187c7d. Declared fixture window only."
+    },
+    "digest": "50a6761371606af1c24e5d9811033e083f9f4d0fc545bce36eef9b7fc00192dc",
+    "subject": {
+      "chainId": 4663,
+      "entityId": "0x0000000000000000000000000000000000000007",
+      "entityType": "WALLET"
+    },
+    "deadlineBlock": "130",
+    "coverage": "DECLARED_SYNTHETIC_FIXTURE_ONLY",
+    "budget": {
+      "maxCostMicrousd": 0,
+      "maxHandoffs": 1,
+      "maxModelCalls": 0,
+      "maxToolCalls": 5
+    },
+    "usage": {
+      "toolCalls": 5,
+      "handoffs": 1,
+      "modelCalls": 0,
+      "costMicrousd": 0
+    },
+    "usageScope": "LOGICAL_REPLAY_RESERVATIONS",
+    "remainingLocalAdvances": 29
+  }
+}
