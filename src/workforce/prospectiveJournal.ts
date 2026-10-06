@@ -46,7 +46,7 @@ export class ProspectiveJournal {
   }
   async restore(input:unknown){
     const value=input as {mode?:string;manifest?:{json?:string};calls?:{sequence:number;json:string}[]};
-    if(!value||value.mode!=='UNVERIFIED_PROSPECTIVE_EXPORT'||typeof value.manifest?.json!=='string'||!Array.isArray(value.calls)||value.calls.length>48||
+    if(!value||value.mode!=='UNVERIFIED_PROSPECTIVE_EXPORT'||typeof value.manifest?.json!=='string'||!Array.isArray(value.calls)||value.calls.length>96||
       value.calls.some((row,i)=>row.sequence!==i+1||typeof row.json!=='string'))throw new Error('PROSPECTIVE_EXPORT_INVALID');
     const manifest=JSON.parse(value.manifest.json) as CaptureManifest,calls=value.calls.map(row=>JSON.parse(row.json) as CaptureCall);
     await auditProspective(manifest,calls);
@@ -67,7 +67,7 @@ export class ProspectiveJournal {
       const row=this.db.prepare('SELECT json FROM prospective_manifest WHERE id=1').get() as {json:string}|undefined;
       if(!row)throw new Error('PROSPECTIVE_MANIFEST_REQUIRED');
       const entries=this.db.prepare('SELECT sequence,json FROM prospective_calls ORDER BY sequence').all() as {sequence:number;json:string}[];
-      if(entries.length>48||entries.some((entry,i)=>entry.sequence!==i+1))throw new Error('PROSPECTIVE_JOURNAL_INVALID');
+      if(entries.length>96||entries.some((entry,i)=>entry.sequence!==i+1))throw new Error('PROSPECTIVE_JOURNAL_INVALID');
       return {manifest:JSON.parse(row.json) as CaptureManifest,calls:entries.map(row=>JSON.parse(row.json) as CaptureCall)};
     })();
   }

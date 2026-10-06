@@ -22,15 +22,18 @@ try{
   if(allowed[command].some(key=>!args[key]))throw new Error('PROSPECTIVE_ARGUMENT_REQUIRED');
   let result;
   if(command==='audit'){
-    if(statSync(args.input).size>12000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
+    if(statSync(args.input).size>24000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
     const {auditProspective}=await import('../dist/src/workforce/prospective.js');const data=JSON.parse(readFileSync(args.input,'utf8'));
-    if(data.mode!=='UNVERIFIED_PROSPECTIVE_EXPORT'||!Array.isArray(data.calls)||data.calls.length>48)throw new Error('PROSPECTIVE_EXPORT_INVALID');
+    if(data.mode!=='UNVERIFIED_PROSPECTIVE_EXPORT'||!Array.isArray(data.calls)||data.calls.length>96)throw new Error('PROSPECTIVE_EXPORT_INVALID');
+    if(JSON.parse(data.manifest.json).schemaVersion!=='binrat.prospective-capture/4'&&statSync(args.input).size>12000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
     result=await auditProspective(JSON.parse(data.manifest.json),data.calls.map(row=>JSON.parse(row.json)));
   }else{
     store=new ProspectiveJournal(args.db,command==='init'||command==='init-consecutive'||command==='restore',['inspect','export'].includes(command));
     if(command==='restore'){
-      if(statSync(args.input).size>12000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
-      result=await store.restore(JSON.parse(readFileSync(args.input,'utf8')));
+      if(statSync(args.input).size>24000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
+      const input=JSON.parse(readFileSync(args.input,'utf8'));
+      if(JSON.parse(input.manifest.json).schemaVersion!=='binrat.prospective-capture/4'&&statSync(args.input).size>12000000)throw new Error('PROSPECTIVE_EXPORT_TOO_LARGE');
+      result=await store.restore(input);
     }else if(command==='init'||command==='init-consecutive'){
       const createdAtMs=Date.now();result=await store.register(await sealCapture({schemaVersion:command==='init-consecutive'?'binrat.prospective-capture/2':'binrat.prospective-capture/1',
         ...(command==='init-consecutive'?{discovery:{strategy:'CONSECUTIVE_NUMBERED_BLOCKS',maxBlocks:8}}:{}),provenance:'PUBLIC_RPC_SHADOW',captureId:args['capture-id'],
@@ -38,7 +41,7 @@ try{
         authority:{publicRpcRead:true,model:false,delivery:false,capital:false}}));
     }else {
       // V3 has an explicit second source. This keyless CLI must never send its indexed method to public RPC.
-      if(command==='step'&&JSON.parse(store.export().manifest.json).schemaVersion==='binrat.prospective-capture/3')throw new Error('INDEXED_CAPTURE_REQUIRES_EXPLICIT_ARCHIVE_TRANSPORT');
+      if(command==='step'&&['binrat.prospective-capture/3','binrat.prospective-capture/4'].includes(JSON.parse(store.export().manifest.json).schemaVersion))throw new Error('INDEXED_CAPTURE_REQUIRES_EXPLICIT_ARCHIVE_TRANSPORT');
       result=command==='step'?await store.step(publicRead):command==='export'?store.export():await store.inspect(Date.now());
     }
   }

@@ -5,30 +5,31 @@ import {createHash} from 'node:crypto';
 import {ProspectiveJournal} from '../dist/src/workforce/prospectiveJournal.js';
 import {PROSPECTIVE_RPC,PROSPECTIVE_FUNDER,sealCapture} from '../dist/src/workforce/prospective.js';
 import {createIndexedProbeTransport,captureOneIndexedRange} from '../dist/src/workforce/prospectiveTransport.js';
-import {INDEXED_OBSERVATION_V1,observeIndexedFunding} from '../dist/src/workforce/prospectiveObservation.js';
+import {INDEXED_OBSERVATION_V1,observeIndexedFunding,RESERVED_FOLLOWUP_V1,observeReservedFollowup} from '../dist/src/workforce/prospectiveObservation.js';
 
 let store,out,error=null,observation=null,protocol='one-range-v1',handoffSaved=false;
 const save=(name,value)=>writeFileSync(join(out,name),JSON.stringify(value,null,2)+'\n',{mode:0o600});
 try{
   const args={},rest=process.argv.slice(2);
   for(let i=0;i<rest.length;i+=2){const name=rest[i]?.slice(2);if(!rest[i]?.startsWith('--')||!['out','capture-id','source-sha','protocol'].includes(name)||!rest[i+1]||Object.hasOwn(args,name))throw new Error('INDEXED_PROBE_ARGUMENT_INVALID');args[name]=rest[i+1];}
-  protocol=args.protocol??protocol;if(!['one-range-v1','bounded-observation-v1'].includes(protocol))throw new Error('INDEXED_PROBE_PROTOCOL_INVALID');
+  protocol=args.protocol??protocol;if(!['one-range-v1','bounded-observation-v1','reserved-followup-v1'].includes(protocol))throw new Error('INDEXED_PROBE_PROTOCOL_INVALID');
   if(!args.out||!/^[a-zA-Z0-9_:-]{1,100}$/.test(args['capture-id']??'')||!/^[a-f0-9]{40}$/.test(args['source-sha']??''))throw new Error('INDEXED_PROBE_ARGUMENT_REQUIRED');
   out=args.out;mkdirSync(out,{recursive:false,mode:0o700}); // Existing output is a hard stop, never a reset/resume.
   store=new ProspectiveJournal(join(out,'capture.sqlite'),true);
-  const createdAtMs=Date.now(),manifest=await sealCapture({schemaVersion:'binrat.prospective-capture/3',
+  const reserved=protocol==='reserved-followup-v1',policy=reserved?RESERVED_FOLLOWUP_V1:INDEXED_OBSERVATION_V1;
+  const createdAtMs=Date.now(),manifest=await sealCapture({schemaVersion:reserved?'binrat.prospective-capture/4':'binrat.prospective-capture/3',
     discovery:{strategy:'INDEXED_FUNDER_OUTGOING',source:'ALCHEMY_ROBINHOOD_ARCHIVE',maxRangeBlocks:4096,maxPages:3,pageSize:5},
     provenance:'PUBLIC_RPC_SHADOW',captureId:args['capture-id'],funder:PROSPECTIVE_FUNDER,endpoint:PROSPECTIVE_RPC,
-    createdAtMs,expiresAtMs:createdAtMs+86400000,maxRpcCalls:48,historyBlocks:8,maxWindowBlocks:200000,
+    createdAtMs,expiresAtMs:createdAtMs+86400000,maxRpcCalls:reserved?96:48,historyBlocks:8,maxWindowBlocks:200000,
     authority:{publicRpcRead:true,model:false,delivery:false,capital:false}});
   await store.register(manifest);
-  save('registration.json',protocol==='bounded-observation-v1'?
-    await sealCapture({sourceSha:args['source-sha'],runner:'BOUNDED_INDEXED_OBSERVATION',protocol:INDEXED_OBSERVATION_V1,manifest}):
+  save('registration.json',protocol!=='one-range-v1'?
+    await sealCapture({sourceSha:args['source-sha'],runner:reserved?'RESERVED_LAUNCH_FOLLOWUP':'BOUNDED_INDEXED_OBSERVATION',protocol:policy,manifest}):
     {sourceSha:args['source-sha'],runner:'ONE_INDEXED_RANGE_OR_HANDOFF',observationWaitMs:60000,maxRunMs:480000,noRetries:true,manifest});
   const secret=process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL;
   delete process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL;
   const transport=createIndexedProbeTransport(secret);
-  if(protocol==='bounded-observation-v1')observation=await observeIndexedFunding(store,transport,undefined,undefined,async state=>{
+  if(protocol!=='one-range-v1')observation=await (reserved?observeReservedFollowup:observeIndexedFunding)(store,transport,undefined,undefined,async state=>{
     save('checkpoint-audit.json',state);save('checkpoint-raw-receipts.json',store.export());
     if(state.handoff&&!handoffSaved){
       save('handoff-audit.json',state);save('handoff-raw-receipts.json',store.export());handoffSaved=true;
@@ -48,14 +49,15 @@ finally{
         snapshotDigest:audit.snapshotDigest,modelCalls:0,deliveryCalls:0,capitalCalls:0,
         providerReportedCost:null,costNote:'RPC response does not provide billing evidence',
         stopBoundary:observation?.stopReason??(audit.handoff?'HANDOFF_PREPARED':audit.indexedDiscovery.ranges.length?'FIRST_CONFIRMED_INDEXED_RANGE':'HALT_OR_LIMIT'),
-        ...(protocol==='bounded-observation-v1'?{protocol,outcome:audit.rpcCalls===0?'NOT_STARTED':audit.finding?'SUPPORTED_LAUNCH_AFTER_LOCAL_HANDOFF':
+        ...(protocol==='reserved-followup-v1'?{completedEmptyLaunchRanges:observation?.completedEmptyLaunchRanges??null}:{}),
+        ...(protocol!=='one-range-v1'?{protocol,outcome:audit.rpcCalls===0?'NOT_STARTED':audit.finding?'SUPPORTED_LAUNCH_AFTER_LOCAL_HANDOFF':
           audit.phase==='HALTED'?'HALTED':audit.handoff?'HANDOFF_WITHOUT_LATER_LAUNCH_PROOF':audit.funding?'INELIGIBLE_OR_INCOMPLETE_CANDIDATE':'NO_CANDIDATE_RETURNED_IN_OBSERVED_INDEXED_RANGES'}:{})};
       save('summary.json',summary);console.log(JSON.stringify(summary,null,2));
       if(['HALTED','EXHAUSTED','EXPIRED'].includes(audit.phase))process.exitCode=1;
     }catch{console.error(JSON.stringify({error:'INDEXED_PROBE_EXPORT_FAILED',receiptsRetained:true}));process.exitCode=1;}
     finally{store.close();}
     const names=['registration.json','raw-receipts.json','audit.json','summary.json','capture.sqlite'];
-    if(protocol==='bounded-observation-v1')names.push(...['checkpoint-audit.json','checkpoint-raw-receipts.json','handoff-audit.json','handoff-raw-receipts.json'].filter(name=>existsSync(join(out,name))));
+    if(protocol!=='one-range-v1')names.push(...['checkpoint-audit.json','checkpoint-raw-receipts.json','handoff-audit.json','handoff-raw-receipts.json'].filter(name=>existsSync(join(out,name))));
     writeFileSync(join(out,'SHA256SUMS'),names.map(name=>{try{return createHash('sha256').update(readFileSync(join(out,name))).digest('hex')+'  '+name;}catch{return '# missing '+name;}}).join('\n')+'\n',{mode:0o600});
   }else console.error(JSON.stringify({error,providerRequestsStarted:false}));
 }

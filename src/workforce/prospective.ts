@@ -7,6 +7,7 @@ import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH } from '../pons/chain.js';
 import { ponsTokenLaunchedEvent } from '../pons/ponsAbi.js';
 import {outgoingTransferParams,parseOutgoingTransferPage} from '../pons/fundingOutgoing.js';
 import type {PonsExternalNativeInboundCandidate} from '../pons/fundingProvenance.js';
+import {parseStrictJson} from './competence.js';
 
 export const PROSPECTIVE_RPC = 'https://rpc.mainnet.chain.robinhood.com';
 export const PROSPECTIVE_FUNDER = '0x9bc462bce2acd6fbe2ef5470d55b439453451083';
@@ -25,7 +26,10 @@ export interface IndexedManifest extends Omit<ProspectiveManifest,'schemaVersion
   schemaVersion:'binrat.prospective-capture/3';
   discovery:{strategy:'INDEXED_FUNDER_OUTGOING';source:'ALCHEMY_ROBINHOOD_ARCHIVE';maxRangeBlocks:4096;maxPages:3;pageSize:5};
 }
-export type CaptureManifest=ProspectiveManifest|ConsecutiveManifest|IndexedManifest;
+export interface ReservedFollowupManifest extends Omit<IndexedManifest,'schemaVersion'|'maxRpcCalls'> {
+  schemaVersion:'binrat.prospective-capture/4';maxRpcCalls:96;
+}
+export type CaptureManifest=ProspectiveManifest|ConsecutiveManifest|IndexedManifest|ReservedFollowupManifest;
 export interface IndexedCoverage {
   source:'ALCHEMY_ROBINHOOD_ARCHIVE';scope:'PROVIDER_INDEXED_EXTERNAL_NATIVE_CANDIDATES_ONLY';valid:boolean;
   throughBlock:string|null;
@@ -44,7 +48,7 @@ export interface CaptureCall {
   request:RpcRequest; status:'PENDING'|'COMPLETE'|'FAILED'; rawResponse:string|null; error:string|null;
 }
 export interface ProspectiveHandoff {
-  schemaVersion:'binrat.prospective-handoff/1'; fromRat:'SNIFFER';toRat:'RAT_ZERO';
+  schemaVersion:'binrat.prospective-handoff/1'|'binrat.prospective-handoff/2'; fromRat:'SNIFFER';toRat:'RAT_ZERO';
   objective:'CHECK_PONS_LAUNCH_AFTER_OBSERVATION'; captureId:string; recipient:string;
   createdAtMs:number; afterBlock:string; fundingTx:string;
   history:{fromBlock:string;toBlock:string;scope:'TOP_LEVEL_TRANSACTION_PARTICIPATION_ONLY';complete:true;seen:false;blockHashes:string[]};
@@ -72,7 +76,9 @@ const ajv=new Ajv2020({strict:true});
 const manifestShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V1.schema.json','utf8')));
 const consecutiveShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V2.schema.json','utf8')));
 const indexedShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V3.schema.json','utf8')));
+const reservedShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V4.schema.json','utf8')));
 const handoffShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_HANDOFF_V1.schema.json','utf8')));
+const reservedHandoffShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_HANDOFF_V2.schema.json','utf8')));
 const fail=(code='PROSPECTIVE_RESPONSE_INVALID'):never=>{throw new Error(code)};
 const obj=(v:unknown):Obj=>v&&typeof v==='object'&&!Array.isArray(v)?v as Obj:fail();
 const hex=(v:unknown,n:number):string=>typeof v==='string'&&new RegExp(`^0x[a-f0-9]{${n}}$`).test(v)?v:fail();
@@ -84,14 +90,14 @@ export async function sealCapture<T extends object>(value:T):Promise<T & {digest
   const copy={...value} as Record<string,unknown>;delete copy.digest;return {...value,digest:await sha256Hex(copy)} as T & {digest:string};
 }
 export async function validateProspectiveManifest(input:unknown):Promise<CaptureManifest> {
-  if(!manifestShape(input)&&!consecutiveShape(input)&&!indexedShape(input))fail('PROSPECTIVE_MANIFEST_INVALID');
+  if(!manifestShape(input)&&!consecutiveShape(input)&&!indexedShape(input)&&!reservedShape(input))fail('PROSPECTIVE_MANIFEST_INVALID');
   const m=obj(input);
-  const v2=m.schemaVersion==='binrat.prospective-capture/2',v3=m.schemaVersion==='binrat.prospective-capture/3';
-  const keys=v2||v3?'authority,captureId,createdAtMs,digest,discovery,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion':
+  const v2=m.schemaVersion==='binrat.prospective-capture/2',v3=m.schemaVersion==='binrat.prospective-capture/3',v4=m.schemaVersion==='binrat.prospective-capture/4';
+  const keys=v2||v3||v4?'authority,captureId,createdAtMs,digest,discovery,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion':
     'authority,captureId,createdAtMs,digest,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion';
   if(Object.keys(m).sort().join(',')!==keys||
-    (!v2&&!v3&&m.schemaVersion!=='binrat.prospective-capture/1')||m.provenance!=='PUBLIC_RPC_SHADOW'||m.endpoint!==PROSPECTIVE_RPC||m.funder!==PROSPECTIVE_FUNDER||
-    typeof m.captureId!=='string'||!/^[a-zA-Z0-9_:-]{1,100}$/.test(m.captureId)||m.maxRpcCalls!==48||m.historyBlocks!==8||m.maxWindowBlocks!==200000||
+    (!v2&&!v3&&!v4&&m.schemaVersion!=='binrat.prospective-capture/1')||m.provenance!=='PUBLIC_RPC_SHADOW'||m.endpoint!==PROSPECTIVE_RPC||m.funder!==PROSPECTIVE_FUNDER||
+    typeof m.captureId!=='string'||!/^[a-zA-Z0-9_:-]{1,100}$/.test(m.captureId)||m.maxRpcCalls!==(v4?96:48)||m.historyBlocks!==8||m.maxWindowBlocks!==200000||
     !Number.isSafeInteger(m.createdAtMs)||m.createdAtMs<0||m.expiresAtMs!==m.createdAtMs+86400000||
     canonicalJson(m.authority)!==canonicalJson({publicRpcRead:true,model:false,delivery:false,capital:false})||
     (await sealCapture(m)).digest!==m.digest)fail('PROSPECTIVE_MANIFEST_INVALID');
@@ -134,7 +140,7 @@ function filter(from:bigint,to:bigint,recipient:string){return {address:PONS_V2_
 /** Pure reconstruction validates every request in order; future responses cannot modify an earlier prefix. */
 export async function auditProspective(input:unknown,calls:CaptureCall[],now?:number):Promise<ProspectiveState>{
   const m=await validateProspectiveManifest(input);
-  if(!Array.isArray(calls)||calls.length>m.maxRpcCalls||canonicalJson(calls).length>12_000_000)fail('PROSPECTIVE_JOURNAL_INVALID');
+  if(!Array.isArray(calls)||calls.length>m.maxRpcCalls||canonicalJson(calls).length>(m.schemaVersion==='binrat.prospective-capture/4'?24_000_000:12_000_000))fail('PROSPECTIVE_JOURNAL_INVALID');
   const s:ProspectiveState={mode:'LOCAL_READ_ONLY_SHADOW',captureId:m.captureId,phase:'CREATED',stage:'CHAIN',reason:null,rpcCalls:0,initialBlock:null,cursor:null,throughBlock:null,
     funding:null,fundingBlock:null,history:[],handoff:null,finding:null,caseDiff:null,notification:null,discoveryCoverage:'SAMPLED_BLOCKS_ONLY',
     authentication:'PROVIDER_REPORTED_LOCAL_CLOCK_NOT_EXTERNALLY_ATTESTED',nextRequest:null,snapshotDigest:''};
@@ -142,7 +148,7 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
     s.discoveryCoverage='CONTIGUOUS_NUMBERED_BLOCK_PREFIX';
     s.discovery={strategy:'CONSECUTIVE_NUMBERED_BLOCKS',scope:'TOP_LEVEL_TRANSACTIONS_ONLY',fromBlock:null,toBlock:null,throughBlock:null,valid:true,complete:false,blocks:[]};
   }
-  if(m.schemaVersion==='binrat.prospective-capture/3'){
+  if(m.schemaVersion==='binrat.prospective-capture/3'||m.schemaVersion==='binrat.prospective-capture/4'){
     s.discoveryCoverage='PROVIDER_INDEXED_CANDIDATES_ONLY';
     s.indexedDiscovery={source:'ALCHEMY_ROBINHOOD_ARCHIVE',scope:'PROVIDER_INDEXED_EXTERNAL_NATIVE_CANDIDATES_ONLY',valid:true,throughBlock:null,activeRange:null,ranges:[]};
   }
@@ -197,7 +203,7 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
     if(c.status==='FAILED'){if(c!==calls.at(-1))fail('PROSPECTIVE_JOURNAL_INVALID');s.phase='HALTED';s.reason=c.error&&/^[A-Z][A-Z0-9_]{0,100}$/.test(c.error)?c.error:'RPC_FAILED';break;}
     if(c.status!=='COMPLETE'||c.error!==null)fail('PROSPECTIVE_JOURNAL_INVALID');
     try{
-      const r=obj(JSON.parse(c.rawResponse!));
+      const r=obj(m.schemaVersion==='binrat.prospective-capture/4'?parseStrictJson(c.rawResponse!):JSON.parse(c.rawResponse!));
       if(r.jsonrpc!=='2.0'||r.id!==c.sequence||'error'in r||r.result==null)fail('PROSPECTIVE_RPC_ERROR');
       const result=r.result;
       switch(s.stage){
@@ -323,12 +329,12 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
         }
         case 'HANDOFF_HEAD':{
           handoffHead=block(result,false);pointTime(handoffHead,c.completedAtMs!);if(quantity(handoffHead.number)<quantity(preHead!.number))fail('PROSPECTIVE_HEAD_REGRESSED');
-          const handoff:Omit<ProspectiveHandoff,'digest'>={schemaVersion:'binrat.prospective-handoff/1',fromRat:'SNIFFER',toRat:'RAT_ZERO',objective:'CHECK_PONS_LAUNCH_AFTER_OBSERVATION',captureId:m.captureId,
+          const handoff:Omit<ProspectiveHandoff,'digest'>={schemaVersion:m.schemaVersion==='binrat.prospective-capture/4'?'binrat.prospective-handoff/2':'binrat.prospective-handoff/1',fromRat:'SNIFFER',toRat:'RAT_ZERO',objective:'CHECK_PONS_LAUNCH_AFTER_OBSERVATION',captureId:m.captureId,
             recipient:s.funding!.to,createdAtMs:c.completedAtMs!,afterBlock:quantity(handoffHead.number).toString(),fundingTx:s.funding!.hash,
             history:{fromBlock:quantity(s.history[0]!.number).toString(),toBlock:quantity(s.history.at(-1)!.number).toString(),scope:'TOP_LEVEL_TRANSACTION_PARTICIPATION_ONLY',complete:true,seen:false,blockHashes:s.history.map(b=>b.hash)},
             evidenceSequences:Array.from({length:c.sequence},(_,i)=>i+1),authority:{research:true,network:false,provider:false,delivery:false,capital:false},remainingRpcCalls:m.maxRpcCalls-s.rpcCalls};
           if(quantity(handoffHead.number)>BigInt(s.initialBlock!)+BigInt(m.maxWindowBlocks)){s.phase='EXPIRED';s.reason='PARTIAL_DISCOVERY_WINDOW_ENDED';break;}
-          s.handoff=await sealCapture(handoff);if(!handoffShape(s.handoff))fail('PROSPECTIVE_HANDOFF_INVALID');s.cursor=s.handoff.afterBlock;cursorHash=handoffHead.hash;s.stage='WATCH_HEAD';s.phase='HANDOFF_PREPARED';break;
+          s.handoff=await sealCapture(handoff);if(!(m.schemaVersion==='binrat.prospective-capture/4'?reservedHandoffShape(s.handoff):handoffShape(s.handoff)))fail('PROSPECTIVE_HANDOFF_INVALID');s.cursor=s.handoff.afterBlock;cursorHash=handoffHead.hash;s.stage='WATCH_HEAD';s.phase='HANDOFF_PREPARED';break;
         }
         case 'WATCH_HEAD':{
           const b=block(result,false);pointTime(b,c.completedAtMs!);const n=quantity(b.number),cursor=BigInt(s.cursor!);
