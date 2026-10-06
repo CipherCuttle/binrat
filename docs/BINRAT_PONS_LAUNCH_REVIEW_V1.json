@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "binrat.pons-bounded-review/1",
+  "reviewType": "ONE_BOUNDED_HOSTILE_SELF_REVIEW",
+  "independentThirdPartyAudit": false,
+  "reviewedCandidateFingerprint": "4c9b6fb6c7b1ad76607dbca01b07a241e585ff5161529a07b127cec17a78eb66",
+  "findings": [
+    {
+      "id": "C1",
+      "severity": "Critical",
+      "issue": "Async caller mutation can replace signed bytes or authority objects after validation and before the send invocation.",
+      "target": "ponsLaunchJournal.sendOnce and authority/rehearsal/verifier entrypoints",
+      "requiredFix": "Capture immutable signed bytes and sender callback; clone security-sensitive inputs before awaits; test attempted substitution.",
+      "status": "CLOSED_AFTER_FIX_AND_TARGETED_REREVIEW",
+      "fix": "Capture signed bytes/sender, security material, trusted signer identities and callback functions before awaits; freeze phase rules and issued results.",
+      "evidence": "Acceptance 4 attempts asynchronous signed-bytes, gas, transport and trust substitution; original captured bytes are the only invocation."
+    },
+    {
+      "id": "H2",
+      "severity": "High",
+      "issue": "Exact pre-arm trace only binds token/curve/vault results, not complete roles/assets/payout/lock/creation postconditions; config bytes can disagree with declared payout.",
+      "target": "ExactTraceEvidence and rehearseExactEnvelope",
+      "requiredFix": "Validate full observed creation semantics and encoded payout; inspect the whole semantic manifest for literal provisional-vault dependencies.",
+      "status": "CLOSED_AFTER_FIX_AND_TARGETED_REREVIEW",
+      "fix": "Complete observed creation postconditions in the exact trace; encoded payout must match the manifest; whole-manifest literal-vault guard; actual supply equals frozen economics.",
+      "evidence": "Acceptances 3 and 5 reject mismatched payout bytes, lock, roles, assets and supply; the factory-nonce counterfactual accepts the actual vault only with identical semantics."
+    },
+    {
+      "id": "H3",
+      "severity": "High",
+      "issue": "Pre-send reads do not re-run the exact call, and callback-supplied time can miss expiry while async validation runs.",
+      "target": "PonsLaunchJournal.sendOnce",
+      "requiredFix": "Fresh pinned exact eth_call immediately before invocation; trusted-clock checks after awaits; test revert and expiry with zero sends.",
+      "status": "CLOSED_AFTER_FIX_AND_TARGETED_REREVIEW",
+      "fix": "Durable intent then fresh critical reads and exact pinned eth_call, latest/pending wallet reads, and trusted-clock expiry/freshness checks after awaits.",
+      "evidence": "Acceptance 4 fresh call revert and expiry during the call each produce zero sends; uncertain timeout cannot resend."
+    },
+    {
+      "id": "H4",
+      "severity": "High",
+      "issue": "Mandatory code/controller inventory omits known fee-hook/escrow/locker/graduation dependencies and asset contracts; post-verifier does not compare all graph bindings through finality.",
+      "target": "semantic manifest, authority read plan and execution verifier",
+      "requiredFix": "Require known critical dependency bindings/codehashes, asset contracts where applicable, and post-execution graph/controller verification.",
+      "status": "CLOSED_AFTER_FIX_AND_TARGETED_REREVIEW",
+      "fix": "Require all eleven baseline dependencies plus ERC20 asset authority, owners/controller codehashes and graph bindings at pinned reads and both launch/finalized verification blocks.",
+      "evidence": "Acceptances 2 and 5 reject omitted dependencies, asset code omissions, critical read/code drift, and code/owner/graph changes after the launch block."
+    }
+  ],
+  "targetedRereview": {
+    "status": "PASS",
+    "count": 1,
+    "remainingAllowance": 0,
+    "reviewedCandidateFingerprint": "19bbd1ac4e4a066ce2ccecb8d1c3e266aa742afeb5e35bcc307a75e85e6cd166",
+    "checkedFindingIds": [
+      "C1",
+      "H2",
+      "H3",
+      "H4"
+    ],
+    "acceptanceResult": {
+      "tests": 5,
+      "pass": 5,
+      "fail": 0
+    },
+    "remainingCriticalHighInReviewedScope": 0,
+    "recordedAt": "2026-10-06T23:19:30.786788+00:00",
+    "reviewType": "ONE_TARGETED_SELF_REREVIEW",
+    "independentThirdPartyAudit": false
+  },
+  "launchAuthorized": false,
+  "scopeLimit": "Implementation review and synthetic acceptance only; deployed upstream behavior, legal authority and real launch readiness are not established."
+}

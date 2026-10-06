@@ -11,6 +11,7 @@ import { sha256Hex } from '../evidence/canonical.js';
 import {
   PONS_LAUNCH_CHAIN_ID,
   PONS_LAUNCH_PLAN_DIGEST,
+  PONS_V2_FACTORY_CODE_HASH_V1,
   PONS_STAKING_FACTORY_V1,
   PONS_V2_FACTORY_V1,
   PONS_VAULT_LAUNCHER_V1,
@@ -203,9 +204,9 @@ export async function validatePonsPreflightReceipt(
   ) throw new Error('PONS_PREFLIGHT_PLAN_INVALID');
 
   const contracts = record(input.contracts, 'PONS_PREFLIGHT_CONTRACTS_INVALID');
-  validateContract(contracts.ponsFactory, PONS_V2_FACTORY_V1, true);
+  validateContract(contracts.ponsFactory, PONS_V2_FACTORY_V1, PONS_V2_FACTORY_CODE_HASH_V1);
   validateContract(contracts.launcher, PONS_VAULT_LAUNCHER_V1, false);
-  validateContract(contracts.registry, PONS_VAULT_REGISTRY_V1, true);
+  validateContract(contracts.registry, PONS_VAULT_REGISTRY_V1, '0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f');
   validateContract(contracts.stakingFactory, PONS_STAKING_FACTORY_V1, false);
   validateContract(contracts.stakingBeacon, PONS_STAKING_BEACON_V1, false);
   validateContract(contracts.stakingImplementation, PONS_STAKING_IMPLEMENTATION_V1, false);
@@ -286,7 +287,7 @@ export async function validatePonsPreflightReceipt(
 function validateContract(
   value: unknown,
   expectedAddress: Address,
-  requiresPinnedHash: boolean
+  requiresPinnedHash: boolean | Hex
 ): void {
   const input = record(value, 'PONS_PREFLIGHT_CONTRACT_INVALID');
   if (
@@ -300,6 +301,7 @@ function validateContract(
       !isHex(input.expectedCodeHash) ||
       input.expectedCodeHash.length !== 66 ||
       input.codeHash.toLowerCase() !== input.expectedCodeHash.toLowerCase() ||
+      (typeof requiresPinnedHash === 'string' && input.codeHash.toLowerCase() !== requiresPinnedHash.toLowerCase()) ||
       input.status !== 'MATCH'
     ) throw new Error('PONS_PREFLIGHT_CODEHASH_DRIFT');
   } else if (

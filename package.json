@@ -29,7 +29,11 @@
     "telegram:private-menu-activate": "tsx src/telegram/configCli.ts private-menu-activate",
     "telegram:private-menu-restore": "tsx src/telegram/configCli.ts private-menu-restore",
     "telegram:smoke": "tsx src/telegram/configCli.ts smoke",
-    "verify:pons-preflight": "tsx scripts/verify-pons-preflight.ts"
+    "verify:pons-preflight": "tsx scripts/verify-pons-preflight.ts",
+    "verify:pons-launch-authority": "tsx scripts/pons-launch-authority.ts inspect",
+    "verify:pons-launch-acceptance": "tsx --test test/ponsLaunchAuthority.test.ts",
+    "verify:pons-upstream-evidence": "tsx scripts/collect-pons-launch-evidence.ts",
+    "recompute:pons-launch-authority": "tsx scripts/recompute-pons-launch-authority.ts && python3 scripts/generate-pons-authority-schemas.py"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",

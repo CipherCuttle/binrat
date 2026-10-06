@@ -1,9 +1,9 @@
 import { getAddress, isAddress } from 'viem';
 import { sha256Hex } from '../evidence/canonical.js';
 
-export const PONS_LAUNCH_PLAN_SCHEMA_VERSION = 'binrat.pons-launch-plan/0.1' as const;
+export const PONS_LAUNCH_PLAN_SCHEMA_VERSION = 'binrat.pons-launch-plan/0.2' as const;
 export const PONS_LAUNCH_PLAN_VERSION = 'BINRAT_PONS_LAUNCH_PLAN_V1' as const;
-export const PONS_LAUNCH_PLAN_DIGEST = 'f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd' as const;
+export const PONS_LAUNCH_PLAN_DIGEST = '5ce63df38978f60cb293e92c6763a1c9af5dc9e80c890d123c4ecb8bbb09e094' as const;
 export const PONS_LAUNCH_CHAIN_ID = 4663 as const;
 export const PONS_V2_FACTORY_V1 = '0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e' as const;
 export const PONS_V2_FACTORY_CODE_HASH_V1 =
@@ -92,10 +92,11 @@ export async function validatePonsLaunchPlan(value: unknown): Promise<PonsLaunch
     risk.stakingAttestationStatus !== 'CONDITIONAL' ||
     risk.rejectedStakeBurnAttestation !== 'docs/PONSVault_UPSTREAM_ATTESTATION_V1.json' ||
     risk.rejectedStakeBurnAttestationDigest !== '69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c' ||
-    risk.explicitUpstreamRiskAcceptanceRequired !== false ||
+    risk.explicitUpstreamRiskAcceptanceRequired !== true ||
     risk.ownerUpstreamRiskDecision !== 'ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY' ||
     risk.launchMechanicsGate !== 'BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST'
   ) throw new Error('PONS_LAUNCH_PLAN_UPSTREAM_RISK_INVALID');
+  if (input.stakingRequired !== true || input.workingRatStatus !== 'PLANNED' || input.productionEntitlementActive !== false) throw new Error('PONS_LAUNCH_PLAN_STAKING_ENTITLEMENT_BOUNDARY_INVALID');
 
   const historical = record(input.historicalPredecessor);
   if (

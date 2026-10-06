@@ -192,6 +192,9 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
       current.privatePresale !== 'NONE' ||
       current.discountedInsiderRound !== 'NONE' ||
       current.hiddenTeamAllocation !== 'NONE' ||
+      current.stakingRequired !== true ||
+      current.workingRatStatus !== 'PLANNED' ||
+      current.productionEntitlementActive !== false ||
       current.walletRoleStatus !== 'UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC'
     ) throw new Error('CAPABILITY_MANIFEST_CURRENT_PONS_CONFIG_INVALID');
   }

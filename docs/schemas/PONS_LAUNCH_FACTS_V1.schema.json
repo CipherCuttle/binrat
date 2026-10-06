@@ -1,0 +1,550 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:PONS_LAUNCH_FACTS_V1.schema.json",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.pons-launch-facts/1"
+    },
+    "chainId": {
+      "const": 4663
+    },
+    "verifiedLaunchState": {
+      "const": "VERIFIED"
+    },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "executionVerificationDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "upstreamRiskDeclarationDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "token": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "not": {
+        "const": "0x0000000000000000000000000000000000000000"
+      }
+    },
+    "curve": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "not": {
+        "const": "0x0000000000000000000000000000000000000000"
+      }
+    },
+    "vault": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "not": {
+        "const": "0x0000000000000000000000000000000000000000"
+      }
+    },
+    "transaction": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{64}$"
+    },
+    "blockNumber": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "blockHash": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{64}$"
+    },
+    "ponsFactory": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "not": {
+        "const": "0x0000000000000000000000000000000000000000"
+      }
+    },
+    "stakingFactory": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "not": {
+        "const": "0x0000000000000000000000000000000000000000"
+      }
+    },
+    "pair": {
+      "const": "NATIVE_ETH"
+    },
+    "assets": {
+      "type": "object",
+      "properties": {
+        "pairQuoteAsset": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "kind": {
+              "enum": [
+                "NATIVE_ETH",
+                "ERC20"
+              ]
+            },
+            "address": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "evidenceDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "status",
+            "kind",
+            "address",
+            "evidenceDigest"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_ETH"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "const": "0x0000000000000000000000000000000000000000"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "ERC20"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[a-fA-F0-9]{40}$",
+                    "not": {
+                      "const": "0x0000000000000000000000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "vaultQuoteAsset": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "kind": {
+              "enum": [
+                "NATIVE_ETH",
+                "ERC20"
+              ]
+            },
+            "address": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "evidenceDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "status",
+            "kind",
+            "address",
+            "evidenceDigest"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_ETH"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "const": "0x0000000000000000000000000000000000000000"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "ERC20"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[a-fA-F0-9]{40}$",
+                    "not": {
+                      "const": "0x0000000000000000000000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "feeAccountingAsset": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "kind": {
+              "enum": [
+                "NATIVE_ETH",
+                "ERC20"
+              ]
+            },
+            "address": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "evidenceDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "status",
+            "kind",
+            "address",
+            "evidenceDigest"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_ETH"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "const": "0x0000000000000000000000000000000000000000"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "ERC20"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[a-fA-F0-9]{40}$",
+                    "not": {
+                      "const": "0x0000000000000000000000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "rewardAccountingAsset": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "kind": {
+              "enum": [
+                "NATIVE_ETH",
+                "ERC20"
+              ]
+            },
+            "address": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "evidenceDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "status",
+            "kind",
+            "address",
+            "evidenceDigest"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_ETH"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "const": "0x0000000000000000000000000000000000000000"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "ERC20"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[a-fA-F0-9]{40}$",
+                    "not": {
+                      "const": "0x0000000000000000000000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "claimAsset": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "kind": {
+              "enum": [
+                "NATIVE_ETH",
+                "ERC20"
+              ]
+            },
+            "address": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "evidenceDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "status",
+            "kind",
+            "address",
+            "evidenceDigest"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_ETH"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "const": "0x0000000000000000000000000000000000000000"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "const": "ERC20"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "pattern": "^0x[a-fA-F0-9]{40}$",
+                    "not": {
+                      "const": "0x0000000000000000000000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "pairQuoteAsset",
+        "vaultQuoteAsset",
+        "feeAccountingAsset",
+        "rewardAccountingAsset",
+        "claimAsset"
+      ],
+      "additionalProperties": false
+    },
+    "creatorTaxBps": {
+      "const": 0
+    },
+    "buybackEnabled": {
+      "const": false
+    },
+    "openingBuyWei": {
+      "const": "0"
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^0x[a-fA-F0-9]{40}$",
+        "not": {
+          "const": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "economics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "stakingConfiguration": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "template": {
+          "const": "staking"
+        },
+        "configBytes": {
+          "type": "string",
+          "pattern": "^0x([a-fA-F0-9]{2})+$"
+        },
+        "minimumFeesBeforePayoutWei": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "contractMinimumPayoutWei": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "lock": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "NO_SUPPORTED_LOCK",
+                "CONFIGURED"
+              ]
+            },
+            "seconds": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)$"
+            }
+          },
+          "required": [
+            "kind",
+            "seconds"
+          ],
+          "additionalProperties": false
+        },
+        "creationRuleEvidenceDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "vaultPrediction": {
+          "const": "PROVISIONAL"
+        }
+      },
+      "required": [
+        "required",
+        "template",
+        "configBytes",
+        "minimumFeesBeforePayoutWei",
+        "contractMinimumPayoutWei",
+        "lock",
+        "creationRuleEvidenceDigest",
+        "vaultPrediction"
+      ],
+      "additionalProperties": false
+    },
+    "workingRatStatus": {
+      "const": "PLANNED"
+    },
+    "productionEntitlementActive": {
+      "const": false
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "chainId",
+    "verifiedLaunchState",
+    "manifestDigest",
+    "executionVerificationDigest",
+    "upstreamRiskDeclarationDigest",
+    "token",
+    "curve",
+    "vault",
+    "transaction",
+    "blockNumber",
+    "blockHash",
+    "ponsFactory",
+    "stakingFactory",
+    "pair",
+    "assets",
+    "creatorTaxBps",
+    "buybackEnabled",
+    "openingBuyWei",
+    "roles",
+    "economics",
+    "stakingConfiguration",
+    "workingRatStatus",
+    "productionEntitlementActive",
+    "digest"
+  ],
+  "additionalProperties": false
+}
