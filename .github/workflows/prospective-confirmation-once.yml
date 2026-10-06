@@ -1,0 +1,39 @@
+name: prospective-confirmation-once
+on:
+  push:
+    branches: [test/binrat-prospective-confirmation-v1]
+permissions:
+  contents: read
+concurrency:
+  group: binrat-prospective-confirmation-20261006-v1
+  cancel-in-progress: false
+jobs:
+  observe:
+    if: ${{ github.run_attempt == 1 && github.event.head_commit.message == '[binrat-prospective-confirmation-20261006-v1]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify offline before permitting RPC
+        run: pnpm check
+      - name: One future-only funding to later-launch observation
+        env:
+          BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+        run: node scripts/probe-indexed-funder.mjs --protocol bounded-observation-v1 --out "$RUNNER_TEMP/binrat-prospective-confirmation-20261006-v1" --capture-id prospective-confirmation-20261006-v1 --source-sha "$GITHUB_SHA"
+      - name: Preserve original journal, handoff checkpoint and audit even on halt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-prospective-confirmation-20261006-v1
+          path: ${{ runner.temp }}/binrat-prospective-confirmation-20261006-v1/
+          retention-days: 30
+          if-no-files-found: warn
