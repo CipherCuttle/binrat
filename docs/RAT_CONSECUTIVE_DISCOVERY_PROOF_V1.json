@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "binrat.consecutive-discovery-proof/1",
+  "mode": "OFFLINE_SYNTHETIC_CONTROLS_ONLY",
+  "protocol": "binrat.prospective-capture/2",
+  "discoveryBlocks": 8,
+  "maxRpcAttempts": 48,
+  "localTests": 580,
+  "realV2CaptureStarted": false,
+  "newPublicRpcCalls": 0,
+  "newModelCalls": 0,
+  "newModelCostMicrousd": 0,
+  "deliverySends": 0,
+  "controls": {
+    "negative": {
+      "provenance": "SYNTHETIC_TRANSPORT_CONTROL",
+      "phase": "DISCOVERY_COMPLETE",
+      "throughBlock": "108",
+      "confirmedBlocks": 8,
+      "rpcCalls": 35
+    },
+    "positive": {
+      "provenance": "SYNTHETIC_TRANSPORT_CONTROL",
+      "fundingBlock": "102",
+      "handoffAtRpcCall": 24,
+      "launchBlock": "120",
+      "findingAtRpcCall": 31
+    },
+    "waitingAndLateFunding": {
+      "phase": "EXHAUSTED",
+      "rpcCalls": 48,
+      "finding": null
+    }
+  },
+  "historicalV1": {
+    "rawFile": "test/fixtures/workforce/prospective/public-capture-terminal-v1.json",
+    "rawSha256": "37a83a000e36c21951ca4175ec9d5859d1b38b1d3cca904a27b6b2724dd0fd1b",
+    "phase": "EXPIRED",
+    "rpcCalls": 7,
+    "snapshotDigest": "0fd4f00a26c2e7bd8ffc05e5e0d6617f337d39c111d9323fa0ee09ec535b7778",
+    "verdict": "INCONCLUSIVE_PARTIAL_DISCOVERY_WINDOW_ENDED"
+  },
+  "review": {
+    "hostileSelfReview": "HIGH_REPEATED_HASH_AND_MEDIUM_SAME_HEIGHT_FORK_FIXED",
+    "targetedRereview": "PASS",
+    "independentReviewer": false
+  },
+  "authentication": "PROVIDER_REPORTED_LOCAL_CLOCK_NOT_EXTERNALLY_ATTESTED"
+}

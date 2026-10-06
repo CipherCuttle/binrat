@@ -2,7 +2,7 @@
 import Database from 'better-sqlite3';
 import { canonicalJson } from '../evidence/canonical.js';
 import { auditProspective, captureTerminal, sealCapture, validateProspectiveManifest,
-  type ProspectiveManifest, type CaptureCall, type RpcRequest, type ProspectiveState } from './prospective.js';
+  type CaptureManifest, type CaptureCall, type RpcRequest, type ProspectiveState } from './prospective.js';
 
 export interface RpcAttempt {rawResponse:string;error:string|null}
 export type PublicReadTransport=(request:RpcRequest)=>Promise<RpcAttempt>;
@@ -39,7 +39,7 @@ export class ProspectiveJournal {
     const value=input as {mode?:string;manifest?:{json?:string};calls?:{sequence:number;json:string}[]};
     if(!value||value.mode!=='UNVERIFIED_PROSPECTIVE_EXPORT'||typeof value.manifest?.json!=='string'||!Array.isArray(value.calls)||value.calls.length>48||
       value.calls.some((row,i)=>row.sequence!==i+1||typeof row.json!=='string'))throw new Error('PROSPECTIVE_EXPORT_INVALID');
-    const manifest=JSON.parse(value.manifest.json) as ProspectiveManifest,calls=value.calls.map(row=>JSON.parse(row.json) as CaptureCall);
+    const manifest=JSON.parse(value.manifest.json) as CaptureManifest,calls=value.calls.map(row=>JSON.parse(row.json) as CaptureCall);
     await auditProspective(manifest,calls);
     this.db.transaction(()=>{
       const current=this.db.prepare('SELECT json FROM prospective_manifest WHERE id=1').get() as {json:string}|undefined;
@@ -59,7 +59,7 @@ export class ProspectiveJournal {
       if(!row)throw new Error('PROSPECTIVE_MANIFEST_REQUIRED');
       const entries=this.db.prepare('SELECT sequence,json FROM prospective_calls ORDER BY sequence').all() as {sequence:number;json:string}[];
       if(entries.length>48||entries.some((entry,i)=>entry.sequence!==i+1))throw new Error('PROSPECTIVE_JOURNAL_INVALID');
-      return {manifest:JSON.parse(row.json) as ProspectiveManifest,calls:entries.map(row=>JSON.parse(row.json) as CaptureCall)};
+      return {manifest:JSON.parse(row.json) as CaptureManifest,calls:entries.map(row=>JSON.parse(row.json) as CaptureCall)};
     })();
   }
   async inspect(now?:number){const data=this.raw();return auditProspective(data.manifest,data.calls,now);}
@@ -89,6 +89,7 @@ export class ProspectiveJournal {
       const after=await this.inspect(now());
       // One logical boundary per invocation. Subsequent observation requires an explicit manual step.
       if(captureTerminal(after)||after.phase==='HANDOFF_PREPARED'||
+        (after.stage==='SCAN_HEAD'&&(before.stage==='SCAN_HEAD'||before.stage==='SCAN_CONFIRM'))||
         (after.stage==='SAMPLE'&&pending.request.method==='eth_getBlockByNumber'&&pending.request.params[1]===true)||
         (after.stage==='WATCH_HEAD'&&(before.stage==='WATCH_HEAD'||before.stage==='RANGE_ANCHOR')))return after;
     }

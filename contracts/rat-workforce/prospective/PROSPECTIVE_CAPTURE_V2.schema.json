@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provenance",
+    "captureId",
+    "funder",
+    "endpoint",
+    "createdAtMs",
+    "expiresAtMs",
+    "maxRpcCalls",
+    "historyBlocks",
+    "maxWindowBlocks",
+    "authority",
+    "digest",
+    "discovery"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.prospective-capture/2"
+    },
+    "provenance": {
+      "const": "PUBLIC_RPC_SHADOW"
+    },
+    "captureId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "funder": {
+      "const": "0x9bc462bce2acd6fbe2ef5470d55b439453451083"
+    },
+    "endpoint": {
+      "const": "https://rpc.mainnet.chain.robinhood.com"
+    },
+    "createdAtMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "expiresAtMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "maxRpcCalls": {
+      "const": 48
+    },
+    "historyBlocks": {
+      "const": 8
+    },
+    "maxWindowBlocks": {
+      "const": 200000
+    },
+    "authority": {
+      "const": {
+        "publicRpcRead": true,
+        "model": false,
+        "delivery": false,
+        "capital": false
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "discovery": {
+      "const": {
+        "strategy": "CONSECUTIVE_NUMBERED_BLOCKS",
+        "maxBlocks": 8
+      }
+    }
+  }
+}
