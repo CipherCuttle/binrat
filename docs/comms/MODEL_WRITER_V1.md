@@ -61,7 +61,7 @@ Properties:
 - no tools;
 - no streaming;
 - model-compatible `max_completion_tokens=512` completion ceiling;
-- strict JSON Schema response request;
+- strict JSON Schema response request using only the portable provider subset (`type`, `enum`, `required`, `additionalProperties`); local parsing keeps exact version and channel-length enforcement;
 - `provider.require_parameters=true`;
 - provider error bodies are not surfaced;
 - API key is held only in request memory and is never returned in receipts.
