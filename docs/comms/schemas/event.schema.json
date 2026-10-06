@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://binrat.tech/schemas/comms-event-v1.json",
+  "title": "BINRAT Comms Event V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "occurredAt",
+    "type",
+    "lifecycle",
+    "visibility",
+    "publicAuthorized",
+    "headline",
+    "summary",
+    "userValue",
+    "novelty",
+    "repetitionPenalty",
+    "risk",
+    "evidence"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "type": {
+      "enum": [
+        "FEATURE_CHANGE",
+        "FORENSIC_FINDING",
+        "CASE_PUBLISHED",
+        "ROADMAP_UPDATE",
+        "RELEASE",
+        "MANUAL_STORY"
+      ]
+    },
+    "lifecycle": {
+      "enum": [
+        "EXPERIMENTAL",
+        "PLANNED",
+        "BUILDING",
+        "ENGINEERING_PASS",
+        "DEPLOYED",
+        "PUBLIC_LIVE",
+        "BLOCKED",
+        "DEPRECATED",
+        "REJECTED"
+      ]
+    },
+    "visibility": { "enum": ["INTERNAL", "HOLD", "PUBLIC_OK"] },
+    "publicAuthorized": { "type": "boolean" },
+    "headline": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "userValue": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "novelty": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "repetitionPenalty": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "risk": { "enum": ["LOW", "MEDIUM", "HIGH"] },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "ref"],
+        "properties": {
+          "kind": {
+            "enum": [
+              "PR",
+              "COMMIT",
+              "CI",
+              "DEPLOYMENT",
+              "RECEIPT",
+              "DOC",
+              "PRODUCT_STATUS"
+            ]
+          },
+          "ref": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["PASS", "FAIL", "UNKNOWN"] }
+        }
+      }
+    }
+  }
+}

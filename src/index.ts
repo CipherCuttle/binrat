@@ -3,6 +3,7 @@ export const BINRAT_TICKER = '$BINRAT' as const;
 
 export * from './arc/chain.js';
 export * from './arc/arcpadSource.js';
+export * from './comms/commsRat.js';
 export * from './core/types.js';
 export * from './core/identity.js';
 export * from './core/ports.js';

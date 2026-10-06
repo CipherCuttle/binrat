@@ -1,0 +1,18 @@
+{
+  "id": "fixture-funding-watch-building",
+  "occurredAt": "2026-10-06T11:30:00Z",
+  "type": "FEATURE_CHANGE",
+  "lifecycle": "BUILDING",
+  "visibility": "PUBLIC_OK",
+  "publicAuthorized": true,
+  "headline": "THE RAT IS BUILDING A NEW TRIPWIRE.",
+  "summary": "Funding-wallet watch is being implemented behind the existing evidence boundary.",
+  "userValue": 3,
+  "novelty": 3,
+  "repetitionPenalty": 0,
+  "risk": "LOW",
+  "evidence": [
+    { "kind": "PR", "ref": "#fixture" },
+    { "kind": "CI", "ref": "fixture-check", "status": "PASS" }
+  ]
+}
