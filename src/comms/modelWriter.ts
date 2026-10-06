@@ -169,7 +169,7 @@ export async function draftCommsEventWithModel(
       requestDigest,
       rawOutputDigest: await sha256Hex(response.rawOutput),
       draftsDigest: await sha256Hex(drafts),
-      acceptedByDeterministicGate: bundle.violations.length === 0,
+      acceptedByDeterministicGate: bundle.decision === 'POST' && bundle.violations.length === 0,
       violationCount: bundle.violations.length,
       ...(response.usage ? { usage: response.usage } : {}),
     },

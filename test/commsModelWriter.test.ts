@@ -13,7 +13,7 @@ import {
 } from '../src/comms/openRouterWriter.js';
 import type { CommsEvent } from '../src/comms/commsRat.js';
 
-function event(overrides: Partial<CommsEvent> = {}): ComsEvent {
+function event(overrides: Partial<CommsEvent> = {}): CommsEvent {
   return {
     id: 'evt-writer-001',
     occurredAt: '2026-10-06T11:45:00Z',
@@ -93,6 +93,22 @@ test('safe model copy is admitted to a shadow bundle but still cannot publish', 
   assert.match(result.writerReceipt.rawOutputDigest, /^[a-f0-9]{64}$/);
 });
 
+test('high-risk model draft is not marked accepted even when copy itself is clean', async () => {
+  const result = await draftCommsEventWithModel(
+    event({ risk: 'HIGH' }),
+    writer(
+      draft(
+        'NEW TRIPWIRE IN THE WORKSHOP. BUILDING: funding-wallet watch is being implemented. Receipt: PR #137.',
+        'BINRAT UPDATE\n\nFunding-wallet watch is BUILDING.\n\nReceipt: PR #137.',
+      ),
+    ),
+  );
+
+  assert.equal(result.bundle.decision, 'QUEUE');
+  assert.equal(result.bundle.violations.length, 0);
+  assert.equal(result.writerReceipt.acceptedByDeterministicGate, false);
+});
+
 test('prompt-injected live claim is downgraded by the deterministic gate', async () => {
   const result = await draftCommsEventWithModel(
     event({
@@ -122,7 +138,7 @@ test('Brand V1 banned language from a model is downgraded', async () => {
     writer(
       draft(
         'AI-powered alpha. Ape in.',
-       'Smart money found. Trade smarter.',
+        'Smart money found. Trade smarter.',
       ),
     ),
   );
@@ -147,7 +163,7 @@ test('model cannot smuggle decision or lifecycle fields into the output contract
           lifecycle: 'PUBLIC_LIVE',
         }),
       ),
-     /MODEL_DRAFT_SHAPE_INVALID/,
+    /MODEL_DRAFT_SHAPE_INVALID/,
   );
 });
 
