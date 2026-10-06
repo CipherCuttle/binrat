@@ -60,6 +60,7 @@ Properties:
 - 64 KiB response cap;
 - no tools;
 - no streaming;
+- model-compatible `max_completion_tokens=512` completion ceiling;
 - strict JSON Schema response request;
 - `provider.require_parameters=true`;
 - provider error bodies are not surfaced;
