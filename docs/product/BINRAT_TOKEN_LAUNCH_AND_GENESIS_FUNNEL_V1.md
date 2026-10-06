@@ -1,461 +1,337 @@
 # BINRAT TOKEN LAUNCH + GENESIS FUNNEL V1
 
-Status: planning / pre-launch design  
-Authority: roadmap companion for the current Robinhood Chain / Pons V2 direction.  
-Rule: this document does not authorize token marketing, signing, broadcast, launch, or promise financial return.
+Date: 2026-10-06  
+Status: **canonical token/product convergence planning**  
+Authority: `docs/BINRAT_LAUNCH_NIGHT_CANON_V1.md` + current Pons gate/plan artifacts.  
+This document does **not** authorize token marketing, signing, broadcast, launch, or financial-return claims.
 
-## 1. Objective
+## 1. Launch V1 in one breath
 
-Launch $BINRAT early enough that the token and product grow together without turning the product into token marketing.
+> **BINRAT is a workforce of forensic Rats. Rat Zero digs now. Tripwire is being built to stay behind and watch. Sniffer is proving the funding-trail hunt. Stake $BINRAT to unlock more bounded Rat labor when the entitlement is verified. Stake buys labor, not truth.**
 
-V1 should be understandable in one breath:
+The launch is product-led:
 
-> BINRAT digs through launch trash and keeps the receipts. Put $BINRAT to work by staking it: active stake unlocks a more capable Rat while the selected public PonsVault Staking primitive routes creator-fee rewards according to the verified current vault contract. The dependency remains conditional on fresh preflight and exact-manifest verification; its third-party upgrade/audit risk is owner-accepted for this selected dependency but does not authorize launch.
+`FIND → EMPLOY → LEAVE → RETURN`
 
-The launch must optimize for low cognitive load:
+Token acquisition is downstream of experiencing useful evidence.
 
-- one launch rail;
-- one vault template;
-- one stake-backed product tier;
-- one canonical launch manifest;
-- one signing wallet;
-- one self-audit surface;
-- one verified public facts artifact.
+## 2. Selected Launch V1 rail
 
-No custom RatVault, RWA dividend, Rat Bonds, governance, token emissions, or FERAL tier blocks Launch V1.
+Current owner-selected planning target:
 
-## 2. Supersession / current debt
+- Robinhood Chain **4663**;
+- **Pons V2**;
+- **native ETH** pair / quote;
+- public **PonsVault Staking** dependency, conditional on fresh exact preflight;
+- Pons native buyback **OFF**;
+- creator tax **0%**;
+- opening/dev buy **0 ETH**;
+- no private presale;
+- no discounted insider round;
+- no hidden team allocation;
+- one active-stake product tier: **WORKING RAT**.
 
-The old ArcPad / Arc 5042 launch receipts and configuration remain historical evidence. They do not authorize a Robinhood Chain 4663 launch and must not be treated as current Pons launch-mechanics authority.
+The selected PonsVault dependency remains third-party, upgradeable and not established here as independently audited/source-matched. Fresh upstream verification and disclosure remain required before arming.
 
-The canonical capability manifest and launch-gate matrix now distinguish current Pons V1 prelaunch authority from historical Arc evidence. The old Arc receipt stays immutable as historical proof; it is not rewritten to pretend it verified Pons.
-
-Current launch-planning target:
-
-- chain: Robinhood Chain 4663;
-- launch rail: Pons V2;
-- quote/pair: native ETH selected;
-- vault: public PonsVault Staking candidate (CONDITIONAL);
-- Pons native buyback: OFF by owner selection for Launch V1 unless a later separately reviewed manifest explicitly changes it;
-- creator tax: 0% by owner selection for Launch V1;
-- opening/dev buy: 0 ETH by owner selection;
-- no private presale / no discounted insider round / no hidden team allocation;
-- product gate: active stake, not simple wallet balance;
-- launch product tier: one paid/staked tier, **WORKING RAT**.
-
-## 3. Launch V1 product scope
+## 3. Launch V1 product
 
 ### FREE RAT
 
-Core product stays useful:
+Useful without staking:
 
-- open Fresh Garbage;
-- open Case / WHY;
-- inspect receipts;
-- basic Trash Trail;
-- small Rat Watch allowance;
-- receive normal alerts.
+- fresh Pons discovery;
+- Case / WHY;
+- receipts;
+- supported retained history / Trash Trail;
+- bounded current Watch value where available.
+
+The free product must prove why BINRAT matters before asking for a wallet or stake.
 
 ### WORKING RAT
 
-Requires verified active stake at or above the frozen Working Rat threshold.
+Requires verified active $BINRAT stake at or above **one frozen Launch V1 threshold**.
 
-Candidate capabilities:
+Public promise:
 
-- larger Rat Watch allowance;
-- deeper retained history;
-- advanced alert filtering;
-- limited export / power-user convenience where operationally ready.
+> **FREE RAT DIGS WHEN YOU ASK.**  
+> **WORKING RAT KEEPS DIGGING AFTER YOU LEAVE.**
 
-Do not hide the factual answer behind token ownership.
+Launch V1 entitlement can unlock additional bounded labor/capacity where actually implemented, such as:
 
-The stake gate sells depth, scale, speed, and convenience.
+- more Watch/persistent-job capacity;
+- deeper retained coverage;
+- advanced filters;
+- bounded exports / power-user convenience;
+- later Rat workforce capacity.
 
-## 4. Early-supporter doctrine
+Permanent boundary:
 
-Early supporters should be rewarded for **commitment and useful product growth**, not for winning a gas race, wash-trading, or creating fake accounts.
+> **STAKE BUYS LABOR. NOT TRUTH.**
 
-There are three separate reward channels.
+Do not make token balance decide factual output.
 
-### A. Protocol-native stake economics
+## 4. Crew + token story
 
-If the reviewed PonsVault Staking implementation is selected, early stakers participate in the vault's verified creator-fee reward mechanics while they remain staked. For the native-ETH path, BINRAT copy must follow the verified native quote semantics rather than generic WETH wording.
+### RAT ZERO · LIVE
 
-BINRAT does not add inflationary $BINRAT staking emissions in V1.
+The immediate free-product proof.
 
-No projected APY or guaranteed return is marketed.
+### TRIPWIRE · BUILDING
 
-### B. GENESIS RAT recognition
+The clearest future persistent-job value: leave a declared watch, go away, return when supported change occurs.
 
-A launch-era supporter can earn a non-transferable **GENESIS RAT** status.
+### SNIFFER · PROVING
 
-Candidate qualification:
+Real prospective funding handoffs exist. Useful later-launch prediction/yield remains unproven.
 
-- link a wallet to a BINRAT principal;
-- stake at least the frozen WORKING RAT threshold;
-- maintain qualifying active stake for a sustained period during a published Genesis window.
+Sniffer is evidence that the crew is becoming more capable; it is not a reason to pretend prediction is production-ready.
 
-Candidate timing for implementation tests:
+### THE DEN · BUILDING
 
-- Genesis window: first 30 days after verified public launch;
-- sustained stake requirement: 7 continuous days.
+One place for future persistent jobs, limits, status and returned findings.
 
-These numbers are candidates until frozen in the launch/supporter manifest.
+The Den is useful product direction but a complete production Den is **not required for the token transaction**.
 
-GENESIS RAT rewards should be product/culture benefits, not extra token emissions:
+## 5. Launch-night critical path
 
-- permanent Genesis badge / Telegram role;
-- canonical Genesis receipt tied to the linked principal + wallet;
-- distinct share-card treatment;
-- bounded temporary bonus Watch capacity;
-- early access to selected post-launch product experiments;
-- priority invitation to research/community pilots.
+The old broad L0–L10 sequence is replaced for launch-night execution by this bounded path.
 
-Do not reward larger balances beyond the WORKING RAT qualification threshold with stronger Genesis status.
+### A — COMPOSE
 
-A whale and a normal qualifying staker can both be Genesis Rats.
+Create one reviewed launch-night integration line containing only:
 
-### C. Qualified product referrals
+- current public read-plane stability;
+- accepted frontdoor/brand presentation;
+- current Pons preflight;
+- active-stake reader;
+- exact launch rehearsal machinery.
 
-Sharing should be rewarded only when it creates a real BINRAT user.
+Do not merge research chains wholesale.
 
-The referral primitive is a canonical Case / receipt / share link with an attributable invite parameter.
+### B — FREEZE OWNER INPUTS
 
-Do not reward:
+Freeze:
 
-- impressions;
-- likes;
-- raw clicks;
-- X reposts;
-- wallet count;
-- transaction volume;
-- token purchase size.
+- launch/signing wallet;
+- token name/symbol/logo/description/socials;
+- WORKING RAT active-stake threshold;
+- staking payout threshold;
+- treasury/role disclosures required by the final structure.
 
-Candidate qualified activation:
+Derive current Pons economics/config from authoritative live state rather than guessing stale values.
 
-1. referred principal opens a real Case;
-2. performs at least one second meaningful product action, such as another Case/receipt or Watch creation;
-3. returns on a later day or through a later BINRAT event.
+### C — MINIMUM WORKING RAT
 
-Only after retained activation does the referral become rewardable.
+Before calling stake-backed access live:
 
-Candidate referrer rewards:
+- exact token/vault authority;
+- fail-closed active-stake read;
+- one threshold;
+- required wallet/principal binding;
+- activation/deactivation smoke.
 
-- short WORKING RAT product trial;
-- temporary extra Watch capacity;
-- early beta access;
-- Genesis milestone / cosmetic recognition.
+Do not build FERAL RAT.
 
-Referral rewards are capped per principal and per period.
+### D — FRESH PREFLIGHT
 
-They do not promise token distribution, a future airdrop, or conversion into $BINRAT.
+Immediately before manifest freeze, re-read and bind:
 
-## 5. Pre-launch user funnel
+- chain;
+- Pons factory/launcher;
+- registry → staking factory;
+- beacon → implementation;
+- owners / upgrade path;
+- `canLaunch`;
+- current launch config/economics;
+- staking path;
+- exact risk disclosure.
 
-BINRAT's first acquisition funnel should not depend on private investor outreach.
+Any unexpected drift blocks arming.
 
-Primary surfaces:
+### E — EXACT REHEARSAL
 
-- X = distribution / memes / receipts;
-- Telegram bot = scout / activation / Watch / return loop;
-- binrat.tech = canonical product + Case surfaces + launch facts;
-- Substack = optional depth channel after the critical launch path is stable.
+Build the exact intended transaction:
 
-Canonical funnel:
+- exact wallet/from;
+- exact metadata;
+- exact creator-fee recipient semantics;
+- exact launch config/economics;
+- native ETH pair;
+- Staking template/config;
+- 0% creator tax;
+- buyback OFF;
+- 0 opening buy;
+- exact value/calldata.
 
-`X / shared receipt -> OPEN CASE -> DIG DEEPER -> WATCH -> ALERT -> RETURN -> SHARE A RECEIPT -> LINK WALLET -> PUT THE RAT TO WORK -> WORKING RAT -> REPEAT`
+Run no-broadcast simulation and record:
 
-Token acquisition is not the first step.
+- predicted token;
+- predicted vault;
+- calldata hash;
+- manifest digest;
+- expected postconditions;
+- abort/reconciliation path.
 
-The Rat must demonstrate value before asking the user to stake.
+### F — LEGAL / COMPLIANCE
 
-## 6. Core growth loops
+Remains fail-closed until actually satisfied for the final BINRAT Pons/staking/marketing structure.
 
-### Receipt loop
+Engineering progress does not flip this gate.
 
-`Rat finds something -> user opens Case -> user shares evidence-backed receipt -> new user opens Case`
+### G — ARM + EXPLICIT OWNER AUTHORITY
 
-### Watch loop
+Only one immutable reviewed manifest may become `ARMED`.
 
-`user creates Watch -> Rat catches recurrence -> Telegram alert -> user returns -> investigates -> shares`
+No generic “launch BINRAT” authority. Authorization binds the exact manifest.
 
-### Working Rat loop
+### H — BROADCAST + VERIFY
 
-`user sees product value -> stakes $BINRAT -> unlocks more Rat -> uses more BINRAT -> remains staked while useful`
+One intended launch transaction.
 
-### Genesis loop
-
-`early user/supporter -> sustained qualifying stake / retained referrals -> Genesis status -> visible identity / product perks -> more credible community participation`
-
-No loop is allowed to make token balance decide factual truth.
-
-## 7. Event telemetry
-
-### Acquisition
-
-- `receipt_shared`
-- `receipt_opened_from_share`
-- `telegram_opened`
-- `web_case_deeplink_opened`
-
-### Activation
-
-- `case_opened`
-- `receipt_opened`
-- `watch_created`
-- `second_meaningful_action`
-
-### Retention
-
-- `return_next_day`
-- `alert_opened`
-- `case_opened_after_alert`
-
-### Sharing
-
-- `qualified_share_created`
-- `referred_activation_completed`
-- `referred_retention_completed`
-
-### Token/product convergence
-
-- `wallet_linked`
-- `stake_observed`
-- `working_rat_activated`
-- `working_rat_feature_used`
-- `stake_lost_working_rat`
-
-### Genesis
-
-- `genesis_qualification_started`
-- `genesis_qualification_broken`
-- `genesis_rat_awarded`
-
-Do not use token price as a product KPI.
-
-## 8. Anti-farm / anti-Goodhart rules
-
-- no reward for raw clicks;
-- no reward for raw follows;
-- no reward for number of wallets;
-- no reward for transaction volume;
-- no purchase-size multiplier;
-- no token emissions for product usage;
-- no reward for opening the same Case repeatedly;
-- no referral reward until retained activation;
-- one referred principal can qualify once;
-- referral rewards are capped;
-- wallet-link and Telegram-principal abuse controls remain independent;
-- Genesis qualification requires sustained state, not one-block stake.
-
-If the incentive becomes cheaper to farm than the product value it creates, stop the incentive.
-
-## 9. Launch appliance
-
-The repository should drive the owner through a deterministic state machine:
-
-`DRAFT -> PREFLIGHTED -> ARMED -> BROADCAST -> CONFIRMED -> VERIFIED -> PUBLIC`
-
-Any ambiguity enters `ABORT` / reconciliation rather than an improvised second transaction.
-
-The launch system must produce:
-
-- exact launch manifest;
-- Pons / PonsVault dependency attestation;
-- economics scenario artifact;
-- preflight artifact;
-- arm artifact;
-- launch transaction receipt;
-- post-launch verification;
-- canonical public token facts JSON.
-
-CI verifies but never broadcasts.
-
-## 10. One canonical public facts artifact
-
-After post-launch verification, generate one machine-readable facts source consumed by:
-
-- binrat.tech;
-- Telegram launch/status cards;
-- X launch-copy tooling;
-- CASE: $BINRAT;
-- later Substack launch/deep-dive copy.
-
-At minimum it binds:
-
-- chain / chain id;
-- token address;
-- Pons factory / curve;
-- vault address / vault template;
-- pair asset;
-- creator tax;
-- launch transaction / block;
-- reviewed manifest hash;
-- verified state.
-
-No address should be manually copied into several public channels.
-
-## 11. Immediate code workstreams
-
-### L0 — roadmap / authority reconciliation
-
-- freeze this roadmap direction;
-- mark Arc launch mechanics historical for current token planning;
-- define Pons V1 successor authority in the capability manifest / gate matrix;
-- keep launch and marketing authorization blocked.
-
-### L1 — PonsVault forensic pin
-
-- rejected Stake & Burn attestation + exact launcher / registry / current Staking factory / beacon / implementation;
-- ABI;
-- bytecode / codehash;
-- proxy / beacon implementation;
-- upgrade authority;
-- fee sweep permissions;
-- live behavior proof.
-
-### L2 — stake reader
-
-Pure read-only adapter:
-
-`wallet -> verified active Staking-vault stake via stakedOf(address) at pinned block`
-
-Fail closed on unknown chain/vault/code/reorg/staleness.
-
-Genesis sustained qualification must be observed by BINRAT over time. Do not infer continuity from an upstream lock period: the current Staking factory creation payload does not expose a creator-set lock field.
-
-### L3 — WORKING RAT entitlement
-
-One threshold only for Launch V1.
-
-`FREE -> WORKING`
-
-No FERAL tier before launch.
-
-### L4 — wallet link
-
-Telegram principal <-> Robinhood wallet proof using a bounded signed challenge.
-
-No transaction approval or private key access.
-
-### L5 — CASE: $BINRAT
-
-Self-audit:
+Then verify actual:
 
 - token;
 - curve;
-- launch;
 - vault;
+- transaction/block/hash;
+- economics;
 - creator tax;
-- stake state;
-- retired-to-burn-address state where verifiable;
-- graduation;
-- material upstream changes;
-- receipts.
+- pair asset;
+- staking interface;
+- manifest match.
 
-### L6 — Genesis / referral primitives
+Only after verification create the canonical public token facts artifact and move public state to launched.
 
-- attributable canonical share links;
-- retained-activation attribution;
-- Genesis qualification state;
-- bounded product/culture reward ledger;
-- anti-Sybil caps.
+## 6. Launch appliance
 
-No transferable points.
+State machine:
 
-### L7 — economics simulator
+`DRAFT → PREFLIGHTED → ARMED → BROADCAST → CONFIRMED → VERIFIED → PUBLIC`
 
-Compare candidate creator-tax settings and actual live protocol parameters.
+Ambiguity:
 
-Do not predict token price.
+`ABORT / RECONCILE`
 
-### L8 — launch manifest + preflight
+CI verifies and produces receipts. CI never broadcasts.
 
-One frozen config, one hash, one signing authority.
+## 7. Acquisition funnel
 
-### L9 — rehearsal
+Primary surfaces:
 
-No broadcast. Prove preflight, predicted state, launch artifacts, verifier, abort path.
+- **binrat.tech** — product, Cases, crew, roadmap, canonical token facts;
+- **Telegram** — quick digs, alerts and return;
+- **X** — distribution, receipts, Case links;
+- **Substack** — optional depth after the launch-critical path is stable.
 
-### L10 — launch
+Canonical funnel:
 
-Requires separately satisfied legal/compliance, upstream, manifest, verification, and explicit owner authority.
+`X / receipt → START DIGGING → OPEN CASE → DIG → WATCH → ALERT → RETURN → SHARE → LINK WALLET → PUT THE RAT TO WORK → WORKING RAT`
 
-## 12. PR sequence
+Do not lead with a token-buy CTA.
 
-1. `docs/binrat-launch-genesis-funnel-v1` — roadmap + doctrine.
-2. `research/binrat-pons-vault-pins-v1` — upstream forensic proof.
-3. `feat/binrat-pons-stake-read-v1` — read-only stake source.
-4. `feat/binrat-working-rat-v1` — one stake-backed product tier.
-5. `feat/binrat-wallet-link-v1` — principal/wallet binding.
-6. `feat/binrat-token-self-case-v1` — CASE: $BINRAT.
-7. `feat/binrat-genesis-funnel-v1` — qualified shares + Genesis state.
-8. `research/binrat-token-economics-v1` — scenario model.
-9. `ops/binrat-token-launch-rehearsal-v1` — launch appliance dry path.
-10. `ops/binrat-token-launch-candidate-v1` — exact candidate only after all gates.
+## 8. Early supporters / Genesis
 
-## 13. Launch freeze
+Genesis is a **post-launch retention layer**, not a transaction blocker.
 
-Once the launch candidate manifest exists:
+Candidate doctrine:
 
-Allowed:
+- non-transferable **GENESIS RAT** recognition;
+- qualification through sustained useful participation / qualifying active stake;
+- no wealth-weighted Genesis rank;
+- no inflationary $BINRAT emissions;
+- no promised airdrop;
+- no transferable points.
 
-- Critical/High launch/security fix;
-- factual correction;
-- failed acceptance-gate repair.
+Candidate implementation parameters remain:
 
-Not allowed:
+- first 30 days after verified public launch;
+- 7 continuous qualifying stake days.
 
-- custom RatVault;
-- StonkRat;
-- Rat Bonds;
-- FERAL tier;
-- governance;
-- new chain;
-- visual redesign;
-- new referral economy;
-- "while we are here" changes.
+These remain candidates until a separately frozen supporter manifest exists.
 
-Interesting ideas go to the post-launch backlog.
+Possible rewards:
 
-## 14. Success criteria
+- badge / Telegram role;
+- Genesis receipt;
+- share-card treatment;
+- bounded temporary Watch/Rat capacity;
+- early access to experiments.
 
-The first launch/product loop is working when:
+If Genesis/referral implementation threatens launch simplicity, defer it.
 
-- users reach Case from X/Telegram shares;
-- users create Watches;
-- alerts cause return visits;
-- shared receipts create retained users;
-- a meaningful fraction of active stakers actually use BINRAT;
-- a meaningful fraction of power users choose to stake;
-- Genesis rewards do not dominate product behavior;
-- the product remains useful if token volume falls sharply.
+## 9. Referrals
 
-## 15. Kill / simplify criteria
+Referral rewards require retained product activation, not attention farming.
 
-Remove or simplify the supporter incentive if:
+Never reward:
 
-- referral activity is mostly self-referral / farming;
-- rewards create more fake accounts than retained users;
-- users share token-price content instead of evidence;
-- Genesis status becomes a wealth leaderboard;
-- product trials reduce rather than increase eventual staking/product use;
-- incentive accounting becomes a launch blocker.
+- raw clicks;
+- follows;
+- reposts;
+- wallet count;
+- token purchase size;
+- transaction volume.
 
-The fastest safe mechanism wins.
+Candidate rewards are bounded product/culture benefits, not token emissions.
 
-## 16. Post-launch backlog
+Referral machinery is **post-launch unless already safely complete**.
 
-Only after Launch V1 is stable:
+## 10. Public facts after launch
+
+Generate one canonical machine-readable source for:
+
+- chain / chain ID;
+- token;
+- Pons factory / curve;
+- vault / template;
+- pair asset;
+- creator tax;
+- launch transaction/block/hash;
+- reviewed manifest hash;
+- verified state.
+
+Web, Telegram, X tooling and CASE: $BINRAT must consume the same facts.
+
+Do not manually copy the contract address into multiple independent sources.
+
+## 11. Not launch blockers
+
+Do not hold the token transaction for:
 
 - FERAL RAT;
+- Genesis/referrals;
+- Comms Rat;
+- perfect Sniffer prediction;
+- complete Den UX;
+- custom RatVault;
 - Rat Bonds;
-- Shadow Economy contribution settlement;
-- custom RatVault / "every trade feeds the Rat";
-- StonkRat / RWA experiment;
-- API/MCP stake entitlements;
-- advanced contributor reputation.
+- StonkRat / RWA;
+- DAO/governance;
+- autonomous social posting;
+- Substack;
+- new chain support;
+- a visual redesign.
 
-Degen decides attention and participation.
+## 12. Launch freeze
 
-Receipts decide truth.
+After exact manifest freeze, only:
+
+- Critical/High security/launch fix;
+- factual correction;
+- failed-gate repair;
+- required verified-copy correction.
+
+Everything else goes post-launch.
+
+## 13. Success criteria
+
+Launch/product convergence is healthy when:
+
+- a newcomer understands BINRAT before seeing token mechanics;
+- users open Cases from shared receipts;
+- Watch/return behavior creates repeat use;
+- Working Rat users use the unlocked capacity;
+- stake is retained because the product is useful, not because of fake APY promises;
+- the evidence product remains coherent even if $BINRAT volume/price collapses.
+
+Do not use token price as a product KPI.

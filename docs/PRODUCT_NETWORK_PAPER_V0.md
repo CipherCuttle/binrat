@@ -1,3 +1,5 @@
+> **PLANNING STATUS — 2026-10-06:** Long-horizon/background paper. Near-term product, crew, roadmap and token-launch direction is governed by `docs/BINRAT_LAUNCH_NIGHT_CANON_V1.md`, `docs/ROADMAP.md`, and `docs/product/BINRAT_TOKEN_LAUNCH_AND_GENESIS_FUNNEL_V1.md`. Where this older paper conflicts, the newer authorities win. Historical Arc-specific “what exists today” text is not current Pons product authority.
+
 # BINRAT PRODUCT / NETWORK PAPER V0.1
 
 Status: product / network + early fair-launch design draft  
