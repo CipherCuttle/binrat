@@ -67,7 +67,7 @@ function negatedAt(text: string, index: number): boolean {
   return (
     /\b(?:not|never|no)\s+(?:(?:yet|currently|publicly|actually|being|considered|claimed|proven|validated|ready|available)\s+){0,3}$/.test(prefix) ||
     /\bisn['’]?t\s+(?:(?:yet|currently|publicly|actually|being|considered|claimed|proven|validated|ready|available)\s+){0,3}$/.test(prefix) ||
-    /\bdoes(?:\s+not|n['’]?t)\s+(?:(?:prove|establish|show|mean|claim)\s+){0,2}$/.test(prefix) ||
+    /\bdoes(?:\s+not|n['’]?t)\s+(?:(?:prove|establish|show|mean|claim)\s+){0,2}(?:(?:a|the|this|that|our|their|his|her|its)\s+)?$/.test(prefix) ||
     /\bwithout\s+(?:(?:being|proving|establishing)\s+){0,2}$/.test(prefix)
   );
 }
