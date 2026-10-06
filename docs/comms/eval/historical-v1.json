@@ -1,236 +1,733 @@
 [
   {
     "id": "pr140-indexed-archive-one-shot",
-    "source": {"pr": 140, "title": "feat: connect indexed discovery to a bounded archive probe", "headSha": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63"},
+    "source": {
+      "pr": 140,
+      "title": "feat: connect indexed discovery to a bounded archive probe",
+      "headSha": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63"
+    },
     "event": {
-      "id": "pr140-indexed-archive-one-shot", "occurredAt": "2026-10-06T12:00:00Z", "type": "FORENSIC_FINDING", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr140-indexed-archive-one-shot",
+      "occurredAt": "2026-10-06T12:00:00Z",
+      "type": "FORENSIC_FINDING",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "THE ARCHIVE PROBE GOT ONE CLEAN RANGE.",
       "summary": "A one-shot read-only archive capture confirmed one provider-indexed 590-block range and returned zero transfers in that declared range. It produced no candidate, handoff, finding, Case change or notification. This does not establish index freshness or chain-wide funding absence.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "MEDIUM",
-      "evidence": [{"kind":"PR","ref":"#140"},{"kind":"COMMIT","ref":"7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63"},{"kind":"CI","ref":"37462571559","status":"PASS"},{"kind":"RECEIPT","ref":"37462568165","status":"PASS"}]
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "MEDIUM",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#140"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63"
+        },
+        {
+          "kind": "CI",
+          "ref": "37462571559",
+          "status": "PASS"
+        },
+        {
+          "kind": "RECEIPT",
+          "ref": "37462568165",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#140", "37462568165"],
+    "requiredReceiptRefs": [
+      "#140",
+      "37462568165"
+    ],
     "forbiddenClaims": [
-      {"code":"CHAIN_WIDE_ABSENCE","pattern":"\\b(?:no funding occurred|funding is absent|chain-wide absence|there (?:was|is) no funding)\\b"},
-      {"code":"INDEX_FRESHNESS","pattern":"\\bindex(?:ed)? (?:data )?(?:is )?(?:fresh|complete|fully indexed)\\b"},
-      {"code":"FINDING_INVENTED","pattern":"\\b(?:confirmed|found) (?:a )?finding\\b"},
-      {"code":"LIVE_WATCHER_INVENTED","pattern":"\\blive (?:watcher|monitor|monitoring)\\b"}
+      {
+        "code": "CHAIN_WIDE_ABSENCE",
+        "pattern": "\\b(?:no funding occurred|funding is absent|chain-wide absence|there (?:was|is) no funding)\\b"
+      },
+      {
+        "code": "INDEX_FRESHNESS",
+        "pattern": "\\bindex(?:ed)? (?:data )?(?:is )?(?:fresh|complete|fully indexed)\\b"
+      },
+      {
+        "code": "FINDING_INVENTED",
+        "pattern": "\\b(?:confirmed|found) (?:a )?finding\\b"
+      },
+      {
+        "code": "LIVE_WATCHER_INVENTED",
+        "pattern": "\\blive (?:watcher|monitor|monitoring)\\b"
+      }
     ]
   },
   {
     "id": "pr138-indexed-discovery-offline",
-    "source": {"pr": 138, "title": "feat: journal bounded indexed funder discovery", "headSha": "55380186538ccae65c43518742730fb507989730"},
+    "source": {
+      "pr": 138,
+      "title": "feat: journal bounded indexed funder discovery",
+      "headSha": "55380186538ccae65c43518742730fb507989730"
+    },
     "event": {
-      "id": "pr138-indexed-discovery-offline", "occurredAt": "2026-10-06T11:00:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr138-indexed-discovery-offline",
+      "occurredAt": "2026-10-06T11:00:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "FUNDER DISCOVERY GOT A JOURNAL.",
       "summary": "Offline implementation now journals bounded indexed outgoing-funder discovery with strict range, paging, chronology and attempt limits. Secure live archive transport remained a separate gate at this PR; there was no live activation.",
-      "userValue": 2, "novelty": 3, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#138"},{"kind":"COMMIT","ref":"55380186538ccae65c43518742730fb507989730"},{"kind":"CI","ref":"37459731529","status":"PASS"}]
+      "userValue": 2,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "LOW",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#138"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "55380186538ccae65c43518742730fb507989730"
+        },
+        {
+          "kind": "CI",
+          "ref": "37459731529",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#138", "5538018653"],
+    "requiredReceiptRefs": [
+      "#138",
+      "5538018653"
+    ],
     "forbiddenClaims": [
-      {"code":"LIVE_ACTIVATION","pattern":"\\b(?:live|production) (?:discovery|collector|monitoring|watcher)\\b"},
-      {"code":"INDEX_COMPLETE","pattern":"\\bindex(?:ed)? (?:data )?(?:is )?(?:fresh|complete|fully indexed)\\b"},
-      {"code":"COVERAGE_COMPLETE","pattern":"\\bcomplete (?:chain|funding|historical) coverage\\b"}
+      {
+        "code": "LIVE_ACTIVATION",
+        "pattern": "\\b(?:live|production) (?:discovery|collector|monitoring|watcher)\\b"
+      },
+      {
+        "code": "INDEX_COMPLETE",
+        "pattern": "\\bindex(?:ed)? (?:data )?(?:is )?(?:fresh|complete|fully indexed)\\b"
+      },
+      {
+        "code": "COVERAGE_COMPLETE",
+        "pattern": "\\bcomplete (?:chain|funding|historical) coverage\\b"
+      }
     ]
   },
   {
     "id": "pr135-prospective-capture-expired",
-    "source": {"pr": 135, "title": "feat: preserve bounded prospective funding observations", "headSha": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2"},
+    "source": {
+      "pr": 135,
+      "title": "feat: preserve bounded prospective funding observations",
+      "headSha": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2"
+    },
     "event": {
-      "id": "pr135-prospective-capture-expired", "occurredAt": "2026-10-06T10:00:00Z", "type": "FORENSIC_FINDING", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr135-prospective-capture-expired",
+      "occurredAt": "2026-10-06T10:00:00Z",
+      "type": "FORENSIC_FINDING",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "THE FIRST FUNDING WATCH EXPIRED INCONCLUSIVE.",
       "summary": "The bounded public-RPC capture ended EXPIRED after seven complete responses with no selected funding, handoff, finding, Case diff or notification. Sporadic latest-block sampling left gaps, so the result is INCONCLUSIVE_PARTIAL_DISCOVERY_WINDOW_ENDED rather than evidence of funding absence.",
-      "userValue": 3, "novelty": 2, "repetitionPenalty": 0, "risk": "MEDIUM",
-      "evidence": [{"kind":"PR","ref":"#135"},{"kind":"COMMIT","ref":"fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2"},{"kind":"RECEIPT","ref":"INCONCLUSIVE_PARTIAL_DISCOVERY_WINDOW_ENDED","status":"PASS"}]
+      "userValue": 3,
+      "novelty": 2,
+      "repetitionPenalty": 0,
+      "risk": "MEDIUM",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#135"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2"
+        },
+        {
+          "kind": "RECEIPT",
+          "ref": "INCONCLUSIVE_PARTIAL_DISCOVERY_WINDOW_ENDED",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#135", "INCONCLUSIVE_PARTIAL_DISCOVERY_WINDOW_ENDED"],
+    "requiredReceiptRefs": [
+      "#135",
+      "INCONCLUSIVE_PARTIAL_DISCOVERY_WINDOW_ENDED"
+    ],
     "forbiddenClaims": [
-      {"code":"FUNDING_ABSENCE","pattern":"\\b(?:no funding occurred|there was no funding|funding was absent)\\b"},
-      {"code":"EARLY_WARNING_SUCCESS","pattern":"\\b(?:early[- ]warning|pre[- ]launch) (?:success|worked|proved|validated)\\b"},
-      {"code":"COMPLETE_COVERAGE","pattern":"\\b(?:complete|full) coverage\\b"}
+      {
+        "code": "FUNDING_ABSENCE",
+        "pattern": "\\b(?:no funding occurred|there was no funding|funding was absent)\\b"
+      },
+      {
+        "code": "EARLY_WARNING_SUCCESS",
+        "pattern": "\\b(?:early[- ]warning|pre[- ]launch) (?:success|worked|proved|validated)\\b"
+      },
+      {
+        "code": "COMPLETE_COVERAGE",
+        "pattern": "\\b(?:complete|full) coverage\\b"
+      }
     ]
   },
   {
     "id": "pr134-recorded-evidence-replay",
-    "source": {"pr": 134, "title": "feat: replay recorded funding evidence in the local Den", "headSha": "c9abb46633418c0f5a0e1f48a278d7595e86b23e"},
+    "source": {
+      "pr": 134,
+      "title": "feat: replay recorded funding evidence in the local Den",
+      "headSha": "c9abb46633418c0f5a0e1f48a278d7595e86b23e"
+    },
     "event": {
-      "id": "pr134-recorded-evidence-replay", "occurredAt": "2026-10-06T09:30:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr134-recorded-evidence-replay",
+      "occurredAt": "2026-10-06T09:30:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "RECORDED FUNDING CAN REPLAY THROUGH THE DEN.",
       "summary": "A retrospective local replay imports nine recorded public read-only responses, binds one direct ETH transfer to a later Pons-reported deployer launch, and preserves missing recipient history. It does not establish a pre-launch prediction, wallet freshness, model competence or consensus authentication.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#134"},{"kind":"COMMIT","ref":"c9abb46633418c0f5a0e1f48a278d7595e86b23e"},{"kind":"DOC","ref":"docs/RAT_RECORDED_EVIDENCE_V1.md"}]
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "LOW",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#134"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "c9abb46633418c0f5a0e1f48a278d7595e86b23e"
+        },
+        {
+          "kind": "DOC",
+          "ref": "docs/RAT_RECORDED_EVIDENCE_V1.md"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#134", "RAT_RECORDED_EVIDENCE_V1"],
+    "requiredReceiptRefs": [
+      "#134",
+      "RAT_RECORDED_EVIDENCE_V1"
+    ],
     "forbiddenClaims": [
-      {"code":"PREDICTION_INVENTED","pattern":"\\b(?:predicted|caught|detected) (?:the )?(?:launch|funding) before\\b"},
-      {"code":"MODEL_COMPETENCE","pattern":"\\bmodel competence (?:is )?(?:proven|validated|established)\\b"},
-      {"code":"CONSENSUS_PROOF","pattern":"\\bconsensus[- ](?:proven|verified|authenticated)\\b"}
+      {
+        "code": "PREDICTION_INVENTED",
+        "pattern": "\\b(?:predicted|caught|detected) (?:the )?(?:launch|funding) before\\b"
+      },
+      {
+        "code": "MODEL_COMPETENCE",
+        "pattern": "\\bmodel competence (?:is )?(?:proven|validated|established)\\b"
+      },
+      {
+        "code": "CONSENSUS_PROOF",
+        "pattern": "\\bconsensus[- ](?:proven|verified|authenticated)\\b"
+      }
     ]
   },
   {
     "id": "pr133-local-den",
-    "source": {"pr": 133, "title": "feat: add a local Den for saved replay jobs and Case return", "headSha": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce"},
+    "source": {
+      "pr": 133,
+      "title": "feat: add a local Den for saved replay jobs and Case return",
+      "headSha": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce"
+    },
     "event": {
-      "id": "pr133-local-den", "occurredAt": "2026-10-06T09:00:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr133-local-den",
+      "occurredAt": "2026-10-06T09:00:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "THE DEN CAN NOW REMEMBER A LOCAL RAT JOB.",
       "summary": "A localhost-only Den can start, reopen, advance, inspect, cancel and export synthetic replay jobs. Public routes and deployment config are unchanged; there is no live watcher, scheduler, external provider call or Telegram send.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#133"},{"kind":"COMMIT","ref":"2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce"},{"kind":"DOC","ref":"docs/RAT_LOCAL_DEN_BROWSER_PROOF_V1.json"}]
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "LOW",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#133"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce"
+        },
+        {
+          "kind": "DOC",
+          "ref": "docs/RAT_LOCAL_DEN_BROWSER_PROOF_V1.json"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#133", "RAT_LOCAL_DEN_BROWSER_PROOF_V1"],
+    "requiredReceiptRefs": [
+      "#133",
+      "RAT_LOCAL_DEN_BROWSER_PROOF_V1"
+    ],
     "forbiddenClaims": [
-      {"code":"PUBLIC_DEN","pattern":"\\b(?:public|production) Den\\b"},
-      {"code":"LIVE_WATCHER","pattern":"\\blive (?:watcher|monitor|monitoring)\\b"},
-      {"code":"TELEGRAM_SENT","pattern":"\\bTelegram (?:sent|delivery|notification) (?:is )?(?:live|active|working)\\b"}
+      {
+        "code": "PUBLIC_DEN",
+        "pattern": "\\b(?:public|production) Den\\b"
+      },
+      {
+        "code": "LIVE_WATCHER",
+        "pattern": "\\blive (?:watcher|monitor|monitoring)\\b"
+      },
+      {
+        "code": "TELEGRAM_SENT",
+        "pattern": "\\bTelegram (?:sent|delivery|notification) (?:is )?(?:live|active|working)\\b"
+      }
     ]
   },
   {
     "id": "pr132-persistent-local-job",
-    "source": {"pr": 132, "title": "feat: persist local Rat jobs across restart and prepare return artifacts", "headSha": "4b511a0f54338fff1062b92d2e2db56656b4abf2"},
+    "source": {
+      "pr": 132,
+      "title": "feat: persist local Rat jobs across restart and prepare return artifacts",
+      "headSha": "4b511a0f54338fff1062b92d2e2db56656b4abf2"
+    },
     "event": {
-      "id": "pr132-persistent-local-job", "occurredAt": "2026-10-06T08:30:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr132-persistent-local-job",
+      "occurredAt": "2026-10-06T08:30:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "LOCAL RAT JOBS SURVIVE A RESTART.",
       "summary": "A synthetic funding-watch replay can be persisted in SQLite, reopened, advanced manually and return a Case plus PREPARED_ONLY notification when supported. There is no live collector, background scheduler, provider/model call or Telegram send.",
-      "userValue": 3, "novelty": 2, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#132"},{"kind":"COMMIT","ref":"4b511a0f54338fff1062b92d2e2db56656b4abf2"},{"kind":"DOC","ref":"docs/RAT_LOCAL_JOB_PROOF_V1.json"}]
+      "userValue": 3,
+      "novelty": 2,
+      "repetitionPenalty": 0,
+      "risk": "LOW",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#132"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "4b511a0f54338fff1062b92d2e2db56656b4abf2"
+        },
+        {
+          "kind": "DOC",
+          "ref": "docs/RAT_LOCAL_JOB_PROOF_V1.json"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#132", "RAT_LOCAL_JOB_PROOF_V1"],
+    "requiredReceiptRefs": [
+      "#132",
+      "RAT_LOCAL_JOB_PROOF_V1"
+    ],
     "forbiddenClaims": [
-      {"code":"BACKGROUND_WATCHER","pattern":"\\b(?:background|live) (?:watcher|scheduler|collector|monitoring)\\b"},
-      {"code":"TELEGRAM_DELIVERED","pattern":"\\b(?:Telegram|notification) (?:was |is )?(?:sent|delivered)\\b"}
+      {
+        "code": "BACKGROUND_WATCHER",
+        "pattern": "\\b(?:background|live) (?:watcher|scheduler|collector|monitoring)\\b"
+      },
+      {
+        "code": "TELEGRAM_DELIVERED",
+        "pattern": "\\b(?:Telegram|notification) (?:was |is )?(?:sent|delivered)\\b"
+      }
     ]
   },
   {
     "id": "pr131-dataset-proxy-failure",
-    "source": {"pr": 131, "title": "test: add offline next-query scorer and expose dataset shortcut", "headSha": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2"},
+    "source": {
+      "pr": 131,
+      "title": "test: add offline next-query scorer and expose dataset shortcut",
+      "headSha": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2"
+    },
     "event": {
-      "id": "pr131-dataset-proxy-failure", "occurredAt": "2026-10-05T23:00:00Z", "type": "FORENSIC_FINDING", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr131-dataset-proxy-failure",
+      "occurredAt": "2026-10-05T23:00:00Z",
+      "type": "FORENSIC_FINDING",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "THE BENCHMARK CHEATED FOR US. WE KILLED IT.",
       "summary": "The offline next-query pack failed qualification because synthetic block heights leaked case position: a trivial input-only audit recovered all 16 finding opportunities. paidComparisonReady is false and the pack must not support a model-advantage claim.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "MEDIUM",
-      "evidence": [{"kind":"PR","ref":"#131"},{"kind":"COMMIT","ref":"06abc9d592e7f0cf4edd5a389ced77e190ce95c2"},{"kind":"RECEIPT","ref":"FAILED_INDEX_PROXY","status":"PASS"}]
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "MEDIUM",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#131"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2"
+        },
+        {
+          "kind": "RECEIPT",
+          "ref": "FAILED_INDEX_PROXY",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#131", "FAILED_INDEX_PROXY"],
+    "requiredReceiptRefs": [
+      "#131",
+      "FAILED_INDEX_PROXY"
+    ],
     "forbiddenClaims": [
-      {"code":"MODEL_ADVANTAGE","pattern":"\\b(?:model|AI) (?:beat|beats|outperformed|outperforms|has an advantage)\\b"},
-      {"code":"PAID_READY","pattern":"\\bpaid comparison (?:is )?(?:ready|qualified|approved)\\b"},
-      {"code":"DATASET_PASS","pattern":"\\b(?:dataset|benchmark) (?:passed|qualified|is clean)\\b"}
+      {
+        "code": "MODEL_ADVANTAGE",
+        "pattern": "\\b(?:model|AI) (?:beat|beats|outperformed|outperforms|has an advantage)\\b"
+      },
+      {
+        "code": "PAID_READY",
+        "pattern": "\\bpaid comparison (?:is )?(?:ready|qualified|approved)\\b"
+      },
+      {
+        "code": "DATASET_PASS",
+        "pattern": "\\b(?:dataset|benchmark) (?:passed|qualified|is clean)\\b"
+      }
     ]
   },
   {
     "id": "pr129-chronology-miss",
-    "source": {"pr": 129, "title": "test: freeze offline workforce benchmark and preserve chronology miss", "headSha": "9759e02a44c9a6a60390d33db70f57166916e90c"},
+    "source": {
+      "pr": 129,
+      "title": "test: freeze offline workforce benchmark and preserve chronology miss",
+      "headSha": "9759e02a44c9a6a60390d33db70f57166916e90c"
+    },
     "event": {
-      "id": "pr129-chronology-miss", "occurredAt": "2026-10-05T22:00:00Z", "type": "FORENSIC_FINDING", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr129-chronology-miss",
+      "occurredAt": "2026-10-05T22:00:00Z",
+      "type": "FORENSIC_FINDING",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "ONE ALERT FELL THROUGH THE CHRONOLOGY GAP.",
       "summary": "The frozen 40-case offline benchmark recovered 15 of 16 eligible alerts with zero false alerts, while preserving a chronology miss where verified recipient history arrived before funding and was dropped. This is regression evidence, not proof of model competence or generalization.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "MEDIUM",
-      "evidence": [{"kind":"PR","ref":"#129"},{"kind":"COMMIT","ref":"9759e02a44c9a6a60390d33db70f57166916e90c"},{"kind":"RECEIPT","ref":"15/16","status":"PASS"}]
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "MEDIUM",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#129"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "9759e02a44c9a6a60390d33db70f57166916e90c"
+        },
+        {
+          "kind": "RECEIPT",
+          "ref": "15/16",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#129", "15/16"],
+    "requiredReceiptRefs": [
+      "#129",
+      "15/16"
+    ],
     "forbiddenClaims": [
-      {"code":"PERFECT_RECOVERY","pattern":"\\b(?:16\\/16|100%|all) (?:eligible )?alerts? (?:were )?recovered\\b"},
-      {"code":"MODEL_COMPETENCE","pattern":"\\bmodel competence (?:is )?(?:proven|validated|established)\\b"},
-      {"code":"GENERALIZATION","pattern":"\\b(?:generalization|generalisation) (?:is )?(?:proven|validated|established)\\b"}
+      {
+        "code": "PERFECT_RECOVERY",
+        "pattern": "\\b(?:16\\/16|100%|all) (?:eligible )?alerts? (?:were )?recovered\\b"
+      },
+      {
+        "code": "MODEL_COMPETENCE",
+        "pattern": "\\bmodel competence (?:is )?(?:proven|validated|established)\\b"
+      },
+      {
+        "code": "GENERALIZATION",
+        "pattern": "\\b(?:generalization|generalisation) (?:is )?(?:proven|validated|established)\\b"
+      }
     ]
   },
   {
     "id": "pr123-offline-workforce-contracts",
-    "source": {"pr": 123, "title": "feat: prove Rat workforce contracts with bounded offline replay", "headSha": "ed2807f6d49c853713770fba099159e20bfd173b"},
+    "source": {
+      "pr": 123,
+      "title": "feat: prove Rat workforce contracts with bounded offline replay",
+      "headSha": "ed2807f6d49c853713770fba099159e20bfd173b"
+    },
     "event": {
-      "id": "pr123-offline-workforce-contracts", "occurredAt": "2026-10-05T18:00:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr123-offline-workforce-contracts",
+      "occurredAt": "2026-10-05T18:00:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "THE RAT WORKFORCE GOT EXECUTABLE CONTRACTS.",
-      "summary": "Seven strict V1 schemas and an offline deterministic replay now prove bounded job, capability and handoff mechanics. The proof uses synthetic/offline artifacts with zero model/provider calls; it does not prove LLM competence, live coverage or exactly-once delivery.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#123"},{"kind":"COMMIT","ref":"ed2807f6d49c853713770fba099159e20bfd173b"},{"kind":"DOC","ref":"docs/RAT_WORKFORCE_OFFLINE_V1.md"}]
+      "summary": "Seven strict V1 schemas and an offline deterministic replay now prove bounded job, capability and handoff mechanics. The proof uses synthetic/offline artifacts with zero model/provider calls; it does not prove LLM competence, real-time coverage or exactly-once delivery.",
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "LOW",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#123"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "ed2807f6d49c853713770fba099159e20bfd173b"
+        },
+        {
+          "kind": "DOC",
+          "ref": "docs/RAT_WORKFORCE_OFFLINE_V1.md"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#123", "RAT_WORKFORCE_OFFLINE_V1"],
+    "requiredReceiptRefs": [
+      "#123",
+      "RAT_WORKFORCE_OFFLINE_V1"
+    ],
     "forbiddenClaims": [
-      {"code":"LLM_COMPETENCE","pattern":"\\b(?:LLM|model) competence (?:is )?(?:proven|validated|established)\\b"},
-      {"code":"LIVE_COVERAGE","pattern":"\\blive coverage (?:is )?(?:proven|validated|working)\\b"},
-      {"code":"EXACTLY_ONCE","pattern":"\\bexactly[- ]once delivery (?:is )?(?:proven|validated|guaranteed)\\b"}
+      {
+        "code": "LLM_COMPETENCE",
+        "pattern": "\\b(?:LLM|model) competence (?:is )?(?:proven|validated|established)\\b"
+      },
+      {
+        "code": "REALTIME_COVERAGE",
+        "pattern": "\\b(?:real[- ]time|continuous) coverage (?:is )?(?:proven|validated|working)\\b"
+      },
+      {
+        "code": "EXACTLY_ONCE",
+        "pattern": "\\bexactly[- ]once delivery (?:is )?(?:proven|validated|guaranteed)\\b"
+      }
     ]
   },
   {
-    "id": "pr122-frontdoor-journey",
-    "source": {"pr": 122, "title": "feat: teach BINRAT frontdoor journey with honest crew availability", "headSha": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1"},
+    "id": "pr116-read-only-pons-preflight",
+    "source": {
+      "pr": 116,
+      "title": "feat: add read-only Pons preflight v1",
+      "headSha": "ccc677985ce07f438648a2499611e72c36729491"
+    },
     "event": {
-      "id": "pr122-frontdoor-journey", "occurredAt": "2026-10-05T17:00:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
-      "headline": "THE FRONTDOOR NOW TEACHES THE RAT LOOP.",
-      "summary": "The frontdoor implementation teaches FIND → EMPLOY → LEAVE → RETURN and keeps crew availability explicit: Rat Zero LIVE, Tripwire BUILDING, Sniffer NEXT, two LOCKED. The slice itself remained an unmerged engineering candidate with no worker runtime or deployment authority.",
-      "userValue": 3, "novelty": 2, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#122"},{"kind":"COMMIT","ref":"fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1"},{"kind":"DOC","ref":"docs/BINRAT_FRONTDOOR_JOURNEY_V1.md"}]
+      "id": "pr116-read-only-pons-preflight",
+      "occurredAt": "2026-10-03T17:30:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
+      "headline": "PONS PREFLIGHT CAN VERIFY THE RAIL WITHOUT LAUNCHING.",
+      "summary": "A read-only fail-closed preflight verifies Robinhood 4663, the pinned Pons factory/registry, the launcher and staking authority graph, ownership paths, canLaunch and a read-only stake canary. Exact BINRAT launch simulation remains blocked because owner inputs are still null. No launch, marketing, signing, broadcast or deployment authority is granted.",
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "HIGH",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#116"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "ccc677985ce07f438648a2499611e72c36729491"
+        },
+        {
+          "kind": "DOC",
+          "ref": "pnpm verify:pons-preflight"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#122", "BINRAT_FRONTDOOR_JOURNEY_V1"],
+    "requiredReceiptRefs": [
+      "#116",
+      "ccc67798"
+    ],
     "forbiddenClaims": [
-      {"code":"TRIPWIRE_LIVE","pattern":"\\bTripwire (?:is )?LIVE\\b","flags":"i"},
-      {"code":"SNIFFER_LIVE","pattern":"\\bSniffer (?:is )?LIVE\\b","flags":"i"},
-      {"code":"PUBLIC_DEPLOYMENT","pattern":"\\bfrontdoor (?:is |was )?(?:deployed|shipped|publicly live)\\b"}
+      {
+        "code": "EXACT_SIM_COMPLETE",
+        "pattern": "\\bexact (?:BINRAT )?launch simulation (?:passed|completed|is complete)\\b"
+      },
+      {
+        "code": "LAUNCH_AUTHORIZED",
+        "pattern": "\\blaunch (?:is |was )?authorized\\b"
+      },
+      {
+        "code": "READY_TO_LAUNCH",
+        "pattern": "\\bready to launch\\b"
+      },
+      {
+        "code": "OWNER_INPUTS_RESOLVED",
+        "pattern": "\\bowner inputs (?:are |were )?(?:resolved|finalized|complete)\\b"
+      }
     ]
   },
   {
     "id": "pr120-frontdoor-resilience",
-    "source": {"pr": 120, "title": "fix: retain verified public feed across refresh failures", "headSha": "1cfd4fa53347cccff49be62820f18ff584f1c1d1"},
+    "source": {
+      "pr": 120,
+      "title": "fix: retain verified public feed across refresh failures",
+      "headSha": "1cfd4fa53347cccff49be62820f18ff584f1c1d1"
+    },
     "event": {
-      "id": "pr120-frontdoor-resilience", "occurredAt": "2026-10-04T18:00:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr120-frontdoor-resilience",
+      "occurredAt": "2026-10-04T18:00:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "THE FRONTDOOR STOPS EATING VERIFIED DATA ON REFRESH FAILURES.",
       "summary": "The frontend candidate retains the last validated public feed across later status/feed failures, adds explicit fresh/stale/unavailable states and bounded retry behavior. The PR changed no Worker/backend code and performed no merge or deployment.",
-      "userValue": 3, "novelty": 2, "repetitionPenalty": 0, "risk": "LOW",
-      "evidence": [{"kind":"PR","ref":"#120"},{"kind":"COMMIT","ref":"1cfd4fa53347cccff49be62820f18ff584f1c1d1"},{"kind":"CI","ref":"454 tests","status":"PASS"}]
+      "userValue": 3,
+      "novelty": 2,
+      "repetitionPenalty": 0,
+      "risk": "LOW",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#120"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "1cfd4fa53347cccff49be62820f18ff584f1c1d1"
+        },
+        {
+          "kind": "CI",
+          "ref": "454 tests",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#120", "1cfd4fa5"],
+    "requiredReceiptRefs": [
+      "#120",
+      "1cfd4fa5"
+    ],
     "forbiddenClaims": [
-      {"code":"DEPLOYED_FIX","pattern":"\\b(?:fix|frontdoor|resilience) (?:is |was )?(?:deployed|shipped|publicly live)\\b"},
-      {"code":"BACKEND_CHANGED","pattern":"\\bbackend (?:was |is )?(?:changed|rewritten|updated)\\b"}
+      {
+        "code": "DEPLOYED_FIX",
+        "pattern": "\\b(?:fix|frontdoor|resilience) (?:is |was )?(?:deployed|shipped|publicly live)\\b"
+      },
+      {
+        "code": "BACKEND_CHANGED",
+        "pattern": "\\bbackend (?:was |is )?(?:changed|rewritten|updated)\\b"
+      }
     ]
   },
   {
     "id": "pr117-stake-reader",
-    "source": {"pr": 117, "title": "feat: add fail-closed Pons stake reader", "headSha": "c23defaa9ed338e13ba2be72c482af51660aac56"},
+    "source": {
+      "pr": 117,
+      "title": "feat: add fail-closed Pons stake reader",
+      "headSha": "c23defaa9ed338e13ba2be72c482af51660aac56"
+    },
     "event": {
-      "id": "pr117-stake-reader", "occurredAt": "2026-10-03T18:00:00Z", "type": "FEATURE_CHANGE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr117-stake-reader",
+      "occurredAt": "2026-10-03T18:00:00Z",
+      "type": "FEATURE_CHANGE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "WORKING RAT CAN READ ACTIVE STAKE FACTS.",
-      "summary": "A fail-closed read-only Pons stake reader is bound to Robinhood 4663 and the pinned staking beacon/implementation. A live read-only canary verified native ETH quote state and stakedOf <= totalStaked. The WORKING RAT threshold remains unresolved and there is no launch or deployment authority.",
-      "userValue": 3, "novelty": 3, "repetitionPenalty": 0, "risk": "MEDIUM",
-      "evidence": [{"kind":"PR","ref":"#117"},{"kind":"COMMIT","ref":"c23defaa9ed338e13ba2be72c482af51660aac56"},{"kind":"RECEIPT","ref":"block 79400856","status":"PASS"}]
+      "summary": "A fail-closed read-only Pons stake reader is bound to Robinhood 4663 and the pinned staking beacon/implementation. A read-only canary at block 79400856 verified native ETH quote state and stakedOf <= totalStaked. The WORKING RAT threshold remains unresolved and there is no launch or deployment authority.",
+      "userValue": 3,
+      "novelty": 3,
+      "repetitionPenalty": 0,
+      "risk": "MEDIUM",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#117"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "c23defaa9ed338e13ba2be72c482af51660aac56"
+        },
+        {
+          "kind": "RECEIPT",
+          "ref": "block 79400856",
+          "status": "PASS"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#117", "79400856"],
+    "requiredReceiptRefs": [
+      "#117",
+      "79400856"
+    ],
     "forbiddenClaims": [
-      {"code":"THRESHOLD_INVENTED","pattern":"\\bWORKING RAT (?:minimum |stake )?threshold (?:is|=)\\b"},
-      {"code":"LAUNCH_AUTHORIZED","pattern":"\\blaunch (?:is |was )?authorized\\b"},
-      {"code":"PRODUCTION_HOLDER_GATE","pattern":"\\bproduction (?:holder|stake) gate (?:is )?(?:active|live|enabled)\\b"}
+      {
+        "code": "THRESHOLD_INVENTED",
+        "pattern": "\\bWORKING RAT (?:minimum |stake )?threshold (?:is|=)\\b"
+      },
+      {
+        "code": "LAUNCH_AUTHORIZED",
+        "pattern": "\\blaunch (?:is |was )?authorized\\b"
+      },
+      {
+        "code": "PRODUCTION_HOLDER_GATE",
+        "pattern": "\\bproduction (?:holder|stake) gate (?:is )?(?:active|live|enabled)\\b"
+      }
     ]
   },
   {
     "id": "pr115-launch-authority-reconcile",
-    "source": {"pr": 115, "title": "docs: reconcile canonical Pons launch authority v1", "headSha": "d150776e353dfa13fd73125f2d10b3959dc5a5c6"},
+    "source": {
+      "pr": 115,
+      "title": "docs: reconcile canonical Pons launch authority v1",
+      "headSha": "d150776e353dfa13fd73125f2d10b3959dc5a5c6"
+    },
     "event": {
-      "id": "pr115-launch-authority-reconcile", "occurredAt": "2026-10-03T17:00:00Z", "type": "ROADMAP_UPDATE", "lifecycle": "ENGINEERING_PASS", "visibility": "PUBLIC_OK", "publicAuthorized": false,
+      "id": "pr115-launch-authority-reconcile",
+      "occurredAt": "2026-10-03T17:00:00Z",
+      "type": "ROADMAP_UPDATE",
+      "lifecycle": "ENGINEERING_PASS",
+      "visibility": "PUBLIC_OK",
+      "publicAuthorized": false,
       "headline": "PONS LAUNCH POLICY GOT RECONCILED. AUTHORITY DID NOT.",
       "summary": "The authority candidate records selected Launch V1 policy such as native ETH, 0% creator tax and 0 ETH opening buy while keeping launch authorization, marketing authorization and legal/preflight gates blocked. Current Pons wallet roles and several immutable inputs remain unresolved.",
-      "userValue": 3, "novelty": 2, "repetitionPenalty": 0, "risk": "HIGH",
-      "evidence": [{"kind":"PR","ref":"#115"},{"kind":"COMMIT","ref":"d150776e353dfa13fd73125f2d10b3959dc5a5c6"},{"kind":"DOC","ref":"BINRAT Pons Launch Authority Reconciliation V1"}]
+      "userValue": 3,
+      "novelty": 2,
+      "repetitionPenalty": 0,
+      "risk": "HIGH",
+      "evidence": [
+        {
+          "kind": "PR",
+          "ref": "#115"
+        },
+        {
+          "kind": "COMMIT",
+          "ref": "d150776e353dfa13fd73125f2d10b3959dc5a5c6"
+        },
+        {
+          "kind": "DOC",
+          "ref": "BINRAT Pons Launch Authority Reconciliation V1"
+        }
+      ]
     },
     "expectedDecision": "QUEUE",
-    "requiredReceiptRefs": ["#115", "d150776e"],
+    "requiredReceiptRefs": [
+      "#115",
+      "d150776e"
+    ],
     "forbiddenClaims": [
-      {"code":"LAUNCH_AUTHORIZED","pattern":"\\blaunch (?:is |was )?authorized\\b"},
-      {"code":"MARKETING_AUTHORIZED","pattern":"\\bmarketing (?:is |was )?authorized\\b"},
-      {"code":"READY_TO_LAUNCH","pattern":"\\bready to launch\\b"},
-      {"code":"WALLETS_CONFIGURED","pattern":"\\b(?:treasury|launch) wallet (?:is |was )?(?:configured|selected|finalized)\\b"}
+      {
+        "code": "LAUNCH_AUTHORIZED",
+        "pattern": "\\blaunch (?:is |was )?authorized\\b"
+      },
+      {
+        "code": "MARKETING_AUTHORIZED",
+        "pattern": "\\bmarketing (?:is |was )?authorized\\b"
+      },
+      {
+        "code": "READY_TO_LAUNCH",
+        "pattern": "\\bready to launch\\b"
+      },
+      {
+        "code": "WALLETS_CONFIGURED",
+        "pattern": "\\b(?:treasury|launch) wallet (?:is |was )?(?:configured|selected|finalized)\\b"
+      }
     ]
   }
 ]
