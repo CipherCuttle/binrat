@@ -35,7 +35,8 @@
     "competence:capture": "pnpm build && node scripts/capture-rat-competence.mjs",
     "workforce:benchmark": "pnpm build && node scripts/benchmark-workforce.mjs",
     "query:score": "pnpm build && node scripts/eval-next-query.mjs score",
-    "query:prepare": "pnpm build && node scripts/eval-next-query.mjs prepare"
+    "query:prepare": "pnpm build && node scripts/eval-next-query.mjs prepare",
+    "rat:job": "pnpm build && node scripts/local-rat-job.mjs"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
