@@ -224,6 +224,8 @@ test('OpenRouter adapter requests strict structured output with no tools and no 
   assert.ok(capturedInit);
   const body = JSON.parse(String(capturedInit!.body)) as Record<string, any>;
   assert.equal(body.stream, false);
+  assert.equal(body.max_completion_tokens, 512);
+  assert.equal('max_tokens' in body, false);
   assert.equal(body.provider.require_parameters, true);
   assert.equal(body.response_format.type, 'json_schema');
   assert.equal(body.response_format.json_schema.strict, true);
