@@ -162,7 +162,7 @@ const STATUS_PATTERNS: Array<{
   { minimum: 'DEPLOYED', pattern: /\bdeployed\b/i, label: 'DEPLOYED' },
   {
     minimum: 'PUBLIC_LIVE',
-    pattern: /\bpublic[_ -]?live\b|\blive\b|\bshipped\b|\bavailable now\b|\buse it now\b/i,
+    pattern: /\bpublic[_ -]?live\b|\b(?:is|are|was|were|went|currently)\s+live\b|\blive\s+now\b|\blive(?=\s*[.!?](?:\s|$))|\bshipped\b|\bavailable now\b|\buse it now\b/i,
     label: 'PUBLIC_LIVE',
   },
 ];
