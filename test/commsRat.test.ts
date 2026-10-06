@@ -137,3 +137,26 @@ test('unknown deployment evidence cannot manufacture an immediate POST', () => {
   assert.equal(bundle.score, 6);
   assert.equal(bundle.decision, 'QUEUE');
 });
+
+test('negated live wording is not treated as a PUBLIC_LIVE claim', () => {
+  const violations = validateDraftText(
+    'The publishing mechanism remains unconnected, so these drafts are not posted live.',
+    event({ lifecycle: 'ENGINEERING_PASS' }),
+  );
+
+  assert.equal(
+    violations.filter((item) => item.code === 'CAPABILITY_STATUS_UPGRADE').length,
+    0,
+  );
+});
+
+test('later affirmative live wording still fails after an earlier negated mention', () => {
+  const violations = validateDraftText(
+    'These drafts are not posted live. The feature is live now.',
+    event({ lifecycle: 'ENGINEERING_PASS' }),
+  );
+
+  assert.ok(
+    violations.some((item) => item.code === 'CAPABILITY_STATUS_UPGRADE'),
+  );
+});
