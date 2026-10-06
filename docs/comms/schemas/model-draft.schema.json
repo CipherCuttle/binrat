@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://binrat.tech/schemas/comms-model-draft-v1.json",
+  "title": "BINRAT Comms Model Draft V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "x", "telegram"],
+  "properties": {
+    "schemaVersion": { "const": "binrat.comms-draft/1" },
+    "x": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "telegram": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 700
+    }
+  }
+}
