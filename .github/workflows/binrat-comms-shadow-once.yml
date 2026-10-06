@@ -1,0 +1,69 @@
+name: binrat-comms-shadow-once
+
+on:
+  push:
+    branches:
+      - experiment/binrat-comms-shadow-20261006
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-comms-shadow-20261006
+  cancel-in-progress: false
+
+jobs:
+  shadow:
+    if: ${{ github.actor == 'CipherCuttle' && github.run_attempt == '1' && github.event.head_commit.message == '[run-binrat-comms-20261006] approved one shadow draft' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out exact experiment head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify one-shot source binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "1a68748c89c6957dacf2484d2691b8044744f0c3"
+          test "$(git log -1 --format=%s)" = "[run-binrat-comms-20261006] approved one shadow draft"
+          node --check scripts/run-comms-shadow-once.mjs
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install and verify exact source
+        run: |
+          pnpm install --frozen-lockfile=false
+          pnpm check
+
+      - name: Prepare artifact directory
+        run: |
+          mkdir -p "$RUNNER_TEMP/binrat-comms-shadow"
+          printf 'BINRAT_COMMS_SHADOW_OUTPUT=%s\n' "$RUNNER_TEMP/binrat-comms-shadow/result.json" >> "$GITHUB_ENV"
+
+      - name: Execute exactly one real shadow draft
+        env:
+          BINRAT_COMMS_OPENROUTER_API_KEY: ${{ secrets.BINRAT_COMMS_OPENROUTER_API_KEY }}
+          BINRAT_EVAL_OPENROUTER_API_KEY: ${{ secrets.BINRAT_EVAL_OPENROUTER_API_KEY }}
+        run: node scripts/run-comms-shadow-once.mjs
+
+      - name: Preserve shadow result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-comms-shadow-${{ github.run_id }}
+          path: ${{ runner.temp }}/binrat-comms-shadow/
+          retention-days: 30
+          if-no-files-found: warn
