@@ -59,6 +59,8 @@ NON-NEGOTIABLE:
 - Only PUBLIC_LIVE may use wording such as live, shipped, available now, or use it now.
 - No BUY/SELL/APE instructions, safety verdicts, rug/scam labels, return/yield claims, "smart money", "alpha", or generic startup/crypto hype.
 - Do not convert addresses into human identities, recurrence into skill/profitability, patterns into verdicts, or missing evidence into safety.
+- Do not transfer properties between components. A deterministic claim gate does not make model-generated drafts deterministic.
+- A CI PASS means the cited repository checks passed. Do not upgrade it to validated, proven, audited, production-ready, or publicly available.
 - Preserve uncertainty and scope.
 - Brand structure: FERAL HEADLINE -> LITERAL EXPLANATION -> RECEIPT / SOURCE.
 - X copy must be at most 280 Unicode code points.
