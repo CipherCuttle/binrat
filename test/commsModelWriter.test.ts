@@ -230,6 +230,14 @@ test('OpenRouter adapter requests strict structured output with no tools and no 
   assert.equal(body.response_format.type, 'json_schema');
   assert.equal(body.response_format.json_schema.strict, true);
   assert.deepEqual(body.response_format.json_schema.schema, OPENROUTER_COMMS_DRAFT_SCHEMA);
+  assert.deepEqual(body.response_format.json_schema.schema.properties.schemaVersion, {
+    type: 'string',
+    enum: ['binrat.comms-draft/1'],
+  });
+  assert.deepEqual(body.response_format.json_schema.schema.properties.x, {
+    type: 'string',
+  });
+  assert.equal('maxLength' in body.response_format.json_schema.schema.properties.x, false);
   assert.equal('tools' in body, false);
   assert.equal(response.rawOutput.includes('BUILDING'), true);
   assert.deepEqual(response.usage, { inputTokens: 123, outputTokens: 45 });
