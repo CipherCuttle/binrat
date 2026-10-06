@@ -114,7 +114,7 @@ export function createOpenRouterCommsWriter(
         model: config.model,
         messages: request.messages,
         stream: false,
-        max_tokens: 512,
+        max_completion_tokens: 512,
         provider: {
           require_parameters: true,
         },
