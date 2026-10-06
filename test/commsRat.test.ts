@@ -184,3 +184,26 @@ test('does not prove live coverage is a negated capability statement', () => {
     0,
   );
 });
+
+test('live transport pending is not a PUBLIC_LIVE claim', () => {
+  const violations = validateDraftText(
+    'Live archive transport pending.',
+    event({ lifecycle: 'ENGINEERING_PASS' }),
+  );
+
+  assert.equal(
+    violations.filter((item) => item.code === 'CAPABILITY_STATUS_UPGRADE').length,
+    0,
+  );
+});
+
+test('standalone LIVE remains a PUBLIC_LIVE claim', () => {
+  const violations = validateDraftText(
+    'LIVE.',
+    event({ lifecycle: 'ENGINEERING_PASS' }),
+  );
+
+  assert.ok(
+    violations.some((item) => item.code === 'CAPABILITY_STATUS_UPGRADE'),
+  );
+});
