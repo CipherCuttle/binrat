@@ -110,12 +110,13 @@ const BANNED_PATTERNS: RegExp[] = [
   /\bsell now\b/i,
   /\bape in\b/i,
   /\bape this\b/i,
-  /\bsafe score\b/i,
+  /\bsafe\b/i,
   /\brug score\b/i,
   /\brugger\b/i,
   /\bscammer\b/i,
   /\bguaranteed (?:returns|yield|apy|listing|price appreciation)\b/i,
   /\bai[- ]powered alpha\b/i,
+  /\brevolutionary blockchain intelligence\b/i,
   /\bnext 100x\b/i,
   /\bgem found\b/i,
   /\balpha found\b/i,
@@ -123,6 +124,30 @@ const BANNED_PATTERNS: RegExp[] = [
   /\btrade smarter\b/i,
   /\bnever miss the next gem\b/i,
   /\btrust the rat\b/i,
+  /\bcutting[- ]edge\b/i,
+  /\bgame[- ]changing\b/i,
+  /\brevolutionary\b/i,
+  /\bnext[- ]generation\b/i,
+  /\bnext gen\b/i,
+  /\bstate[- ]of[- ]the[- ]art intelligence\b/i,
+  /\bunparalleled insights\b/i,
+  /\bactionable alpha\b/i,
+  /\bunlock alpha\b/i,
+  /\balpha engine\b/i,
+  /\bai[- ]powered\b/i,
+  /\bai driven\b/i,
+  /\bpowered by ai\b/i,
+  /\bintelligent insights\b/i,
+  /\bmake smarter trades\b/i,
+  /\btrade with confidence\b/i,
+  /\bedge the market\b/i,
+  /\bbeat the market\b/i,
+  /\binstitutional[- ]grade alpha\b/i,
+  /\bone[- ]stop shop\b/i,
+  /\bseamless experience\b/i,
+  /\becosystem of intelligence\b/i,
+  /\bweb3 intelligence platform\b/i,
+  /\bcrypto intelligence revolution\b/i,
 ];
 
 const STATUS_PATTERNS: Array<{
@@ -151,21 +176,26 @@ function activeRank(state: CommsLifecycleState): number | null {
 function evidenceStrength(evidence: CommsEvidenceRef[]): number {
   if (evidence.length === 0) return 0;
 
-  const positive = evidence.filter((item) => item.status !== 'FAIL');
   let score = 0;
 
-  if (positive.some((item) => item.kind === 'PR' || item.kind === 'COMMIT' || item.kind === 'DOC')) {
+  if (
+    evidence.some(
+      (item) =>
+        item.status !== 'FAIL' &&
+        (item.kind === 'PR' || item.kind === 'COMMIT' || item.kind === 'DOC'),
+    )
+  ) {
     score += 1;
   }
-  if (positive.some((item) => item.kind === 'CI' && item.status === 'PASS')) {
+  if (evidence.some((item) => item.kind === 'CI' && item.status === 'PASS')) {
     score += 1;
   }
   if (
-    positive.some(
+    evidence.some(
       (item) =>
-        item.kind === 'DEPLOYMENT' ||
-        item.kind === 'RECEIPT' ||
-        item.kind === 'PRODUCT_STATUS',
+        (item.kind === 'RECEIPT' && item.status !== 'FAIL') ||
+        ((item.kind === 'DEPLOYMENT' || item.kind === 'PRODUCT_STATUS') &&
+          item.status === 'PASS'),
     )
   ) {
     score += 1;

@@ -104,13 +104,13 @@ test('internal-only events are ignored', () => {
 
 test('Brand V1 hard-ban language is rejected', () => {
   const violations = validateDraftText(
-    'AI-powered alpha. Ape in. This wallet is a scammer.',
+    'AI-powered alpha. Ape in. This wallet is a scammer. This is safe.',
     event({ lifecycle: 'PUBLIC_LIVE' }),
   );
 
   assert.equal(
     violations.filter((item) => item.code === 'BANNED_LANGUAGE').length,
-    3,
+    4,
   );
 });
 
@@ -123,4 +123,17 @@ test('a POST with invalid custom drafts is downgraded to QUEUE', () => {
   assert.equal(bundle.triageDecision, 'POST');
   assert.equal(bundle.decision, 'QUEUE');
   assert.ok(bundle.violations.length > 0);
+});
+
+test('unknown deployment evidence cannot manufacture an immediate POST', () => {
+  const bundle = buildShadowPostBundle(
+    event({
+      userValue: 3,
+      novelty: 3,
+      evidence: [{ kind: 'DEPLOYMENT', ref: 'prod-unknown', status: 'UNKNOWN' }],
+    }),
+  );
+
+  assert.equal(bundle.score, 6);
+  assert.equal(bundle.decision, 'QUEUE');
 });
