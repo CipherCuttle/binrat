@@ -5,6 +5,8 @@ import { decodeEventLog, keccak256, toEventSelector, type Hex } from 'viem';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH } from '../pons/chain.js';
 import { ponsTokenLaunchedEvent } from '../pons/ponsAbi.js';
+import {outgoingTransferParams,parseOutgoingTransferPage} from '../pons/fundingOutgoing.js';
+import type {PonsExternalNativeInboundCandidate} from '../pons/fundingProvenance.js';
 
 export const PROSPECTIVE_RPC = 'https://rpc.mainnet.chain.robinhood.com';
 export const PROSPECTIVE_FUNDER = '0x9bc462bce2acd6fbe2ef5470d55b439453451083';
@@ -19,7 +21,17 @@ export interface ConsecutiveManifest extends Omit<ProspectiveManifest,'schemaVer
   schemaVersion:'binrat.prospective-capture/2';
   discovery:{strategy:'CONSECUTIVE_NUMBERED_BLOCKS';maxBlocks:8};
 }
-export type CaptureManifest=ProspectiveManifest|ConsecutiveManifest;
+export interface IndexedManifest extends Omit<ProspectiveManifest,'schemaVersion'> {
+  schemaVersion:'binrat.prospective-capture/3';
+  discovery:{strategy:'INDEXED_FUNDER_OUTGOING';source:'ALCHEMY_ROBINHOOD_ARCHIVE';maxRangeBlocks:4096;maxPages:3;pageSize:5};
+}
+export type CaptureManifest=ProspectiveManifest|ConsecutiveManifest|IndexedManifest;
+export interface IndexedCoverage {
+  source:'ALCHEMY_ROBINHOOD_ARCHIVE';scope:'PROVIDER_INDEXED_EXTERNAL_NATIVE_CANDIDATES_ONLY';valid:boolean;
+  throughBlock:string|null;
+  activeRange:{fromBlock:string;toBlock:string;pages:number;providerEnumerationComplete:boolean;pageKey:string|null}|null;
+  ranges:{fromBlock:string;toBlock:string;pageSequences:number[];anchorSequence:number;confirmationSequence:number}[];
+}
 export interface ConsecutiveCoverage {
   strategy:'CONSECUTIVE_NUMBERED_BLOCKS'; scope:'TOP_LEVEL_TRANSACTIONS_ONLY';
   fromBlock:string|null;toBlock:string|null;throughBlock:string|null;
@@ -40,7 +52,7 @@ export interface ProspectiveHandoff {
   remainingRpcCalls:number; digest:string;
 }
 type Phase='CREATED'|'SEARCHING'|'DISCOVERY_COMPLETE'|'COLLECTING_HISTORY'|'HANDOFF_PREPARED'|'WATCHING'|'FOUND'|'INELIGIBLE'|'EXPIRED'|'EXHAUSTED'|'HALTED';
-type Stage='CHAIN'|'CODE'|'INITIAL_HEAD'|'SAMPLE'|'SCAN_HEAD'|'SCAN_ANCHOR'|'SCAN_BLOCK'|'SCAN_CONFIRM'|'FUNDING_RECEIPT'|'HISTORY'|'FUNDING_RECHECK'|'PRE_HEAD'|'PRE_LOGS'|'HANDOFF_HEAD'|'WATCH_HEAD'|'WATCH_ANCHOR'|'RANGE_START'|'WATCH_LOGS'|'RANGE_ANCHOR'|'LAUNCH_RECEIPT'|'LAUNCH_BLOCK';
+type Stage='INDEX_HEAD'|'INDEX_CURSOR'|'INDEX_RANGE'|'INDEX_PAGE'|'INDEX_CONFIRM'|'INDEX_FUNDING_BLOCK'|'CHAIN'|'CODE'|'INITIAL_HEAD'|'SAMPLE'|'SCAN_HEAD'|'SCAN_ANCHOR'|'SCAN_BLOCK'|'SCAN_CONFIRM'|'FUNDING_RECEIPT'|'HISTORY'|'FUNDING_RECHECK'|'PRE_HEAD'|'PRE_LOGS'|'HANDOFF_HEAD'|'WATCH_HEAD'|'WATCH_ANCHOR'|'RANGE_START'|'WATCH_LOGS'|'RANGE_ANCHOR'|'LAUNCH_RECEIPT'|'LAUNCH_BLOCK';
 type Obj=Record<string,any>;
 export interface ProspectiveState {
   mode:'LOCAL_READ_ONLY_SHADOW'; captureId:string; phase:Phase; stage:Stage; reason:string|null; rpcCalls:number;
@@ -50,14 +62,16 @@ export interface ProspectiveState {
     fundingBlock:string;launchBlock:string;handoffDigest:string;historyScope:string;evidenceSequences:number[];digest:string}|null;
   caseDiff:{provenance:'PUBLIC_RPC_SHADOW';beforeDigest:string;afterDigest:string;addedFacts:string[]}|null;
   notification:{state:'PREPARED_ONLY';deliveryAuthorized:false;id:string;text:string}|null;
-  discoveryCoverage:'SAMPLED_BLOCKS_ONLY'|'CONTIGUOUS_NUMBERED_BLOCK_PREFIX';
+  discoveryCoverage:'SAMPLED_BLOCKS_ONLY'|'CONTIGUOUS_NUMBERED_BLOCK_PREFIX'|'PROVIDER_INDEXED_CANDIDATES_ONLY';
   discovery?:ConsecutiveCoverage;
+  indexedDiscovery?:IndexedCoverage;
   authentication:'PROVIDER_REPORTED_LOCAL_CLOCK_NOT_EXTERNALLY_ATTESTED';
   nextRequest:RpcRequest|null; snapshotDigest:string;
 }
 const ajv=new Ajv2020({strict:true});
 const manifestShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V1.schema.json','utf8')));
 const consecutiveShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V2.schema.json','utf8')));
+const indexedShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_CAPTURE_V3.schema.json','utf8')));
 const handoffShape=ajv.compile(JSON.parse(readFileSync('contracts/rat-workforce/prospective/PROSPECTIVE_HANDOFF_V1.schema.json','utf8')));
 const fail=(code='PROSPECTIVE_RESPONSE_INVALID'):never=>{throw new Error(code)};
 const obj=(v:unknown):Obj=>v&&typeof v==='object'&&!Array.isArray(v)?v as Obj:fail();
@@ -70,13 +84,13 @@ export async function sealCapture<T extends object>(value:T):Promise<T & {digest
   const copy={...value} as Record<string,unknown>;delete copy.digest;return {...value,digest:await sha256Hex(copy)} as T & {digest:string};
 }
 export async function validateProspectiveManifest(input:unknown):Promise<CaptureManifest> {
-  if(!manifestShape(input)&&!consecutiveShape(input))fail('PROSPECTIVE_MANIFEST_INVALID');
+  if(!manifestShape(input)&&!consecutiveShape(input)&&!indexedShape(input))fail('PROSPECTIVE_MANIFEST_INVALID');
   const m=obj(input);
-  const v2=m.schemaVersion==='binrat.prospective-capture/2';
-  const keys=v2?'authority,captureId,createdAtMs,digest,discovery,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion':
+  const v2=m.schemaVersion==='binrat.prospective-capture/2',v3=m.schemaVersion==='binrat.prospective-capture/3';
+  const keys=v2||v3?'authority,captureId,createdAtMs,digest,discovery,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion':
     'authority,captureId,createdAtMs,digest,endpoint,expiresAtMs,funder,historyBlocks,maxRpcCalls,maxWindowBlocks,provenance,schemaVersion';
   if(Object.keys(m).sort().join(',')!==keys||
-    (!v2&&m.schemaVersion!=='binrat.prospective-capture/1')||m.provenance!=='PUBLIC_RPC_SHADOW'||m.endpoint!==PROSPECTIVE_RPC||m.funder!==PROSPECTIVE_FUNDER||
+    (!v2&&!v3&&m.schemaVersion!=='binrat.prospective-capture/1')||m.provenance!=='PUBLIC_RPC_SHADOW'||m.endpoint!==PROSPECTIVE_RPC||m.funder!==PROSPECTIVE_FUNDER||
     typeof m.captureId!=='string'||!/^[a-zA-Z0-9_:-]{1,100}$/.test(m.captureId)||m.maxRpcCalls!==48||m.historyBlocks!==8||m.maxWindowBlocks!==200000||
     !Number.isSafeInteger(m.createdAtMs)||m.createdAtMs<0||m.expiresAtMs!==m.createdAtMs+86400000||
     canonicalJson(m.authority)!==canonicalJson({publicRpcRead:true,model:false,delivery:false,capital:false})||
@@ -128,6 +142,13 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
     s.discoveryCoverage='CONTIGUOUS_NUMBERED_BLOCK_PREFIX';
     s.discovery={strategy:'CONSECUTIVE_NUMBERED_BLOCKS',scope:'TOP_LEVEL_TRANSACTIONS_ONLY',fromBlock:null,toBlock:null,throughBlock:null,valid:true,complete:false,blocks:[]};
   }
+  if(m.schemaVersion==='binrat.prospective-capture/3'){
+    s.discoveryCoverage='PROVIDER_INDEXED_CANDIDATES_ONLY';
+    s.indexedDiscovery={source:'ALCHEMY_ROBINHOOD_ARCHIVE',scope:'PROVIDER_INDEXED_EXTERNAL_NATIVE_CANDIDATES_ONLY',valid:true,throughBlock:null,activeRange:null,ranges:[]};
+  }
+  let indexHead:Obj|null=null,indexStart:Obj|null=null,indexCursorHash:string|null=null,indexCursorTime=0n,indexAnchorSequence=0;
+  let indexCandidate:PonsExternalNativeInboundCandidate|null=null,indexPages:number[]=[],indexKeys=new Set<string>(),indexHashes=new Set<string>(),indexLastBlock=0n;
+  const indexCursor=()=>BigInt(s.indexedDiscovery!.throughBlock??s.initialBlock!);
   let preHead:Obj|null=null,handoffHead:Obj|null=null,rangeBlock:Obj|null=null,rangeStart:Obj|null=null,rangeLog:Obj|null=null;
   let scanHead:Obj|null=null,scanBlock:Obj|null=null,scanReadSequence=0,scanCursorTime=0n,scanInitialHash:string|null=null;
   let cursorHash:string|null=null;
@@ -138,9 +159,15 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
     switch(s.stage){
       case 'CHAIN':method='eth_chainId';break;
       case 'CODE':method='eth_getCode';params=[PONS_V2_FACTORY,'latest'];break;
-      case 'INITIAL_HEAD':case 'SCAN_HEAD':case 'PRE_HEAD':case 'HANDOFF_HEAD':case 'WATCH_HEAD':method='eth_getBlockByNumber';params=['latest',false];break;
+      case 'INDEX_HEAD':case 'INITIAL_HEAD':case 'SCAN_HEAD':case 'PRE_HEAD':case 'HANDOFF_HEAD':case 'WATCH_HEAD':method='eth_getBlockByNumber';params=['latest',false];break;
       case 'SCAN_ANCHOR':method='eth_getBlockByNumber';params=[q(discoveryCursor()),false];break;
       case 'SCAN_BLOCK':case 'SCAN_CONFIRM':method='eth_getBlockByNumber';params=[q(discoveryCursor()+1n),s.stage==='SCAN_BLOCK'];break;
+      case 'INDEX_CURSOR':method='eth_getBlockByNumber';params=[q(indexCursor()),false];break;
+      case 'INDEX_RANGE':case 'INDEX_CONFIRM':method='eth_getBlockByNumber';params=[q(BigInt(s.indexedDiscovery!.activeRange!.toBlock)),false];break;
+      case 'INDEX_PAGE':{
+        const r=s.indexedDiscovery!.activeRange!;method='alchemy_getAssetTransfers';params=[outgoingTransferParams(m.funder,BigInt(r.fromBlock),BigInt(r.toBlock),r.pageKey)];break;
+      }
+      case 'INDEX_FUNDING_BLOCK':method='eth_getBlockByNumber';params=[q(indexCandidate!.blockNumber),true];break;
       case 'SAMPLE':method='eth_getBlockByNumber';params=['latest',true];break;
       case 'FUNDING_RECEIPT':method='eth_getTransactionReceipt';params=[s.funding!.hash];break;
       case 'HISTORY':method='eth_getBlockByNumber';params=[q(quantity(s.fundingBlock!.number)-8n+BigInt(s.history.length)),true];break;
@@ -182,7 +209,56 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
             if(quantity(b.number)>99999999999999999991n)fail();
             s.discovery.fromBlock=(quantity(b.number)+1n).toString();s.discovery.toBlock=(quantity(b.number)+8n).toString();
             scanInitialHash=b.hash;cursorHash=b.hash;scanCursorTime=quantity(b.timestamp);s.stage='SCAN_HEAD';
-          }break;
+          }
+          if(s.indexedDiscovery){indexCursorHash=b.hash;indexCursorTime=quantity(b.timestamp);s.stage='INDEX_HEAD';}
+          break;
+        }
+        case 'INDEX_HEAD':{
+          indexHead=block(result,false);pointTime(indexHead,c.completedAtMs!);const n=quantity(indexHead.number),cursor=indexCursor();
+          if(n<cursor)fail('PROSPECTIVE_HEAD_REGRESSED');
+          if(n===cursor&&(indexHead.hash!==indexCursorHash||quantity(indexHead.timestamp)!==indexCursorTime))fail('PROSPECTIVE_INDEX_CURSOR_REORG');
+          if(n>BigInt(s.initialBlock!)+BigInt(m.maxWindowBlocks)){s.phase='EXPIRED';s.reason='PARTIAL_DISCOVERY_WINDOW_ENDED';break;}
+          if(n===cursor)break;
+          s.indexedDiscovery!.activeRange={fromBlock:(cursor+1n).toString(),toBlock:(n<cursor+4096n?n:cursor+4096n).toString(),pages:0,providerEnumerationComplete:false,pageKey:null};
+          indexCandidate=null;indexPages=[];indexKeys=new Set();indexHashes=new Set();indexLastBlock=0n;s.stage='INDEX_CURSOR';break;
+        }
+        case 'INDEX_CURSOR':{
+          const b=block(result,false);if(quantity(b.number)!==indexCursor()||b.hash!==indexCursorHash||quantity(b.timestamp)!==indexCursorTime)fail('PROSPECTIVE_INDEX_CURSOR_REORG');
+          s.stage='INDEX_RANGE';break;
+        }
+        case 'INDEX_RANGE':{
+          indexStart=block(result,false);const r=s.indexedDiscovery!.activeRange!;
+          if(indexStart.hash===indexCursorHash||(indexStart.number===indexHead!.number&&(indexStart.hash!==indexHead!.hash||indexStart.timestamp!==indexHead!.timestamp||indexStart.parentHash!==indexHead!.parentHash))||quantity(indexStart.number)!==BigInt(r.toBlock)||quantity(indexStart.timestamp)<indexCursorTime||quantity(indexStart.timestamp)>quantity(indexHead!.timestamp))fail('PROSPECTIVE_INDEX_RANGE_INVALID');
+          indexAnchorSequence=c.sequence;s.stage='INDEX_PAGE';break;
+        }
+        case 'INDEX_PAGE':{
+          const r=s.indexedDiscovery!.activeRange!,page=parseOutgoingTransferPage(result,m.funder,BigInt(r.fromBlock),BigInt(r.toBlock));
+          for(const t of page.transfers){
+            if(t.blockNumber<indexLastBlock||indexHashes.has(t.txHash))fail('PROSPECTIVE_INDEX_ORDER_OR_DUPLICATE');
+            indexLastBlock=t.blockNumber;indexHashes.add(t.txHash);
+          }
+          if(page.pageKey&&(indexKeys.has(page.pageKey)||page.pageKey===r.pageKey))fail('PROSPECTIVE_INDEX_PAGE_CYCLE');
+          if(page.pageKey)indexKeys.add(page.pageKey);
+          r.pages++;indexPages.push(c.sequence);r.pageKey=page.pageKey;r.providerEnumerationComplete=page.pageKey===null;
+          indexCandidate=page.transfers.find(t=>t.from!==t.to)??null;
+          if(indexCandidate||r.providerEnumerationComplete)s.stage='INDEX_CONFIRM';
+          else if(r.pages===3){s.phase='EXHAUSTED';s.reason='INDEXED_PAGE_LIMIT_PARTIAL_RANGE';}
+          break;
+        }
+        case 'INDEX_CONFIRM':{
+          const b=block(result,false),r=s.indexedDiscovery!.activeRange!;
+          if(b.number!==indexStart!.number||b.hash!==indexStart!.hash||b.timestamp!==indexStart!.timestamp||b.parentHash!==indexStart!.parentHash||canonicalJson(b.transactions)!==canonicalJson(indexStart!.transactions))fail('PROSPECTIVE_INDEX_RANGE_REORG');
+          if(indexCandidate){s.stage='INDEX_FUNDING_BLOCK';break;}
+          s.indexedDiscovery!.ranges.push({fromBlock:r.fromBlock,toBlock:r.toBlock,pageSequences:[...indexPages],anchorSequence:indexAnchorSequence,confirmationSequence:c.sequence});
+          s.indexedDiscovery!.throughBlock=r.toBlock;indexCursorHash=b.hash;indexCursorTime=quantity(b.timestamp);s.indexedDiscovery!.activeRange=null;s.stage='INDEX_HEAD';break;
+        }
+        case 'INDEX_FUNDING_BLOCK':{
+          const b=block(result,true),t=indexCandidate!;
+          if(quantity(b.number)!==t.blockNumber||quantity(b.timestamp)<indexCursorTime||quantity(b.timestamp)>quantity(indexStart!.timestamp)||(t.blockNumber===indexCursor()+1n&&b.parentHash!==indexCursorHash))fail('PROSPECTIVE_INDEX_TRANSFER_BINDING_INVALID');
+          if(b.number===indexStart!.number&&b.hash!==indexStart!.hash)fail('PROSPECTIVE_INDEX_RANGE_REORG');
+          const tx=b.transactions.find((x:Obj)=>x.hash===t.txHash);
+          if(!tx||tx.from!==t.from||tx.to!==t.to||quantity(tx.value)!==t.valueWei)fail('PROSPECTIVE_INDEX_TRANSFER_CANONICAL_MISMATCH');
+          s.funding=tx;s.fundingBlock=b;s.stage='FUNDING_RECEIPT';s.phase='COLLECTING_HISTORY';break;
         }
         case 'SCAN_HEAD':{
           scanHead=block(result,false);pointTime(scanHead,c.completedAtMs!);
@@ -285,7 +361,7 @@ export async function auditProspective(input:unknown,calls:CaptureCall[],now?:nu
           s.finding=await sealCapture(content);s.caseDiff={provenance:'PUBLIC_RPC_SHADOW',beforeDigest:s.handoff!.digest,afterDigest:s.finding.digest,addedFacts:['PONS_REPORTED_DEPLOYER_LAUNCH','FUNDING_PRECEDES_LAUNCH','LAUNCH_AFTER_LOCAL_HANDOFF']};s.notification={state:'PREPARED_ONLY',deliveryAuthorized:false,id:s.finding.digest,text:'Recorded direct funding, bounded recipient-window absence, then a Pons launch after the prepared handoff. Nothing sent.'};s.phase='FOUND';s.reason='SUPPORTED_LAUNCH_AFTER_LOCAL_HANDOFF';break;
         }
       }
-    }catch(error){if(c!==calls.at(-1))fail('PROSPECTIVE_JOURNAL_INVALID');if(s.discovery&&s.stage.startsWith('SCAN_')){s.discovery.valid=false;s.discovery.complete=false;}s.phase='HALTED';s.reason=error instanceof Error&&/^[A-Z][A-Z0-9_]{0,100}$/.test(error.message)?error.message:'PROSPECTIVE_RESPONSE_INVALID';break;}
+    }catch(error){if(c!==calls.at(-1))fail('PROSPECTIVE_JOURNAL_INVALID');if(s.discovery&&s.stage.startsWith('SCAN_')){s.discovery.valid=false;s.discovery.complete=false;}if(s.indexedDiscovery&&s.stage.startsWith('INDEX_'))s.indexedDiscovery.valid=false;s.phase='HALTED';s.reason=error instanceof Error&&/^[A-Z][A-Z0-9_]{0,100}$/.test(error.message)?error.message:'PROSPECTIVE_RESPONSE_INVALID';break;}
   }
   if(!terminal(s)&&s.rpcCalls===m.maxRpcCalls){s.phase='EXHAUSTED';s.reason='ORIGIN_RPC_BUDGET_EXHAUSTED';}
   if(!terminal(s)&&now!==undefined&&now>m.expiresAtMs){s.phase='EXPIRED';s.reason='WALL_DEADLINE_PARTIAL_COVERAGE';}
