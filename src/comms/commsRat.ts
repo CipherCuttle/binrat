@@ -115,8 +115,6 @@ const BANNED_PATTERNS: RegExp[] = [
   /\brugger\b/i,
   /\bscammer\b/i,
   /\bguaranteed (?:returns|yield|apy|listing|price appreciation)\b/i,
-  /\bai[- ]powered alpha\b/i,
-  /\brevolutionary blockchain intelligence\b/i,
   /\bnext 100x\b/i,
   /\bgem found\b/i,
   /\balpha found\b/i,

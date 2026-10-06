@@ -112,7 +112,7 @@ Hard queue conditions override the score:
 
 ## Threat model covered in V1
 
-- poisoned commit/PR wording cannot grant claim authority;
+- PR/commit evidence references do not grant public authority; `publicAuthorized` is a separate trusted input;
 - BUILDING/ENGINEERING_PASS cannot silently become LIVE;
 - missing receipts stop immediate publication;
 - Brand V1 hard-ban phrases are linted;
