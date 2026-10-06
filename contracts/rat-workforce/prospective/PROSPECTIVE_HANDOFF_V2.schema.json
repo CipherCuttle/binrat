@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "fromRat",
+    "toRat",
+    "objective",
+    "captureId",
+    "recipient",
+    "createdAtMs",
+    "afterBlock",
+    "fundingTx",
+    "history",
+    "evidenceSequences",
+    "authority",
+    "remainingRpcCalls",
+    "digest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.prospective-handoff/2"
+    },
+    "fromRat": {
+      "const": "SNIFFER"
+    },
+    "toRat": {
+      "const": "RAT_ZERO"
+    },
+    "objective": {
+      "const": "CHECK_PONS_LAUNCH_AFTER_OBSERVATION"
+    },
+    "captureId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_:-]{1,100}$"
+    },
+    "recipient": {
+      "type": "string",
+      "pattern": "^0x[a-f0-9]{40}$"
+    },
+    "createdAtMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "afterBlock": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "fundingTx": {
+      "type": "string",
+      "pattern": "^0x[a-f0-9]{64}$"
+    },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromBlock",
+        "toBlock",
+        "scope",
+        "complete",
+        "seen",
+        "blockHashes"
+      ],
+      "properties": {
+        "fromBlock": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,19})$"
+        },
+        "toBlock": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,19})$"
+        },
+        "scope": {
+          "const": "TOP_LEVEL_TRANSACTION_PARTICIPATION_ONLY"
+        },
+        "complete": {
+          "const": true
+        },
+        "seen": {
+          "const": false
+        },
+        "blockHashes": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^0x[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "evidenceSequences": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 96,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 96
+      }
+    },
+    "authority": {
+      "const": {
+        "research": true,
+        "network": false,
+        "provider": false,
+        "delivery": false,
+        "capital": false
+      }
+    },
+    "remainingRpcCalls": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 96
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}
