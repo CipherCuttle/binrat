@@ -171,6 +171,30 @@ function activeRank(state: CommsLifecycleState): number | null {
   return ACTIVE_RANK[state] ?? null;
 }
 
+function isNegatedStatusMatch(text: string, index: number): boolean {
+  const prefix = text.slice(Math.max(0, index - 40), index).toLowerCase();
+  return (
+    /\b(?:not|never)\s+(?:(?:yet|currently|publicly|actually|being|posted|made|marked|considered|called)\s+){0,3}$/.test(
+      prefix,
+    ) ||
+    /\bisn['’]?t\s+(?:(?:yet|currently|publicly|actually|being|posted|made|marked|considered|called)\s+){0,3}$/.test(
+      prefix,
+    ) ||
+    /\bwithout\s+(?:(?:being|going)\s+){0,2}$/.test(prefix)
+  );
+}
+
+function firstAffirmativeStatusMatch(text: string, pattern: RegExp): RegExpExecArray | null {
+  const flags = pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`;
+  const globalPattern = new RegExp(pattern.source, flags);
+
+  for (const match of text.matchAll(globalPattern)) {
+    if (!isNegatedStatusMatch(text, match.index ?? 0)) return match;
+  }
+
+  return null;
+}
+
 function evidenceStrength(evidence: CommsEvidenceRef[]): number {
   if (evidence.length === 0) return 0;
 
@@ -308,7 +332,7 @@ export function validateDraftText(text: string, event: CommsEvent): ClaimViolati
 
   const rank = activeRank(event.lifecycle);
   for (const rule of STATUS_PATTERNS) {
-    const match = text.match(rule.pattern);
+    const match = firstAffirmativeStatusMatch(text, rule.pattern);
     if (!match) continue;
 
     const requiredRank = ACTIVE_RANK[rule.minimum]!;
