@@ -1,0 +1,258 @@
+{
+  "mode": "RECORDED_RPC_RETROSPECTIVE",
+  "rawFile": "test/fixtures/workforce/recorded/pons-funding-a-rpc-v1.json",
+  "rawSha256": "ee77cab9e2261935b03afc32b55a026d3fad94df35b976832744010fd0ce9ab9",
+  "bundleFile": "test/fixtures/workforce/recorded/pons-funding-a-bundle-v1.json",
+  "bundleSha256": "46415525f1194ad5d4e44d6bbc29b2d760c33b630d2c49a669809a483a59ffaa",
+  "bundleDigest": "401fffc91695f04602b181c9a3ea96f6a789f6745dce44d80faeb130372a66a0",
+  "readOnlyResponses": 9,
+  "transferBlock": "77795399",
+  "launchBlock": "77796794",
+  "captureCheckpoint": "81253814",
+  "receivedAt": "2026-10-06T01:43:26.980853+00:00",
+  "initial": {
+    "phase": "READY",
+    "revision": 0
+  },
+  "beforeCapture": {
+    "phase": "WAITING",
+    "claims": 0,
+    "toolCalls": 0,
+    "handoffs": 0
+  },
+  "finding": {
+    "phase": "FOUND",
+    "revision": 2,
+    "receipt": {
+      "schemaVersion": "binrat.recorded-job-receipt/1",
+      "provenance": "RECORDED_RPC_RETROSPECTIVE",
+      "jobId": "recorded-pons-funding-a",
+      "inputDigest": "401fffc91695f04602b181c9a3ea96f6a789f6745dce44d80faeb130372a66a0",
+      "throughBlock": "81253814",
+      "status": "DONE",
+      "coverage": "PARTIAL_RECORDED_RELATION_NO_RECIPIENT_HISTORY",
+      "claims": [
+        {
+          "kind": "NATIVE_TRANSFER_OBSERVED",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "WALLET",
+            "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+          },
+          "evidenceRefs": [
+            "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2"
+          ],
+          "scope": "RECORDED_RPC_RESPONSES_ONLY"
+        },
+        {
+          "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+          },
+          "evidenceRefs": [
+            "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13"
+          ],
+          "scope": "RECORDED_RPC_RESPONSES_ONLY"
+        },
+        {
+          "kind": "FUNDING_PRECEDES_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+          },
+          "evidenceRefs": [
+            "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+            "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13"
+          ],
+          "scope": "RECORDED_RPC_RESPONSES_ONLY"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+          "kind": "NATIVE_TRANSFER",
+          "chainId": 4663,
+          "blockNumber": "77795399",
+          "blockHash": "0xe4503eaee898f505ec7b85584ab0f20480518318cfd93cd9609fe714659cec9c",
+          "availableAtBlock": "81253814",
+          "from": "0x9bc462bce2acd6fbe2ef5470d55b439453451083",
+          "to": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8",
+          "txHash": "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+          "valueWei": "12681852309631219",
+          "digest": "0056790a90772bd26f2f044eb9b118385b661ccc343343286971d0adb541689d"
+        },
+        {
+          "id": "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13",
+          "kind": "PONS_LAUNCH",
+          "chainId": 4663,
+          "blockNumber": "77796794",
+          "blockHash": "0xfbe0c088f5a3c74e4322fdaa2f8d62c2733fbb28b89f31891b8bc3775e979c39",
+          "availableAtBlock": "81253814",
+          "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+          "creator": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8",
+          "token": "0xf4b0f5b87e2c508ca3507812da62367dad1b04eb",
+          "pool": "0xcb32a72d3a122a512052b48bee9d8fcec5b35161",
+          "txHash": "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7",
+          "logIndex": 13,
+          "digest": "081102961f595af196ca6532c9c3fdc3cc54a60a279ae58758b4a4ac8b77efc9"
+        }
+      ],
+      "handoffs": [],
+      "caseDiff": {
+        "beforeDigest": "2d1256861b904a7ba74574a3015bcf8b6fc16bc159dda5a2652775d36d935cc7",
+        "afterDigest": "6c7b0e9edc699dbe8888ab7cedf1d48a83ac484921e99ef9f58b603a711b950c",
+        "addedClaims": [
+          {
+            "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+            "subject": {
+              "chainId": 4663,
+              "entityType": "CREATOR",
+              "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+            },
+            "evidenceRefs": [
+              "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13"
+            ],
+            "scope": "RECORDED_RPC_RESPONSES_ONLY"
+          },
+          {
+            "kind": "FUNDING_PRECEDES_LAUNCH",
+            "subject": {
+              "chainId": 4663,
+              "entityType": "CREATOR",
+              "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+            },
+            "evidenceRefs": [
+              "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+              "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13"
+            ],
+            "scope": "RECORDED_RPC_RESPONSES_ONLY"
+          }
+        ],
+        "fundingReceipt": {
+          "chainId": 4663,
+          "deployer": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8",
+          "evidenceDigest": "3662d010be38e53ab476450dc600781f871a3a93cc0dd9f922af8d22527fb5ce",
+          "fundingId": "f2e43f7c827357b72ecf07f738ad3a87066828e299b988e1661ccd307879ef40",
+          "fundingVersion": "BINRAT_PONS_PRELAUNCH_NATIVE_INBOUND_V1",
+          "launchBlock": "77796794",
+          "launchBlockHash": "0xfbe0c088f5a3c74e4322fdaa2f8d62c2733fbb28b89f31891b8bc3775e979c39",
+          "launchId": "6ebb4e84cbad72c35e28e77ebbeb781805b7c3cb830191ed0c58b303c6a792c2",
+          "sourceAddress": "0x9bc462bce2acd6fbe2ef5470d55b439453451083",
+          "transferBlock": "77795399",
+          "transferBlockHash": "0xe4503eaee898f505ec7b85584ab0f20480518318cfd93cd9609fe714659cec9c",
+          "transferTimestampMs": 1790900033000,
+          "transferTxHash": "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+          "valueWei": "12681852309631219"
+        }
+      },
+      "alert": {
+        "decision": "ALERT",
+        "reason": "RETROSPECTIVE_RELATION",
+        "findingId": "6c7b0e9edc699dbe8888ab7cedf1d48a83ac484921e99ef9f58b603a711b950c"
+      },
+      "usage": {
+        "toolCalls": 4,
+        "handoffs": 0,
+        "modelCalls": 0,
+        "costMicrousd": 0
+      },
+      "trace": [
+        {
+          "sequence": 1,
+          "tool": "READ_RECORDED_TRANSFER",
+          "atBlock": "81253814"
+        },
+        {
+          "sequence": 2,
+          "tool": "READ_RECORDED_PONS_LAUNCH",
+          "atBlock": "81253814"
+        },
+        {
+          "sequence": 3,
+          "tool": "BUILD_RECORDED_CASE_DIFF",
+          "atBlock": "81253814"
+        },
+        {
+          "sequence": 4,
+          "tool": "PREPARE_RECORDED_ALERT",
+          "atBlock": "81253814"
+        }
+      ],
+      "observation": {
+        "availableAtBlock": "81253814",
+        "receivedAt": "2026-10-06T01:43:26.980853+00:00",
+        "predictionEstablished": false,
+        "recipientFreshnessEstablished": false,
+        "authentication": "PROVIDER_REPORTED_NOT_CONSENSUS_PROVEN"
+      },
+      "receiptId": "18639be833e3660594f6c916a80a6bbbb8674e32d201c6cf11eaabd70b9634b2"
+    },
+    "notification": {
+      "id": "5c913b9b83e0e71b683a67c9c5b17043c10b75b5b8622eb82fd0d250f4bce9da",
+      "state": "PREPARED_ONLY",
+      "deliveryAuthorized": false,
+      "target": "UNASSIGNED",
+      "text": "Recorded retrospective relation: direct funding preceded a Pons launch. Finding 6c7b0e9edc699dbe8888ab7cedf1d48a83ac484921e99ef9f58b603a711b950c. No earlier prediction or recipient freshness established."
+    }
+  },
+  "restartSameNotification": true,
+  "duplicateImportSameSnapshot": true,
+  "journalEntries": 3,
+  "localCase": {
+    "provenance": "RECORDED_RPC_RETROSPECTIVE",
+    "findingId": "6c7b0e9edc699dbe8888ab7cedf1d48a83ac484921e99ef9f58b603a711b950c",
+    "diff": {
+      "beforeDigest": "2d1256861b904a7ba74574a3015bcf8b6fc16bc159dda5a2652775d36d935cc7",
+      "afterDigest": "6c7b0e9edc699dbe8888ab7cedf1d48a83ac484921e99ef9f58b603a711b950c",
+      "addedClaims": [
+        {
+          "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+          },
+          "evidenceRefs": [
+            "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13"
+          ],
+          "scope": "RECORDED_RPC_RESPONSES_ONLY"
+        },
+        {
+          "kind": "FUNDING_PRECEDES_LAUNCH",
+          "subject": {
+            "chainId": 4663,
+            "entityType": "CREATOR",
+            "entityId": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8"
+          },
+          "evidenceRefs": [
+            "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+            "0x259bd408520b99864a7a069896dcf6868fe0ed18a3bbce95ff32f02fd9ab06d7:13"
+          ],
+          "scope": "RECORDED_RPC_RESPONSES_ONLY"
+        }
+      ],
+      "fundingReceipt": {
+        "chainId": 4663,
+        "deployer": "0xaf70c00d8d252fc9fe68f00525b8df4e4fdcfcb8",
+        "evidenceDigest": "3662d010be38e53ab476450dc600781f871a3a93cc0dd9f922af8d22527fb5ce",
+        "fundingId": "f2e43f7c827357b72ecf07f738ad3a87066828e299b988e1661ccd307879ef40",
+        "fundingVersion": "BINRAT_PONS_PRELAUNCH_NATIVE_INBOUND_V1",
+        "launchBlock": "77796794",
+        "launchBlockHash": "0xfbe0c088f5a3c74e4322fdaa2f8d62c2733fbb28b89f31891b8bc3775e979c39",
+        "launchId": "6ebb4e84cbad72c35e28e77ebbeb781805b7c3cb830191ed0c58b303c6a792c2",
+        "sourceAddress": "0x9bc462bce2acd6fbe2ef5470d55b439453451083",
+        "transferBlock": "77795399",
+        "transferBlockHash": "0xe4503eaee898f505ec7b85584ab0f20480518318cfd93cd9609fe714659cec9c",
+        "transferTimestampMs": 1790900033000,
+        "transferTxHash": "0xcb29fa5271340288f12d79fba9adcd783a6d789e4dc043bd299812620511e9e2",
+        "valueWei": "12681852309631219"
+      }
+    }
+  },
+  "newModelCalls": 0,
+  "newModelCostMicrousd": 0,
+  "deliveredNotifications": 0
+}

@@ -75,7 +75,7 @@ export async function startLocalDen(options: { dbPath: string; port?: number; as
             try { jobs.push({ verification: 'VERIFIED', ...await store.inspect(jobId) }); }
             catch (error) { jobs.push({ verification: 'FAILED', jobId, error: safeCode(error) }); }
           }
-          return { mode: 'LOCAL_SYNTHETIC_REPLAY', jobs, maxJobs: LOCAL_DEN_MAX_JOBS };
+          return { mode: 'LOCAL_REPLAY', jobs, maxJobs: LOCAL_DEN_MAX_JOBS };
         });
         json(response, result); return;
       }

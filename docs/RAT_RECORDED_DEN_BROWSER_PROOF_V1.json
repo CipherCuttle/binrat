@@ -1,0 +1,80 @@
+{
+  "mode": "LOCAL_REPLAY",
+  "viewports": [
+    {
+      "width": 320,
+      "passed": true
+    },
+    {
+      "width": 360,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "passed": true
+    },
+    {
+      "width": 430,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "passed": true
+    },
+    {
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "passed": true
+    }
+  ],
+  "restart": true,
+  "cancel": true,
+  "expiry": true,
+  "incomplete": true,
+  "exhaustion": true,
+  "unavailableRecovery": true,
+  "malformedRecovery": true,
+  "uncertainWriteRecovery": true,
+  "openTabRestartRecovery": true,
+  "newModelCalls": 0,
+  "deliveredNotifications": 0,
+  "recorded": {
+    "sourceDigest": "401fffc91695f04602b181c9a3ea96f6a789f6745dce44d80faeb130372a66a0",
+    "viewports": [
+      {
+        "width": 320,
+        "passed": true
+      },
+      {
+        "width": 360,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "passed": true
+      },
+      {
+        "width": 430,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "passed": true
+      },
+      {
+        "width": 1024,
+        "passed": true
+      },
+      {
+        "width": 1440,
+        "passed": true
+      }
+    ],
+    "predictionEstablished": false,
+    "recipientFreshnessEstablished": false
+  },
+  "unverifiedProvenance": true
+}
