@@ -40,6 +40,9 @@ export interface CommsEvalCaseResult {
   forbiddenClaims: string[];
   hardFidelityPass: boolean;
   automaticCandidate: boolean;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  durationMs: number | null;
   x: string | null;
   telegram: string | null;
   error: string | null;
@@ -54,6 +57,9 @@ export interface CommsEvalSummary {
   automaticCandidates: number;
   unsupportedClaimFailures: number;
   decisionMismatches: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  maxCaseDurationMs: number;
   manualEditReviewRequired: boolean;
   autonomyVerdict:
     | 'BLOCKED_PROVIDER_FAILURE'
@@ -101,6 +107,7 @@ function hasReceipt(bundle: ShadowPostBundle, refs: string[]): boolean {
 export function evaluateCommsDraftAttempt(
   testCase: CommsEvalCase,
   attempt: ModelDraftAttempt,
+  durationMs: number | null = null,
 ): CommsEvalCaseResult {
   const text = attempt.bundle.drafts.x + '\n' + attempt.bundle.drafts.telegram;
   const forbiddenClaims = testCase.forbiddenClaims
@@ -141,6 +148,9 @@ export function evaluateCommsDraftAttempt(
     forbiddenClaims,
     hardFidelityPass,
     automaticCandidate,
+    inputTokens: attempt.writerReceipt.usage?.inputTokens ?? null,
+    outputTokens: attempt.writerReceipt.usage?.outputTokens ?? null,
+    durationMs,
     x: attempt.bundle.drafts.x,
     telegram: attempt.bundle.drafts.telegram,
     error: null,
@@ -150,6 +160,7 @@ export function evaluateCommsDraftAttempt(
 export function failedCommsEvalCase(
   testCase: CommsEvalCase,
   error: string,
+  durationMs: number | null = null,
 ): CommsEvalCaseResult {
   return {
     id: testCase.id,
@@ -164,6 +175,9 @@ export function failedCommsEvalCase(
     forbiddenClaims: [],
     hardFidelityPass: false,
     automaticCandidate: false,
+    inputTokens: null,
+    outputTokens: null,
+    durationMs,
     x: null,
     telegram: null,
     error,
@@ -181,6 +195,18 @@ export function summarizeCommsEval(
     (item) => item.capabilityUpgradeCount > 0 || item.forbiddenClaims.length > 0,
   ).length;
   const decisionMismatches = results.filter((item) => !item.decisionMatches).length;
+  const totalInputTokens = results.reduce(
+    (sum, item) => sum + (item.inputTokens ?? 0),
+    0,
+  );
+  const totalOutputTokens = results.reduce(
+    (sum, item) => sum + (item.outputTokens ?? 0),
+    0,
+  );
+  const maxCaseDurationMs = results.reduce(
+    (max, item) => Math.max(max, item.durationMs ?? 0),
+    0,
+  );
 
   let autonomyVerdict: CommsEvalSummary['autonomyVerdict'];
   if (modelCallSuccesses !== results.length) {
@@ -205,6 +231,9 @@ export function summarizeCommsEval(
     automaticCandidates,
     unsupportedClaimFailures,
     decisionMismatches,
+    totalInputTokens,
+    totalOutputTokens,
+    maxCaseDurationMs,
     manualEditReviewRequired: true,
     autonomyVerdict,
   };
