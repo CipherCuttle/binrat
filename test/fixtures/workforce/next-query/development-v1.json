@@ -1,0 +1,4760 @@
+{
+  "schemaVersion": "binrat.next-query-pack/1",
+  "provenance": "SYNTHETIC_MODEL_UNRUN",
+  "split": "development",
+  "registrationDigest": "24f7e09bffcd563de85e56633f85d7150111bcbb18aa1d03eeaaeb9807e01580",
+  "generatorDigest": "db26d61f38181b082e5258f926619c187e6afe44bb72597e2493cb27eccc280f",
+  "cases": [
+    {
+      "taskId": "query-0b76c5836b029235",
+      "stratum": "ONE_ELIGIBLE",
+      "variant": 0,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-0b76c5836b029235",
+        "decisionBlock": "10000",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-0b76c5836b029235-226424e7",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-0b76c5836b029235-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x895998bb5f09eabaec1718be4fab875d415a859e"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "9920",
+                "toBlock": "10080"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-0b76c5836b029235-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "9973",
+              "availableAtBlock": "9974",
+              "blockHash": "0x3a93b86f5043a7be9553ed0c05220853ba40ac6b6cabff734d6044470fde3610",
+              "from": "0x895998bb5f09eabaec1718be4fab875d415a859e",
+              "to": "0xb613d86312f2c0d031c170ce8c24df281660080b",
+              "txHash": "0x3cb9d4b781098559518d04d7f030a42bbbb9e78c5cfb96ea01131abc326965af",
+              "valueWei": "16239160",
+              "digest": "813fe2096cf9f88c821f7ee7521671517ecc6bd714d227db3438a4ccdc00561d"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xb613d86312f2c0d031c170ce8c24df281660080b"
+              },
+              "evidenceRefs": [
+                "query-0b76c5836b029235-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x3a93b86f5043a7be9553ed0c05220853ba40ac6b6cabff734d6044470fde3610",
+            "fromBlock": "9920",
+            "toBlock": "9972"
+          },
+          {
+            "queryId": "query-0b76c5836b029235-9926a695",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-0b76c5836b029235-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x895998bb5f09eabaec1718be4fab875d415a859e"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "9920",
+                "toBlock": "10080"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-0b76c5836b029235-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "9970",
+              "availableAtBlock": "9971",
+              "blockHash": "0x9385b7248e45254edd23d1b2e29dc82728ddcdd6fb54ef339c3630687dbfc6e5",
+              "from": "0x895998bb5f09eabaec1718be4fab875d415a859e",
+              "to": "0xb28d576ff352af14d46664e0038e2c8949e53d45",
+              "txHash": "0x351dbe3f7be2da7ec49edf7fdb19601f7dab872a322f33c693528f7c60d689fd",
+              "valueWei": "3787096",
+              "digest": "a342be85b138a980321271b918c10fadf36eb53e07cc80332b5cb5ab002435d9"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xb28d576ff352af14d46664e0038e2c8949e53d45"
+              },
+              "evidenceRefs": [
+                "query-0b76c5836b029235-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x9385b7248e45254edd23d1b2e29dc82728ddcdd6fb54ef339c3630687dbfc6e5",
+            "fromBlock": "9920",
+            "toBlock": "9969"
+          },
+          {
+            "queryId": "query-0b76c5836b029235-49b157c0",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-0b76c5836b029235-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x895998bb5f09eabaec1718be4fab875d415a859e"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "9920",
+                "toBlock": "10080"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-0b76c5836b029235-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "9976",
+              "availableAtBlock": "9977",
+              "blockHash": "0x7968811fba46feb1a01be77e318954f92916dbb1eb2ee5d73da1d70618ccdd1d",
+              "from": "0x895998bb5f09eabaec1718be4fab875d415a859e",
+              "to": "0xcc3438abb2e090480330e0c02a5ad8ad81aa579c",
+              "txHash": "0x6bafb669945ae0609a5b37991c625fafb728a2ee72c9b38d9c403d237bd103a6",
+              "valueWei": "7195399",
+              "digest": "bd13986e94bc8d115e8ca5050763656a2db5031c7decef87c774dd3a739c7109"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xcc3438abb2e090480330e0c02a5ad8ad81aa579c"
+              },
+              "evidenceRefs": [
+                "query-0b76c5836b029235-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x7968811fba46feb1a01be77e318954f92916dbb1eb2ee5d73da1d70618ccdd1d",
+            "fromBlock": "9920",
+            "toBlock": "9975"
+          }
+        ],
+        "taskDigest": "642d03181ba82061387ccaed217f196b50106e01115fb8e451864e04c224d8bf"
+      },
+      "outcomes": {
+        "query-0b76c5836b029235-9926a695": {
+          "history": {
+            "id": "query-0b76c5836b029235-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10001",
+            "availableAtBlock": "10001",
+            "blockHash": "0xbb49400ee50721471bb29369e3ee5399bff7f7a143ffe92bf978199ba22d7922",
+            "recipient": "0xb28d576ff352af14d46664e0038e2c8949e53d45",
+            "fromBlock": "9920",
+            "toBlock": "9969",
+            "complete": true,
+            "seen": false,
+            "digest": "28c2363018ee264ae6d6c3cc4ed7e240115df8d69c1d16b5fcae59c01b899fc2"
+          },
+          "later": [
+            {
+              "id": "query-0b76c5836b029235-launch-0",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10008",
+              "availableAtBlock": "10012",
+              "blockHash": "0x91ad84f9dd4c4892b8543ff2353ba232262a82fc7bd5945add2ae82bba7fed3b",
+              "creator": "0xb28d576ff352af14d46664e0038e2c8949e53d45",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xe3e7703535b288e434c5eaf30b1dad64ad895f5b",
+              "pool": "0x8c9e840aba71ad7e94f8f1a4cbf85f3259964989",
+              "txHash": "0x5751cd2fa50c03ee22eedfede00c130cce66eb0075f58c4cf324ccfa0ccdec27",
+              "logIndex": 0,
+              "digest": "5eceb1703886da3747f3f989bdbc86e22d1801fbffffc552ad8b177ef02dc31a"
+            }
+          ],
+          "canonicalBlocks": {
+            "10001": "0xbb49400ee50721471bb29369e3ee5399bff7f7a143ffe92bf978199ba22d7922",
+            "10008": "0x91ad84f9dd4c4892b8543ff2353ba232262a82fc7bd5945add2ae82bba7fed3b"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xb28d576ff352af14d46664e0038e2c8949e53d45"
+                },
+                "evidenceRefs": [
+                  "query-0b76c5836b029235-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xb28d576ff352af14d46664e0038e2c8949e53d45"
+                },
+                "evidenceRefs": [
+                  "query-0b76c5836b029235-history-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xb28d576ff352af14d46664e0038e2c8949e53d45"
+                },
+                "evidenceRefs": [
+                  "query-0b76c5836b029235-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xb28d576ff352af14d46664e0038e2c8949e53d45"
+                },
+                "evidenceRefs": [
+                  "query-0b76c5836b029235-funding-0",
+                  "query-0b76c5836b029235-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xb28d576ff352af14d46664e0038e2c8949e53d45"
+              },
+              "createdAtBlock": "10001",
+              "afterBlock": "9970",
+              "evidenceRefs": [
+                "query-0b76c5836b029235-funding-0",
+                "query-0b76c5836b029235-history-0"
+              ]
+            }
+          }
+        },
+        "query-0b76c5836b029235-226424e7": {
+          "history": {
+            "id": "query-0b76c5836b029235-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10001",
+            "availableAtBlock": "10001",
+            "blockHash": "0xbb49400ee50721471bb29369e3ee5399bff7f7a143ffe92bf978199ba22d7922",
+            "recipient": "0xb613d86312f2c0d031c170ce8c24df281660080b",
+            "fromBlock": "9920",
+            "toBlock": "9972",
+            "complete": true,
+            "seen": true,
+            "digest": "bac133d4977c572eeea4f0ff5cb65e7ea07e763b29c9d72e14cdc2dce7d98b8a"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10001": "0xbb49400ee50721471bb29369e3ee5399bff7f7a143ffe92bf978199ba22d7922"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xb613d86312f2c0d031c170ce8c24df281660080b"
+                },
+                "evidenceRefs": [
+                  "query-0b76c5836b029235-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-0b76c5836b029235-49b157c0": {
+          "history": {
+            "id": "query-0b76c5836b029235-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10001",
+            "availableAtBlock": "10001",
+            "blockHash": "0xbb49400ee50721471bb29369e3ee5399bff7f7a143ffe92bf978199ba22d7922",
+            "recipient": "0xcc3438abb2e090480330e0c02a5ad8ad81aa579c",
+            "fromBlock": "9920",
+            "toBlock": "9975",
+            "complete": true,
+            "seen": true,
+            "digest": "fc09e7cfa0b113f88db89b751f1f5dc6e7c714ad4073273c1dd971c88aba9e0d"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10001": "0xbb49400ee50721471bb29369e3ee5399bff7f7a143ffe92bf978199ba22d7922"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xcc3438abb2e090480330e0c02a5ad8ad81aa579c"
+                },
+                "evidenceRefs": [
+                  "query-0b76c5836b029235-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "3d368eae3485ee0a2935ef3b8e0e8e29ab4b00bfb10db1e0f43e15db3ec16294"
+    },
+    {
+      "taskId": "query-9fd870bd57442ecd",
+      "stratum": "ONE_ELIGIBLE",
+      "variant": 1,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-9fd870bd57442ecd",
+        "decisionBlock": "10100",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-9fd870bd57442ecd-e9fadf45",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-9fd870bd57442ecd-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xbf6dd0a4b6ffbcf2239d7c7b41f3f14dd2c2eaea"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10020",
+                "toBlock": "10180"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-9fd870bd57442ecd-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10076",
+              "availableAtBlock": "10077",
+              "blockHash": "0x79810f3c60bc045d92c5356f51ca50c065476fe4c1a9eecf128c3c5dc6498444",
+              "from": "0xbf6dd0a4b6ffbcf2239d7c7b41f3f14dd2c2eaea",
+              "to": "0x8e6069560de967035fd2c95932408e0d86852c13",
+              "txHash": "0xa02c6928813bef853571c79b93fa01f3dbb5cfa717c314d2369e007eeaf95676",
+              "valueWei": "15301681",
+              "digest": "01cbecb05f688ee51dc3ba932ca8c7a8fa9524a2c3b4019d8b2b338de671f8df"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x8e6069560de967035fd2c95932408e0d86852c13"
+              },
+              "evidenceRefs": [
+                "query-9fd870bd57442ecd-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x79810f3c60bc045d92c5356f51ca50c065476fe4c1a9eecf128c3c5dc6498444",
+            "fromBlock": "10020",
+            "toBlock": "10075"
+          },
+          {
+            "queryId": "query-9fd870bd57442ecd-75bc8668",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-9fd870bd57442ecd-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xbf6dd0a4b6ffbcf2239d7c7b41f3f14dd2c2eaea"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10020",
+                "toBlock": "10180"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-9fd870bd57442ecd-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10073",
+              "availableAtBlock": "10074",
+              "blockHash": "0xd8677df0e76ecd3142e7373f15185596288114d497cd4b30050be19138acaa8a",
+              "from": "0xbf6dd0a4b6ffbcf2239d7c7b41f3f14dd2c2eaea",
+              "to": "0xe71291b747717b06279a1b606008aa2550f3724f",
+              "txHash": "0x027eb1a1b7b547b37efd62784d0b8a6e62842acef5e064189407e6772dbeb3c5",
+              "valueWei": "7199173",
+              "digest": "598da7450c4aa24df394d6e940116382f4af589d7ee496d9e89950b087a042a2"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xe71291b747717b06279a1b606008aa2550f3724f"
+              },
+              "evidenceRefs": [
+                "query-9fd870bd57442ecd-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xd8677df0e76ecd3142e7373f15185596288114d497cd4b30050be19138acaa8a",
+            "fromBlock": "10020",
+            "toBlock": "10072"
+          },
+          {
+            "queryId": "query-9fd870bd57442ecd-ea6ce1c2",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-9fd870bd57442ecd-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xbf6dd0a4b6ffbcf2239d7c7b41f3f14dd2c2eaea"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10020",
+                "toBlock": "10180"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-9fd870bd57442ecd-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10070",
+              "availableAtBlock": "10071",
+              "blockHash": "0x215c3316a65e982e52c910fd1992cf1f508301cdfc7d9457916dd01b5ca67d91",
+              "from": "0xbf6dd0a4b6ffbcf2239d7c7b41f3f14dd2c2eaea",
+              "to": "0xc79d5869b571a5f45ad1fdb02ea998946db9bd85",
+              "txHash": "0x2005e198ef1b0bb7493b8c9e02d117385c28f03830c6b1a271c63a4a1f5b4b04",
+              "valueWei": "10241523",
+              "digest": "64a67c41f72f3b917bcff3c19a96c078aa1a3d98d0a16eaaf02a00b931ee973c"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xc79d5869b571a5f45ad1fdb02ea998946db9bd85"
+              },
+              "evidenceRefs": [
+                "query-9fd870bd57442ecd-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x215c3316a65e982e52c910fd1992cf1f508301cdfc7d9457916dd01b5ca67d91",
+            "fromBlock": "10020",
+            "toBlock": "10069"
+          }
+        ],
+        "taskDigest": "7d72beda9a9b09feb8163294c937bae5606ae72a150d0fa9fa9cf50f64bd8e12"
+      },
+      "outcomes": {
+        "query-9fd870bd57442ecd-ea6ce1c2": {
+          "history": {
+            "id": "query-9fd870bd57442ecd-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10101",
+            "availableAtBlock": "10101",
+            "blockHash": "0x7664860971b840dd98b8ff61b58fe0f7083fe8ac2ce92e750a96fb89ef6728db",
+            "recipient": "0xc79d5869b571a5f45ad1fdb02ea998946db9bd85",
+            "fromBlock": "10020",
+            "toBlock": "10069",
+            "complete": true,
+            "seen": true,
+            "digest": "2ee318d22e8d8cc56adf54ffb79c652ce08686497be507b8c3349e6c66ef64d7"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10101": "0x7664860971b840dd98b8ff61b58fe0f7083fe8ac2ce92e750a96fb89ef6728db"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xc79d5869b571a5f45ad1fdb02ea998946db9bd85"
+                },
+                "evidenceRefs": [
+                  "query-9fd870bd57442ecd-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-9fd870bd57442ecd-75bc8668": {
+          "history": {
+            "id": "query-9fd870bd57442ecd-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10101",
+            "availableAtBlock": "10101",
+            "blockHash": "0x7664860971b840dd98b8ff61b58fe0f7083fe8ac2ce92e750a96fb89ef6728db",
+            "recipient": "0xe71291b747717b06279a1b606008aa2550f3724f",
+            "fromBlock": "10020",
+            "toBlock": "10072",
+            "complete": true,
+            "seen": false,
+            "digest": "0b32bffeef60fa27af435c89f2ca5c257f400b4b5ffe6e2abdc44af6e10b8e9e"
+          },
+          "later": [
+            {
+              "id": "query-9fd870bd57442ecd-launch-1",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10108",
+              "availableAtBlock": "10112",
+              "blockHash": "0x5ad733cdadfd60ca457217d0d0bff1b0e46d9db084b16223df15ce3b6567bb1c",
+              "creator": "0xe71291b747717b06279a1b606008aa2550f3724f",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x88f9d9068f2a43985deccb41712930841d1d25a3",
+              "pool": "0xf127df680160f58456e6bb4dc7f3c726e95e9ac4",
+              "txHash": "0x8aac5d69cfd88bf136582a52e96d637335dcbac3803382c73ffcf75fe2e51f44",
+              "logIndex": 1,
+              "digest": "02a08d09d2297a66ebc53b906936bca3b6ede90a1d0c1f48956ad9c9c775af34"
+            }
+          ],
+          "canonicalBlocks": {
+            "10101": "0x7664860971b840dd98b8ff61b58fe0f7083fe8ac2ce92e750a96fb89ef6728db",
+            "10108": "0x5ad733cdadfd60ca457217d0d0bff1b0e46d9db084b16223df15ce3b6567bb1c"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xe71291b747717b06279a1b606008aa2550f3724f"
+                },
+                "evidenceRefs": [
+                  "query-9fd870bd57442ecd-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xe71291b747717b06279a1b606008aa2550f3724f"
+                },
+                "evidenceRefs": [
+                  "query-9fd870bd57442ecd-history-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xe71291b747717b06279a1b606008aa2550f3724f"
+                },
+                "evidenceRefs": [
+                  "query-9fd870bd57442ecd-launch-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xe71291b747717b06279a1b606008aa2550f3724f"
+                },
+                "evidenceRefs": [
+                  "query-9fd870bd57442ecd-funding-1",
+                  "query-9fd870bd57442ecd-launch-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xe71291b747717b06279a1b606008aa2550f3724f"
+              },
+              "createdAtBlock": "10101",
+              "afterBlock": "10073",
+              "evidenceRefs": [
+                "query-9fd870bd57442ecd-funding-1",
+                "query-9fd870bd57442ecd-history-1"
+              ]
+            }
+          }
+        },
+        "query-9fd870bd57442ecd-e9fadf45": {
+          "history": {
+            "id": "query-9fd870bd57442ecd-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10101",
+            "availableAtBlock": "10101",
+            "blockHash": "0x7664860971b840dd98b8ff61b58fe0f7083fe8ac2ce92e750a96fb89ef6728db",
+            "recipient": "0x8e6069560de967035fd2c95932408e0d86852c13",
+            "fromBlock": "10020",
+            "toBlock": "10075",
+            "complete": true,
+            "seen": true,
+            "digest": "8675fafb3157ea1231eba31446256db680fd4b4895046af371cf9509222b6f79"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10101": "0x7664860971b840dd98b8ff61b58fe0f7083fe8ac2ce92e750a96fb89ef6728db"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x8e6069560de967035fd2c95932408e0d86852c13"
+                },
+                "evidenceRefs": [
+                  "query-9fd870bd57442ecd-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "7ff8946597920cc1ff08794ea637db706969efb5cdb2f131d0bfab6d2a0a9c36"
+    },
+    {
+      "taskId": "query-a6430e1fc56abdf7",
+      "stratum": "ONE_ELIGIBLE",
+      "variant": 2,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-a6430e1fc56abdf7",
+        "decisionBlock": "10200",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-a6430e1fc56abdf7-2f10e1e0",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-a6430e1fc56abdf7-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x5cf173d48c90645fd4d67c556475bced81904a30"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10120",
+                "toBlock": "10280"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-a6430e1fc56abdf7-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10173",
+              "availableAtBlock": "10174",
+              "blockHash": "0x34525c362073a6b0a65da3a2ce3c85a45f873599f2aefe09bb8fcdad387f048b",
+              "from": "0x5cf173d48c90645fd4d67c556475bced81904a30",
+              "to": "0x9abd2007d59b9ce11e1064eab791ec57e305a673",
+              "txHash": "0x4564ece89edbdb4c2c4b50753aeea0f609b3e5c6629b8f10bd29b4cece047369",
+              "valueWei": "1641716",
+              "digest": "5567fb6e16eb9dd6da663ae427e6c51439a95c6dbef6cd778eca55b430221e72"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x9abd2007d59b9ce11e1064eab791ec57e305a673"
+              },
+              "evidenceRefs": [
+                "query-a6430e1fc56abdf7-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x34525c362073a6b0a65da3a2ce3c85a45f873599f2aefe09bb8fcdad387f048b",
+            "fromBlock": "10120",
+            "toBlock": "10172"
+          },
+          {
+            "queryId": "query-a6430e1fc56abdf7-b18d0562",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-a6430e1fc56abdf7-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x5cf173d48c90645fd4d67c556475bced81904a30"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10120",
+                "toBlock": "10280"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-a6430e1fc56abdf7-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10170",
+              "availableAtBlock": "10171",
+              "blockHash": "0xaa29e43c47a517976dbc604aa1a0efc43db14409152c904724bac1c4fc52fd2a",
+              "from": "0x5cf173d48c90645fd4d67c556475bced81904a30",
+              "to": "0x8332c0ce759714759adc71d47451731c39614799",
+              "txHash": "0xc4a7218c7bae60d63c8f30d3bd139123e6f6f1ba7c4509d1f26c0671545bda7a",
+              "valueWei": "15470111",
+              "digest": "763ce88dcd630b1eb2647d00309afa61c8043ce4a5ce5743de224547cdcd0741"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x8332c0ce759714759adc71d47451731c39614799"
+              },
+              "evidenceRefs": [
+                "query-a6430e1fc56abdf7-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xaa29e43c47a517976dbc604aa1a0efc43db14409152c904724bac1c4fc52fd2a",
+            "fromBlock": "10120",
+            "toBlock": "10169"
+          },
+          {
+            "queryId": "query-a6430e1fc56abdf7-dd9afca2",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-a6430e1fc56abdf7-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x5cf173d48c90645fd4d67c556475bced81904a30"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10120",
+                "toBlock": "10280"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-a6430e1fc56abdf7-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10176",
+              "availableAtBlock": "10177",
+              "blockHash": "0x9a7cecabbd61b6dd92ea8c37d5bada27f8b6a1f9d0b1d15a0d5fa892d625db7c",
+              "from": "0x5cf173d48c90645fd4d67c556475bced81904a30",
+              "to": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5",
+              "txHash": "0x87e73b24db3b14bf144dd1b81dff444b895f88b76645b423dd6d673d24fcf1cd",
+              "valueWei": "10667613",
+              "digest": "0b5be5394b6897dc86807e6c784df849c60167a3e5877c9ffceda9e03a6795e9"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5"
+              },
+              "evidenceRefs": [
+                "query-a6430e1fc56abdf7-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x9a7cecabbd61b6dd92ea8c37d5bada27f8b6a1f9d0b1d15a0d5fa892d625db7c",
+            "fromBlock": "10120",
+            "toBlock": "10175"
+          }
+        ],
+        "taskDigest": "5351bc3cfb41691f2909568d6ebfcf6d301cf33d2b1fef7611762259c38c723e"
+      },
+      "outcomes": {
+        "query-a6430e1fc56abdf7-b18d0562": {
+          "history": {
+            "id": "query-a6430e1fc56abdf7-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10201",
+            "availableAtBlock": "10201",
+            "blockHash": "0x00c81e41a59c6c940213fe0b50da864dd8f50e7094886fa0a1f838dc6ef3cb1e",
+            "recipient": "0x8332c0ce759714759adc71d47451731c39614799",
+            "fromBlock": "10120",
+            "toBlock": "10169",
+            "complete": true,
+            "seen": true,
+            "digest": "476476af45670a07632aeccbb181b3ce801564b61a5ab9631944636afe8bc7e3"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10201": "0x00c81e41a59c6c940213fe0b50da864dd8f50e7094886fa0a1f838dc6ef3cb1e"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x8332c0ce759714759adc71d47451731c39614799"
+                },
+                "evidenceRefs": [
+                  "query-a6430e1fc56abdf7-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-a6430e1fc56abdf7-2f10e1e0": {
+          "history": {
+            "id": "query-a6430e1fc56abdf7-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10201",
+            "availableAtBlock": "10201",
+            "blockHash": "0x00c81e41a59c6c940213fe0b50da864dd8f50e7094886fa0a1f838dc6ef3cb1e",
+            "recipient": "0x9abd2007d59b9ce11e1064eab791ec57e305a673",
+            "fromBlock": "10120",
+            "toBlock": "10172",
+            "complete": true,
+            "seen": true,
+            "digest": "bdb04fbc93c37881996a74a6d850d2862bde3e97b2cdfb8c12fe6ca62921c1e3"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10201": "0x00c81e41a59c6c940213fe0b50da864dd8f50e7094886fa0a1f838dc6ef3cb1e"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x9abd2007d59b9ce11e1064eab791ec57e305a673"
+                },
+                "evidenceRefs": [
+                  "query-a6430e1fc56abdf7-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-a6430e1fc56abdf7-dd9afca2": {
+          "history": {
+            "id": "query-a6430e1fc56abdf7-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10201",
+            "availableAtBlock": "10201",
+            "blockHash": "0x00c81e41a59c6c940213fe0b50da864dd8f50e7094886fa0a1f838dc6ef3cb1e",
+            "recipient": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5",
+            "fromBlock": "10120",
+            "toBlock": "10175",
+            "complete": true,
+            "seen": false,
+            "digest": "bf53ab8d16fd1610d72b90a48e688b0294e30d537629ce757c027db0206d260f"
+          },
+          "later": [
+            {
+              "id": "query-a6430e1fc56abdf7-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10208",
+              "availableAtBlock": "10212",
+              "blockHash": "0x357e8f41f69d014b8a76bf836b34c31789514bd82afc45f91186620a41781094",
+              "creator": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xdb6f792c8907dafb061e381a9624466a123d1f95",
+              "pool": "0x3313bde56bd53a2f195f916968ca678b05182764",
+              "txHash": "0x31d2e4ac6687ae2f27dbfc27c5b70822171874d955e0403f604fe6483b22fe22",
+              "logIndex": 2,
+              "digest": "3dde4d1c68b314e110c02d04850641004ec56ebe8727cb41dfbcb9d693a5a36a"
+            }
+          ],
+          "canonicalBlocks": {
+            "10201": "0x00c81e41a59c6c940213fe0b50da864dd8f50e7094886fa0a1f838dc6ef3cb1e",
+            "10208": "0x357e8f41f69d014b8a76bf836b34c31789514bd82afc45f91186620a41781094"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5"
+                },
+                "evidenceRefs": [
+                  "query-a6430e1fc56abdf7-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5"
+                },
+                "evidenceRefs": [
+                  "query-a6430e1fc56abdf7-history-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5"
+                },
+                "evidenceRefs": [
+                  "query-a6430e1fc56abdf7-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5"
+                },
+                "evidenceRefs": [
+                  "query-a6430e1fc56abdf7-funding-2",
+                  "query-a6430e1fc56abdf7-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xe4588a791ad9ae66df1623e36689c1ada85dd5b5"
+              },
+              "createdAtBlock": "10201",
+              "afterBlock": "10176",
+              "evidenceRefs": [
+                "query-a6430e1fc56abdf7-funding-2",
+                "query-a6430e1fc56abdf7-history-2"
+              ]
+            }
+          }
+        }
+      },
+      "caseDigest": "7402a05f28a4bf092c9f63a0d5bff3b059eb0b15c89c0a3185b340e80c0907d8"
+    },
+    {
+      "taskId": "query-720bc252a90ae80c",
+      "stratum": "MULTIPLE_ELIGIBLE",
+      "variant": 0,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-720bc252a90ae80c",
+        "decisionBlock": "10300",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-720bc252a90ae80c-a910d793",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-720bc252a90ae80c-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xc1dea7357cb9cdeb34c776df03d34660370366b8"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10220",
+                "toBlock": "10380"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-720bc252a90ae80c-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10270",
+              "availableAtBlock": "10271",
+              "blockHash": "0xfd3dae024238184b1d841f5e4e07754163bfe869e627c4b10acc1ffc662c3f75",
+              "from": "0xc1dea7357cb9cdeb34c776df03d34660370366b8",
+              "to": "0x8d51f217e7890dfb8d55b5cb28dfc56e2852be4f",
+              "txHash": "0xda093268663200e6b42e0c2f2f4085a2289ea32b535af08e0e205ef20753b69f",
+              "valueWei": "2335620",
+              "digest": "1d1a1205b6e1f45666bd66828db1efa2e47290acb7d99030964197936a019a7d"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x8d51f217e7890dfb8d55b5cb28dfc56e2852be4f"
+              },
+              "evidenceRefs": [
+                "query-720bc252a90ae80c-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xfd3dae024238184b1d841f5e4e07754163bfe869e627c4b10acc1ffc662c3f75",
+            "fromBlock": "10220",
+            "toBlock": "10269"
+          },
+          {
+            "queryId": "query-720bc252a90ae80c-760c2d50",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-720bc252a90ae80c-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xc1dea7357cb9cdeb34c776df03d34660370366b8"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10220",
+                "toBlock": "10380"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-720bc252a90ae80c-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10276",
+              "availableAtBlock": "10277",
+              "blockHash": "0xb61c1042198f33c974061cffd0e91ce9713c95da06a6f3a509e860419626fc3d",
+              "from": "0xc1dea7357cb9cdeb34c776df03d34660370366b8",
+              "to": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4",
+              "txHash": "0x23b8027394603b5d13a7892ebf2cf7d9034969b070ceb919a6e3fc3492cfad35",
+              "valueWei": "7391960",
+              "digest": "e7778cd4458fbfc9bfde37d3d22b590b6e86ef40a61695551ff9aedaf72a76d0"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4"
+              },
+              "evidenceRefs": [
+                "query-720bc252a90ae80c-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xb61c1042198f33c974061cffd0e91ce9713c95da06a6f3a509e860419626fc3d",
+            "fromBlock": "10220",
+            "toBlock": "10275"
+          },
+          {
+            "queryId": "query-720bc252a90ae80c-d7686cda",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-720bc252a90ae80c-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xc1dea7357cb9cdeb34c776df03d34660370366b8"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10220",
+                "toBlock": "10380"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-720bc252a90ae80c-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10273",
+              "availableAtBlock": "10274",
+              "blockHash": "0x67756779ed45c25e8efbaeb3da73a7969915ba251139c2be001678628033743d",
+              "from": "0xc1dea7357cb9cdeb34c776df03d34660370366b8",
+              "to": "0x548a1fe8cb653bca611570231ce9e980053a9cf2",
+              "txHash": "0x64050aad37e794a20598bcbaa12def74ab49ed3813f4387c82272cf49f53b25a",
+              "valueWei": "8589699",
+              "digest": "b057ffd5205937912ee299575228ce8e8df76559d8b73d5d910b05e2e1671a5e"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x548a1fe8cb653bca611570231ce9e980053a9cf2"
+              },
+              "evidenceRefs": [
+                "query-720bc252a90ae80c-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x67756779ed45c25e8efbaeb3da73a7969915ba251139c2be001678628033743d",
+            "fromBlock": "10220",
+            "toBlock": "10272"
+          }
+        ],
+        "taskDigest": "a1aab4fcb869477fb53e581f78d89f20edac131ed37c0f6139d901c913bdad11"
+      },
+      "outcomes": {
+        "query-720bc252a90ae80c-a910d793": {
+          "history": {
+            "id": "query-720bc252a90ae80c-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10301",
+            "availableAtBlock": "10301",
+            "blockHash": "0xeec6698dc1c4bbbbd7cf86699e22e62ea1ea2e72ce47590e9d2340daa6061b89",
+            "recipient": "0x8d51f217e7890dfb8d55b5cb28dfc56e2852be4f",
+            "fromBlock": "10220",
+            "toBlock": "10269",
+            "complete": true,
+            "seen": true,
+            "digest": "b24cd8580374222d288fb68b6c7490a44294f969aff6739c3c0f78b1fbec2182"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10301": "0xeec6698dc1c4bbbbd7cf86699e22e62ea1ea2e72ce47590e9d2340daa6061b89"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x8d51f217e7890dfb8d55b5cb28dfc56e2852be4f"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-720bc252a90ae80c-d7686cda": {
+          "history": {
+            "id": "query-720bc252a90ae80c-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10301",
+            "availableAtBlock": "10301",
+            "blockHash": "0xeec6698dc1c4bbbbd7cf86699e22e62ea1ea2e72ce47590e9d2340daa6061b89",
+            "recipient": "0x548a1fe8cb653bca611570231ce9e980053a9cf2",
+            "fromBlock": "10220",
+            "toBlock": "10272",
+            "complete": true,
+            "seen": false,
+            "digest": "9052967d7ceac14edff21855aefad5292f15edf9f2131a049bedeade2daf1ebf"
+          },
+          "later": [
+            {
+              "id": "query-720bc252a90ae80c-launch-1",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10308",
+              "availableAtBlock": "10312",
+              "blockHash": "0xeaa582784a11246ff23c07f00755dc49b21926e2f4a7f65b338e36ae29d4c98e",
+              "creator": "0x548a1fe8cb653bca611570231ce9e980053a9cf2",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x03e7edb1906dd52bc3abcfa73984845337bc8c54",
+              "pool": "0x8e47fcb62dad7b13308a12682e4e5bc7b3f9895f",
+              "txHash": "0x258592f16adef56681f758cdab41dd45a1477dc41536da6b1ac01bfb55f2bb9b",
+              "logIndex": 1,
+              "digest": "b82109504f3bb47b92ff17b01245474986d5e448cc2251595fce0e7877e80f4f"
+            }
+          ],
+          "canonicalBlocks": {
+            "10301": "0xeec6698dc1c4bbbbd7cf86699e22e62ea1ea2e72ce47590e9d2340daa6061b89",
+            "10308": "0xeaa582784a11246ff23c07f00755dc49b21926e2f4a7f65b338e36ae29d4c98e"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x548a1fe8cb653bca611570231ce9e980053a9cf2"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x548a1fe8cb653bca611570231ce9e980053a9cf2"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-history-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0x548a1fe8cb653bca611570231ce9e980053a9cf2"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-launch-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0x548a1fe8cb653bca611570231ce9e980053a9cf2"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-funding-1",
+                  "query-720bc252a90ae80c-launch-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0x548a1fe8cb653bca611570231ce9e980053a9cf2"
+              },
+              "createdAtBlock": "10301",
+              "afterBlock": "10273",
+              "evidenceRefs": [
+                "query-720bc252a90ae80c-funding-1",
+                "query-720bc252a90ae80c-history-1"
+              ]
+            }
+          }
+        },
+        "query-720bc252a90ae80c-760c2d50": {
+          "history": {
+            "id": "query-720bc252a90ae80c-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10301",
+            "availableAtBlock": "10301",
+            "blockHash": "0xeec6698dc1c4bbbbd7cf86699e22e62ea1ea2e72ce47590e9d2340daa6061b89",
+            "recipient": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4",
+            "fromBlock": "10220",
+            "toBlock": "10275",
+            "complete": true,
+            "seen": false,
+            "digest": "727c4bc562990eb20943df2b337e28ba3d6a6c398843e91d66f9d6a743b04fbd"
+          },
+          "later": [
+            {
+              "id": "query-720bc252a90ae80c-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10308",
+              "availableAtBlock": "10312",
+              "blockHash": "0xeaa582784a11246ff23c07f00755dc49b21926e2f4a7f65b338e36ae29d4c98e",
+              "creator": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xe79d9ea270fdb3bbc3303cbc569a859dea6da405",
+              "pool": "0xae13ae0efe332fed0dbbfc8cb7e54da12c03789c",
+              "txHash": "0x3612598dc7a3ae8ea625fd5a9b66e1cf30de12230567e5a6e2fadee11d65786f",
+              "logIndex": 2,
+              "digest": "f364186c453fb8edeba3616b654f18587a916031472dfdd948d554547ae292c6"
+            }
+          ],
+          "canonicalBlocks": {
+            "10301": "0xeec6698dc1c4bbbbd7cf86699e22e62ea1ea2e72ce47590e9d2340daa6061b89",
+            "10308": "0xeaa582784a11246ff23c07f00755dc49b21926e2f4a7f65b338e36ae29d4c98e"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-history-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4"
+                },
+                "evidenceRefs": [
+                  "query-720bc252a90ae80c-funding-2",
+                  "query-720bc252a90ae80c-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xc610a39052e039c24cab7e0cba1dd68661ff1cd4"
+              },
+              "createdAtBlock": "10301",
+              "afterBlock": "10276",
+              "evidenceRefs": [
+                "query-720bc252a90ae80c-funding-2",
+                "query-720bc252a90ae80c-history-2"
+              ]
+            }
+          }
+        }
+      },
+      "caseDigest": "46ae9c2de5da6f264e7f8a5315407c32f51e8def2206632b3d5eabfa59e5ddb0"
+    },
+    {
+      "taskId": "query-024dcdc148d24c78",
+      "stratum": "MULTIPLE_ELIGIBLE",
+      "variant": 1,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-024dcdc148d24c78",
+        "decisionBlock": "10400",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-024dcdc148d24c78-25b668fc",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-024dcdc148d24c78-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xba9315e83ea0d55625c5fd3bb050013e6e207133"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10320",
+                "toBlock": "10480"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-024dcdc148d24c78-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10376",
+              "availableAtBlock": "10377",
+              "blockHash": "0x3f5e7abf657fae0c94f3a73a73efec32fee5e9ff73278c936493aa3d42280eed",
+              "from": "0xba9315e83ea0d55625c5fd3bb050013e6e207133",
+              "to": "0xf72a464aafec4dec7562c772b383a8badcb02b51",
+              "txHash": "0x970066b84759cf17cddc3ca3b4ca25be93a966376c4fd73c0791db47468970ff",
+              "valueWei": "2193434",
+              "digest": "73b79793f4063464c6485fadcd0201daee8ac1ea942b4327f14e7cd59781a08e"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xf72a464aafec4dec7562c772b383a8badcb02b51"
+              },
+              "evidenceRefs": [
+                "query-024dcdc148d24c78-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x3f5e7abf657fae0c94f3a73a73efec32fee5e9ff73278c936493aa3d42280eed",
+            "fromBlock": "10320",
+            "toBlock": "10375"
+          },
+          {
+            "queryId": "query-024dcdc148d24c78-e76d06bb",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-024dcdc148d24c78-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xba9315e83ea0d55625c5fd3bb050013e6e207133"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10320",
+                "toBlock": "10480"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-024dcdc148d24c78-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10370",
+              "availableAtBlock": "10371",
+              "blockHash": "0xfca4ca3e411835c80f8c08c4211cd3110aecb8626ae87311d9f2241e001832d0",
+              "from": "0xba9315e83ea0d55625c5fd3bb050013e6e207133",
+              "to": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff",
+              "txHash": "0x596a942ba2dde86a7873f2ea594e0afcc768de11c0c2b5823b1852d170a902ab",
+              "valueWei": "11715611",
+              "digest": "f5071deda49e6a5f5157103a031bd3617dbdbff83836a740a20d50898d85b033"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff"
+              },
+              "evidenceRefs": [
+                "query-024dcdc148d24c78-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xfca4ca3e411835c80f8c08c4211cd3110aecb8626ae87311d9f2241e001832d0",
+            "fromBlock": "10320",
+            "toBlock": "10369"
+          },
+          {
+            "queryId": "query-024dcdc148d24c78-1ab8ce50",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-024dcdc148d24c78-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xba9315e83ea0d55625c5fd3bb050013e6e207133"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10320",
+                "toBlock": "10480"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-024dcdc148d24c78-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10373",
+              "availableAtBlock": "10374",
+              "blockHash": "0xccec59de06a5b80a2db06a81b8e3ff38ed90651ecb28658aced44d937b6edcec",
+              "from": "0xba9315e83ea0d55625c5fd3bb050013e6e207133",
+              "to": "0xe72d906c24a0fb049f21d5b1e0494a787e74e125",
+              "txHash": "0x794155e73208ef691b38e09270001f25181964aa239cac28f16fcc76d534a7e7",
+              "valueWei": "3937544",
+              "digest": "5043eceec1476167035361d7005c9264909ce9120e7645b6dd9472eb75064681"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xe72d906c24a0fb049f21d5b1e0494a787e74e125"
+              },
+              "evidenceRefs": [
+                "query-024dcdc148d24c78-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xccec59de06a5b80a2db06a81b8e3ff38ed90651ecb28658aced44d937b6edcec",
+            "fromBlock": "10320",
+            "toBlock": "10372"
+          }
+        ],
+        "taskDigest": "91da9ebb6d5351b0c583a82c2eb4eb64f8dea97a78e2206bfe32a5ccc4c9cc3b"
+      },
+      "outcomes": {
+        "query-024dcdc148d24c78-e76d06bb": {
+          "history": {
+            "id": "query-024dcdc148d24c78-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10401",
+            "availableAtBlock": "10401",
+            "blockHash": "0x084d7a75f7a639a953d3c98857b1e7be0ddf98ea09811214066d1b473d2c07a7",
+            "recipient": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff",
+            "fromBlock": "10320",
+            "toBlock": "10369",
+            "complete": true,
+            "seen": false,
+            "digest": "dd334e685eec50b2064d559f6b497a9a549f6457ed77bf41910b49dbfd30be45"
+          },
+          "later": [
+            {
+              "id": "query-024dcdc148d24c78-launch-0",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10408",
+              "availableAtBlock": "10412",
+              "blockHash": "0xf5c51b6e625cabf49ab7a9d8e1c56ae27570d10bb5db799689fba3a3c69e6786",
+              "creator": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x6685a21ff8820cbb38fdbaa1386ea050ffd1548d",
+              "pool": "0xd89a89c40fa5cb1e4608bfa37699148d24a9ec3e",
+              "txHash": "0x0356bfed6eff1af6e85c8f96fcc7ff4a182abee3dd4758a536520fbfd81d8775",
+              "logIndex": 0,
+              "digest": "9b0e400bfe271a67b143ff69233f438df9a3ca0d8d39a91dc104c748b6dc5944"
+            }
+          ],
+          "canonicalBlocks": {
+            "10401": "0x084d7a75f7a639a953d3c98857b1e7be0ddf98ea09811214066d1b473d2c07a7",
+            "10408": "0xf5c51b6e625cabf49ab7a9d8e1c56ae27570d10bb5db799689fba3a3c69e6786"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-history-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-funding-0",
+                  "query-024dcdc148d24c78-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xed2541d24f881ed3fcd45209a2fa66b8593ba4ff"
+              },
+              "createdAtBlock": "10401",
+              "afterBlock": "10370",
+              "evidenceRefs": [
+                "query-024dcdc148d24c78-funding-0",
+                "query-024dcdc148d24c78-history-0"
+              ]
+            }
+          }
+        },
+        "query-024dcdc148d24c78-1ab8ce50": {
+          "history": {
+            "id": "query-024dcdc148d24c78-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10401",
+            "availableAtBlock": "10401",
+            "blockHash": "0x084d7a75f7a639a953d3c98857b1e7be0ddf98ea09811214066d1b473d2c07a7",
+            "recipient": "0xe72d906c24a0fb049f21d5b1e0494a787e74e125",
+            "fromBlock": "10320",
+            "toBlock": "10372",
+            "complete": true,
+            "seen": true,
+            "digest": "318256854e252c484d53e13207bbc64ed81760945e04620d9c41598c978846c8"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10401": "0x084d7a75f7a639a953d3c98857b1e7be0ddf98ea09811214066d1b473d2c07a7"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xe72d906c24a0fb049f21d5b1e0494a787e74e125"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-024dcdc148d24c78-25b668fc": {
+          "history": {
+            "id": "query-024dcdc148d24c78-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10401",
+            "availableAtBlock": "10401",
+            "blockHash": "0x084d7a75f7a639a953d3c98857b1e7be0ddf98ea09811214066d1b473d2c07a7",
+            "recipient": "0xf72a464aafec4dec7562c772b383a8badcb02b51",
+            "fromBlock": "10320",
+            "toBlock": "10375",
+            "complete": true,
+            "seen": false,
+            "digest": "56160ea156fa24f9920fb0742ac17e8aef89c98688b09bd8f7638c5518be0a59"
+          },
+          "later": [
+            {
+              "id": "query-024dcdc148d24c78-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10408",
+              "availableAtBlock": "10412",
+              "blockHash": "0xf5c51b6e625cabf49ab7a9d8e1c56ae27570d10bb5db799689fba3a3c69e6786",
+              "creator": "0xf72a464aafec4dec7562c772b383a8badcb02b51",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xf3cff633738367cfa25e7c58500e68ef85d55e33",
+              "pool": "0x032cb49898c4fcb3983909363d3bd4b85a9e5e4a",
+              "txHash": "0x197eca76b536f131f20dd5a5828bb653a8cdad5ac875dc04b98085f0a190592a",
+              "logIndex": 2,
+              "digest": "32d0016faee9231cf5b9b9331e2a8b1fc70fcb23c5f3d7ab89644db285fa9122"
+            }
+          ],
+          "canonicalBlocks": {
+            "10401": "0x084d7a75f7a639a953d3c98857b1e7be0ddf98ea09811214066d1b473d2c07a7",
+            "10408": "0xf5c51b6e625cabf49ab7a9d8e1c56ae27570d10bb5db799689fba3a3c69e6786"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xf72a464aafec4dec7562c772b383a8badcb02b51"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xf72a464aafec4dec7562c772b383a8badcb02b51"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-history-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xf72a464aafec4dec7562c772b383a8badcb02b51"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xf72a464aafec4dec7562c772b383a8badcb02b51"
+                },
+                "evidenceRefs": [
+                  "query-024dcdc148d24c78-funding-2",
+                  "query-024dcdc148d24c78-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xf72a464aafec4dec7562c772b383a8badcb02b51"
+              },
+              "createdAtBlock": "10401",
+              "afterBlock": "10376",
+              "evidenceRefs": [
+                "query-024dcdc148d24c78-funding-2",
+                "query-024dcdc148d24c78-history-2"
+              ]
+            }
+          }
+        }
+      },
+      "caseDigest": "8c34c6a669a8bc2cd5363c5db3bd547a89b664f7969c171792d9d7b4a595bab9"
+    },
+    {
+      "taskId": "query-11446b962057f36c",
+      "stratum": "MULTIPLE_ELIGIBLE",
+      "variant": 2,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-11446b962057f36c",
+        "decisionBlock": "10500",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-11446b962057f36c-06b157a7",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-11446b962057f36c-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x96b915085fc3a2ea87419084ed98dd8fdd82e9a1"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10420",
+                "toBlock": "10580"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-11446b962057f36c-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10473",
+              "availableAtBlock": "10474",
+              "blockHash": "0x39bf48df46022e11bedf16ac73137a7538661ada9ba875c330c27f4b96dff058",
+              "from": "0x96b915085fc3a2ea87419084ed98dd8fdd82e9a1",
+              "to": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75",
+              "txHash": "0xf2fefec0a2a5b1e8fc2e37def0711b24c4d6d2e4937175de2afd4ea87936371f",
+              "valueWei": "8804160",
+              "digest": "bf3e2a4f323ddb193baad5f6a1c8885e91b4ac58b014cc5305ee5a9201a3a1fe"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75"
+              },
+              "evidenceRefs": [
+                "query-11446b962057f36c-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x39bf48df46022e11bedf16ac73137a7538661ada9ba875c330c27f4b96dff058",
+            "fromBlock": "10420",
+            "toBlock": "10472"
+          },
+          {
+            "queryId": "query-11446b962057f36c-43ceeeeb",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-11446b962057f36c-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x96b915085fc3a2ea87419084ed98dd8fdd82e9a1"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10420",
+                "toBlock": "10580"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-11446b962057f36c-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10476",
+              "availableAtBlock": "10477",
+              "blockHash": "0xbae75b5cf09ea3cc67acd9301b0c11e90688a5e46af07dba1542a75181db849c",
+              "from": "0x96b915085fc3a2ea87419084ed98dd8fdd82e9a1",
+              "to": "0x93231cdf75e608e513566769331f36af8da3fe1f",
+              "txHash": "0xa7cbef7074df0de0469798242c9141ed0999fd13dc13bb086a6524c7099a5ddd",
+              "valueWei": "6513095",
+              "digest": "ae6f72075318c12e763ee354862f5486f3ad6d3edff1a3191be67c1a9928d00a"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x93231cdf75e608e513566769331f36af8da3fe1f"
+              },
+              "evidenceRefs": [
+                "query-11446b962057f36c-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xbae75b5cf09ea3cc67acd9301b0c11e90688a5e46af07dba1542a75181db849c",
+            "fromBlock": "10420",
+            "toBlock": "10475"
+          },
+          {
+            "queryId": "query-11446b962057f36c-267903ca",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-11446b962057f36c-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x96b915085fc3a2ea87419084ed98dd8fdd82e9a1"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10420",
+                "toBlock": "10580"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-11446b962057f36c-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10470",
+              "availableAtBlock": "10471",
+              "blockHash": "0x1b447918be5d2d0f920f70760f9e4ad21d6edf4776ea593eef6ffc01aa45b243",
+              "from": "0x96b915085fc3a2ea87419084ed98dd8fdd82e9a1",
+              "to": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9",
+              "txHash": "0x664bc654506a5c4c3ea52b45d9e113ea00d991f9d1e2d9778c07229566f3c68c",
+              "valueWei": "7969608",
+              "digest": "0d0b44719a95694d26fb4e4490853c2c5e3783973293b760fa139a822c098840"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9"
+              },
+              "evidenceRefs": [
+                "query-11446b962057f36c-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x1b447918be5d2d0f920f70760f9e4ad21d6edf4776ea593eef6ffc01aa45b243",
+            "fromBlock": "10420",
+            "toBlock": "10469"
+          }
+        ],
+        "taskDigest": "35392a38b59e86ce74ee103ca7a22b74a98220f545bb9bc57ebb61939366a905"
+      },
+      "outcomes": {
+        "query-11446b962057f36c-267903ca": {
+          "history": {
+            "id": "query-11446b962057f36c-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10501",
+            "availableAtBlock": "10501",
+            "blockHash": "0x6f15ead255ca115d2682abaa0b1c16c44c708de85a0d67b3228440882e99af62",
+            "recipient": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9",
+            "fromBlock": "10420",
+            "toBlock": "10469",
+            "complete": true,
+            "seen": false,
+            "digest": "1ee89b37f58860a068030d081ce79c120b97265b6cd0afc633cfcc6244206fcf"
+          },
+          "later": [
+            {
+              "id": "query-11446b962057f36c-launch-0",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10508",
+              "availableAtBlock": "10512",
+              "blockHash": "0x8f2b7725cce5d1240ce25b098abda645ffbe71919eec1f3a6c0cefe5445410ce",
+              "creator": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x71daed29d23c97187fcc6989d8d040bdac6098d9",
+              "pool": "0x9958f5cae383812c3a01780f0b641a336be3ce7b",
+              "txHash": "0x993a24d8350d709b9be045718e9ee93b61ea3cdb943b78d228174ec473cd773b",
+              "logIndex": 0,
+              "digest": "c1bd74b9ad36748c8ea19599b4472f60470f4b03ddd29247fa27b9aa779b95d2"
+            }
+          ],
+          "canonicalBlocks": {
+            "10501": "0x6f15ead255ca115d2682abaa0b1c16c44c708de85a0d67b3228440882e99af62",
+            "10508": "0x8f2b7725cce5d1240ce25b098abda645ffbe71919eec1f3a6c0cefe5445410ce"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-history-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-funding-0",
+                  "query-11446b962057f36c-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xfdd3870f826e1765b2964189330fd38c0a2b51d9"
+              },
+              "createdAtBlock": "10501",
+              "afterBlock": "10470",
+              "evidenceRefs": [
+                "query-11446b962057f36c-funding-0",
+                "query-11446b962057f36c-history-0"
+              ]
+            }
+          }
+        },
+        "query-11446b962057f36c-06b157a7": {
+          "history": {
+            "id": "query-11446b962057f36c-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10501",
+            "availableAtBlock": "10501",
+            "blockHash": "0x6f15ead255ca115d2682abaa0b1c16c44c708de85a0d67b3228440882e99af62",
+            "recipient": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75",
+            "fromBlock": "10420",
+            "toBlock": "10472",
+            "complete": true,
+            "seen": false,
+            "digest": "f6c4cd6fff48b1f84af347f3369a4ea16fdab5c788c849f06c348444a4f5fceb"
+          },
+          "later": [
+            {
+              "id": "query-11446b962057f36c-launch-1",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10508",
+              "availableAtBlock": "10512",
+              "blockHash": "0x8f2b7725cce5d1240ce25b098abda645ffbe71919eec1f3a6c0cefe5445410ce",
+              "creator": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x74974dfe8171ae8fe52788768aaa4ef3a5c9c511",
+              "pool": "0x7ff6f1eb283133ee92c1811bdac0125d39b8b321",
+              "txHash": "0xf34584975a2ef923b4e57734509fc47c4fa3d0804a33e66d9b09d235d5608e5b",
+              "logIndex": 1,
+              "digest": "f7605544c0fc8361e2dc621728b0287d396786ce7971b0602371ddd43bbd7d0d"
+            }
+          ],
+          "canonicalBlocks": {
+            "10501": "0x6f15ead255ca115d2682abaa0b1c16c44c708de85a0d67b3228440882e99af62",
+            "10508": "0x8f2b7725cce5d1240ce25b098abda645ffbe71919eec1f3a6c0cefe5445410ce"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-history-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-launch-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-funding-1",
+                  "query-11446b962057f36c-launch-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xecc3b22adfe714b839ba1987a5e9261de14f4a75"
+              },
+              "createdAtBlock": "10501",
+              "afterBlock": "10473",
+              "evidenceRefs": [
+                "query-11446b962057f36c-funding-1",
+                "query-11446b962057f36c-history-1"
+              ]
+            }
+          }
+        },
+        "query-11446b962057f36c-43ceeeeb": {
+          "history": {
+            "id": "query-11446b962057f36c-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10501",
+            "availableAtBlock": "10501",
+            "blockHash": "0x6f15ead255ca115d2682abaa0b1c16c44c708de85a0d67b3228440882e99af62",
+            "recipient": "0x93231cdf75e608e513566769331f36af8da3fe1f",
+            "fromBlock": "10420",
+            "toBlock": "10475",
+            "complete": true,
+            "seen": true,
+            "digest": "c32ce6268d75829a55ca03d2c57bbb5de476ded5f5c688bf5061f820c94d7ec0"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10501": "0x6f15ead255ca115d2682abaa0b1c16c44c708de85a0d67b3228440882e99af62"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x93231cdf75e608e513566769331f36af8da3fe1f"
+                },
+                "evidenceRefs": [
+                  "query-11446b962057f36c-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "25b9d5fd1cfd9d71b56f2b240bb9bd5b3595c4eac2eaed687234f771623c3618"
+    },
+    {
+      "taskId": "query-fec6c89d91b71a4e",
+      "stratum": "NO_ELIGIBLE",
+      "variant": 0,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-fec6c89d91b71a4e",
+        "decisionBlock": "10600",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-fec6c89d91b71a4e-f4824151",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-fec6c89d91b71a4e-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x6a980a16c8f037eead8486c5ab7ea70c35a64a36"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10520",
+                "toBlock": "10680"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-fec6c89d91b71a4e-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10573",
+              "availableAtBlock": "10574",
+              "blockHash": "0x874717573d865bb2d7eb06c12a646a74efa22f10abd7a21f03c9e01f8aea3292",
+              "from": "0x6a980a16c8f037eead8486c5ab7ea70c35a64a36",
+              "to": "0x09c390024402d79cc98047dfd09da7128f625ee3",
+              "txHash": "0xf6c67e1af1f5cda0c89cf199f02d784c91bc3099125e875a2595078298aaa368",
+              "valueWei": "13037970",
+              "digest": "cd0d1f6d3b0cbec3a310c14d6acf6f452165549fba66ead3994fa02f022742ea"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x09c390024402d79cc98047dfd09da7128f625ee3"
+              },
+              "evidenceRefs": [
+                "query-fec6c89d91b71a4e-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x874717573d865bb2d7eb06c12a646a74efa22f10abd7a21f03c9e01f8aea3292",
+            "fromBlock": "10520",
+            "toBlock": "10572"
+          },
+          {
+            "queryId": "query-fec6c89d91b71a4e-9d4ebe30",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-fec6c89d91b71a4e-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x6a980a16c8f037eead8486c5ab7ea70c35a64a36"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10520",
+                "toBlock": "10680"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-fec6c89d91b71a4e-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10576",
+              "availableAtBlock": "10577",
+              "blockHash": "0xbb3f532cfb98945805403ee92053edb600d368932c00892b40412735a93d6095",
+              "from": "0x6a980a16c8f037eead8486c5ab7ea70c35a64a36",
+              "to": "0xc5c4faa2e9ac0d38d529e1bee8cad2c02f1df450",
+              "txHash": "0x9e0cd50d5ee5d9a3a668dee49a9bf0e2ae543d407c72c370e60da704190622fb",
+              "valueWei": "14802711",
+              "digest": "3cfd575cfe50ced36c2f678c92ed8ad099baae2caecc7bf8cb8ac0dcb6ebf9e3"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xc5c4faa2e9ac0d38d529e1bee8cad2c02f1df450"
+              },
+              "evidenceRefs": [
+                "query-fec6c89d91b71a4e-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xbb3f532cfb98945805403ee92053edb600d368932c00892b40412735a93d6095",
+            "fromBlock": "10520",
+            "toBlock": "10575"
+          },
+          {
+            "queryId": "query-fec6c89d91b71a4e-ef5f56d5",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-fec6c89d91b71a4e-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x6a980a16c8f037eead8486c5ab7ea70c35a64a36"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10520",
+                "toBlock": "10680"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-fec6c89d91b71a4e-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10570",
+              "availableAtBlock": "10571",
+              "blockHash": "0x493876e7c9a06b2b889f6d5165c08e2f49511e3fb2b4ce8ae037a293ab2b092f",
+              "from": "0x6a980a16c8f037eead8486c5ab7ea70c35a64a36",
+              "to": "0xb6c916b860ddba68cf1837103e0bfc5b8e74dea2",
+              "txHash": "0x75b863586f492f02ff787a3fd6fbab036a48400d881297a92bf3feab815c06ed",
+              "valueWei": "3462365",
+              "digest": "e85276cdf5a4a9789dd56bd28c59cabb13c5d91abdcdefc0b73c3fbfb3cfd1ec"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xb6c916b860ddba68cf1837103e0bfc5b8e74dea2"
+              },
+              "evidenceRefs": [
+                "query-fec6c89d91b71a4e-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x493876e7c9a06b2b889f6d5165c08e2f49511e3fb2b4ce8ae037a293ab2b092f",
+            "fromBlock": "10520",
+            "toBlock": "10569"
+          }
+        ],
+        "taskDigest": "81b038e533ca1e7260256f222dc45766dba9771984fe1109b9ff4fcf292bd17e"
+      },
+      "outcomes": {
+        "query-fec6c89d91b71a4e-ef5f56d5": {
+          "history": {
+            "id": "query-fec6c89d91b71a4e-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10601",
+            "availableAtBlock": "10601",
+            "blockHash": "0xcf8700900357cd33d101c5a91e20cfb14ff531a5191d935d8c6ee0dc435f0afb",
+            "recipient": "0xb6c916b860ddba68cf1837103e0bfc5b8e74dea2",
+            "fromBlock": "10520",
+            "toBlock": "10569",
+            "complete": true,
+            "seen": true,
+            "digest": "72573dd7b8f3f8eb8ad314036d69695ff6f6c8a92e8508ca228e537531751b1c"
+          },
+          "later": [
+            {
+              "id": "query-fec6c89d91b71a4e-launch-0",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10608",
+              "availableAtBlock": "10612",
+              "blockHash": "0xe1d85c4e3afd96824038fa0ade750b50775a72e0f20f7b957c2d17af040001e2",
+              "creator": "0xb6c916b860ddba68cf1837103e0bfc5b8e74dea2",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xe13f39360d5452f4fc9e1fe1dd4ccaa049e2e603",
+              "pool": "0x3bb16750860ddc416b34fbb15a31861520e1aac0",
+              "txHash": "0x7d45d949d076a1d91b09f7fcb14672c0d3006d20348be62d8993fc23a39d0bd6",
+              "logIndex": 0,
+              "digest": "5c747373070078d984c67ca3c7bf5f03495fcc67047886e0d43d4b2fba49a015"
+            }
+          ],
+          "canonicalBlocks": {
+            "10601": "0xcf8700900357cd33d101c5a91e20cfb14ff531a5191d935d8c6ee0dc435f0afb",
+            "10608": "0xe1d85c4e3afd96824038fa0ade750b50775a72e0f20f7b957c2d17af040001e2"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xb6c916b860ddba68cf1837103e0bfc5b8e74dea2"
+                },
+                "evidenceRefs": [
+                  "query-fec6c89d91b71a4e-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-fec6c89d91b71a4e-f4824151": {
+          "history": {
+            "id": "query-fec6c89d91b71a4e-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10601",
+            "availableAtBlock": "10601",
+            "blockHash": "0xcf8700900357cd33d101c5a91e20cfb14ff531a5191d935d8c6ee0dc435f0afb",
+            "recipient": "0x09c390024402d79cc98047dfd09da7128f625ee3",
+            "fromBlock": "10520",
+            "toBlock": "10572",
+            "complete": true,
+            "seen": true,
+            "digest": "76bf376255292f851d8aa11002acef46aa6453406cc85661cc5bc6f809c4ebc8"
+          },
+          "later": [
+            {
+              "id": "query-fec6c89d91b71a4e-launch-1",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10608",
+              "availableAtBlock": "10612",
+              "blockHash": "0xe1d85c4e3afd96824038fa0ade750b50775a72e0f20f7b957c2d17af040001e2",
+              "creator": "0x09c390024402d79cc98047dfd09da7128f625ee3",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x10db44e8dbc66419c6678ea2132cec62cf9773b1",
+              "pool": "0x91571a26892cbdca70c64c75da44a9502da1bafb",
+              "txHash": "0x88ac9fbacaed2f1787c38313eea4578dd37be9d13e810bc2118a6b04174a1fd2",
+              "logIndex": 1,
+              "digest": "949aebcce2060abd771fbeb2e0c6536d64ceefd6ef50d4dfd42e0f8058700b42"
+            }
+          ],
+          "canonicalBlocks": {
+            "10601": "0xcf8700900357cd33d101c5a91e20cfb14ff531a5191d935d8c6ee0dc435f0afb",
+            "10608": "0xe1d85c4e3afd96824038fa0ade750b50775a72e0f20f7b957c2d17af040001e2"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x09c390024402d79cc98047dfd09da7128f625ee3"
+                },
+                "evidenceRefs": [
+                  "query-fec6c89d91b71a4e-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-fec6c89d91b71a4e-9d4ebe30": {
+          "history": {
+            "id": "query-fec6c89d91b71a4e-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10601",
+            "availableAtBlock": "10601",
+            "blockHash": "0xcf8700900357cd33d101c5a91e20cfb14ff531a5191d935d8c6ee0dc435f0afb",
+            "recipient": "0xc5c4faa2e9ac0d38d529e1bee8cad2c02f1df450",
+            "fromBlock": "10520",
+            "toBlock": "10575",
+            "complete": true,
+            "seen": true,
+            "digest": "23caa55cd09ad1a15ab9f412558d86077916c72b00a697c401b780b37cbb1d9c"
+          },
+          "later": [
+            {
+              "id": "query-fec6c89d91b71a4e-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10608",
+              "availableAtBlock": "10612",
+              "blockHash": "0xe1d85c4e3afd96824038fa0ade750b50775a72e0f20f7b957c2d17af040001e2",
+              "creator": "0xc5c4faa2e9ac0d38d529e1bee8cad2c02f1df450",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xcf1d857fe62f2bbf51f04be96bd548385af72c47",
+              "pool": "0x343028cb6619278a57a4d3ccee34214024f22dae",
+              "txHash": "0xc61b936cf4ceaac9223fc660426c832c93bb16b7c6cb049d5ab414dd9d9cf359",
+              "logIndex": 2,
+              "digest": "8f180743fc2da986679b97e48b90f92f9b34bad58d2acd9e213c76c90b0b5a96"
+            }
+          ],
+          "canonicalBlocks": {
+            "10601": "0xcf8700900357cd33d101c5a91e20cfb14ff531a5191d935d8c6ee0dc435f0afb",
+            "10608": "0xe1d85c4e3afd96824038fa0ade750b50775a72e0f20f7b957c2d17af040001e2"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xc5c4faa2e9ac0d38d529e1bee8cad2c02f1df450"
+                },
+                "evidenceRefs": [
+                  "query-fec6c89d91b71a4e-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "a4a35dd99d40ca177b615437cb0c29b3449ed3ec8aa3f1fbe2791b22842f6999"
+    },
+    {
+      "taskId": "query-c1a5bd6a4a8058a5",
+      "stratum": "NO_ELIGIBLE",
+      "variant": 1,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-c1a5bd6a4a8058a5",
+        "decisionBlock": "10700",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-c1a5bd6a4a8058a5-a6c81a31",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-c1a5bd6a4a8058a5-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xab00b3f532be1f2bb1259b27d9dec60a4212ed96"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10620",
+                "toBlock": "10780"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-c1a5bd6a4a8058a5-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10673",
+              "availableAtBlock": "10674",
+              "blockHash": "0xf1f55cc7ba2c850a6ce76ed8b7e8c404d9f4eea6680bf3e76d352183e8af358b",
+              "from": "0xab00b3f532be1f2bb1259b27d9dec60a4212ed96",
+              "to": "0x798d48fd57d68f3b425294df03ed4dbb1baa66a3",
+              "txHash": "0x9617f283a351d9383ef6dfee7a7227774bd3ebc5e0534eb8e852b6a45ed474f1",
+              "valueWei": "11271991",
+              "digest": "9837e1dfe643624123225e9f73c1c86c1de246d7ce26da001e6c212460ac79ff"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x798d48fd57d68f3b425294df03ed4dbb1baa66a3"
+              },
+              "evidenceRefs": [
+                "query-c1a5bd6a4a8058a5-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xf1f55cc7ba2c850a6ce76ed8b7e8c404d9f4eea6680bf3e76d352183e8af358b",
+            "fromBlock": "10620",
+            "toBlock": "10672"
+          },
+          {
+            "queryId": "query-c1a5bd6a4a8058a5-4a098543",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-c1a5bd6a4a8058a5-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xab00b3f532be1f2bb1259b27d9dec60a4212ed96"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10620",
+                "toBlock": "10780"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-c1a5bd6a4a8058a5-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10670",
+              "availableAtBlock": "10671",
+              "blockHash": "0x7209d5d697f005297ddc1f3820ac1c6c4defdcecfeced07889f5b1359fcba14e",
+              "from": "0xab00b3f532be1f2bb1259b27d9dec60a4212ed96",
+              "to": "0xb9781360c241139f415013df317c0b4cc186988b",
+              "txHash": "0x4c4026831be92bfb5bac138699bf4fb556c01980e6d3af1d231e901e65e495d9",
+              "valueWei": "13842666",
+              "digest": "e7de344cda66970bea9fc123e3c80f0ba70b247d8188619e4e5b1f68db3c20ea"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xb9781360c241139f415013df317c0b4cc186988b"
+              },
+              "evidenceRefs": [
+                "query-c1a5bd6a4a8058a5-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x7209d5d697f005297ddc1f3820ac1c6c4defdcecfeced07889f5b1359fcba14e",
+            "fromBlock": "10620",
+            "toBlock": "10669"
+          },
+          {
+            "queryId": "query-c1a5bd6a4a8058a5-df70639f",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-c1a5bd6a4a8058a5-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xab00b3f532be1f2bb1259b27d9dec60a4212ed96"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10620",
+                "toBlock": "10780"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-c1a5bd6a4a8058a5-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10676",
+              "availableAtBlock": "10677",
+              "blockHash": "0xe28e45d90afb0d887f0bd4c110545913263fae30318fd8024162d45d1a89314d",
+              "from": "0xab00b3f532be1f2bb1259b27d9dec60a4212ed96",
+              "to": "0x41547bc1cbe6e182ebff6c3a0025468729bc0911",
+              "txHash": "0xae45a9a565698bb43e6998b4febd6a2b8468176bc86a031845199ac1e8ea6ac2",
+              "valueWei": "5901003",
+              "digest": "2fb0b34c8f3494cd32924b863cc08b8ed8d751c5955b1dc3148903e3648ddc5d"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x41547bc1cbe6e182ebff6c3a0025468729bc0911"
+              },
+              "evidenceRefs": [
+                "query-c1a5bd6a4a8058a5-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xe28e45d90afb0d887f0bd4c110545913263fae30318fd8024162d45d1a89314d",
+            "fromBlock": "10620",
+            "toBlock": "10675"
+          }
+        ],
+        "taskDigest": "3418a86dbd7b05cdab2dec9719fcd9882a2337189dd466eac3fd51b21ce62eb4"
+      },
+      "outcomes": {
+        "query-c1a5bd6a4a8058a5-4a098543": {
+          "history": {
+            "id": "query-c1a5bd6a4a8058a5-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10701",
+            "availableAtBlock": "10701",
+            "blockHash": "0x77b6294ab56346ef8c7961fe0c45574826c326f958045050f1327a1ab5d21e5b",
+            "recipient": "0xb9781360c241139f415013df317c0b4cc186988b",
+            "fromBlock": "10620",
+            "toBlock": "10669",
+            "complete": false,
+            "seen": false,
+            "digest": "e878b2d4cd5fe336046b54ce35501fae776c532e0093f344f0733b61cee19b9d"
+          },
+          "later": [
+            {
+              "id": "query-c1a5bd6a4a8058a5-launch-0",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10708",
+              "availableAtBlock": "10712",
+              "blockHash": "0x6af4d522e20e468618b5ae6809ba5e1dd8b7a267bf83c6d36269a8a4ddccc174",
+              "creator": "0xb9781360c241139f415013df317c0b4cc186988b",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x58b40540c90d5379ca27bf6219022a4a1fc9a117",
+              "pool": "0xe9436e8dccb8eb8d0b86017867f215667b000c7c",
+              "txHash": "0x33258b612f5094c64dd204acea4e0d624a2997e088b5d2de98e8028cddc04a1e",
+              "logIndex": 0,
+              "digest": "388fffa37f88fbe5daa724e9a757ada548c37a4efd1f5f2891d5a35e370fe9b0"
+            }
+          ],
+          "canonicalBlocks": {
+            "10701": "0x77b6294ab56346ef8c7961fe0c45574826c326f958045050f1327a1ab5d21e5b",
+            "10708": "0x6af4d522e20e468618b5ae6809ba5e1dd8b7a267bf83c6d36269a8a4ddccc174"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xb9781360c241139f415013df317c0b4cc186988b"
+                },
+                "evidenceRefs": [
+                  "query-c1a5bd6a4a8058a5-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-c1a5bd6a4a8058a5-a6c81a31": {
+          "history": {
+            "id": "query-c1a5bd6a4a8058a5-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10701",
+            "availableAtBlock": "10701",
+            "blockHash": "0x77b6294ab56346ef8c7961fe0c45574826c326f958045050f1327a1ab5d21e5b",
+            "recipient": "0x798d48fd57d68f3b425294df03ed4dbb1baa66a3",
+            "fromBlock": "10620",
+            "toBlock": "10672",
+            "complete": false,
+            "seen": false,
+            "digest": "bc12e65358bb72a1ae6fffa37d835042761b97c9ae4b7cc89bc41fd75213c3dc"
+          },
+          "later": [
+            {
+              "id": "query-c1a5bd6a4a8058a5-launch-1",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10708",
+              "availableAtBlock": "10712",
+              "blockHash": "0x6af4d522e20e468618b5ae6809ba5e1dd8b7a267bf83c6d36269a8a4ddccc174",
+              "creator": "0x798d48fd57d68f3b425294df03ed4dbb1baa66a3",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x3c57891fec819c83efd334aac7b07ca0e589d666",
+              "pool": "0x8e9970015ca83cfcf90a8c1696418308311d8d75",
+              "txHash": "0x787e6da59551dec9e608bc757aaee9da845cd03c9002f3eecf392c525fa27bca",
+              "logIndex": 1,
+              "digest": "8828faf65c764fa4c87b44ea539c98e40d6fa8fb2b3428719ad4877f7ff08ba3"
+            }
+          ],
+          "canonicalBlocks": {
+            "10701": "0x77b6294ab56346ef8c7961fe0c45574826c326f958045050f1327a1ab5d21e5b",
+            "10708": "0x6af4d522e20e468618b5ae6809ba5e1dd8b7a267bf83c6d36269a8a4ddccc174"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x798d48fd57d68f3b425294df03ed4dbb1baa66a3"
+                },
+                "evidenceRefs": [
+                  "query-c1a5bd6a4a8058a5-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-c1a5bd6a4a8058a5-df70639f": {
+          "history": {
+            "id": "query-c1a5bd6a4a8058a5-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10701",
+            "availableAtBlock": "10701",
+            "blockHash": "0x77b6294ab56346ef8c7961fe0c45574826c326f958045050f1327a1ab5d21e5b",
+            "recipient": "0x41547bc1cbe6e182ebff6c3a0025468729bc0911",
+            "fromBlock": "10620",
+            "toBlock": "10675",
+            "complete": false,
+            "seen": false,
+            "digest": "ba20adc5b82042e1c32bbc221e6a65457151422eec517c121566169e3e6f7ce7"
+          },
+          "later": [
+            {
+              "id": "query-c1a5bd6a4a8058a5-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10708",
+              "availableAtBlock": "10712",
+              "blockHash": "0x6af4d522e20e468618b5ae6809ba5e1dd8b7a267bf83c6d36269a8a4ddccc174",
+              "creator": "0x41547bc1cbe6e182ebff6c3a0025468729bc0911",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x5fa5e344e5738a364df0a8c1388e2fe5a9651fb5",
+              "pool": "0xa932905d4d6e9b9019c19935bce1b11ac1f2917d",
+              "txHash": "0xd3bee6d78782524669537e75e66967057d6de3a517931322c626341755d91410",
+              "logIndex": 2,
+              "digest": "7ca79706b9b7a3087c5ab0be4fdcadcb3e9fa34d7fdeff19d23694bde0b2fd1b"
+            }
+          ],
+          "canonicalBlocks": {
+            "10701": "0x77b6294ab56346ef8c7961fe0c45574826c326f958045050f1327a1ab5d21e5b",
+            "10708": "0x6af4d522e20e468618b5ae6809ba5e1dd8b7a267bf83c6d36269a8a4ddccc174"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x41547bc1cbe6e182ebff6c3a0025468729bc0911"
+                },
+                "evidenceRefs": [
+                  "query-c1a5bd6a4a8058a5-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "49abff9585a78b2b283ed3df20c94452bd0f358609511b766c4982b023ac2834"
+    },
+    {
+      "taskId": "query-ad9ac220cb23b055",
+      "stratum": "NO_ELIGIBLE",
+      "variant": 2,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-ad9ac220cb23b055",
+        "decisionBlock": "10800",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-ad9ac220cb23b055-b231fdac",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-ad9ac220cb23b055-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x790dc5a7a70fd941d86d14d23dc52d91540898ef"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10720",
+                "toBlock": "10880"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-ad9ac220cb23b055-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10770",
+              "availableAtBlock": "10771",
+              "blockHash": "0x7cfa986d0718961151d0d0288be7448f61fd9e4650d1d88f120c041f0a6a4d83",
+              "from": "0x790dc5a7a70fd941d86d14d23dc52d91540898ef",
+              "to": "0x9fe4fe733763bd0b408716deaf9ed5aa1b790d1b",
+              "txHash": "0x7f03e1cd6dd066529237cef784beb15b8cdd1bed620434f3e5021822cd78d50e",
+              "valueWei": "12134163",
+              "digest": "9b695c4b1628eacb6d5d4c2698a5507857fb3fa2c2147816722357ce93b7a820"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x9fe4fe733763bd0b408716deaf9ed5aa1b790d1b"
+              },
+              "evidenceRefs": [
+                "query-ad9ac220cb23b055-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x7cfa986d0718961151d0d0288be7448f61fd9e4650d1d88f120c041f0a6a4d83",
+            "fromBlock": "10720",
+            "toBlock": "10769"
+          },
+          {
+            "queryId": "query-ad9ac220cb23b055-a7cf41d6",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-ad9ac220cb23b055-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x790dc5a7a70fd941d86d14d23dc52d91540898ef"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10720",
+                "toBlock": "10880"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-ad9ac220cb23b055-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10773",
+              "availableAtBlock": "10774",
+              "blockHash": "0x76d9980db7b1b375f5a28462de95221f95c38de2db4894c42c3cfa91fc29a49a",
+              "from": "0x790dc5a7a70fd941d86d14d23dc52d91540898ef",
+              "to": "0x70a8c72e5dd0097945249c352bc825fb1e8afc47",
+              "txHash": "0xe4451bd3f36b3a6b459b35d06a58d49bb3a0c551ce8205875e279a94ed04de6d",
+              "valueWei": "2991989",
+              "digest": "528ed1caad7fa21b8e0bf6290b068d481acbd239920928d8ebf751ad1b2f5f7e"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x70a8c72e5dd0097945249c352bc825fb1e8afc47"
+              },
+              "evidenceRefs": [
+                "query-ad9ac220cb23b055-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x76d9980db7b1b375f5a28462de95221f95c38de2db4894c42c3cfa91fc29a49a",
+            "fromBlock": "10720",
+            "toBlock": "10772"
+          },
+          {
+            "queryId": "query-ad9ac220cb23b055-60e53de7",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-ad9ac220cb23b055-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x790dc5a7a70fd941d86d14d23dc52d91540898ef"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10720",
+                "toBlock": "10880"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-ad9ac220cb23b055-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10776",
+              "availableAtBlock": "10777",
+              "blockHash": "0xc84de6ad08bb67d734ca5cd3ec877770c5bca4ab56cfd2f7bd511f543f94ba91",
+              "from": "0x790dc5a7a70fd941d86d14d23dc52d91540898ef",
+              "to": "0x4b196fd4a7bb6d0395e6b36d8810866e19928404",
+              "txHash": "0xc72b138b3f1493d75b7907954b0f4d8bdcac6d7995e15cfe08006a43f6833d7d",
+              "valueWei": "10554476",
+              "digest": "23a4fedf18eaabb9eb9cca03ec87fcc2613690690485d5b5d8d80809ced89d2d"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x4b196fd4a7bb6d0395e6b36d8810866e19928404"
+              },
+              "evidenceRefs": [
+                "query-ad9ac220cb23b055-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xc84de6ad08bb67d734ca5cd3ec877770c5bca4ab56cfd2f7bd511f543f94ba91",
+            "fromBlock": "10720",
+            "toBlock": "10775"
+          }
+        ],
+        "taskDigest": "687570a2e90280253a41c3e3d09c08128c80ad9124c6b779bb537c4883e8e9a1"
+      },
+      "outcomes": {
+        "query-ad9ac220cb23b055-b231fdac": {
+          "history": {
+            "id": "query-ad9ac220cb23b055-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10801",
+            "availableAtBlock": "10801",
+            "blockHash": "0x44f5b61e38172e587bf811218b81120199572691dd30a452a4ef6a24b7ac370d",
+            "recipient": "0x9fe4fe733763bd0b408716deaf9ed5aa1b790d1b",
+            "fromBlock": "10720",
+            "toBlock": "10769",
+            "complete": true,
+            "seen": true,
+            "digest": "cf6f5ab7faeb2c45847f6ed9e87dfbff2b1e86fdaeeda613aead23a11b78e0b5"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10801": "0x44f5b61e38172e587bf811218b81120199572691dd30a452a4ef6a24b7ac370d"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x9fe4fe733763bd0b408716deaf9ed5aa1b790d1b"
+                },
+                "evidenceRefs": [
+                  "query-ad9ac220cb23b055-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-ad9ac220cb23b055-a7cf41d6": {
+          "history": {
+            "id": "query-ad9ac220cb23b055-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10801",
+            "availableAtBlock": "10801",
+            "blockHash": "0x44f5b61e38172e587bf811218b81120199572691dd30a452a4ef6a24b7ac370d",
+            "recipient": "0x70a8c72e5dd0097945249c352bc825fb1e8afc47",
+            "fromBlock": "10720",
+            "toBlock": "10772",
+            "complete": true,
+            "seen": true,
+            "digest": "64fc42d3d11274b44532d7980fdd059964d50547242a937280a375d3ddf2a13f"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10801": "0x44f5b61e38172e587bf811218b81120199572691dd30a452a4ef6a24b7ac370d"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x70a8c72e5dd0097945249c352bc825fb1e8afc47"
+                },
+                "evidenceRefs": [
+                  "query-ad9ac220cb23b055-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-ad9ac220cb23b055-60e53de7": {
+          "history": {
+            "id": "query-ad9ac220cb23b055-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10801",
+            "availableAtBlock": "10801",
+            "blockHash": "0x44f5b61e38172e587bf811218b81120199572691dd30a452a4ef6a24b7ac370d",
+            "recipient": "0x4b196fd4a7bb6d0395e6b36d8810866e19928404",
+            "fromBlock": "10720",
+            "toBlock": "10775",
+            "complete": true,
+            "seen": true,
+            "digest": "ed49603633573f9b674a18228742b4f7f74d9254488412e4e433ba2671afa10d"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "10801": "0x44f5b61e38172e587bf811218b81120199572691dd30a452a4ef6a24b7ac370d"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x4b196fd4a7bb6d0395e6b36d8810866e19928404"
+                },
+                "evidenceRefs": [
+                  "query-ad9ac220cb23b055-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "b8ea817a5832c3d58dcae132afc573e3c2732e09b67fe6b47f428215569dab4b"
+    },
+    {
+      "taskId": "query-1b45ec650ae369bf",
+      "stratum": "COVERAGE_AND_BUDGET",
+      "variant": 0,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-1b45ec650ae369bf",
+        "decisionBlock": "10900",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-1b45ec650ae369bf-d81fee6c",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-1b45ec650ae369bf-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x4da74e0b28514827856351c0fc9ba7b8e85f50f6"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10820",
+                "toBlock": "10980"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-1b45ec650ae369bf-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10876",
+              "availableAtBlock": "10877",
+              "blockHash": "0xc7de1436e0ae813cb5dc1d92dafad0a1471f1549fae87c41c167875b0b06433e",
+              "from": "0x4da74e0b28514827856351c0fc9ba7b8e85f50f6",
+              "to": "0x8172d27c5b7a9487831376eac289a21dba7e6c0b",
+              "txHash": "0x073c38c90c5199556603978b1173a5ad392834ab03f0555c50bc45a35f46d4eb",
+              "valueWei": "1896769",
+              "digest": "c87c6f6910c759e52a07934e550fc5d60b3f38707bf9b4273ebc929dcecdc180"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x8172d27c5b7a9487831376eac289a21dba7e6c0b"
+              },
+              "evidenceRefs": [
+                "query-1b45ec650ae369bf-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xc7de1436e0ae813cb5dc1d92dafad0a1471f1549fae87c41c167875b0b06433e",
+            "fromBlock": "10820",
+            "toBlock": "10875"
+          },
+          {
+            "queryId": "query-1b45ec650ae369bf-ab5894be",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-1b45ec650ae369bf-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x4da74e0b28514827856351c0fc9ba7b8e85f50f6"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10820",
+                "toBlock": "10980"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-1b45ec650ae369bf-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10870",
+              "availableAtBlock": "10871",
+              "blockHash": "0x2f751e904b88d87291ca58c44b986f6d980db36012d42459b7ec34000d896f7e",
+              "from": "0x4da74e0b28514827856351c0fc9ba7b8e85f50f6",
+              "to": "0xffac287825057f386cef0ff331c2569dda3359d5",
+              "txHash": "0x6e9b09c3969ee8af912af61002323acc2fc3358df1bf8890565bbc963811a872",
+              "valueWei": "1666690",
+              "digest": "885d4eae55d32945c1290eb71a09934594ffc7f2787081a6932585e3c903d07b"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xffac287825057f386cef0ff331c2569dda3359d5"
+              },
+              "evidenceRefs": [
+                "query-1b45ec650ae369bf-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x2f751e904b88d87291ca58c44b986f6d980db36012d42459b7ec34000d896f7e",
+            "fromBlock": "10820",
+            "toBlock": "10869"
+          },
+          {
+            "queryId": "query-1b45ec650ae369bf-55312c50",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-1b45ec650ae369bf-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x4da74e0b28514827856351c0fc9ba7b8e85f50f6"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10820",
+                "toBlock": "10980"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-1b45ec650ae369bf-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10873",
+              "availableAtBlock": "10874",
+              "blockHash": "0xa0d7842a1fee2abb11e6fc14f8edab4290ec696d828a3daeb2aa9f27829b79e2",
+              "from": "0x4da74e0b28514827856351c0fc9ba7b8e85f50f6",
+              "to": "0xe6ac63e5e4709103141d31aa83c47ebee8783faf",
+              "txHash": "0xc7c2257082673f1a580e3da30f10781f2e521685de812b741a469f8c65ea7b24",
+              "valueWei": "2364797",
+              "digest": "120fc19ddef472f67619e7be593e2782e0488c261011afedf454cdde52ef0b4a"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xe6ac63e5e4709103141d31aa83c47ebee8783faf"
+              },
+              "evidenceRefs": [
+                "query-1b45ec650ae369bf-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xa0d7842a1fee2abb11e6fc14f8edab4290ec696d828a3daeb2aa9f27829b79e2",
+            "fromBlock": "10820",
+            "toBlock": "10872"
+          }
+        ],
+        "taskDigest": "e0be6dfc5a260d12efc53acb5a57882ef1c7e9e916de8664edd227eb847e6335"
+      },
+      "outcomes": {
+        "query-1b45ec650ae369bf-ab5894be": {
+          "history": {
+            "id": "query-1b45ec650ae369bf-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10901",
+            "availableAtBlock": "10901",
+            "blockHash": "0x91927a9c0bbb21b66c3ec2f35a3f5e81e0a9b4ccad29229b82e9261dd21e64ce",
+            "recipient": "0xffac287825057f386cef0ff331c2569dda3359d5",
+            "fromBlock": "10820",
+            "toBlock": "10869",
+            "complete": true,
+            "seen": false,
+            "digest": "f21bb7ffde18d996aaad53ab52aff5f690819d1991b44b291239b29a75e92e71"
+          },
+          "later": [
+            {
+              "id": "query-1b45ec650ae369bf-launch-0",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10908",
+              "availableAtBlock": "10912",
+              "blockHash": "0xbc4a3c9f96c5124a14f3e5869290daf5654dc33ed8b2e4b5ced9bfc1130c7b63",
+              "creator": "0xffac287825057f386cef0ff331c2569dda3359d5",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xee78212fa955575162691055dfd5682384cc0117",
+              "pool": "0x9d77971e6f10819f031771dba5dc8e94034be33a",
+              "txHash": "0x0f99b2afa66d6edc59592d0973c073e7c1ae90bd8a6a86ae1080662c04d04f3b",
+              "logIndex": 0,
+              "digest": "4908172e27981c11ed9c142b4d89ded54b2d3011793cb2c56fe662bc4967062a"
+            }
+          ],
+          "canonicalBlocks": {
+            "10901": "0x91927a9c0bbb21b66c3ec2f35a3f5e81e0a9b4ccad29229b82e9261dd21e64ce",
+            "10908": "0xbc4a3c9f96c5124a14f3e5869290daf5654dc33ed8b2e4b5ced9bfc1130c7b63"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xffac287825057f386cef0ff331c2569dda3359d5"
+                },
+                "evidenceRefs": [
+                  "query-1b45ec650ae369bf-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xffac287825057f386cef0ff331c2569dda3359d5"
+                },
+                "evidenceRefs": [
+                  "query-1b45ec650ae369bf-history-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xffac287825057f386cef0ff331c2569dda3359d5"
+                },
+                "evidenceRefs": [
+                  "query-1b45ec650ae369bf-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xffac287825057f386cef0ff331c2569dda3359d5"
+                },
+                "evidenceRefs": [
+                  "query-1b45ec650ae369bf-funding-0",
+                  "query-1b45ec650ae369bf-launch-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xffac287825057f386cef0ff331c2569dda3359d5"
+              },
+              "createdAtBlock": "10901",
+              "afterBlock": "10870",
+              "evidenceRefs": [
+                "query-1b45ec650ae369bf-funding-0",
+                "query-1b45ec650ae369bf-history-0"
+              ]
+            }
+          }
+        },
+        "query-1b45ec650ae369bf-55312c50": {
+          "history": {
+            "id": "query-1b45ec650ae369bf-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10901",
+            "availableAtBlock": "10901",
+            "blockHash": "0x91927a9c0bbb21b66c3ec2f35a3f5e81e0a9b4ccad29229b82e9261dd21e64ce",
+            "recipient": "0xe6ac63e5e4709103141d31aa83c47ebee8783faf",
+            "fromBlock": "10820",
+            "toBlock": "10872",
+            "complete": false,
+            "seen": false,
+            "digest": "0257b53ec1a783e7cb8c8fa3e3608054e92d76f557e4390050dd7cba33108238"
+          },
+          "later": [
+            {
+              "id": "query-1b45ec650ae369bf-launch-1",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10908",
+              "availableAtBlock": "10912",
+              "blockHash": "0xbc4a3c9f96c5124a14f3e5869290daf5654dc33ed8b2e4b5ced9bfc1130c7b63",
+              "creator": "0xe6ac63e5e4709103141d31aa83c47ebee8783faf",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xabfc650b40679c2967b9b6abab1851685c49f8aa",
+              "pool": "0x662429b4da93ad9d684e3dbe60fddd101bee60c4",
+              "txHash": "0x6f29aad629155d85983e327223a9b76ba35f2d1d7c4e47936a1a10d0e3cb62fb",
+              "logIndex": 1,
+              "digest": "9516ad3d4f5fe938bc8ae89f5fcd3e69ad206769bb2bf2d11d8f13649a28be1c"
+            }
+          ],
+          "canonicalBlocks": {
+            "10901": "0x91927a9c0bbb21b66c3ec2f35a3f5e81e0a9b4ccad29229b82e9261dd21e64ce",
+            "10908": "0xbc4a3c9f96c5124a14f3e5869290daf5654dc33ed8b2e4b5ced9bfc1130c7b63"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xe6ac63e5e4709103141d31aa83c47ebee8783faf"
+                },
+                "evidenceRefs": [
+                  "query-1b45ec650ae369bf-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-1b45ec650ae369bf-d81fee6c": {
+          "history": {
+            "id": "query-1b45ec650ae369bf-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "10901",
+            "availableAtBlock": "10901",
+            "blockHash": "0x91927a9c0bbb21b66c3ec2f35a3f5e81e0a9b4ccad29229b82e9261dd21e64ce",
+            "recipient": "0x8172d27c5b7a9487831376eac289a21dba7e6c0b",
+            "fromBlock": "10820",
+            "toBlock": "10875",
+            "complete": false,
+            "seen": false,
+            "digest": "9c885fabf2444bbc75493ff47e65cd960c991af01bbdd34ed9b5354a6ae1ab12"
+          },
+          "later": [
+            {
+              "id": "query-1b45ec650ae369bf-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "10908",
+              "availableAtBlock": "10912",
+              "blockHash": "0xbc4a3c9f96c5124a14f3e5869290daf5654dc33ed8b2e4b5ced9bfc1130c7b63",
+              "creator": "0x8172d27c5b7a9487831376eac289a21dba7e6c0b",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0x3894ce3dfddf64cdb0ef6d6ff07c7be44959256a",
+              "pool": "0x94d43c22468d4945a1c6423c68c183ff99af7581",
+              "txHash": "0x664c54cefb81e97b69d03fe25b4c5f88896b13f4da8d2883c66a059b33f6387e",
+              "logIndex": 2,
+              "digest": "d5686be3bf0c0396a92ee7bb51bd8c1b92bc6b8149b6939873374d6f7cdd1b14"
+            }
+          ],
+          "canonicalBlocks": {
+            "10901": "0x91927a9c0bbb21b66c3ec2f35a3f5e81e0a9b4ccad29229b82e9261dd21e64ce",
+            "10908": "0xbc4a3c9f96c5124a14f3e5869290daf5654dc33ed8b2e4b5ced9bfc1130c7b63"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x8172d27c5b7a9487831376eac289a21dba7e6c0b"
+                },
+                "evidenceRefs": [
+                  "query-1b45ec650ae369bf-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "157c3c9f5d68636f6051f3dfcadf68257a2736da4e374ad85a19428d4f4b6a33"
+    },
+    {
+      "taskId": "query-d893bffba6e6b81a",
+      "stratum": "COVERAGE_AND_BUDGET",
+      "variant": 1,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-d893bffba6e6b81a",
+        "decisionBlock": "11000",
+        "budget": {
+          "maxQueries": 0
+        },
+        "candidates": [
+          {
+            "queryId": "query-d893bffba6e6b81a-41758eba",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-d893bffba6e6b81a-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x6be8345e09d325466f69639fa3afb7d3bf78b8be"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10920",
+                "toBlock": "11080"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-d893bffba6e6b81a-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10973",
+              "availableAtBlock": "10974",
+              "blockHash": "0xd4ee7b93148d0dd739a026dfe319a0fff6c5632c0007481de3249e20ecf91491",
+              "from": "0x6be8345e09d325466f69639fa3afb7d3bf78b8be",
+              "to": "0xf34ca0268b9e39653a288c8422c33c773443c802",
+              "txHash": "0x7241759a02dd992f2a6886d835e940c46771478380221682e4a4b2c3e2c663c8",
+              "valueWei": "15525837",
+              "digest": "aba7f3dedb97e1eb8f26ff6d57ac2709e694673024f286a24bcf66a579344521"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xf34ca0268b9e39653a288c8422c33c773443c802"
+              },
+              "evidenceRefs": [
+                "query-d893bffba6e6b81a-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xd4ee7b93148d0dd739a026dfe319a0fff6c5632c0007481de3249e20ecf91491",
+            "fromBlock": "10920",
+            "toBlock": "10972"
+          },
+          {
+            "queryId": "query-d893bffba6e6b81a-a4bc8ab8",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-d893bffba6e6b81a-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x6be8345e09d325466f69639fa3afb7d3bf78b8be"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10920",
+                "toBlock": "11080"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-d893bffba6e6b81a-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10970",
+              "availableAtBlock": "10971",
+              "blockHash": "0xcf20a6b2cc8afcf441e6b864434595fe62344ec8962d67c3f4e32bf93b31af93",
+              "from": "0x6be8345e09d325466f69639fa3afb7d3bf78b8be",
+              "to": "0x0a88c947147254ec3d594cf2713080716a0a7b15",
+              "txHash": "0x05aa2c0641021362853378d0b510f2ea71d78958282f1f0598031de3948a19a1",
+              "valueWei": "15294745",
+              "digest": "9871287a03bd90e54590bf7615fe8d646f6325b794b1d4bbdde423591367124a"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x0a88c947147254ec3d594cf2713080716a0a7b15"
+              },
+              "evidenceRefs": [
+                "query-d893bffba6e6b81a-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xcf20a6b2cc8afcf441e6b864434595fe62344ec8962d67c3f4e32bf93b31af93",
+            "fromBlock": "10920",
+            "toBlock": "10969"
+          },
+          {
+            "queryId": "query-d893bffba6e6b81a-bc6bd7b3",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-d893bffba6e6b81a-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x6be8345e09d325466f69639fa3afb7d3bf78b8be"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "10920",
+                "toBlock": "11080"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-d893bffba6e6b81a-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "10976",
+              "availableAtBlock": "10977",
+              "blockHash": "0x431d0ccd22171cf14393dc28bab3058f3accbe8bab69d2fb8b15907f0867443f",
+              "from": "0x6be8345e09d325466f69639fa3afb7d3bf78b8be",
+              "to": "0x38f9811e3956b521f284604f3b6695150741674b",
+              "txHash": "0x85cc057908e7434630d0f2c85cf58cea0047403f15188c775211bf11e59531c8",
+              "valueWei": "13883759",
+              "digest": "ae9150263502452009cf795cf4bb37cf031eeabcce083ac1bfd7283ddb8b54a6"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x38f9811e3956b521f284604f3b6695150741674b"
+              },
+              "evidenceRefs": [
+                "query-d893bffba6e6b81a-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x431d0ccd22171cf14393dc28bab3058f3accbe8bab69d2fb8b15907f0867443f",
+            "fromBlock": "10920",
+            "toBlock": "10975"
+          }
+        ],
+        "taskDigest": "b502831aae3978395dfb5e61a03d04f753c082c729eaf9055610952252a0055f"
+      },
+      "outcomes": {
+        "query-d893bffba6e6b81a-a4bc8ab8": {
+          "history": {
+            "id": "query-d893bffba6e6b81a-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "11001",
+            "availableAtBlock": "11001",
+            "blockHash": "0xc8e80cbf6cb8d01dc357fe098289ff726425f03474b36e57bfdde6ea767cb532",
+            "recipient": "0x0a88c947147254ec3d594cf2713080716a0a7b15",
+            "fromBlock": "10920",
+            "toBlock": "10969",
+            "complete": true,
+            "seen": true,
+            "digest": "8e138f2958f52b28fbc3e9ea1b4ef9bc682a267d9b13e56445484b0067bd5f72"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "11001": "0xc8e80cbf6cb8d01dc357fe098289ff726425f03474b36e57bfdde6ea767cb532"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x0a88c947147254ec3d594cf2713080716a0a7b15"
+                },
+                "evidenceRefs": [
+                  "query-d893bffba6e6b81a-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-d893bffba6e6b81a-41758eba": {
+          "history": {
+            "id": "query-d893bffba6e6b81a-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "11001",
+            "availableAtBlock": "11001",
+            "blockHash": "0xc8e80cbf6cb8d01dc357fe098289ff726425f03474b36e57bfdde6ea767cb532",
+            "recipient": "0xf34ca0268b9e39653a288c8422c33c773443c802",
+            "fromBlock": "10920",
+            "toBlock": "10972",
+            "complete": true,
+            "seen": true,
+            "digest": "96b9061ef419f15be496a567c5959dee812efd8e8a1600fe675b8c32974bd1ec"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "11001": "0xc8e80cbf6cb8d01dc357fe098289ff726425f03474b36e57bfdde6ea767cb532"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xf34ca0268b9e39653a288c8422c33c773443c802"
+                },
+                "evidenceRefs": [
+                  "query-d893bffba6e6b81a-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        },
+        "query-d893bffba6e6b81a-bc6bd7b3": {
+          "history": {
+            "id": "query-d893bffba6e6b81a-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "11001",
+            "availableAtBlock": "11001",
+            "blockHash": "0xc8e80cbf6cb8d01dc357fe098289ff726425f03474b36e57bfdde6ea767cb532",
+            "recipient": "0x38f9811e3956b521f284604f3b6695150741674b",
+            "fromBlock": "10920",
+            "toBlock": "10975",
+            "complete": true,
+            "seen": true,
+            "digest": "263d0603c00d62cc2322511fffa889dc15a8c8b2764affccf39dab9fbe07710c"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "11001": "0xc8e80cbf6cb8d01dc357fe098289ff726425f03474b36e57bfdde6ea767cb532"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x38f9811e3956b521f284604f3b6695150741674b"
+                },
+                "evidenceRefs": [
+                  "query-d893bffba6e6b81a-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": null
+          }
+        }
+      },
+      "caseDigest": "740b023d8b5edbbce7701a044682731775b8084d0767a2873c5860f4eec111f7"
+    },
+    {
+      "taskId": "query-72bdbfb95c417cc5",
+      "stratum": "COVERAGE_AND_BUDGET",
+      "variant": 2,
+      "task": {
+        "schemaVersion": "binrat.next-query-task/1",
+        "provenance": "SYNTHETIC_OFFLINE_REPLAY",
+        "taskId": "query-72bdbfb95c417cc5",
+        "decisionBlock": "11100",
+        "budget": {
+          "maxQueries": 1
+        },
+        "candidates": [
+          {
+            "queryId": "query-72bdbfb95c417cc5-3d4f6e41",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-72bdbfb95c417cc5-job-1",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x1a1b13fa3b7a5a6eae40f818a82f87ced46838e6"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "11020",
+                "toBlock": "11180"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-72bdbfb95c417cc5-funding-1",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "11073",
+              "availableAtBlock": "11074",
+              "blockHash": "0x261913dd5fc26ee0eb7fb964b971aa8a88ef12b6fed1d06ecedda4de4f4ac639",
+              "from": "0x1a1b13fa3b7a5a6eae40f818a82f87ced46838e6",
+              "to": "0x9adee5bbfdf78db3e219718c2300de646ec5951e",
+              "txHash": "0x0ac3c986831ae4b0d054d7f5c23dc123a9b9312f95b56bbcca1dda7132505fac",
+              "valueWei": "11687844",
+              "digest": "de6ab427030f540877e1198c5d9c406e0e53c66b27ae2aad57d6459898ff568f"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x9adee5bbfdf78db3e219718c2300de646ec5951e"
+              },
+              "evidenceRefs": [
+                "query-72bdbfb95c417cc5-funding-1"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x261913dd5fc26ee0eb7fb964b971aa8a88ef12b6fed1d06ecedda4de4f4ac639",
+            "fromBlock": "11020",
+            "toBlock": "11072"
+          },
+          {
+            "queryId": "query-72bdbfb95c417cc5-7c3ca5e4",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-72bdbfb95c417cc5-job-0",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x1a1b13fa3b7a5a6eae40f818a82f87ced46838e6"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "11020",
+                "toBlock": "11180"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-72bdbfb95c417cc5-funding-0",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "11070",
+              "availableAtBlock": "11071",
+              "blockHash": "0xe5b84d2ddaaf604d6c7c528a1a25a3cf47d54e7477bdc8d8da25e28a0f6462f3",
+              "from": "0x1a1b13fa3b7a5a6eae40f818a82f87ced46838e6",
+              "to": "0x163909944400e5f0a6456ffdbeddde88f1172a3a",
+              "txHash": "0x4611471fb7dfd0606d42a1fc78d74a693e601a1a9e78a700bf31a546ecdb8f00",
+              "valueWei": "14322346",
+              "digest": "59b488a304f57e1d01d72c2010557957e5e8e758a65577f3167a3e15b9c6f953"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x163909944400e5f0a6456ffdbeddde88f1172a3a"
+              },
+              "evidenceRefs": [
+                "query-72bdbfb95c417cc5-funding-0"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0xe5b84d2ddaaf604d6c7c528a1a25a3cf47d54e7477bdc8d8da25e28a0f6462f3",
+            "fromBlock": "11020",
+            "toBlock": "11069"
+          },
+          {
+            "queryId": "query-72bdbfb95c417cc5-c055d81b",
+            "tool": "READ_RECIPIENT_WINDOW_FIXTURE",
+            "costQueries": 1,
+            "job": {
+              "schemaVersion": "binrat.rat-job/1",
+              "mode": "OFFLINE_REPLAY",
+              "jobId": "query-72bdbfb95c417cc5-job-2",
+              "leadRat": "SNIFFER",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0x1a1b13fa3b7a5a6eae40f818a82f87ced46838e6"
+              },
+              "objective": "FOLLOW_FUNDER_TO_FUTURE_PONS_LAUNCH",
+              "authority": {
+                "research": true,
+                "network": false,
+                "provider": false,
+                "delivery": false,
+                "capital": false
+              },
+              "budget": {
+                "maxToolCalls": 5,
+                "maxHandoffs": 1,
+                "maxModelCalls": 0,
+                "maxCostMicrousd": 0
+              },
+              "window": {
+                "fromBlock": "11020",
+                "toBlock": "11180"
+              }
+            },
+            "fundingReceipt": {
+              "id": "query-72bdbfb95c417cc5-funding-2",
+              "kind": "NATIVE_TRANSFER",
+              "chainId": 4663,
+              "blockNumber": "11076",
+              "availableAtBlock": "11077",
+              "blockHash": "0x3093451690c98dc6a0c36d2133f5a18cb5affdc257824dce1a48dfa9af2627e4",
+              "from": "0x1a1b13fa3b7a5a6eae40f818a82f87ced46838e6",
+              "to": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b",
+              "txHash": "0xaf15159606570575c1a80045c40018d1207e3791c0edcdc3be68bcbee3239cda",
+              "valueWei": "14732900",
+              "digest": "5c4c1bc59fc3daf21cfa7c0669c75527420710ddf129dd03b54bc85fd0a4422b"
+            },
+            "fundingClaim": {
+              "kind": "NATIVE_TRANSFER_OBSERVED",
+              "subject": {
+                "chainId": 4663,
+                "entityType": "WALLET",
+                "entityId": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b"
+              },
+              "evidenceRefs": [
+                "query-72bdbfb95c417cc5-funding-2"
+              ],
+              "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+            },
+            "canonicalBlockHash": "0x3093451690c98dc6a0c36d2133f5a18cb5affdc257824dce1a48dfa9af2627e4",
+            "fromBlock": "11020",
+            "toBlock": "11075"
+          }
+        ],
+        "taskDigest": "603db1d43a534a0a25cec77f067c91c794fae82448488264022ac9e9330fbdd3"
+      },
+      "outcomes": {
+        "query-72bdbfb95c417cc5-7c3ca5e4": {
+          "history": {
+            "id": "query-72bdbfb95c417cc5-history-0",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "11101",
+            "availableAtBlock": "11101",
+            "blockHash": "0x5fc8c7ebdc8a83cfd252f27343c8fa579ce91c41ba88b0b2d02935e0e6201252",
+            "recipient": "0x163909944400e5f0a6456ffdbeddde88f1172a3a",
+            "fromBlock": "11020",
+            "toBlock": "11069",
+            "complete": true,
+            "seen": false,
+            "digest": "5a17b18fe4b6154b1540e4cf239d2b55dbe50247bf5e8c958700b5a0edcd36f2"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "11101": "0x5fc8c7ebdc8a83cfd252f27343c8fa579ce91c41ba88b0b2d02935e0e6201252"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x163909944400e5f0a6456ffdbeddde88f1172a3a"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-funding-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x163909944400e5f0a6456ffdbeddde88f1172a3a"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-history-0"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0x163909944400e5f0a6456ffdbeddde88f1172a3a"
+              },
+              "createdAtBlock": "11101",
+              "afterBlock": "11070",
+              "evidenceRefs": [
+                "query-72bdbfb95c417cc5-funding-0",
+                "query-72bdbfb95c417cc5-history-0"
+              ]
+            }
+          }
+        },
+        "query-72bdbfb95c417cc5-3d4f6e41": {
+          "history": {
+            "id": "query-72bdbfb95c417cc5-history-1",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "11101",
+            "availableAtBlock": "11101",
+            "blockHash": "0x5fc8c7ebdc8a83cfd252f27343c8fa579ce91c41ba88b0b2d02935e0e6201252",
+            "recipient": "0x9adee5bbfdf78db3e219718c2300de646ec5951e",
+            "fromBlock": "11020",
+            "toBlock": "11072",
+            "complete": true,
+            "seen": false,
+            "digest": "d9a0694d981b43cea34abbcec015e23de70e77309ada4d59032c3c820b4ffe1a"
+          },
+          "later": [],
+          "canonicalBlocks": {
+            "11101": "0x5fc8c7ebdc8a83cfd252f27343c8fa579ce91c41ba88b0b2d02935e0e6201252"
+          },
+          "expected": {
+            "eligibleAlert": false,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x9adee5bbfdf78db3e219718c2300de646ec5951e"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-funding-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0x9adee5bbfdf78db3e219718c2300de646ec5951e"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-history-1"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0x9adee5bbfdf78db3e219718c2300de646ec5951e"
+              },
+              "createdAtBlock": "11101",
+              "afterBlock": "11073",
+              "evidenceRefs": [
+                "query-72bdbfb95c417cc5-funding-1",
+                "query-72bdbfb95c417cc5-history-1"
+              ]
+            }
+          }
+        },
+        "query-72bdbfb95c417cc5-c055d81b": {
+          "history": {
+            "id": "query-72bdbfb95c417cc5-history-2",
+            "kind": "RECIPIENT_WINDOW",
+            "chainId": 4663,
+            "blockNumber": "11101",
+            "availableAtBlock": "11101",
+            "blockHash": "0x5fc8c7ebdc8a83cfd252f27343c8fa579ce91c41ba88b0b2d02935e0e6201252",
+            "recipient": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b",
+            "fromBlock": "11020",
+            "toBlock": "11075",
+            "complete": true,
+            "seen": false,
+            "digest": "1707ad8a794105fc16133d9b71c5792cbb49fb6d97a2606d71832ecc9944b1bc"
+          },
+          "later": [
+            {
+              "id": "query-72bdbfb95c417cc5-launch-2",
+              "kind": "PONS_LAUNCH",
+              "chainId": 4663,
+              "blockNumber": "11108",
+              "availableAtBlock": "11112",
+              "blockHash": "0xc4ec540cb5bbf4e8543a63555d3bdecac64a6c6e8d0424352124f03ed10f8c98",
+              "creator": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b",
+              "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+              "token": "0xda59f888c3f452633e96bde7e4f4de02afe899d3",
+              "pool": "0x5345ae00da77eb61da496e20e244d4d8dec35de6",
+              "txHash": "0xc8fc6eab75af960081d76f544054bd117c204ba3e793852e08c9902d8c52b8b6",
+              "logIndex": 2,
+              "digest": "7dc24381e070c2541a41b442acd3992c49639fb8064b36ad8d565ae2a90f4dc3"
+            }
+          ],
+          "canonicalBlocks": {
+            "11101": "0x5fc8c7ebdc8a83cfd252f27343c8fa579ce91c41ba88b0b2d02935e0e6201252",
+            "11108": "0xc4ec540cb5bbf4e8543a63555d3bdecac64a6c6e8d0424352124f03ed10f8c98"
+          },
+          "expected": {
+            "eligibleAlert": true,
+            "allowedClaims": [
+              {
+                "kind": "NATIVE_TRANSFER_OBSERVED",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-funding-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "RECIPIENT_NOT_SEEN_IN_WINDOW",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "WALLET",
+                  "entityId": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-history-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "PONS_REPORTED_DEPLOYER_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              },
+              {
+                "kind": "FUNDING_PRECEDES_LAUNCH",
+                "subject": {
+                  "chainId": 4663,
+                  "entityType": "CREATOR",
+                  "entityId": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b"
+                },
+                "evidenceRefs": [
+                  "query-72bdbfb95c417cc5-funding-2",
+                  "query-72bdbfb95c417cc5-launch-2"
+                ],
+                "scope": "DECLARED_FIXTURE_WINDOW_ONLY"
+              }
+            ],
+            "handoff": {
+              "subject": {
+                "chainId": 4663,
+                "entityType": "CREATOR",
+                "entityId": "0xecbcbca2c47394760aebd4f2009b9f1883f99f9b"
+              },
+              "createdAtBlock": "11101",
+              "afterBlock": "11076",
+              "evidenceRefs": [
+                "query-72bdbfb95c417cc5-funding-2",
+                "query-72bdbfb95c417cc5-history-2"
+              ]
+            }
+          }
+        }
+      },
+      "caseDigest": "f148c167e163c5c1101c438cc7a5d966a7487ab3f736bc0353cb2f1c5525126a"
+    }
+  ],
+  "packDigest": "8ee4b2ec4e7c38c4f258332bdd95bdaea82e450d205a337e4a65ad775a4fabd9"
+}

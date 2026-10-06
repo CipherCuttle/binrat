@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:binrat:next-query:v1:NEXT_QUERY_TASK_V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provenance",
+    "taskId",
+    "decisionBlock",
+    "budget",
+    "candidates",
+    "taskDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "binrat.next-query-task/1"
+    },
+    "provenance": {
+      "const": "SYNTHETIC_OFFLINE_REPLAY"
+    },
+    "taskId": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/id"
+    },
+    "decisionBlock": {
+      "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/block"
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxQueries"
+      ],
+      "properties": {
+        "maxQueries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "queryId",
+          "tool",
+          "costQueries",
+          "job",
+          "fundingReceipt",
+          "fundingClaim",
+          "canonicalBlockHash",
+          "fromBlock",
+          "toBlock"
+        ],
+        "properties": {
+          "queryId": {
+            "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/id"
+          },
+          "tool": {
+            "const": "READ_RECIPIENT_WINDOW_FIXTURE"
+          },
+          "costQueries": {
+            "const": 1
+          },
+          "job": {
+            "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1"
+          },
+          "fundingReceipt": {
+            "allOf": [
+              {
+                "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/event"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_TRANSFER"
+                  }
+                }
+              }
+            ]
+          },
+          "fundingClaim": {
+            "allOf": [
+              {
+                "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/claim"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "NATIVE_TRANSFER_OBSERVED"
+                  }
+                }
+              }
+            ]
+          },
+          "canonicalBlockHash": {
+            "type": "string",
+            "pattern": "^0x[a-f0-9]{64}$"
+          },
+          "fromBlock": {
+            "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/block"
+          },
+          "toBlock": {
+            "$ref": "urn:binrat:workforce:v1:RAT_JOB_CONTRACT_V1#/$defs/block"
+          }
+        }
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "taskDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

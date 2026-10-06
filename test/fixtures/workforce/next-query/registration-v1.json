@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "binrat.next-query-registration/1",
+  "seed": "BINRAT_NEXT_QUERY_20261006_V1",
+  "baseHead": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+  "strata": ["ONE_ELIGIBLE", "MULTIPLE_ELIGIBLE", "NO_ELIGIBLE", "COVERAGE_AND_BUDGET"],
+  "developmentPerStratum": 3,
+  "evaluationPerStratum": 6,
+  "candidatesPerCase": 3,
+  "baseline": "LARGEST_VALUE_THEN_QUERY_ID",
+  "maxQueries": 1,
+  "continuationMaxTools": 5,
+  "continuationMaxHandoffs": 1,
+  "minimumFutureSnifferGain": 2,
+  "admittedSafetyViolationTolerance": 0,
+  "modelExecutionAuthorized": false
+}
