@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   shadow:
-    if: ${{ github.actor == 'CipherCuttle' && github.run_attempt == '1' && github.event.head_commit.message == '[run-binrat-comms-20261006] approved one shadow draft' }}
+    if: ${{ github.actor == 'CipherCuttle' && github.run_attempt == '1' && github.event.head_commit.message == '[run-binrat-comms-20261006-b] approved one shadow draft after checkout fix' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -23,13 +23,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 3
 
       - name: Verify one-shot source binding
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "1a68748c89c6957dacf2484d2691b8044744f0c3"
-          test "$(git log -1 --format=%s)" = "[run-binrat-comms-20261006] approved one shadow draft"
+          test "$(git rev-parse HEAD^^)" = "1a68748c89c6957dacf2484d2691b8044744f0c3"
+          test "$(git rev-parse HEAD^)" = "7ccc1e8ed6a1e974e105c86dbbaf1e2ec87e74d9"
+          test "$(git log -1 --format=%s)" = "[run-binrat-comms-20261006-b] approved one shadow draft after checkout fix"
           node --check scripts/run-comms-shadow-once.mjs
 
       - name: Set up pnpm
