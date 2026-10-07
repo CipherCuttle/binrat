@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { runPrelaunchBenchmark } from '../src/intelligence/prelaunchBenchmark.js';
 import { PRELAUNCH_BENCHMARK_PROJECTS } from './fixtures/prelaunchBenchmarkProjects.js';
+import { evaluatePrelaunchProject } from '../src/intelligence/prelaunchScout.js';
 
 test('paired benchmark freezes 20 projects into 20 early controls and 20 late positives', () => {
   const report = runPrelaunchBenchmark(PRELAUNCH_BENCHMARK_PROJECTS);
@@ -67,7 +68,6 @@ test('future launch receipt scores the benchmark but cannot change point-in-time
   };
 
   const cutoff = '2024-04-12';
-  const { evaluatePrelaunchProject } = requireScout();
   const withOutcome = evaluatePrelaunchProject(original.fixture, cutoff);
   const withoutOutcome = evaluatePrelaunchProject(launchless.fixture, cutoff);
 
@@ -94,13 +94,3 @@ test('benchmark shape rejects a leaked post-launch receipt', () => {
     }
   }]), /PRELAUNCH_BENCHMARK_POST_LAUNCH_RECEIPT/);
 });
-
-function requireScout(): typeof import('../src/intelligence/prelaunchScout.js') {
-  // Static import semantics without introducing a second top-level import into the benchmark fixture test.
-  return {
-    evaluatePrelaunchProject: (fixture, asOf) => {
-      // This indirection is replaced below by the real import through NodeNext resolution.
-      throw new Error(`UNREACHABLE:${fixture.projectId}:${asOf}`);
-    }
-  } as never;
-}
