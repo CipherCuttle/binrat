@@ -31,7 +31,8 @@ export interface PrelaunchProjectFixture {
 }
 
 export type PrelaunchScoutStatus =
-  | 'QUALIFIED_PRELAUNCH_BACKTEST'\n  | 'QUALIFIED_WATCH'
+  | 'QUALIFIED_PRELAUNCH_BACKTEST'
+  | 'QUALIFIED_WATCH'
   | 'TECHNICAL_ONLY'
   | 'INSUFFICIENT_EVIDENCE'
   | 'ALREADY_LAUNCHED';
