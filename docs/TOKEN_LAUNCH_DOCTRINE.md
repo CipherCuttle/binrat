@@ -1,241 +1,60 @@
-# BINRAT FAIR LAUNCH DOCTRINE V0
+# BINRAT FAIR LAUNCH DOCTRINE V1
 
-Status: planning / pre-launch design  
+Status: planning / pre-launch design
 This document is not a statutory MiCA crypto-asset white paper and is not legal, tax, or investment advice.
+
+## Launch-night convergence boundary
+
+Selected truthful framing from PR #148: useful evidence comes before token acquisition. The Rat proves value first. Token utility ships only as actual capabilities become verified.
+
+| Rat / surface | Current stage |
+|---|---|
+| Rat Zero / Scout | LIVE; runtime freshness must be established separately |
+| Tripwire / Watcher | BUILDING |
+| Sniffer / Trail Hunter | PROVING; no public production agent or proven prediction |
+| Working Rat | PLANNED / POST-LAUNCH; `productionEntitlementActive=false` |
+| Den / ORGANIZE | PLANNED / POST-LAUNCH |
+| Two unnamed `?????` slots | LOCKED |
+
+Token: `NOT_LAUNCHED`. PonsVault Staking is **required at token launch** and must be verified in the exact creation path. Staking does **not** activate Working Rat entitlement. Current wallet roles remain unresolved; historical Arc 5042 records confer no current Pons authority.
+
+Today's journey is `DISCOVER → OPEN CASE → CHECK RECEIPTS`; `FIND → EMPLOY → LEAVE → RETURN` is future direction. No token acquisition or employment action is implied today.
+
+C2's phase-aware gates and exact manifest/envelope machinery govern execution. No future execution receipt is required PRE-ARM; verified execution and canonical facts are required POST-BROADCAST/PRE-PUBLIC. Legal and exact owner authority remain mandatory. Genesis/referrals and Working Rat activation are deferred and are not token execution blockers.
+
+Production acceptance remains UNVERIFIED. These prose corrections grant no launch or marketing authority. The stricter counsel/disclosure/notification requirements below remain intact.
 
 ## Intent
 
-BINRAT intends to fair-launch `$BINRAT` early.
+Useful discovery and receipts precede token acquisition. The token is not proof of a mature network. Culture/coordination and progressive product access are planning reasons; neither implies appreciation, income, APY or future return.
 
-The project will not pretend the token is appearing only because a fully mature protocol already needs it.
+## Selected exact launch policy
 
-The reasons are explicit:
+Robinhood 4663 / Pons V2 / native ETH pair / required PonsVault Staking. Creator tax 0%, opening buy 0 ETH and buyback OFF. No private presale, insider discount or hidden team allocation. Final policies and disclosures require exact mechanically verified evidence.
 
-1. **bankroll the build** — disclosed project/creator fee revenue helps fund engineering, infrastructure, research, security, design, distribution, and operations;
-2. **create a native culture asset** — BINRAT is deliberately memetic and should have a degen/community layer;
-3. **ship utility progressively** — token utility grows as real product capabilities ship;
-4. **coordinate a future evidence network** — later stages can use token collateral for adversarial contribution mechanics.
+PonsVault Staking is a third-party upgradeable dependency. Fresh code/controllers, graph, creation behavior, assets, payout/lock/principal semantics and exact rehearsal remain upstream prerequisites. Known source/audit uncertainty must be disclosed; unknown critical behavior cannot be waived by accepting risk. A simulation or old receipt never grants launch authority.
 
-None of these statements is a promise of token appreciation or holder return.
+Historical Arc receipts remain historical. They cannot establish current Pons wallet, fee, chain or launch authority.
 
-## Fair means fair access, not no project revenue
+## Product utility boundary
 
-The target launch has:
+Free discovery, Cases, receipts and supported retained evidence remain useful. Working Rat is PLANNED / POST-LAUNCH. Production stays FREE; `productionEntitlementActive=false`.
 
-- no private presale;
-- no VC/insider discount;
-- no hidden team allocation;
-- one public market;
-- public contract address;
-- public launch mechanics;
-- disclosed creator/project fee route;
-- disclosed founder/project purchases, if any;
-- disclosed treasury wallets;
-- no mint/pause/blacklist authority where the selected launch contract provides those guarantees;
-- locked liquidity where the selected launch contract provides that guarantee.
+Future active-stake capacity requires separately reviewed wallet/principal binding, threshold, capacity enforcement and activation evidence. The threshold is deferred and does not block the token transaction. Required launch Staking provides no current Rat labor entitlement.
 
-Project revenue is not hidden. It is part of the design.
+**STAKE BUYS LABOR. NOT TRUTH.** is the future product boundary. Neither wallet balance nor stake may rewrite evidence, upgrade UNKNOWN, imply human identity or buy a different factual answer.
 
-## Preferred current launch rail: ArcPad standard launch
+No fake employment, staking control, reward/APY or token availability claim. No Den, Genesis/referral, FERAL tier, custom vault, Comms or tokenomics work is authorized by this convergence.
 
-Subject to legal/compliance review immediately before launch, the candidate rail is ArcPad's current Arc-mainnet USDC standard creator-rewards path. The dated `LAUNCH_MECHANICS_VERIFICATION_V0` receipt independently established that this variant currently provides:
+## Disclosure and marketing
 
-- fixed 1,000,000,000 token supply;
-- no presale;
-- no team allocation;
-- launch directly into a Uniswap V3 pool;
-- an initial position minted to a non-upgradeable locker whose observed runtime exposes no withdrawal, position-transfer, or decrease-liquidity path;
-- an optional same-transaction creator first buy through the new public pool, with privileged first-position ordering that must be disclosed if selected;
-- a creator claim on 50% of collected quote-side USDC fees and an ArcPad treasury route for the other 50%;
-- launch-token-side pool fees routed to the dead address;
-- a temporary 2% per-recipient cap lasting exactly 1,200 blocks, which is not Sybil resistance;
-- an ArcPad launcher-owner power to redirect future creator quote-fee accrual.
+Fair access requires inspectable verified mechanics and any privileged inventory or later founder/project purchases to be disclosed. No token purchase CTA before product value. No returns, listings, price, prediction or utility guarantees.
 
-The position can move out of range and cease being economically active even though its NFT cannot be withdrawn under the observed runtime. The observed initial mint also leaves sub-token raw-unit dust in the launcher, so BINRAT must not describe the allocation as literally 100% of raw units entering liquidity.
-
-The canonical receipt is `docs/LAUNCH_MECHANICS_VERIFICATION_V0.json`, summarized in `docs/LAUNCH_MECHANICS_VERIFICATION_V0.md`. ArcPad contract source was not available in a form that could be matched to deployed bytecode; the ArcPad findings are therefore on-chain verified or retained as platform claims, never source-verified.
-
-`docs/BINRAT_LAUNCH_CONFIG_V0.json` binds that receipt to the owner-selected project roles. Treasury is `0xab063A9b53a2Ab832a941aE5890ea05c1672339D`; project/creator fee recipient is `0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866`. They are separate, non-interchangeable owner declarations, not custody or on-chain execution proof. The privileged first buy, private presale, discounted insider round, hidden team allocation, and privileged founder/project launch allocation are all disabled or none. A founder/project ordinary public-market purchase at launch is not planned.
-
-BINRAT must re-verify the live app routing, deployed bytecode, state, fee authority, and current ArcPad terms immediately before launch. Product docs and this dated receipt are not perpetual contract authority.
-
-That verification must produce a dated launch-mechanics receipt binding the contract addresses, relevant code/immutability properties, fee routes, liquidity-lock mechanics, source documents, and verification timestamp used for the launch authorization decision.
-
-## Treasury doctrine
-
-The project should publish a treasury/funding surface before or at launch.
-
-It should show at minimum:
-
-- treasury addresses;
-- creator-fee recipient address;
-- cumulative token-related USDC inflow;
-- categorized project outflow;
-- current runway/balance where operationally safe;
-- links to on-chain transactions;
-- material changes to treasury policy.
-
-Suggested public categories:
-
-- infrastructure / data;
-- engineering;
-- security / audits;
-- research / bounties;
-- design / distribution / community;
-- legal / compliance / operations.
-
-Do not fabricate fixed percentages before the operating budget actually exists.
-
-## Founder exposure
-
-A fair launch should not conceal founder inventory.
-
-If the founder/project wants token exposure:
-
-- acquire it through the same public market available to everyone;
-- disclose the relevant wallet(s);
-- disclose any launch-block/dev-buy mechanism used;
-- do not relabel a privileged allocation as a market purchase.
-
-The cleanest claim is the claim that can be verified on-chain.
-
-## Utility ladder
-
-Capability and utility status comes from `docs/CAPABILITY_MANIFEST_V0.json`.
-
-The status model distinguishes:
-
-- **ENGINEERING_PASS** — reviewed implementation passed engineering;
-- **DEPLOYED** — referenced implementation is deployed;
-- **PUBLIC_LIVE** — deployed capability is authorized for public use;
-- **BUILDING**;
-- **PLANNED**;
-- **EXPERIMENTAL**.
-
-### Launch / early utility
-
-Candidate early surfaces:
-
-#### Rat Radar depth
-Rat Radar should provide a genuinely useful public watchlist while reserving higher-cost operational depth for eligible holders.
-
-Public users should retain access to exact addresses on a bounded watchlist, sample size/coverage, basic inclusion reasons, and the receipts needed to verify factual claims.
-
-A wallet that proves control and satisfies a publicly frozen $BINRAT balance threshold may unlock deeper ranking coverage, richer factor decomposition, live activity views, custom filters/cohorts, larger watch capacity, and later API/webhook access.
-
-The holder gate sells depth, speed, scale, filtering, and convenience. It must not hide or rewrite factual receipts.
-
-The initial balance threshold may be derived from a percentage of fixed total supply, but the final threshold must be frozen only after distribution and price-sensitivity simulation. The product must describe the actual balance test precisely rather than imply control of a percentage of circulating supply.
-
-Pre-token Holder Gate V0 keeps eligibility behind a provider interface. Deterministic fixtures may exercise the policy in tests, but production resolves to FREE unless canonical token configuration and a separately reviewed balance source both exist. A configured address or threshold alone is not sufficient to activate HOLDER. Wallet control uses message signing only; it never requests a transaction, gas, approval, transfer, or private key.
-
-#### Rat Watch capacity
-Token holding/locking can unlock additional watch slots, richer alert configuration, or community alert channels.
-
-#### Rat Den
-Optional post-launch holder-gated community and product surfaces.
-
-Core receipts and factual evidence must not become inaccessible merely because a user does not hold the token.
-
-#### Dumpster Raids — post-launch experiment
-Dumpster Raids are not required for Launch V0.
-
-If later authorized, holders can lock tokens to signal which evidence gap, creator cluster, or Case File the community most wants investigated.
-
-This changes **priority**, not truth. The locking/unlocking contract, accounting, abuse controls, and applicable compliance treatment require their own bounded gate.
-
-#### Trash Hunts
-Seasonal evidence/research quests.
-
-Useful work can earn Rat Credits and Rat Reputation.
-
-The project should avoid designing them as games of chance.
-
-#### Bounty Boost
-A holder can add `$BINRAT` to a bounded evidence bounty or case reward.
-
-The bounty terms and evidence requirements remain fixed and inspectable.
-
-#### Case Sponsor
-A holder can visibly sponsor an investigation without receiving adjudication authority.
-
-### Network utility
-
-Later, after the contribution system exists:
-
-#### Bonded submission
-Submitting certain non-deterministic external claims requires collateral.
-
-#### Bonded challenge
-Challenging a claim requires collateral.
-
-#### Anti-spam / Sybil cost
-Repeated low-quality participation becomes economically expensive.
-
-#### Rat Node bond
-Independent evidence providers may eventually lock collateral against defined service/evidence obligations.
-
-## Rat Credits and Rat Reputation
-
-Do not collapse all incentives into one token.
-
-### $BINRAT
-Transferable culture/coordination/collateral asset.
-
-### Rat Credits
-Off-chain, non-transferable product credits earned/spent through useful activity.
-
-### Rat Reputation
-Non-transferable evidence history.
-
-A wallet can own a huge amount of `$BINRAT` and still have terrible Rat Reputation.
-
-## Degen layer
-
-BINRAT should embrace being fun.
-
-Acceptable degen surfaces include:
-
-- public Trash Hunts;
-- Rat Den roles;
-- seasonal leaderboards;
-- Dumpster Raid priority battles;
-- bounty boosts;
-- meme/art/community drops;
-- visible on-chain treasury/fee counters;
-- achievement badges;
-- community rituals around major Trash Trail discoveries.
-
-The rule is simple:
-
-> **Degen decides attention. Receipts decide truth.**
-
-Avoid mechanics whose core value proposition is guaranteed yield, promised appreciation, or misleading scarcity.
-
-## Marketing doctrine
-
-Allowed framing:
-
-- "We are fair-launching early."
-- "The project intends to use disclosed creator/project fee revenue to help bankroll development."
-- "Utility will be shipped progressively against a public roadmap."
-- "Some roadmap utility is not built yet."
-- "The token can lose all value."
-- "No private presale / no discounted insider round" when mechanically true.
-
-Avoid framing such as:
-
-- "buy before utility arrives";
-- "utility will make the token worth more";
-- guaranteed returns;
-- guaranteed APY;
-- guaranteed listings;
-- manufactured partnership claims;
-- implying roadmap delivery guarantees token value.
+Before public token marketing or execution, the exact final Pons/Staking/product structure must satisfy the legal gate. `marketingAuthorized=false`, `launchAuthorized=false`, `tokenState=NOT_LAUNCHED` remain unchanged.
 
 ## Compliance / launch-authorization lane
 
-Compliance begins in parallel with Launch V0 engineering. It is not a final checklist after token-facing product work is complete.
+Compliance applies to the exact final Pons/Staking structure. It is not a final checklist after token-facing product work is complete.
 
 BINRAT adopts a stricter internal fail-closed rule: public token-launch marketing and launch execution remain unauthorized until counsel has determined the applicable obligations and the corresponding disclosure/notification/marketing gates have been satisfied.
 
@@ -246,22 +65,20 @@ Before authorization:
 3. determine the applicable MiCA white-paper/notification/marketing requirements;
 4. produce any required statutory disclosure artifact separately from the product/network paper;
 5. review launch website, Telegram, X, and other token-facing marketing for consistency;
-6. freeze and publish the final launch mechanics and treasury addresses where required/appropriate;
-7. independently verify the deployed token/launch contracts and fee routes and bind them into a dated launch-mechanics receipt;
+6. freeze the final launch mechanics and any verified required role addresses; publication requires its own scoped approval;
+7. independently verify deployed upstream launch/Staking behavior before execution; after broadcast verify actual creation and canonical facts before publication;
 8. update the canonical capability manifest with evidence references;
-9. require explicit owner launch authority;
+9. require exact-manifest owner authority and a separately scoped final envelope approval;
 10. only then authorize launch.
 
 The capability manifest starts with both `marketingAuthorized` and `launchAuthorized` false. Documentation or implementation progress alone must never flip those values.
 
-## Product invariant
+## Exact authority and facts
 
-The token may fund BINRAT.
+`DRAFT → PREFLIGHTED → ARMED → BROADCAST → CONFIRMED → VERIFIED → PUBLIC`
 
-The token may coordinate BINRAT.
+The immutable semantic manifest and final execution envelope have separate authority. Pre-send ambiguity aborts; a possible send enters ABORT/RECONCILE and never authorizes an improvised second transaction. CI never broadcasts.
 
-The token may make BINRAT more fun.
-
-The token may increasingly unlock/use BINRAT features as they are built.
+Only canonical verified execution can produce the write-once launch-facts artifact/digest. Asset fields remain distinct. Public state requires scoped legal and owner publication approval bound to those facts. This candidate grants none.
 
 **The token never gets to rewrite a receipt.**

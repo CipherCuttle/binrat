@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "binrat.pons-launch-sprint-receipt/1",
+  "recordedAt": "2026-10-06T23:19:30.786788+00:00",
+  "status": "IMPLEMENTED_LOCAL_CHECKS_PASS_LAUNCH_BLOCKED",
+  "worktree": "/home/swirky/binrat-launch-authority-sprint-v1",
+  "detachedHead": "ccc677985ce07f438648a2499611e72c36729491",
+  "candidateCommitted": false,
+  "candidateFingerprint": "19bbd1ac4e4a066ce2ccecb8d1c3e266aa742afeb5e35bcc307a75e85e6cd166",
+  "fingerprintAlgorithm": "SHA256(canonical sorted JSON map of each tracked/unignored current file path to SHA256(file bytes)); exclude review and sprint receipt to avoid cycles",
+  "fingerprintedFileCount": 403,
+  "composition": {
+    "115": {
+      "head": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+      "includedAsAncestor": true
+    },
+    "116": {
+      "head": "ccc677985ce07f438648a2499611e72c36729491",
+      "base": true
+    },
+    "117": {
+      "head": "c23defaa9ed338e13ba2be72c482af51660aac56",
+      "parent": "ccc677985ce07f438648a2499611e72c36729491",
+      "applied": "CHERRY_PICK_NO_COMMIT_FIRST"
+    },
+    "118": {
+      "head": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+      "parent": "ccc677985ce07f438648a2499611e72c36729491",
+      "applied": "CHERRY_PICK_NO_COMMIT_SECOND"
+    },
+    "148": {
+      "role": "PLANNING_DOCTRINE_ONLY_NOT_MERGED"
+    },
+    "headsRechecked": true,
+    "historicalReceiptsReusedAsAuthority": false,
+    "staleTelegramLabelRepair": "Already included in #116 via 0e850f528c54afbc1d25f923df4c0aef7bb16495; expected truthful treasury role label. Production voice unchanged."
+  },
+  "implemented": [
+    "Phase-aware transition gates with future receipt only post-broadcast/pre-public",
+    "Immutable semantic manifest plus separately authorized final execution envelope and signed-byte attachment",
+    "Measured freshness and pinned primary reads with independent agreement/unavailability semantics",
+    "Complete critical-behavior and bounded upstream-risk interface; unknown critical mechanics cannot be waived",
+    "Exact no-broadcast rehearsal and fresh final call with full creation semantics",
+    "Launch-wallet quiescence and durable one-send/reconciliation mechanism",
+    "Canonical finalized execution verifier and write-once launch-facts JSON/digest",
+    "Canonical-bound active-stake reader while Working Rat remains PLANNED and entitlement inactive"
+  ],
+  "policy": {
+    "chainId": 4663,
+    "rail": "PONS_V2_NATIVE_ETH_PONSVault_STAKING",
+    "stakingRequired": true,
+    "workingRatStatus": "PLANNED",
+    "productionEntitlementActive": false,
+    "creatorTaxBps": 0,
+    "buybackEnabled": false,
+    "openingBuyWei": "0"
+  },
+  "checks": [
+    {
+      "command": "pnpm check",
+      "result": "PASS",
+      "tests": 486,
+      "pass": 486,
+      "fail": 0,
+      "includes": "TypeScript build, existing tests and five acceptance groups, web/share-card/launch-presentation invariants",
+      "logDigest": "be6281b215c1f4262ff09e8651fea730e92e13ce3e827bcebcd49e9a94de2ab6"
+    },
+    {
+      "command": "pnpm --dir web-v2 check",
+      "result": "PASS",
+      "includes": "V2 evidence integrity and TypeScript/Vite build"
+    },
+    {
+      "command": "pnpm verify:pons-launch-acceptance",
+      "result": "PASS",
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "role": "ONE_TARGETED_REREVIEW_REGRESSION_RUN",
+      "logDigest": "d943c1baa9d1d4ca691f4689795835cd331ef73e35575a58331a876147d0c3ea"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "command": "pnpm verify:pons-launch-authority",
+      "result": "EXPECTED_BLOCKED_DRAFT"
+    }
+  ],
+  "githubExactCandidateCI": "NOT_RUN_NO_CANDIDATE_COMMIT_PUSH_OR_PR_MUTATION",
+  "review": {
+    "artifact": "docs/BINRAT_PONS_LAUNCH_REVIEW_V1.json",
+    "hostileReviews": 1,
+    "targetedRereviews": 1,
+    "initialCritical": 1,
+    "initialHigh": 3,
+    "remainingCriticalHighInReviewedScope": 0,
+    "selfReview": true,
+    "independentThirdPartyAudit": false
+  },
+  "artifactsRecomputed": {
+    "planDigest": "5ce63df38978f60cb293e92c6763a1c9af5dc9e80c890d123c4ecb8bbb09e094",
+    "matrixDigest": "e3d1266ec58b311f1a43ad79c7d6845e63ec1b70ad024fe37fc42d19ecc62be5",
+    "readiness": "docs/BINRAT_PONS_LAUNCH_READINESS_V1.json",
+    "schemas": [
+      "docs/schemas/PONS_LAUNCH_MANIFEST_V1.schema.json",
+      "docs/schemas/PONS_EXECUTION_ENVELOPE_V1.schema.json",
+      "docs/schemas/PONS_SIGNED_ENVELOPE_V1.schema.json",
+      "docs/schemas/PONS_LAUNCH_FACTS_V1.schema.json"
+    ],
+    "upstreamDiagnostic": "docs/PONS_UPSTREAM_VERIFICATION_CURRENT.json",
+    "sourceAvailabilityDiagnostic": "docs/PONS_SOURCE_AVAILABILITY_DIAGNOSTIC_V1.json",
+    "forensicRequirements": "docs/PONS_LAUNCH_FORENSIC_REQUIREMENTS_V1.json"
+  },
+  "notGeneratedWithoutRequiredInputs": [
+    "Real frozen manifest/envelope",
+    "Real scoped owner/legal/behavior/upstream approvals",
+    "Launch-authorizing fresh evidence or exact final rehearsal receipt",
+    "Signed real launch transaction",
+    "Execution receipt and actual launch-facts artifact"
+  ],
+  "remainingOwnerDecisions": [
+    "Exact exclusively operated launch wallet and funding",
+    "Final token metadata and allocation declarations",
+    "Verified payout threshold and supported lock choice after deployed semantics are resolved",
+    "Select and accept existing freshly derived config/economics without inventing new economics",
+    "Exact-manifest bounded upstream-risk acceptance",
+    "Measured signing workflow/runtime freshness limit and approved provider/backing policy",
+    "Final exact envelope, fee ceiling/expiry and scoped one-send arm approval",
+    "Later scoped publication approval bound to verified facts"
+  ],
+  "deferred": [
+    "Working Rat threshold/principal binding/capacity activation",
+    "Treasury address unless a verified launch role actually needs one"
+  ],
+  "remainingExternalBlockers": [
+    "BLOCKED_LEGAL",
+    "CRITICAL_DEPLOYED_BEHAVIOR_NOT_FULLY_VERIFIED",
+    "FRESHNESS_POLICY_UNRESOLVED",
+    "EXACT_MANIFEST_AND_ENVELOPE_NOT_FROZEN",
+    "SCOPED_APPROVALS_NOT_GRANTED",
+    "INDEPENDENT_UPSTREAM_BEHAVIOR_AND_CREATION_TRACE_PROOFS_REQUIRED",
+    "AUTHORITATIVE_SOURCE_RUNTIME_MATCH_WHEN_SOURCE_OBTAINABLE",
+    "VERIFIED_ASSET_PAYOUT_LOCK_PRINCIPAL_RECIPIENT_CONTROLLER_SEMANTICS_REQUIRED",
+    "TRUSTED_PRIVATE_APPROVAL_REVOCATION_ACTIVE_ENVELOPE_STORE_AND_CANONICAL_DURABLE_JOURNAL_OPERATOR_CONFIGURATION_REQUIRED"
+  ],
+  "codex1Dependency": "Expose/consume canonical verified launch-facts JSON and digest on web/Telegram/X/CASE:$BINRAT; preserve separate asset fields and Staking required versus Working Rat PLANNED/inactive; use actual verified addresses and specifically accepted risk disclosures. C2 owns no public route/presentation.",
+  "changedFiles": [
+    ".github/workflows/ci.yml",
+    "docs/BINRAT_EXACT_PONS_LAUNCH_REHEARSAL_V1.md",
+    "docs/BINRAT_EXACT_PONS_LAUNCH_REHEARSAL_V1_RECEIPT.json",
+    "docs/BINRAT_PONS_LAUNCH_AUTHORITY_V1.md",
+    "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
+    "docs/BINRAT_PONS_LAUNCH_READINESS_V1.json",
+    "docs/BINRAT_PONS_LAUNCH_REVIEW_V1.json",
+    "docs/BINRAT_PONS_LAUNCH_SPRINT_RECEIPT_V1.json",
+    "docs/CAPABILITY_MANIFEST_V0.json",
+    "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
+    "docs/PONSVault_PRODUCTION_UI_ABI_V1.json",
+    "docs/PONS_LAUNCH_FORENSIC_REQUIREMENTS_V1.json",
+    "docs/PONS_SOURCE_AVAILABILITY_DIAGNOSTIC_V1.json",
+    "docs/PONS_UPSTREAM_VERIFICATION_CURRENT.json",
+    "docs/WORKING_RAT_L2_V1.md",
+    "docs/fixtures/PONSVault_RWA_LAUNCH_TX_V1.json",
+    "docs/fixtures/PONSVault_SYNTHETIC_STAKING_CALL_V1.json",
+    "docs/fixtures/PONS_PREFLIGHT_V1_CURRENT.json",
+    "docs/schemas/PONS_EXECUTION_ENVELOPE_V1.schema.json",
+    "docs/schemas/PONS_LAUNCH_FACTS_V1.schema.json",
+    "docs/schemas/PONS_LAUNCH_MANIFEST_V1.schema.json",
+    "docs/schemas/PONS_SIGNED_ENVELOPE_V1.schema.json",
+    "package.json",
+    "scripts/collect-pons-launch-evidence.ts",
+    "scripts/generate-pons-authority-schemas.py",
+    "scripts/pons-launch-authority.ts",
+    "scripts/recompute-pons-launch-authority.ts",
+    "scripts/verify-pons-preflight.ts",
+    "src/holder/ponsStakeReader.ts",
+    "src/holder/workingRatPolicyBoundary.ts",
+    "src/index.ts",
+    "src/launchConfig/gateMatrix.ts",
+    "src/launchConfig/ponsExecutionEnvelope.ts",
+    "src/launchConfig/ponsFreshAuthority.ts",
+    "src/launchConfig/ponsLaunchFacts.ts",
+    "src/launchConfig/ponsLaunchJournal.ts",
+    "src/launchConfig/ponsLaunchManifest.ts",
+    "src/launchConfig/ponsLaunchRehearsal.ts",
+    "src/launchConfig/ponsLaunchVerifier.ts",
+    "src/launchConfig/ponsPlan.ts",
+    "src/launchConfig/ponsPreflight.ts",
+    "src/launchConfig/ponsVaultLaunchAbi.ts",
+    "src/telegram/rat.ts",
+    "test/fixtures/pons-rwa-historical-tx.json",
+    "test/fixtures/ponsLaunchAuthorityFixture.ts",
+    "test/launchGateMatrix.test.ts",
+    "test/ponsLaunchAuthority.test.ts",
+    "test/ponsLaunchPlan.test.ts",
+    "test/ponsLaunchRehearsal.test.ts",
+    "test/ponsStakeReader.test.ts"
+  ],
+  "stopCondition": "One bounded implementation complete; local checks green; one hostile self-review repaired and one targeted self-rereview closed; remaining launch prerequisites recorded; STOP before any live arm, real signing, broadcast, deployment or publication.",
+  "launchState": "DRAFT",
+  "readyToArm": false,
+  "launchAuthorized": false,
+  "genericOwnerAuthorityGranted": false,
+  "liveArming": false,
+  "realSigning": false,
+  "broadcast": false,
+  "deployment": false,
+  "publication": false,
+  "commitsCreated": 0,
+  "branchesCreated": 0,
+  "pullRequestsMutated": 0
+}

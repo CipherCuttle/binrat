@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "binrat.ponsvault-staking-attestation/0.1",
+  "attestationVersion": "PONSVault_STAKING_ATTESTATION_V1",
+  "observedOn": "2026-10-03",
+  "observedBlock": 79139797,
+  "chainId": 4663,
+  "status": "CONDITIONAL",
+  "launchAuthorizationEffect": "BLOCKS_LAUNCH_UNTIL_UPSTREAM_RISK_ACCEPTED_AND_RECHECKED",
+  "l2ReadBuildEffect": "READ_ONLY_STAKE_READER_ALLOWED_FAIL_CLOSED",
+  "scope": "PonsVault public Staking candidate for BINRAT Launch V1",
+  "candidateConclusion": {
+    "technicallyComposableForBinratV1": true,
+    "selectedAsTechnicalReplacementCandidate": true,
+    "sourceMatchSatisfied": false,
+    "currentLauncherStakingLiveExecutionObserved": false,
+    "reason": "The current public Staking registry/factory path composes with native-ETH Pons launches in dry execution and exposes a verified per-wallet active-stake read, but public source matching, current-launcher live Staking execution, exact native reward transfer semantics, and third-party upgrade authority remain unresolved launch risks."
+  },
+  "contracts": {
+    "ponsFactory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "ponsVaultLauncher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+    "ponsVaultRegistry": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+    "stakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+    "stakingImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "upstreamOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b"
+  },
+  "liveState": {
+    "registryStakingFactory": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingTemplate": "staking",
+    "stakingFactoryBeacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+    "stakingFactoryImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "stakingFactoryOwner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+    "stakingBeaconOwner": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+    "stakingBeaconImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "upstreamOwnerCode": "0x",
+    "factoryVaultCount": 1,
+    "currentLauncherCanLaunch": true
+  },
+  "sourceProvenance": {
+    "ponsV2Source": "PUBLIC_REPOSITORY_AVAILABLE",
+    "ponsV2Repository": "ponsdotdev/pons-labs",
+    "ponsV2SourceCommit": "44a3db9193c365f6c25cf0d4c2efc396e6de0df5",
+    "ponsVaultDocs": "https://www.ponsvault.com/docs",
+    "ponsVaultLaunchForm": "https://www.ponsvault.com/launch",
+    "ponsVaultAdvertisedRepository": "https://github.com/ponsvault/PonsVault",
+    "ponsVaultAdvertisedRepositoryStatus": "HTTP_404",
+    "ponsVaultSourceMatch": "NOT_SATISFIED",
+    "thirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS"
+  },
+  "factoryCreationInterface": {
+    "selector": "0xd7d7d551",
+    "signature": "createVault(address,address,bytes)",
+    "configEncoding": "abi.encode(uint256 minimumFeesBeforePayoutRaw)",
+    "lockPeriodFieldPresent": false,
+    "historicalFactoryCreateTx": "0x300335cd71201b787ba59b98561fcf337e2e26c3172b557590959d9d37751d46",
+    "historicalFactoryCreateConfigRaw": "25000000000000000",
+    "nativeEthCreateSimulation": {
+      "status": "SUCCESS_ETH_CALL_NO_STATE_CHANGE",
+      "inputToken": "0x645187382c996cbe752630786164f461ff43180b",
+      "inputQuoteAsset": "0x0000000000000000000000000000000000000000",
+      "inputMinimumFeesBeforePayoutRaw": "100000000000000000",
+      "returnedVault": "0x757ef16e4ea4c703d3e0cbc77cb61599597974e1",
+      "returnedVaultStatus": "SIMULATION_ONLY_NOT_DEPLOYED"
+    }
+  },
+  "stakeReadInterface": {
+    "selector": "0xaf500ba3",
+    "signature": "stakedOf(address)",
+    "returnType": "uint256",
+    "currentImplementationSelectorPresent": true,
+    "examples": [
+      {
+        "symbol": "CLAI",
+        "vault": "0x96e5c19717f5e681375b65771dd85628f700eb42",
+        "quoteAsset": "0x0000000000000000000000000000000000000000",
+        "wallet": "0x35df6256c2fa5c52ae5741a8d81e7047e20b0e6d",
+        "stakedRaw": "206422751238216967",
+        "totalStakedRaw": "206422751238216967"
+      },
+      {
+        "symbol": "SINU",
+        "vault": "0x83f6f9189ba41d4d571d47dafe1ee97c7372af9a",
+        "quoteAsset": "0x0000000000000000000000000000000000000000",
+        "wallet": "0xb3d873d4d8cced0ee50d7340a50777d2f35dbe9d",
+        "stakedRaw": "1931511547768569834",
+        "totalStakedRaw": "1931511547768569834"
+      }
+    ],
+    "l2Requirement": "Reader must resolve registry->factory->beacon->implementation at a pinned block and fail closed on any drift or unreadable stakedOf(address)."
+  },
+  "lockSemantics": {
+    "currentFactoryCreationLockField": "ABSENT",
+    "currentImplementationLiveRoundTripTx": "0xf454a73d7f0585a5f653f67972114934e40c51e075988b940b0416edd91c2b87",
+    "currentImplementationObservedBehavior": "SAME_TRANSACTION_STAKE_THEN_UNSTAKE_SUCCEEDED",
+    "currentPathPrincipalLockVerdict": "NO_LOCK_OBSERVED",
+    "docsCreatorSelectableLockClaim": "NOT_AUTHORITY_FOR_CURRENT_FACTORY_PATH"
+  },
+  "feeRouting": {
+    "ponsSourceVerdict": "CREATOR_BASE_FEE_SHARE_PLUS_FULL_CREATOR_TAX_ROUTE_TO_CURRENT_CREATOR_FEE_RECIPIENT",
+    "baseFeeCreatorShare": "BASE_FEE_MINUS_PROTOCOL_SHARE_MINUS_ANY_ACTIVE_PONS_BUYBACK_SLICE",
+    "creatorTax": "PAID_TO_CREATOR_FEE_RECIPIENT_IN_FULL",
+    "ponsVaultLauncherAction": "REDIRECTS_CREATOR_FEE_RECIPIENT_TO_CREATED_VAULT",
+    "binratV1NativePonsBuybackCandidate": "FALSE_NOT_FROZEN"
+  },
+  "nativeRewardSemantics": {
+    "ethPairQuoteAssetRepresentation": "ADDRESS_ZERO",
+    "publicLaunchFormClaim": "STAKERS_EARN_CREATOR_FEES_IN_ETH",
+    "technicalDocsClaim": "FEES_ARRIVE_AT_VAULT_AS_WETH",
+    "liveEthPairRunEvidence": [
+      {
+        "symbol": "SINU",
+        "distributedQuoteRaw": "100012100000000000",
+        "runs": 1
+      },
+      {
+        "symbol": "MIMCREEPZ",
+        "distributedQuoteRaw": "100010027000000000",
+        "runs": 1
+      },
+      {
+        "symbol": "LAPTOP",
+        "distributedQuoteRaw": "100010107000000000",
+        "runs": 1
+      }
+    ],
+    "exactClaimTransferAsset": "UNRESOLVED_DOCS_VS_UI",
+    "marketingRule": "DO_NOT_DESCRIBE_REWARD_ASSET_MORE_SPECIFICALLY_THAN_VERIFIED"
+  },
+  "launcherComposition": {
+    "currentLiveLauncherStakingExecutionObserved": false,
+    "observedCurrentLauncherExecutions": 4,
+    "observedCurrentLauncherTemplates": [
+      "rwa"
+    ],
+    "currentLauncherPonsDeployerBehavior": "LAUNCHER_IS_PONS_TOKEN_DEPLOYER",
+    "currentLauncherCreatorAccounting": "SEPARATE_CREATOR_MAPPING_AND_VAULT_FEE_RECIPIENT",
+    "publicCopyConflict": "CURRENT_LAUNCH_UI_CLAIM_YOU_STAY_ONCHAIN_DEPLOYER_CONTRADICTS_OBSERVED_CURRENT_LAUNCHER_PATH",
+    "alignedAtomicStakingSimulation": {
+      "status": "SUCCESS_ETH_CALL_NO_STATE_CHANGE",
+      "template": "staking",
+      "pairAsset": "NATIVE_ETH_ADDRESS_ZERO",
+      "minimumFeesBeforePayoutRaw": "100000000000000000",
+      "freshSalt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+      "returnedToken": "0x5f20224e39a02c86101d8ce3ad536eb11e228059",
+      "returnedVault": "0x757ef16e4ea4c703d3e0cbc77cb61599597974e1",
+      "returnedAddressesStatus": "SIMULATION_ONLY_NOT_DEPLOYED"
+    }
+  },
+  "upgradeAuthority": {
+    "factoryOwnerType": "EOA",
+    "beaconOwnedByFactory": true,
+    "currentImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+    "historicalUpgradeEvidence": [
+      {
+        "transaction": "0x2c7a3d2b58f57940de242770ca513ae60f1c1cb2ce18cf3e65b1e0afbfd92a99",
+        "newImplementation": "0x04abb04a0e46f7324bb04af38e3a28bd25516949"
+      },
+      {
+        "transaction": "0x1b23d74fb6bd73a6b1e7e9480197445d0bd6638216dd4737cc9cad19e49c12fa",
+        "newImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4"
+      }
+    ],
+    "launchRisk": "USER_STAKED_BINRAT_PRINCIPAL_DEPENDS_ON_THIRD_PARTY_UPGRADE_AUTHORITY"
+  },
+  "requiredNextEvidenceAndControls": [
+    "Make public Staking the conditional technical replacement candidate; do not revive the rejected Stake & Burn factory.",
+    "Repair canonical roadmap/doctrine/launch-plan authority so a fresh agent cannot build L2 against Stake & Burn.",
+    "Build L2 as read-only and fail closed on chain, registry, factory, beacon, implementation, vault and stakedOf(address) drift.",
+    "Resolve exact ETH-versus-WETH claim transfer semantics before token-facing reward copy or CASE: $BINRAT claims.",
+    "Obtain authoritative PonsVault source/ABI or explicit owner risk acceptance for the third-party upgradeable staking dependency before launch authorization.",
+    "At launch preflight re-read Pons canLaunch, launch config/economics, registry staking factory, beacon, implementation, owner and exact immutable launch inputs.",
+    "Do not merge, deploy, sign or broadcast from this attestation."
+  ],
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "attestationDigest": "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d"
+}

@@ -1,13 +1,30 @@
 # BINRAT ROADMAP
 
-Status: **canonical future-product authority**  
-Current capability/deployment status: runtime `/api/capabilities` backed by `CAPABILITY_MANIFEST_JSON`  
-Language: `docs/PRODUCT_LANGUAGE.md`  
+Status: **canonical future-product authority**
+Current capability/deployment status: runtime `/api/capabilities` backed by `CAPABILITY_MANIFEST_JSON`
+Language: `docs/PRODUCT_LANGUAGE.md`
 Principles: `docs/PHILOSOPHY.md`
 
 This roadmap describes product direction, not dates, guaranteed delivery, token value, or launch authorization. Public status badges must come from canonical capability state rather than this document.
 
-## 01 — SNIFF
+## Launch-night stage truth
+
+| Rat / surface | Current stage |
+|---|---|
+| Rat Zero / Scout | LIVE; runtime freshness must be established separately |
+| Tripwire / Watcher | BUILDING |
+| Sniffer / Trail Hunter | PROVING; no public production agent or proven prediction |
+| Working Rat | PLANNED / POST-LAUNCH; `productionEntitlementActive=false` |
+| Den / ORGANIZE | PLANNED / POST-LAUNCH |
+| Two unnamed `?????` slots | LOCKED |
+
+Token: `NOT_LAUNCHED`. PonsVault Staking is **required at token launch** and must be verified in the exact creation path. Staking does **not** activate Working Rat entitlement. Current wallet roles remain unresolved; historical Arc 5042 records confer no current Pons authority.
+
+Today: `DISCOVER → OPEN CASE → CHECK RECEIPTS`. Future: `FIND → EMPLOY → LEAVE → RETURN`.
+
+Sniffer follows evidenced funding trails; later-launch prediction remains unproven. Persistent Tripwire jobs are BUILDING. Do not render fake working jobs.
+
+## 01 — SNIFF · LIVE
 
 > **THE RAT CATCHES THE LAUNCH.**
 
@@ -20,7 +37,7 @@ Stable capability IDs:
 - `dig_case`
 - `rat_radar`
 
-## 02 — REMEMBER
+## 02 — REMEMBER · LIVE
 
 > **SITES VANISH. THE TRAIL DOESN'T.**
 
@@ -33,7 +50,7 @@ Stable capability IDs:
 - `replay_lab`
 - `dead_drops`
 
-## 03 — WATCH
+## 03 — WATCH · BUILDING
 
 > **LEAVE A TRIPWIRE IN THE TRASH.**
 
@@ -46,7 +63,7 @@ Stable capability IDs:
 - `trash_dna_tripwires`
 - `webhook_alerts`
 
-## 04 — HUNT
+## 04 — HUNT · PROVING
 
 > **POINT THE RATS AT SOMETHING WORTH DIGGING.**
 
@@ -64,7 +81,7 @@ Stable capability IDs:
 
 **Degen decides attention. Receipts decide truth.**
 
-## 05 — ORGANIZE
+## 05 — ORGANIZE · PLANNED / POST-LAUNCH
 
 > **USEFUL WORK EARNS A RECEIPT.**
 
@@ -79,7 +96,7 @@ Stable capability IDs:
 - `creator_right_of_reply`
 - `rat_den`
 
-## 06 — AUTONOMOUS RAT
+## 06 — AUTONOMOUS RAT · LOCKED
 
 > **GIVE IT A CASE. IT COMES BACK WITH RECEIPTS.**
 

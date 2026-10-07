@@ -20,9 +20,45 @@ jobs:
       - run: python3 -m py_compile scripts/cutover-cloudflare-telegram.py scripts/publish-cloudflare-capability-manifest.py scripts/deploy-cloudflare-web-assets.py scripts/deploy-rat-watch-candidate.py scripts/deploy-rat-radar-candidate.py
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - name: Validate frozen Pons launch authority without signing or sending
+        run: pnpm verify:pons-launch-authority
       - name: Check isolated Product Surface V2
         run: pnpm --dir web-v2 check
 
+  pons-preflight-live-readonly:
+    if: ${{ github.event_name == 'pull_request' && (startsWith(github.head_ref, 'feat/binrat-pons-') || startsWith(github.head_ref, 'feat/binrat-exact-pons-') || startsWith(github.head_ref, 'feat/binrat-working-rat-') || startsWith(github.head_ref, 'integration/binrat-pons-') || github.head_ref == 'integration/binrat-launch-night-v1') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ROBINHOOD_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run read-only Pons preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${ROBINHOOD_RPC_URL:-}" || {
+            echo "ROBINHOOD_RPC_URL is not configured"
+            exit 1
+          }
+          pnpm --silent exec tsx scripts/verify-pons-preflight.ts > pons-preflight-receipt.json
+          jq empty pons-preflight-receipt.json
+      - name: Upload Pons preflight receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-preflight-v1
+          path: pons-preflight-receipt.json
+          retention-days: 7
+          if-no-files-found: error
 
   rat-radar-candidate-deploy:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-rat-radar-v0' }}
@@ -148,7 +184,7 @@ jobs:
 
   frontdoor-browser-smoke:
     name: frontdoor-browser-smoke
-    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1' || github.head_ref == 'feat/binrat-frontdoor-journey-v1' || github.head_ref == 'integration/binrat-public-truth-launch-v1') }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1' || github.head_ref == 'feat/binrat-frontdoor-journey-v1' || github.head_ref == 'integration/binrat-public-truth-launch-v1' || github.head_ref == 'integration/binrat-launch-night-v1') }}
     needs: [check]
     runs-on: ubuntu-latest
     timeout-minutes: 12

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "binrat.pons-upstream-diagnostic/1",
+  "observedAt": "2026-10-06T22:45:14.411Z",
+  "classification": "READ_ONLY_DIAGNOSTIC_NOT_LAUNCH_AUTHORITY",
+  "signing": false,
+  "broadcast": false,
+  "launchAuthorized": false,
+  "workingRatStatus": "PLANNED",
+  "productionEntitlementActive": false,
+  "stakingRequired": true,
+  "status": "BLOCKED_CRITICAL_BEHAVIOR_AND_OWNER_INPUTS",
+  "chainId": 4663,
+  "block": {
+    "number": "81992749",
+    "hash": "0x7a14b203444ddb4599492c095aa0564dab17a140798d06b5c93b35cb7d9f6190"
+  },
+  "canonicalRecheck": true,
+  "codehashes": {
+    "ponsFactory": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+    "launcher": "0x5a6baeade01d8119231385e1a6f38c50388b2f30063d3c6c3e5736e590ad12a0",
+    "stakingFactory": "0xae06892852ab939bbd7a2b845b7f3a15b4a60f3d31f2eb1ff3aefa90ac4a7196",
+    "stakingBeacon": "0xe2acec43371955eacf7fdf055a2680093f081520546eeb337a2aa709e8fdee20",
+    "registry": "0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f",
+    "stakingImplementation": "0x60b9f463c5edaff979833cdb23653a5b0cddf1a13fda6742fb8fbec9844eced1"
+  },
+  "rawCalls": {
+    "registryStakingFactory": {
+      "target": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+      "calldata": "0x9aeb42977374616b696e6700000000000000000000000000000000000000000000000000",
+      "result": "0x0000000000000000000000001488473464f2c6e6c5c412f05d805c619322e7eb",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 192
+    },
+    "launcherRegistry": {
+      "target": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+      "calldata": "0x7b103999",
+      "result": "0x000000000000000000000000aa9c86049a258d4a076d3ef367f69c231c9746d5",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 192
+    },
+    "registryOwner": {
+      "target": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+      "calldata": "0x8da5cb5b",
+      "result": "0x000000000000000000000000897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 193
+    },
+    "stakingFactoryOwner": {
+      "target": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "calldata": "0x8da5cb5b",
+      "result": "0x000000000000000000000000897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 195
+    },
+    "stakingFactoryBeacon": {
+      "target": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "calldata": "0x59659e90",
+      "result": "0x000000000000000000000000ef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 197
+    },
+    "launcherPonsFactory": {
+      "target": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+      "calldata": "0xc45a0155",
+      "result": "0x0000000000000000000000007ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 200
+    },
+    "launchDeployer": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x858f5964",
+      "result": "0x0000000000000000000000003711cea4feade896c913c68f01eda97cb06d1a42",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 361
+    },
+    "launchForwarder": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x9b924452",
+      "result": "0x000000000000000000000000e33e9e479df8802cb0866d5d05258bec4cf62948",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 362
+    },
+    "ponsOwner": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x8da5cb5b",
+      "result": "0x000000000000000000000000263ed295dafae1d9aadd6e56c4b6f9f38ee019dd",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 362
+    },
+    "candidateConfig0_NOT_OWNER_FROZEN": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x1cad862d0000000000000000000000000000000000000000000000000000000000000000",
+      "result": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000017508f1956a800000000000000000000000000000000000000000000000000003a4965bf58a40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c80000000000000000000000000000000000000000000000000000000000000001",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 362
+    },
+    "launchFee": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0xcf3cf573",
+      "result": "0x0000000000000000000000000000000000000000000000000001c6bf52634000",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 362
+    },
+    "snipeTaxSeconds": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x6783774b",
+      "result": "0x0000000000000000000000000000000000000000000000000000000000000003",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 363
+    },
+    "snipeTaxStartBps": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x50e25ac2",
+      "result": "0x00000000000000000000000000000000000000000000000000000000000026ac",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 367
+    },
+    "launchConfigCount": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0xae72d871",
+      "result": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 399
+    },
+    "beaconOwner": {
+      "target": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "calldata": "0x8da5cb5b",
+      "result": "0x0000000000000000000000001488473464f2c6e6c5c412f05d805c619322e7eb",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 408
+    },
+    "beaconImplementation": {
+      "target": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "calldata": "0x5c60da1b",
+      "result": "0x000000000000000000000000c8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 408
+    },
+    "candidatePreview0Native_NOT_OWNER_FROZEN": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0xf718b78c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "result": "0xa9fc75d4203a33fe660e8fa32c74c3aa41c1fda4bf23d3a39b6bc22a1f8b1ca7",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 408
+    },
+    "stakingFactoryImplementation": {
+      "target": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "calldata": "0x5c60da1b",
+      "result": "0x000000000000000000000000c8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 408
+    },
+    "launchEnabled": {
+      "target": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "calldata": "0x236a4afb",
+      "result": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "status": "OBSERVED_NOT_BEHAVIOR_PROOF",
+      "latencyMs": 438
+    }
+  },
+  "measurements": {
+    "blockIntervalsMs": [
+      100,
+      100,
+      100
+    ],
+    "rpcRoundTripsMs": [
+      192,
+      192,
+      193,
+      195,
+      197,
+      200,
+      361,
+      362,
+      362,
+      362,
+      362,
+      363,
+      367,
+      399,
+      408,
+      408,
+      408,
+      408,
+      438
+    ],
+    "signingWorkflowMs": null,
+    "runtimeMaxAgeMs": null,
+    "freshnessBudget": "UNRESOLVED"
+  },
+  "independentConfirmation": "UNAVAILABLE_NOT_CONFIGURED",
+  "exactWalletCanLaunch": "UNKNOWN_OWNER_WALLET_NOT_SELECTED",
+  "assets": {
+    "pairQuoteAsset": "NATIVE_ETH_SELECTED_NOT_EXECUTED",
+    "vaultQuoteAsset": "UNKNOWN_FOR_BINRAT",
+    "feeAccountingAsset": "UNKNOWN",
+    "rewardAccountingAsset": "UNKNOWN",
+    "claimAsset": "UNKNOWN"
+  },
+  "criticalBehavior": "UNKNOWN_UNTIL_REPRODUCIBLE_ABI_FORK_TRACE_SOURCE_BINDING",
+  "sourceRuntimeBinding": "NOT_ESTABLISHED",
+  "digest": "e9fd1dfaeab2204bf70ef5d73aec32ec62d1df349c74e2a2d3078858d13567c8"
+}
