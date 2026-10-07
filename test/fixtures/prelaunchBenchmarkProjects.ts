@@ -40,7 +40,7 @@ function project(input: ProjectInput): HistoricalBenchmarkProject {
           observedOn: input.backingOn,
           kind: 'INSTITUTIONAL_RELATION',
           entity: input.backingEntity,
-          relation: input.backingRelation ?? 'LEAD_INVESTOR',
+          relation: input.backingRelation ?? 'INVESTOR',
           sourceRef: input.backingRef
         },
         {
@@ -69,7 +69,7 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     codeRef: 'https://github.com/taikoxyz/taiko-mono',
     executionOn: '2022-12-27',
     executionRef: 'https://www.reddit.com/r/taiko_xyz/comments/zwoz3z',
-    backingOn: '2024-03-03',
+    backingOn: '2024-03-02',
     backingEntity: 'Wintermute Ventures',
     backingRelation: 'INVESTOR',
     backingRef: 'https://www.theblock.co/news/deals/2024-03-02-ethereum-layer-2-taiko-funding-mainnet-280268',
