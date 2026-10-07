@@ -11,7 +11,7 @@ export const PublicStage = Object.freeze({ LIVE:'LIVE', BUILDING:'BUILDING', PRO
 export type PublicProductStage = typeof PublicStage[keyof typeof PublicStage];
 export const WORKING_RAT_SELECTION = Object.freeze({ workingRatStatus:PublicStage.PLANNED, productionEntitlementActive:false,
   phase:'POST_LAUNCH', source:'OWNER_CONFIRMED_CODEX_2_INPUT_CONTRACT',
-  stakingBoundary:'PonsVault Staking may exist at token launch without public Working Rat entitlement.' } as const);
+  stakingBoundary:'PonsVault Staking is required at token launch. It does not activate Working Rat entitlement.' } as const);
 const crewMapping = Object.freeze([
   {id:'rat-zero',name:'RAT ZERO',role:'SCOUT',description:'Fresh Pons discovery, supported Cases and retained receipts.'},
   {id:'tripwire',name:'TRIPWIRE',role:'WATCHER',description:'Current Watch infrastructure exists. Persistent Rat employment is not available.'},
@@ -81,7 +81,8 @@ export async function projectPublicProduct(input:{manifest:CapabilityManifest;sn
   const current=obj(root.currentPonsLaunchConfiguration), plan=obj(root.currentLaunchPlan);
   const ponsAuthority=current.chainId===4663&&plan.chainId===4663&&current.authorityScope==='CURRENT_PONS_V1_PRELAUNCH';
   const holder=obj(caps.holderGateV0);
-  const workingSupported=ponsAuthority&&holder.productionHolderEligibilityActive===false&&holder.walletAuthStatus==='DISABLED_BY_DEFAULT'&&
+  const workingSupported=ponsAuthority&&current.stakingRequired===true&&current.workingRatStatus===WORKING_RAT_SELECTION.workingRatStatus&&
+    current.productionEntitlementActive===false&&holder.productionHolderEligibilityActive===false&&holder.walletAuthStatus==='DISABLED_BY_DEFAULT'&&
     (root.productionEntitlementActive===undefined||root.productionEntitlementActive===false)&&(root.workingRatStatus===undefined||root.workingRatStatus===WORKING_RAT_SELECTION.workingRatStatus);
   const den=caps.ratDenV0, watch=caps.ratWatchV0;
   const handoff=await snifferProof(input.research===undefined?researchEvidence:input.research);
