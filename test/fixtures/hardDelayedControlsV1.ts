@@ -105,4 +105,56 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
     },
     notes: 'Namada had already published its mainnet release candidate when the Anoma Foundation published the genesis balance and transaction files used to build the full genesis block. Mainnet still arrived 110 days later.'
   }
+  {
+    projectId: 'zksync-era',
+    targetLabel: 'zkSync Era public alpha',
+    triggerOn: '2022-12-13',
+    pressure: {
+      projectId: 'zksync-era',
+      receipts: [
+        {
+          observedOn: '2022-10-28',
+          kind: 'PRODUCTION_DEPLOYMENT',
+          sourceRef: 'https://www.theblock.co/post/180846/matter-labs-releases-first-phase-of-zksync-2-0-mainnet-called-baby-alpha'
+        },
+        {
+          observedOn: '2022-12-13',
+          kind: 'AUDIT_REMEDIATION',
+          sourceRef: 'https://www.openzeppelin.com/news/zksync-layer-1-diff-audit'
+        }
+      ]
+    },
+    outcome: {
+      kind: 'HISTORICAL_LAUNCH',
+      launchOn: '2023-03-24',
+      sourceRef: 'https://www.theblock.co/news/ecosystems/2023-03-24-zksync-era-first-zkevm-goes-live-in-major-development-for-ethereum-222596'
+    },
+    notes: 'Baby Alpha put the end-to-end system on Ethereum mainnet with restricted access. The later public OpenZeppelin diff-audit documented an already-deployed alpha system and 15 of 16 findings resolved. Public access still waited another 101 days.'
+  },
+  {
+    projectId: 'rocket-pool',
+    targetLabel: 'Rocket Pool mainnet',
+    triggerOn: '2021-08-01',
+    pressure: {
+      projectId: 'rocket-pool',
+      receipts: [
+        {
+          observedOn: '2021-06-15',
+          kind: 'AUDIT_REMEDIATION',
+          sourceRef: 'https://medium.com/rocket-pool/development-update-june-2021-89f3a83011c0'
+        },
+        {
+          observedOn: '2021-08-01',
+          kind: 'RELEASE_CANDIDATE',
+          sourceRef: 'https://github.com/rocket-pool/rocketpool/releases/tag/v1.0.0-rc2'
+        }
+      ]
+    },
+    outcome: {
+      kind: 'HISTORICAL_LAUNCH',
+      launchOn: '2021-11-09',
+      sourceRef: 'https://medium.com/rocket-pool/where-we-are-and-whats-to-come-7f5f932e9035'
+    },
+    notes: 'Rocket Pool publicly documented that first-round audit findings were addressed and verified, then cut a second mainnet v1.0.0 release candidate. Mainnet still launched 100 days later.'
+  },
 ] as const;
