@@ -373,9 +373,25 @@ jobs:
           HTTP_STATUS="$(curl -fsS -o "$RUNNER_TEMP/status.json" -w '%{http_code}' "$CANDIDATE_URL/api/status")"
           if [ "$HTTP_STATUS" != "200" ]; then echo "SMOKE_FAIL: /api/status HTTP $HTTP_STATUS"; exit 1; fi
           cat "$RUNNER_TEMP/status.json"; echo
-          jq -e '.schemaVersion == "binrat.public-status/0.1" and .chainId == 4663 and .state == "NO_VERIFIED_SNAPSHOT"' \
-            "$RUNNER_TEMP/status.json" > /dev/null || { echo "SMOKE_FAIL: /api/status schema mismatch"; exit 1; }
-          echo "SMOKE_OK: /api/health 200; /api/status 200 schema=binrat.public-status/0.1 chain=4663 state=NO_VERIFIED_SNAPSHOT" | tee -a "$GITHUB_STEP_SUMMARY"
+          jq -e '
+            .schemaVersion == "binrat.public-status/0.1"
+            and .chainId == 4663
+            and (
+              .state == "NO_VERIFIED_SNAPSHOT"
+              or (
+                .state == "FRESH_VERIFIED"
+                and .lastSyncError == null
+                and (.checkpointBlock | type == "string" and length > 0)
+                and (.checkpointBlockHash | type == "string" and length > 0)
+                and (.feedDigest | type == "string" and length > 0)
+                and (.verifiedAtMs | type == "number")
+                and (.freshnessValidUntilMs | type == "number")
+                and (.runtimeUpdatedAtMs | type == "number")
+              )
+            )
+          ' "$RUNNER_TEMP/status.json" > /dev/null || { echo "SMOKE_FAIL: /api/status schema/state mismatch"; exit 1; }
+          STATUS_STATE="$(jq -r '.state' "$RUNNER_TEMP/status.json")"
+          echo "SMOKE_OK: /api/health 200; /api/status 200 schema=binrat.public-status/0.1 chain=4663 state=$STATUS_STATE" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Preserve gate receipts
         if: always()
