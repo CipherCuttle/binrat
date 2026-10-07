@@ -3,46 +3,62 @@ import test from 'node:test';
 import { runHardDelayedControls } from '../src/intelligence/launchPressureHardControlsV1.js';
 import { HARD_DELAYED_CONTROLS_V1 } from './fixtures/launchPressureHardControlsV1.js';
 
-test('strict cohort contains six direct frozen-V0 counterexamples', () => {
+test('strict cohort contains four direct frozen-V0 counterexamples', () => {
   const report = runHardDelayedControls(HARD_DELAYED_CONTROLS_V1);
 
-  assert.equal(report.counterexampleCount, 6);
-  assert.equal(report.laterLaunchCount, 5);
-  assert.equal(report.stillUnlaunchedCount, 1);
-  assert.equal(report.minDelayDaysLowerBound, 90);
-  assert.equal(report.medianDelayDaysLowerBound, 144);
+  assert.equal(report.counterexampleCount, 4);
+  assert.equal(report.laterLaunchCount, 4);
+  assert.equal(report.stillUnlaunchedCount, 0);
+  assert.equal(report.minDelayDaysLowerBound, 110);
+  assert.equal(report.medianDelayDaysLowerBound, 227);
   assert.equal(report.maxDelayDaysLowerBound, 509);
 
   assert.deepEqual(report.familyHistogram, {
-    'RELEASE_CANDIDATE+TOKEN_DISTRIBUTION': 1,
-    'AUDIT_REMEDIATION+RELEASE_CANDIDATE': 5
+    'AUDIT_REMEDIATION+RELEASE_CANDIDATE': 1,
+    'AUDIT_REMEDIATION+TOKEN_DISTRIBUTION': 1,
+    'AUDIT_REMEDIATION+PRODUCTION_INFRA': 1,
+    'RELEASE_CANDIDATE+TOKEN_DISTRIBUTION': 1
   });
 
   assert.ok(report.rows.every((row) => row.state === 'PRODUCTION_PREP'));
 });
 
-test('QRL 2.0 remains a chronology-safe current delayed control', () => {
+test('each strict counterexample remains beyond the 90-day launch-clock boundary', () => {
   const report = runHardDelayedControls(HARD_DELAYED_CONTROLS_V1);
-  const qrl = report.rows.find((row) => row.projectId === 'qrl-2');
+  const delays = new Map(report.rows.map((row) => [row.projectId, row.delayDaysLowerBound]));
 
-  assert.ok(qrl);
-  assert.equal(qrl.outcome, 'STILL_UNLAUNCHED');
-  assert.equal(qrl.cutoffOn, '2026-04-03');
-  assert.equal(qrl.observedThrough, '2026-10-02');
-  assert.equal(qrl.delayDaysLowerBound, 182);
-  assert.deepEqual(qrl.active60dFamilies, [
-    'AUDIT_REMEDIATION',
-    'RELEASE_CANDIDATE'
-  ]);
+  assert.equal(delays.get('tari'), 509);
+  assert.equal(delays.get('zetachain'), 237);
+  assert.equal(delays.get('neon-evm'), 217);
+  assert.equal(delays.get('namada'), 110);
+  assert.ok([...delays.values()].every((delay) => delay >= 90));
 });
 
 test('hard controls reject a delayed outcome shorter than 90 days', () => {
-  const base = HARD_DELAYED_CONTROLS_V1.find((row) => row.projectId === 'dusk');
-  assert.ok(base);
-
   assert.throws(() => runHardDelayedControls([{
-    ...base,
-    cutoffOn: '2024-10-10'
+    projectId: 'synthetic-short-delay',
+    cutoffOn: '2024-01-01',
+    observedThrough: '2024-03-30',
+    outcome: 'LATER_LAUNCH',
+    launchOn: '2024-03-30',
+    scope: 'NETWORK_MAINNET',
+    evidenceReason: 'Synthetic boundary guard.',
+    outcomeSourceRef: 'fixture:outcome',
+    pressure: {
+      projectId: 'synthetic-short-delay',
+      receipts: [
+        {
+          observedOn: '2023-12-20',
+          kind: 'AUDIT_REMEDIATION',
+          sourceRef: 'fixture:audit'
+        },
+        {
+          observedOn: '2023-12-25',
+          kind: 'RELEASE_CANDIDATE',
+          sourceRef: 'fixture:rc'
+        }
+      ]
+    }
   }]), /HARD_CONTROL_DELAY_LT_90/);
 });
 
@@ -55,7 +71,7 @@ test('hard controls reject evidence observed after the frozen cutoff', () => {
       receipts: [
         ...base.pressure.receipts,
         {
-          observedOn: '2024-08-01',
+          observedOn: '2023-12-15',
           kind: 'PRODUCTION_DEPLOYMENT' as const,
           sourceRef: 'fixture:future-receipt'
         }
