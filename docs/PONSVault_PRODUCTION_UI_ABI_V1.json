@@ -1,0 +1,34 @@
+{
+  "classification": "PINNED_PRODUCTION_UI_ABI",
+  "sourceSurface": "https://www.ponsvault.com/launch",
+  "uiDeploymentIdentifier": "dpl_3GqtGP7hXYxb4sBTYSiwpaGPMHsb",
+  "productionBundle": "/_next/static/chunks/10opw2r9zotbj.js",
+  "productionBundleSha256": "580d679b7163dbfae91300ea0b2c7c9ba8dd8f8e9268c8383660f351c60a7b53",
+  "launcher": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+  "canonicalSignature": "launchWithVault((string,string,string,string,(string,string,string,string,string),address,uint16,bool,bytes32,bytes32),uint256,address,bytes32,bytes)",
+  "selector": "0x969e6741",
+  "sourceRuntimeBinding": "UNRESOLVED",
+  "function": {
+    "type": "function", "name": "launchWithVault", "stateMutability": "payable",
+    "inputs": [
+      {"name":"params","type":"tuple","components":[
+        {"name":"name","type":"string"},{"name":"symbol","type":"string"},{"name":"logo","type":"string"},{"name":"description","type":"string"},
+        {"name":"socials","type":"tuple","components":[{"name":"twitter","type":"string"},{"name":"telegram","type":"string"},{"name":"discord","type":"string"},{"name":"website","type":"string"},{"name":"farcaster","type":"string"}]},
+        {"name":"creatorFeeRecipient","type":"address"},{"name":"creatorTaxBps","type":"uint16"},{"name":"buybackEnabled","type":"bool"},{"name":"expectedEconomics","type":"bytes32"},{"name":"salt","type":"bytes32"}
+      ]},
+      {"name":"launchConfigId","type":"uint256"},{"name":"pairToken","type":"address"},{"name":"templateId","type":"bytes32"},{"name":"vaultConfig","type":"bytes"}
+    ],
+    "outputs": [{"name":"token","type":"address"},{"name":"vault","type":"address"}]
+  },
+  "event": {
+    "type":"event","name":"Launched","anonymous":false,"inputs":[
+      {"name":"token","type":"address","indexed":true},{"name":"vault","type":"address","indexed":true},{"name":"creator","type":"address","indexed":true},
+      {"name":"curve","type":"address","indexed":false},{"name":"pairToken","type":"address","indexed":false},{"name":"templateId","type":"bytes32","indexed":false}
+    ]
+  },
+  "evidence": {
+    "historicalRoundTripTransaction":"0x30aa4930d0572dbffd67de63d2a01a24ca426098a75ba304ad89b17a081a4f98",
+    "historicalTransactionClassification":"RWA launch; proves shared launcher interface, not Staking",
+    "syntheticStakingReturnFixture":{"token":"0x0d5afa91c20be6df39b2e970b3737c68b70a358d","vault":"0x757ef16e4ea4c703d3e0cbc77cb61599597974e1"}
+  }
+}

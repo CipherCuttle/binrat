@@ -131,7 +131,7 @@ test('configured wallets preserve NOT_LAUNCHED and cannot enable launch, account
 
 test('status consistency validator rejects contradictory token state', async () => {
   const config = await validateLaunchConfig(await json(CONFIG_URL));
-  const manifest = await json(MANIFEST_URL);
+  const manifest = await json(new URL('../docs/CAPABILITY_MANIFEST_V0.json', import.meta.url));
   validateLaunchStatusConsistency(config, manifest);
   (manifest.launchAuthorization as Record<string, unknown>).tokenState = 'LAUNCHED';
   assert.throws(() => validateLaunchStatusConsistency(config, manifest), /LAUNCH_STATUS_CONTRADICTION/);
@@ -143,6 +143,7 @@ test('canonical Telegram token consumes Pons roles without historical Arc fallba
   const reply = await renderRatReply('/token', {apiBaseUrl:'https://binrat.example',siteUrl:'https://binrat.example',manifest});
   assert.match(reply??'',/token state: NOT_LAUNCHED/);assert.match(reply??'',/launch authorization: BLOCKED/);
   assert.match(reply??'',/treasury role: NOT_CONFIGURED/);assert.match(reply??'',/Working Rat: PLANNED/);
+  assert.match(reply??'',/project fee recipient role: NOT_CONFIGURED/);
   assert.doesNotMatch(reply??'',new RegExp(BINRAT_TREASURY_ADDRESS));assert.doesNotMatch(reply??'',new RegExp(BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS));
 });
 

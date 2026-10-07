@@ -58,6 +58,9 @@ test('research result and handoff tampering cannot establish PROVING',async()=>{
 });
 test('presentation decoder accepts the C2 Pons manifest without relaxing execution validation',()=>{
   const raw=manifest();assert.equal(raw.currentLaunchPlan?.chainId,4663);
+  assert.equal(validateCapabilityManifest(raw),raw);
+  raw.launchGateStatus!.matrix='docs/LAUNCH_GATE_MATRIX_V0.json';
+  assert.equal(decodePublicCapabilityManifest(raw),raw);
   assert.throws(()=>validateCapabilityManifest(raw),/CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID/);
   raw.launchAuthorization.launchAuthorized=true;
   assert.throws(()=>decodePublicCapabilityManifest(raw),/CAPABILITY_MANIFEST_INVALID/);

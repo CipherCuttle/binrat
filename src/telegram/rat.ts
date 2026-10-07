@@ -11,6 +11,10 @@ import {
 } from '../launchConfig/config.js';
 import { REQUIRED_LAUNCH_GATE_IDS } from '../launchConfig/gateMatrix.js';
 import {
+  PONS_LAUNCH_PLAN_DIGEST,
+  PONS_LAUNCH_CHAIN_ID
+} from '../launchConfig/ponsPlan.js';
+import {
   makeRatAnswerPlan,
   renderRatVoice,
   type RatAnswerPlan,
@@ -37,6 +41,7 @@ export interface CapabilityManifest {
     tokenState?: string;
     explicitOwnerLaunchAuthorityState?: string;
   };
+  /** Legacy Arc fixture metadata; never a source of current public roles. */
   launchConfiguration?: {
     treasuryAddress: string;
     projectFeeRecipientAddress: string;
@@ -154,25 +159,60 @@ export function validateCapabilityManifest(value: unknown): CapabilityManifest {
     launch.launchAuthorized !== false ||
     launch.tokenState !== 'NOT_LAUNCHED'
   ) throw new Error('CAPABILITY_MANIFEST_AUTHORIZATION_ESCALATION');
-  if (root.launchConfiguration !== undefined) {
-    const config = record(root.launchConfiguration);
+  if (root.currentLaunchPlan !== undefined) {
+    const plan = record(root.currentLaunchPlan);
     if (
-      config.configDigest !== LAUNCH_CONFIG_DIGEST ||
-      config.treasuryAddress !== BINRAT_TREASURY_ADDRESS ||
-      config.projectFeeRecipientAddress !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS ||
-      config.tokenAddressState !== 'NOT_YET_CREATED' ||
-      config.accountingActive !== false ||
-      config.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED'
-    ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_CONFIG_INVALID');
+      plan.chainId !== PONS_LAUNCH_CHAIN_ID ||
+      plan.rail !== 'pons-v2-vault-staking-candidate-v1' ||
+      plan.plan !== 'docs/BINRAT_PONS_LAUNCH_PLAN_V1.json' ||
+      plan.planDigest !== PONS_LAUNCH_PLAN_DIGEST ||
+      plan.status !== 'PLANNING_ONLY' ||
+      plan.historicalArcAuthority !== 'HISTORICAL_ONLY_NOT_PONS_AUTHORITY'
+    ) throw new Error('CAPABILITY_MANIFEST_PONS_PLAN_INVALID');
+  }
+  if (root.historicalArcLaunchConfiguration !== undefined) {
+    const historical = record(root.historicalArcLaunchConfiguration);
+    if (
+      historical.configDigest !== LAUNCH_CONFIG_DIGEST ||
+      historical.treasuryAddress !== BINRAT_TREASURY_ADDRESS ||
+      historical.projectFeeRecipientAddress !== BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS ||
+      historical.tokenAddressState !== 'NOT_YET_CREATED' ||
+      historical.accountingActive !== false ||
+      historical.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED' ||
+      historical.authorityScope !== 'HISTORICAL_ARC_V0_ROLE_BINDING_ONLY_NOT_CURRENT_PUBLIC_ROLE_SOURCE'
+    ) throw new Error('CAPABILITY_MANIFEST_HISTORICAL_ARC_CONFIG_INVALID');
+  }
+  if (root.currentLaunchPlan !== undefined) {
+    const current = record(root.currentPonsLaunchConfiguration);
+    if (
+      current.authorityScope !== 'CURRENT_PONS_V1_PRELAUNCH' ||
+      current.chainId !== PONS_LAUNCH_CHAIN_ID ||
+      current.treasuryAddress !== null ||
+      current.launchWalletAddress !== null ||
+      current.creatorFeeRecipientAddress !== null ||
+      current.tokenAddressState !== 'NOT_YET_CREATED' ||
+      current.accountingActive !== false ||
+      current.holderGateStatus !== 'TOKEN_AUTHORITY_NOT_CONFIGURED' ||
+      current.creatorTaxBps !== 0 ||
+      current.openingBuyWei !== '0' ||
+      current.privatePresale !== 'NONE' ||
+      current.discountedInsiderRound !== 'NONE' ||
+      current.hiddenTeamAllocation !== 'NONE' ||
+      current.stakingRequired !== true ||
+      current.workingRatStatus !== 'PLANNED' ||
+      current.productionEntitlementActive !== false ||
+      current.walletRoleStatus !== 'UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC'
+    ) throw new Error('CAPABILITY_MANIFEST_CURRENT_PONS_CONFIG_INVALID');
   }
   if (root.launchGateStatus !== undefined) {
     const gateStatus = record(root.launchGateStatus);
     const statuses = record(gateStatus.statuses);
     if (
-      gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_V0.json' ||
+      gateStatus.matrix !== 'docs/LAUNCH_GATE_MATRIX_PONS_V1.json' ||
       typeof gateStatus.matrixDigest !== 'string' ||
       !/^[0-9a-f]{64}$/.test(gateStatus.matrixDigest) ||
-      gateStatus.blockingGateCount !== 2
+      !Number.isSafeInteger(gateStatus.blockingGateCount) ||
+      Number(gateStatus.blockingGateCount) < 1
     ) throw new Error('CAPABILITY_MANIFEST_LAUNCH_GATES_INVALID');
     const ids = Object.keys(statuses).sort();
     if (JSON.stringify(ids) !== JSON.stringify([...REQUIRED_LAUNCH_GATE_IDS].sort())) {
@@ -199,6 +239,7 @@ const VALID_GATE_STATUSES = new Set([
   'PARTIAL',
   'BLOCKED_FUTURE_EVENT',
   'BLOCKED_OWNER_INPUT',
+  'BLOCKED_UPSTREAM_VERIFICATION',
   'BLOCKED_LEGAL'
 ]);
 

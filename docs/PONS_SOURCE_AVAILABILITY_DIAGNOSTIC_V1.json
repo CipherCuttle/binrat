@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "binrat.pons-source-availability-diagnostic/1",
+  "classification": "DIAGNOSTIC_NOT_AUTHORITY",
+  "sources": {
+    "ponsFactory": {
+      "url": "https://raw.githubusercontent.com/ponsdotdev/pons-labs/44a3db9193c365f6c25cf0d4c2efc396e6de0df5/contractsV2/src/v2/PonsV2LaunchFactory.sol",
+      "httpStatus": 200,
+      "bodySha256": "561475202f7635d9c2caa1c4eed196642bedc2c32ed77afc6297175ef86ea2c7",
+      "runtimeMatch": "NOT_ESTABLISHED"
+    },
+    "ponsVaultRepository": {
+      "url": "https://api.github.com/repos/ponsvault/PonsVault",
+      "httpStatus": 404,
+      "classification": "NOT_OBTAINED_AT_THIS_PATH_NOT_PROOF_OF_GLOBAL_ABSENCE"
+    },
+    "explorerStakingFactory": {
+      "url": "https://robinhoodchain.blockscout.com/api/v2/smart-contracts/0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "httpStatus": 403,
+      "classification": "NOT_OBTAINED_AT_THIS_PATH_NOT_PROOF_OF_GLOBAL_ABSENCE"
+    }
+  },
+  "authoritativeSourceIfAvailable": "MATCH_BEFORE_ARMING",
+  "criticalUnknownBehavior": "BLOCKING",
+  "launchAuthorized": false
+}

@@ -251,7 +251,7 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         '',
         plan.facts.tokenMessage,
         'Working Rat is planned post-launch. No public entitlement or staking action.',
-        'PonsVault Staking may exist at token launch without public Working Rat entitlement.',
+        'PonsVault Staking is required at token launch. It does not activate Working Rat entitlement.',
         'STAKE BUYS LABOR. NOT TRUTH.',
         '',
         line('rule', plan.facts.invariant)

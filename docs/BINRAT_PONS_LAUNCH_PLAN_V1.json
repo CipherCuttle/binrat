@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "binrat.pons-launch-plan/0.1",
+  "schemaVersion": "binrat.pons-launch-plan/0.2",
   "planVersion": "BINRAT_PONS_LAUNCH_PLAN_V1",
   "frozenOn": "2026-10-03",
   "status": "PLANNING_ONLY",
@@ -10,7 +10,7 @@
     "ponsFactory": {
       "address": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
       "runtimeCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
-      "verificationStatus": "OFFICIAL_SOURCE_AND_LIVE_CODEHASH_MATCH"
+      "verificationStatus": "LIVE_CODEHASH_PINNED_CURRENT_SOURCE_RUNTIME_MATCH_NOT_ESTABLISHED"
     },
     "ponsVaultLauncher": {
       "address": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
@@ -50,9 +50,10 @@
     "stakingAttestationStatus": "CONDITIONAL",
     "rejectedStakeBurnAttestation": "docs/PONSVault_UPSTREAM_ATTESTATION_V1.json",
     "rejectedStakeBurnAttestationDigest": "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c",
-    "explicitUpstreamRiskAcceptanceRequired": false,
+    "explicitUpstreamRiskAcceptanceRequired": true,
     "launchMechanicsGate": "BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST",
-    "ownerUpstreamRiskDecision": "ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY"
+    "ownerUpstreamRiskDecision": "ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY",
+    "boundedAcceptance": "EXACT_MANIFEST_ONLY_AFTER_INDEPENDENT_CRITICAL_BEHAVIOR_VERIFICATION"
   },
   "historicalPredecessor": {
     "chainId": 5042,
@@ -65,7 +66,7 @@
     "launchAuthorized": false,
     "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
   },
-  "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+  "planDigest": "5ce63df38978f60cb293e92c6763a1c9af5dc9e80c890d123c4ecb8bbb09e094",
   "ownerSelectedLaunchPolicy": {
     "evidenceClass": "OWNER_POLICY",
     "creatorTaxBps": 0,
@@ -75,5 +76,40 @@
     "hiddenTeamAllocation": "NONE",
     "publicMarketOnly": true,
     "laterFounderProjectPurchase": "ORDINARY_PUBLIC_MARKET_ONLY_DISCLOSED"
+  },
+  "stakingRequired": true,
+  "workingRatStatus": "PLANNED",
+  "productionEntitlementActive": false,
+  "inputClassification": {
+    "owner": [
+      "launchWalletAddress",
+      "tokenMetadata",
+      "minimumFeesBeforePayoutWei"
+    ],
+    "freshChain": [
+      "launchConfigId",
+      "expectedEconomics"
+    ],
+    "deferred": [
+      "workingRatMinStakeRaw"
+    ],
+    "conditional": [
+      "treasuryAddress"
+    ],
+    "postBroadcast": [
+      "tokenAddress",
+      "curveAddress",
+      "vaultAddress",
+      "transaction",
+      "block",
+      "blockHash"
+    ]
+  },
+  "authorityArtifacts": {
+    "semanticManifestSchema": "binrat.pons-semantic-manifest/1",
+    "executionEnvelopeSchema": "binrat.pons-execution-envelope/1",
+    "publicFactsSchema": "binrat.pons-launch-facts/1",
+    "freshnessBudget": "UNRESOLVED_MEASUREMENTS_AND_RUNTIME_LIMIT_REQUIRED",
+    "sourceUnavailability": "BOUNDED_RESIDUAL_ONLY_UNKNOWN_CRITICAL_BEHAVIOR_BLOCKS"
   }
 }
