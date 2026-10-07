@@ -31,7 +31,6 @@ export interface PrelaunchProjectFixture {
 }
 
 export type PrelaunchScoutStatus =
-  | 'QUALIFIED_PRELAUNCH_BACKTEST'
   | 'QUALIFIED_WATCH'
   | 'TECHNICAL_ONLY'
   | 'INSUFFICIENT_EVIDENCE'
@@ -45,6 +44,7 @@ export interface PrelaunchScoutResult {
   technicalSignals: PrelaunchSignalKind[];
   backingEntities: string[];
   nonBackingRelations: Array<{ entity: string; relation: InstitutionalRelation }>;
+  laterObservedLaunchInFixture: boolean;
   leadDaysToObservedLaunch: number | null;
 }
 
@@ -67,11 +67,13 @@ export function evaluatePrelaunchProject(
   assertProjectId(fixture.projectId);
   const asOfMs = parseIsoDay(asOf, 'PRELAUNCH_SCOUT_AS_OF_INVALID');
   const receipts = fixture.receipts.map(validateReceipt).sort(compareReceipts);
-  const observed = receipts.filter((receipt) => parseIsoDay(receipt.observedOn, 'PRELAUNCH_SCOUT_RECEIPT_DATE_INVALID') <= asOfMs);
+  const observed = receipts.filter(
+    (receipt) => parseIsoDay(receipt.observedOn, 'PRELAUNCH_SCOUT_RECEIPT_DATE_INVALID') <= asOfMs
+  );
 
   const technicalSet = new Set<PrelaunchSignalKind>();
   const backingEntities = new Set<string>();
-  const nonBackingRelations = new Map<string, InstitutionalRelation>();
+  const nonBackingRelations = new Map<string, { entity: string; relation: InstitutionalRelation }>();
 
   for (const receipt of observed) {
     if (receipt.kind === 'PUBLIC_CODE' || TECHNICAL_EXECUTION_SIGNALS.has(receipt.kind)) {
@@ -84,7 +86,7 @@ export function evaluatePrelaunchProject(
     if (BACKING_RELATIONS.has(relation)) {
       backingEntities.add(entity);
     } else {
-      nonBackingRelations.set(`${entity}\u0000${relation}`, relation);
+      nonBackingRelations.set(`${entity}\u0000${relation}`, { entity, relation });
     }
   }
 
@@ -95,8 +97,6 @@ export function evaluatePrelaunchProject(
   let status: PrelaunchScoutStatus;
   if (alreadyLaunched) {
     status = 'ALREADY_LAUNCHED';
-  } else if (hasPublicCode && hasExecutionEvidence && backingEntities.size > 0 && nextFutureLaunch(receipts, asOfMs) !== null) {
-    status = 'QUALIFIED_PRELAUNCH_BACKTEST';
   } else if (hasPublicCode && hasExecutionEvidence && backingEntities.size > 0) {
     status = 'QUALIFIED_WATCH';
   } else if (hasPublicCode && hasExecutionEvidence) {
@@ -114,13 +114,10 @@ export function evaluatePrelaunchProject(
     status,
     technicalSignals: [...technicalSet].sort(),
     backingEntities: [...backingEntities].sort(),
-    nonBackingRelations: [...nonBackingRelations.keys()]
-      .map((key) => {
-        const [entity, relation] = key.split('\u0000') as [string, InstitutionalRelation];
-        return { entity, relation };
-      })
+    nonBackingRelations: [...nonBackingRelations.values()]
       .sort((a, b) => a.entity.localeCompare(b.entity) || a.relation.localeCompare(b.relation)),
-    leadDaysToObservedLaunch: status === 'QUALIFIED_PRELAUNCH_BACKTEST' && nextLaunch !== null
+    laterObservedLaunchInFixture: nextLaunch !== null,
+    leadDaysToObservedLaunch: status === 'QUALIFIED_WATCH' && nextLaunch !== null
       ? Math.floor((nextLaunch - asOfMs) / 86_400_000)
       : null
   };
