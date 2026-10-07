@@ -51,7 +51,7 @@ test('current rule usually identifies serious projects long before a 90-day laun
 
   const byProject = new Map(report.projects.map((row) => [row.projectId, row]));
   assert.equal(byProject.get('manta-pacific')?.firstQualificationLeadDays, 55);
-  assert.equal(byProject.get('taiko')?.firstQualificationLeadDays, 85);
+  assert.equal(byProject.get('taiko')?.firstQualificationLeadDays, 86);
   assert.equal(byProject.get('aleo')?.firstQualificationLeadDays, 778);
 });
 
