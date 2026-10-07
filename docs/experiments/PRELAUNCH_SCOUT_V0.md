@@ -10,14 +10,14 @@ This spike tests the decision rule only. It does not crawl GitHub, testnets, wal
 
 ## Rule under test
 
-A project can become a `QUALIFIED_PRELAUNCH_BACKTEST` only when all of the following are present before the replay cutoff:
+A project becomes a `QUALIFIED_WATCH` only from evidence available at or before the replay cutoff:
 
 1. public code;
 2. at least one execution signal: testnet deployment, contract deployment, or audit;
 3. at least one typed backing relationship: `LEAD_INVESTOR`, `INVESTOR`, or `STRATEGIC_INVESTOR`;
-4. a later observed public-launch receipt exists in the historical fixture.
+4. no public-launch receipt observed at or before the cutoff.
 
-For a live project where no later launch receipt is yet known, the strongest allowed result is `QUALIFIED_WATCH`.
+A later public-launch receipt is **outcome data only**. It may measure lead time after the decision, but it must never affect whether the project qualified. This is the explicit lookahead-bias guard.
 
 `LIQUIDITY_PROVIDER`, `MARKET_MAKER`, `WALLET_ADJACENCY`, and `UNKNOWN` never count as investor backing.
 
@@ -34,8 +34,11 @@ Expected replay:
 
 - 2024-03-02 => `TECHNICAL_ONLY`
 - 2024-03-04 => `QUALIFIED_WATCH`
-- lead time => 84 days
+- later observed launch in fixture => yes
+- measured lead time => 84 days
 - 2024-05-27 => `ALREADY_LAUNCHED`
+
+The detector must produce the same 2024-03-04 decision if the future 2024-05-27 receipt is removed. Only the outcome metric is allowed to disappear.
 
 ### GTE — current watch fixture
 
@@ -44,23 +47,24 @@ Expected replay:
 - Code4rena GTE Spot CLOB and Router audit started 2025-07-23: https://code4rena.com/audits/2025-07-gte-spot-clob-and-router
 - Wintermute Ventures portfolio lists GTE when checked 2026-10-07: https://www.wintermute.com/ventures/portfolio
 
-Expected current result on 2026-10-07: `QUALIFIED_WATCH`.
+Expected result from this fixture on 2026-10-07: `QUALIFIED_WATCH`.
 
-That label intentionally does not assert that a token or TGE has not happened. A future launch-state resolver must provide affirmative coverage before BINRAT can make a stronger live claim.
+That label does **not** assert that a token or TGE has not happened. It means only that the evidence available to this fixture meets the watch rule and no launch receipt is present in the fixture by the cutoff. A future launch-state resolver needs affirmative, bounded coverage before BINRAT can make a stronger live launch-state claim.
 
 ## Controls
 
-The test suite also preregisters failure controls:
+The test suite preregisters failure controls:
 
 - public code + testnet, no institutional relation => must remain `TECHNICAL_ONLY`;
 - wallet adjacency => must not count as backing;
 - liquidity-provider relationship => must not count as backing;
 - market-maker relationship => must not count as backing;
-- missing source or relation fields => fail closed.
+- missing source or relation fields => fail closed;
+- adding or removing evidence dated after the replay cutoff => must not change the detector decision.
 
 ## What this proves
 
-If green, the spike proves that BINRAT can represent and replay the combined signal without violating the claim boundary.
+If green, the spike proves that BINRAT can represent and replay the combined signal without violating the claim boundary or using future outcome leakage.
 
 It does **not** prove predictive alpha, profitable token selection, live discovery recall, or acceptable false-positive rates.
 
