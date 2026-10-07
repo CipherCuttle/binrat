@@ -80,13 +80,28 @@ test('historical replay detects Taiko before observed public launch with measura
   assert.equal(beforeFunding.status, 'TECHNICAL_ONLY');
 
   const afterFunding = evaluatePrelaunchProject(taiko, '2024-03-04');
-  assert.equal(afterFunding.status, 'QUALIFIED_PRELAUNCH_BACKTEST');
+  assert.equal(afterFunding.status, 'QUALIFIED_WATCH');
   assert.deepEqual(afterFunding.backingEntities, ['GSR', 'Wintermute Ventures']);
-  assert.equal(afterFunding.leadDaysToObservedLaunch, 84);
+  assert.equal(afterFunding.laterObservedLaunchInFixture, true);\n  assert.equal(afterFunding.leadDaysToObservedLaunch, 84);
 
   const launchDay = evaluatePrelaunchProject(taiko, '2024-05-27');
   assert.equal(launchDay.status, 'ALREADY_LAUNCHED');
   assert.equal(launchDay.leadDaysToObservedLaunch, null);
+});
+
+test('future launch outcome never changes the detector decision', () => {
+  const withFutureOutcome = evaluatePrelaunchProject(taiko, '2024-03-04');
+  const withoutFutureOutcome = evaluatePrelaunchProject({
+    ...taiko,
+    receipts: taiko.receipts.filter((receipt) => receipt.observedOn <= '2024-03-04')
+  }, '2024-03-04');
+
+  assert.equal(withFutureOutcome.status, 'QUALIFIED_WATCH');
+  assert.equal(withoutFutureOutcome.status, 'QUALIFIED_WATCH');
+  assert.deepEqual(withoutFutureOutcome.backingEntities, withFutureOutcome.backingEntities);
+  assert.deepEqual(withoutFutureOutcome.technicalSignals, withFutureOutcome.technicalSignals);
+  assert.equal(withFutureOutcome.leadDaysToObservedLaunch, 84);
+  assert.equal(withoutFutureOutcome.leadDaysToObservedLaunch, null);
 });
 
 test('current GTE evidence becomes a watch candidate without pretending absence proves prelaunch', () => {
@@ -96,7 +111,7 @@ test('current GTE evidence becomes a watch candidate without pretending absence 
   assert.ok(result.technicalSignals.includes('PUBLIC_CODE'));
   assert.ok(result.technicalSignals.includes('TESTNET_DEPLOYMENT'));
   assert.ok(result.technicalSignals.includes('AUDIT'));
-  assert.equal(result.leadDaysToObservedLaunch, null);
+  assert.equal(result.laterObservedLaunchInFixture, false);\n  assert.equal(result.leadDaysToObservedLaunch, null);
 });
 
 test('GitHub plus testnet activity without a typed backing relation does not qualify', () => {
