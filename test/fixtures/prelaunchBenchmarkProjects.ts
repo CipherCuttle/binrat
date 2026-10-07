@@ -131,7 +131,7 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     codeOn: '2020-02-16',
     codeRef: 'https://github.com/ProvableHQ/snarkOS',
     executionOn: '2022-08-02',
-    executionRef: 'https://aleo.org/',
+    executionRef: 'https://aleo.org/post/announcing-testnet-3/',
     backingOn: '2022-02-07',
     backingEntity: 'SoftBank Vision Fund 2',
     backingRef: 'https://www.theblock.co/news/deals/2022-02-07-aleo-raises-200-million-softbank-tiger-others-blockchain-133218',
@@ -160,7 +160,7 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     backingEntity: 'Polychain Capital',
     backingRef: 'https://www.theblock.co/news/business/2023-04-20-berachain-funding-new-layer-1-blockchain-227344',
     launchOn: '2025-02-06',
-    launchRef: 'https://blog.berachain.com/'
+    launchRef: 'https://blog.berachain.com/blog/whats-possible-on-berachain-a-look-at-key-dapps-and-strategies-on-mainnet'
   }),
   project({
     projectId: 'monad',
@@ -172,14 +172,14 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     backingEntity: 'Paradigm',
     backingRef: 'https://www.theblock.co/news/deals/2024-04-09-monad-labs-raises-225-million-in-funding-round-led-by-paradigm-287257',
     launchOn: '2025-11-24',
-    launchRef: 'https://blog.uniswap.org/'
+    launchRef: 'https://blog.uniswap.org/monad-mainnet-is-now-live-on-uniswap'
   }),
   project({
     projectId: 'babylon',
     codeOn: '2024-07-26',
     codeRef: 'https://github.com/babylonlabs-io/babylon',
     executionOn: '2024-02-28',
-    executionRef: 'https://babylonlabs.io/',
+    executionRef: 'https://babylonlabs.io/blog/babylons-bitcoin-staking-testnet-open-for-public',
     backingOn: '2024-05-30',
     backingEntity: 'Paradigm',
     backingRef: 'https://www.prweb.com/releases/babylon-completes-70m-raise-led-by-paradigm-to-advance-trustless-bitcoin-staking-302159158.html',
@@ -220,19 +220,19 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     backingEntity: 'Polychain Capital',
     backingRef: 'https://www.theblock.co/news/deals/2024-04-25-polychain-capital-38-million-usd-series-a-round-movement-labs-facebook-move-ethereum-290891',
     launchOn: '2024-12-09',
-    launchRef: 'https://www.movementnetwork.xyz/'
+    launchRef: 'https://www.prnewswire.com/news-releases/movement-network-foundation-announces-launch-of-movement-mainnet-beta-and-move-token-generation-event-302325523.html'
   }),
   project({
     projectId: 'initia',
     codeOn: '2023-10-12',
     codeRef: 'https://github.com/initia-labs/initia',
     executionOn: '2024-05-14',
-    executionRef: 'https://initia.xyz/',
+    executionRef: 'https://medium.com/@initialabs/the-validator-initiation-a-guide-to-initias-incentivized-testnet-for-validators-b6ddd2eff632',
     backingOn: '2024-09-25',
     backingEntity: 'Theory Ventures',
     backingRef: 'https://www.theblock.co/news/deals/2024-09-25-initia-funding-token-valuation-318102',
     launchOn: '2025-04-24',
-    launchRef: 'https://initia.xyz/'
+    launchRef: 'https://blockworks.co/news/initia-mainnet-launch-appchain-l1'
   }),
   project({
     projectId: 'story',
@@ -268,20 +268,20 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     backingEntity: 'Big Brain Holdings',
     backingRef: 'https://www.theblock.co/news/deals/2023-02-09-modular-blockchain-dymension-raises-6-7-million-in-private-token-round-210093',
     launchOn: '2024-02-06',
-    launchRef: 'https://github.com/dymensionxyz/dymension'
+    launchRef: 'https://github.com/dymensionxyz/networks/blob/main/mainnet/dymension/genesis_validators.md'
   }),
   project({
     projectId: 'sei',
     codeOn: '2022-05-17',
     codeRef: 'https://github.com/sei-protocol/sei-chain',
     executionOn: '2023-05-02',
-    executionRef: 'https://blog.sei.io/',
+    executionRef: 'https://t.me/s/astroport_fi?before=588',
     backingOn: '2023-04-11',
     backingEntity: 'Jump Crypto',
     backingRelation: 'INVESTOR',
     backingRef: 'https://blog.sei.io/announcements/sei-labs-raises-30m-to-build-the-layer-1-for-trading/',
     launchOn: '2023-08-15',
-    launchRef: 'https://blog.sei.io/'
+    launchRef: 'https://www.theblock.co/news/ecosystems/2023-08-15-coinbase-set-to-list-sei-as-blockchains-mainnet-goes-live-245377'
   }),
   project({
     projectId: 'aptos',
@@ -304,7 +304,7 @@ export const PRELAUNCH_BENCHMARK_PROJECTS: readonly HistoricalBenchmarkProject[]
     backingOn: '2022-09-08',
     backingEntity: 'a16z crypto',
     backingRelation: 'INVESTOR',
-    backingRef: 'https://forums.sui.io/t/looking-back-sui-in-q3-2022/466',
+    backingRef: 'https://www.theblock.co/post/168532/mysten-labs-sui-blockchain-fundraise-ftx-ventures/',
     launchOn: '2023-05-03',
     launchRef: 'https://www.sui.io/blog/sui-and-the-journey-ahead'
   })
