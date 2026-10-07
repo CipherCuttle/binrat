@@ -177,8 +177,8 @@ export const LAUNCH_PRESSURE_V1_LAUNCHERS: readonly LaunchedPressureProject[] = 
   {
     projectId: 'initia',
     launchOn: '2025-04-24',
-    coverage: 'VERIFIED',
-    coverageReason: 'GitHub audit-hardening changes and the v1.0.0-beta.0 release transition provide two distinct prelaunch families.',
+    coverage: 'PARTIAL',
+    coverageReason: 'Audit-hardening changes are clean P4 evidence, but v1.0.0-beta.0 is not source-literal as a mainnet candidate; no second qualifying family is counted.',
     pressure: {
       projectId: 'initia',
       receipts: [
@@ -186,11 +186,6 @@ export const LAUNCH_PRESSURE_V1_LAUNCHERS: readonly LaunchedPressureProject[] = 
           observedOn: '2025-03-04',
           kind: 'AUDIT_REMEDIATION',
           sourceRef: 'https://github.com/initia-labs/initia/commit/a4505349444a6f0cf08745f5b90e6c25b5109de3'
-        },
-        {
-          observedOn: '2025-03-10',
-          kind: 'RELEASE_CANDIDATE',
-          sourceRef: 'https://github.com/initia-labs/initia/commit/ad20224e830db1a6bb2bacf4c10123498b488ce6'
         }
       ]
     }
