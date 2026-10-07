@@ -31,7 +31,7 @@ export interface PrelaunchProjectFixture {
 }
 
 export type PrelaunchScoutStatus =
-  | 'QUALIFIED_PRELAUNCH'
+  | 'QUALIFIED_PRELAUNCH_BACKTEST'\n  | 'QUALIFIED_WATCH'
   | 'TECHNICAL_ONLY'
   | 'INSUFFICIENT_EVIDENCE'
   | 'ALREADY_LAUNCHED';
@@ -94,19 +94,17 @@ export function evaluatePrelaunchProject(
   let status: PrelaunchScoutStatus;
   if (alreadyLaunched) {
     status = 'ALREADY_LAUNCHED';
+  } else if (hasPublicCode && hasExecutionEvidence && backingEntities.size > 0 && nextFutureLaunch(receipts, asOfMs) !== null) {
+    status = 'QUALIFIED_PRELAUNCH_BACKTEST';
   } else if (hasPublicCode && hasExecutionEvidence && backingEntities.size > 0) {
-    status = 'QUALIFIED_PRELAUNCH';
+    status = 'QUALIFIED_WATCH';
   } else if (hasPublicCode && hasExecutionEvidence) {
     status = 'TECHNICAL_ONLY';
   } else {
     status = 'INSUFFICIENT_EVIDENCE';
   }
 
-  const nextLaunch = receipts
-    .filter((receipt) => receipt.kind === 'PUBLIC_LAUNCH')
-    .map((receipt) => parseIsoDay(receipt.observedOn, 'PRELAUNCH_SCOUT_RECEIPT_DATE_INVALID'))
-    .filter((launchMs) => launchMs > asOfMs)
-    .sort((a, b) => a - b)[0];
+  const nextLaunch = nextFutureLaunch(receipts, asOfMs);
 
   return {
     version: PRELAUNCH_SCOUT_VERSION,
@@ -121,10 +119,18 @@ export function evaluatePrelaunchProject(
         return { entity, relation };
       })
       .sort((a, b) => a.entity.localeCompare(b.entity) || a.relation.localeCompare(b.relation)),
-    leadDaysToObservedLaunch: status === 'QUALIFIED_PRELAUNCH' && nextLaunch !== undefined
+    leadDaysToObservedLaunch: status === 'QUALIFIED_PRELAUNCH_BACKTEST' && nextLaunch !== null
       ? Math.floor((nextLaunch - asOfMs) / 86_400_000)
       : null
   };
+}
+
+function nextFutureLaunch(receipts: readonly PrelaunchSignalReceipt[], asOfMs: number): number | null {
+  return receipts
+    .filter((receipt) => receipt.kind === 'PUBLIC_LAUNCH')
+    .map((receipt) => parseIsoDay(receipt.observedOn, 'PRELAUNCH_SCOUT_RECEIPT_DATE_INVALID'))
+    .filter((launchMs) => launchMs > asOfMs)
+    .sort((a, b) => a - b)[0] ?? null;
 }
 
 function validateReceipt(receipt: PrelaunchSignalReceipt): PrelaunchSignalReceipt {
