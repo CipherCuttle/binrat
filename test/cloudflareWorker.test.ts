@@ -12,7 +12,7 @@ import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { buildProvenanceFact } from '../src/intelligence/provenance.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
 
-const CHAIN_ID = 5042;
+const CHAIN_ID = 4663;
 
 test('Cloudflare cron queues an independent bounded Pons job', async () => {
   const db = new D1CompatDatabase();
@@ -146,6 +146,8 @@ test('Cloudflare read API projects the same durable BINRAT evidence from D1', as
       updatedAtMs: Date.now()
     });
 
+    const latest=await latestPonsLaunchSnapshot(db,Date.now(),20);
+    assert.ok(latest);await publishPublicSnapshot(db,await buildPublicSnapshot({schemaVersion:'binrat.latest-launches/0.1',chainId:4663,...latest,historyCoverage:'PARTIAL'}),Date.now());
     const env = {
       DB: db,
       CAPABILITY_MANIFEST_JSON: JSON.stringify({
@@ -392,8 +394,8 @@ async function makeLaunch(): Promise<LaunchObserved> {
   const launcher = address(1);
   const txHash = hex64(2);
   const token = address(3);
-  const launchId = await deriveLaunchId({ chainId: CHAIN_ID, launcher, txHash, token });
-  const eventId = await deriveEventId({ chainId: CHAIN_ID, launcher, txHash, logIndex: 4 });
+  const launchId = await deriveLaunchId({ chainId: CHAIN_ID, launcher, txHash, token,source:'PONS_V2' });
+  const eventId = await deriveEventId({ chainId: CHAIN_ID, launcher, txHash, logIndex: 4,source:'PONS_V2' });
   return {
     launchId,
     eventId,
@@ -401,7 +403,7 @@ async function makeLaunch(): Promise<LaunchObserved> {
     blockNumber: 100n,
     blockHash: hex64(100),
     observedAtMs: 100_000,
-    source: 'ARCPAD',
+    source: 'PONS_V2',
     launcher,
     txHash,
     logIndex: 4,

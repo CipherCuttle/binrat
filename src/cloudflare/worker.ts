@@ -38,14 +38,18 @@ import {
   loadRatMemory, pruneRatConversation, reserveRatAiCall, resolveRatFollowup, saveRatMemory,
   type RatAiBinding, type RatMemory
 } from './ratConversation.js';
-import { renderRatReplyDetailed, validateCapabilityManifest, type RatConfig } from '../telegram/rat.js';
+import { renderRatReplyDetailed, validateCapabilityManifest, decodePublicCapabilityManifest, type RatConfig } from '../telegram/rat.js';
 import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore } from './ratWatch.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
 import { publicStatus, readPublicSnapshot } from './publicSnapshot.js';
 import { readCreatorSummary } from './creatorSummaryReadModel.js';
+import { readPublicCaseFeed } from './publicCaseReadModel.js';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
+import { observedPublicRelease } from '../public/releaseIdentity.js';
+import { publicReleaseIdentity } from '../public/generated/releaseIdentity.js';
+import { projectPublicProduct, type PublicProduct } from '../public/productProjection.js';
 import { D1TelegramLedger } from './telegramLedger.js';
 import {
   D1HolderAuthStore,
@@ -74,6 +78,7 @@ import { telegramProductConfig } from '../telegram/config.js';
 import { verifyTelegramInitData } from '../telegram/miniAppAuth.js';
 
 export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
+  BINRAT_WORKER_VERSION?: { id: string; tag?: string; timestamp?: string };
   DB: D1DatabaseLike;
   SYNC_QUEUE?: SyncQueueProducerLike;
   CAPABILITY_MANIFEST_JSON?: string;
@@ -245,13 +250,14 @@ export async function handleWorkerRequest(
   if (request.method === 'GET' && pathname === '/health') {
     let repliesEnabled = false;
     try { repliesEnabled = parseRepliesEnabled(env.TELEGRAM_REPLIES_ENABLED); } catch {}
-    const manifest = readManifest(env);
+    const manifest = readPublicManifest(env);
     return json(200, {
       ok: true,
       service: 'binrat-cloudflare-edge',
       capabilityStatus: manifest?.capabilities.telegramRatV0?.engineeringStatus ?? 'UNKNOWN',
       launchAuthorization: manifest?.launchAuthorization.status ?? 'UNVERIFIED_REMOTE_STATUS',
       releaseSha: env.BINRAT_RELEASE_SHA ?? null,
+      release: { ...await observedPublicRelease(manifest,env.BINRAT_RELEASE_SHA), workerRevisionId:env.BINRAT_WORKER_VERSION?.id??null, effectiveMaxStatusAgeMs:maxStatusAgeMs(env) },
       repliesEnabled,
       conversationEnabled: env.RAT_CONVERSATION_ENABLED === 'true',
       aiEnabled: ratAiActive(env, Date.now()),
@@ -455,14 +461,15 @@ export async function handleBinratApiRequest(
   }
 
   try {
-    if (pathname === '/api/capabilities') return capabilities(env);
+    if (pathname === '/api/capabilities') return await capabilities(env);
     if (pathname === '/api/health') return health(env);
     if (pathname === '/api/status') {
       const status = await publicStatus(env.DB,deps.now(),maxStatusAgeMs(env));
       return publicJson(request,200,status,await sha256Hex(status),
         'public, max-age=5, s-maxage=5, must-revalidate');
     }
-    if (pathname === '/api/dumpster-ledger') return dumpsterLedger(env);
+    if(pathname.startsWith('/api/rat-radar/')) return json(410,{error:'LEGACY_ARC_RADAR_RETIRED',chainId:4663,replacement:'PONS_DEPLOYER_RECURRENCE'});
+    if (pathname === '/api/dumpster-ledger') return await dumpsterLedger(env);
     if (pathname === '/api/launches/latest') {
       const published = await readPublicSnapshot(env.DB);
       if (!published) return json(503,{ ready:false,reason:'NO_VERIFIED_SNAPSHOT' });
@@ -477,7 +484,29 @@ export async function handleBinratApiRequest(
       return publicJson(request,200,summary,await sha256Hex(summary),
         'public, max-age=15, s-maxage=60, stale-while-revalidate=300, stale-if-error=86400');
     }
+    if (pathname.startsWith('/api/bag/')) {
+      const match = /^\/api\/bag\/([0-9a-f]{64})(?:\/(intelligence|replay))?$/.exec(pathname);
+      if (!match) return json(400, { error: 'BAG_ID_INVALID' });
+      const feed = await readPublicCaseFeed(env.DB,match[1]!);
+      if (!feed) return json(404, { error: 'BAG_NOT_FOUND' });
+      const bag = feed.bags.find(item => item.id === match[1])!;
+      if (match[2]) {
+        const observations = (await new D1Store(env.DB,4663).listObservationsForLaunch(bag.id))
+          .filter(receipt => receipt.observedBlock <= BigInt(feed.asOfBlock));
+        return json(200, match[2] === 'intelligence'
+          ? await projectBagIntelligence(feed,bag,observations)
+          : await projectReplayBundle(feed,bag,observations));
+      }
+      return json(200, { schemaVersion:feed.schemaVersion,chainId:feed.chainId,asOfBlock:feed.asOfBlock,
+        historyCoverage:feed.historyCoverage,bag,receipt:feed.receipt });
+    }
 
+    // Reject unknown paths before any index-wide projection. In the old
+    // deployment an absent /api/status handler could fall through here.
+    if (pathname !== '/api/feed' && !pathname.startsWith('/api/creator/') &&
+        !pathname.startsWith('/api/bag/') && !pathname.startsWith('/api/rat-radar/')) {
+      return json(404, { error: 'NOT_FOUND' });
+    }
     const ready = await readyContext(env);
     if (!ready) return json(503, { ready: false, reason: 'INDEX_NOT_READY' });
     const { store, feed } = ready;
@@ -1068,7 +1097,7 @@ async function telegramWebhook(
       allowUnaddressed = message.reply_to_message.from.id === identity.id;
     }
 
-    const manifest = readManifest(env);
+    const manifest = readPublicManifest(env);
     if (!manifest) throw new Error('CAPABILITY_MANIFEST_INVALID');
 
     const config: RatConfig = {
@@ -1331,56 +1360,10 @@ async function handleRatWatchCommand(
     };
   }
 
-  const ready = await readyContext(env);
-  if (!ready) {
-    return {
-      intent: 'WATCH',
-      text: '🐀 live index is not authoritative right now. watch was not added.'
-    };
-  }
-
-  const knownCreator = ready.feed.bags.some(
-    (bag) => bag.reportedCreatorAddress.toLowerCase() === command.creator
-  );
-  if (!knownCreator) {
-    return {
-      intent: 'WATCH',
-      text: [
-        '🐀 that address is not currently indexed as a Pons-reported deployer.',
-        'watch was not added. unknown is not clean.'
-      ].join('\n')
-    };
-  }
-
-  const result = await watches.subscribe(
-    chatId,
-    command.creator,
-    BigInt(ready.feed.asOfBlock),
-    nowMs
-  );
-  if (result === 'LIMIT_REACHED') {
-    return {
-      intent: 'WATCH',
-      text: '🐀 watch list full. max 25 exact creator addresses per chat.'
-    };
-  }
-  if (result === 'DUPLICATE') {
-    return {
-      intent: 'WATCH',
-      text: `🐀 already watching ${command.creator}.`
-    };
-  }
-  return {
-    intent: 'WATCH',
-    text: [
-      '🐀 watch armed.',
-      command.creator,
-      '',
-      `starting after block ${ready.feed.asOfBlock}.`,
-      'i will alert on a future launch from the same Pons-reported deployer address.',
-      'same address != same human identity.'
-    ].join('\n')
-  };
+  // The legacy delivery cycle still targets Arc. Admit no current Pons
+  // subscription here. Existing gated Pons Watch handles its own source checks.
+  // LIST and UNWATCH above remain available for retained legacy rows.
+  return {intent:'WATCH',text:'🐀 the legacy Watch rail is not verified for Pons. Watch was not added. Persistent Tripwire jobs are not available.'};
 }
 
 async function getBotIdentity(token: string, fetchImpl: typeof fetch): Promise<TelegramUser> {
@@ -1430,10 +1413,9 @@ async function sendMessage(
 }
 
 async function health(env: BinratWorkerEnv): Promise<Response> {
-  const ponsRuntime = await new D1RuntimeStateStore(env.DB, ROBINHOOD_CHAIN_ID).get();
-  // Before the first Pons bootstrap, retain the historical health surface. Once a
-  // Pons runtime row exists, even an unhealthy one remains authoritative (no Arc masking).
-  const live = await chainHealth(env, ponsRuntime ? ROBINHOOD_CHAIN_ID : ARC_CHAIN_ID);
+  // Missing current runtime remains unavailable; it cannot promote historical
+  // Arc state to current launch-facing authority.
+  const live = await chainHealth(env, ROBINHOOD_CHAIN_ID);
   const historicalArc = await chainHealth(env, ARC_CHAIN_ID);
   return json(200, { ...live, historicalArc: { ...historicalArc, role: 'HISTORICAL_LEGACY_EVIDENCE' } });
 }
@@ -1474,18 +1456,34 @@ async function chainHealth(env: BinratWorkerEnv, chainId: number): Promise<Recor
   };
 }
 
-function capabilities(env: BinratWorkerEnv): Response {
-  const manifest = readManifest(env);
-  return manifest
-    ? json(200, manifest)
-    : json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
+async function capabilities(env: BinratWorkerEnv): Promise<Response> {
+  const manifest = readPublicManifest(env);
+  if (!manifest) return json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
+  const publicProduct = await publicProductFor(env,manifest);
+  // Legacy configuration remains accessible only with explicit historical scope.
+  const {launchConfiguration,...view}=manifest;
+  return json(200,{...view,publicProduct,
+    ...(launchConfiguration?{historicalArcLaunchConfiguration:{...launchConfiguration,chainId:5042,authorityScope:'HISTORICAL_ONLY_NOT_CURRENT_AUTHORITY'}}:{})});
 }
 
 async function dumpsterLedger(env: BinratWorkerEnv): Promise<Response> {
-  const manifest = readManifest(env);
+  const manifest = readPublicManifest(env);
   if (!manifest) return json(503, { error: 'CAPABILITY_MANIFEST_NOT_CONFIGURED' });
-  const funding = resolveProductionFundingConfig(env.BINRAT_FUNDING_CONFIG_JSON, ARC_CHAIN_ID);
-  return json(200, await projectDumpsterLedger(manifest, funding, [], 'PRODUCTION'));
+  const product=await publicProductFor(env,manifest);
+  return json(200,{schemaVersion:'binrat.public-funding/1',chainId:product.currentAuthority.chainId,
+    authorityScope:'CURRENT_PONS',status:product.currentAuthority.status,configuredAuthorities:product.currentAuthority,
+    accountingActive:false,entries:[],totals:null,launchState:product.launchState,
+    explanation:'Current Pons wallet roles come from canonical configuration. Missing remains unconfigured. No accounting observations are projected.'});
+}
+
+async function publicProductFor(env:BinratWorkerEnv,manifest:ReturnType<typeof decodePublicCapabilityManifest>):Promise<PublicProduct> {
+  const [snapshot,status]=await Promise.all([readPublicSnapshot(env.DB),publicStatus(env.DB,Date.now(),maxStatusAgeMs(env))]);
+  return projectPublicProduct({manifest,snapshot:snapshot?.snapshot??null,status,
+    watchRuntime:{enabled:env.BINRAT_AUTONOMOUS_RAT_ENABLED==='true',publicEnabled:env.BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED==='true',allowedUserId:env.BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID}});
+}
+function readPublicManifest(env:BinratWorkerEnv) {
+  if(!env.CAPABILITY_MANIFEST_JSON) return null;
+  try { return decodePublicCapabilityManifest(JSON.parse(env.CAPABILITY_MANIFEST_JSON)); } catch { return null; }
 }
 
 function readManifest(env: BinratWorkerEnv) {
@@ -1498,10 +1496,8 @@ function readManifest(env: BinratWorkerEnv) {
 }
 
 async function readyContext(env: BinratWorkerEnv): Promise<ReadyContext | null> {
-  // The new live surface is Robinhood-first. Arc remains a historical read fallback
-  // only while a Robinhood index has not yet been bootstrapped (not when it is stale).
-  const ponsRuntime = await new D1RuntimeStateStore(env.DB, ROBINHOOD_CHAIN_ID).get();
-  const chainId = ponsRuntime ? ROBINHOOD_CHAIN_ID : ARC_CHAIN_ID;
+  // Current public reads never fall back to historical Arc authority/data.
+  const chainId = ROBINHOOD_CHAIN_ID;
   const store = new D1Store(env.DB, chainId);
   const runtimeStore = new D1RuntimeStateStore(env.DB, chainId);
   const runtime = await runtimeStore.get();
@@ -1618,6 +1614,8 @@ function json(status: number, value: unknown): Response {
     status,
     headers: {
       'cache-control': 'no-store',
+      'x-binrat-build-id': publicReleaseIdentity.buildId,
+      'x-binrat-source-sha': publicReleaseIdentity.sourceSha,
       'x-content-type-options': 'nosniff'
     }
   });
@@ -1633,6 +1631,8 @@ async function publicJson(
   const etag=`"${digest}"`;
   const headers={
     'cache-control':cacheControl,
+    'x-binrat-build-id':publicReleaseIdentity.buildId,
+    'x-binrat-source-sha':publicReleaseIdentity.sourceSha,
     'etag':etag,
     'x-content-type-options':'nosniff'
   };

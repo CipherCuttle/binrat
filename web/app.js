@@ -1,7 +1,7 @@
-import { loadDumpsterFeed, loadDumpsterLedger, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
+import { loadDumpsterFeed, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 import { PublicReadPlane, ReadState } from "./read-plane.js";
-import { initFrontdoor, renderFreshCases, renderFreshState } from "./frontdoor.js";
+import { initFrontdoor, renderFreshCases, renderFreshState, renderPublicProduct, productRat } from "./frontdoor.js";
 
 const grid = document.querySelector("#garbage-grid");
 const drawer = document.querySelector("#drawer");
@@ -11,6 +11,7 @@ const backdrop = document.querySelector("#backdrop");
 const randomBag = document.querySelector("#random-bag");
 let returnFocus = null;
 let activeDrawerBagId = null;
+let activeDrawerBag = null;
 let bags = [];
 let activeFilter = "all";
 let activeMode = null;
@@ -41,14 +42,14 @@ const modeCopy = {
   },
   LIVE: {
     header: "LIVE INDEX",
-    desk: "LIVE // PUBLIC PROJECTION V0",
+    desk: "PUBLIC RECEIPTS",
     status: "PUBLIC PROJECTION / PONS 4663",
     detail: "HISTORY COVERAGE: UNVERIFIED",
     end: "END OF CURRENT INDEX",
     bagLabel: "INDEXED BAGS",
     report: "PUBLIC PROJECTION",
     token: "TOKEN ADDRESS / OBSERVED ON ROBINHOOD",
-    source: "LIVE // PUBLIC PROJECTION V0",
+    source: "PUBLIC RECEIPTS",
     stamp: "PUBLIC EVIDENCE",
     scope: "this projection",
     launch: "Observed on Pons",
@@ -142,9 +143,7 @@ sectionNav?.addEventListener("click", (event) => {
   if (event.target.closest("a")) sectionNav.open = false;
 });
 
-void bootstrapRoadmapCapabilities();
-void bootstrapTokenCapabilities();
-void bootstrapLedger();
+void bootstrapPublicProduct();
 const readPlane = new PublicReadPlane({
   loadFeed: loadDumpsterFeed,
   pollingEnabled: WEB_DATA_SOURCE_MODE === "LIVE",
@@ -167,18 +166,29 @@ function renderVerifiedSnapshot(feed) {
   renderIntake();
   renderFeed();
   renderFreshCases(feed);
+  void bootstrapPublicProduct();
 }
 
 function renderReadState({ state, snapshot, status: sourceStatus }) {
   renderFreshState({ state, snapshot, status: sourceStatus });
   document.body.dataset.readState = state;
+  if (snapshot?.feed) {
+    renderLiveRail(snapshot.feed);
+    for (const bag of bags) bag.readState = state;
+  }
+  if (activeDrawerBag?.mode === 'LIVE') {
+    const bound = activeDrawerBag.asOfBlock === snapshot?.checkpoint && activeDrawerBag.asOfBlockHash === snapshot?.checkpointBlockHash && activeDrawerBag.feedDigest === snapshot?.digest;
+    activeDrawerBag.readState = bound ? state : ReadState.STALE;
+    const stamp = drawerContent.querySelector('.share-card-kicker');
+    if (stamp) stamp.textContent = `HOT GARBAGE // ${buildShareCardModel(activeDrawerBag).stamp}`;
+  }
   const status = document.querySelector("#read-freshness");
   if (!status) return;
   if (state === ReadState.LOADING) {
     status.hidden = false;
     status.dataset.state = state;
     const message = WEB_DATA_SOURCE_MODE === "LIVE"
-      ? "DIGGING THROUGH VERIFIED PONS RECEIPTS…"
+      ? "CHECKING PONS RECEIPTS…"
       : "LOADING SYNTHETIC FIXTURES…";
     status.textContent = message;
     latestBag.innerHTML = `<span class="intake-loading">${message}</span>`;
@@ -197,178 +207,15 @@ function renderReadState({ state, snapshot, status: sourceStatus }) {
   }
 }
 
-async function bootstrapRoadmapCapabilities() {
-  const rail = document.querySelector("[data-roadmap-status]");
-  const targets = document.querySelectorAll("[data-roadmap-capability]");
-  if (!rail || targets.length === 0) return;
-
-  if (WEB_DATA_SOURCE_MODE !== "LIVE") {
-    rail.dataset.state = "UNAVAILABLE";
-    rail.querySelector("b").textContent = "FIXTURE MODE / STATUS NOT PROMOTED";
-    return;
-  }
-
+async function bootstrapPublicProduct() {
   try {
     const manifest = await loadCapabilityManifest();
-    if (!manifest) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
-    const statuses = roadmapCapabilityStatuses(manifest.capabilities);
-    let applied = 0;
-    for (const target of targets) {
-      const status = statuses[target.dataset.roadmapCapability];
-      if (!status) continue;
-      target.dataset.status = status;
-      applied += 1;
-    }
-    rail.querySelector("b").textContent =
-      applied > 0 ? "RUNTIME CAPABILITY MANIFEST" : "MANIFEST LOADED / NO BADGES RESOLVED";
+    renderPublicProduct(manifest.publicProduct);
+    document.body.dataset.productState = "VERIFIED_PROJECTION";
   } catch {
-    rail.dataset.state = "UNAVAILABLE";
-    rail.querySelector("b").textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
+    renderPublicProduct(null);
+    document.body.dataset.productState = "UNVERIFIED";
   }
-}
-
-async function bootstrapTokenCapabilities() {
-  const rail = document.querySelector(".token-prelaunch-source");
-  const targets = document.querySelectorAll("[data-token-capability]");
-  if (!rail || targets.length === 0) return;
-
-  if (WEB_DATA_SOURCE_MODE !== "LIVE") {
-    rail.textContent = "FIXTURE MODE / STATUS NOT PROMOTED";
-    return;
-  }
-
-  try {
-    const manifest = await loadCapabilityManifest();
-    if (!manifest) throw new Error("CAPABILITY_MANIFEST_NOT_AVAILABLE");
-    const statuses = roadmapCapabilityStatuses(manifest.capabilities);
-    let applied = 0;
-    for (const target of targets) {
-      const status = statuses[target.dataset.tokenCapability];
-      if (!status) continue;
-      target.dataset.status = status;
-      applied += 1;
-    }
-    renderTokenLaunchState(manifest.launchAuthorization);
-    rail.textContent = applied > 0
-      ? "RUNTIME CAPABILITY MANIFEST"
-      : "RUNTIME MANIFEST / NO UTILITY BADGES RESOLVED";
-  } catch {
-    rail.textContent = "STATUS UNAVAILABLE / NOTHING PROMOTED";
-    renderTokenLaunchState(null);
-  }
-}
-
-function renderTokenLaunchState(launchAuthorization) {
-  const section = document.querySelector("#token-status");
-  if (!section) return;
-
-  const prelaunch =
-    launchAuthorization?.tokenState === "NOT_LAUNCHED" &&
-    launchAuthorization?.status === "BLOCKED" &&
-    launchAuthorization?.marketingAuthorized === false &&
-    launchAuthorization?.launchAuthorized === false;
-
-  section.dataset.tokenState = prelaunch ? "NOT_LAUNCHED" : "UNVERIFIED";
-  document.querySelector("#token-public-state").textContent =
-    prelaunch ? "$BINRAT IS NOT LIVE." : "TOKEN STATE REQUIRES VERIFIED PUBLICATION";
-  document.querySelector("#token-contract-state").textContent =
-    prelaunch
-      ? "NO OFFICIAL CONTRACT HAS BEEN PUBLISHED"
-      : "NO CONTRACT PROMOTED BY THIS SURFACE";
-  document.querySelector("#token-launch-gate").textContent =
-    prelaunch ? "BLOCKED" : "UNVERIFIED / FAIL CLOSED";
-  document.querySelector("#token-marketing-gate").textContent =
-    prelaunch ? "NOT AUTHORIZED" : "UNVERIFIED / FAIL CLOSED";
-}
-
-function roadmapCapabilityStatuses(capabilities) {
-  const out = {};
-  const pons = capabilities?.robinhoodLiveIntelligenceV1;
-  if (pons?.publicStatus === "PUBLIC_LIVE_BETA" || pons?.publicStatus === "PUBLIC_LIVE") {
-    out.pons_live_intelligence = "LIVE";
-  } else if (pons?.engineeringStatus === "BUILDING") {
-    out.pons_live_intelligence = "BUILDING";
-  }
-
-  const radar = capabilities?.ratRadarV0;
-  if (radar?.currentRailReplacementStatus === "BUILDING_ON_PONS_4663") {
-    out.rat_radar = "BUILDING";
-  } else if (radar?.publicStatus === "PUBLIC_LIVE_BETA") {
-    out.rat_radar = "LIVE";
-  }
-
-  const replay = capabilities?.replayLab;
-  const replayScope = String(replay?.statusScope ?? "");
-  if (
-    replay?.publicStatus === "PUBLIC_LIVE_BETA" &&
-    !replayScope.startsWith("LEGACY_")
-  ) out.replay_lab = "LIVE";
-  else if (replay?.engineeringStatus === "BUILDING") out.replay_lab = "BUILDING";
-
-  const watch = capabilities?.ratWatchV0;
-  if (watch?.currentRailRevalidationRequired === true) out.rat_watch = "BUILDING";
-  else if (
-    watch?.publicStatus === "PUBLIC_LIVE_BETA" ||
-    watch?.deploymentStatus === "CLOUDFLARE_SUBSCRIPTION_LIVE_VERIFIED"
-  ) out.rat_watch = "LIVE";
-
-  const raids = capabilities?.dumpsterRaidsV0;
-  if (raids?.engineeringStatus === "EXPERIMENTAL") out.dumpster_raids = "EXPERIMENT";
-  else if (raids?.engineeringStatus === "PLANNED") out.dumpster_raids = "PLANNED";
-
-  const den = capabilities?.ratDenV0;
-  if (den?.engineeringStatus === "PLANNED") out.rat_den = "PLANNED";
-
-  return out;
-}
-
-async function bootstrapLedger() {
-  const section = document.querySelector("#dumpster-ledger");
-  if (!section) return;
-  try {
-    const ledger = await loadDumpsterLedger();
-    if (!ledger) {
-      section.dataset.ledgerState = "FIXTURE_MODE";
-      document.querySelector("#ledger-funding-status").textContent =
-        "LIVE FUNDING STATE HIDDEN IN FIXTURE MODE";
-      return;
-    }
-    section.dataset.ledgerState = ledger.accountingState;
-    document.querySelector("#ledger-funding-status").textContent =
-      ledger.fundingAuthority.status;
-    document.querySelector("#ledger-token-state").textContent = ledger.tokenState;
-    document.querySelector("#ledger-wallet-status").textContent =
-      ledger.configuredAuthorities.status === "OWNER_SELECTED_PRE_LAUNCH"
-        ? "2 FUTURE ROLES CONFIGURED / ACCOUNTING OFF"
-        : "NOT CONFIGURED";
-    document.querySelector("#ledger-money-in").textContent =
-      `${ledger.totals.tokenInflowsRaw} RAW / ${ledger.totals.inflowEntryCount} ENTRIES`;
-    document.querySelector("#ledger-money-out").textContent =
-      `${ledger.totals.tokenOutflowsRaw} RAW / ${ledger.totals.outflowEntryCount} ENTRIES`;
-    document.querySelector("#ledger-receipt").textContent =
-      ledger.entries.length === 0
-        ? `${ledger.receipt.receiptId} / NO PRODUCTION ENTRIES`
-        : `${ledger.receipt.receiptId} / ${ledger.entries.length} ENTRIES`;
-    document.querySelector("#ledger-explanation").textContent = ledger.explanation;
-    document.querySelector("#ledger-boundary").textContent =
-      ledger.evidenceBoundary;
-    renderUtility("#ledger-shipped", ledger.utilityStatus.shipped);
-    renderUtility("#ledger-building", ledger.utilityStatus.building);
-    renderUtility("#ledger-planned", ledger.utilityStatus.planned);
-  } catch (error) {
-    section.dataset.ledgerState = "FAIL_CLOSED";
-    document.querySelector("#ledger-funding-status").textContent =
-      "PUBLIC LEDGER UNAVAILABLE / FAIL CLOSED";
-    document.querySelector("#ledger-explanation").textContent =
-      "The funding projection could not be verified. No wallet or balance is being presented as production truth.";
-    console.error(error);
-  }
-}
-
-function renderUtility(selector, items) {
-  document.querySelector(selector).textContent = items.length
-    ? items.map((item) => `${item.capability} / ${item.publicStatus}`).join(" · ")
-    : "NONE DECLARED";
 }
 
 function renderUnavailable() {
@@ -509,7 +356,7 @@ function summarizeEvidence(bag) {
 function renderLiveRail(feed) {
   if (!liveRail) return;
   if (activeMode === "LIVE") {
-    liveRail.innerHTML = `<span class="live-rail-dot" aria-hidden="true"></span><strong>LIVE</strong><span>PONS 4663</span><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>BLOCK ${escapeHtml(feed.asOfBlock)}</span><span>HISTORY ${escapeHtml(feed.historyCoverage)}</span>`;
+    liveRail.innerHTML = `<span class="live-rail-dot" aria-hidden="true"></span><strong>${document.body.dataset.readState === ReadState.FRESH ? "FRESH VERIFIED" : "STALE VERIFIED"}</strong><span>PONS 4663</span><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>BLOCK ${escapeHtml(feed.asOfBlock)}</span><span>HISTORY ${escapeHtml(feed.historyCoverage)}</span>`;
     return;
   }
   liveRail.innerHTML = `<span class="live-rail-dot fixture" aria-hidden="true"></span><strong>FIXTURE</strong><span>${String(bags.length).padStart(2, "0")} BAGS</span><span>SYNTHETIC DATA</span>`;
@@ -586,6 +433,7 @@ function openBag(idOrBag, origin = document.activeElement) {
     : idOrBag;
   if (!bag) return;
   activeDrawerBagId = bag.id;
+  activeDrawerBag = bag;
   returnFocus = origin instanceof HTMLElement ? origin : null;
 
   const trail = bag.trail.length
@@ -605,6 +453,7 @@ function openBag(idOrBag, origin = document.activeElement) {
       ? `<div class="empty-trail">${escapeHtml(bag.priorLaunches)} earlier indexed launch${bag.priorLaunches===1?"":"es"} exist for this reported deployer. The fast homepage view does not inline the full trail; Deployer File loads it on demand.</div>`
       : `<div class="empty-trail">No earlier matching launch is present in ${copy().scope}. History coverage is ${escapeHtml(bag.coverage)}. Missing history is not positive evidence.</div>`;
 
+  bag.readState = bag.asOfBlock === readPlane.snapshot?.checkpoint && bag.asOfBlockHash === readPlane.snapshot?.checkpointBlockHash && bag.feedDigest === readPlane.snapshot?.digest ? document.body.dataset.readState : "STALE_VERIFIED";
   const share = buildShareCardModel(bag);
 
   drawerContent.innerHTML = `
@@ -662,10 +511,10 @@ function openBag(idOrBag, origin = document.activeElement) {
     </section>
 
     <section class="case-next-step" aria-label="Future monitoring job">
-      <span>TRIPWIRE · BUILDING</span>
+      <span>TRIPWIRE · ${escapeHtml(productRat("tripwire")?.status ?? "UNVERIFIED")}</span>
       <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
       <p>Tripwire is being built to watch this exact Pons-reported deployer and bring you back when a supported condition changes. Persistent jobs are not available yet.</p>
-      <a class="button ghost" href="#crew-tripwire" data-crew-handoff>BUILDING · SEE THE JOB <span>→</span></a>
+      <a class="button ghost" href="#crew-tripwire" data-crew-handoff>SEE THE FUTURE PLAN <span>→</span></a>
     </section>
   `;
 
@@ -940,6 +789,7 @@ function closeDrawer() {
   backdrop.hidden = true;
   if (wasOpen && returnFocus?.isConnected) returnFocus.focus();
   activeDrawerBagId = null;
+  activeDrawerBag = null;
   returnFocus = null;
 }
 

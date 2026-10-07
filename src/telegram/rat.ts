@@ -1,5 +1,9 @@
 import type { RatConversationContext, RatIntent, RatUnderstanding } from './nlp.js';
 import { understandRatMessage } from './nlp.js';
+import type { PublicProduct } from '../public/productProjection.js';
+import { buildPublicSnapshot } from '../cloudflare/publicSnapshot.js';
+import { projectPublicProduct, validateTransportedProduct } from '../public/productProjection.js';
+import type { PublishedPublicSnapshot } from '../cloudflare/publicSnapshot.js';
 import {
   BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS,
   BINRAT_TREASURY_ADDRESS,
@@ -48,6 +52,31 @@ export interface CapabilityManifest {
     blockingGateCount: number;
   };
   invariant: string;
+  publicProduct?: PublicProduct;
+  currentLaunchPlan?: { chainId?:number; planDigest?:string; [key:string]:unknown };
+  currentPonsLaunchConfiguration?: { chainId?:number; authorityScope?:string; treasuryAddress?:string|null;launchWalletAddress?:string|null;creatorFeeRecipientAddress?:string|null; [key:string]:unknown };
+  historicalArcLaunchConfiguration?: Record<string,unknown>;
+}
+
+/** Display decoding only. Execution guards continue using validateCapabilityManifest. */
+export function decodePublicCapabilityManifest(value:unknown):CapabilityManifest {
+  const root=record(value), launch=record(root.launchAuthorization), capabilities=record(root.capabilities);
+  if(root.schemaVersion!=='binrat.capability-manifest/0.1'||typeof root.invariant!=='string'||
+     !root.capabilities||typeof launch.status!=='string'||typeof launch.tokenState!=='string'||
+     launch.marketingAuthorized!==false||launch.launchAuthorized!==false||
+     !['BLOCKED','UNVERIFIED','UNVERIFIED_REMOTE_STATUS'].includes(launch.status)) throw new Error('CAPABILITY_MANIFEST_INVALID');
+  for(const state of Object.values(capabilities)) {
+    if(!state||typeof state!=='object'||Array.isArray(state)) throw new Error('CAPABILITY_MANIFEST_INVALID');
+  }
+  if(root.publicProduct!==undefined) {
+    const product=record(root.publicProduct);
+    if(product.schemaVersion!=='binrat.public-product/1'||!Array.isArray(product.crew)||
+       typeof product.manifestDigest!=='string'||!/^[0-9a-f]{64}$/.test(product.manifestDigest)) throw new Error('CAPABILITY_MANIFEST_INVALID');
+    const projectedLaunch=record(product.launchState);
+    if(projectedLaunch.status!==launch.status||projectedLaunch.tokenState!==launch.tokenState||
+       projectedLaunch.marketingAuthorized!==launch.marketingAuthorized||projectedLaunch.launchAuthorized!==launch.launchAuthorized) throw new Error('CAPABILITY_MANIFEST_INVALID');
+  }
+  return value as CapabilityManifest;
 }
 
 export interface RatConfig {
@@ -93,8 +122,9 @@ function capabilityStatus(key: string, manifest: CapabilityManifest): string {
 }
 
 function failClosedManifest(local: CapabilityManifest): CapabilityManifest {
+  const {publicProduct:_discarded,...canonical}=local;
   return {
-    ...local,
+    ...canonical,
     launchAuthorization: {
       ...local.launchAuthorization,
       status: 'UNVERIFIED_REMOTE_STATUS',
@@ -178,7 +208,7 @@ async function getJson(
   fetchImpl: FetchLike
 ): Promise<{ ok: boolean; status: number; value: Record<string, unknown> }> {
   const response = await fetchImpl(`${trimSlash(config.apiBaseUrl)}${path}`, {
-    headers: { accept: 'application/json' }
+    headers: { accept: 'application/json' }, signal:AbortSignal.timeout(15_000)
   });
   let parsed: unknown = {};
   try { parsed = await response.json(); } catch {}
@@ -186,11 +216,15 @@ async function getJson(
 }
 
 async function currentManifest(config: RatConfig, fetchImpl: FetchLike): Promise<CapabilityManifest> {
-  if (config.manifestMode !== 'REMOTE_FAIL_CLOSED') return config.manifest;
+  if (config.manifestMode !== 'REMOTE_FAIL_CLOSED') {
+    const {publicProduct:_discarded,...canonical}=config.manifest;
+    return {...canonical,publicProduct:await projectPublicProduct({manifest:canonical,snapshot:null,status:null})};
+  }
   try {
     const result = await getJson('/api/capabilities', config, fetchImpl);
     if (!result.ok) return failClosedManifest(config.manifest);
-    return validateCapabilityManifest(result.value);
+    const manifest=decodePublicCapabilityManifest(result.value);
+    return {...manifest,publicProduct:manifest.publicProduct?await validateTransportedProduct(manifest):await projectPublicProduct({manifest,snapshot:null,status:null})};
   } catch {
     return failClosedManifest(config.manifest);
   }
@@ -206,27 +240,24 @@ function staticPlan(
       return makeRatAnswerPlan('WHY', 'RUMMAGING', { site: trimSlash(config.siteUrl) }, [], [], ['STATIC_PRODUCT_THESIS']);
     case 'ROADMAP':
       return makeRatAnswerPlan('ROADMAP', 'NEUTRAL', {
-        intelligenceV1: capabilityStatus('intelligenceV1', manifest),
-        replayLab: capabilityStatus('replayLab', manifest),
-        telegramRatV0: capabilityStatus('telegramRatV0', manifest),
-        dumpsterLedger: capabilityStatus('dumpsterLedger', manifest),
-        ratDenV0: capabilityStatus('ratDenV0', manifest),
-        ratWatchV0: capabilityStatus('ratWatchV0', manifest),
-        dumpsterRaidsV0: capabilityStatus('dumpsterRaidsV0', manifest),
+        crew:manifest.publicProduct?.crew.map(rat=>`${rat.name} · ${rat.role} · ${rat.status}${rat.phase==='POST_LAUNCH'?' · POST-LAUNCH':''}`)??['Product status UNVERIFIED'],
+        roadmap:manifest.publicProduct?.roadmap.join(' → ')??'UNVERIFIED',
+        todayJourney:manifest.publicProduct?.todayJourney.join(' → ')??'UNVERIFIED',
+        futureLoop:manifest.publicProduct?.futureWorkforceLoop.join(' → ')??'UNVERIFIED',
         launchAuthorization: manifest.launchAuthorization.status
       }, [], [], ['CAPABILITY_MANIFEST']);
     case 'TOKEN': {
-      const launch = manifest.launchAuthorization;
+      const launch = manifest.publicProduct?.launchState??{status:manifest.launchAuthorization.status==='UNVERIFIED_REMOTE_STATUS'?'UNVERIFIED_REMOTE_STATUS':'UNVERIFIED',tokenState:'UNVERIFIED',marketingAuthorized:false,launchAuthorized:false};
       const tokenState = launch.tokenState ?? 'UNKNOWN';
       return makeRatAnswerPlan('TOKEN', 'NEUTRAL', {
         tokenState,
         launchAuthorization: launch.status,
         marketingAuthorized: boolLabel(launch.marketingAuthorized),
         launchAuthorized: boolLabel(launch.launchAuthorized),
-        treasury: manifest.launchConfiguration?.treasuryAddress ?? 'NOT_CONFIGURED',
-        projectFeeRecipient: manifest.launchConfiguration?.projectFeeRecipientAddress ?? 'NOT_CONFIGURED',
-        tokenAddressState: manifest.launchConfiguration?.tokenAddressState ?? 'UNKNOWN',
-        holderGateStatus: manifest.launchConfiguration?.holderGateStatus ?? 'UNKNOWN',
+        treasury: manifest.publicProduct?.currentAuthority.treasuryAddress ?? 'NOT_CONFIGURED',
+        projectFeeRecipient: manifest.publicProduct?.currentAuthority.creatorFeeRecipientAddress ?? 'NOT_CONFIGURED',
+        tokenAddressState: manifest.publicProduct?.currentAuthority.status==='CANONICAL_PONS_SCOPE'?manifest.currentPonsLaunchConfiguration?.tokenAddressState as string ?? 'UNVERIFIED':'UNVERIFIED',
+        holderGateStatus: manifest.publicProduct?.crew.find(rat=>rat.id==='working-rat')?.status??'UNVERIFIED',
         tokenMessage: tokenState === 'NOT_LAUNCHED'
           ? 'no official $BINRAT token is launched yet.'
           : 'reporting the canonical manifest state only.',
@@ -250,45 +281,20 @@ function staticPlan(
 
 async function statusPlan(config: RatConfig, fetchImpl: FetchLike, manifest: CapabilityManifest): Promise<RatAnswerPlan> {
   try {
-    const result = await getJson('/api/health', config, fetchImpl);
-    const h = result.value;
-    if (
-      !result.ok ||
-      typeof h.indexReady !== 'boolean' ||
-      typeof h.observationReady !== 'boolean' ||
-      typeof h.historyBackfillComplete !== 'boolean'
-    ) {
-      return makeRatAnswerPlan('STATUS', 'STUCK_IN_A_PIPE', {
-        index: `UNAVAILABLE / HTTP ${result.status}`,
-        launchCount: 0,
-        checkpointBlock: 'NONE',
-        history: 'UNKNOWN',
-        observations: 'UNKNOWN',
-        telegramStatus: capabilityStatus('telegramRatV0', manifest)
-      }, [], ['the rat will not invent a healthy status.'], ['/api/health']);
-    }
-    const ready = h.indexReady === true;
-    const obs = h.observationReady === true;
-    const history = h.historyBackfillComplete === true;
-    return makeRatAnswerPlan('STATUS', ready && obs ? (history ? 'RUMMAGING' : 'DIGGING') : 'STUCK_IN_A_PIPE', {
-      index: ready ? 'READY' : 'DEGRADED',
-      launchCount: numberValue(h.launchCount),
-      checkpointBlock: stringValue(h.checkpointBlock, 'NONE'),
-      history: history ? 'COMPLETE' : 'IN PROGRESS / UNVERIFIED',
-      observations: obs ? 'READY' : 'PARTIAL / DEGRADED',
-      telegramStatus: capabilityStatus('telegramRatV0', manifest),
-      ...(h.lastSyncError ? { indexError: stringValue(h.lastSyncError) } : {}),
-      ...(h.lastObservationError ? { observationError: stringValue(h.lastObservationError) } : {})
-    }, [], [], ['/api/health']);
+    const [status,feed]=await Promise.all([getJson('/api/status',config,fetchImpl),getJson('/api/launches/latest',config,fetchImpl)]);
+    if(!status.ok||!feed.ok) throw new Error('PUBLIC_READ_UNAVAILABLE');
+    expectSchema(status.value,'binrat.public-status/0.1');
+    expectSchema(feed.value,'binrat.latest-launches/0.1');
+    const product=await projectPublicProduct({manifest,snapshot:feed.value as unknown as PublishedPublicSnapshot,status:status.value});
+    if(!product.snapshotBinding) throw new Error('PUBLIC_READ_BINDING_INVALID');
+    return makeRatAnswerPlan('STATUS',product.runtimeFreshness==='FRESH_VERIFIED'?'NEUTRAL':'STUCK_IN_A_PIPE',{
+      index:product.runtimeFreshness,launchCount:Array.isArray(feed.value.launches)?feed.value.launches.length:0,
+      checkpointBlock:product.snapshotBinding.checkpointBlock,history:'PARTIAL',observations:'NOT ESTABLISHED BY THIS PUBLICATION',
+      telegramStatus:'PUBLIC RECEIPTS',...(status.value.lastSyncError?{indexError:stringValue(status.value.lastSyncError)}:{})
+    },[],product.runtimeFreshness==='STALE_VERIFIED'?['Retained verified evidence. Freshness is not established.']:[],['/api/status','/api/launches/latest']);
   } catch {
-    return makeRatAnswerPlan('STATUS', 'STUCK_IN_A_PIPE', {
-      index: 'UNREACHABLE',
-      launchCount: 0,
-      checkpointBlock: 'NONE',
-      history: 'UNKNOWN',
-      observations: 'UNKNOWN',
-      telegramStatus: capabilityStatus('telegramRatV0', manifest)
-    }, [], ['public read plane unreachable. the rat will not guess.'], ['/api/health']);
+    return makeRatAnswerPlan('STATUS','STUCK_IN_A_PIPE',{index:'UNVERIFIED / UNAVAILABLE',launchCount:0,checkpointBlock:'NONE',history:'UNKNOWN',
+      observations:'UNKNOWN',telegramStatus:'UNVERIFIED'},[],['The public snapshot binding could not be established. No healthy state is invented.'],['/api/status','/api/launches/latest']);
   }
 }
 
@@ -302,37 +308,22 @@ async function creatorPlan(
     return makeRatAnswerPlan('CREATOR_HISTORY', 'EMPTY_PAWS', { invalidInput: true });
   }
   try {
-    const result = await getJson(`/api/creator/${address.toLowerCase()}`, config, fetchImpl);
-    if (result.status === 404) return makeRatAnswerPlan('CREATOR_HISTORY', 'EMPTY_PAWS', { notFound: true });
-    if (!result.ok) {
-      return makeRatAnswerPlan(
-        'CREATOR_HISTORY',
-        'STUCK_IN_A_PIPE',
-        { notFound: true },
-        [],
-        [`Creator File unavailable / HTTP ${result.status}.`]
-      );
-    }
-    expectSchema(result.value, 'binrat.creator-file/0.1');
-    const c = result.value;
-    const receipt = record(c.receipt);
-    const receiptId = stringValue(receipt.receiptId, '');
-    if (
-      !ADDRESS_RE.test(stringValue(c.reportedCreatorAddress, '')) ||
-      typeof c.indexedLaunchCount !== 'number' ||
-      typeof c.historyCoverage !== 'string'
-    ) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
-
-    const indexedLaunchCount = numberValue(c.indexedLaunchCount);
-    return makeRatAnswerPlan('CREATOR_HISTORY', indexedLaunchCount > 1 ? 'SMELLS_FAMILIAR' : 'RUMMAGING', {
-      creator: stringValue(c.reportedCreatorAddress),
-      indexedLaunchCount,
-      firstIndexedBlock: stringValue(c.firstIndexedBlock),
-      lastIndexedBlock: stringValue(c.lastIndexedBlock),
-      historyCoverage: stringValue(c.historyCoverage),
-      receipt: receiptId || 'UNKNOWN',
-      identityRiskLanguage: understanding.identityRiskLanguage
-    }, receiptId ? [receiptId] : [], [], [`/api/creator/${address.toLowerCase()}`]);
+    const path=`/api/creator/${address.toLowerCase()}/summary`;
+    const result=await getJson(path,config,fetchImpl);
+    if(result.status===404) return makeRatAnswerPlan('CREATOR_HISTORY','EMPTY_PAWS',{notFound:true});
+    if(!result.ok) throw new Error('PUBLIC_API_UNAVAILABLE');
+    expectSchema(result.value,'binrat.creator-summary/0.1');
+    const c=result.value, launches=c.launches;
+    if(c.chainId!==4663||c.reportedCreatorAddress!==address.toLowerCase()||!Array.isArray(launches)||launches.length<1||launches.length>4||
+       record(c.coverage).mode!=='LATEST_4_VERIFIED_PONS_LAUNCHES'||record(c.coverage).olderLaunchesOmitted!==true||
+       !/^[0-9a-f]{64}$/.test(stringValue(c.feedDigest,''))||!/^0x[0-9a-f]{64}$/.test(stringValue(c.checkpointBlockHash,''))) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+    const receiptIds=launches.map(value=>stringValue(record(record(value).evidence).factId,'')).filter(id=>/^binrat-fact:4663:[0-9a-f]{64}$/.test(id));
+    if(receiptIds.length!==launches.length) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+    return makeRatAnswerPlan('CREATOR_HISTORY',launches.length>1?'SMELLS_FAMILIAR':'RUMMAGING',{
+      creator:stringValue(c.reportedCreatorAddress),indexedLaunchCount:launches.length,
+      firstIndexedBlock:stringValue(record(launches.at(-1)).blockNumber),lastIndexedBlock:stringValue(record(launches[0]).blockNumber),
+      historyCoverage:'LATEST 4 VERIFIED PONS LAUNCHES / OLDER LAUNCHES OMITTED',receipt:receiptIds.join(', '),identityRiskLanguage:understanding.identityRiskLanguage
+    },[],['Existing provenance fact identifiers, not a newly created deployer receipt. Bounded deployer history. This count is not a complete indexed history.'],[path]);
   } catch {
     return makeRatAnswerPlan(
       'CREATOR_HISTORY',
@@ -454,17 +445,19 @@ async function addressLookupPlan(
   }
 
   try {
-    const result = await getJson('/api/feed', config, fetchImpl);
-    if (!result.ok) throw new Error('PUBLIC_API_UNAVAILABLE');
-    expectSchema(result.value, 'binrat.public-feed/0.1');
-    if (!Array.isArray(result.value.bags)) throw new Error('PUBLIC_API_CONTRACT_MISMATCH');
+    const result = await getJson('/api/launches/latest',config,fetchImpl);
+    if(!result.ok) throw new Error('PUBLIC_API_UNAVAILABLE');
+    expectSchema(result.value,'binrat.latest-launches/0.1');
+    const raw=result.value as unknown as PublishedPublicSnapshot;
+    const verified=await buildPublicSnapshot(raw);
+    if(verified.feedDigest!==raw.feedDigest) throw new Error('PUBLIC_SNAPSHOT_DIGEST_INVALID');
 
     const roles = new Set<'TOKEN' | 'POOL' | 'REPORTED_CREATOR'>();
     const bagIds = new Set<string>();
 
-    for (const value of result.value.bags) {
+    for (const value of verified.launches) {
       const bag = record(value);
-      const bagId = stringValue(bag.id, '');
+      const bagId = stringValue(bag.launchId, '');
       if (stringValue(bag.token, '').toLowerCase() === address) {
         roles.add('TOKEN');
         if (BAG_ID_RE.test(bagId)) bagIds.add(bagId);
@@ -473,7 +466,7 @@ async function addressLookupPlan(
         roles.add('POOL');
         if (BAG_ID_RE.test(bagId)) bagIds.add(bagId);
       }
-      if (stringValue(bag.reportedCreatorAddress, '').toLowerCase() === address) {
+      if (stringValue(bag.deployer, '').toLowerCase() === address) {
         roles.add('REPORTED_CREATOR');
       }
     }
@@ -483,7 +476,7 @@ async function addressLookupPlan(
         address,
         role: 'UNKNOWN',
         roles: 'NONE'
-      }, [], [], ['/api/feed']);
+      }, [], [], ['/api/launches/latest']);
     }
 
     if (roles.size === 1 && roles.has('REPORTED_CREATOR')) {
@@ -502,13 +495,13 @@ async function addressLookupPlan(
       address,
       role: 'AMBIGUOUS',
       roles: [...roles].sort().join(', ')
-    }, [], [], ['/api/feed']);
+    }, [], [], ['/api/launches/latest']);
   } catch {
     return makeRatAnswerPlan('ADDRESS_LOOKUP', 'STUCK_IN_A_PIPE', {
       address,
       role: 'UNKNOWN',
       roles: 'UNAVAILABLE'
-    }, [], ['address-role lookup failed or violated the public API contract.'], ['/api/feed']);
+    }, [], ['address-role lookup failed or violated the public API contract.'], ['/api/launches/latest']);
   }
 }
 

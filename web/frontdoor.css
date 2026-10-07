@@ -132,3 +132,5 @@ code, .eyebrow, .rat-status, .fresh-block { font-family: "Geist Mono", monospace
   .site-footer { padding-block: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+/* Product direction stays visibly distinct from today's evidence journey. */
+.roadmap-line { margin-block: 2rem; color: var(--muted, #a5aca6); font-size: .875rem; overflow-wrap: anywhere; }

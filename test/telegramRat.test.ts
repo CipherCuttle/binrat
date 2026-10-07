@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
+import { buildPublicSnapshot } from '../src/cloudflare/publicSnapshot.js';
 import {
   renderRatReply,
   renderRatReplyDetailed,
@@ -7,25 +9,7 @@ import {
   type CapabilityManifest
 } from '../src/telegram/rat.js';
 
-const manifest: CapabilityManifest = {
-  schemaVersion: 'binrat.capability-manifest/0.1',
-  capabilities: {
-    intelligenceV1: { engineeringStatus: 'ENGINEERING_PASS', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
-    replayLab: { engineeringStatus: 'BUILDING', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
-    telegramRatV0: { engineeringStatus: 'BUILDING', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
-    dumpsterLedger: { engineeringStatus: 'PLANNED', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
-    ratDenV0: { engineeringStatus: 'PLANNED', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
-    ratWatchV0: { engineeringStatus: 'PLANNED', publicStatus: 'NOT_PUBLIC_LIVE_AUTHORIZED' },
-    dumpsterRaidsV0: { engineeringStatus: 'EXPERIMENTAL', phase: 'POST_LAUNCH' }
-  },
-  launchAuthorization: {
-    status: 'BLOCKED',
-    marketingAuthorized: false,
-    launchAuthorized: false,
-    tokenState: 'NOT_LAUNCHED'
-  },
-  invariant: 'Degen can decide attention and priority. It cannot decide what is true.'
-};
+const manifest: CapabilityManifest=JSON.parse(readFileSync('docs/CAPABILITY_MANIFEST_V0.json','utf8'));
 
 const config = {
   apiBaseUrl: 'https://api.example.test',
@@ -39,7 +23,7 @@ test('token answer is sourced from fail-closed launch authorization', async () =
   assert.match(reply ?? '', /launch authorization: BLOCKED/);
   assert.match(reply ?? '', /marketing authorized: NO/);
   assert.match(reply ?? '', /launch authorized: NO/);
-  assert.match(reply ?? '', /not equity, revenue share, or yield/i);
+  assert.match(reply ?? '', /No public entitlement or staking action/i);
 });
 
 test('remote manifest failure revokes launch and marketing authority in replies', async () => {
@@ -63,31 +47,23 @@ test('remote manifest failure revokes launch and marketing authority in replies'
   assert.match(reply ?? '', /token state: UNVERIFIED/);
 });
 
-test('roadmap answer reports canonical capability states instead of hard-coded shipped claims', async () => {
-  const reply = await renderRatReply('binrat what is next on the roadmap?', config);
-  assert.match(reply ?? '', /Intelligence V1: ENGINEERING_PASS/);
-  assert.match(reply ?? '', /Replay Lab: BUILDING/);
-  assert.match(reply ?? '', /Telegram Rat V0: BUILDING/);
-  assert.match(reply ?? '', /Dumpster Raids V0: EXPERIMENTAL/);
-  assert.match(reply ?? '', /launch authorization: BLOCKED/);
+test('roadmap uses one projected crew and explicit future employment',async()=>{
+ const reply=await renderRatReply('/roadmap',config);
+ assert.match(reply??'',/TRIPWIRE · WATCHER · BUILDING/);assert.match(reply??'',/SNIFFER · TRAIL HUNTER · PROVING/);
+ assert.match(reply??'',/THE DEN · ORGANIZE · PLANNED · POST-LAUNCH/);
+ assert.match(reply??'',/Future workforce direction: FIND → EMPLOY → LEAVE → RETURN/);
+ assert.doesNotMatch(reply??'',/Intelligence V1|Dumpster Ledger|Rat Den V0|Rat Watch V0|Sniffer NEXT|Den BUILDING/);
 });
-
-test('status is grounded in public health API', async () => {
-  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
-    indexReady: true,
-    launchCount: 12,
-    checkpointBlock: '12345',
-    historyBackfillComplete: false,
-    observationReady: true,
-    lastSyncError: null,
-    lastObservationError: null
-  }), { status: 200, headers: { 'content-type': 'application/json' } });
-
-  const reply = await renderRatReply('/status', config, fakeFetch);
-  assert.match(reply ?? '', /index: READY/);
-  assert.match(reply ?? '', /launches indexed: 12/);
-  assert.match(reply ?? '', /IN PROGRESS \/ UNVERIFIED/);
-  assert.match(reply ?? '', /Telegram Rat capability: BUILDING/);
+test('status is grounded in the complete verified snapshot contract',async()=>{
+ const snapshot=await latest();const now=Date.now();
+ const status={schemaVersion:'binrat.public-status/0.1',chainId:4663,state:'FRESH_VERIFIED',checkpointBlock:snapshot.sourceCheckpoint,
+  checkpointBlockHash:snapshot.checkpointBlockHash,feedDigest:snapshot.feedDigest,verifiedAtMs:now,publicationVersion:1,runtimeUpdatedAtMs:now,freshnessValidUntilMs:now+180000,lastSyncError:null};
+ const requests:string[]=[];
+ const fakeFetch:typeof fetch=async input=>{const url=String(input);requests.push(url);return jsonResponse(url.endsWith('/api/status')?status:snapshot);};
+ const reply=await renderRatReply('/status',config,fakeFetch);
+ assert.match(reply??'',/index: FRESH_VERIFIED/);assert.match(reply??'',/launches in publication: 1/);
+ assert.ok(requests.every(url=>!url.endsWith('/api/health')));
+ status.feedDigest='b'.repeat(64);assert.match(await renderRatReply('/status',config,fakeFetch)??'',/UNVERIFIED \/ UNAVAILABLE/);
 });
 
 test('invalid creator address fails before network lookup', async () => {
@@ -101,36 +77,21 @@ test('invalid creator address fails before network lookup', async () => {
   assert.equal(calls, 0);
 });
 
-test('creator answer preserves identity boundary and receipt', async () => {
-  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
-    schemaVersion: 'binrat.creator-file/0.1',
-    reportedCreatorAddress: '0x1111111111111111111111111111111111111111',
-    indexedLaunchCount: 3,
-    firstIndexedBlock: '100',
-    lastIndexedBlock: '300',
-    historyCoverage: 'UNVERIFIED',
-    receipt: { receiptId: 'binrat-creator:abc' }
-  }), { status: 200, headers: { 'content-type': 'application/json' } });
-
-  const reply = await renderRatReply('/creator 0x1111111111111111111111111111111111111111', config, fakeFetch);
-  assert.match(reply ?? '', /indexed launches: 3/);
-  assert.match(reply ?? '', /binrat-creator:abc/);
-  assert.match(reply ?? '', /not proof of common human identity/i);
+test('deployer answer preserves bounded scope, fact receipts and identity boundary',async()=>{
+ const address='0x1111111111111111111111111111111111111111';let path='';
+ const fakeFetch:typeof fetch=async input=>{path=String(input);return jsonResponse({schemaVersion:'binrat.creator-summary/0.1',chainId:4663,
+  reportedCreatorAddress:address,checkpointBlockHash:`0x${'1'.repeat(64)}`,feedDigest:'b'.repeat(64),coverage:{mode:'LATEST_4_VERIFIED_PONS_LAUNCHES',olderLaunchesOmitted:true},
+  launches:[{blockNumber:'100',evidence:{factId:'binrat-fact:4663:'+ 'a'.repeat(64)}}]});};
+ const reply=await renderRatReply('/creator '+address,config,fakeFetch);
+ assert.match(path,/\/summary$/);assert.match(reply??'',/launches in bounded response: 1/);assert.match(reply??'',/binrat-fact:4663:/);
+ assert.match(reply??'',/OLDER LAUNCHES OMITTED/);assert.match(reply??'',/not proof of common human identity/i);
 });
 
 test('bare token address resolves to its bag instead of pretending to be a creator', async () => {
   const launchId='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
   const fakeFetch: typeof fetch = async (input) => {
     const url=String(input);
-    if (url.endsWith('/api/feed')) return new Response(JSON.stringify({
-      schemaVersion: 'binrat.public-feed/0.1',
-      bags: [{
-        id: launchId,
-        token: '0x1111111111111111111111111111111111111111',
-        pool: '0x2222222222222222222222222222222222222222',
-        reportedCreatorAddress: '0x3333333333333333333333333333333333333333'
-      }]
-    }), { status: 200, headers: { 'content-type': 'application/json' } });
+    if(url.endsWith('/api/launches/latest')) return jsonResponse(await latest());
     if (url.endsWith('/api/bag/'+launchId)) return new Response(JSON.stringify({
       schemaVersion: 'binrat.public-feed/0.1',
       asOfBlock: '500',
@@ -153,20 +114,10 @@ test('bare token address resolves to its bag instead of pretending to be a creat
   assert.doesNotMatch(reply ?? '', /Creator File/);
 });
 
-test('address with multiple indexed roles asks for disambiguation', async () => {
-  const fakeFetch: typeof fetch = async () => new Response(JSON.stringify({
-    schemaVersion: 'binrat.public-feed/0.1',
-    bags: [{
-      id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      token: '0x1111111111111111111111111111111111111111',
-      pool: '0x2222222222222222222222222222222222222222',
-      reportedCreatorAddress: '0x1111111111111111111111111111111111111111'
-    }]
-  }), { status: 200, headers: { 'content-type': 'application/json' } });
-
-  const reply = await renderRatReply('rat 0x1111111111111111111111111111111111111111', config, fakeFetch);
-  assert.match(reply ?? '', /multiple meanings/i);
-  assert.match(reply ?? '', /REPORTED_CREATOR, TOKEN/);
+test('address with multiple indexed roles asks for disambiguation',async()=>{
+ const fakeFetch:typeof fetch=async()=>jsonResponse(await latest('0x1111111111111111111111111111111111111111'));
+ const reply=await renderRatReply('rat 0x1111111111111111111111111111111111111111',config,fakeFetch);
+ assert.match(reply??'',/multiple meanings/i);assert.match(reply??'',/REPORTED_CREATOR, TOKEN/);
 });
 
 test('Replay consumer rejects schema drift instead of synthesizing a timeline', async () => {
@@ -203,3 +154,9 @@ test('manifest validator fails closed on malformed launch authorization', () => 
     /CAPABILITY_MANIFEST_INVALID/
   );
 });
+
+function jsonResponse(value:unknown) {return new Response(JSON.stringify(value),{status:200,headers:{'content-type':'application/json'}});}
+async function latest(deployer='0x3333333333333333333333333333333333333333') {
+ const id='a'.repeat(64);return buildPublicSnapshot({schemaVersion:'binrat.latest-launches/0.1',chainId:4663,sourceCheckpoint:'500',checkpointBlockHash:`0x${'1'.repeat(64)}`,historyCoverage:'PARTIAL',
+ launches:[{launchId:id,factId:`binrat-fact:4663:${id}`,token:'0x1111111111111111111111111111111111111111',deployer,txHash:`0x${'2'.repeat(64)}`,blockNumber:'100',priorLaunchCount:2,symbol:'RAT',name:'Rat Bag',metadata:{imageUri:'',website:'',twitter:'',telegram:''}}]});
+}

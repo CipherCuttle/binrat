@@ -67,7 +67,7 @@ function errorCopy(code: string): string {
   return "🐀 PIPE SMELLS WRONG.\nCan't verify fresh chain data right now.";
 }
 export function renderRatCard(outcome: AutonomousOutcome): RatCard {
-  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nCatch repeat launchers early.\nRATS shows the freshest deployers that just came back. WATCH pings you if one launches again.',keyboard:[
+  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nDiscover Pons launches. Open a Case. Check receipts.\nCurrent Watch follows exact indexed deployer recurrence where current bot access is enabled. Persistent Tripwire jobs are not available.',keyboard:[
     [callbackButton('Fresh Rats',{action:'RATS'}),callbackButton('DIG',{action:'DIG_PROMPT'})],
     [callbackButton('Watches',{action:'WATCHES'})]
   ]});
@@ -124,7 +124,7 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
       [callbackButton('Home',{action:'HOME'})]
     ]});
   }
-  if (outcome.kind === 'SHARE') return card({view:'CASE',media:'evidence-found',caption:`🐀 RECEIPT PACKED.\nPublic evidence only. No private watch data.\n\nhttps://t.me/BinratBot?start=receipt_${outcome.receipt.receiptId}`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
+  if (outcome.kind === 'SHARE') return card({view:'CASE',media:'evidence-found',caption:`🐀 RECEIPT PACKED.\nPublic evidence only. No private watch data. Access follows current bot gates.\n\nhttps://t.me/BinratBot?start=receipt_${outcome.receipt.receiptId}`,keyboard:[[callbackButton('Home',{action:'HOME'})]]});
   if (outcome.kind === 'OPEN_RECEIPT') {
     const id=share(outcome.receipt.finding);
     return card({view:'CASE',media:'evidence-found',caption:`🐀 SOMEONE LEFT A RECEIPT.\n${caseFact(outcome.receipt.finding)}`,keyboard:[

@@ -19,7 +19,9 @@ export function buildShareCardModel(bag) {
     coverage,
     note: cleanText(bag.note, 'still digging.'),
     receipt: cleanText(bag.receipt, 'receipt_unavailable'),
-    stamp: bag.mode === 'LIVE' ? 'LIVE // PUBLIC PROJECTION' : 'FIXTURE // NOT LIVE EVIDENCE',
+    stamp: bag.mode === 'LIVE' ? bag.readState === 'STALE_VERIFIED' ? 'STALE VERIFIED // RETAINED RECEIPTS'
+      : bag.readState === 'FRESH_VERIFIED' ? 'VERIFIED RECEIPTS // FRESH AT CAPTURE'
+      : 'PUBLIC RECEIPTS // FRESHNESS UNVERIFIED' : 'FIXTURE // NOT LIVE EVIDENCE',
     footer: 'HE GETS THE SCRAPS. YOU GET THE RECEIPTS.'
   });
 }

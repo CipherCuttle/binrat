@@ -1,15 +1,16 @@
 {
   "schemaVersion": "binrat.capability-manifest/0.1",
-  "updatedAt": "2026-09-21",
+  "updatedAt": "2026-10-03",
   "doctrine": {
     "roadmap": "docs/ROADMAP_V0.md",
     "philosophy": "docs/PHILOSOPHY.md",
     "tokenLaunch": "docs/TOKEN_LAUNCH_DOCTRINE.md",
     "launchMechanicsReceipt": "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
-    "launchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
     "launchExecutionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
-    "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
-    "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md"
+    "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
+    "productNetworkPaper": "docs/PRODUCT_NETWORK_PAPER_V0.md",
+    "currentLaunchPlan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
+    "historicalArcLaunchConfiguration": "docs/BINRAT_LAUNCH_CONFIG_V0.json"
   },
   "capabilities": {
     "intelligenceV1": {
@@ -36,9 +37,9 @@
       "publicStatus": "PRE_LAUNCH_TRANSPARENCY_LIVE",
       "endpoint": "/api/dumpster-ledger",
       "cloudflareWorkerVersion": "4648a965-9701-4793-b9a0-903f9786e6e5",
-      "productionFundingAuthority": "PRELAUNCH_AUTHORITIES_CONFIGURED",
+      "productionFundingAuthority": "CURRENT_PONS_WALLET_ROLES_NOT_CONFIGURED",
       "productionAccountingActive": false,
-      "configuredWalletCount": 2
+      "configuredWalletCount": 0
     },
     "ratDenV0": {
       "engineeringStatus": "PLANNED",
@@ -68,7 +69,7 @@
       "publicStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
       "walletAuthStatus": "DISABLED_BY_DEFAULT",
       "productionHolderEligibilityActive": false,
-      "configuredAuthorityDisplay": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY"
+      "configuredAuthorityDisplay": "NO_CURRENT_PONS_WALLET_AUTHORITY"
     },
     "launchMechanicsV0": {
       "engineeringStatus": "ENGINEERING_PASS",
@@ -80,25 +81,34 @@
       "receiptDigest": "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6",
       "sourceMatchStatus": "ARCPAD_DEPLOYED_SOURCE_NOT_VERIFIED",
       "ownerInputRequired": false,
-      "launchAuthorizationEffect": "NONE"
+      "launchAuthorizationEffect": "NONE_HISTORICAL_ONLY",
+      "publicStatus": "HISTORICAL_SUPERSEDED_BY_PONS_V1"
     },
     "launchConfigurationV0": {
       "engineeringStatus": "ENGINEERING_PASS",
-      "publicStatus": "OWNER_POLICY_FROZEN_PRE_LAUNCH",
+      "publicStatus": "HISTORICAL_ARC_ROLE_BINDING_ONLY",
       "config": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
       "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
       "executionReceiptTemplate": "docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json",
+      "launchAuthorizationEffect": "NONE_HISTORICAL_ONLY"
+    },
+    "launchMechanicsPonsV1": {
+      "engineeringStatus": "BUILDING",
+      "verificationStatus": "BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST",
+      "chainId": 4663,
+      "selectedCandidateRail": "pons-v2-vault-staking-candidate-v1",
+      "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
+      "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+      "launchAuthorizationEffect": "BLOCKS_UNTIL_SATISFIED"
+    },
+    "launchPlanPonsV1": {
+      "engineeringStatus": "ENGINEERING_PASS",
+      "publicStatus": "PLANNING_ONLY_NOT_LAUNCH_AUTHORITY",
+      "chainId": 4663,
+      "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
+      "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
       "launchAuthorizationEffect": "NONE"
     }
-  },
-  "launchConfiguration": {
-    "configVersion": "BINRAT_LAUNCH_CONFIG_V0",
-    "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
-    "treasuryAddress": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D",
-    "projectFeeRecipientAddress": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866",
-    "tokenAddressState": "NOT_YET_CREATED",
-    "accountingActive": false,
-    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED"
   },
   "launchAuthorization": {
     "status": "BLOCKED",
@@ -110,24 +120,24 @@
     "receiptExistenceAuthorizesLaunch": false,
     "requiredEvidence": [
       "legal_compliance_artifacts",
-      "launch_mechanics_verification_receipt",
+      "pons_v1_launch_mechanics_and_vault_upstream_attestation",
       "actual_token_address_and_launch_execution_receipt",
       "telegram_doctrine_smoke",
-      "rat_radar_free_value_and_holder_gate_smoke",
+      "working_rat_active_stake_smoke",
       "rat_watch_live_subscription_and_delivery_smoke",
       "dumpster_ledger_bootstrap",
-      "replay_lab_real_evidence_smoke",
+      "pons_case_replay_evidence_smoke",
       "status_consistency_check",
       "allocation_and_privileged_inventory_disclosure"
     ],
     "tokenState": "NOT_LAUNCHED"
   },
   "launchGateStatus": {
-    "matrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
-    "matrixDigest": "d244d4b8d19d17679adee0e995dbbf4845f321702ea91bfcc646497e6f2ce73b",
+    "matrix": "docs/LAUNCH_GATE_MATRIX_PONS_V1.json",
+    "matrixDigest": "8d49c8c7c5941858b7fe15e20273c6774df0b8baf30738863c816010d0a0298d",
     "statuses": {
       "legal_compliance_artifacts": "BLOCKED_LEGAL",
-      "launch_mechanics_verification_receipt": "SATISFIED",
+      "launch_mechanics_verification_receipt": "BLOCKED_UPSTREAM_VERIFICATION",
       "actual_token_address_and_launch_execution_receipt": "BLOCKED_FUTURE_EVENT",
       "telegram_doctrine_smoke": "SATISFIED",
       "rat_radar_free_value_and_holder_gate_smoke": "PARTIAL",
@@ -137,7 +147,41 @@
       "status_consistency_check": "SATISFIED",
       "allocation_and_privileged_inventory_disclosure": "PARTIAL"
     },
-    "blockingGateCount": 2
+    "blockingGateCount": 5
   },
-  "invariant": "Degen can decide attention and priority. It cannot decide what is true."
+  "invariant": "Degen can decide attention and priority. It cannot decide what is true.",
+  "currentLaunchPlan": {
+    "chainId": 4663,
+    "rail": "pons-v2-vault-staking-candidate-v1",
+    "plan": "docs/BINRAT_PONS_LAUNCH_PLAN_V1.json",
+    "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+    "status": "PLANNING_ONLY",
+    "historicalArcAuthority": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
+  },
+  "historicalArcLaunchConfiguration": {
+    "configVersion": "BINRAT_LAUNCH_CONFIG_V0",
+    "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8",
+    "treasuryAddress": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D",
+    "projectFeeRecipientAddress": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866",
+    "tokenAddressState": "NOT_YET_CREATED",
+    "accountingActive": false,
+    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+    "authorityScope": "HISTORICAL_ARC_V0_ROLE_BINDING_ONLY_NOT_CURRENT_PUBLIC_ROLE_SOURCE"
+  },
+  "currentPonsLaunchConfiguration": {
+    "authorityScope": "CURRENT_PONS_V1_PRELAUNCH",
+    "chainId": 4663,
+    "treasuryAddress": null,
+    "launchWalletAddress": null,
+    "creatorFeeRecipientAddress": null,
+    "tokenAddressState": "NOT_YET_CREATED",
+    "accountingActive": false,
+    "holderGateStatus": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+    "creatorTaxBps": 0,
+    "openingBuyWei": "0",
+    "privatePresale": "NONE",
+    "discountedInsiderRound": "NONE",
+    "hiddenTeamAllocation": "NONE",
+    "walletRoleStatus": "UNRESOLVED_OWNER_INPUTS_NOT_PUBLIC"
+  }
 }

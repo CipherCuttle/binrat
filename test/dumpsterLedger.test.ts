@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import worker from '../src/cloudflare/worker.js';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { ARC_CHAIN_ID } from '../src/arc/chain.js';
@@ -269,37 +271,16 @@ test('production funding configuration never defaults open and fixtures cannot l
   );
 });
 
-test('Cloudflare exposes the empty ledger without changing existing public routing', async () => {
-  const db = new D1CompatDatabase();
-  await db.exec(D1_SCHEMA_SQL);
-  const env: BinratWorkerEnv = {
-    DB: db,
-    CAPABILITY_MANIFEST_JSON: JSON.stringify(manifest)
-  };
+test('Cloudflare funding presentation consumes Pons authority without Arc wallets',async()=>{
+  const db=new D1CompatDatabase();await db.exec(D1_SCHEMA_SQL);
   try {
-    const ledgerResponse = await handleWorkerRequest(
-      new Request('https://binrat.example/api/dumpster-ledger'),
-      env
-    );
-    assert.equal(ledgerResponse.status, 200);
-    const ledger = await ledgerResponse.json() as {
-      schemaVersion: string;
-      fundingAuthority: { status: string };
-      totals: { entryCount: number };
-    };
-    assert.equal(ledger.schemaVersion, 'binrat.dumpster-ledger/0.1');
-    assert.equal(ledger.fundingAuthority.status, 'PRELAUNCH_AUTHORITIES_CONFIGURED');
-    assert.equal(ledger.totals.entryCount, 0);
-
-    assert.equal((await handleWorkerRequest(
-      new Request('https://binrat.example/api/capabilities'), env
-    )).status, 200);
-    assert.equal((await handleWorkerRequest(
-      new Request('https://binrat.example/api/health'), env
-    )).status, 200);
-  } finally {
-    db.close();
-  }
+    const manifest=JSON.parse(await readFile(new URL('../docs/CAPABILITY_MANIFEST_V0.json',import.meta.url),'utf8'));
+    const response=await worker.fetch(new Request('https://binrat.example/api/dumpster-ledger'),{DB:db,CAPABILITY_MANIFEST_JSON:JSON.stringify(manifest)});
+    assert.equal(response.status,200);const body=await response.json() as any;
+    assert.equal(body.schemaVersion,'binrat.public-funding/1');assert.equal(body.chainId,4663);assert.equal(body.accountingActive,false);
+    assert.deepEqual(body.entries,[]);assert.equal(body.configuredAuthorities.treasuryAddress,null);
+    assert.doesNotMatch(JSON.stringify(body),/0xab063A9b53a2Ab832a941aE5890ea05c1672339D/i);
+  } finally { db.close(); }
 });
 
 function fixtureConfig() {

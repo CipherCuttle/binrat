@@ -9,7 +9,7 @@
 #   gh workflow run public-read-plane-stability-candidate.yml \
 #     --ref integration/binrat-public-read-plane-stability-v1
 #
-# Authority: SHA 2d507045327bd4269a5c0dd4f2050805488f60ee (draft PR #121).
+# Authority: an explicitly reviewed immutable source SHA, supplied at dispatch.
 # Secrets consumed directly from GitHub Actions (never printed):
 #   - BINRAT_CLOUDFLARE_ADMIN_API_TOKEN (D1/queues/workers API scope)
 #   - BINRAT_CLOUDFLARE_ACCOUNT_ID
@@ -18,7 +18,17 @@
 name: public-read-plane-stability-candidate
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Exact reviewed candidate Git SHA (40 lowercase hex characters)
+        required: true
+        type: string
+      deploy_authorized:
+        description: Separate owner authorization to provision and deploy this candidate
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -28,7 +38,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  BINRAT_STABILITY_SHA: "2d507045327bd4269a5c0dd4f2050805488f60ee"
+  BINRAT_STABILITY_SHA: ${{ inputs.reviewed_sha }}
   CANDIDATE_WORKER: "binrat-read-plane-stability-candidate"
   CANDIDATE_D1: "binrat-read-plane-stability-candidate"
   CANDIDATE_QUEUE: "binrat-read-plane-stability-candidate-sync"
@@ -43,6 +53,7 @@ env:
 
 jobs:
   stability-candidate-gate:
+    if: ${{ inputs.deploy_authorized == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -54,13 +65,14 @@ jobs:
       - name: Checkout exact stability SHA
         uses: actions/checkout@v4
         with:
-          ref: "2d507045327bd4269a5c0dd4f2050805488f60ee"
+          ref: ${{ inputs.reviewed_sha }}
           persist-credentials: false
 
       - name: Authority re-check (HEAD must equal pinned SHA)
         run: |
           set -euo pipefail
           HEAD_SHA="$(git rev-parse HEAD)"
+          [[ "$BINRAT_STABILITY_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo 'GUARD_FAIL: INVALID_REVIEWED_SHA'; exit 1; }
           echo "AUTHORITY_RECHECK: HEAD=$HEAD_SHA pinned=$BINRAT_STABILITY_SHA"
           if [ "$HEAD_SHA" != "$BINRAT_STABILITY_SHA" ]; then
             echo "GUARD_FAIL: AUTHORITY_MISMATCH"
@@ -79,6 +91,9 @@ jobs:
 
       - name: Install dependencies (frozen lockfile)
         run: pnpm install --frozen-lockfile
+
+      - name: Test exact source and generate public release identity
+        run: pnpm check
 
       - name: Provision candidate D1 (create only; never reuse production)
         run: |
@@ -111,6 +126,7 @@ jobs:
           const cfg = {
             name: 'binrat-read-plane-stability-candidate',
             main: 'src/cloudflare/worker.ts',
+            version_metadata: { binding: 'BINRAT_WORKER_VERSION' },
             compatibility_date: '2026-09-18',
             compatibility_flags: ['nodejs_compat'],
             workers_dev: true,
@@ -203,7 +219,7 @@ jobs:
             if (vars[key] !== 'false') fail('VAR_MUST_BE_FALSE:' + key);
           }
           if (vars.BINRAT_PONS_OUTCOME_ENABLED !== 'true') fail('PONS_OUTCOME_NOT_ENABLED');
-          if (vars.BINRAT_RELEASE_SHA !== '2d507045327bd4269a5c0dd4f2050805488f60ee') fail('RELEASE_SHA_MISMATCH');
+          if (vars.BINRAT_RELEASE_SHA !== process.env.BINRAT_STABILITY_SHA) fail('RELEASE_SHA_MISMATCH');
           console.log('GUARD_PASS: candidate config is production-free');
           console.log('  worker=' + cfg.name);
           console.log('  d1=' + dbs[0].database_name + ' id=' + dbs[0].database_id);
@@ -280,16 +296,6 @@ jobs:
           pnpm dlx "wrangler@$WRANGLER_VERSION" deploy --dry-run --outdir .wrangler-dry-run \
             --config "$CANDIDATE_CONFIG" 2>&1 | tee "$RUNNER_TEMP/dry-run.log"
 
-      - name: Deploy candidate Worker (explicit --config, workers.dev only)
-        run: |
-          set -euo pipefail
-          pnpm dlx "wrangler@$WRANGLER_VERSION" deploy --config "$CANDIDATE_CONFIG" \
-            2>&1 | tee "$RUNNER_TEMP/deploy.log"
-          VERSION_ID="$(grep -oE 'Current Version ID: [0-9a-f-]{36}' "$RUNNER_TEMP/deploy.log" | head -n1 | awk '{print $4}')"
-          if [ -z "$VERSION_ID" ]; then echo "GUARD_FAIL: VERSION_ID_CAPTURE_FAILED"; exit 1; fi
-          echo "CANDIDATE_VERSION_ID=$VERSION_ID" >> "$GITHUB_ENV"
-          echo "Deploy receipt: worker=$CANDIDATE_WORKER version=$VERSION_ID sha=$BINRAT_STABILITY_SHA" | tee -a "$GITHUB_STEP_SUMMARY"
-
       - name: Set candidate-only secrets (values via stdin, never printed)
         run: |
           set -euo pipefail
@@ -302,6 +308,59 @@ jobs:
           SMOKE_SECRET="$(openssl rand -hex 32)"
           printf '%s\n' "$SMOKE_SECRET" | W secret put RAT_CANDIDATE_SMOKE_SECRET --config "$CANDIDATE_CONFIG"
           echo "Secrets set on $CANDIDATE_WORKER: BINRAT_ROBINHOOD_ARCHIVE_RPC_URL, RAT_CANDIDATE_SMOKE_SECRET" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy candidate Worker (explicit --config, workers.dev only)
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'EOF'
+          import { readFileSync,writeFileSync,readdirSync,appendFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          const files=readdirSync('.wrangler-dry-run').filter(name=>name.endsWith('.js'));
+          if(files.length!==1) throw new Error('BUILD_ARTIFACT_AMBIGUOUS');
+          const main='.wrangler-dry-run/'+files[0];
+          const workerSha256=createHash('sha256').update(readFileSync(main)).digest('hex');
+          const cfg=JSON.parse(readFileSync(process.env.CANDIDATE_CONFIG,'utf8'));
+          cfg.main=main; cfg.no_bundle=true;
+          writeFileSync('wrangler.stability-built.jsonc',JSON.stringify(cfg,null,2));
+          const release=JSON.parse(readFileSync('web/release.json','utf8'));
+          if(!release.sourceClean||release.sourceSha!==process.env.BINRAT_STABILITY_SHA) throw new Error('BUILD_SOURCE_UNVERIFIED');
+          writeFileSync(process.env.RUNNER_TEMP+'/built-release.json',JSON.stringify({release,workerSha256,main},null,2));
+          appendFileSync(process.env.GITHUB_ENV,'CANDIDATE_BUILD_ID='+release.buildId+'\n');
+          EOF
+          pnpm dlx "wrangler@$WRANGLER_VERSION" deploy --no-bundle --message "source=$BINRAT_STABILITY_SHA" --config wrangler.stability-built.jsonc \
+            2>&1 | tee "$RUNNER_TEMP/deploy.log"
+          VERSION_ID="$(grep -oE 'Current Version ID: [0-9a-f-]{36}' "$RUNNER_TEMP/deploy.log" | head -n1 | awk '{print $4}')"
+          if [ -z "$VERSION_ID" ]; then echo "GUARD_FAIL: VERSION_ID_CAPTURE_FAILED"; exit 1; fi
+          echo "CANDIDATE_VERSION_ID=$VERSION_ID" >> "$GITHUB_ENV"
+          echo "Deploy receipt: worker=$CANDIDATE_WORKER version=$VERSION_ID sha=$BINRAT_STABILITY_SHA" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Read back final active revision and schedule (GET-only)
+        run: |
+          set -euo pipefail
+          pnpm dlx "wrangler@$WRANGLER_VERSION" deployments list --json --config "$CANDIDATE_CONFIG" > "$RUNNER_TEMP/deployments-readback.json"
+          pnpm dlx "wrangler@$WRANGLER_VERSION" versions view "$CANDIDATE_VERSION_ID" --json --config "$CANDIDATE_CONFIG" > "$RUNNER_TEMP/version-readback.json"
+          node --input-type=module <<'EOF'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const artifact=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/built-release.json','utf8'));
+          const deployments=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/deployments-readback.json','utf8'));
+          const version=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/version-readback.json','utf8'));
+          const active=deployments.sort((a,b)=>a.created_on.localeCompare(b.created_on)).at(-1);
+          const id=process.env.CANDIDATE_VERSION_ID;
+          if(version.id!==id||version.annotations?.['workers/message']!=='source='+artifact.release.sourceSha||
+             active?.versions?.length!==1||active.versions[0].version_id!==id||active.versions[0].percentage!==100) throw new Error('ACTIVE_WORKER_REVISION_UNVERIFIED');
+          const url='https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(process.env.CLOUDFLARE_ACCOUNT_ID)+'/workers/scripts/'+encodeURIComponent(process.env.CANDIDATE_WORKER)+'/schedules';
+          const response=await fetch(url,{method:'GET',redirect:'error',headers:{authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN},signal:AbortSignal.timeout(15000)});
+          if(!response.ok) throw new Error('SCHEDULE_READBACK_UNAVAILABLE');
+          const schedules=await response.json();
+          if(schedules.success!==true||schedules.result?.schedules?.length!==1||schedules.result.schedules[0].cron!=='* * * * *') throw new Error('PUBLICATION_CADENCE_UNVERIFIED');
+          const receipt={readbackSource:'CLOUDFLARE_READ_ONLY',capturedAtMs:Date.now(),origin:process.env.CANDIDATE_URL,
+            workerName:process.env.CANDIDATE_WORKER,workerRevisionId:id,sourceSha:artifact.release.sourceSha,buildId:artifact.release.buildId,
+            workerSha256:artifact.workerSha256,assetsDigest:artifact.release.assetsDigest,
+            activeVersions:active.versions.map(v=>({id:v.version_id,percentage:v.percentage})),
+            runtimeSemantics:{...artifact.release.runtimeSemantics,configurationSource:'CLOUDFLARE_READ_ONLY_SCHEDULE_AND_REVIEWED_CACHE_HEADERS'},
+            cronReadback:['* * * * *']};
+          writeFileSync(process.env.RUNNER_TEMP+'/provider-readback.json',JSON.stringify(receipt,null,2));
+          EOF
 
       - name: Smoke /api/health and /api/status
         run: |
@@ -328,5 +387,10 @@ jobs:
             ${{ runner.temp }}/deploy.log
             ${{ runner.temp }}/health.json
             ${{ runner.temp }}/status.json
+            ${{ runner.temp }}/built-release.json
+            ${{ runner.temp }}/provider-readback.json
+            .artifacts/public-truth/source-receipt.json
+            .wrangler-dry-run/
+            web/release.json
           retention-days: 30
           if-no-files-found: warn

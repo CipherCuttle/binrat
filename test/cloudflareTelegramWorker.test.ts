@@ -58,7 +58,7 @@ test('Cloudflare Telegram webhook authenticates and durably ignores while replie
   }
 });
 
-test('Cloudflare Telegram Rat resolves /status locally and persists reply receipt', async () => {
+test('Cloudflare Telegram Rat rejects Arc-only status and persists its fail-closed reply receipt', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
   const store = new D1Store(db, 5042);
@@ -111,8 +111,8 @@ test('Cloudflare Telegram Rat resolves /status locally and persists reply receip
       { externalFetch: telegramFetch, now: () => Date.now() }
     );
     assert.equal(response.status, 200);
-    assert.match(sentText, /index: READY/);
-    assert.match(sentText, /launches indexed: 1/);
+    assert.match(sentText, /index: UNVERIFIED \/ UNAVAILABLE/);
+    assert.match(sentText, /launches in publication: 0/);
 
     const row = await new D1TelegramLedger(db).get(11);
     assert.equal(row?.state, 'REPLIED');

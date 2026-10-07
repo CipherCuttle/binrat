@@ -1,9 +1,18 @@
 // Presentation only. The existing read plane owns data; this module cannot admit jobs.
 const profiles = Object.freeze({
-  "rat-zero": { name: "RAT ZERO", role: "SCOUT", status: "LIVE", image: "rat-zero.jpg", headline: "WHAT JUST HIT THE DUMPSTER?", description: "Finds fresh Pons launches and checks what BINRAT remembers.", steps: ["Find fresh Pons launches.", "Open the launch evidence.", "Keep source-backed receipts and visible gaps."], action: "DIG WITH RAT ZERO", href: "#garbage" },
-  tripwire: { name: "TRIPWIRE", role: "WATCHER", status: "BUILDING", image: "tripwire.png", headline: "LEAVE HIM ON SOMETHING.", description: "Watches a subject and alerts you when a supported condition changes. Persistent Tripwire jobs are being built.", steps: ["Watch an exact address or supported condition.", "Wait quietly when nothing qualifies.", "Bring you back to the changed Case."], action: "BUILDING · NOT AVAILABLE YET" },
-  sniffer: { name: "SNIFFER", role: "TRAIL HUNTER", status: "NEXT", image: "sniffer.png", headline: "HE FOLLOWS THE MONEY.", description: "Follows an evidenced funder into new wallets and checks whether they later launch on Pons. Sniffer jobs are next.", steps: ["Follow an evidenced funding trail.", "Notice a qualifying recipient.", "Hand a later Pons launch to Rat Zero."], action: "NEXT · NOT AVAILABLE YET" },
+  "rat-zero": { name: "RAT ZERO", role: "SCOUT", image: "rat-zero.jpg", headline: "WHAT JUST HIT THE DUMPSTER?", steps: ["Discover a Pons launch.", "Open its supported Case.", "Check receipts and visible gaps."], action: "START DIGGING", href: "#garbage" },
+  tripwire: { name: "TRIPWIRE", role: "WATCHER", image: "tripwire.png", headline: "A FUTURE RAT TO LEAVE BEHIND.", steps: ["Pons Watch follows current bot access gates. Legacy Watch cannot be re-armed on Pons.", "Persistent Tripwire job admission is not available.", "No Rat is employed from this page."] },
+  sniffer: { name: "SNIFFER", role: "TRAIL HUNTER", image: "sniffer.png", headline: "HE FOLLOWS THE MONEY.", steps: ["A real funding handoff has been captured.", "Later-launch usefulness remains unproven.", "No prediction or production employment is offered."] },
 });
+let publicProduct = null;
+let refreshSelected = () => {};
+export function productRat(id) { return publicProduct?.crew.find(rat => rat.id === id) ?? null; }
+export function renderPublicProduct(product) {
+  publicProduct = product;
+  for (const target of document.querySelectorAll("[data-product-status]")) target.textContent = productRat(target.dataset.productStatus)?.status ?? "UNVERIFIED";
+  for (const target of document.querySelectorAll("[data-product-description]")) target.textContent = productRat(target.dataset.productDescription)?.description ?? "Status unavailable.";
+  refreshSelected();
+}
 const escapeHtml = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 
 export function initFrontdoor({ initialFragment, onOpenCase, onRetry, onNavigate }) {
@@ -12,16 +21,20 @@ export function initFrontdoor({ initialFragment, onOpenCase, onRetry, onNavigate
   const panel = document.querySelector("#crew-selected");
   const fresh = document.querySelector("#fresh-cases");
   const menu = document.querySelector(".section-nav");
+  let selected = "rat-zero";
 
   function selectRat(key) {
     const profile = profiles[key];
     if (!profile) return;
+    selected = key;
+    const rat = productRat(key);
+    const status = rat?.status ?? "UNVERIFIED";
     for (const button of document.querySelectorAll("[data-select-rat]")) {
       button.setAttribute("aria-pressed", String(button.dataset.selectRat === key));
     }
     panel.dataset.rat = key;
     panel.innerHTML = `<figure class="crew-portrait"><img src="./assets/crew/${profile.image}" alt="${profile.name}, the approved BINRAT ${profile.role.toLowerCase()}" width="1024" height="1024" loading="lazy" /></figure>
-      <div class="crew-job"><p class="eyebrow">${profile.role} <span class="rat-status">${profile.status}</span></p><h3>${profile.name}</h3><strong class="crew-line">${profile.headline}</strong><p>${profile.description}</p><ol>${profile.steps.map((step) => `<li>${step}</li>`).join("")}</ol>${profile.href ? `<a class="button primary" href="${profile.href}">${profile.action} <span aria-hidden="true">→</span></a>` : `<p class="rat-unavailable">${profile.action}</p>`}</div>`;
+      <div class="crew-job"><p class="eyebrow">${profile.role} <span class="rat-status">${escapeHtml(status)}</span></p><h3>${profile.name}</h3><strong class="crew-line">${profile.headline}</strong><p>${escapeHtml(rat?.description ?? "Product status unavailable. No capability is promoted.")}</p><ol>${(status==='UNVERIFIED'?['Canonical evidence is unavailable.']:profile.steps).map((step) => `<li>${step}</li>`).join("")}</ol>${profile.href && rat?.actionAvailable ? `<a class="button primary" href="${profile.href}">${profile.action} <span aria-hidden="true">→</span></a>` : `<p class="rat-unavailable">${escapeHtml(status)} · ${key === "rat-zero" ? "CHECK READ AVAILABILITY" : "NOT AVAILABLE YET"}</p>`}</div>`;
   }
 
   function applyDestination(fragment) {
@@ -43,6 +56,7 @@ export function initFrontdoor({ initialFragment, onOpenCase, onRetry, onNavigate
     menu.open = false;
   }
 
+  refreshSelected = () => selectRat(selected);
   selectRat("rat-zero");
   applyDestination(initialFragment || location.hash);
   window.addEventListener("hashchange", () => {
@@ -100,8 +114,9 @@ export function renderFreshState({ state, snapshot, status }) {
   }
   const checkpoint = snapshot?.checkpoint ? ` · verified through block ${snapshot.checkpoint}` : "";
   const statusMatchesSnapshot = status?.checkpointBlock === snapshot?.checkpoint &&
+    status?.chainId === snapshot?.chainId && status?.checkpointBlockHash === snapshot?.checkpointBlockHash &&
     snapshot?.digest && status?.feedDigest === snapshot.digest;
-  const verifiedAt = statusMatchesSnapshot && Number.isSafeInteger(status?.verifiedAtMs) && status.verifiedAtMs > 0 && status.verifiedAtMs <= 8.64e15
+  const verifiedAt = statusMatchesSnapshot && Number.isSafeInteger(status?.verifiedAtMs) && status.verifiedAtMs > 0 && status.verifiedAtMs <= Date.now() && status.verifiedAtMs <= 8.64e15
     ? ` · snapshot verified ${new Date(status.verifiedAtMs).toISOString()}` : "";
   label.textContent = `${state === "STALE_VERIFIED" ? "Refresh unavailable. Showing last verified launches" : "Showing verified Pons launches"}${checkpoint}${verifiedAt}.`;
 }

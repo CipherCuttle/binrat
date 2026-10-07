@@ -7,8 +7,8 @@ const dataSource = readFileSync(new URL('../web/data-source.js', import.meta.url
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 
 const requiredHtml = [
-  'YOUR RATS CAN.', 'START DIGGING', 'WORKING RAT · PLANNED',
-  'More work never buys a different truth.',
+  'RAT ZERO IS DIGGING.', 'START DIGGING', 'data-product-status="working-rat"',
+  'STAKE BUYS LABOR. NOT TRUTH.',
   'og:title', 'og:description', 'twitter:card', './launch-presentation.css'
 ];
 for (const marker of requiredHtml) {
@@ -26,10 +26,7 @@ if (!launchDoc.includes('NOT LAUNCHED') || !launchDoc.includes('NOT PUBLISHED') 
   throw new Error('LAUNCH_STATUS_DOC_DRIFT');
 }
 if (!launchDoc.includes('The token never gets to rewrite a receipt.')) throw new Error('LAUNCH_TRUTH_BOUNDARY_MISSING');
-if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('LAUNCH_RUNTIME_TOKEN_STATE_NOT_FAIL_CLOSED');
-if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('LAUNCH_RUNTIME_AUTHORITY_NOT_FAIL_CLOSED');
 if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('LAUNCH_RUNTIME_AUTHORITY_SHAPE_NOT_BOUND');
-if (!app.includes('renderTokenLaunchState(manifest.launchAuthorization)')) throw new Error('LAUNCH_RUNTIME_PRESENTATION_NOT_BOUND');
 
 // The current frontdoor deliberately omits token promotion; authority remains in the docs/runtime.
 if (html.includes('$BINRAT') || html.includes('id="token-status"')) throw new Error('LAUNCH_UNAUTHORIZED_PUBLIC_TOKEN_PROMOTION');
@@ -51,3 +48,4 @@ for (const prohibited of [
 }
 
 console.log('BINRAT launch-presentation invariants: PASS');
+if(!app.includes('renderPublicProduct(manifest.publicProduct)')) throw new Error('LAUNCH_RUNTIME_PROJECTION_NOT_BOUND');

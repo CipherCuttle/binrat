@@ -38,7 +38,7 @@ assert.equal(malformed.coverage, 'UNVERIFIED');
 console.log('BINRAT share-card invariants: PASS');
 
 const live = { ...fixture, mode: 'LIVE', coverage: 'UNVERIFIED' };
-assert.equal(buildShareCardModel(live).stamp, 'LIVE // PUBLIC PROJECTION');
+assert.equal(buildShareCardModel(live).stamp, 'PUBLIC RECEIPTS // FRESHNESS UNVERIFIED');
 assert.match(buildSharePostText(live), /prior indexed bags: 8/);
 assert.ok(!buildSharePostText(live).includes('fixture'));
 assert.throws(() => buildShareCardModel({ ...fixture, mode: 'OTHER' }));

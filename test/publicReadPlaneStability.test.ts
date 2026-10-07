@@ -12,6 +12,7 @@ import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { deriveEventId, deriveLaunchId } from '../src/core/identity.js';
 import { buildProvenanceFact } from '../src/intelligence/provenance.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
+import { canonicalJson } from '../src/evidence/canonical.js';
 
 const NOW=Date.now();
 const CHECKPOINT=200n;
@@ -21,6 +22,59 @@ const address=(value:number)=>`0x${value.toString(16).padStart(40,'0')}` as Hex;
 const feedLaunch=(id:string)=>({launchId:id.repeat(64),token:address(7),symbol:'P',name:'Pons',blockNumber:'100',
   txHash:hash(8),deployer:CREATOR,priorLaunchCount:0,factId:`binrat-fact:4663:${id.repeat(64)}`,
   metadata:{imageUri:'',website:'',twitter:'',telegram:''}});
+
+test('regression: embedded snapshot digest must equal the canonical row digest',async()=>{
+  const f=await fixture(0);
+  try {
+    const snapshot=await seedPublished(f);
+    await f.db.prepare('UPDATE binrat_public_snapshots SET snapshot_json=? WHERE chain_id=4663')
+      .bind(canonicalJson({...snapshot,feedDigest:'f'.repeat(64)})).run();
+    await assert.rejects(readPublicSnapshot(f.db),/PUBLIC_SNAPSHOT_DIGEST_INVALID/);
+  } finally { f.compat.close(); }
+});
+test('regression: same-checkpoint conflicting publication retains the verified row',async()=>{
+  for(const change of ['hash','digest']) {
+    const f=await fixture(0);
+    try {
+      const old=await seedPublished(f);
+      const next=await buildPublicSnapshot({schemaVersion:'binrat.latest-launches/0.1',chainId:4663,
+        sourceCheckpoint:'200',checkpointBlockHash:change==='hash'?hash(999):old.checkpointBlockHash,
+        historyCoverage:'PARTIAL',launches:change==='digest'?[feedLaunch('e')]:[]});
+      await assert.rejects(publishPublicSnapshot(f.db,next,NOW+1),/PUBLIC_SNAPSHOT_CHECKPOINT_CONFLICT/);
+      assert.equal((await readPublicSnapshot(f.db))?.feedDigest,old.feedDigest);
+    } finally { f.compat.close(); }
+  }
+});
+test('regression: unknown public route is a cheap 404 without full projection',async()=>{
+  const f=await fixture(0);
+  try {
+    f.db.statements=0;
+    const response=await worker.fetch(new Request('https://binrat.example/api/unknown'),{DB:f.db});
+    assert.equal(response.status,404);
+    assert.equal(f.db.statements,0);
+  } finally { f.compat.close(); }
+});
+test('public Case reads existing verified evidence with three bounded queries, including stale publications',async()=>{
+  const f=await fixture(25);
+  try {
+    const raw=await latestPonsLaunchSnapshot(f.db,NOW,20);
+    await publishPublicSnapshot(f.db,await buildPublicSnapshot({schemaVersion:'binrat.latest-launches/0.1',chainId:4663,...raw,historyCoverage:'PARTIAL'}),NOW);
+    await f.runtime.put({sourceVerified:false,liveCaughtUp:false,headBlock:202n,targetBlock:200n,
+      observationReady:false,historyBackfillComplete:false,historyBackfillTargetBlock:null,lastSyncError:'RPC_TIMEOUT',
+      lastHistoryError:null,lastObservationError:null,updatedAtMs:NOW});
+    f.db.statements=0;
+    const response=await worker.fetch(new Request(`https://binrat.example/api/bag/${f.launches[24]!.launchId}`),{DB:f.db});
+    assert.equal(response.status,200);
+    assert.equal(f.db.statements,3);
+    const body=await response.json() as {chainId:number;bag:{id:string;trashTrail:{prior:unknown[]}}};
+    assert.equal(body.chainId,4663);
+    assert.equal(body.bag.id,f.launches[24]!.launchId);
+    assert.equal(body.bag.trashTrail.prior.length,19);
+    await f.db.prepare("UPDATE provenance_facts SET payload_json='{}' WHERE launch_id=?").bind(f.launches[24]!.launchId).run();
+    const corrupted=await worker.fetch(new Request(`https://binrat.example/api/bag/${f.launches[24]!.launchId}`),{DB:f.db});
+    assert.equal(corrupted.status,503);
+  } finally { f.compat.close(); }
+});
 
 class CountingDb implements D1DatabaseLike {
   statements=0;
@@ -258,4 +312,26 @@ test('private holder responses keep no-store and corrupted snapshots fail closed
     await assert.rejects(readPublicSnapshot(f.db),/PUBLIC_SNAPSHOT_DIGEST_INVALID/);
     assert.notEqual(snapshot.feedDigest,'0'.repeat(64));
   } finally { f.compat.close(); }
+});
+
+test('hostile H3: future or expired publication metadata preserves stale verified evidence',async()=>{
+ const f=await fixture(0);
+ try {
+  await seedPublished(f);
+  for(const verifiedAt of [NOW+1_000_000,NOW-180_001]) {
+   await f.db.prepare('UPDATE binrat_public_snapshots SET verified_at_ms=? WHERE chain_id=4663').bind(verifiedAt).run();
+   const status=await publicStatus(f.db,NOW,180_000);assert.equal(status.state,'STALE_VERIFIED');
+   assert.ok(await readPublicSnapshot(f.db));
+  }
+ } finally {f.compat.close();}
+});
+
+test('hostile H2: health never promotes Arc to current when the Pons runtime is missing',async()=>{
+ const f=await fixture(0);
+ try {
+  await f.db.prepare('DELETE FROM binrat_runtime_state WHERE chain_id=4663').run();
+  const response=await worker.fetch(new Request('https://binrat.example/api/health'),{DB:f.db});
+  const body=await response.json() as {chainId:number;indexReady:boolean;historicalArc:unknown};
+  assert.equal(body.chainId,4663);assert.equal(body.indexReady,false);assert.ok(body.historicalArc);
+ } finally {f.compat.close();}
 });

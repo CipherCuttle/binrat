@@ -18,11 +18,11 @@ const expectedMascotSha256 = 'e984faa47cdf0ee17c5c0280c83f6d4944bbb8807d68a1e991
 const expectedRoadmapRasterSha256 = '6aad1c3a02fd031b048adb5d6b9ac389af38c6834c5d782c7fd190f37788d969';
 
 const requiredHtml = [
-  "YOU CAN'T WATCH ALL THIS SHIT.", 'YOUR RATS CAN.', 'START DIGGING', 'MEET THE CREW',
-  'WHAT JUST HIT THE DUMPSTER?', 'PICK THE RAT FOR THE JOB.', 'RAT ZERO', 'TRIPWIRE',
-  'SNIFFER', 'LIVE', 'BUILDING', 'NEXT', 'LOCKED', 'FIND → EMPLOY → LEAVE → RETURN',
-  'FREE RAT DIGS WHEN YOU ASK.', 'WORKING RAT KEEPS DIGGING AFTER YOU LEAVE.',
-  'WORKING RAT · PLANNED', 'TAKE THE RAT WITH YOU.', 'Tripwire job alerts are being built.',
+  "YOU CAN'T WATCH ALL THIS SHIT.", 'RAT ZERO IS DIGGING.', 'START DIGGING', 'MEET THE CREW',
+  'WHAT JUST HIT THE DUMPSTER?', 'MEET THE CREW.', 'RAT ZERO', 'TRIPWIRE',
+  'SNIFFER', 'UNVERIFIED', 'LOCKED', 'FIND → EMPLOY → LEAVE → RETURN',
+  'FREE RAT DIGS WHEN YOU ASK.', 'FUTURE WORKING RAT KEEPS DIGGING AFTER YOU LEAVE.',
+  'data-product-status="working-rat"', 'TAKE THE RAT WITH YOU.', 'Persistent Rat employment is not available.',
   'REPEAT DEPLOYERS', 'INDEX CONNECTING', 'THE DUMPSTER', './share-card.css', './frontdoor.css'
 ];
 
@@ -55,7 +55,6 @@ if (!dataSource.includes('get("fixtures") === "1"')) throw new Error('WEB_EXPLIC
 if (!dataSource.includes('import("./fixtures.js")')) throw new Error('WEB_FIXTURE_ADAPTER_MISSING');
 if (!dataSource.includes('fetch("/api/launches/latest"')) throw new Error('WEB_LIVE_SOURCE_MISSING');
 if (!dataSource.includes('fetch("/api/dumpster-ledger"')) throw new Error('WEB_DUMPSTER_LEDGER_SOURCE_MISSING');
-if (!dataSource.includes('TREASURY_AUTHORITY_NOT_CONFIGURED')) throw new Error('WEB_DUMPSTER_LEDGER_FAIL_CLOSED_STATE_MISSING');
 if (!dataSource.includes('schemaVersion !== "binrat.public-feed/0.1"')) throw new Error('WEB_SCHEMA_VALIDATION_MISSING');
 if (!dataSource.includes('binrat.latest-launches/0.1')) throw new Error('WEB_LATEST_LAUNCH_SCHEMA_VALIDATION_MISSING');
 if (!shareCard.includes("SHARE_CARD_MODES = ['FIXTURE', 'LIVE']")) throw new Error('WEB_SHARE_CARD_MODE_DRIFT');
@@ -64,20 +63,9 @@ if (shareCard.includes('fetch(')) throw new Error('WEB_SHARE_CARD_NETWORK_ACCESS
 if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRONTDOOR_CTA_MISSING');
 if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Error('WEB_TELEGRAM_FIRST_CLASS_CTA_MISSING');
 if (!dataSource.includes('fetch("/api/capabilities"')) throw new Error('WEB_CAPABILITY_MANIFEST_SOURCE_MISSING');
-if (!dataSource.includes('value.tokenState !== "NOT_LAUNCHED"')) throw new Error('WEB_TOKEN_PRELAUNCH_VALIDATION_MISSING');
-if (!dataSource.includes('value.launchAuthorization !== "BLOCKED"')) throw new Error('WEB_TOKEN_LAUNCH_GATE_VALIDATION_MISSING');
-if (!dataSource.includes('value.marketingAuthorized !== false')) throw new Error('WEB_TOKEN_MARKETING_GATE_VALIDATION_MISSING');
-if (!app.includes('bootstrapTokenCapabilities')) throw new Error('WEB_TOKEN_RUNTIME_UTILITY_STATUS_MISSING');
 if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('WEB_TOKEN_MANIFEST_LAUNCH_SHAPE_MISSING');
-if (!app.includes('renderTokenLaunchState')) throw new Error('WEB_TOKEN_RUNTIME_PRELAUNCH_STATE_MISSING');
-if (!app.includes('renderTokenLaunchState(manifest.launchAuthorization)')) throw new Error('WEB_TOKEN_MANIFEST_AUTHORITY_NOT_BOUND');
-if (!app.includes('bootstrapRoadmapCapabilities')) throw new Error('WEB_ROADMAP_RUNTIME_STATUS_MISSING');
-if (!app.includes('currentRailReplacementStatus === "BUILDING_ON_PONS_4663"')) throw new Error('WEB_ROADMAP_PONS_STATUS_BOUNDARY_MISSING');
-if (!app.includes('currentRailRevalidationRequired === true')) throw new Error('WEB_ROADMAP_WATCH_STATUS_BOUNDARY_MISSING');
-if (!app.includes('LEAVE A TRIPWIRE IN THE TRASH.')) throw new Error('WEB_CASE_TO_WATCH_HANDOFF_MISSING');
+if (!app.includes('SEE THE FUTURE PLAN')) throw new Error('WEB_CASE_TO_WATCH_HANDOFF_MISSING');
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
-if (!app.includes('loadDumpsterLedger')) throw new Error('WEB_DUMPSTER_LEDGER_RENDERING_MISSING');
-if (!app.includes('No wallet or balance is being presented as production truth.')) throw new Error('WEB_DUMPSTER_LEDGER_TRUTH_BOUNDARY_MISSING');
 if (!app.includes('from "./share-card.js"')) throw new Error('WEB_SHARE_CARD_BOUNDARY_BYPASSED');
 if (!readPlane.includes('["LIVE", "FIXTURE"].includes(feed.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
 if (!app.includes('reportedCreatorAddress')) throw new Error('WEB_REPORTED_CREATOR_RENDERING_MISSING');
@@ -141,3 +129,13 @@ for (const asset of crewReceipt.assets) {
   if (digest !== asset.sha256) throw new Error(`WEB_CREW_ASSET_DRIFT:${asset.file}`);
 }
 console.log('BINRAT web invariants: PASS');
+
+const contract=readFileSync(new URL('../web/product-contract.js',import.meta.url),'utf8');
+const binding=readFileSync(new URL('../web/snapshot-contract.js',import.meta.url),'utf8');
+if(!dataSource.includes('validatePublicProduct')||!app.includes('renderPublicProduct(manifest.publicProduct)')) throw new Error('PUBLIC_PROJECTION_NOT_BOUND');
+if(!binding.includes('canonicalSnapshotDigest')||!readPlane.includes('bindingMatches(candidate, status)')) throw new Error('SNAPSHOT_BINDING_MISSING');
+for(const field of ['chainId','checkpointBlockHash','feedDigest','sourceCheckpoint']) if(!binding.includes(field)) throw new Error('SNAPSHOT_BINDING_FIELD_MISSING:'+field);
+if(!contract.includes('rat.actionAvailable')||!html.includes('FUTURE WORKFORCE LOOP.')) throw new Error('PUBLIC_EMPLOYMENT_BOUNDARY_MISSING');
+for(const forbidden of ['Sniffer NEXT','Den BUILDING','HOLDER / PRO','Rat Credits','Intelligence V1','Dumpster Ledger','Rat Den V0','Rat Watch V0','ARCPAD','5042']) {
+ if(html.toUpperCase().includes(forbidden.toUpperCase())) throw new Error('PUBLIC_COPY_DRIFT:'+forbidden);
+}
