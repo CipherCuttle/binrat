@@ -1278,9 +1278,9 @@ async function executeUiCallback(
   if (action.action === 'RATS_PAGE') {
     try {
       const snapshot=await loadRatsSnapshot(db,action.discoveryId,now);
-      if (action.index >= snapshot.candidates.length) return {kind:'ERROR',code:'That Rat snapshot is unavailable or its page is out of bounds.'};
+      if (action.index >= snapshot.candidates.length) return {kind:'ERROR',code:'That find snapshot is unavailable or its page is out of bounds.'};
       return {kind:'RATS',snapshot,candidateIndex:action.index};
-    } catch { return {kind:'ERROR',code:'That Rat snapshot is unavailable or expired.'}; }
+    } catch { return {kind:'ERROR',code:'That find snapshot is unavailable or expired.'}; }
   }
   if (action.action === 'WATCHES') return commandFor('watches');
   const caseId = await caseIdForShare(db,action.shareId);

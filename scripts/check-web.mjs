@@ -20,7 +20,7 @@ const expectedRoadmapRasterSha256 = '6aad1c3a02fd031b048adb5d6b9ac389af38c6834c5
 const requiredHtml = [
   "YOU CAN'T WATCH ALL THIS SHIT.", 'RAT ZERO IS DIGGING.', 'START DIGGING', 'MEET THE CREW',
   'WHAT JUST HIT THE DUMPSTER?', 'MEET THE CREW.', 'RAT ZERO', 'TRIPWIRE',
-  'SNIFFER', 'UNVERIFIED', 'LOCKED', 'FIND → EMPLOY → LEAVE → RETURN',
+  'SNIFFER', 'CHECKING', 'LOCKED', 'FIND → EMPLOY → LEAVE → RETURN',
   'FREE RAT DIGS WHEN YOU ASK.', 'FUTURE WORKING RAT KEEPS DIGGING AFTER YOU LEAVE.',
   'data-product-status="working-rat"', 'TAKE THE RAT WITH YOU.', 'Persistent Rat employment is not available.',
   'REPEAT DEPLOYERS', 'INDEX CONNECTING', 'THE DUMPSTER', './share-card.css', './frontdoor.css'
@@ -31,8 +31,8 @@ for (const marker of requiredHtml) {
 }
 
 const frontdoorOrder = [
-  'id="hero-title"', 'id="fresh-proof"', 'id="crew"', 'id="how"',
-  'id="working-rat"', 'id="telegram"'
+  'id="hero-title"', 'id="fresh-proof"', 'id="crew"', 'id="telegram"',
+  'id="how"', 'id="working-rat"'
 ].map((marker) => html.indexOf(marker));
 if (
   frontdoorOrder.some((index) => index < 0) ||
@@ -41,6 +41,20 @@ if (
   throw new Error(`WEB_FRONTDOOR_ORDER_DRIFT:${frontdoorOrder.join(',')}`);
 }
 
+const frontdoorJs = readFileSync(new URL('../web/frontdoor.js', import.meta.url), 'utf8');
+// Loading must not masquerade as canonical UNVERIFIED; failure must still fail closed to UNVERIFIED.
+if (/data-product-status="[a-z-]+"[^>]*>UNVERIFIED</.test(html)) throw new Error('WEB_LOADING_STATE_MASQUERADES_AS_UNVERIFIED');
+if (!frontdoorJs.includes('"UNVERIFIED"') || !frontdoorJs.includes('projectionSettled')) throw new Error('WEB_FAIL_CLOSED_UNVERIFIED_MISSING');
+// Customer-facing vocabulary: Den is planned and not primary navigation; Telegram is a hero secondary.
+const navBlocks = html.match(/<nav aria-label="(?:Primary|Mobile primary)">[\s\S]*?<\/nav>/g) ?? [];
+if (navBlocks.length !== 2 || navBlocks.some((block) => block.includes('#den'))) throw new Error('WEB_DEN_IN_PRIMARY_NAV');
+if (/<footer[\s\S]*href="#den"/.test(html)) throw new Error('WEB_DEN_IN_FOOTER_NAV');
+const heroBlock = html.slice(html.indexOf('id="hero-title"'), html.indexOf('id="fresh-proof"'));
+if (!heroBlock.includes('Fresh Pons launches. What BINRAT remembers about the deployer. Receipts you can open.')) throw new Error('WEB_HERO_CURRENT_VALUE_MISSING');
+if (!heroBlock.includes('t.me/BinratBot')) throw new Error('WEB_HERO_TELEGRAM_SECONDARY_MISSING');
+if (/future product direction|EMPLOY|Working Rat|staking/i.test(heroBlock)) throw new Error('WEB_HERO_FUTURE_LANGUAGE');
+if (/Fresh Rats/i.test(html)) throw new Error('WEB_FRESH_RATS_COLLISION');
+if (!html.includes('Watch is not Tripwire')) throw new Error('WEB_WATCH_TRIPWIRE_DISTINCTION_MISSING');
 if (!css.includes('--red: #ff2638')) throw new Error('WEB_BRAND_RED_DRIFT');
 if (!css.includes('--dumpster: #263b35')) throw new Error('WEB_DUMPSTER_GREEN_DRIFT');
 if (css.includes('image-rendering: pixelated') || shareCss.includes('image-rendering: pixelated')) throw new Error('WEB_ARTIFICIAL_PIXELATION');

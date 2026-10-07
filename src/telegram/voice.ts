@@ -268,8 +268,13 @@ function bodyFor(plan: RatAnswerPlan): string[] {
       ];
     case 'HELP':
       return [
+        "BINRAT digs through fresh Pons launches. Rat Zero is BINRAT's current Scout.",
+        'Open a Case. Check the receipts. Other Rats are not ready yet.',
+        '',
         'ask me like a person or use commands:',
         '',
+        '/rats — fresh finds: repeat deployers BINRAT just noticed',
+        '/dig 0x... — check a deployer',
         '/status — verified publication and freshness',
         '/roadmap — crew stages and future product direction',
         '/token — launch/token state',
@@ -280,7 +285,7 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         'Pons Watch follows current bot access gates. Legacy Watch cannot be re-armed on Pons. It is not Tripwire employment.',
         '/watch 0x... — watch a future indexed launch from the same exact Pons-reported deployer',
         '/unwatch 0x... — stop watching that reported address',
-        '/watches — list this chat\'s watched reported addresses',
+        '/watches — my watches: this chat\'s watched reported addresses',
         '/proof — rules of the bin',
         '/feedback bug: <message> — private suggestion box (when enabled)',
         '/feedback idea: <message> — suggest a feature (when enabled)',

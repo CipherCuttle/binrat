@@ -308,7 +308,7 @@ export function renderRats(snapshot: RatsSnapshot): string {
     'No profitability, safety or identity conclusion.'
   ].join('\n\n');
   return [
-    '🐀 FRESHEST REPEAT DEPLOYERS',
+    '🐀 FRESH FINDS · freshest repeat deployers',
     snapshot.candidates.map(candidate => {
       const prior=Math.max(1,candidate.recurrenceCount-1);
       const latest=candidate.latestLaunch.symbol ? String.fromCharCode(36) + candidate.latestLaunch.symbol : (candidate.latestLaunch.name || 'unnamed launch');
