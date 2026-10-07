@@ -84,8 +84,8 @@ This makes the control label chronology-safe: at least 90 days of future non-lau
 
 | Replay | TP | FN | Recall |
 | --- | ---: | ---: | ---: |
-| 45d before launch | 1 | 6 | 14.3% |
-| 30d before launch | 1 | 6 | 14.3% |
+| 45d before launch | 2 | 5 | 28.6% |
+| 30d before launch | 2 | 5 | 28.6% |
 | 14d before launch | 5 | 2 | 71.4% |
 | 7d before launch | 5 | 2 | 71.4% |
 
@@ -108,7 +108,7 @@ The preregistered medium-horizon target was:
 
 V1 result:
 
-- 45-day recall = **14.3%**
+- 45-day recall = **28.6%**
 - 180-day temporal FPR = **0%**
 
 Therefore:
