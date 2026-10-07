@@ -13,11 +13,6 @@ export const LAUNCH_PRESSURE_PILOT: readonly HistoricalPressureProject[] = [
           sourceRef: 'https://github.com/taikoxyz/taiko-mono/commit/8e1221081c4f8bec4963c8dd64ace64fb1413c9b'
         },
         {
-          observedOn: '2024-05-11',
-          kind: 'RELEASE_CANDIDATE',
-          sourceRef: 'https://github.com/taikoxyz/taiko-mono/commit/dd8725f8d27f835102fa3c5a013003090268357d'
-        },
-        {
           observedOn: '2024-05-13',
           kind: 'PRODUCTION_DEPLOYMENT',
           sourceRef: 'https://github.com/taikoxyz/taiko-mono/commit/c6a7e4ce260deec0277fd750d1e93cc2a2fbf9d4'
