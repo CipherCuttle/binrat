@@ -24,7 +24,7 @@ import {
 
 const CONFIG_URL = new URL('../docs/BINRAT_LAUNCH_CONFIG_V0.json', import.meta.url);
 const EXECUTION_URL = new URL('../docs/BINRAT_LAUNCH_EXECUTION_RECEIPT_V0.template.json', import.meta.url);
-const MANIFEST_URL = new URL('../docs/CAPABILITY_MANIFEST_V0.json', import.meta.url);
+const MANIFEST_URL = new URL('./fixtures/historical-arc-capability-manifest.json', import.meta.url);
 
 async function json(url: URL): Promise<Record<string, unknown>> {
   return JSON.parse(await readFile(url, 'utf8')) as Record<string, unknown>;
@@ -138,18 +138,12 @@ test('status consistency validator rejects contradictory token state', async () 
   assert.throws(() => validateCapabilityManifest(manifest), /AUTHORIZATION_ESCALATION/);
 });
 
-test('canonical Telegram token behavior reports configured roles without escalating launch state', async () => {
-  const manifest = await json(MANIFEST_URL) as unknown as CapabilityManifest;
-  const reply = await renderRatReply('/token', {
-    apiBaseUrl: 'https://binrat.example',
-    siteUrl: 'https://binrat.example',
-    manifest
-  });
-  assert.match(reply ?? '', /token state: NOT_LAUNCHED/);
-  assert.match(reply ?? '', /launch authorization: BLOCKED/);
-  assert.match(reply ?? '', new RegExp(BINRAT_TREASURY_ADDRESS));
-  assert.match(reply ?? '', new RegExp(BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS));
-  assert.match(reply ?? '', /Holder Gate: TOKEN_AUTHORITY_NOT_CONFIGURED/);
+test('canonical Telegram token consumes Pons roles without historical Arc fallback', async () => {
+  const manifest = await json(new URL('../docs/CAPABILITY_MANIFEST_V0.json',import.meta.url)) as unknown as CapabilityManifest;
+  const reply = await renderRatReply('/token', {apiBaseUrl:'https://binrat.example',siteUrl:'https://binrat.example',manifest});
+  assert.match(reply??'',/token state: NOT_LAUNCHED/);assert.match(reply??'',/launch authorization: BLOCKED/);
+  assert.match(reply??'',/treasury role: NOT_CONFIGURED/);assert.match(reply??'',/Working Rat: PLANNED/);
+  assert.doesNotMatch(reply??'',new RegExp(BINRAT_TREASURY_ADDRESS));assert.doesNotMatch(reply??'',new RegExp(BINRAT_PROJECT_FEE_RECIPIENT_ADDRESS));
 });
 
 test('allocation and first-buy owner policy are explicit and mechanics digest remains bound', async () => {

@@ -1,3 +1,4 @@
+import { validatePublicProduct } from "./product-contract.js";
 export const WEB_DATA_SOURCE_VERSION = "BINRAT_WEB_DATA_SOURCE_V0";
 export const WEB_DATA_SOURCE_MODE =
   new URLSearchParams(globalThis.location?.search ?? "").get("fixtures") === "1"
@@ -23,72 +24,14 @@ export async function loadDumpsterFeed({ signal } = {}) {
 
 export async function loadDumpsterLedger() {
   if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
-  const response = await fetch("/api/dumpster-ledger", {
-    headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!response.ok) throw new Error("DUMPSTER_LEDGER_NOT_AVAILABLE");
+  const response = await fetch("/api/dumpster-ledger", { headers: { accept: "application/json" }, signal: AbortSignal.timeout(15000) });
+  if (!response.ok) throw new Error("PUBLIC_FUNDING_NOT_AVAILABLE");
   const value = await response.json();
-  const statuses = [
-    "PRELAUNCH_AUTHORITIES_CONFIGURED",
-    "TREASURY_AUTHORITY_NOT_CONFIGURED",
-    "TREASURY_AUTHORITY_INVALID",
-    "FUNDING_OBSERVATION_SOURCE_NOT_IMPLEMENTED",
-  ];
-  const rawAmount = (candidate) =>
-    typeof candidate === "string" && /^(0|[1-9][0-9]*)$/.test(candidate);
-  const utility = (candidate) =>
-    Array.isArray(candidate) &&
-    candidate.every(
-      (item) =>
-        typeof item?.capability === "string" &&
-        typeof item.engineeringStatus === "string" &&
-        typeof item.deploymentStatus === "string" &&
-        typeof item.publicStatus === "string",
-    );
-  if (
-    value?.schemaVersion !== "binrat.dumpster-ledger/0.1" ||
-    value.projectionVersion !== "BINRAT_DUMPSTER_LEDGER_V0" ||
-    value.tokenState !== "NOT_LAUNCHED" ||
-    value.launchAuthorization !== "BLOCKED" ||
-    value.marketingAuthorized !== false ||
-    value.chainId !== 5042 ||
-    !["PRE_LAUNCH_AUTHORITIES_CONFIGURED", "FAIL_CLOSED"].includes(
-      value.accountingState,
-    ) ||
-    value.fundingAuthority?.accountingEnabled !== false ||
-    !statuses.includes(value.fundingAuthority.status) ||
-    !Array.isArray(value.fundingAuthority.creatorFeeRecipients) ||
-    !Array.isArray(value.fundingAuthority.treasuryAddresses) ||
-    value.configuredAuthorities?.status !== "OWNER_SELECTED_PRE_LAUNCH" ||
-    value.configuredAuthorities?.treasury?.role !== "TREASURY" ||
-    value.configuredAuthorities.treasury.address !==
-      "0xab063A9b53a2Ab832a941aE5890ea05c1672339D" ||
-    value.configuredAuthorities?.projectFeeRecipient?.role !==
-      "PROJECT_FEE_RECIPIENT" ||
-    value.configuredAuthorities.projectFeeRecipient.address !==
-      "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866" ||
-    value.configuredAuthorities.onChainRoleProof !== "NOT_YET_AVAILABLE" ||
-    value.observedDataAvailability?.tokenAddress !== "NOT_YET_AVAILABLE" ||
-    value.observedDataAvailability?.launchBlock !== "NOT_YET_AVAILABLE" ||
-    value.observedDataAvailability?.launchTransaction !== "NOT_YET_AVAILABLE" ||
-    !Number.isSafeInteger(value.totals?.entryCount) ||
-    !Number.isSafeInteger(value.totals?.inflowEntryCount) ||
-    !Number.isSafeInteger(value.totals?.outflowEntryCount) ||
-    !rawAmount(value.totals?.tokenInflowsRaw) ||
-    !rawAmount(value.totals?.tokenOutflowsRaw) ||
-    !Array.isArray(value.entries) ||
-    value.entries.length !== value.totals.entryCount ||
-    value.utilityStatus?.source !== "CAPABILITY_MANIFEST" ||
-    !utility(value.utilityStatus.shipped) ||
-    !utility(value.utilityStatus.building) ||
-    !utility(value.utilityStatus.planned) ||
-    typeof value.explanation !== "string" ||
-    typeof value.evidenceBoundary !== "string" ||
-    typeof value.receipt?.receiptId !== "string" ||
-    !value.receipt.receiptId.startsWith("binrat-dumpster-ledger:")
-  ) {
-    throw new Error("DUMPSTER_LEDGER_INVALID");
+  const roles = value?.configuredAuthorities;
+  if (value?.schemaVersion !== "binrat.public-funding/1" || value.chainId !== 4663 || value.authorityScope !== "CURRENT_PONS" ||
+      value.accountingActive !== false || value.totals !== null || !Array.isArray(value.entries) || value.entries.length !== 0 ||
+      !roles || roles.chainId !== 4663 || [roles.treasuryAddress, roles.launchWalletAddress, roles.creatorFeeRecipientAddress].some(item => item !== null && !address(item))) {
+    throw new Error("PUBLIC_FUNDING_INVALID");
   }
   return value;
 }
@@ -99,6 +42,8 @@ export function adaptLatestLaunches(feed) {
     feed.chainId !== 4663 ||
     feed.historyCoverage !== "PARTIAL" ||
     !block(feed.sourceCheckpoint) ||
+    !/^0x[0-9a-f]{64}$/.test(feed.checkpointBlockHash) ||
+    !/^[0-9a-f]{64}$/.test(feed.feedDigest) ||
     !Array.isArray(feed.launches) ||
     feed.launches.length > 20
   ) throw new Error("WEB_LATEST_LAUNCHES_INVALID");
@@ -110,7 +55,7 @@ export function adaptLatestLaunches(feed) {
       !block(launch.blockNumber) || BigInt(launch.blockNumber) > BigInt(feed.sourceCheckpoint) ||
       typeof launch.symbol !== "string" || typeof launch.name !== "string" ||
       !Number.isSafeInteger(launch.priorLaunchCount) || launch.priorLaunchCount < 0 ||
-      typeof launch.factId !== "string" || !launch.factId ||
+      launch.factId !== `binrat-fact:4663:${launch.launchId}` ||
       !launch.metadata || !["imageUri","website","twitter","telegram"].every(key => typeof launch.metadata[key] === "string")
     ) throw new Error("WEB_LATEST_LAUNCH_INVALID");
 
@@ -148,14 +93,19 @@ export function adaptLatestLaunches(feed) {
       note:ratNote(launch.priorLaunchCount),
       receipt:`fact:${launch.factId}`,
       asOfBlock:feed.sourceCheckpoint,
-      asOfBlockHash:""
+      feedDigest:feed.feedDigest,
+      asOfBlockHash:feed.checkpointBlockHash
     };
   });
 
   return {
     version:WEB_DATA_SOURCE_VERSION,
     mode:"LIVE",
+    chainId:feed.chainId,
     asOfBlock:feed.sourceCheckpoint,
+    checkpointBlockHash:feed.checkpointBlockHash,
+    feedDigest:feed.feedDigest,
+    canonicalSnapshot:structuredClone(feed),
     historyCoverage:"PARTIAL",
     bags
   };
@@ -402,7 +352,6 @@ export async function loadReplayBundle(bagId) {
 
 
 export async function loadCapabilityManifest() {
-  if (WEB_DATA_SOURCE_MODE !== "LIVE") return null;
   const response = await fetch("/api/capabilities", {
     headers: { accept: "application/json" },
     signal: AbortSignal.timeout(15000),
@@ -420,5 +369,6 @@ export async function loadCapabilityManifest() {
     typeof value.launchAuthorization.launchAuthorized !== "boolean" ||
     typeof value.launchAuthorization.tokenState !== "string"
   ) throw new Error("CAPABILITY_MANIFEST_INVALID");
+  validatePublicProduct(value.publicProduct);
   return value;
 }

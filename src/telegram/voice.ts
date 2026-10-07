@@ -28,13 +28,10 @@ export interface RatFactsByIntent {
     observationError?: string;
   };
   ROADMAP: {
-    intelligenceV1: string;
-    replayLab: string;
-    telegramRatV0: string;
-    dumpsterLedger: string;
-    ratDenV0: string;
-    ratWatchV0: string;
-    dumpsterRaidsV0: string;
+    crew:string[];
+    roadmap:string;
+    todayJourney:string;
+    futureLoop:string;
     launchAuthorization: string;
   };
   WHY: { site: string };
@@ -223,20 +220,21 @@ function bodyFor(plan: RatAnswerPlan): string[] {
       return [
         'BINRAT remembers what launches try to forget.',
         '',
-        'creator history. point-in-time observations. trash trails. replayable receipts.',
+        'Rat Zero finds Pons launches. Open a Case. Check retained receipts.',
+        'Persistent Rat employment is future product direction.',
         'no SAFE/RUG score. no BUY/SELL call. evidence first.',
         '',
         plan.facts.site
       ];
     case 'ROADMAP':
       return [
-        line('Intelligence V1', plan.facts.intelligenceV1),
-        line('Replay Lab', plan.facts.replayLab),
-        line('Telegram Rat V0', plan.facts.telegramRatV0),
-        line('Dumpster Ledger', plan.facts.dumpsterLedger),
-        line('Rat Den V0', plan.facts.ratDenV0),
-        line('Rat Watch V0', plan.facts.ratWatchV0),
-        line('Dumpster Raids V0', plan.facts.dumpsterRaidsV0),
+        ...plan.facts.crew,
+        '',
+        plan.facts.roadmap,
+        line('Today',plan.facts.todayJourney),
+        line('Future workforce direction',plan.facts.futureLoop),
+        'Persistent Rat employment is not available today.',
+        'Current Watch is separate from future Tripwire jobs.',
         '',
         line('launch authorization', plan.facts.launchAuthorization)
       ];
@@ -249,10 +247,12 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         line('treasury role', plan.facts.treasury),
         line('project fee recipient role', plan.facts.projectFeeRecipient),
         line('token address', plan.facts.tokenAddressState),
-        line('Holder Gate', plan.facts.holderGateStatus),
+        line('Working Rat', plan.facts.holderGateStatus),
         '',
         plan.facts.tokenMessage,
-        'Rat Credits are separate, off-chain, non-transferable contribution/coordination units; they are not equity, revenue share, or yield.',
+        'Working Rat is planned post-launch. No public entitlement or staking action.',
+        'PonsVault Staking may exist at token launch without public Working Rat entitlement.',
+        'STAKE BUYS LABOR. NOT TRUTH.',
         '',
         line('rule', plan.facts.invariant)
       ];
@@ -270,14 +270,15 @@ function bodyFor(plan: RatAnswerPlan): string[] {
       return [
         'ask me like a person or use commands:',
         '',
-        '/status — live index state',
-        '/roadmap — canonical capability state',
+        '/status — verified publication and freshness',
+        '/roadmap — crew stages and future product direction',
         '/token — launch/token state',
-        '/creator 0x... — creator file',
-        '/bag <launch-id> — launch summary',
+        '/creator 0x... — Pons-reported deployer receipts',
+        '/bag <launch-id> — supported Case',
         '/replay <launch-id> — launch → 5m → 1h → 24h',
         '/receipt <launch-id> — public receipt',
-        '/watch 0x... — alert on a future launch from this indexed reported creator address',
+        'Pons Watch follows current bot access gates. Legacy Watch cannot be re-armed on Pons. It is not Tripwire employment.',
+        '/watch 0x... — watch a future indexed launch from the same exact Pons-reported deployer',
         '/unwatch 0x... — stop watching that reported address',
         '/watches — list this chat\'s watched reported addresses',
         '/proof — rules of the bin',
@@ -288,7 +289,7 @@ function bodyFor(plan: RatAnswerPlan): string[] {
     case 'STATUS':
       return [
         line('index', plan.facts.index),
-        line('launches indexed', plan.facts.launchCount),
+        line('launches in publication', plan.facts.launchCount),
         line('checkpoint block', plan.facts.checkpointBlock),
         line('historical backfill', plan.facts.history),
         line('observations', plan.facts.observations),
@@ -297,12 +298,12 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         ...(plan.facts.observationError ? [line('observation error', plan.facts.observationError)] : [])
       ];
     case 'CREATOR_HISTORY':
-      if (hasFlag(plan.facts, 'notFound')) return ['no indexed Creator File for that address. unknown is not clean.'];
+      if (hasFlag(plan.facts, 'notFound')) return ['no bounded Deployer File for that address. unknown is not clean.'];
       if (hasFlag(plan.facts, 'invalidInput')) return ['invalid creator address. expected 0x + 40 hex characters.'];
       if ('creator' in plan.facts) {
         return [
-          line('reported creator', plan.facts.creator),
-          line('indexed launches', plan.facts.indexedLaunchCount),
+          line('Pons-reported deployer', plan.facts.creator),
+          line('launches in bounded response', plan.facts.indexedLaunchCount),
           line('first indexed block', plan.facts.firstIndexedBlock),
           line('last indexed block', plan.facts.lastIndexedBlock),
           line('history coverage', plan.facts.historyCoverage),
@@ -319,7 +320,7 @@ function bodyFor(plan: RatAnswerPlan): string[] {
       if (plan.facts.role === 'UNKNOWN') {
         return [
           line('address', plan.facts.address),
-          'not indexed as a token, pool, or ArcPad-reported creator address.',
+          'No matching token or Pons-reported deployer in this bounded publication. Pool role and older history are not established.',
           'unknown is not clean.'
         ];
       }
@@ -344,7 +345,7 @@ function bodyFor(plan: RatAnswerPlan): string[] {
         return [
           `${plan.facts.symbol} — ${plan.facts.name}`,
           line('launch', plan.facts.launchId),
-          line('reported creator', plan.facts.creator),
+          line('Pons-reported deployer', plan.facts.creator),
           line('prior launches from same reported address', plan.facts.priorLaunchCount),
           line('history coverage', plan.facts.historyCoverage),
           line('receipt', plan.facts.receipt)

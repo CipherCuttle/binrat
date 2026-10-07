@@ -89,10 +89,15 @@ export async function publishPublicSnapshot(
   if (validated.feedDigest !== snapshot.feedDigest || !Number.isSafeInteger(verifiedAtMs) || verifiedAtMs < 0) {
     throw new Error('PUBLIC_SNAPSHOT_VALIDATION_FAILED');
   }
-  const current = await db.prepare(
-    'SELECT publication_version FROM binrat_public_snapshots WHERE chain_id=? LIMIT 1'
-  ).bind(PUBLIC_SNAPSHOT_CHAIN_ID).first<{publication_version:number}>();
-  const publicationVersion = (current?.publication_version ?? 0) + 1;
+  const current = await readPublicSnapshot(db);
+  if (current && BigInt(snapshot.sourceCheckpoint) < BigInt(current.checkpointBlock)) {
+    throw new Error('PUBLIC_SNAPSHOT_CHECKPOINT_REGRESSION');
+  }
+  if (current?.checkpointBlock === snapshot.sourceCheckpoint &&
+      (current.checkpointBlockHash !== snapshot.checkpointBlockHash || current.feedDigest !== snapshot.feedDigest)) {
+    throw new Error('PUBLIC_SNAPSHOT_CHECKPOINT_CONFLICT');
+  }
+  const publicationVersion = (current?.publicationVersion ?? 0) + 1;
   const result = await db.prepare(`
     INSERT INTO binrat_public_snapshots (
       chain_id,checkpoint_block,checkpoint_block_hash,feed_digest,snapshot_json,verified_at_ms,publication_version
@@ -103,12 +108,19 @@ export async function publishPublicSnapshot(
       feed_digest=excluded.feed_digest,
       snapshot_json=excluded.snapshot_json,
       verified_at_ms=excluded.verified_at_ms,
-      publication_version=excluded.publication_version
+      publication_version=binrat_public_snapshots.publication_version+1
+    WHERE (binrat_public_snapshots.checkpoint_block=excluded.checkpoint_block
+      AND binrat_public_snapshots.checkpoint_block_hash=excluded.checkpoint_block_hash
+      AND binrat_public_snapshots.feed_digest=excluded.feed_digest)
+      OR length(binrat_public_snapshots.checkpoint_block)<length(excluded.checkpoint_block)
+      OR (length(binrat_public_snapshots.checkpoint_block)=length(excluded.checkpoint_block)
+        AND binrat_public_snapshots.checkpoint_block<excluded.checkpoint_block)
   `).bind(
     snapshot.chainId,snapshot.sourceCheckpoint,snapshot.checkpointBlockHash,snapshot.feedDigest,
     canonicalJson(snapshot),verifiedAtMs,publicationVersion
   ).run();
   if (!result.success) throw new Error('PUBLIC_SNAPSHOT_PUBLICATION_FAILED');
+  if (result.meta?.changes === 0) throw new Error('PUBLIC_SNAPSHOT_CHECKPOINT_CONFLICT');
 }
 
 export async function readPublicSnapshot(db: D1DatabaseLike): Promise<StoredPublicSnapshot | null> {
@@ -135,6 +147,7 @@ export async function readPublicSnapshot(db: D1DatabaseLike): Promise<StoredPubl
     launches: snapshot.launches
   });
   if (canonicalJson(snapshot) !== row.snapshot_json || canonical.feedDigest !== row.feed_digest ||
+      snapshot.feedDigest !== row.feed_digest || snapshot.chainId !== row.chain_id ||
       snapshot.sourceCheckpoint !== row.checkpoint_block || snapshot.checkpointBlockHash !== row.checkpoint_block_hash) {
     throw new Error('PUBLIC_SNAPSHOT_DIGEST_INVALID');
   }
@@ -161,16 +174,20 @@ export async function publicStatus(
   if (!snapshot) return {
     schemaVersion: PUBLIC_STATUS_SCHEMA,chainId: PUBLIC_SNAPSHOT_CHAIN_ID,state:'NO_VERIFIED_SNAPSHOT',
     checkpointBlock:null,checkpointBlockHash:null,feedDigest:null,verifiedAtMs:null,
+    publicationVersion:null,freshnessValidUntilMs:null,
     runtimeUpdatedAtMs:runtime?.updatedAtMs ?? null,lastSyncError:runtime?.lastSyncError ?? null
   };
   const checkpointBlock = BigInt(snapshot.checkpointBlock);
   const target = verifiedRuntimeTarget(runtime, checkpointBlock, nowMs, maxAgeMs);
-  const fresh = target === checkpointBlock && Boolean(runtime?.liveCaughtUp);
+  const fresh = target === checkpointBlock && Boolean(runtime?.liveCaughtUp) &&
+    snapshot.verifiedAtMs<=nowMs && nowMs-snapshot.verifiedAtMs<maxAgeMs;
   return {
     schemaVersion: PUBLIC_STATUS_SCHEMA,chainId: PUBLIC_SNAPSHOT_CHAIN_ID,
     state:fresh ? 'FRESH_VERIFIED' : 'STALE_VERIFIED',
     checkpointBlock:snapshot.checkpointBlock,checkpointBlockHash:snapshot.checkpointBlockHash,
     feedDigest:snapshot.feedDigest,verifiedAtMs:snapshot.verifiedAtMs,
+    publicationVersion:snapshot.publicationVersion,
+    freshnessValidUntilMs:runtime ? Math.min(runtime.updatedAtMs+maxAgeMs,snapshot.verifiedAtMs+maxAgeMs) : null,
     runtimeUpdatedAtMs:runtime?.updatedAtMs ?? null,lastSyncError:runtime?.lastSyncError ?? null
   };
 }

@@ -148,7 +148,7 @@ jobs:
 
   frontdoor-browser-smoke:
     name: frontdoor-browser-smoke
-    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1' || github.head_ref == 'feat/binrat-frontdoor-journey-v1') }}
+    if: ${{ github.event_name == 'pull_request' && (github.head_ref == 'feat/binrat-degen-frontdoor-v1' || github.head_ref == 'fix/binrat-read-plane-frontend-resilience-v1' || github.head_ref == 'feat/binrat-frontdoor-journey-v1' || github.head_ref == 'integration/binrat-public-truth-launch-v1') }}
     needs: [check]
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -163,6 +163,11 @@ jobs:
           node-version: 22
       - name: Install repository dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build exact local candidate and synthetic Worker fixtures
+        run: |
+          pnpm rebuild better-sqlite3
+          pnpm build
+          pnpm exec tsx scripts/create-public-browser-fixtures.ts
       - name: Install isolated Playwright Chromium
         shell: bash
         run: |

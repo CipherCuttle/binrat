@@ -164,134 +164,15 @@ test('SIWE holder proof rejects tampering, impersonation, replay, cross-domain u
   }
 });
 
-test('Worker preserves free truth and exposes strictly deeper holder projection only to HOLDER sessions', async () => {
-  const db = new D1CompatDatabase();
-  await db.exec(D1_SCHEMA_SQL);
-  const store = new D1Store(db, ARC_CHAIN_ID);
-  const radar = new D1RatRadarStore(db, ARC_CHAIN_ID);
-  const runtime = new D1RuntimeStateStore(db, ARC_CHAIN_ID);
-  let nowMs = Date.now();
-  const eligibility = new FixtureHolderEligibilitySource({ [HOLDER.address]: 10n }, 10n);
-  const env: BinratWorkerEnv = { DB: db, BINRAT_HOLDER_WALLET_AUTH_ENABLED: 'true' };
-  const deps: WorkerDeps = { externalFetch: fetch, now: () => nowMs, holderEligibilitySource: eligibility };
-
+test('historical Arc public depth routes stay retired for free, forged and holder sessions',async()=>{
+  const db=new D1CompatDatabase();await db.exec(D1_SCHEMA_SQL);
   try {
-    const receipts = [];
-    for (let index = 0; index < 7; index += 1) {
-      const launch = await makeLaunch(100n + BigInt(index * 10), index + 1);
-      await store.putLaunch(launch);
-      await store.putProvenanceFact(await buildProvenanceFact(launch));
-      const receipt = await makeSwap(
-        launch,
-        launch.blockNumber + BigInt(index + 1),
-        10 + index,
-        address(700 + index)
-      );
-      receipts.push(receipt);
-      await radar.putSwap(receipt);
+    const env={DB:db};
+    for(const headers of [{} as Record<string,string>,{authorization:`Bearer ${'a'.repeat(64)}`}]) {
+      const response=await handleWorkerRequest(new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`,{headers}),env);
+      assert.equal(response.status,410);assert.equal((await response.json() as any).error,'LEGACY_ARC_RADAR_RETIRED');
     }
-    await store.commitCheckpoint({
-      blockNumber: 300n,
-      blockHash: hex64(300),
-      guardBlockNumber: 299n,
-      guardBlockHash: hex64(299)
-    });
-    await runtime.put({
-      sourceVerified: true,
-      liveCaughtUp: true,
-      headBlock: 302n,
-      targetBlock: 300n,
-      observationReady: true,
-      historyBackfillComplete: false,
-      historyBackfillTargetBlock: 99n,
-      lastSyncError: null,
-      lastHistoryError: null,
-      lastObservationError: null,
-      updatedAtMs: Date.now()
-    });
-
-    const freeBeforeResponse = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist`), env, deps
-    );
-    assert.equal(freeBeforeResponse.status, 200);
-    const freeBefore = await freeBeforeResponse.json() as WatchlistBody;
-    assert.equal(freeBefore.candidates.length, 5);
-
-    const unauthenticatedFull = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`), env, deps
-    );
-    assert.equal(unauthenticatedFull.status, 401);
-
-    const forgedSession = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`, {
-        headers: { authorization: `Bearer ${'a'.repeat(64)}` }
-      }),
-      env,
-      deps
-    );
-    assert.equal(forgedSession.status, 401);
-
-    const holderSession = await createWorkerSession(HOLDER, env, deps);
-    assert.equal(holderSession.accessTier, 'HOLDER');
-    const fullResponse = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`, {
-        headers: { authorization: `Bearer ${holderSession.token}` }
-      }),
-      env,
-      deps
-    );
-    assert.equal(fullResponse.status, 200);
-    const full = await fullResponse.json() as HolderWatchlistBody;
-    assert.equal(full.schemaVersion, 'binrat.rat-radar-holder-watchlist/0.1');
-    assert.equal(full.access.accessTier, 'HOLDER');
-    assert.equal(full.access.wallet, HOLDER.address.toLowerCase());
-    assert.equal(full.candidates.length, 7);
-    assert.ok(full.candidates.length > freeBefore.candidates.length);
-    assert.deepEqual(
-      full.candidates.slice(0, 5).map(commonCandidate),
-      freeBefore.candidates.map(commonCandidate)
-    );
-    assert.ok(full.candidates.every((candidate) => candidate.publicEvidencePaths.length > 0));
-    assert.ok(full.candidates.every((candidate) => candidate.totalObservedReceiptCount >= 1));
-
-    const freeAfterResponse = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist`), env, deps
-    );
-    assert.deepEqual(await freeAfterResponse.json(), freeBefore);
-
-    const publicReceipt = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/activity/${receipts[0]!.activityId}`), env, deps
-    );
-    assert.equal(publicReceipt.status, 200);
-    const publicAddress = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/address/${receipts[0]!.recipient}/activity`), env, deps
-    );
-    assert.equal(publicAddress.status, 200);
-
-    const freeSession = await createWorkerSession(OTHER, env, deps);
-    assert.equal(freeSession.accessTier, 'FREE');
-    const freeFull = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`, {
-        headers: { authorization: `Bearer ${freeSession.token}` }
-      }),
-      env,
-      deps
-    );
-    assert.equal(freeFull.status, 403);
-
-    nowMs = holderSession.expiresAtMs;
-    const expiredSession = await handleWorkerRequest(
-      new Request(`${ORIGIN}/api/rat-radar/watchlist?depth=full`, {
-        headers: { authorization: `Bearer ${holderSession.token}` }
-      }),
-      env,
-      deps
-    );
-    assert.equal(expiredSession.status, 401);
-  } finally {
-    store.close();
-    db.close();
-  }
+  } finally {db.close();}
 });
 
 test('production wallet-auth write surface is disabled unless explicitly enabled', async () => {

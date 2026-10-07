@@ -17,7 +17,7 @@ import { validateCapabilityManifest } from '../src/telegram/rat.js';
 
 const MATRIX_URL = new URL('../docs/LAUNCH_GATE_MATRIX_V0.json', import.meta.url);
 const CONFIG_URL = new URL('../docs/BINRAT_LAUNCH_CONFIG_V0.json', import.meta.url);
-const MANIFEST_URL = new URL('../docs/CAPABILITY_MANIFEST_V0.json', import.meta.url);
+const MANIFEST_URL = new URL('./fixtures/historical-arc-capability-manifest.json', import.meta.url);
 
 async function json(url: URL): Promise<Record<string, any>> {
   return JSON.parse(await readFile(url, 'utf8')) as Record<string, any>;

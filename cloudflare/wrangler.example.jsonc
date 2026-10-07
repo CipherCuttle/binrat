@@ -2,6 +2,7 @@
   // Copy to wrangler.jsonc after creating the D1 database.
   "name": "binrat-edge-v0",
   "main": "src/cloudflare/worker.ts",
+  "version_metadata": { "binding": "BINRAT_WORKER_VERSION" },
   "compatibility_date": "2026-09-18",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {

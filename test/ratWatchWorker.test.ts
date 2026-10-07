@@ -9,11 +9,11 @@ import type { Hex, LaunchObserved } from '../src/core/types.js';
 import { buildProvenanceFact } from '../src/intelligence/provenance.js';
 import { D1CompatDatabase } from './support/d1Compat.js';
 
-test('Telegram /watch persists exact reported creator subscription and operational receipt', async () => {
+test('regression: legacy Arc Watch cannot arm a Pons subscription or promise an alert', async () => {
   const db = new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
-  const store = new D1Store(db, 5042);
-  const runtime = new D1RuntimeStateStore(db, 5042);
+  const store = new D1Store(db, 4663);
+  const runtime = new D1RuntimeStateStore(db, 4663);
   const creator = address(5);
   const launch = await makeLaunch(creator);
   const sent: string[] = [];
@@ -91,16 +91,15 @@ test('Telegram /watch persists exact reported creator subscription and operation
     );
 
     assert.equal(response.status, 200);
-    assert.match(sent[0] ?? '', /watch armed/i);
-    assert.match(sent[0] ?? '', /same address != same human identity/i);
+    assert.match(sent[0] ?? '', /Pons.*not.*verified|not verified.*Pons/i);
+    assert.doesNotMatch(sent[0] ?? '', /watch armed|i will alert/i);
 
     const subscription = await db.prepare(`
       SELECT chat_id,creator,start_block
       FROM rat_watch_subscriptions
       WHERE chat_id = 77
     `).first<{ chat_id: number; creator: string; start_block: string }>();
-    assert.equal(subscription?.creator, creator);
-    assert.equal(subscription?.start_block, '100');
+    assert.equal(subscription,null);
 
     const receipt = await db.prepare(`
       SELECT state,intent,renderer_version,plan_digest,reply_digest,telegram_message_id
@@ -131,13 +130,13 @@ async function makeLaunch(creator: Hex): Promise<LaunchObserved> {
   const txHash = hex64(2);
   const token = address(3);
   return {
-    launchId: await deriveLaunchId({ chainId: 5042, launcher, txHash, token }),
-    eventId: await deriveEventId({ chainId: 5042, launcher, txHash, logIndex: 4 }),
-    chainId: 5042,
+    launchId: await deriveLaunchId({ chainId: 4663, launcher, txHash, token,source:'PONS_V2' }),
+    eventId: await deriveEventId({ chainId: 4663, launcher, txHash, logIndex: 4,source:'PONS_V2' }),
+    chainId: 4663,
     blockNumber: 100n,
     blockHash: hex64(100),
     observedAtMs: 100_000,
-    source: 'ARCPAD',
+    source: 'PONS_V2',
     launcher,
     txHash,
     logIndex: 4,

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "binrat.pons-launch-plan/0.1",
+  "planVersion": "BINRAT_PONS_LAUNCH_PLAN_V1",
+  "frozenOn": "2026-10-03",
+  "status": "PLANNING_ONLY",
+  "chainId": 4663,
+  "launchRail": {
+    "railId": "pons-v2-vault-staking-candidate-v1",
+    "pairAsset": "NATIVE_ETH_SELECTED",
+    "ponsFactory": {
+      "address": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+      "runtimeCodeHash": "0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84",
+      "verificationStatus": "OFFICIAL_SOURCE_AND_LIVE_CODEHASH_MATCH"
+    },
+    "ponsVaultLauncher": {
+      "address": "0x1770c356eB9312079b9A00e26a8CF4b0a1473dBA",
+      "runtimeCodeHash": null,
+      "verificationStatus": "LIVE_CODE_PRESENT_SOURCE_MATCH_PENDING"
+    },
+    "ponsVaultRegistry": {
+      "address": "0xaA9C86049A258D4A076d3eF367F69C231C9746D5",
+      "runtimeCodeHash": "0x0818f2fd53a4ccaf9edcb34a9fc7b0980f659dfa99862439c813e0719caaa93f",
+      "verificationStatus": "LIVE_CODEHASH_PINNED_SOURCE_MATCH_PENDING"
+    },
+    "stakingFactory": {
+      "address": "0x1488473464F2C6E6c5C412f05d805c619322E7EB",
+      "runtimeCodeHash": null,
+      "beacon": "0xef9f80d2f51ec6aecab284e778f328e9f0982a6f",
+      "vaultImplementation": "0xc8e0a4fe58918c47f66cf630c6a7205741c11fd4",
+      "owner": "0x897ac30f73ba92e1efbc1df1e67f8b5f4b3ecd2b",
+      "verificationStatus": "CONDITIONAL_L1B_PINNED_SOURCE_MATCH_PENDING"
+    },
+    "ponsNativeBuybackEnabled": "OWNER_SELECTED_FALSE"
+  },
+  "unresolvedImmutableInputs": {
+    "launchConfigId": null,
+    "expectedEconomics": null,
+    "minimumFeesBeforePayoutWei": null,
+    "workingRatMinStakeRaw": null,
+    "treasuryAddress": null,
+    "launchWalletAddress": null,
+    "tokenMetadata": null
+  },
+  "upstreamRisk": {
+    "ponsVaultPublicSourceStatus": "NOT_SATISFIED",
+    "ponsVaultThirdPartyAuditStatus": "NOT_COMPLETED_PER_PUBLIC_DOCS",
+    "stakingUpgradeAuthorityStatus": "ACTIVE_EOA_CONTROL_CHAIN_OBSERVED",
+    "stakingAttestation": "docs/PONSVault_STAKING_ATTESTATION_V1.json",
+    "stakingAttestationDigest": "f42f4794f3e064262b901cf1dbaa10bfa3a2a3370267f7db48b8387972aad54d",
+    "stakingAttestationStatus": "CONDITIONAL",
+    "rejectedStakeBurnAttestation": "docs/PONSVault_UPSTREAM_ATTESTATION_V1.json",
+    "rejectedStakeBurnAttestationDigest": "69ee99d7b574c2fbb272d7521c2dfd70741c00ca95b401ac895b68928cb2916c",
+    "explicitUpstreamRiskAcceptanceRequired": false,
+    "launchMechanicsGate": "BLOCKED_FRESH_PREFLIGHT_AND_EXACT_MANIFEST",
+    "ownerUpstreamRiskDecision": "ACCEPTED_FOR_SELECTED_DEPENDENCY_NOT_LAUNCH_AUTHORITY"
+  },
+  "historicalPredecessor": {
+    "chainId": 5042,
+    "launchConfig": "docs/BINRAT_LAUNCH_CONFIG_V0.json",
+    "launchGateMatrix": "docs/LAUNCH_GATE_MATRIX_V0.json",
+    "authority": "HISTORICAL_ONLY_NOT_PONS_AUTHORITY"
+  },
+  "authorization": {
+    "marketingAuthorized": false,
+    "launchAuthorized": false,
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED"
+  },
+  "planDigest": "f361ed1e751a69b1d1a5915cac210b321224926199f96e92b1f37c20ef29bcdd",
+  "ownerSelectedLaunchPolicy": {
+    "evidenceClass": "OWNER_POLICY",
+    "creatorTaxBps": 0,
+    "openingBuyWei": "0",
+    "privatePresale": "NONE",
+    "discountedInsiderRound": "NONE",
+    "hiddenTeamAllocation": "NONE",
+    "publicMarketOnly": true,
+    "laterFounderProjectPurchase": "ORDINARY_PUBLIC_MARKET_ONLY_DISCLOSED"
+  }
+}

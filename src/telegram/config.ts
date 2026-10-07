@@ -15,7 +15,7 @@ export const telegramProductConfig = Object.freeze({
         { command: 'start', description: 'Wake the rat' },
         { command: 'rats', description: 'Find repeated deployers' },
         { command: 'dig', description: 'Investigate an address' },
-        { command: 'watches', description: 'Show active watches' },
+        { command: 'watches', description: 'Restricted current Watch list' },
         { command: 'help', description: 'How BINRAT works' }
       ]
     },
@@ -25,7 +25,7 @@ export const telegramProductConfig = Object.freeze({
         { command: 'start', description: 'Wake the rat' },
         { command: 'rats', description: 'Find repeated deployers' },
         { command: 'dig', description: 'Investigate an address' },
-        { command: 'watches', description: 'Show active watches' },
+        { command: 'watches', description: 'Restricted current Watch list' },
         { command: 'help', description: 'How BINRAT works' }
       ]
     }

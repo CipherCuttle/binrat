@@ -6,25 +6,22 @@ const launchId = "a".repeat(64);
 const token = `0x${"1".repeat(40)}`;
 const deployer = `0x${"2".repeat(40)}`;
 const hash = `0x${"3".repeat(64)}`;
-const status = (block, digest, state = "FRESH_VERIFIED") => ({
-  schemaVersion: "binrat.public-status/0.1", chainId: 4663, state,
-  checkpointBlock: String(block), checkpointBlockHash: hash, feedDigest: digest,
-  verifiedAtMs: 1, runtimeUpdatedAtMs: 2, lastSyncError: null,
-});
-const feed = (block, symbol) => ({
-  schemaVersion: "binrat.latest-launches/0.1", chainId: 4663,
-  historyCoverage: "PARTIAL", sourceCheckpoint: String(block),
-  launches: [{
-    launchId, token, txHash: hash, deployer, blockNumber: String(block),
-    symbol, name: `${symbol} receipt`, priorLaunchCount: 1, factId: `fact-${symbol}`,
-    metadata: { imageUri: "", website: "", twitter: "", telegram: "" },
-  }],
-});
+const {createHash}=require('node:crypto');
+const canonical=value=>JSON.stringify((function normalize(v){return Array.isArray(v)?v.map(normalize):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,normalize(v[k])])):v;})(value));
+const feed=(block,symbol)=>{
+ const raw={schemaVersion:'binrat.latest-launches/0.1',chainId:4663,historyCoverage:'PARTIAL',sourceCheckpoint:String(block),checkpointBlockHash:hash,
+  launches:[{launchId,token,txHash:hash,deployer,blockNumber:String(block),symbol,name:`${symbol} receipt`,priorLaunchCount:1,factId:`binrat-fact:4663:${launchId}`,metadata:{imageUri:'',website:'',twitter:'',telegram:''}}]};
+ return {...raw,feedDigest:createHash('sha256').update(canonical(raw)).digest('hex')};
+};
+const status=(block,digest,state='FRESH_VERIFIED')=>({schemaVersion:'binrat.public-status/0.1',chainId:4663,state,
+ checkpointBlock:String(block),checkpointBlockHash:hash,feedDigest:feed(block,digest==='digest-2'?'B':'A').feedDigest,
+ verifiedAtMs:Date.now(),runtimeUpdatedAtMs:Date.now(),lastSyncError:null,publicationVersion:Number(block)-99,freshnessValidUntilMs:Date.now()+180000});
 const waitForApiRequest = (page, pathname) => page.waitForRequest((request) => new URL(request.url()).pathname === pathname);
 
 async function newLivePage(browser, { failInitial = false } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
+  await page.addInitScript(()=>{Math.random=()=>0.5;});
   await page.clock.install();
   const counts = { feed: 0, status: 0, creator: 0 };
   const feedQueue = [feed(100, "A")];
@@ -104,7 +101,7 @@ async function newLivePage(browser, { failInitial = false } = {}) {
     assert.equal(counts.feed, 2, "changed digest gets one feed refresh; stale copy remains after invalid refresh");
     assert.equal(await page.locator(".token-symbol").innerText(), "A");
     assert.match(await page.locator("#home-freshness").innerText(), /Showing last verified launches/);
-    assert.doesNotMatch(await page.locator("#home-freshness").innerText(), /snapshot verified/, "newer status cannot lend its verification timestamp to the retained older feed");
+    assert.match(await page.locator("#home-freshness").innerText(), /verified through block 100/, "retained timestamp must remain bound to the old publication");
     assert.equal(await page.locator("#fresh-cases h3").innerText(), "A");
 
     // Force a valid recovery for the same changed digest after the malformed payload.
@@ -124,6 +121,7 @@ async function newLivePage(browser, { failInitial = false } = {}) {
     });
     await page.clock.fastForward(240_000);
     assert.equal(counts.status, beforeHidden, "hidden tab must pause polling");
+    assert.equal(await page.locator("body").getAttribute("data-read-state"),"STALE_VERIFIED","expiry must still apply while hidden");
     await h.context.close();
 
     const empty = await newLivePage(browser, { failInitial: true });

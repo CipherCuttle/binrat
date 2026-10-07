@@ -117,7 +117,7 @@ function renderBootstrap(data) {
   }
 
   const watches=byId('watch-list'); watches.replaceChildren();
-  if(!data.watches?.length) watches.append(el('div','panel','Empty paws. Nothing is on Rat Watch yet.'));
+  if(!data.watches?.length) watches.append(el('div','panel','Empty paws. Nothing is on Watch yet.'));
   for(const watch of data.watches||[]) {
     const labels=watchLabels(data,watch);
     const card=el('article','card');
@@ -177,7 +177,7 @@ function renderTrashTrail(root,trashTrail) {
     const watch=el('article','panel');
     watch.append(
       el('p','eyebrow','RAT WATCH'),
-      el('p','',"There is enough remembered outcome evidence to show Rat Watch for this exact source-reported deployer."),
+      el('p','',"There is enough remembered outcome evidence to show Watch for this exact source-reported deployer."),
       el('p','meta','Watch changes stay in Telegram chat in this read-only Mini App.')
     );
     const button=el('button','inspect','SEE RAT WATCH');

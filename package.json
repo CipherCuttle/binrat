@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node dist/src/server.js",
     "serve:live": "tsx src/server.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "node scripts/build-public-release.mjs && tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts test/readPlane.test.mjs",
     "web:serve": "node scripts/serve-web.mjs",
     "web:check": "node --check web/fixtures.js && node --check web/data-source.js && node --check web/share-card.js && node --check web/read-plane.js && node --check web/app.js && node --check web/frontdoor.js && node --check web/react-bits-island.js && node --check web/app/app.js && node scripts/check-web.mjs && node scripts/check-share-card.mjs && node scripts/check-launch-presentation.mjs",

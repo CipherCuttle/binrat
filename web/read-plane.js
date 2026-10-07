@@ -1,3 +1,4 @@
+import { verifyFeedBinding, bindingMatches } from "./snapshot-contract.js";
 const STATUS_SCHEMA = "binrat.public-status/0.1";
 const FAILURE_BACKOFF_MS = [15_000, 30_000, 60_000, 120_000];
 
@@ -14,10 +15,22 @@ export function validatePublicStatus(value) {
     value?.schemaVersion !== STATUS_SCHEMA || value.chainId !== 4663 ||
     !["FRESH_VERIFIED", "STALE_VERIFIED", "NO_VERIFIED_SNAPSHOT"].includes(value.state)
   ) throw new Error("PUBLIC_STATUS_INVALID");
-  if (value.state === "NO_VERIFIED_SNAPSHOT") return value;
+  if (value.state === "NO_VERIFIED_SNAPSHOT") {
+    if (["checkpointBlock", "checkpointBlockHash", "feedDigest", "verifiedAtMs", "publicationVersion", "freshnessValidUntilMs"].some(key => value[key] !== null)) {
+      throw new Error("PUBLIC_STATUS_INVALID");
+    }
+    return value;
+  }
   if (
     typeof value.checkpointBlock !== "string" || !/^(0|[1-9][0-9]*)$/.test(value.checkpointBlock) ||
-    typeof value.feedDigest !== "string" || !value.feedDigest
+    !/^0x[0-9a-f]{64}$/.test(value.checkpointBlockHash) ||
+    !/^[0-9a-f]{64}$/.test(value.feedDigest) ||
+    !Number.isSafeInteger(value.verifiedAtMs) || value.verifiedAtMs < 0 ||
+    !Number.isSafeInteger(value.publicationVersion) || value.publicationVersion < 1 ||
+    (value.runtimeUpdatedAtMs !== null && (!Number.isSafeInteger(value.runtimeUpdatedAtMs) || value.runtimeUpdatedAtMs < 0)) ||
+    (value.freshnessValidUntilMs !== null && (!Number.isSafeInteger(value.freshnessValidUntilMs) || value.freshnessValidUntilMs < 0)) ||
+    (value.lastSyncError !== null && typeof value.lastSyncError !== "string") ||
+    (value.state === "FRESH_VERIFIED" && (value.runtimeUpdatedAtMs === null || value.freshnessValidUntilMs === null || value.lastSyncError !== null))
   ) throw new Error("PUBLIC_STATUS_INVALID");
   return value;
 }
@@ -35,6 +48,7 @@ export class PublicReadPlane {
     setTimer = globalThis.setTimeout.bind(globalThis),
     clearTimer = globalThis.clearTimeout.bind(globalThis),
     random = Math.random,
+    now = Date.now,
   }) {
     this.fetchImpl = fetchImpl;
     this.loadFeed = loadFeed;
@@ -46,6 +60,8 @@ export class PublicReadPlane {
     this.setTimer = setTimer;
     this.clearTimer = clearTimer;
     this.random = random;
+    this.now = now;
+    this.expiryTimer = null;
     this.state = ReadState.LOADING;
     this.snapshot = null;
     this.status = null;
@@ -58,6 +74,16 @@ export class PublicReadPlane {
   }
 
   publish(state, error = null) {
+    if (this.expiryTimer !== null) this.clearTimer(this.expiryTimer);
+    this.expiryTimer = null;
+    if (state === ReadState.FRESH) {
+      const remaining = this.status.freshnessValidUntilMs - this.now();
+      if (remaining <= 0) { state = ReadState.STALE; error = new Error("PUBLIC_STATUS_EXPIRED"); }
+      else this.expiryTimer = this.setTimer(() => {
+        this.expiryTimer = null;
+        this.publish(ReadState.STALE, new Error("PUBLIC_STATUS_EXPIRED"));
+      }, remaining);
+    }
     this.state = state;
     this.error = error;
     this.onState({ state, snapshot: this.snapshot, status: this.status, error });
@@ -71,6 +97,7 @@ export class PublicReadPlane {
   }
 
   async loadInitial() {
+    if (this.snapshot) this.publish(ReadState.STALE, new Error("PUBLIC_FRESHNESS_BEING_ESTABLISHED"));
     const generation = ++this.generation;
     const controller = new AbortController();
     this.active = { generation, controller };
@@ -78,42 +105,50 @@ export class PublicReadPlane {
       const feed = await this.loadFeed({ signal: controller.signal });
       if (generation !== this.generation) return;
       if (!this.validateFeed(feed)) throw new Error("PUBLIC_FEED_INVALID");
-      this.snapshot = { feed, digest: null, checkpoint: String(feed.asOfBlock ?? "") };
-      this.onSnapshot(feed);
-      this.publish(this.pollingEnabled ? ReadState.FRESH : ReadState.FIXTURE);
-      if (!this.pollingEnabled) return;
-      try {
-        const status = await this.fetchStatus(controller.signal);
-        if (generation !== this.generation) return;
-        this.status = status;
-        if (status.state === "NO_VERIFIED_SNAPSHOT") throw new Error("STATUS_HAS_NO_VERIFIED_SNAPSHOT");
-        if (status.checkpointBlock === this.snapshot.checkpoint) {
-          this.snapshot.digest = status.feedDigest;
-        } else {
-          this.publish(ReadState.STALE);
-          const updatedFeed = await this.loadFeed({ signal: controller.signal });
-          if (generation !== this.generation) return;
-          if (!this.validateFeed(updatedFeed) || String(updatedFeed.asOfBlock ?? "") !== status.checkpointBlock)
-            throw new Error("PUBLIC_FEED_CHECKPOINT_MISMATCH");
-          this.snapshot = { feed: updatedFeed, digest: status.feedDigest, checkpoint: status.checkpointBlock };
-          this.onSnapshot(updatedFeed);
-        }
-        this.publish(status.state === "FRESH_VERIFIED" ? ReadState.FRESH : ReadState.STALE);
-        this.failures = 0;
-      } catch (error) {
-        // The primary validated feed is already available; status is advisory.
-        this.failures += 1;
-        this.publish(ReadState.STALE, error);
+      if (!this.pollingEnabled) {
+        if (feed.mode !== "FIXTURE") throw new Error("FIXTURE_MODE_REQUIRED");
+        this.snapshot = { feed }; this.onSnapshot(feed); this.publish(ReadState.FIXTURE); return;
       }
+      let candidate = { feed, ...await verifyFeedBinding(feed) };
+      if (generation !== this.generation) return;
+      const status = await this.fetchStatus(controller.signal);
+      if (generation !== this.generation) return;
+      this.rejectConflict(status);
+      if (status.state === "NO_VERIFIED_SNAPSHOT") throw new Error("STATUS_HAS_NO_VERIFIED_SNAPSHOT");
+      if (candidate.checkpoint !== status.checkpointBlock) {
+        const updatedFeed = await this.loadFeed({ signal: controller.signal });
+        if (!this.validateFeed(updatedFeed)) throw new Error("PUBLIC_FEED_INVALID");
+        candidate = { feed: updatedFeed, ...await verifyFeedBinding(updatedFeed) };
+      }
+      if (generation !== this.generation) return;
+      this.accept(candidate, status);
     } catch (error) {
       if (generation === this.generation) {
         this.failures += 1;
-        this.publish(ReadState.UNAVAILABLE, error);
+        this.publish(this.snapshot ? ReadState.STALE : ReadState.UNAVAILABLE, error);
       }
     } finally {
       if (this.active?.generation === generation) this.active = null;
       if (this.running && this.pollingEnabled) this.schedule(this.failures ? this.backoffDelay() : 15_000);
     }
+  }
+
+  rejectConflict(status) {
+    if (!this.snapshot || status.state === "NO_VERIFIED_SNAPSHOT") return;
+    if (status.checkpointBlock === this.snapshot.checkpoint && !bindingMatches(this.snapshot, status)) {
+      throw new Error("PUBLIC_SNAPSHOT_CHECKPOINT_CONFLICT");
+    }
+    if (BigInt(status.checkpointBlock) < BigInt(this.snapshot.checkpoint)) throw new Error("PUBLIC_SNAPSHOT_CHECKPOINT_REGRESSION");
+  }
+
+  accept(candidate, status) {
+    if (!bindingMatches(candidate, status)) throw new Error("PUBLIC_FEED_BINDING_MISMATCH");
+    if (status.state === "FRESH_VERIFIED" && (status.freshnessValidUntilMs <= this.now() || status.verifiedAtMs > this.now() || status.runtimeUpdatedAtMs > this.now())) throw new Error("PUBLIC_STATUS_EXPIRED");
+    this.snapshot = candidate;
+    this.status = status;
+    this.onSnapshot(candidate.feed);
+    this.failures = 0;
+    this.publish(status.state === "FRESH_VERIFIED" ? ReadState.FRESH : ReadState.STALE);
   }
 
   async fetchStatus(signal) {
@@ -151,37 +186,20 @@ export class PublicReadPlane {
     try {
       const status = await this.fetchStatus(controller.signal);
       if (generation !== this.generation) return;
-      this.status = status;
-      if (!this.snapshot) {
-        if (status.state === "NO_VERIFIED_SNAPSHOT") throw new Error("NO_VERIFIED_SNAPSHOT");
-        const feed = await this.loadFeed({ signal: controller.signal });
-        if (generation !== this.generation) return;
-        if (!this.validateFeed(feed) || String(feed.asOfBlock ?? "") !== status.checkpointBlock)
-          throw new Error("PUBLIC_FEED_INVALID");
-        this.snapshot = { feed, digest: status.feedDigest, checkpoint: status.checkpointBlock };
-        this.onSnapshot(feed);
-        this.failures = 0;
-        this.publish(status.state === "FRESH_VERIFIED" ? ReadState.FRESH : ReadState.STALE);
-        return;
-      }
       if (status.state === "NO_VERIFIED_SNAPSHOT") {
-        this.publish(ReadState.STALE, new Error("STATUS_HAS_NO_VERIFIED_SNAPSHOT"));
         throw new Error("STATUS_HAS_NO_VERIFIED_SNAPSHOT");
       }
-
-      const checkpointChanged = status.checkpointBlock !== this.snapshot.checkpoint;
-      const digestChanged = this.snapshot.digest !== null && status.feedDigest !== this.snapshot.digest;
-      if (checkpointChanged || digestChanged || this.snapshot.digest === null) {
+      this.rejectConflict(status);
+      let candidate = this.snapshot;
+      if (!candidate || candidate.checkpoint !== status.checkpointBlock) {
+        if (this.snapshot) this.publish(ReadState.STALE, new Error("PUBLIC_FRESHNESS_BEING_ESTABLISHED"));
         const feed = await this.loadFeed({ signal: controller.signal });
         if (generation !== this.generation) return;
         if (!this.validateFeed(feed)) throw new Error("PUBLIC_FEED_INVALID");
-        const checkpoint = String(feed.asOfBlock ?? "");
-        if (checkpoint !== status.checkpointBlock) throw new Error("PUBLIC_FEED_CHECKPOINT_MISMATCH");
-        this.snapshot = { feed, digest: status.feedDigest, checkpoint };
-        this.onSnapshot(feed);
+        candidate = { feed, ...await verifyFeedBinding(feed) };
       }
-      this.failures = 0;
-      this.publish(status.state === "FRESH_VERIFIED" ? ReadState.FRESH : ReadState.STALE);
+      if (generation !== this.generation) return;
+      this.accept(candidate, status);
     } catch (error) {
       if (generation === this.generation) {
         this.failures += 1;
@@ -196,6 +214,9 @@ export class PublicReadPlane {
 
   visibilityChanged() {
     if (!this.running) return;
+    if (this.state === ReadState.FRESH && this.status.freshnessValidUntilMs <= this.now()) {
+      this.publish(ReadState.STALE, new Error("PUBLIC_STATUS_EXPIRED"));
+    }
     if (!this.isVisible()) {
       if (this.timer !== null) this.clearTimer(this.timer);
       this.timer = null;
@@ -222,6 +243,8 @@ export class PublicReadPlane {
     this.running = false;
     if (this.timer !== null) this.clearTimer(this.timer);
     this.timer = null;
+    if (this.expiryTimer !== null) this.clearTimer(this.expiryTimer);
+    this.expiryTimer = null;
     if (this.active) this.active.controller.abort();
     this.active = null;
     this.generation += 1;
