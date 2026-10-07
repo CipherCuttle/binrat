@@ -45,9 +45,9 @@ No V0 threshold or family definition is changed.
 
 Planned target: **10 strict controls**.
 
-Final strict cohort after hostile review: **4**.
+Final strict cohort after hostile review and targeted extension: **6**.
 
-Target status: **NOT MET (4/10)**.
+Target status: **NOT MET (6/10)**.
 
 The missing six are not backfilled with weaker evidence.
 
@@ -59,14 +59,16 @@ The missing six are not backfilled with weaker evidence.
 | ZetaChain | 2023-06-08 | P4 audit remediation + P6 genesis token distribution | 237d |
 | Neon EVM | 2022-12-12 | P4 audit remediation + P3 production infrastructure | 217d |
 | Namada | 2024-08-15 | P5 mainnet release candidate + P6 genesis distribution files | 110d |
+| zkSync Era | 2022-12-13 | P2 restricted production deployment + P4 public remediation audit | 101d |
+| Rocket Pool | 2021-08-01 | P4 verified audit remediation + P5 mainnet release candidate | 100d |
 
 Frozen lag summary:
 
-- minimum: **110 days**
-- median: **227 days**
+- minimum: **100 days**
+- median: **163.5 days**
 - maximum: **509 days**
 
-All four evaluate as `PRODUCTION_PREP` under the unchanged V0 rule.
+All six evaluate as `PRODUCTION_PREP` under the unchanged V0 rule.
 
 ## Why each case qualifies
 
@@ -109,13 +111,34 @@ That is clean P5 + P6.
 
 Mainnet launched on 2024-12-03.
 
+### zkSync Era
+
+Matter Labs deployed the restricted Baby Alpha end-to-end system to Ethereum mainnet on 2022-10-28.
+
+The trigger deliberately does **not** backdate later audit knowledge. On 2022-12-13 OpenZeppelin publicly published its diff audit, documenting that the alpha contracts were already deployed and that 15 of 16 findings in that review were resolved.
+
+At that public observation point, the 46-day-old P2 deployment and current P4 remediation receipt put frozen V0 into `PRODUCTION_PREP`.
+
+Wider public access did not open until 2023-03-24, 101 days later.
+
+### Rocket Pool
+
+On 2021-06-15 Rocket Pool publicly documented that the first-round audit issues had been addressed and verified during the second audit round.
+
+On 2021-08-01 the project cut `v1.0.0-rc2`, explicitly described as the second release candidate for mainnet v1.0.0.
+
+That is clean P4 + P5 within V0's 60-day window.
+
+Mainnet launched on 2021-11-09, 100 days later.
+
 ## Combination result
 
 Each admitted counterexample uses a different two-family combination:
 
-- `AUDIT_REMEDIATION + RELEASE_CANDIDATE`: 1
+- `AUDIT_REMEDIATION + RELEASE_CANDIDATE`: 2
 - `AUDIT_REMEDIATION + TOKEN_DISTRIBUTION`: 1
 - `AUDIT_REMEDIATION + PRODUCTION_INFRA`: 1
+- `AUDIT_REMEDIATION + PRODUCTION_DEPLOYMENT`: 1
 - `RELEASE_CANDIDATE + TOKEN_DISTRIBUTION`: 1
 
 This matters.
@@ -128,7 +151,7 @@ A team can have remediated audits, an RC, genesis distribution data, or technica
 
 ## Hostile-review correction
 
-The first draft admitted six cases.
+The research pass surfaced more candidates than the frozen cohort admits.
 
 Hostile review found a methodological High: several receipts were typed too loosely as P4.
 
@@ -202,7 +225,7 @@ The following simple claim is falsified:
 
 One valid counterexample would falsify that universal claim.
 
-This benchmark contains four, spanning four different family combinations and delays from 110 to 509 days.
+This benchmark contains six strict counterexamples, spanning five different family combinations and delays from 100 to 509 days.
 
 This does **not** erase Benchmark V1's observation that V0 clustered near the final two weeks for 5/7 coverage-verified launchers.
 
@@ -261,7 +284,7 @@ Candidate V1 concepts:
 
 ## Verdict
 
-- target of 10 strict controls: **NOT MET (4/10)**
+- target of 10 strict controls: **NOT MET (6/10)**
 - admitted evidence quality: **PASS FOR FALSIFICATION**
 - V0 as a universal <=90d clock: **FALSIFIED**
 - V0 as a late readiness alert: **STILL POTENTIALLY USEFUL**
