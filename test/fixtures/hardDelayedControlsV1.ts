@@ -104,7 +104,7 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
       sourceRef: 'https://namada.net/blog/namada-mainnet-is-live'
     },
     notes: 'Namada had already published its mainnet release candidate when the Anoma Foundation published the genesis balance and transaction files used to build the full genesis block. Mainnet still arrived 110 days later.'
-  }
+  },
   {
     projectId: 'zksync-era',
     targetLabel: 'zkSync Era public alpha',
