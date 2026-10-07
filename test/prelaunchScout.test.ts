@@ -82,7 +82,8 @@ test('historical replay detects Taiko before observed public launch with measura
   const afterFunding = evaluatePrelaunchProject(taiko, '2024-03-04');
   assert.equal(afterFunding.status, 'QUALIFIED_WATCH');
   assert.deepEqual(afterFunding.backingEntities, ['GSR', 'Wintermute Ventures']);
-  assert.equal(afterFunding.laterObservedLaunchInFixture, true);\n  assert.equal(afterFunding.leadDaysToObservedLaunch, 84);
+  assert.equal(afterFunding.laterObservedLaunchInFixture, true);
+  assert.equal(afterFunding.leadDaysToObservedLaunch, 84);
 
   const launchDay = evaluatePrelaunchProject(taiko, '2024-05-27');
   assert.equal(launchDay.status, 'ALREADY_LAUNCHED');
@@ -111,7 +112,8 @@ test('current GTE evidence becomes a watch candidate without pretending absence 
   assert.ok(result.technicalSignals.includes('PUBLIC_CODE'));
   assert.ok(result.technicalSignals.includes('TESTNET_DEPLOYMENT'));
   assert.ok(result.technicalSignals.includes('AUDIT'));
-  assert.equal(result.laterObservedLaunchInFixture, false);\n  assert.equal(result.leadDaysToObservedLaunch, null);
+  assert.equal(result.laterObservedLaunchInFixture, false);
+  assert.equal(result.leadDaysToObservedLaunch, null);
 });
 
 test('GitHub plus testnet activity without a typed backing relation does not qualify', () => {
