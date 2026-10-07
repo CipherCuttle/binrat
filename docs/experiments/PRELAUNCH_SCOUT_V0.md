@@ -33,7 +33,7 @@ For a live project where no later launch receipt is yet known, the strongest all
 Expected replay:
 
 - 2024-03-02 => `TECHNICAL_ONLY`
-- 2024-03-04 => `QUALIFIED_PRELAUNCH_BACKTEST`
+- 2024-03-04 => `QUALIFIED_WATCH`
 - lead time => 84 days
 - 2024-05-27 => `ALREADY_LAUNCHED`
 
@@ -70,7 +70,7 @@ Do not build a broad crawler until the rule survives a frozen dataset of at leas
 
 - 20 historical projects that later launched;
 - 20 contemporaneous controls that did not meet the outcome;
-- point-in-time evidence only, with no post-launch leakage.
+- point-in-time decision evidence only; later launch outcomes may be attached solely for scoring lead time and precision, never as detector inputs.
 
 Measure:
 
