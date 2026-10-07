@@ -194,7 +194,7 @@ export const LAUNCH_PRESSURE_V1_LAUNCHERS: readonly LaunchedPressureProject[] = 
     projectId: 'story',
     launchOn: '2025-02-13',
     coverage: 'VERIFIED',
-    coverageReason: 'Public Story repo exposes audit fixes, explicit mainnet network support/genesis work, and a stable 1.0 release before launch.',
+    coverageReason: 'Public Story repo exposes audit fixes, production RPC/explorer wiring, and separate mainnet genesis configuration before launch.',
     pressure: {
       projectId: 'story',
       receipts: [
@@ -205,13 +205,13 @@ export const LAUNCH_PRESSURE_V1_LAUNCHERS: readonly LaunchedPressureProject[] = 
         },
         {
           observedOn: '2024-12-13',
-          kind: 'PRODUCTION_CHAIN_CONFIG',
+          kind: 'PRODUCTION_INFRA',
           sourceRef: 'https://github.com/piplabs/story/commit/4779e266fa8e3a9f34b2062421a1693911ed4dd9'
         },
         {
-          observedOn: '2025-01-18',
-          kind: 'RELEASE_CANDIDATE',
-          sourceRef: 'https://github.com/piplabs/story/commit/2dd5638879c3021c42aa7cb418a9d3bd1702b9b8'
+          observedOn: '2024-12-18',
+          kind: 'PRODUCTION_CHAIN_CONFIG',
+          sourceRef: 'https://github.com/piplabs/story/commit/e9da1b43eca7caf9c3e6528c3f6ea8b792436401'
         }
       ]
     }
