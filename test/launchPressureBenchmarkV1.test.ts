@@ -40,15 +40,15 @@ test('frozen v0 pressure rule fails the 45d target but improves sharply in the l
   const byHorizon = new Map(report.horizons.map((row) => [row.leadDays, row]));
   assert.deepEqual(byHorizon.get(45), {
     leadDays: 45,
-    truePositive: 1,
-    falseNegative: 6,
-    recall: 1 / 7
+    truePositive: 2,
+    falseNegative: 5,
+    recall: 2 / 7
   });
   assert.deepEqual(byHorizon.get(30), {
     leadDays: 30,
-    truePositive: 1,
-    falseNegative: 6,
-    recall: 1 / 7
+    truePositive: 2,
+    falseNegative: 5,
+    recall: 2 / 7
   });
   assert.deepEqual(byHorizon.get(14), {
     leadDays: 14,
