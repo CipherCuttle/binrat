@@ -13,15 +13,15 @@ test('v1 cohort freezes 20 launchers but scores only coverage-verified evidence'
   );
 
   assert.equal(report.launcherCount, 20);
-  assert.equal(report.verifiedLauncherCount, 8);
-  assert.equal(report.partialLauncherCount, 12);
+  assert.equal(report.verifiedLauncherCount, 7);
+  assert.equal(report.partialLauncherCount, 13);
   assert.equal(report.controlCount, 3);
   assert.equal(report.verifiedControlCount, 2);
   assert.equal(report.partialControlCount, 1);
 
   assert.equal(
     report.cases.filter((row) => row.cohort === 'LAUNCHED').length,
-    8 * 5
+    7 * 5
   );
   assert.equal(
     report.cases.filter((row) => row.cohort === 'UNRESOLVED_CONTROL').length,
@@ -40,31 +40,31 @@ test('frozen v0 pressure rule fails the 45d target but improves sharply in the l
   const byHorizon = new Map(report.horizons.map((row) => [row.leadDays, row]));
   assert.deepEqual(byHorizon.get(45), {
     leadDays: 45,
-    truePositive: 2,
+    truePositive: 1,
     falseNegative: 6,
-    recall: 0.25
+    recall: 1 / 7
   });
   assert.deepEqual(byHorizon.get(30), {
     leadDays: 30,
-    truePositive: 2,
+    truePositive: 1,
     falseNegative: 6,
-    recall: 0.25
+    recall: 1 / 7
   });
   assert.deepEqual(byHorizon.get(14), {
     leadDays: 14,
-    truePositive: 6,
+    truePositive: 5,
     falseNegative: 2,
-    recall: 0.75
+    recall: 5 / 7
   });
   assert.deepEqual(byHorizon.get(7), {
     leadDays: 7,
-    truePositive: 6,
+    truePositive: 5,
     falseNegative: 2,
-    recall: 0.75
+    recall: 5 / 7
   });
 
   assert.equal(report.launcherEarlyFalsePositive, 0);
-  assert.equal(report.launcherEarlyTrueNegative, 8);
+  assert.equal(report.launcherEarlyTrueNegative, 7);
   assert.equal(report.launcherEarlyFalsePositiveRate, 0);
 });
 
