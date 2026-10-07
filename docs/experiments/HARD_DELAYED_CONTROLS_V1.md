@@ -4,11 +4,11 @@ Date: 2026-10-07
 
 ## Question
 
-Launch Pressure V0 treats a project as pressure-imminent when recent, distinct production-preparation families cluster strongly enough to reach `PRODUCTION_PREP` or `ARMED`.
+Launch Pressure V0 calls a project pressure-imminent when the frozen evaluator reaches `PRODUCTION_PREP` or `ARMED`.
 
-This adversarial benchmark asks a deliberately hostile question:
+This adversarial benchmark asks:
 
-> Can we find projects that satisfy the frozen V0 pressure-imminent rule at time T and still do not publicly launch for at least 90 days?
+> Can a project satisfy that unchanged V0 rule at time T and still fail to publicly launch for at least 90 days?
 
 If yes, the simple interpretation
 
@@ -16,11 +16,11 @@ If yes, the simple interpretation
 
 is falsified.
 
-## Important: this is not a false-positive-rate sample
+## This is not an FPR sample
 
-Controls are selected **because** they are counterexamples to the V0 timing hypothesis.
+Cases are selected **because** they are hard counterexamples.
 
-Therefore this cohort cannot estimate:
+The cohort cannot estimate:
 
 - population false-positive rate;
 - live precision;
@@ -31,74 +31,182 @@ It is an adversarial falsification set.
 
 ## Admission rule
 
-A case is admitted only when all of the following are true:
+A case is admitted only if:
 
-1. all pressure receipts were publicly observable by trigger time T;
+1. every pressure receipt was public by trigger time T;
 2. the unchanged V0 evaluator returns `PRODUCTION_PREP` or `ARMED` at T;
-3. the target launch is unambiguous enough to score;
-4. no target public launch occurs for at least 90 days after T;
-5. historical source wording supports the typed P1-P6 relation without upgrading vague marketing into technical evidence.
+3. each receipt satisfies the already-frozen P1-P6 meaning literally;
+4. the target launch is unambiguous enough to score;
+5. the target does not publicly launch for at least 90 days after T.
 
-No V0 state-machine threshold is changed.
+No V0 threshold or family definition is changed.
 
 ## Target
 
 Planned target: **10 strict controls**.
 
-Strict research pass admitted: **6**.
+Final strict cohort after hostile review: **4**.
 
-Target status: **NOT MET**.
+Target status: **NOT MET (4/10)**.
 
-The missing four are not backfilled with weaker evidence. A smaller clean falsification set is preferable to a larger contaminated one.
+The missing six are not backfilled with weaker evidence.
 
 ## Frozen controls
 
 | Project | Trigger | Active V0 families | Outcome lag |
 | --- | --- | --- | ---: |
 | Tari Minotari | 2023-12-14 | P4 audit remediation + P5 release candidate | 509d |
-| QRL 2.0 / Zond | 2026-04-03 | P4 audit completion + P5 code freeze | 187d observed, unresolved |
-| Shardeum | 2025-01-15 | P4 prior vulnerability remediation + P5 code freeze | 110d |
-| ZetaChain | 2023-06-08 | P4 audit fixes + P6 genesis token distribution | 237d |
-| Neon EVM | 2022-12-12 | P4 completed audits + P3 production infrastructure | 217d |
-| Namada | 2024-08-26 | P4 completed audits + P5 mainnet release candidate | 99d |
+| ZetaChain | 2023-06-08 | P4 audit remediation + P6 genesis token distribution | 237d |
+| Neon EVM | 2022-12-12 | P4 audit remediation + P3 production infrastructure | 217d |
+| Namada | 2024-08-15 | P5 mainnet release candidate + P6 genesis distribution files | 110d |
 
 Frozen lag summary:
 
-- minimum: **99 days**
-- median: **202 days**
+- minimum: **110 days**
+- median: **227 days**
 - maximum: **509 days**
 
-All six evaluate as `PRODUCTION_PREP` under the unchanged V0 rule.
+All four evaluate as `PRODUCTION_PREP` under the unchanged V0 rule.
+
+## Why each case qualifies
+
+### Tari Minotari
+
+On 2023-12-14 Tari reported that base-node and wallet audit issues had been addressed and published its first release candidate, described as code believed to be what would run on mainnet while explicitly not being the mainnet release.
+
+That is clean P4 + P5.
+
+Genesis was not mined until 2025-05-06.
+
+### ZetaChain
+
+Public GitHub history shows:
+
+- 2023-05-16: Zellic audit fixes;
+- 2023-06-08: genesis token-distribution refactor.
+
+That is clean P4 + P6.
+
+Mainnet Beta did not launch until 2024-01-31.
+
+### Neon EVM
+
+Ackee Blockchain reported on 2022-11-04 that Neon supplied an updated codebase addressing the audit findings, with every finding fixed except one informational issue.
+
+On 2022-12-12 Neon reported that the production environment and infrastructure needed for live dApps were technically ready, while explaining that organizational / external / market dependencies still prevented activation.
+
+That is clean P4 + P3.
+
+Production mainnet did not launch until 2023-07-17.
+
+### Namada
+
+Namada published its mainnet release candidate on 2024-07-09.
+
+On 2024-08-15 the Anoma Foundation published the genesis balance and transaction files associated with the proposed genesis distribution, including tooling to build the full genesis block.
+
+That is clean P5 + P6.
+
+Mainnet launched on 2024-12-03.
 
 ## Combination result
 
-False-clock combinations:
+Each admitted counterexample uses a different two-family combination:
 
-- `AUDIT_REMEDIATION + RELEASE_CANDIDATE`: **4**
-- `AUDIT_REMEDIATION + PRODUCTION_INFRA`: **1**
-- `AUDIT_REMEDIATION + TOKEN_DISTRIBUTION`: **1**
+- `AUDIT_REMEDIATION + RELEASE_CANDIDATE`: 1
+- `AUDIT_REMEDIATION + TOKEN_DISTRIBUTION`: 1
+- `AUDIT_REMEDIATION + PRODUCTION_INFRA`: 1
+- `RELEASE_CANDIDATE + TOKEN_DISTRIBUTION`: 1
 
-The dominant failure is clear:
+This matters.
 
-> **readiness artifacts are not the same thing as clock-closing artifacts.**
+The failure is not confined to one bad signal family.
 
-An audit can finish while governance, operations, economics, external integrations, market timing, validator coordination, legal work, foundation setup, or another launch gate remains open.
+> **Readiness artifacts are not the same as clock-closing artifacts.**
 
-A release candidate or code freeze can exist specifically so those remaining gates can be tested.
+A team can have remediated audits, an RC, genesis distribution data, or technically ready infrastructure while another launch gate remains open.
 
-Production infrastructure can be technically ready while an organization deliberately does not activate it.
+## Hostile-review correction
+
+The first draft admitted six cases.
+
+Hostile review found a methodological High: several receipts were typed too loosely as P4.
+
+Frozen P4 is:
+
+> final audit remediation / fix-review closure
+
+It is **not**:
+
+- merely “audit completed”;
+- a generic bug bounty;
+- an old security fix with no closure evidence.
+
+The following first-draft cases were therefore removed:
+
+### QRL 2.0 / Zond
+
+The 2026-04-03 source said two cryptographic-library audits were complete, but did not establish remediation closure at that date. Later remediation evidence exists, but it is too late to combine with the old code-freeze event under V0's 60-day window.
+
+### Shardeum
+
+The source said prior bounty programs had identified and rectified vulnerabilities, but that does not satisfy the frozen audit-remediation / fix-review meaning strongly enough.
+
+### Namada P4 was replaced, not widened
+
+A forum statement that two audits had completed was not retained as P4.
+
+Namada remains admitted only because the independent genesis-balance publication is clean P6 evidence within 60 days of the mainnet RC.
+
+### Neon P4 was strengthened
+
+Generic “audits completed” wording was replaced by the auditor's own statement that an updated codebase addressed the reported issues and fixed all findings except one informational item.
+
+No ontology was expanded to save a case.
+
+## Other rejected / non-admitted candidates
+
+### Sonic
+
+Early “mainnet” genesis and bootnode artifacts are entangled with migration from the already-live Fantom/Opera network. Target provenance is ambiguous.
+
+### Babylon
+
+Launch semantics are phased: Bitcoin Staking mainnet phases predate the later Genesis-chain milestone. A single launch date would mislabel the target.
+
+### Dusk
+
+Audit-remediation evidence is clean, but early mainnet installer configuration contained placeholder infrastructure; the required independent hard family did not survive strict review.
+
+### Avail
+
+Early prepare-mainnet and dummy-mainnet chain-spec work are primarily one P1 family. Candidate telemetry/deployment evidence was test/dev oriented or otherwise not clean production evidence.
+
+### Massa
+
+Genesis preparation is clear, but the candidate second hard family did not survive source-literal review.
+
+### Saga
+
+A “Mainnet v1” change is release-oriented, but a second independent qualifying family was not established.
+
+### Aleo
+
+Audit work is clear, but the exact code-freeze completion date around the 90-day boundary was not strong enough for admission.
 
 ## Structural verdict
 
-The following simple claim is now falsified:
+The following simple claim is falsified:
 
 > Two sufficiently recent, distinct V0 pressure families imply launch within 90 days.
 
-Multiple clean counterexamples survive far beyond 90 days.
+One valid counterexample would falsify that universal claim.
 
-This does **not** erase the earlier Benchmark V1 result that V0 clustered around the final two weeks for 5/7 coverage-verified launchers.
+This benchmark contains four, spanning four different family combinations and delays from 110 to 509 days.
 
-It means the current V0 state has two different meanings mixed together:
+This does **not** erase Benchmark V1's observation that V0 clustered near the final two weeks for 5/7 coverage-verified launchers.
+
+It means V0 currently mixes two states:
 
 ```text
 READY-LOOKING
@@ -106,97 +214,60 @@ and
 ACTUALLY CLOSING LAUNCH GATES
 ```
 
-Those are not equivalent.
+They are not equivalent.
 
-## Rejected / non-admitted candidates
+## Pressure V1 hypothesis
 
-Several tempting candidates were deliberately excluded.
-
-### Sonic
-
-Early public code contains mainnet genesis and bootnode-looking artifacts, but the evidence is entangled with migration from the already-live Fantom/Opera mainnet. Production-target provenance is ambiguous.
-
-### Babylon
-
-The project has phased launch semantics. Bitcoin Staking mainnet phases predate the later Babylon Genesis chain. A single “launch date” would mislabel the target.
-
-### Dusk
-
-Audit-fix evidence is clean, but early mainnet installer configuration used placeholder infrastructure. The frozen V0 hard-family requirement is not cleanly satisfied.
-
-### Avail
-
-Early “prepare mainnet” and dummy mainnet chain-spec work are primarily one P1 family. Telemetry/deployment evidence inspected in the same period was test/dev oriented or otherwise not clean production evidence.
-
-### Massa
-
-Genesis preparation is clear, but the second candidate family did not survive source-literal review.
-
-### Saga
-
-“Mainnet v1” is clear release-oriented work, but a second independent qualifying family was not established.
-
-### Aleo
-
-Audit work is clear, but the exact code-freeze completion date near the 90-day boundary was not established strongly enough for admission.
-
-These exclusions are evidence that the cohort is intentionally conservative.
-
-## What Pressure V1 should test
-
-Do **not** tune V0 against these six cases.
+Do not tune V0 on these four cases.
 
 A future V1 should be preregistered around a different causal model:
 
 ```text
 READINESS
-  audit / RC / config / infra
+  audit / RC / config / infra / genesis distribution
         ↓
 OPEN BLOCKERS
-  governance / ops / security / integrations / launch dependencies
+  governance / ops / security / integrations / external dependencies
         ↓
 BLOCKER CLOSED
         ↓
 IRREVERSIBLE EXECUTION
-  canonical genesis
+  canonical genesis finalization
   funded production deployer
   production deployment
-  activated validators
-  live bridge / production endpoint
+  activated validator set
+  live production bridge / endpoint
         ↓
 IMMINENT
 ```
 
-Candidate concepts for a separately preregistered V1:
+Candidate V1 concepts:
 
-1. **OPEN_BLOCKER / BLOCKER_CLOSED receipts**
-   - explicit unresolved audit work;
-   - delayed external dependency;
-   - governance/validator ceremony outstanding;
-   - launch gate explicitly reopened or closed.
+1. **OPEN_BLOCKER / BLOCKER_CLOSED**
+   Explicit unresolved gates should cap imminence even when positive readiness evidence is strong.
 
-2. **Canonicality / target provenance**
-   - distinguish migration artifacts, testnet configs, placeholders, and old-mainnet state from the actual target launch.
+2. **Target provenance**
+   Distinguish migration artifacts, placeholders, old-mainnet state, testnet state, and the actual launch target.
 
 3. **Irreversibility after closure**
-   - require an expensive/canonical production action after the last known blocker closes instead of counting static readiness artifacts alone.
+   Prefer a canonical production action that occurs after the last known blocker closes.
 
 4. **Sequence direction**
-   - `audit complete -> RC` is not enough;
-   - `last blocker closed -> canonical production action -> production network activation` is a stronger causal sequence.
+   `audit remediated -> RC` is not enough.
+   `last blocker closed -> canonical production action -> network activation` is a stronger causal sequence.
 
 5. **Negative evidence**
-   - an explicit open blocker should suppress or cap imminence even when several positive families exist.
+   A public unresolved dependency should reduce or suppress the launch clock instead of being ignored.
 
 ## Verdict
 
-- strict target of 10 controls: **NOT MET (6/10)**
-- evidence quality of admitted controls: **PASS FOR FALSIFICATION**
-- V0 as simple <=90d clock: **FALSIFIED**
-- V0 as late readiness alert: **STILL POTENTIALLY USEFUL**
-- V1 blocker/closure model: **WORTH PREREGISTERING**
-- live precision / profitability: **UNKNOWN**
-- production deployment: **NOT AUTHORIZED**
+- target of 10 strict controls: **NOT MET (4/10)**
+- admitted evidence quality: **PASS FOR FALSIFICATION**
+- V0 as a universal <=90d clock: **FALSIFIED**
+- V0 as a late readiness alert: **STILL POTENTIALLY USEFUL**
+- blocker/closure model: **NEXT PREREGISTRATION CANDIDATE**
+- population precision / profitability: **UNKNOWN**
+- production use: **NOT AUTHORIZED**
 
 ## Authority boundary
 
