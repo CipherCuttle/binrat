@@ -18,6 +18,7 @@ export interface HardDelayedControl {
   launchOn?: string;
   scope: HardControlScope;
   evidenceReason: string;
+  outcomeSourceRef: string;
   pressure: LaunchPressureInput;
 }
 
@@ -84,6 +85,7 @@ function validateAndScore(control: HardDelayedControl): HardDelayedControlRow {
     throw new Error('HARD_CONTROL_PROJECT_ID_MISMATCH');
   }
   if (!control.evidenceReason.trim()) throw new Error('HARD_CONTROL_REASON_REQUIRED');
+  if (!control.outcomeSourceRef.trim()) throw new Error('HARD_CONTROL_OUTCOME_SOURCE_REQUIRED');
 
   const cutoffMs = parseIsoDay(control.cutoffOn, 'HARD_CONTROL_CUTOFF_INVALID');
   const observedThroughMs = parseIsoDay(
