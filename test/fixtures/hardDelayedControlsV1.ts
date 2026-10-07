@@ -28,58 +28,6 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
     notes: 'Official update says base-node and wallet audit issues were addressed and publishes the first release candidate believed to contain mainnet code, while explicitly saying it was not the mainnet release.'
   },
   {
-    projectId: 'qrl-2',
-    targetLabel: 'QRL 2.0 / Zond mainnet',
-    triggerOn: '2026-04-03',
-    pressure: {
-      projectId: 'qrl-2',
-      receipts: [
-        {
-          observedOn: '2026-04-03',
-          kind: 'AUDIT_REMEDIATION',
-          sourceRef: 'https://www.theqrl.org/weekly/2026-april-03/'
-        },
-        {
-          observedOn: '2026-04-03',
-          kind: 'RELEASE_CANDIDATE',
-          sourceRef: 'https://www.theqrl.org/weekly/2026-april-03/'
-        }
-      ]
-    },
-    outcome: {
-      kind: 'UNRESOLVED',
-      observedThrough: '2026-10-07',
-      sourceRef: 'https://www.theqrl.org/roadmap/'
-    },
-    notes: 'QRL weekly update says relevant repositories reached code freeze and two cryptographic-library audits were complete. QRL 2.0 remained a future mainnet target through the observation date.'
-  },
-  {
-    projectId: 'shardeum',
-    targetLabel: 'Shardeum mainnet',
-    triggerOn: '2025-01-15',
-    pressure: {
-      projectId: 'shardeum',
-      receipts: [
-        {
-          observedOn: '2024-12-17',
-          kind: 'RELEASE_CANDIDATE',
-          sourceRef: 'https://shardeum.org/blog/incentivized-testnet-stage-4/'
-        },
-        {
-          observedOn: '2025-01-15',
-          kind: 'AUDIT_REMEDIATION',
-          sourceRef: 'https://shardeum.org/blog/350k-bug-bounty-iii/'
-        }
-      ]
-    },
-    outcome: {
-      kind: 'HISTORICAL_LAUNCH',
-      launchOn: '2025-05-05',
-      sourceRef: 'https://shardeum.org/blog/mainnet-launch/'
-    },
-    notes: 'Official sources describe a pre-mainnet code freeze and say prior bounty programs identified and rectified important vulnerabilities. Token-only mainnet still launched more than 90 days later.'
-  },
-  {
     projectId: 'zetachain',
     targetLabel: 'ZetaChain Mainnet Beta',
     triggerOn: '2023-06-08',
@@ -113,9 +61,9 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
       projectId: 'neon-evm',
       receipts: [
         {
-          observedOn: '2022-12-12',
+          observedOn: '2022-11-04',
           kind: 'AUDIT_REMEDIATION',
-          sourceRef: 'https://medium.com/neon-labs/neon-evms-mainnet-launch-community-update-eeef3aea02a2'
+          sourceRef: 'https://medium.com/ackee-blockchain/neon-labs-neon-evm-audit-summary-416e323badeb'
         },
         {
           observedOn: '2022-12-12',
@@ -129,12 +77,12 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
       launchOn: '2023-07-17',
       sourceRef: 'https://www.neonevm.org/blog/2023-was-a-big-year-for-neon-evm'
     },
-    notes: 'Neon said audits were complete and the production environment plus live-dApp infrastructure were technically ready, but organizational and market dependencies delayed launch for months.'
+    notes: 'Ackee says Neon supplied an updated codebase that fixed every finding except one informational issue. Weeks later Neon said its production environment and live-dApp infrastructure were technically ready, yet organizational and market dependencies delayed launch for months.'
   },
   {
     projectId: 'namada',
     targetLabel: 'Namada mainnet',
-    triggerOn: '2024-08-26',
+    triggerOn: '2024-08-15',
     pressure: {
       projectId: 'namada',
       receipts: [
@@ -144,9 +92,9 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
           sourceRef: 'https://namada.net/blog/the-namada-mainnet-release-candidate-and-the-namada-mainnet-security-program'
         },
         {
-          observedOn: '2024-08-26',
-          kind: 'AUDIT_REMEDIATION',
-          sourceRef: 'https://forum.namada.net/t/the-namada-mainnet-release-candidate-discussions/846'
+          observedOn: '2024-08-15',
+          kind: 'TOKEN_DISTRIBUTION',
+          sourceRef: 'https://forum.namada.net/t/genesis-balance-files/907'
         }
       ]
     },
@@ -155,6 +103,6 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
       launchOn: '2024-12-03',
       sourceRef: 'https://namada.net/blog/namada-mainnet-is-live'
     },
-    notes: 'Namada published a mainnet release candidate; a core-contributor forum update later said both listed Informal Systems audits had completed. Mainnet still arrived 99 days after the trigger.'
+    notes: 'Namada had already published its mainnet release candidate when the Anoma Foundation published the genesis balance and transaction files used to build the full genesis block. Mainnet still arrived 110 days later.'
   }
 ] as const;
