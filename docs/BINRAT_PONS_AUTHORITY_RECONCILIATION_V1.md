@@ -1,8 +1,8 @@
 # BINRAT Pons Launch Authority Reconciliation V1
 
-Date: 2026-10-03  
-Status: CANONICAL PRELAUNCH AUTHORITY CANDIDATE / NO LAUNCH AUTHORITY  
-Branch: `integration/binrat-pons-launch-canonical-v1`  
+Date: 2026-10-03
+Status: CANONICAL PRELAUNCH AUTHORITY CANDIDATE / NO LAUNCH AUTHORITY
+Branch: `integration/binrat-pons-launch-canonical-v1`
 Base authority candidate: `docs/binrat-staking-authority-rebind-v1@4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c`
 
 ## Purpose

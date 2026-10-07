@@ -1,6 +1,6 @@
 # BINRAT ROADMAP V0
 
-Status: planning document  
+Status: planning document
 Rule: roadmap items are not promises, launch dates, or claims of future token value.
 
 ## CURRENT PRODUCT STATE — PUBLIC LIVE BETA / TOKEN LAUNCH BLOCKED
@@ -65,9 +65,9 @@ Primary funnel:
 
 `X / shared receipt -> OPEN CASE -> DIG DEEPER -> WATCH -> ALERT -> RETURN -> SHARE A RECEIPT -> LINK WALLET -> PUT THE RAT TO WORK -> WORKING RAT -> REPEAT`
 
-Telegram is the scout/return loop.  
-X is distribution and receipt sharing.  
-binrat.tech is the canonical product/token-facts surface.  
+Telegram is the scout/return loop.
+X is distribution and receipt sharing.
+binrat.tech is the canonical product/token-facts surface.
 Substack is optional depth and must not become a launch blocker.
 
 ### Immediate launch train

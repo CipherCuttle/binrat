@@ -1,7 +1,7 @@
 # BINRAT Pons Preflight V1
 
-Status: read-only preflight implementation  
-Authority base: `integration/binrat-pons-launch-canonical-v1`  
+Status: read-only preflight implementation
+Authority base: `integration/binrat-pons-launch-canonical-v1`
 Chain: Robinhood Chain 4663
 
 ## Purpose
