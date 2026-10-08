@@ -78,7 +78,17 @@ if (!html.includes('https://t.me/BinratBot')) throw new Error('WEB_TELEGRAM_FRON
 if ((html.match(/https:\/\/t\.me\/BinratBot/g) ?? []).length < 2) throw new Error('WEB_TELEGRAM_FIRST_CLASS_CTA_MISSING');
 if (!dataSource.includes('fetch("/api/capabilities"')) throw new Error('WEB_CAPABILITY_MANIFEST_SOURCE_MISSING');
 if (!dataSource.includes('typeof value.launchAuthorization.marketingAuthorized !== "boolean"')) throw new Error('WEB_TOKEN_MANIFEST_LAUNCH_SHAPE_MISSING');
-if (!app.includes('SEE THE FUTURE PLAN')) throw new Error('WEB_CASE_TO_WATCH_HANDOFF_MISSING');
+for (const marker of [
+  'RAT ZERO FOUND SOMETHING.',
+  '01 / SUPPORTED FACTS',
+  '02 / FOLLOW THE TRAIL',
+  'NEXT / CURRENT WATCH',
+  'When it is enabled for you, current Watch is accessed through the Telegram bot.',
+  'COPY DEPLOYER',
+  'SEE TRIPWIRE PLAN'
+]) {
+  if (!app.includes(marker)) throw new Error(`WEB_CASE_JOURNEY_MISSING:${marker}`);
+}
 if (!app.includes('from "./data-source.js"')) throw new Error('WEB_DATA_SOURCE_BOUNDARY_BYPASSED');
 if (!app.includes('from "./share-card.js"')) throw new Error('WEB_SHARE_CARD_BOUNDARY_BYPASSED');
 if (!readPlane.includes('["LIVE", "FIXTURE"].includes(feed.mode)')) throw new Error('WEB_UNAUTHORIZED_DATA_SOURCE_FAIL_CLOSED_MISSING');
@@ -133,7 +143,9 @@ if (!frontdoor.includes('feed.bags.slice(0, 3)')) throw new Error('WEB_HOME_PROO
 if (!frontdoor.includes('FIXTURE · NOT LIVE EVIDENCE')) throw new Error('WEB_HOME_FIXTURE_STAMP_MISSING');
 if (frontdoor.includes('fetch(')) throw new Error('WEB_HOME_BYPASSES_READ_PLANE');
 if (!app.includes('renderFreshCases(feed)') || !app.includes('renderFreshState(')) throw new Error('WEB_HOME_READ_PLANE_BINDING_MISSING');
-if (!app.includes('Persistent jobs are not available yet.')) throw new Error('WEB_CASE_WATCH_AVAILABILITY_MISSING');
+if (!app.includes('Persistent Tripwire jobs are not available yet.')) throw new Error('WEB_CASE_WATCH_AVAILABILITY_MISSING');
+if (!app.includes('No prior match is not a safety claim, prediction or proof that the address is globally new.')) throw new Error('WEB_CASE_NO_PRIOR_BOUNDARY_MISSING');
+if (!app.includes('Missing history stays missing; absence outside this coverage is unknown.')) throw new Error('WEB_CASE_PARTIAL_HISTORY_BOUNDARY_MISSING');
 if (html.includes('$BINRAT') || html.includes('token-status') || html.includes('NEEDS A COIN')) throw new Error('WEB_PUBLIC_TOKEN_MARKETING_REINTRODUCED');
 if ((html.match(/class="locked-slot"/g) ?? []).length !== 2) throw new Error('WEB_LOCKED_ROSTER_DRIFT');
 if (!frontdoorCss.includes('"Geist Sans"') || !frontdoorCss.includes('"Geist Mono"')) throw new Error('WEB_GEIST_MISSING');
