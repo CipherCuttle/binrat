@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, statSync, renameSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve, relative } from "node:path";
 
@@ -13,6 +13,9 @@ mkdirSync(staging, { recursive: true });
 const env = { ...process.env, VITE_BINRAT_V3_CANDIDATE: "1" };
 execFileSync("pnpm", ["exec", "tsc", "-b"], { cwd: webV2, env, stdio: "inherit" });
 execFileSync("pnpm", ["exec", "vite", "build", "--outDir", site, "--emptyOutDir"], { cwd: webV2, env, stdio: "inherit" });
+// Vite builds the dedicated entry as frontdoor-candidate.html; promote only
+// inside the ignored offline staging directory to support SPA navigation.
+renameSync(join(site, "frontdoor-candidate.html"), join(site, "index.html"));
 const htmlFile = join(site, "index.html");
 let html = readFileSync(htmlFile, "utf8");
 if (!/type="module"[^>]*src="\/assets\//.test(html) || !/<div id="root"><\/div>/.test(html)) {
@@ -47,6 +50,23 @@ if (!files.some(item => item.path.startsWith("assets/") && item.path.endsWith(".
   throw new Error("FRONTDOOR_BUILD_BUNDLES_MISSING");
 }
 const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+const proposal = {
+  directory: "./.artifacts/v3-frontdoor/site",
+  not_found_handling: "single-page-application",
+  run_worker_first: ["/api", "/api/*", "/health", "/telegram/*", "/__candidate/*"]
+};
+// Offline contract checks; Cloudflare routing must still be verified on an
+// isolated non-production Worker, not inferred from this local path model.
+const workerPaths = ["/api", "/api/status", "/api/launches/latest", "/api/miniapp/bootstrap", "/api/holder/session", "/health", "/telegram/webhook", "/__candidate/pons-bootstrap"];
+for (const path of workerPaths) {
+  if (!(path === "/api" || path.startsWith("/api/") || path === "/health" ||
+    path.startsWith("/telegram/") || path.startsWith("/__candidate/"))) {
+    throw new Error("FRONTDOOR_API_ROUTING_UNPROTECTED:" + path);
+  }
+}
+const js = files.filter(item => item.path.startsWith("assets/") && item.path.endsWith(".js"))
+  .map(item => readFileSync(join(site, item.path), "utf8")).join("\\n");
+if (js.includes("binrat-product-surface-v2-demo")) throw new Error("LEGACY_V2_APP_BUNDLED");
 const receipt = {
   schemaVersion: "binrat.frontdoor-staged-static/1",
   sourceSha: sha,
@@ -54,6 +74,11 @@ const receipt = {
   mode: "V3_PONS_READONLY_CANDIDATE",
   apiRouting: "SAME_ORIGIN_ONLY",
   productionAuthorized: false,
+  ownerVisualApproval: "APPROVED_LOCAL_CANDIDATE_ONLY_2026_10_08",
+  cloudflareRoutingProposal: proposal,
+  runtimeRoutingVerified: false,
+  livePonsSourceHealthy: false,
+  rollbackRequires: ["active deployed Worker version", "active asset release identity", "isolated rollback rehearsal"],
   files,
 };
 writeFileSync(join(staging, "manifest.json"), JSON.stringify(receipt, null, 2) + "\n");
