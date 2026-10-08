@@ -57,6 +57,29 @@ The separate inventory summary deliberately returns `INSUFFICIENT_DATA`. It repo
 
 **No real-world V1 recall, V0-vs-V1 false-clock reduction, or live precision is computed.** Zero verified cases does not mean zero real signals or zero false positives.
 
+## Protocol deviation — outcome data seen before receipt freeze
+
+**Important: this first pass violated the ideal two-pass outcome-masking order in PR #158.**
+Historical outcome dates for nine projects were gathered before the complete
+point-in-time V1/V0 prelaunch receipt corpora were archived and frozen.
+
+This is logged as **OUTCOME_EXPOSURE_BEFORE_RECEIPT_LOCK**, not silently
+treated as a compliant blind replay. Recording the labels in a separate
+file prevents accidental *runtime* leakage; it does not undo the human
+researcher's exposure to future outcomes and possible selection bias.
+
+Consequences:
+- No performance estimate from this investigator's subsequently coded
+  12-target corpus should be called truly out-of-sample or blinded.
+- A separate collector must process primary evidence using a source/cutoff
+  manifest that does not reveal launch dates or these candidate labels;
+  record all searches/rejections before an independent label join. Even that
+  is only partially blinded when events are well-known.
+- The only robust non-retrospective validation is genuinely prospective
+  shadow observation of projects registered while still unlaunched.
+- This draft remains a reproducible **research diagnostic and protocol
+  failure report**, not the final 12-target efficacy verdict.
+
 ## Hostile methodological finding
 
 The prereg holdout contains **12 projects known historically to have launched**, most on the OP Stack. It is not a representative cross-section of at-risk projects and does not automatically contain the required >=4 separate delayed project controls or >=5 outcome-blind V0-positive delayed episodes. Post-hoc substitution to rescue the benchmark is forbidden.
