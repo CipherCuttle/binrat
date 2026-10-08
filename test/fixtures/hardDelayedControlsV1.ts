@@ -23,7 +23,7 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
     outcome: {
       kind: 'HISTORICAL_LAUNCH',
       launchOn: '2025-05-06',
-      sourceRef: 'https://github.com/tari-project/tari/blob/development/changelog-Mainnet.md'
+      sourceRef: 'https://github.com/tari-project/universe/blob/6e2d99138d77102ac55206cfd7469d51c7afe807/CHANGELOG.md'
     },
     notes: 'Official update says base-node and wallet audit issues were addressed and publishes the first release candidate believed to contain mainnet code, while explicitly saying it was not the mainnet release.'
   },
