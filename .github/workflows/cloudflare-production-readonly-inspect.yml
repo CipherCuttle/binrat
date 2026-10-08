@@ -461,7 +461,7 @@ jobs:
               reasons.append(f"health status {health.get('status')}")
           status_ep = out['http'].get('status')
           if status_ep and status_ep.get('status') != '200':
-              reasons.append(f"status endpoint HTTP {status_ep.get('status')} (recorded, not gating)")
+              reasons.append(f"status endpoint HTTP {status_ep.get('status')}")
           out['verdict'] = 'FAIL' if reasons else 'PASS'
           out['verdictReasons'] = reasons
 
@@ -504,3 +504,9 @@ jobs:
           name: cloudflare-production-readonly-inspect
           path: cloudflare-production-readonly-inspect.json
           retention-days: 30
+      
+      # Upload the sanitized evidence first, then make the job's exit status
+      # agree with its report. All operations remain READ-ONLY.
+      - name: Gate sanitized inspection result (never launch authorization)
+        if: always()
+        run: node scripts/verify-production-inspection-report.mjs cloudflare-production-readonly-inspect.json "$OPERATION"
