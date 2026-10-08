@@ -56,6 +56,7 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
+  if (new URLSearchParams(window.location.search).get("visual") === "lab") return { page: "visual-lab" };
   if (path === "/visual-lab") return { page: "visual-lab" };
   if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/saved") return { page: "saved" };
