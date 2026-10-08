@@ -555,7 +555,7 @@ function openBag(idOrBag, origin = document.activeElement) {
     <section class="case-next-step" aria-label="What to do next">
       <span>NEXT / CURRENT WATCH</span>
       <h3>DON'T KEEP CHECKING THIS SHIT.</h3>
-      <p>Where enabled, Watch can alert you when a future supported indexed launch appears from this same reported deployer. Current Watch is available through the Telegram bot. Watch is not Tripwire.</p>
+      <p>Where enabled, Watch can alert you when a future supported indexed launch appears from this same reported deployer. When it is enabled for you, current Watch is accessed through the Telegram bot. Watch is not Tripwire.</p>
       <div class="case-next-actions">
         <a class="button primary" href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM <span>↗</span></a>
         <button class="button ghost" type="button" data-copy-watch-subject>COPY DEPLOYER</button>
