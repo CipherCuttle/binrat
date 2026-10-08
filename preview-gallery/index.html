@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BINRAT Frontend Museum</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#0f120f;color:#ecebdc}
+*{box-sizing:border-box}
+body{margin:0;background:#0f120f;color:#ecebdc}
+main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:48px 0 72px}
+.eyebrow{font:700 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:#d59a61}
+h1{font-size:clamp(38px,7vw,80px);line-height:.95;letter-spacing:-.055em;margin:12px 0 18px}
+.lede{max-width:760px;color:#aaa99f;font-size:18px;line-height:1.65}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:36px}
+.card{border:1px solid #353b34;background:#171b17;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:245px}
+.card.current{border-color:#d59a61}
+.card h2{font-size:26px;margin:0;letter-spacing:-.03em}
+.meta{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8e9188;overflow-wrap:anywhere}
+.card p{color:#b7b9ae;line-height:1.55;margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{border:1px solid #3e443d;padding:5px 8px;font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d3d4c9}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+a{color:inherit;text-decoration:none}
+.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:18px;min-height:44px;padding:12px 14px;border:1px solid #4e554d;font-weight:700}
+.btn.primary{background:#d59a61;color:#11130f;border-color:#d59a61}
+.note{margin-top:28px;border-top:1px solid #30362f;padding-top:20px;color:#8e9188;line-height:1.6}
+@media(max-width:760px){main{padding-top:30px}.grid{grid-template-columns:1fr}.card{min-height:0}}
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">BINRAT / FRONTEND MUSEUM / 2026-10-08</div>
+  <h1>EVERY FRONTDOOR.<br/>SIDE BY SIDE.</h1>
+  <p class="lede">Frozen previews of the meaningful BINRAT frontend generations. These are for comparing product direction and user journey, not production truth. Where available, links open fixture/demo mode so the UI has something to show.</p>
+
+  <section class="grid">
+    <article class="card current">
+      <div class="eyebrow">PRODUCTION</div>
+      <h2>binrat.tech</h2>
+      <div class="meta">current public production surface</div>
+      <p>The currently deployed public site. Use this as the baseline for what users actually see today.</p>
+      <div class="tags"><span class="tag">LIVE</span><span class="tag">PRODUCTION</span></div>
+      <div class="actions"><a class="btn primary" href="https://binrat.tech" target="_blank" rel="noopener">OPEN PRODUCTION ↗</a></div>
+    </article>
+
+    <article class="card">
+      <div class="eyebrow">PR #89</div>
+      <h2>Fresh Garbage Mini App</h2>
+      <div class="meta">feat/binrat-miniapp-hot-garbage-stability-v1 · 3eba47cc2ab6d72b057f13a4e561bda168447a29</div>
+      <p>Telegram Mini App-era take on the Fresh Garbage flow. Useful as a contrast because it optimizes for compact in-app discovery rather than the full forensic web experience.</p>
+      <div class="tags"><span class="tag">MINI APP</span><span class="tag">FRESH GARBAGE</span></div>
+      <div class="actions"><a class="btn" href="https://binrat-preview-miniapp-hot-garbage.onrender.com" target="_blank" rel="noopener">OPEN VERSION ↗</a></div>
+    </article>
+
+    <article class="card">
+      <div class="eyebrow">PR #106</div>
+      <h2>Degen Frontdoor V1</h2>
+      <div class="meta">feat/binrat-degen-frontdoor-v1 · 64ec4702ca71330f41a2f8a8f575eeff44958f12</div>
+      <p>The sharper degen-facing frontdoor before the Rat workforce hierarchy became the organizing product story.</p>
+      <div class="tags"><span class="tag">DEGEN</span><span class="tag">HOT GARBAGE</span></div>
+      <div class="actions"><a class="btn" href="https://binrat-preview-degen-frontdoor.onrender.com/?fixtures=1" target="_blank" rel="noopener">OPEN FIXTURE ↗</a></div>
+    </article>
+
+    <article class="card">
+      <div class="eyebrow">PR #122</div>
+      <h2>Rat Workforce Frontdoor</h2>
+      <div class="meta">feat/binrat-frontdoor-journey-v1 · fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1</div>
+      <p>The first frontdoor that explicitly taught Rat Zero, Tripwire and Sniffer as a crew and tried to expose the future workforce loop.</p>
+      <div class="tags"><span class="tag">RAT ZERO</span><span class="tag">CREW</span><span class="tag">WORKFORCE</span></div>
+      <div class="actions"><a class="btn" href="https://binrat-preview-frontdoor-journey.onrender.com/?fixtures=1" target="_blank" rel="noopener">OPEN FIXTURE ↗</a></div>
+    </article>
+
+    <article class="card">
+      <div class="eyebrow">PR #151</div>
+      <h2>Launch-night Integration</h2>
+      <div class="meta">integration/binrat-launch-night-v1 · e34a94cf1702340582266852495e28423728add0</div>
+      <p>The launch-night integrated surface before the later comprehension cleanup. Useful for seeing how much future-state explanation had accumulated.</p>
+      <div class="tags"><span class="tag">LAUNCH NIGHT</span><span class="tag">PUBLIC TRUTH</span></div>
+      <div class="actions"><a class="btn" href="https://binrat-preview-launch-night.onrender.com/?fixtures=1" target="_blank" rel="noopener">OPEN FIXTURE ↗</a></div>
+    </article>
+
+    <article class="card">
+      <div class="eyebrow">COMPREHENSION PASS</div>
+      <h2>Launch Comprehension V1</h2>
+      <div class="meta">fix/binrat-launch-comprehension-v1 · c5a4809b0eb763d50fae378b0c50dc9d278ed1cd</div>
+      <p>The cleanup that made Web and Telegram use one vocabulary: Fresh Finds, Watch ≠ Tripwire, CHECKING ≠ UNVERIFIED, and current value before future architecture.</p>
+      <div class="tags"><span class="tag">CLARITY</span><span class="tag">FRESH FINDS</span><span class="tag">WATCH</span></div>
+      <div class="actions"><a class="btn" href="https://binrat-comprehension-preview-1008.onrender.com/?fixtures=1" target="_blank" rel="noopener">OPEN FIXTURE ↗</a></div>
+    </article>
+
+    <article class="card current">
+      <div class="eyebrow">PR #164 / LATEST EXPERIMENT</div>
+      <h2>Case Journey Convergence</h2>
+      <div class="meta">feat/binrat-case-journey-convergence-v1 · d83105d58c81eb1affb135d0a7d26085ae1f86f9</div>
+      <p>The newest version: Rat Zero gives a reason, the Case tells a story, receipts come after context, and Watch/Telegram gives the user a next action.</p>
+      <div class="tags"><span class="tag">FIND → CASE</span><span class="tag">TRAIL</span><span class="tag">RECEIPTS</span><span class="tag">RETURN</span></div>
+      <div class="actions"><a class="btn primary" href="https://binrat-case-journey-preview-1008.onrender.com/?fixtures=1" target="_blank" rel="noopener">OPEN LATEST ↗</a></div>
+    </article>
+  </section>
+
+  <p class="note">Not included: backend-only branches, read-plane reliability-only changes, CI-only test branches, or Rat research branches that do not represent a materially distinct frontend. None of these preview links change binrat.tech.</p>
+</main>
+</body>
+</html>
