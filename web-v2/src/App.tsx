@@ -5,6 +5,7 @@ import { loadProductData, loadLiveReplayBundle, selectedDataMode, type DataMode 
 import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
+import { VisualLab } from "./VisualLab";
 import type {
   Bag,
   EvidenceState,
@@ -26,6 +27,7 @@ import {
 } from "./Primitives";
 
 type Route =
+  | { page: "visual-lab" }
   | { page: "home" }
   | { page: "dumpster" }
   | { page: "saved" }
@@ -54,6 +56,7 @@ const appBase = () =>
 function readRoute(): Route {
   const path =
     window.location.pathname.replace(appBase(), "").replace(/\/$/, "") || "/";
+  if (path === "/visual-lab") return { page: "visual-lab" };
   if (path === "/" || path === "/index.html") return { page: "home" };
   if (path === "/saved") return { page: "saved" };
   if (path === "/more") return { page: "more" };
@@ -93,6 +96,7 @@ export default function App() {
   const [mode, setMode] = useState<DataMode>(selectedDataMode);
   const [error, setError] = useState("");
   useEffect(() => {
+    if (readRoute().page === "visual-lab") return;
     loadProductData()
       .then((data) => {
         setFeed(data.feed);
@@ -125,6 +129,8 @@ export default function App() {
         : "smooth",
     });
   };
+  if (route.page === "visual-lab") return <VisualLab />;
+
   const requestedBag = feed && route.page === "bag"
     ? findBagAtCheckpoint(feed, route.id)
     : undefined;
