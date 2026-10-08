@@ -34,8 +34,13 @@ function collect(dir) {
 }
 collect(site);
 files.sort((a,b) => a.path.localeCompare(b.path));
-for (const path of ["index.html", "visual-lab/scene/alley-bg-desktop.webp", "visual-lab/foreground/ratzero-dumpster-desktop.webp", "crew/rat-avatar-48.png", "fonts/geist-sans.woff2"]) {
+// publicDir copies Crew/Geist verbatim; imported Visual Lab WebP artwork is
+// emitted as hashed Vite assets instead of the original public/visual-lab path.
+for (const path of ["index.html", "crew/rat-avatar-48.png", "fonts/geist-sans.woff2"]) {
   if (!files.some(item => item.path === path)) throw new Error("FRONTDOOR_BUILD_ASSET_MISSING:" + path);
+}
+if (!files.some(item => item.path.startsWith("assets/") && item.path.endsWith(".webp"))) {
+  throw new Error("FRONTDOOR_HASHED_ARTWORK_MISSING");
 }
 if (!files.some(item => item.path.startsWith("assets/") && item.path.endsWith(".js")) ||
     !files.some(item => item.path.startsWith("assets/") && item.path.endsWith(".css"))) {
