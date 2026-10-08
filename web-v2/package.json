@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "check:evidence": "node checks/check-evidence.mjs",
-    "check": "pnpm check:evidence && pnpm check:visual && pnpm build",
+    "check": "pnpm check:evidence && pnpm check:visual && pnpm build && pnpm check:cutover",
     "preview": "vite preview",
-    "check:visual": "node checks/check-visual-lab.mjs"
+    "check:visual": "node checks/check-visual-lab.mjs",
+    "build:frontdoor-candidate": "node checks/build-frontdoor-candidate.mjs",
+    "check:cutover": "node checks/check-frontdoor-candidate.mjs"
   },
   "dependencies": {
     "react": "latest",
