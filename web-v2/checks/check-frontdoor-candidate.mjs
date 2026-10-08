@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const root = new URL("../", import.meta.url);
+const source = (file) => readFileSync(new URL(file, root), "utf8");
+const main = source("src/main.tsx");
+const candidate = source("src/FrontdoorCandidateApp.tsx");
+const oldApp = source("src/App.tsx");
+const pons = source("src/PonsCasePreview.tsx");
+const vite = source("vite.config.ts");
+const build = source("checks/build-frontdoor-candidate.mjs");
+assert.match(main, /VITE_BINRAT_V3_CANDIDATE === '1'/);
+assert.match(main, /import\('\.\/FrontdoorCandidateApp'\)/);
+assert.match(main, /import\('\.\/App'\)/);
+assert.match(candidate, /loc\.path === '\/'/);
+assert.match(candidate, /PonsCasePreview/);
+assert.match(candidate, /\/bag/);
+assert.match(candidate, /NOT IN THIS BUILD/);
+assert.doesNotMatch(candidate, /loadProductData|liveAdapter|radarShortlistCounts|fetch\(/);
+assert.match(pons, /Same-origin Pons public feed/);
+assert.doesNotMatch(pons, /sourceOrigin/);
+assert.match(pons, /get\("case"\)/);
+assert.match(oldApp, /PonsCasePreview/); // Previous lab route preserved.
+assert.match(vite, /apply: "serve"|ponsPreviewProxy/);
+assert.match(build, /\.artifacts\/v3-frontdoor/);
+assert.match(build, /productionAuthorized: false/);
+assert.doesNotMatch(build, /cloudflare deploy|wrangler deploy|rsync|writeFileSync\(["']web\//);
+console.log("V3 candidate separation and static staging source gates: PASS");

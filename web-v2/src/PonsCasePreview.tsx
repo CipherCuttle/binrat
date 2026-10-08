@@ -6,7 +6,8 @@ import "./visual-lab.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS" | "NEXT";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS", "NEXT"];
-const sourceOrigin = "https://binrat-read-plane-stability-candidate.pettevik.workers.dev";
+const sourceRoute = "/api/launches/latest";
+const candidateSite = import.meta.env.VITE_BINRAT_V3_CANDIDATE === "1";
 const tokenLabel = (item: PonsCase) => item.symbol || item.token.slice(0, 10) + "…";
 
 /**
@@ -18,7 +19,11 @@ export function PonsCasePreview() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(() => {
+    const queryId = new URLSearchParams(window.location.search).get("case");
+    if (queryId && /^[0-9a-f]{64}$/.test(queryId)) return queryId;
+    return /^\/bag\/([0-9a-f]{64})\/?$/.exec(window.location.pathname)?.[1] ?? null;
+  });
   const [stage, setStage] = useState<Stage>("WHAT");
   const [clock, setClock] = useState(Date.now());
   const stageTabs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -85,12 +90,24 @@ export function PonsCasePreview() {
     advance(stages[n], true);
   }
   const refresh = () => setRetry((n) => n + 1);
+  function selectCase(id: string) {
+    setSelectedId(id);
+    setStage("WHAT");
+    if (candidateSite) {
+      const url = new URL(window.location.href);
+      url.pathname = "/";
+      url.searchParams.delete("visual");
+      url.searchParams.delete("ponsPreview");
+      url.searchParams.set("case", id);
+      window.history.replaceState(window.history.state, "", url.pathname + url.search);
+    }
+  }
 
   return <div className="visual-lab vl-pons-preview" data-material="pearl">
     <AlleyWorld />
     <a className="vl-skip" href="#vl-case">Skip to Case</a>
     <header className="vl-topbar">
-      <a className="vl-brand" href="/visual-lab"><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
+      <a className="vl-brand" href={candidateSite ? "/" : "/visual-lab"}><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
       <div className="vl-command">
         <span>PONS / ROBINHOOD 4663</span>
         <div className="vl-lab-stamp"><span>ISOLATED CANDIDATE PREVIEW</span><b>PONS READ-ONLY · {readState}</b></div>
@@ -106,7 +123,7 @@ export function PonsCasePreview() {
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No Cases to open.</p>}
         {data && cases.length > 0 && <div className="vl-find-rail">
           {cases.map((item) => <button type="button" key={item.id} aria-label={"Open Case " + item.id} className={"vl-find " + (active?.id === item.id ? "active" : "")}
-            aria-pressed={active?.id === item.id} onClick={() => { setSelectedId(item.id); setStage("WHAT"); }}>
+            aria-pressed={active?.id === item.id} onClick={() => selectCase(item.id)}>
             <span className="vl-find-mark">{item.symbol.slice(0, 1) || "?"}</span><span><strong>{tokenLabel(item)}</strong><small>BLOCK {item.block}</small></span>
           </button>)}
         </div>}
@@ -148,7 +165,7 @@ export function PonsCasePreview() {
             <p>{active.priorLaunches > 0 ? String(active.priorLaunches) + " earlier indexed launches share the Pons-reported deployer. Their individual records are not included in this bounded preview." : "Zero matching earlier launches in this partial index does not prove a clean history."}</p></div>}
           {stage === "RECEIPTS" && <div className="vl-receipts-view"><div className="vl-stage-heading"><div><span className="vl-eyebrow">CHECK THE RECEIPTS</span><h2>Exact source-bound record.</h2></div></div>
             <details className="vl-receipt"><summary><strong>Pons indexed launch and checkpoint</strong> · EXPAND</summary>
-              <div className="vl-receipt-body"><dl><div><dt>Chain</dt><dd>4663</dd></div><div><dt>Block</dt><dd>{active.block}</dd></div><div><dt>Source receipt</dt><dd>{active.receipt}</dd></div><div><dt>Feed digest</dt><dd>{active.feedDigest}</dd></div><div><dt>Verified at</dt><dd>{new Date(data.status.verifiedAtMs).toISOString()}</dd></div><div><dt>Source</dt><dd><a href={sourceOrigin + "/api/launches/latest"} target="_blank" rel="noreferrer">Pons public candidate feed ↗</a></dd></div><div><dt>Limits</dt><dd>Partial index. Earlier launch records, optional intelligence and replay are not loaded in this preview.</dd></div></dl>
+              <div className="vl-receipt-body"><dl><div><dt>Chain</dt><dd>4663</dd></div><div><dt>Block</dt><dd>{active.block}</dd></div><div><dt>Source receipt</dt><dd>{active.receipt}</dd></div><div><dt>Feed digest</dt><dd>{active.feedDigest}</dd></div><div><dt>Verified at</dt><dd>{new Date(data.status.verifiedAtMs).toISOString()}</dd></div><div><dt>Source</dt><dd><a href={sourceRoute} target="_blank" rel="noreferrer">Same-origin Pons public feed ↗</a></dd></div><div><dt>Limits</dt><dd>Partial index. Earlier launch records, optional intelligence and replay are not loaded in this preview.</dd></div></dl>
                 <pre tabIndex={0}>{JSON.stringify({ chainId: 4663, launchId: active.id, token: active.token, txHash: active.txHash, reportedDeployer: active.reportedCreatorAddress, blockNumber: active.block, checkpointBlock: data.status.checkpointBlock, checkpointBlockHash: data.status.checkpointBlockHash, feedDigest: data.status.feedDigest, priorLaunchCount: active.priorLaunches, coverage: "PARTIAL" }, null, 2)}</pre>
               </div></details><p className="vl-provenance">Feed/status digest binding is checked. This UI does not independently verify transaction execution from RPC.</p></div>}
           {stage === "NEXT" && <div className="vl-next-view"><span className="vl-eyebrow">YOUR NEXT MOVE</span><h2>Inspect, then decide.</h2>
@@ -158,7 +175,7 @@ export function PonsCasePreview() {
         </section>
         <div className="vl-case-bottom"><p>PARTIAL INDEX · DEPLOYER ADDRESS IS NOT A HUMAN IDENTITY · NO BUY/SELL RECOMMENDATION</p></div>
       </article>}
-      <footer className="vl-footer">PONS READ-ONLY EXPERIMENT · PUBLIC CANDIDATE SOURCE · NO PRODUCTION AUTHORITY
+      <footer className="vl-footer">PONS READ-ONLY EXPERIMENT · SOURCE IS THE CURRENT SAME-ORIGIN API · NO PRODUCTION AUTHORITY
         {data && <span>{readState} · Verified {new Date(data.status.verifiedAtMs).toISOString()} · Freshness expires {data.status.freshnessValidUntilMs === null ? "UNKNOWN" : new Date(data.status.freshnessValidUntilMs).toISOString()} · {data.status.lastSyncError ?? "No reported sync error"}</span>}
       </footer>
     </main>

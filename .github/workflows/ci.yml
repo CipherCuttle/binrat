@@ -25,6 +25,54 @@ jobs:
       - name: Check isolated Product Surface V2
         run: pnpm --dir web-v2 check
 
+  v3-frontdoor-static-candidate:
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-v3-frontdoor-cutover-candidate-v1' }}
+    needs: [check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - name: Build the staged static homepage (no production asset writes)
+        run: pnpm --dir web-v2 build:frontdoor-candidate
+      - name: Install pinned Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/cutover-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/cutover-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify homepage, unavailable state, deep link and legacy isolation
+        env:
+          BINRAT_FRONTDOOR_OUTPUT: .artifacts/v3-frontdoor/browser
+        run: |
+          pnpm --dir web-v2 exec vite preview --host 127.0.0.1 --port 4189 --outDir ../.artifacts/v3-frontdoor/site > "$RUNNER_TEMP/cutover-vite.log" 2>&1 &
+          pid=$!
+          trap 'kill "$pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4189/ >/dev/null; then break; fi
+            if [ "$attempt" -eq 30 ]; then cat "$RUNNER_TEMP/cutover-vite.log"; exit 1; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/cutover-playwright/node_modules" node web-v2/checks/frontdoor-candidate-browser.cjs
+      - name: Preserve static candidate and browser proof for exact PR head
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-v3-frontdoor-candidate-${{ github.event.pull_request.head.sha }}
+          path: |
+            .artifacts/v3-frontdoor/site/
+            .artifacts/v3-frontdoor/manifest.json
+            .artifacts/v3-frontdoor/browser/
+          retention-days: 14
+          if-no-files-found: warn
+
   pons-case-runtime-proof:
     if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-pons-case-preview-v1' }}
     needs: [check]
