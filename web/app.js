@@ -247,7 +247,7 @@ function renderIntake() {
   latestBag.innerHTML = `<span class="intake-label">LAST INTO THE BIN</span>
     <button class="intake-bag" type="button" aria-label="Open latest ${copy().report} bag ${escapeHtml(latest.symbol)}">
       <b>${escapeHtml(latest.symbol)}</b><span class="intake-note">${escapeHtml(latest.note)}</span>
-      <span class="intake-block">BLOCK / ${escapeHtml(latest.block)}</span><span class="intake-open">INSPECT RECEIPT ↗</span>
+      <span class="intake-block">BLOCK / ${escapeHtml(latest.block)}</span><span class="intake-open">OPEN CASE ↗</span>
     </button>`;
   const button = latestBag.querySelector("button");
   button.addEventListener("click", () => openBag(latest.id, button));
@@ -306,7 +306,7 @@ function renderCard(bag) {
       <div class="feed-cell feed-prior" data-label="PRIOR BAGS"><strong>${escapeHtml(bag.priorLaunches)}</strong><span>INDEXED</span></div>
       <div class="feed-cell feed-socials" data-label="SOCIALS">${renderSocials(bag)}</div>
       <div class="feed-cell feed-evidence" data-label="EVIDENCE STATE"><span class="evidence-summary ${evidenceState.toLowerCase()}">${evidenceState}</span><small>${coverage} HISTORY</small></div>
-      <div class="feed-cell feed-inspect" data-label="INSPECT"><span>OPEN FILE</span><b aria-hidden="true">↗</b></div>
+      <div class="feed-cell feed-inspect" data-label="CASE"><span>OPEN CASE</span><b aria-hidden="true">↗</b></div>
       <div class="feed-mobile-note"><span>RAT NOTE /</span> “${escapeHtml(bag.note)}”</div>
     </article>`;
 }
@@ -427,6 +427,30 @@ if (
   });
 }
 
+function buildCaseOpening(bag) {
+  const prior = Number.isSafeInteger(bag.priorLaunches) && bag.priorLaunches > 0 ? bag.priorLaunches : 0;
+  const coverage = normalizeCoverage(bag.coverage);
+  if (prior > 0) {
+    return {
+      headline: "SMELLS FAMILIAR.",
+      body: `This Pons-reported deployer appears on ${prior} earlier indexed launch${prior === 1 ? "" : "es"} in current coverage.`,
+      boundary: `History coverage: ${coverage}. Same reported address is not a human-identity claim.`,
+    };
+  }
+  if (coverage === "COMPLETE") {
+    return {
+      headline: "NO PRIOR BAG IN CURRENT COVERAGE.",
+      body: "No earlier matching launch is present in this Case's current indexed coverage.",
+      boundary: "No prior match is not a safety claim, prediction or proof that the address is globally new.",
+    };
+  }
+  return {
+    headline: "NOT ENOUGH HISTORY YET.",
+    body: "No earlier matching launch is present in the current indexed view.",
+    boundary: `History coverage: ${coverage}. Missing history stays missing; absence outside this coverage is unknown.`,
+  };
+}
+
 function openBag(idOrBag, origin = document.activeElement) {
   const bag = typeof idOrBag === "string"
     ? bags.find((item) => item.id === idOrBag)
@@ -455,21 +479,39 @@ function openBag(idOrBag, origin = document.activeElement) {
 
   bag.readState = bag.asOfBlock === readPlane.snapshot?.checkpoint && bag.asOfBlockHash === readPlane.snapshot?.checkpointBlockHash && bag.feedDigest === readPlane.snapshot?.digest ? document.body.dataset.readState : "STALE_VERIFIED";
   const share = buildShareCardModel(bag);
+  const opening = buildCaseOpening(bag);
 
   drawerContent.innerHTML = `
-    <p class="drawer-kicker">TRASH TRAIL // ${copy().report}</p>
-    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">FILE<br/><b>${(() => { const index=bags.findIndex((item)=>item.id===bag.id); return index>=0 ? String(index+1).padStart(3,"0") : "HIST"; })()}</b></div></div>
-    <div class="address creator-address"><span>Pons-reported deployer address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
-    <div class="address"><span>${copy().token}</span><code>${escapeHtml(bag.token)}</code></div>
-    ${activeMode === "LIVE" ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ""}
+    <p class="drawer-kicker">RAT ZERO // CASE FILE</p>
+    <div class="drawer-title-row"><div><h2 id="drawer-title">${escapeHtml(bag.symbol)}</h2><p>${escapeHtml(bag.name)} / ${escapeHtml(ageLabel(bag))}</p></div><div class="case-number">CASE<br/><b>${(() => { const index=bags.findIndex((item)=>item.id===bag.id); return index>=0 ? String(index+1).padStart(3,"0") : "HIST"; })()}</b></div></div>
+
+    <section class="case-opening" aria-label="What Rat Zero found">
+      <span class="case-opening-kicker">RAT ZERO FOUND SOMETHING.</span>
+      <h3>${escapeHtml(opening.headline)}</h3>
+      <p class="case-opening-body">${escapeHtml(opening.body)}</p>
+      <p class="case-opening-boundary">${escapeHtml(opening.boundary)}</p>
+    </section>
+
+    <ol class="case-path" aria-label="Case journey">
+      <li><strong>WHAT</strong><span>why this Case exists</span></li>
+      <li><strong>TRAIL</strong><span>what BINRAT remembers</span></li>
+      <li><strong>RECEIPTS</strong><span>check the evidence</span></li>
+      <li><strong>NEXT</strong><span>watch or carry it with you</span></li>
+    </ol>
+
+    <div class="case-subjects" aria-label="Case subjects">
+      <div class="address creator-address"><span>Pons-reported deployer address</span><code>${escapeHtml(bag.reportedCreatorAddress)}</code></div>
+      <div class="address"><span>${copy().token}</span><code>${escapeHtml(bag.token)}</code></div>
+      ${activeMode === "LIVE" ? `<div class="address"><span>LAUNCH TRANSACTION</span><code>${escapeHtml(bag.txHash)}</code></div>` : ""}
+    </div>
     <div class="drawer-note"><span>RAT NOTE / PRESENTATION, NOT A VERDICT</span>“${escapeHtml(bag.note)}”</div>
-    <div class="file-section-heading"><h3>01 / OBSERVATIONS</h3><span>${bag.evidence.length} RECORDS</span></div>
+    <div class="file-section-heading"><h3>01 / SUPPORTED FACTS</h3><span>${bag.evidence.length} RECORDS</span></div>
     <div class="evidence-list">
       ${bag.evidence.map((item) => `<div class="evidence-item ${normalizeTone(item.tone)}"><span class="evidence-label">${normalizeTone(item.tone).toUpperCase()}</span><span>${escapeHtml(item.text)}</span></div>`).join("")}
     </div>
 
     <div class="trail">
-      <div class="file-section-heading"><h3>02 / TRASH TRAIL</h3><span>${escapeHtml(bag.priorLaunches)} PRIOR INDEXED BAGS</span></div>
+      <div class="file-section-heading"><h3>02 / FOLLOW THE TRAIL</h3><span>${escapeHtml(bag.priorLaunches)} PRIOR INDEXED BAGS</span></div>
       <p class="trail-summary">Same reported address. Not a claim of human identity. ${bag.trail.length} earlier bag${bag.trail.length === 1 ? "" : "s"} shown in ${copy().scope}.</p>
       <div class="trail-rows"><div class="trail-row current"><strong>${escapeHtml(bag.symbol)} / CURRENT BAG</strong><span class="trail-age">${escapeHtml(ageLabel(bag))}</span><span class="trail-outcome">${copy().launch}</span><span class="coverage ${normalizeCoverage(bag.coverage)}">${normalizeCoverage(bag.coverage)}</span></div>${trail}</div>
     </div>
@@ -510,17 +552,34 @@ function openBag(idOrBag, origin = document.activeElement) {
       <div class="share-copy-status" aria-live="polite"></div>
     </section>
 
-    <section class="case-next-step" aria-label="Future monitoring job">
-      <span>TRIPWIRE · ${escapeHtml(statusOf("tripwire"))}</span>
-      <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
-      <p>Tripwire is being built to watch this exact Pons-reported deployer and bring you back when a supported condition changes. Persistent jobs are not available yet.</p>
-      <a class="button ghost" href="#crew-tripwire" data-crew-handoff>SEE THE FUTURE PLAN <span>→</span></a>
+    <section class="case-next-step" aria-label="What to do next">
+      <span>NEXT / CURRENT WATCH</span>
+      <h3>DON'T KEEP CHECKING THIS SHIT.</h3>
+      <p>Where enabled, Watch can alert you when a future supported indexed launch appears from this same reported deployer. Current Watch is available through the Telegram bot. Watch is not Tripwire.</p>
+      <div class="case-next-actions">
+        <a class="button primary" href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM <span>↗</span></a>
+        <button class="button ghost" type="button" data-copy-watch-subject>COPY DEPLOYER</button>
+      </div>
+      <div class="case-next-copy-status" data-watch-copy-status aria-live="polite"></div>
+      <p class="case-next-boundary"><strong>TRIPWIRE · ${escapeHtml(statusOf("tripwire"))}</strong> Persistent Tripwire jobs are not available yet.</p>
+      <a class="section-link" href="#crew-tripwire" data-crew-handoff>SEE TRIPWIRE PLAN →</a>
     </section>
   `;
 
   const copyButton = drawerContent.querySelector("[data-copy-post]");
   const copyStatus = drawerContent.querySelector(".share-copy-status");
   copyButton?.addEventListener("click", () => copySharePost(bag, copyStatus));
+  const watchCopyButton = drawerContent.querySelector("[data-copy-watch-subject]");
+  const watchCopyStatus = drawerContent.querySelector("[data-watch-copy-status]");
+  watchCopyButton?.addEventListener("click", async () => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("CLIPBOARD_UNAVAILABLE");
+      await navigator.clipboard.writeText(bag.reportedCreatorAddress);
+      if (watchCopyStatus) watchCopyStatus.textContent = "DEPLOYER COPIED";
+    } catch {
+      if (watchCopyStatus) watchCopyStatus.textContent = "COPY UNAVAILABLE";
+    }
+  });
   if (activeMode === "LIVE") {
     void hydrateBagIntelligence(bag);
     void hydrateCreatorFile(bag);
