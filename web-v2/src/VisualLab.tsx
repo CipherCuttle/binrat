@@ -29,7 +29,7 @@ function EvidenceSurface({ children, className = "" }: { children: ReactNode; cl
   return <div className={`vl-evidence-surface ${className}`}>{children}</div>;
 }
 
-function AlleyWorld() {
+export function AlleyWorld() {
   return <div className="vl-world" aria-hidden="true">
     <picture className="vl-alley">
       <source media="(max-width:700px)" srcSet={alleyMobile} />

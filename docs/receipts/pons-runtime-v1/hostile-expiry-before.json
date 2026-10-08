@@ -1,0 +1,8 @@
+{
+  "evidence": "SIMULATED_TIMER_THROTTLING",
+  "before": "PONS READ-ONLY · FRESH_VERIFIED",
+  "after": "PONS READ-ONLY · FRESH_VERIFIED",
+  "clock": 1791486043764,
+  "expiredAt": 1791486033682,
+  "result": "FAIL"
+}

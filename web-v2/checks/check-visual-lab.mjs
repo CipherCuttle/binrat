@@ -85,4 +85,7 @@ if (!lab.includes('get("visualDebug") === "1"') || !lab.includes('{debug &&')) t
 
 execFileSync(process.execPath, ["--import", "tsx", fileURLToPath(new URL("./check-visual-lab-fixtures.ts", import.meta.url))], { stdio: "inherit" });
 
+if (!app.includes("PonsCasePreview") || !app.includes('get("ponsPreview") === "1"')) throw new Error("PONS_PREVIEW_ROUTE_NOT_ISOLATED");
+execFileSync(process.execPath, ["--test", fileURLToPath(new URL("./check-pons-readonly-preview.mjs", import.meta.url))], { stdio: "inherit" });
+execFileSync(process.execPath, ["--test", fileURLToPath(new URL("./check-pons-preview-proxy.mjs", import.meta.url))], { stdio: "inherit" });
 console.log("BINRAT visual lab invariants: PASS");

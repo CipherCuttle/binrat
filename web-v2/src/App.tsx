@@ -6,6 +6,7 @@ import type { LiveReplayBundle } from "./liveAdapter";
 import { addressFromRoute, selectRadarCandidate } from "./routeIdentity";
 import { CreatorFilePage, MethodPage, ReplayIndexPage, WatchPage, LedgerPage, TokenStatusPage } from "./RoutePages";
 import { VisualLab } from "./VisualLab";
+import { PonsCasePreview } from "./PonsCasePreview";
 import type {
   Bag,
   EvidenceState,
@@ -130,7 +131,8 @@ export default function App() {
         : "smooth",
     });
   };
-  if (route.page === "visual-lab") return <VisualLab />;
+  if (route.page === "visual-lab") return new URLSearchParams(window.location.search).get("ponsPreview") === "1"
+    ? <PonsCasePreview /> : <VisualLab />;
 
   const requestedBag = feed && route.page === "bag"
     ? findBagAtCheckpoint(feed, route.id)
