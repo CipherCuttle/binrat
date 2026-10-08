@@ -1,4 +1,9 @@
 import { useMemo, useState, type PointerEvent, type ReactNode } from "react";
+import alleyDesktop from "../public/visual-lab/scene/alley-bg-desktop.webp";
+import alleyMobile from "../public/visual-lab/scene/alley-bg-mobile.webp";
+import ratDesktop from "../public/visual-lab/foreground/ratzero-dumpster-desktop.webp";
+import ratMobile from "../public/visual-lab/foreground/ratzero-dumpster-mobile.webp";
+import foregroundTrash from "../public/visual-lab/foreground/foreground-trash.webp";
 import "./visual-lab.css";
 
 type Material = "glass" | "refract" | "pearl";
@@ -20,9 +25,11 @@ const trail = [
 ];
 
 function HoloPanel({
+  id,
   className = "",
   children,
 }: {
+  id?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -32,9 +39,38 @@ function HoloPanel({
     event.currentTarget.style.setProperty("--py", `${event.clientY - box.top}px`);
   };
   return (
-    <section className={`vl-panel ${className}`} onPointerMove={move}>
+    <section id={id} className={`vl-panel ${className}`} onPointerMove={move}>
       {children}
     </section>
+  );
+}
+
+// Decorative environment only. Failed artwork leaves the readable CSS backdrop.
+// Import URLs so Vite bundles these alongside the existing canonical publicDir.
+function AlleyWorld() {
+  const [alleyFailed, setAlleyFailed] = useState(false);
+  const [ratFailed, setRatFailed] = useState(false);
+  const [trashFailed, setTrashFailed] = useState(false);
+  return (
+    <div className="vl-world" aria-hidden="true">
+      {!alleyFailed && (
+        <picture className="vl-alley">
+          <source media="(max-width:760px)" srcSet={alleyMobile} />
+          <img src={alleyDesktop} alt="" width={1672} height={941}
+            decoding="async" fetchPriority="high" onError={() => setAlleyFailed(true)} />
+        </picture>
+      )}
+      {!trashFailed && <img className="vl-world-trash" src={foregroundTrash} alt=""
+        width={1600} height={533} decoding="async" onError={() => setTrashFailed(true)} />}
+      <div className="vl-world-shade" />
+      {!ratFailed && (
+        <picture className="vl-rat-scene">
+          <source media="(max-width:760px)" srcSet={ratMobile} />
+          <img src={ratDesktop} alt="" width={720} height={900}
+            decoding="async" onError={() => setRatFailed(true)} />
+        </picture>
+      )}
+    </div>
   );
 }
 
@@ -65,19 +101,12 @@ export function VisualLab() {
   const [material, setMaterial] = useState<Material>("refract");
   const [activeFind, setActiveFind] = useState(0);
   const [step, setStep] = useState<Step>("WHAT");
+  const [section, setSection] = useState("vl-case");
   const active = useMemo(() => finds[activeFind]!, [activeFind]);
 
   return (
     <div className="visual-lab" data-material={material}>
-      <div className="vl-world" aria-hidden="true">
-        <div className="vl-sky" />
-        <div className="vl-city" />
-        <div className="vl-grid-glow" />
-        <div className="vl-rat-scene">
-          <img src="/crew/rat-zero.jpg" alt="" />
-        </div>
-        <div className="vl-ground-glow" />
-      </div>
+      <AlleyWorld />
 
       <header className="vl-topbar vl-panel">
         <a className="vl-brand" href="/visual-lab" aria-label="BINRAT visual lab home">
@@ -86,9 +115,10 @@ export function VisualLab() {
         </a>
         <div className="vl-live"><i /> RAT ZERO · LIVE</div>
         <nav aria-label="Visual lab">
-          <button className="active" type="button">CASES</button>
-          <button type="button">FRESH FINDS</button>
-          <button type="button">CREW</button>
+          {([["vl-case", "CASES"], ["vl-finds", "FRESH FINDS"], ["vl-crew", "CREW"]] as const).map(([id, label]) => (
+            <a key={id} href={`#${id}`} className={section === id ? "active" : ""}
+              aria-current={section === id ? "location" : undefined} onClick={() => setSection(id)}>{label}</a>
+          ))}
         </nav>
         <div className="vl-lab-stamp">VISUAL LAB · SYNTHETIC · NO LIVE EVIDENCE</div>
       </header>
@@ -99,6 +129,7 @@ export function VisualLab() {
             key={value}
             type="button"
             className={material === value ? "active" : ""}
+            aria-pressed={material === value}
             onClick={() => setMaterial(value)}
           >
             {value.toUpperCase()}
@@ -107,7 +138,7 @@ export function VisualLab() {
       </aside>
 
       <main className="vl-workspace">
-        <HoloPanel className="vl-finds">
+        <HoloPanel id="vl-finds" className="vl-finds">
           <header>
             <div><span className="vl-eyebrow">RAT ZERO / SCOUT</span><h2>FRESH FINDS</h2></div>
             <small>SYNTHETIC VISUAL-LAB DATA</small>
@@ -118,6 +149,7 @@ export function VisualLab() {
                 key={find.symbol}
                 type="button"
                 className={index === activeFind ? "vl-find active" : "vl-find"}
+                aria-pressed={index === activeFind}
                 onClick={() => {
                   setActiveFind(index);
                   setStep("WHAT");
@@ -133,7 +165,7 @@ export function VisualLab() {
         </HoloPanel>
 
         <div className="vl-main-grid">
-          <HoloPanel className="vl-case">
+          <HoloPanel id="vl-case" className="vl-case">
             <div className="vl-case-topline">
               <span>ACTIVE CASE · {String(activeFind + 1).padStart(3, "0")}</span>
               <b><i /> RAT ZERO INVESTIGATING</b>
@@ -202,7 +234,7 @@ export function VisualLab() {
               <small>WATCH IS NOT TRIPWIRE. PERSISTENT TRIPWIRE JOBS ARE NOT LIVE.</small>
             </HoloPanel>
 
-            <HoloPanel className="vl-crew">
+            <HoloPanel id="vl-crew" className="vl-crew">
               <div className="vl-section-title"><span>THE CREW</span><b>STATUS</b></div>
               <CrewCard image="/crew/rat-avatar-48.png" name="RAT ZERO" role="SCOUT" status="LIVE" />
               <CrewCard image="/crew/tripwire.png" name="TRIPWIRE" role="WATCHER" status="BUILDING" />

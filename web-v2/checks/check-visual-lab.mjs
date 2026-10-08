@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 
 const app = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const lab = readFileSync(new URL("../src/VisualLab.tsx", import.meta.url), "utf8");
@@ -31,7 +32,7 @@ for (const material of ['glass', 'refract', 'pearl']) {
 if (!app.includes('get("visual") === "lab"') || !app.includes('page: "visual-lab"')) {
   throw new Error("VISUAL_LAB_ROUTE_MISSING");
 }
-if (!lab.includes('/crew/rat-zero.jpg') || !lab.includes('/crew/tripwire.png') || !lab.includes('/crew/sniffer.png')) {
+if (!lab.includes('/crew/rat-avatar-48.png') || !lab.includes('/crew/tripwire.png') || !lab.includes('/crew/sniffer.png')) {
   throw new Error("VISUAL_LAB_CANONICAL_CREW_ASSETS_MISSING");
 }
 if (lab.includes("fetch(")) throw new Error("VISUAL_LAB_NETWORK_ACCESS");
@@ -43,6 +44,38 @@ if (!css.includes("backdrop-filter") || !css.includes("@keyframes vlPearl")) {
 }
 if (!css.includes("@media (prefers-reduced-motion:reduce)")) {
   throw new Error("VISUAL_LAB_REDUCED_MOTION_GUARD_MISSING");
+}
+
+// Original source artwork must survive binary-safe transfer unchanged.
+const artworkRoot = new URL("../public/visual-lab/", import.meta.url);
+const originals = JSON.parse(readFileSync(new URL("originals.json", artworkRoot), "utf8"));
+if (originals.length !== 10) throw new Error("VISUAL_LAB_ORIGINAL_PACK_INCOMPLETE");
+for (const asset of originals) {
+  const bytes = readFileSync(new URL(asset.path, artworkRoot));
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  if (bytes.length !== asset.bytes || sha256 !== asset.sha256) {
+    throw new Error(`VISUAL_LAB_ORIGINAL_BYTES_CHANGED:${asset.path}`);
+  }
+}
+for (const path of [
+  "scene/alley-bg-desktop.webp", "scene/alley-bg-mobile.webp",
+  "foreground/ratzero-dumpster-desktop.webp", "foreground/ratzero-dumpster-mobile.webp",
+  "foreground/foreground-trash.webp",
+]) {
+  const bytes = readFileSync(new URL(path, artworkRoot));
+  if (bytes.toString("ascii", 0, 4) !== "RIFF" || bytes.toString("ascii", 8, 12) !== "WEBP") {
+    throw new Error(`VISUAL_LAB_RENDER_ASSET_INVALID:${path}`);
+  }
+  if (!lab.includes(path)) throw new Error(`VISUAL_LAB_RENDER_ASSET_NOT_IMPORTED:${path}`);
+}
+if (/vl-sky|vl-city|vl-grid-glow|vl-ground-glow/.test(lab + css)) {
+  throw new Error("VISUAL_LAB_PLACEHOLDER_WORLD_RETAINED");
+}
+if ((lab.match(/className="vl-rat-scene"/g) || []).length !== 1) {
+  throw new Error("VISUAL_LAB_DUPLICATE_RAT_FOREGROUND");
+}
+if (/public\/visual-lab\/(case-scenes|decals)\//.test(lab)) {
+  throw new Error("VISUAL_LAB_CASE_SCENE_OR_DECAL_MOUNTED");
 }
 
 console.log("BINRAT visual lab invariants: PASS");
