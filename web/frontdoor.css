@@ -96,6 +96,30 @@ code, .eyebrow, .rat-status, .fresh-block { font-family: "Geist Mono", monospace
 .feed-filters button, .feed-search input { font-size: 14px; min-height: 44px; }
 #dumpster-view { padding-top: 32px; }
 .feed-inspect span { font-size: 14px; }
+
+/* Case journey: attention first, then trail, receipts, next action. */
+.case-opening { margin: 24px 0 18px; padding: 24px; border: 1px solid var(--line); background: linear-gradient(135deg, #1c241d, #151916); }
+.case-opening-kicker { display: block; font-family: "Geist Mono", monospace; font-size: 13px; letter-spacing: .055em; color: var(--orange); }
+.case-opening h3 { margin-top: 10px; font-size: clamp(30px, 4vw, 46px); line-height: 1.02; letter-spacing: -.045em; }
+.case-opening-body { margin-top: 14px; font-size: 18px !important; line-height: 1.55 !important; max-width: 720px; }
+.case-opening-boundary { margin-top: 10px; color: var(--muted); font-size: 14px !important; line-height: 1.6 !important; }
+.case-path { list-style: none; padding: 0; margin: 0 0 24px; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border: 1px solid var(--line); }
+.case-path li { padding: 14px; border-right: 1px solid var(--line); min-width: 0; }
+.case-path li:last-child { border-right: 0; }
+.case-path strong, .case-path span { display: block; }
+.case-path strong { font-family: "Geist Mono", monospace; font-size: 13px; color: var(--bone); }
+.case-path span { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.case-subjects { margin-top: 18px; }
+.case-next-step { margin-top: 28px; padding: 24px; border-color: #53614d; background: #192019; }
+.case-next-step > span { font-family: "Geist Mono", monospace; font-size: 13px; color: var(--orange); letter-spacing: .05em; }
+.case-next-step h3 { margin-top: 10px; font-size: clamp(28px, 3vw, 40px); line-height: 1.05; letter-spacing: -.04em; }
+.case-next-step p { max-width: 760px; }
+.case-next-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.case-next-actions .button { margin: 0; }
+.case-next-copy-status { min-height: 20px; margin-top: 8px; color: var(--muted); font-family: "Geist Mono", monospace; font-size: 12px; }
+.case-next-boundary { margin-top: 16px !important; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); }
+.case-next-boundary strong { color: var(--orange); }
+
 @media (max-width: 1100px) {
   .journey-hero { gap: 28px; }
   .site-header > nav { gap: 18px; }
@@ -127,6 +151,13 @@ code, .eyebrow, .rat-status, .fresh-block { font-family: "Geist Mono", monospace
   .crew-roster strong { display: inline; margin-right: 12px; }
   .crew-roster .rat-status { float: right; margin-top: 0; }
   .loop-steps { grid-template-columns: 1fr 1fr; gap: 24px 20px; }
+  .case-path { grid-template-columns: 1fr 1fr; }
+  .case-path li:nth-child(2) { border-right: 0; }
+  .case-path li:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .case-opening { padding: 20px; }
+  .case-opening-body { font-size: 16px !important; }
+  .case-next-actions { display: grid; grid-template-columns: 1fr; }
+  .case-next-actions .button { width: 100%; justify-content: space-between; }
   .telegram-return { align-items: flex-start; flex-direction: column; }
   .telegram-return .button { width: 100%; }
   .site-footer { padding-block: 24px; }
