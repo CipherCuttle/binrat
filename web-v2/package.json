@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "check:evidence": "node checks/check-evidence.mjs",
-    "check": "pnpm check:evidence && pnpm build",
-    "preview": "vite preview"
+    "check": "pnpm check:evidence && pnpm check:visual && pnpm build",
+    "preview": "vite preview",
+    "check:visual": "node checks/check-visual-lab.mjs"
   },
   "dependencies": {
     "react": "latest",
