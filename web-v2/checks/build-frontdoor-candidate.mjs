@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, statSync, renameSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, join, resolve, relative } from "node:path";
+import { join, resolve, relative } from "node:path";
 
 const webV2 = fileURLToPath(new URL("../", import.meta.url));
 const root = resolve(webV2, "..");
@@ -50,26 +50,21 @@ if (!files.some(item => item.path.startsWith("assets/") && item.path.endsWith(".
   throw new Error("FRONTDOOR_BUILD_BUNDLES_MISSING");
 }
 const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+const sourceDirty = execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" }).trim().length > 0;
 const proposal = {
   directory: "./.artifacts/v3-frontdoor/site",
   not_found_handling: "single-page-application",
   run_worker_first: ["/api", "/api/*", "/health", "/telegram/*", "/__candidate/*"]
 };
-// Offline contract checks; Cloudflare routing must still be verified on an
-// isolated non-production Worker, not inferred from this local path model.
-const workerPaths = ["/api", "/api/status", "/api/launches/latest", "/api/miniapp/bootstrap", "/api/holder/session", "/health", "/telegram/webhook", "/__candidate/pons-bootstrap"];
-for (const path of workerPaths) {
-  if (!(path === "/api" || path.startsWith("/api/") || path === "/health" ||
-    path.startsWith("/telegram/") || path.startsWith("/__candidate/"))) {
-    throw new Error("FRONTDOOR_API_ROUTING_UNPROTECTED:" + path);
-  }
-}
+// check-frontdoor-routing.mjs exercises this exact proposal in local workerd.
+// Provider routing and the active production configuration remain unverified.
 const js = files.filter(item => item.path.startsWith("assets/") && item.path.endsWith(".js"))
   .map(item => readFileSync(join(site, item.path), "utf8")).join("\\n");
 if (js.includes("binrat-product-surface-v2-demo")) throw new Error("LEGACY_V2_APP_BUNDLED");
 const receipt = {
   schemaVersion: "binrat.frontdoor-staged-static/1",
   sourceSha: sha,
+  sourceDirty,
   artifactDirectory: ".artifacts/v3-frontdoor/site",
   mode: "V3_PONS_READONLY_CANDIDATE",
   apiRouting: "SAME_ORIGIN_ONLY",
@@ -83,3 +78,4 @@ const receipt = {
 };
 writeFileSync(join(staging, "manifest.json"), JSON.stringify(receipt, null, 2) + "\n");
 console.log(JSON.stringify({ verdict: "STAGED_ONLY", commit: sha, files: files.length, output: receipt.artifactDirectory, bytes: files.reduce((n,f)=>n+f.bytes,0), noDeploy: true }));
+execFileSync("node", ["checks/check-frontdoor-package.mjs"], { cwd: webV2, stdio: "inherit" });

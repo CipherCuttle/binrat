@@ -44,10 +44,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build the staged static homepage (no production asset writes)
         run: pnpm --dir web-v2 build:frontdoor-candidate
-      - name: Install pinned Chromium
+      - name: Install pinned Chromium and local Worker runner
         run: |
-          npm install --prefix "$RUNNER_TEMP/cutover-playwright" --no-save --no-package-lock playwright@1.56.1
+          npm install --prefix "$RUNNER_TEMP/cutover-playwright" --no-save --no-package-lock playwright@1.56.1 wrangler@4.135.0
           node "$RUNNER_TEMP/cutover-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify SPA and API isolation in local workerd (no remote bindings)
+        run: |
+          pnpm build
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/cutover-playwright" node web-v2/checks/check-frontdoor-routing.mjs
       - name: Verify homepage, unavailable state, deep link and legacy isolation
         env:
           BINRAT_FRONTDOOR_OUTPUT: .artifacts/v3-frontdoor/browser
@@ -60,7 +64,7 @@ jobs:
             if [ "$attempt" -eq 30 ]; then cat "$RUNNER_TEMP/cutover-vite.log"; exit 1; fi
             sleep 1
           done
-          NODE_PATH="$RUNNER_TEMP/cutover-playwright/node_modules" node web-v2/checks/frontdoor-candidate-browser.cjs
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/cutover-playwright" node web-v2/checks/frontdoor-candidate-browser.cjs
       - name: Preserve static candidate and browser proof for exact PR head
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,6 +73,9 @@ jobs:
           path: |
             .artifacts/v3-frontdoor/site/
             .artifacts/v3-frontdoor/manifest.json
+            .artifacts/v3-frontdoor/package-results.json
+            .artifacts/v3-frontdoor/routing/results.json
+            .artifacts/v3-frontdoor/routing/local-wrangler.log
             .artifacts/v3-frontdoor/browser/
           retention-days: 14
           if-no-files-found: warn

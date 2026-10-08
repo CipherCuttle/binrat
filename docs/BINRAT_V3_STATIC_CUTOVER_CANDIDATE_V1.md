@@ -39,3 +39,9 @@ The preview-only proxy is Vite development tooling, not part of the static site 
 PASS = exact SHA candidate build + manifest/asset integrity + browser homepage at desktop/mobile/tablet, retained `/visual-lab`, exact Case routing and 503/empty/stale truth. Evidence testing here can use recorded real candidate transport but must be marked replay. V3 visual owner signoff, source freshness, active Worker provenance, route fallback and production authorization are **independent unresolved gates**.
 
 PLAN → CHANGESET → VERIFY → VERDICT. No merge, production deploy, token action or automatic grant.
+
+## Issue #171 safety verification
+
+See `BINRAT_V3_ISSUE_171_VERIFICATION_V1.md` for the routing matrix, bounded review, reproducible compiled-browser gates and proposed deployment/rollback procedure. Local workerd proof now exercises the actual Worker fetch handler with IO disabled, including static path collisions, unknown API paths, navigation and seven methods. This supersedes the previous hardcoded path-model check; provider routing is still unverified.
+
+The build records `sourceDirty` as well as `sourceSha`. A working-tree result is not exact-commit evidence. CI preserves package, local routing and browser receipts for its exact PR head. Existing V3 JS/CSS/art remain unchanged; browser replay is never production freshness evidence.

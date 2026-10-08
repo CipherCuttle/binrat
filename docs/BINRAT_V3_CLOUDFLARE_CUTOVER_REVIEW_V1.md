@@ -27,7 +27,9 @@ The deployable configuration has **not** been written or applied. A proposed `as
 Cloudflare reference:
 https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/
 
-The SPA fallback should allow direct browser navigation to `/bag/<64hex>`, `/visual-lab`, and client routes. Every API request and existing Telegram webhook route must still reach the current Worker. **These rules have been checked offline but not verified on Cloudflare's runtime.** A browser navigating to an API URL must not receive the SPA HTML.
+Local Wrangler 4.135.0/workerd now verifies direct GET and browser navigation to `/bag/<64hex>`, `/visual-lab`, and client routes. The actual webhook is `/telegram/webhook` (`src/cloudflare/worker.ts`). API, webhook and health paths reach the actual Worker handler with IO disabled for GET, HEAD, POST, PUT, PATCH, DELETE and OPTIONS, including collisions with static files and unknown future API paths. **This is local runtime proof; the active provider configuration remains unverified.** A browser navigating to an API URL must not receive the SPA HTML.
+
+Missing asset paths return SPA HTML under this proposal. All current compiled resource paths are present and byte-checked; this does not establish compatibility with old tabs requesting absent previous chunks. Before release, retain complete previous assets, rehearse version/asset rollback and test old/new-tab behavior. See `BINRAT_V3_ISSUE_171_VERIFICATION_V1.md` for exact reproduction and the proposal-only runbook.
 
 ## Release blockers
 
@@ -53,4 +55,4 @@ pnpm --dir web-v2 build:frontdoor-candidate
 cat .artifacts/v3-frontdoor/manifest.json
 ```
 
-**Gates:** Offline artifact and recorded-response browser test must pass at exact SHA. Cloudflare SPA runtime, current production Pons freshness, production provider route identity and cutover authority all remain **BLOCKED / UNVERIFIED / FALSE**.
+**Gates:** Offline artifact, local workerd routing and recorded-response browser test must pass at exact SHA. Current production Pons freshness, production provider route/version identity, proven rollback and cutover authority remain **BLOCKED / UNVERIFIED / FALSE**.
