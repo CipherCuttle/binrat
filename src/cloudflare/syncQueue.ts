@@ -1343,6 +1343,7 @@ function safeErrorName(error: unknown): string {
     'ERROR',
     'FETCH_ERROR',
     'HTTP_REQUEST_ERROR',
+    'LIMIT_EXCEEDED_RPC_ERROR',
     'NETWORK_ERROR',
     'RPC_ERROR',
     'TIMEOUT_ERROR',
@@ -1372,6 +1373,9 @@ function safeCauseCode(error: unknown): string | null {
   let current: unknown = error;
   for (let depth = 0; depth < 3 && current && typeof current === 'object'; depth += 1) {
     const code = (current as { code?: unknown }).code;
+    // JSON-RPC limit errors can arrive over HTTP 200; retain only the known
+    // numeric class, never provider messages, request bodies, or RPC URLs.
+    if (code === -32005) return 'RPC_LIMIT_EXCEEDED';
     if (typeof code === 'string' && allowed.has(code)) return code;
     current = (current as { cause?: unknown }).cause;
   }

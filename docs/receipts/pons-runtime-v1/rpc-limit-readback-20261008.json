@@ -1,0 +1,752 @@
+{
+  "schemaVersion": "binrat.pons-rpc-recovery-readback/1",
+  "scope": "Read-only provider diagnosis; local diagnostic correction only",
+  "assignment": "https://github.com/CipherCuttle/binrat/pull/169#issuecomment-6069444598",
+  "baselineSourceSha": "cd889687c97f21b62fb166a7f72ded28df4243fb",
+  "branch": "fix/pons-rpc-limit-diagnostics-v1",
+  "productionAuthorization": false,
+  "tokenTradingMarketingAuthorization": false,
+  "deployments": [
+    {
+      "worker": "binrat-edge-v0",
+      "observedAt": "2026-10-08T22:02:28.934Z",
+      "activeDeployment": "6b5b6741-452c-41f1-8e4d-bc352b2ef505",
+      "activeVersion": "f2744535-e04b-4944-85c2-341ccba40ecb",
+      "trafficPercentage": 100,
+      "reportedSourceSha": "53325fd0806765578ed6921428ad55f15a9728f1",
+      "workerModule": {
+        "name": "worker.js",
+        "bytes": 1942152,
+        "sha256": "ab4dd261a8c12e03a6ecf928d0a760db697c8375b59c083ab7e9ae4e00ce5cce"
+      },
+      "workerModuleObservedAt": "2026-10-08T22:24:53.053Z",
+      "scriptRuntime": {
+        "assets": {
+          "serve_directly": true,
+          "raw_run_worker_first": false,
+          "base_path": "/"
+        },
+        "compatibility_date": "2026-09-18",
+        "compatibility_flags": [
+          "nodejs_compat"
+        ],
+        "usage_model": "standard"
+      },
+      "databaseId": "46814564-1a41-449a-88e5-c1349eed3a27",
+      "queue": {
+        "observedAt": "2026-10-08T22:06:21.757Z",
+        "queueName": "binrat-sync-v0",
+        "queueId": "c4e67ab772474f08b31648bcc0a7852b",
+        "fields": [
+          "queue_id",
+          "queue_name",
+          "settings",
+          "created_on",
+          "modified_on",
+          "producers_total_count",
+          "producers",
+          "consumers_total_count",
+          "consumers"
+        ],
+        "settings": {
+          "delivery_delay": 0,
+          "message_retention_period": 86400
+        },
+        "producers": [
+          {
+            "type": "worker",
+            "script": "binrat-edge-v0"
+          }
+        ],
+        "consumers": [
+          {
+            "consumer_id": "5c682ab721a64b7a97ff4af6c918a8db",
+            "type": "worker",
+            "script": "binrat-edge-v0",
+            "settings": {
+              "batch_size": 1,
+              "max_retries": 5,
+              "max_wait_time_ms": 1000,
+              "max_concurrency": 1,
+              "retry_delay": 30
+            }
+          }
+        ]
+      },
+      "cron": [
+        "* * * * *"
+      ],
+      "rpcHost": "rpc.ordofi.network",
+      "archiveSecretPresent": true,
+      "numericBindings": {
+        "BINRAT_CONFIRMATIONS": "2",
+        "BINRAT_LIVE_LOOKBACK_BLOCKS": "1000",
+        "BINRAT_MAX_STATUS_AGE_MS": "180000",
+        "BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS": "4096",
+        "BINRAT_PONS_CATCHUP_MAX_BATCHES": "4",
+        "BINRAT_PONS_CATCHUP_WORK_BUDGET_MS": "60000",
+        "BINRAT_PONS_MAX_BATCH_BLOCKS": "1024",
+        "BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS": "128",
+        "BINRAT_PONS_NEAR_HEAD_BLOCKS": "2048",
+        "BINRAT_PONS_OUTCOME_MAX_PER_CYCLE": "1",
+        "BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE": "1"
+      },
+      "schema": {
+        "observedAt": "2026-10-08T22:04:34.651Z",
+        "objects": [
+          {
+            "type": "table",
+            "name": "binrat_public_snapshots",
+            "sql": "CREATE TABLE binrat_public_snapshots (\n  chain_id INTEGER PRIMARY KEY CHECK(chain_id = 4663),\n  checkpoint_block TEXT NOT NULL,\n  checkpoint_block_hash TEXT NOT NULL,\n  feed_digest TEXT NOT NULL,\n  snapshot_json TEXT NOT NULL,\n  verified_at_ms INTEGER NOT NULL,\n  publication_version INTEGER NOT NULL CHECK(publication_version > 0)\n)"
+          },
+          {
+            "type": "table",
+            "name": "binrat_runtime_state",
+            "sql": "CREATE TABLE binrat_runtime_state (\n  chain_id INTEGER PRIMARY KEY,\n  source_verified INTEGER NOT NULL,\n  live_caught_up INTEGER NOT NULL,\n  head_block TEXT,\n  target_block TEXT,\n  observation_ready INTEGER NOT NULL,\n  history_backfill_complete INTEGER NOT NULL,\n  history_backfill_target_block TEXT,\n  last_sync_error TEXT,\n  last_history_error TEXT,\n  last_observation_error TEXT,\n  updated_at_ms INTEGER NOT NULL\n)"
+          },
+          {
+            "type": "table",
+            "name": "binrat_sync_leases",
+            "sql": "CREATE TABLE binrat_sync_leases (\n  lease_name TEXT PRIMARY KEY,\n  owner_token TEXT NOT NULL,\n  lease_until_ms INTEGER NOT NULL,\n  updated_at_ms INTEGER NOT NULL\n)"
+          },
+          {
+            "type": "table",
+            "name": "chain_checkpoints",
+            "sql": "CREATE TABLE chain_checkpoints (\n  chain_id INTEGER PRIMARY KEY,\n  block_number TEXT NOT NULL,\n  block_hash TEXT NOT NULL,\n  guard_block_number TEXT,\n  guard_block_hash TEXT\n)"
+          },
+          {
+            "type": "index",
+            "name": "idx_launches_chain_block_numeric",
+            "sql": "CREATE INDEX idx_launches_chain_block_numeric\n  ON launches(chain_id, CAST(block_number AS INTEGER))"
+          },
+          {
+            "type": "index",
+            "name": "idx_launches_chain_source_block_numeric",
+            "sql": "CREATE INDEX idx_launches_chain_source_block_numeric\n  ON launches(chain_id, source, CAST(block_number AS INTEGER), log_index, launch_id)"
+          },
+          {
+            "type": "index",
+            "name": "idx_launches_chain_source_creator_block_numeric",
+            "sql": "CREATE INDEX idx_launches_chain_source_creator_block_numeric\n  ON launches(chain_id, source, creator, CAST(block_number AS INTEGER), log_index, launch_id)"
+          }
+        ],
+        "migrationVersionLedger": "UNVERIFIED: d1_migrations not present in selected sqlite_master results",
+        "rowsWritten": 0
+      },
+      "samples": [
+        {
+          "runtime": {
+            "observedAt": "2026-10-08T22:05:09.308Z",
+            "row": {
+              "chain_id": 4663,
+              "source_verified": 0,
+              "live_caught_up": 0,
+              "head_block": "83574076",
+              "target_block": "83574074",
+              "last_sync_error": "PONS_GET_FACTORY_CODE_FAILED",
+              "updated_at_ms": 1791497096659
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "checkpoint": {
+            "observedAt": "2026-10-08T22:05:09.492Z",
+            "row": {
+              "chain_id": 4663,
+              "block_number": "83573396",
+              "block_hash": "0x7bec479cf274bb21de074fdbe15c2cb9e320e3d331de398518636539e377b0dd",
+              "guard_block_number": "83573364",
+              "guard_block_hash": "0xb2b0525b7084425cf5a88f6f6a8d04714b078ea3924fb2cc29b6111573f67dc2"
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "snapshot": {
+            "observedAt": "2026-10-08T22:05:09.688Z",
+            "row": {
+              "chain_id": 4663,
+              "checkpoint_block": "80368666",
+              "checkpoint_block_hash": "0x9f483e3292f7143dc133e6b893356dd0976886a19217939226251ffbab79b2e5",
+              "feed_digest": "c028deff072bf2dac5302eac130ec23ef35cf95e2e6da2aa55c0c8dd1d63dfcc",
+              "verified_at_ms": 1791160704936,
+              "publication_version": 25
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          }
+        },
+        {
+          "runtime": {
+            "observedAt": "2026-10-08T22:13:41.040Z",
+            "row": {
+              "chain_id": 4663,
+              "source_verified": 0,
+              "live_caught_up": 0,
+              "head_block": "83574076",
+              "target_block": "83574074",
+              "last_sync_error": "PONS_GET_HEAD_FAILED",
+              "updated_at_ms": 1791497620672
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "checkpoint": {
+            "observedAt": "2026-10-08T22:13:41.193Z",
+            "row": {
+              "chain_id": 4663,
+              "block_number": "83573396",
+              "block_hash": "0x7bec479cf274bb21de074fdbe15c2cb9e320e3d331de398518636539e377b0dd",
+              "guard_block_number": "83573364",
+              "guard_block_hash": "0xb2b0525b7084425cf5a88f6f6a8d04714b078ea3924fb2cc29b6111573f67dc2"
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "snapshot": {
+            "observedAt": "2026-10-08T22:13:41.333Z",
+            "row": {
+              "chain_id": 4663,
+              "checkpoint_block": "80368666",
+              "checkpoint_block_hash": "0x9f483e3292f7143dc133e6b893356dd0976886a19217939226251ffbab79b2e5",
+              "feed_digest": "c028deff072bf2dac5302eac130ec23ef35cf95e2e6da2aa55c0c8dd1d63dfcc",
+              "verified_at_ms": 1791160704936,
+              "publication_version": 25
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          }
+        }
+      ]
+    },
+    {
+      "worker": "binrat-read-plane-stability-candidate",
+      "observedAt": "2026-10-08T22:02:30.769Z",
+      "activeDeployment": "7990d92e-9a37-433d-8d6e-7350f3d6af53",
+      "activeVersion": "1f68b4d6-3a57-4022-bb3b-c4496b864bcb",
+      "trafficPercentage": 100,
+      "reportedSourceSha": "e34a94cf1702340582266852495e28423728add0",
+      "workerModule": {
+        "name": "worker.js",
+        "bytes": 2243358,
+        "sha256": "ff32ecdedf0585552b2aec7235ce46f017f4e2f35e72b74e413806ac8235a50f"
+      },
+      "workerModuleObservedAt": "2026-10-08T22:24:55.276Z",
+      "scriptRuntime": {
+        "assets": {
+          "serve_directly": true,
+          "raw_run_worker_first": false,
+          "base_path": "/"
+        },
+        "compatibility_date": "2026-09-18",
+        "compatibility_flags": [
+          "nodejs_compat"
+        ],
+        "usage_model": "standard"
+      },
+      "databaseId": "6bd76897-c255-4d8e-a66f-9423a2fbdd77",
+      "queue": {
+        "observedAt": "2026-10-08T22:06:23.793Z",
+        "queueName": "binrat-read-plane-stability-candidate-sync",
+        "queueId": "adcd82e47d5f444e8c9bb35eb5e8829c",
+        "fields": [
+          "queue_id",
+          "queue_name",
+          "settings",
+          "created_on",
+          "modified_on",
+          "producers_total_count",
+          "producers",
+          "consumers_total_count",
+          "consumers"
+        ],
+        "settings": {
+          "delivery_delay": 0,
+          "message_retention_period": 345600
+        },
+        "producers": [
+          {
+            "type": "worker",
+            "script": "binrat-read-plane-stability-candidate"
+          }
+        ],
+        "consumers": [
+          {
+            "consumer_id": "848f788ed27b4fdfbb07162559c8f150",
+            "type": "worker",
+            "script": "binrat-read-plane-stability-candidate",
+            "settings": {
+              "batch_size": 1,
+              "max_retries": 5,
+              "max_wait_time_ms": 1000,
+              "max_concurrency": 1,
+              "retry_delay": 30
+            }
+          }
+        ]
+      },
+      "cron": [
+        "* * * * *"
+      ],
+      "rpcHost": "rpc.ordofi.network",
+      "archiveSecretPresent": true,
+      "numericBindings": {
+        "BINRAT_CONFIRMATIONS": "2",
+        "BINRAT_LIVE_LOOKBACK_BLOCKS": "1000",
+        "BINRAT_MAX_STATUS_AGE_MS": "180000",
+        "BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS": "4096",
+        "BINRAT_PONS_CATCHUP_MAX_BATCHES": "4",
+        "BINRAT_PONS_CATCHUP_WORK_BUDGET_MS": "60000",
+        "BINRAT_PONS_MAX_BATCH_BLOCKS": "1024",
+        "BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS": "128",
+        "BINRAT_PONS_NEAR_HEAD_BLOCKS": "2048"
+      },
+      "schema": {
+        "observedAt": "2026-10-08T22:04:35.843Z",
+        "objects": [
+          {
+            "type": "table",
+            "name": "binrat_public_snapshots",
+            "sql": "CREATE TABLE binrat_public_snapshots (\n  chain_id INTEGER PRIMARY KEY CHECK(chain_id = 4663),\n  checkpoint_block TEXT NOT NULL,\n  checkpoint_block_hash TEXT NOT NULL,\n  feed_digest TEXT NOT NULL,\n  snapshot_json TEXT NOT NULL,\n  verified_at_ms INTEGER NOT NULL,\n  publication_version INTEGER NOT NULL CHECK(publication_version > 0)\n)"
+          },
+          {
+            "type": "table",
+            "name": "binrat_runtime_state",
+            "sql": "CREATE TABLE binrat_runtime_state (\n  chain_id INTEGER PRIMARY KEY,\n  source_verified INTEGER NOT NULL,\n  live_caught_up INTEGER NOT NULL,\n  head_block TEXT,\n  target_block TEXT,\n  observation_ready INTEGER NOT NULL,\n  history_backfill_complete INTEGER NOT NULL,\n  history_backfill_target_block TEXT,\n  last_sync_error TEXT,\n  last_history_error TEXT,\n  last_observation_error TEXT,\n  updated_at_ms INTEGER NOT NULL\n)"
+          },
+          {
+            "type": "table",
+            "name": "binrat_sync_leases",
+            "sql": "CREATE TABLE binrat_sync_leases (\n  lease_name TEXT PRIMARY KEY,\n  owner_token TEXT NOT NULL,\n  lease_until_ms INTEGER NOT NULL,\n  updated_at_ms INTEGER NOT NULL\n)"
+          },
+          {
+            "type": "table",
+            "name": "chain_checkpoints",
+            "sql": "CREATE TABLE chain_checkpoints (\n  chain_id INTEGER PRIMARY KEY,\n  block_number TEXT NOT NULL,\n  block_hash TEXT NOT NULL,\n  guard_block_number TEXT,\n  guard_block_hash TEXT\n)"
+          },
+          {
+            "type": "index",
+            "name": "idx_launches_chain_block_numeric",
+            "sql": "CREATE INDEX idx_launches_chain_block_numeric\n  ON launches(chain_id, CAST(block_number AS INTEGER))"
+          },
+          {
+            "type": "index",
+            "name": "idx_launches_chain_source_block_numeric",
+            "sql": "CREATE INDEX idx_launches_chain_source_block_numeric\n  ON launches(chain_id, source, CAST(block_number AS INTEGER), log_index, launch_id)"
+          },
+          {
+            "type": "index",
+            "name": "idx_launches_chain_source_creator_block_numeric",
+            "sql": "CREATE INDEX idx_launches_chain_source_creator_block_numeric\n  ON launches(chain_id, source, creator, CAST(block_number AS INTEGER), log_index, launch_id)"
+          }
+        ],
+        "migrationVersionLedger": "UNVERIFIED: d1_migrations not present in selected sqlite_master results",
+        "rowsWritten": 0
+      },
+      "samples": [
+        {
+          "runtime": {
+            "observedAt": "2026-10-08T22:05:10.112Z",
+            "row": {
+              "chain_id": 4663,
+              "source_verified": 0,
+              "live_caught_up": 0,
+              "head_block": "83573648",
+              "target_block": "83573646",
+              "last_sync_error": "SYNC_UNKNOWN_ERROR",
+              "updated_at_ms": 1791497101482
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "checkpoint": {
+            "observedAt": "2026-10-08T22:05:10.311Z",
+            "row": {
+              "chain_id": 4663,
+              "block_number": "83573282",
+              "block_hash": "0x9b5a65528247c04a1c0076b1cc448a3e3dee31086ab10ed16395b6d622d2773d",
+              "guard_block_number": "83573250",
+              "guard_block_hash": "0x76c057494ca8d24d55acbdbfddb02b580eebd38100c457048c85ccae10acd0a5"
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "snapshot": {
+            "observedAt": "2026-10-08T22:05:10.491Z",
+            "row": {
+              "chain_id": 4663,
+              "checkpoint_block": "83571234",
+              "checkpoint_block_hash": "0xb447d2d93038314118bfc67680c1a77b01c10b06b620063baab75cf66970755b",
+              "feed_digest": "4d452d4f41f695e756149ab0a6e767d2c2d775051f22f611254f7071b51858e4",
+              "verified_at_ms": 1791488908168,
+              "publication_version": 5523
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          }
+        },
+        {
+          "runtime": {
+            "observedAt": "2026-10-08T22:13:42.537Z",
+            "row": {
+              "chain_id": 4663,
+              "source_verified": 0,
+              "live_caught_up": 0,
+              "head_block": "83573648",
+              "target_block": "83573646",
+              "last_sync_error": "SYNC_UNKNOWN_ERROR",
+              "updated_at_ms": 1791497610811
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "checkpoint": {
+            "observedAt": "2026-10-08T22:13:42.693Z",
+            "row": {
+              "chain_id": 4663,
+              "block_number": "83573282",
+              "block_hash": "0x9b5a65528247c04a1c0076b1cc448a3e3dee31086ab10ed16395b6d622d2773d",
+              "guard_block_number": "83573250",
+              "guard_block_hash": "0x76c057494ca8d24d55acbdbfddb02b580eebd38100c457048c85ccae10acd0a5"
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          },
+          "snapshot": {
+            "observedAt": "2026-10-08T22:13:42.832Z",
+            "row": {
+              "chain_id": 4663,
+              "checkpoint_block": "83571234",
+              "checkpoint_block_hash": "0xb447d2d93038314118bfc67680c1a77b01c10b06b620063baab75cf66970755b",
+              "feed_digest": "4d452d4f41f695e756149ab0a6e767d2c2d775051f22f611254f7071b51858e4",
+              "verified_at_ms": 1791488908168,
+              "publication_version": 5523
+            },
+            "rowsRead": 1,
+            "rowsWritten": 0,
+            "changedDb": false
+          }
+        }
+      ]
+    }
+  ],
+  "candidateBundleMatchesPriorProviderReceipt": true,
+  "candidatePriorProviderReceipt": "docs/receipts/pons-runtime-v1/prior-provider-readback.json",
+  "candidateFailure": {
+    "observedAt": "2026-10-08T22:14:45.756Z",
+    "scriptVersion": {
+      "id": "1f68b4d6-3a57-4022-bb3b-c4496b864bcb"
+    },
+    "queue": "binrat-read-plane-stability-candidate-sync",
+    "events": [
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_HEAD",
+        "status": "START"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_HEAD",
+        "status": "PASS"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_CHAIN_ID",
+        "status": "START"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_CHAIN_ID",
+        "status": "PASS"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_FACTORY_CODE",
+        "status": "START"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_FACTORY_CODE",
+        "status": "PASS"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_HEAD",
+        "status": "START"
+      },
+      {
+        "event": "PONS_BOOTSTRAP_OPERATION",
+        "operation": "PONS_GET_HEAD",
+        "status": "PASS"
+      },
+      {
+        "event": "SYNC_PHASE",
+        "phase": "LIVE_BATCH_START",
+        "fromBlock": "83573283",
+        "toBlock": "83577378"
+      },
+      {
+        "event": "SYNC_PHASE",
+        "phase": "LIVE_LOG_READ_START",
+        "fromBlock": "83573283",
+        "toBlock": "83577378"
+      },
+      {
+        "event": "SYNC_PHASE",
+        "phase": "PROVENANCE_REPAIR_START",
+        "fromBlock": "83573283"
+      },
+      {
+        "event": "SYNC_PHASE",
+        "phase": "PROVENANCE_REPAIR_DONE",
+        "fromBlock": "83573283"
+      },
+      {
+        "event": "SYNC_FAILURE",
+        "phase": "LIVE_SYNC",
+        "cycleId": "c5541f44-1b6d-42e4-903d-5bcac21de03a",
+        "code": "SYNC_UNKNOWN_ERROR",
+        "errorName": "UNKNOWN_ERROR",
+        "httpStatus": null,
+        "causeCode": null
+      }
+    ]
+  },
+  "candidateFailureCountInBoundedRangeTail": 4,
+  "configuredProductionRpcProbe": {
+    "observedAt": "2026-10-08T22:13:44.556Z",
+    "rpcHost": "rpc.ordofi.network",
+    "method": "eth_getLogs",
+    "httpStatus": 200,
+    "elapsedMs": 1209,
+    "errorCode": -32005,
+    "errorMessage": "the network is busy, please try again in a moment",
+    "fromBlock": "83573283",
+    "toBlock": "83573646",
+    "logCount": null
+  },
+  "candidateViemProbe": {
+    "observedAt": "2026-10-08T22:15:03.808Z",
+    "results": [
+      {
+        "label": "configured-full",
+        "fromBlock": "83573283",
+        "toBlock": "83573646",
+        "ok": false,
+        "causes": [
+          {
+            "name": "LimitExceededRpcError",
+            "code": -32005,
+            "status": null,
+            "providerBusy": true
+          },
+          {
+            "name": "RpcRequestError",
+            "code": -32005,
+            "status": null,
+            "providerBusy": true
+          },
+          {
+            "code": -32005,
+            "status": null,
+            "providerBusy": false
+          }
+        ],
+        "elapsedMs": 2926
+      },
+      {
+        "label": "configured-half",
+        "fromBlock": "83573283",
+        "toBlock": "83573464",
+        "ok": false,
+        "causes": [
+          {
+            "name": "LimitExceededRpcError",
+            "code": -32005,
+            "status": null,
+            "providerBusy": true
+          },
+          {
+            "name": "RpcRequestError",
+            "code": -32005,
+            "status": null,
+            "providerBusy": true
+          },
+          {
+            "code": -32005,
+            "status": null,
+            "providerBusy": false
+          }
+        ],
+        "elapsedMs": 2826
+      },
+      {
+        "label": "configured-one",
+        "fromBlock": "83573283",
+        "toBlock": "83573283",
+        "ok": false,
+        "causes": [
+          {
+            "name": "LimitExceededRpcError",
+            "code": -32005,
+            "status": null,
+            "providerBusy": true
+          },
+          {
+            "name": "RpcRequestError",
+            "code": -32005,
+            "status": null,
+            "providerBusy": true
+          },
+          {
+            "code": -32005,
+            "status": null,
+            "providerBusy": false
+          }
+        ],
+        "elapsedMs": 2924
+      },
+      {
+        "label": "official-full",
+        "fromBlock": "83573283",
+        "toBlock": "83573646",
+        "ok": false,
+        "causes": [
+          {
+            "name": "HttpRequestError",
+            "code": null,
+            "status": 403,
+            "providerBusy": false
+          }
+        ],
+        "elapsedMs": 493
+      },
+      {
+        "label": "configured",
+        "head": "83657796",
+        "authorityVerified": true
+      },
+      {
+        "label": "official",
+        "authorityVerified": false,
+        "causes": [
+          {
+            "name": "Error",
+            "code": null,
+            "status": null,
+            "providerBusy": false
+          },
+          {
+            "name": "HttpRequestError",
+            "code": null,
+            "status": 403,
+            "providerBusy": false
+          }
+        ]
+      }
+    ]
+  },
+  "candidateExactRangeAndRecentBlockProbe": {
+    "observedAt": "2026-10-08T22:15:54.034Z",
+    "head": "83658219",
+    "results": [
+      {
+        "label": "actual-failing-range",
+        "fromBlock": "83573283",
+        "toBlock": "83577378",
+        "ok": false,
+        "errorName": "LimitExceededRpcError",
+        "rpcCode": -32005,
+        "providerBusy": true
+      },
+      {
+        "label": "recent-one-block",
+        "fromBlock": "83658217",
+        "toBlock": "83658217",
+        "ok": false,
+        "errorName": "LimitExceededRpcError",
+        "rpcCode": -32005,
+        "providerBusy": true
+      }
+    ]
+  },
+  "publicProductionReadback": [
+    {
+      "observedAt": "2026-10-08T22:15:54.495Z",
+      "url": "https://binrat.tech/health",
+      "status": 200,
+      "releaseSha": "53325fd0806765578ed6921428ad55f15a9728f1"
+    },
+    {
+      "observedAt": "2026-10-08T22:15:54.634Z",
+      "url": "https://binrat.tech/api/status",
+      "status": 503,
+      "reason": "INDEX_NOT_READY",
+      "ready": false
+    },
+    {
+      "observedAt": "2026-10-08T22:15:55.113Z",
+      "url": "https://binrat.tech/api/launches/latest",
+      "status": 503,
+      "reason": "PUBLIC_PROJECTION_UNAVAILABLE",
+      "ready": false
+    }
+  ],
+  "candidatePublicStatus": {
+    "observedAt": "2026-10-08T22:24:56.955Z",
+    "url": "https://binrat-read-plane-stability-candidate.pettevik.workers.dev/api/status",
+    "httpStatus": 200,
+    "body": {
+      "schemaVersion": "binrat.public-status/0.1",
+      "chainId": 4663,
+      "state": "STALE_VERIFIED",
+      "checkpointBlock": "83571234",
+      "checkpointBlockHash": "0xb447d2d93038314118bfc67680c1a77b01c10b06b620063baab75cf66970755b",
+      "feedDigest": "4d452d4f41f695e756149ab0a6e767d2c2d775051f22f611254f7071b51858e4",
+      "verifiedAtMs": 1791488908168,
+      "publicationVersion": 5523,
+      "freshnessValidUntilMs": 1791489088168,
+      "runtimeUpdatedAtMs": 1791498291011,
+      "lastSyncError": "SYNC_UNKNOWN_ERROR"
+    }
+  },
+  "localCorrection": {
+    "files": [
+      {
+        "path": "src/cloudflare/syncQueue.ts",
+        "sha256": "4b6bc795e074c9fe08300cd991376a9e23087dda57d60e4f4b38778d572fcd35"
+      },
+      {
+        "path": "test/ponsRpcLimitDiagnostic.test.ts",
+        "sha256": "b902989ea8fd03242da8882f71208368c89cd8540762183d850464dbf19b5297"
+      }
+    ],
+    "redRegression": {
+      "tests": 3,
+      "passed": 0,
+      "failed": 3
+    },
+    "focusedTests": {
+      "command": "pnpm exec tsx --test test/ponsRpcLimitDiagnostic.test.ts test/cloudflareSyncQueue.test.ts test/ponsSource.test.ts test/sync.test.ts",
+      "passed": 43,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "typecheck": {
+      "command": "pnpm exec tsc -p tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    "productionIndexingAdvanced": false,
+    "upstreamInternalReason": "UNVERIFIED: provider returned -32005 busy; quota/capacity/node cause is not visible in available evidence"
+  }
+}
