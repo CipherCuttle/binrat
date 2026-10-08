@@ -1,0 +1,122 @@
+[
+  {
+    "path": "scene/alley-bg-desktop.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_05 AM-1.png",
+    "sha256": "013901ad88399ad2821d6b0cb036b7ba61f5d5a826f991665670e8ede47d7492",
+    "bytes": 2977015,
+    "width": 1672,
+    "height": 941,
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "path": "foreground/ratzero-dumpster-desktop.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_06 AM-2.png",
+    "sha256": "6553630089f925a547d13b1589adab60626c8ec73700e8f19dbe4aac1b79ab32",
+    "bytes": 2436302,
+    "width": 1122,
+    "height": 1402,
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "path": "scene/alley-bg-mobile.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_07 AM-3.png",
+    "sha256": "ad07c46d373f4ae896bbd5400c7d41b912636fe36c1d577b40200d1b2ec355d6",
+    "bytes": 2850785,
+    "width": 941,
+    "height": 1672,
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "path": "foreground/rat-zero-dumpster-a.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_09 AM-4.png",
+    "sha256": "ccedd22fbcc35ffe8d9e9e1233ce0fd457e13d308535cce3a397bc00d69cdea1",
+    "bytes": 2385916,
+    "width": 1122,
+    "height": 1402,
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "path": "case-scenes/case-neon-alley.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_10 AM-5.png",
+    "sha256": "9f526a37658e4796b0f2775b489a7f5a047b4311371c5e4e414cc4909ed35885",
+    "bytes": 2773204,
+    "width": 1672,
+    "height": 941,
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "path": "case-scenes/case-trash-evidence.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_11 AM-6.png",
+    "sha256": "58768427371da93765cb9cafd93492d2b8d930e08b745a5242893ea697a52b55",
+    "bytes": 2709688,
+    "width": 1672,
+    "height": 941,
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "path": "case-scenes/case-funder-trail.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_12 AM-7.png",
+    "sha256": "0829d8752ce10333c9e3252f4bb23da00193355fb37ec4b4c25814ad64ea42ed",
+    "bytes": 2850341,
+    "width": 1672,
+    "height": 941,
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "path": "case-scenes/case-repeat-deployer.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_13 AM-8.png",
+    "sha256": "87a1c522ea6ac516b800ad344e88640c730eda6e7a1a400aee2f431105703210",
+    "bytes": 2863644,
+    "width": 1672,
+    "height": 941,
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "path": "decals/graffiti-sticker-pack.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_15 AM-9.png",
+    "sha256": "f20c0adb2f4ff8b2ae4c648f5c84c2b55d395f3a464e82d90689c711cb0f3e16",
+    "bytes": 2813164,
+    "width": 1254,
+    "height": 1254,
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "path": "foreground/foreground-trash.png",
+    "sourceFile": "ChatGPT Image Oct 8, 2026, 06_07_16 AM-10.png",
+    "sha256": "805c074a15cb16523b369317f6c8da9597cad9fd5bf8967d18c5f30608d41263",
+    "bytes": 1722815,
+    "width": 2172,
+    "height": 724,
+    "alphaRange": [
+      0,
+      255
+    ]
+  }
+]
