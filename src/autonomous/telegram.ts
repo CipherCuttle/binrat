@@ -7,6 +7,7 @@ import { createPublicShareReceipt, openPublicShareReceipt, renderOpenedReceipt, 
 import type { WatchSource } from './source.js';
 import { commandReplay, listWatches, mutateWatch, reserveDig } from './watches.js';
 import type { AutonomousOutcome } from './outcome.js';
+import { HOME_INTRO, HOME_WATCH_NOTE } from './homeCopy.js';
 
 export interface RatCommand { name: 'dig' | 'watch' | 'unwatch' | 'watches' | 'why' | 'rats' | 'share' | 'start'; argument: string }
 export function parseAutonomousCommand(text: string): RatCommand | null {
@@ -73,9 +74,9 @@ export async function executeAutonomousCommand(
       INDEX_UNAVAILABLE:'The live index is unavailable or stale. No new investigation or alert authority.',
       SOURCE_UNAVAILABLE:'A fresh canonical Robinhood boundary could not be verified. Watch was not added.',
       RATS_USAGE:'Usage: /rats',
-      DISCOVERY_UNAVAILABLE:'Discovery receipts are unavailable. No rats invented.',
-      DISCOVERY_WRITE_FAILED:'Discovery receipts could not be saved. No rats invented.',
-      DISCOVERY_RETENTION_FAILED:'Discovery retention is unavailable. No rats invented.',
+      DISCOVERY_UNAVAILABLE:'Discovery receipts are unavailable. No finds invented.',
+      DISCOVERY_WRITE_FAILED:'Discovery receipts could not be saved. No finds invented.',
+      DISCOVERY_RETENTION_FAILED:'Discovery retention is unavailable. No finds invented.',
       PUBLIC_RECEIPT_UNAVAILABLE:'That public receipt is unavailable, expired or invalid.',
       SHARE_WRITE_FAILED:'Public receipt could not be created.',
       SHARE_ID_UNAVAILABLE:'Public receipt ID could not be allocated.',
@@ -89,7 +90,7 @@ export async function executeAutonomousCommand(
 /** Legacy commands retain their established full-text rendering. */
 export function renderLegacyAutonomousOutcome(outcome: AutonomousOutcome): string {
   switch (outcome.kind) {
-    case 'HOME': return '🐀 BINRAT\n\nI dig through Pons launches and reported deployers. You get the receipts.\n\n/rats — what the rat noticed\n/dig <address> — investigate\n/watches — what I\'m watching';
+    case 'HOME': return `🐀 BINRAT\n\n${HOME_INTRO}\n\n/rats — fresh finds: repeat deployers BINRAT just noticed\n/dig <address> — check a deployer\n/watches — my watches\n/help — all commands\n\n${HOME_WATCH_NOTE}`;
     case 'RATS': return renderRats(outcome.snapshot);
     case 'CASE': return renderReceipt(outcome.receipt,outcome.mode) + (outcome.privateAttention ? `\n\n${outcome.privateAttention}` : '');
     case 'WATCH': case 'REPLAY': return outcome.reply;

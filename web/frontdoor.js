@@ -1,15 +1,19 @@
 // Presentation only. The existing read plane owns data; this module cannot admit jobs.
 const profiles = Object.freeze({
   "rat-zero": { name: "RAT ZERO", role: "SCOUT", image: "rat-zero.jpg", headline: "WHAT JUST HIT THE DUMPSTER?", steps: ["Discover a Pons launch.", "Open its supported Case.", "Check receipts and visible gaps."], action: "START DIGGING", href: "#garbage" },
-  tripwire: { name: "TRIPWIRE", role: "WATCHER", image: "tripwire.png", headline: "A FUTURE RAT TO LEAVE BEHIND.", steps: ["Pons Watch follows current bot access gates. Legacy Watch cannot be re-armed on Pons.", "Persistent Tripwire job admission is not available.", "No Rat is employed from this page."] },
+  tripwire: { name: "TRIPWIRE", role: "WATCHER", image: "tripwire.png", headline: "A FUTURE RAT TO LEAVE BEHIND.", steps: ["Where enabled, Watch alerts you when a future supported indexed launch appears from the same reported deployer. Watch is not Tripwire.", "Pons Watch follows current bot access gates. Legacy Watch cannot be re-armed on Pons.", "Persistent Tripwire job admission is not available. No Rat is employed from this page."] },
   sniffer: { name: "SNIFFER", role: "TRAIL HUNTER", image: "sniffer.png", headline: "HE FOLLOWS THE MONEY.", steps: ["A real funding handoff has been captured.", "Later-launch usefulness remains unproven.", "No prediction or production employment is offered."] },
 });
 let publicProduct = null;
+// Loading is not a product state: until the projection settles show CHECKING. Failure stays canonical UNVERIFIED.
+let projectionSettled = false;
+export const statusOf = (id) => projectionSettled ? (productRat(id)?.status ?? "UNVERIFIED") : "CHECKING";
 let refreshSelected = () => {};
 export function productRat(id) { return publicProduct?.crew.find(rat => rat.id === id) ?? null; }
 export function renderPublicProduct(product) {
   publicProduct = product;
-  for (const target of document.querySelectorAll("[data-product-status]")) target.textContent = productRat(target.dataset.productStatus)?.status ?? "UNVERIFIED";
+  projectionSettled = true;
+  for (const target of document.querySelectorAll("[data-product-status]")) target.textContent = statusOf(target.dataset.productStatus);
   for (const target of document.querySelectorAll("[data-product-description]")) target.textContent = productRat(target.dataset.productDescription)?.description ?? "Status unavailable.";
   refreshSelected();
 }
@@ -28,13 +32,13 @@ export function initFrontdoor({ initialFragment, onOpenCase, onRetry, onNavigate
     if (!profile) return;
     selected = key;
     const rat = productRat(key);
-    const status = rat?.status ?? "UNVERIFIED";
+    const status = statusOf(key);
     for (const button of document.querySelectorAll("[data-select-rat]")) {
       button.setAttribute("aria-pressed", String(button.dataset.selectRat === key));
     }
     panel.dataset.rat = key;
     panel.innerHTML = `<figure class="crew-portrait"><img src="./assets/crew/${profile.image}" alt="${profile.name}, the approved BINRAT ${profile.role.toLowerCase()}" width="1024" height="1024" loading="lazy" /></figure>
-      <div class="crew-job"><p class="eyebrow">${profile.role} <span class="rat-status">${escapeHtml(status)}</span></p><h3>${profile.name}</h3><strong class="crew-line">${profile.headline}</strong><p>${escapeHtml(rat?.description ?? "Product status unavailable. No capability is promoted.")}</p><ol>${(status==='UNVERIFIED'?['Canonical evidence is unavailable.']:profile.steps).map((step) => `<li>${step}</li>`).join("")}</ol>${profile.href && rat?.actionAvailable ? `<a class="button primary" href="${profile.href}">${profile.action} <span aria-hidden="true">→</span></a>` : `<p class="rat-unavailable">${escapeHtml(status)} · ${key === "rat-zero" ? "CHECK READ AVAILABILITY" : "NOT AVAILABLE YET"}</p>`}</div>`;
+      <div class="crew-job"><p class="eyebrow">${profile.role} <span class="rat-status">${escapeHtml(status)}</span></p><h3>${profile.name}</h3><strong class="crew-line">${profile.headline}</strong><p>${escapeHtml(rat?.description ?? (projectionSettled ? "Product status unavailable. No capability is promoted." : "Checking current status…"))}</p><ol>${(status==='UNVERIFIED'?['Canonical evidence is unavailable.']:status==='CHECKING'?['Checking current status…']:profile.steps).map((step) => `<li>${step}</li>`).join("")}</ol>${profile.href && rat?.actionAvailable ? `<a class="button primary" href="${profile.href}">${profile.action} <span aria-hidden="true">→</span></a>` : `<p class="rat-unavailable">${status === "CHECKING" ? "CHECKING STATUS…" : `${escapeHtml(status)} · ${key === "rat-zero" ? "CHECK READ AVAILABILITY" : "NOT AVAILABLE YET"}`}</p>`}</div>`;
   }
 
   function applyDestination(fragment) {

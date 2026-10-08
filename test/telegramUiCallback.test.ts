@@ -28,7 +28,7 @@ test('RATS pages use a compact persisted snapshot reference with bounded next an
     const snapshot=await discoverRats(f.db,f.now());
     assert.equal(snapshot.candidates.length,2);
     const first=renderRatCard({kind:'RATS',snapshot,candidateIndex:0});
-    assert.match(first.caption,/Fresh repeat 1\/2 · newest first/);
+    assert.match(first.caption,/Fresh find 1\/2 · newest first/);
     const firstPageButtons=first.keyboard.flat().filter(button=>'callbackData' in button && ['Newer','Older'].includes(button.text));
     assert.deepEqual(firstPageButtons.map(button=>button.text),['Older']);
     const nextData=(firstPageButtons[0] as {callbackData:string}).callbackData;
@@ -36,7 +36,7 @@ test('RATS pages use a compact persisted snapshot reference with bounded next an
     assert.ok(new TextEncoder().encode(nextData).byteLength<=TELEGRAM_CALLBACK_MAX_BYTES);
     const loaded=await loadRatsSnapshot(f.db,snapshot.discoveryId,f.now());
     const second=renderRatCard({kind:'RATS',snapshot:loaded,candidateIndex:1});
-    assert.match(second.caption,/Fresh repeat 2\/2 · newest first/);
+    assert.match(second.caption,/Fresh find 2\/2 · newest first/);
     const secondPageButtons=second.keyboard.flat().filter(button=>'callbackData' in button && ['Newer','Older'].includes(button.text));
     assert.deepEqual(secondPageButtons.map(button=>button.text),['Newer']);
     const previousData=(secondPageButtons[0] as {callbackData:string}).callbackData;

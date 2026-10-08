@@ -1,7 +1,7 @@
 import { loadDumpsterFeed, loadPublicBag, loadBagIntelligence, loadCreatorFile, loadReplayBundle, loadCapabilityManifest, WEB_DATA_SOURCE_MODE } from "./data-source.js";
 import { buildShareCardModel, buildSharePostText } from "./share-card.js";
 import { PublicReadPlane, ReadState } from "./read-plane.js";
-import { initFrontdoor, renderFreshCases, renderFreshState, renderPublicProduct, productRat } from "./frontdoor.js";
+import { initFrontdoor, renderFreshCases, renderFreshState, renderPublicProduct, productRat, statusOf } from "./frontdoor.js";
 
 const grid = document.querySelector("#garbage-grid");
 const drawer = document.querySelector("#drawer");
@@ -511,7 +511,7 @@ function openBag(idOrBag, origin = document.activeElement) {
     </section>
 
     <section class="case-next-step" aria-label="Future monitoring job">
-      <span>TRIPWIRE · ${escapeHtml(productRat("tripwire")?.status ?? "UNVERIFIED")}</span>
+      <span>TRIPWIRE · ${escapeHtml(statusOf("tripwire"))}</span>
       <h3>LEAVE A TRIPWIRE IN THE TRASH.</h3>
       <p>Tripwire is being built to watch this exact Pons-reported deployer and bring you back when a supported condition changes. Persistent jobs are not available yet.</p>
       <a class="button ghost" href="#crew-tripwire" data-crew-handoff>SEE THE FUTURE PLAN <span>→</span></a>

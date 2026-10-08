@@ -61,10 +61,10 @@ test('V2 error cards preserve fail-closed reason classes instead of collapsing t
   const cases:Array<[string,RegExp]> = [
     ['The live index is unavailable or stale. No new investigation or alert authority.',/INDEX WENT COLD/],
     ['A fresh canonical Robinhood boundary could not be verified. Watch was not added.',/PONS HEAD NOT VERIFIED/],
-    ['That Rat snapshot is unavailable or expired.',/THAT RAT PAGE EXPIRED/],
-    ['Discovery receipts are unavailable. No rats invented.',/RAT RECEIPTS UNAVAILABLE/],
-    ['Discovery receipts could not be saved. No rats invented.',/RAT SNAPSHOT NOT SAVED/],
-    ['Discovery retention is unavailable. No rats invented.',/RAT SNAPSHOT NOT SAVED/]
+    ['That find snapshot is unavailable or expired.',/THAT FIND EXPIRED/],
+    ['Discovery receipts are unavailable. No finds invented.',/FIND RECEIPTS UNAVAILABLE/],
+    ['Discovery receipts could not be saved. No finds invented.',/FIND SNAPSHOT NOT SAVED/],
+    ['Discovery retention is unavailable. No finds invented.',/FIND SNAPSHOT NOT SAVED/]
   ];
   for (const [code,expected] of cases) {
     const card=renderRatCard({kind:'ERROR',code});
@@ -92,7 +92,8 @@ test('V2 scout cards lead with one factual finding and keep infrastructure vocab
       assert.doesNotMatch(card.caption,JARGON,card.view);
       assert.ok(primaryActions(card)<=2,`${card.view} primary actions`);
     }
-    assert.match(cards[0]!.caption,/Discover Pons launches. Open a Case. Check receipts./i);
+    assert.match(cards[0]!.caption,/fresh Pons launches and remember which deployers have been here before/i);
+    assert.match(cards[0]!.caption,/Open a find. Check the receipts./i);
     assert.match(cards[1]!.caption,/REPEAT DEPLOYER ACTIVE/);
     assert.match(cards[1]!.caption,/Recent repeat launch: \$FIXTURE/);
     assert.doesNotMatch(cards[1]!.caption,/block 100/);

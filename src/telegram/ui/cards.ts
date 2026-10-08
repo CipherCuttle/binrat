@@ -1,5 +1,6 @@
 import type { AutonomousOutcome } from '../../autonomous/outcome.js';
 import { type Receipt } from '../../autonomous/model.js';
+import { HOME_INTRO, HOME_WATCH_NOTE } from '../../autonomous/homeCopy.js';
 import { callbackButton, copyButton } from './keyboard.js';
 import { TELEGRAM_UI_RENDERER_VERSION, type RatCard } from './types.js';
 
@@ -58,18 +59,18 @@ function errorCopy(code: string): string {
   if (/capacity|limit reached/i.test(code)) return '🐀 BIN IS FULL FOR NOW.\nTry again after 00:00 UTC.';
   if (/live index is unavailable or stale/i.test(code)) return '🐀 INDEX WENT COLD.\nFresh Pons 4663 state is not verified right now. No new claim was made; try again shortly.';
   if (/fresh canonical Robinhood boundary could not be verified/i.test(code)) return '🐀 PONS HEAD NOT VERIFIED.\nThe live boundary could not be checked, so no Watch was added.';
-  if (/snapshot is unavailable|snapshot.*expired/i.test(code)) return '🐀 THAT RAT PAGE EXPIRED.\nOpen RATS again for a fresh discovery snapshot.';
-  if (/discovery receipts are unavailable/i.test(code)) return '🐀 RAT RECEIPTS UNAVAILABLE.\nI could not reconstruct a verified discovery snapshot.';
-  if (/discovery receipts could not be saved|discovery retention is unavailable/i.test(code)) return '🐀 RAT SNAPSHOT NOT SAVED.\nDiscovery evidence could not be persisted safely. No Rat card was invented.';
+  if (/snapshot is unavailable|snapshot.*expired/i.test(code)) return '🐀 THAT FIND EXPIRED.\nOpen FRESH FINDS again for a fresh snapshot.';
+  if (/discovery receipts are unavailable/i.test(code)) return '🐀 FIND RECEIPTS UNAVAILABLE.\nI could not reconstruct a verified discovery snapshot.';
+  if (/discovery receipts could not be saved|discovery retention is unavailable/i.test(code)) return '🐀 FIND SNAPSHOT NOT SAVED.\nDiscovery evidence could not be persisted safely. No find was invented.';
   if (/receipt/i.test(code)) return "🐀 THAT RECEIPT ISN'T HERE.\nIt may have expired or failed verification.";
   if (/live watches|historical evidence/i.test(code)) return '🐀 OLD TRAIL ONLY.\nArc 5042 stays historical. Live watches run on Pons 4663.';
   if (/malformed|unsupported/i.test(code)) return '🐀 WRONG KIND OF SCRAP.\nPaste a deployer address and I\'ll check it.';
   return "🐀 PIPE SMELLS WRONG.\nCan't verify fresh chain data right now.";
 }
 export function renderRatCard(outcome: AutonomousOutcome): RatCard {
-  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:'🐀 BINRAT\n\nDiscover Pons launches. Open a Case. Check receipts.\nCurrent Watch follows exact indexed deployer recurrence where current bot access is enabled. Persistent Tripwire jobs are not available.',keyboard:[
-    [callbackButton('Fresh Rats',{action:'RATS'}),callbackButton('DIG',{action:'DIG_PROMPT'})],
-    [callbackButton('Watches',{action:'WATCHES'})]
+  if (outcome.kind === 'HOME') return card({view:'HOME',media:'idle-neutral',caption:`🐀 BINRAT\n\n${HOME_INTRO}\n\nFRESH FINDS: repeat deployers BINRAT just noticed.\nDIG: check a deployer address.\nMY WATCHES: deployers you watch.\n\n${HOME_WATCH_NOTE}`,keyboard:[
+    [callbackButton('FRESH FINDS',{action:'RATS'}),callbackButton('DIG',{action:'DIG_PROMPT'})],
+    [callbackButton('MY WATCHES',{action:'WATCHES'})]
   ]});
   if (outcome.kind === 'RATS') {
     const candidate=outcome.snapshot.candidates[outcome.candidateIndex];
@@ -91,7 +92,7 @@ export function renderRatCard(outcome: AutonomousOutcome): RatCard {
       previous.length ? `Previous from same deployer: ${previous.join(' · ')}` : '',
       `Same deployer has ${prior} earlier indexed launch${prior===1?'':'es'} total.`,
       'Watch this deployer and BINRAT will ping you if these paws launch again.',
-      `Fresh repeat ${outcome.candidateIndex+1}/${pageCount} · newest first.`
+      `Fresh find ${outcome.candidateIndex+1}/${pageCount} · newest first.`
     ].filter(Boolean).join('\n'),keyboard:[
       [callbackButton('Open case',{action:'CASE',shareId:id}),callbackButton('Watch deployer',{action:'WATCH',shareId:id})],
       [callbackButton('Why flagged',{action:'WHY',shareId:id}),copyButton('Copy deployer',candidate.entity.entityId)],
