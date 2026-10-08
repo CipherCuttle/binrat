@@ -38,7 +38,7 @@ export function PonsCasePreview() {
 
   useEffect(() => {
     const expiry = data?.status.freshnessValidUntilMs;
-    if (expiry == null) return;
+    if (expiry == null || expiry <= clock) return;
     const delay = Math.max(0, Math.min(2147483647, expiry - Date.now() + 1));
     const handle = window.setTimeout(() => setClock(Date.now()), delay);
     return () => window.clearTimeout(handle);
