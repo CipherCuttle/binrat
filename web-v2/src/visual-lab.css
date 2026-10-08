@@ -111,7 +111,38 @@
 }
 .vl-hero-surface::before { content: ""; position: absolute; z-index: -1; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(122deg, #fff5ef17, transparent 14% 36%, #a3e6ff09 39%, #dba1ff12 41%, transparent 45% 82%, #b0baff12), radial-gradient(ellipse at 0 0, #ed8dff26, transparent 46%), radial-gradient(ellipse at 100% 95%, #91d7ff12, transparent 40%); }
 .vl-hero-surface::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; border: 2px solid transparent; pointer-events: none; background: linear-gradient(117deg, #f5dcff 0%, #e899ff 7%, transparent 22% 39%, #d1fdff 52%, #717dff 60%, transparent 76%, #ecc3ff 96%) border-box; mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); mask-composite: exclude; opacity: .85; }
-.visual-lab[data-material="pearl"] .vl-hero-surface { --vl-optic: pearl; }
+/* PEARL: warm alley light enters the upper-left edge; cool light exits the
+   lower-right laminate. A protected reading plane sits inside clearer margins.
+   Two static optical layers share one backdrop sample; no extra blur surfaces. */
+.visual-lab[data-material="pearl"] .vl-hero-surface {
+  border-color: #a4d8fa70;
+  border-radius: 22px 8px 24px 8px;
+  background:
+    linear-gradient(105deg, #17385630, #0a172cbf 43%, #08152ddd 76%, #1637537a),
+    linear-gradient(180deg, #15284438, #1118318c 28% 76%, #28455d24);
+  backdrop-filter: blur(7px) saturate(1.3);
+  box-shadow: inset 1px 1px #ffe7f280, inset -1px -1px #7df4ff9c,
+    -2px -1px 0 #e28aff40, 2px 2px 0 #6999f252, 0 15px 30px #050b2066;
+}
+.visual-lab[data-material="pearl"] .vl-hero-surface::before {
+  inset: 5px;
+  border-radius: 17px 4px 19px 4px;
+  border: 1px solid #bddfff26;
+  background:
+    linear-gradient(116deg, transparent 19%, #e3dbff0a 22%, #d9f4ff20 22.2%, transparent 22.7% 68%, #8cbffb08 71%, transparent 74%),
+    radial-gradient(ellipse 65% 9% at 0 0, #ffbef650, transparent 85%),
+    radial-gradient(ellipse 48% 18% at 100% 100%, #7bdfff2b, transparent 85%),
+    linear-gradient(180deg, #b6dfff0d, transparent 14% 86%, #b4deff0a);
+  box-shadow: inset 1px 0 #ffc4f426, inset -1px -1px #9af6ff38;
+}
+.visual-lab[data-material="pearl"] .vl-hero-surface::after {
+  inset: -3px;
+  border-width: 2px;
+  background:
+    linear-gradient(128deg, transparent 55%, #6ef4ffb3 73%, #e6f8fff0 74%, #ad8fffc2 75%, transparent 80%),
+    linear-gradient(132deg, #fff0cf 1%, #e7b4fa 4%, #a88affcc 7%, #5fb6ff85 10%, transparent 20% 67%, #529ab78a 83%, #9cf6ffc2 93%, #e69afaad 100%);
+  opacity: 1;
+}
 .visual-lab[data-material="glass"] .vl-hero-surface { background: #17233bb3; backdrop-filter: blur(6px); }
 .visual-lab[data-material="glass"] .vl-hero-surface::before { opacity: .15; }
 .visual-lab[data-material="refract"] .vl-hero-surface { background: linear-gradient(130deg, #40356a66, #12384144), #13182f9e; backdrop-filter: blur(20px) saturate(1.65); }
@@ -129,6 +160,7 @@
 .vl-alert { color: #ffa194; font: 650 13px var(--vl-mono); letter-spacing: .035em; }
 .vl-case-intro h1 { color: var(--vl-cream); font-weight: 900; font-size: clamp(38px, 3.8vw, 64px); letter-spacing: -.048em; line-height: .98; margin: 9px 0 14px; text-wrap: balance; text-shadow: 0 2px 1px #341b3677; }
 .vl-case-intro p { font-size: 16px; line-height: 1.6; color: #e1dff4; max-width: 560px; }
+.vl-mobile-significance { display: none; }
 .vl-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .vl-chips span { padding: 3px 9px; border: 1px solid #cba7ff80; border-radius: 6px; background: #632f9230; font: 500 12px/1.5 var(--vl-mono); color: #d8bcff; }
 .vl-chips span:first-child { color: var(--vl-cyan); border-color: #72ecff80; background: #2d91bc1a; }
@@ -250,36 +282,37 @@
   .visual-lab { padding: 12px 12px 24px; }
   .vl-topbar { grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
   .vl-brand { border: 0; box-shadow: none; background: transparent; backdrop-filter: none; padding: 3px 0; gap: 6px; }
-  .vl-brand strong { font-size: 36px; }.vl-brand span { font: 500 12px/1.3 var(--vl-mono); }
+  .vl-brand strong { font-size: 36px; }.vl-brand span { display: none; }
   .vl-command { position: static; border: 0; box-shadow: none; background: transparent; backdrop-filter: none; padding: 0; min-height: 0; display: block; }
   .vl-command nav { display: none; }
   .vl-crew-toggle { border: 1px solid #b6c4e777; padding: 6px 9px; background: #15182ab3; border-radius: 10px; }
   .vl-crew-toggle img { width: 27px; height: 27px; }
-  .vl-lab-stamp { position: absolute; top: 92px; left: 0; display: block; line-height: 1.6; }
+  .vl-lab-stamp { position: absolute; top: 57px; left: 0; display: block; line-height: 1.6; }
   .vl-lab-stamp span { display: none; }.vl-lab-stamp b { color: #e5d4f4; font-size: 12px; background: #15142a96; padding: 4px 7px; border-radius: 4px; }
   .vl-crew-popover { top: 76px; right: 0; }
   .vl-alley { height: 850px; }.vl-alley img { object-position: center -85px; }
   .vl-world-shade { background: linear-gradient(0deg, #0b1024 15%, transparent 80%); }
   .vl-world-trash { display: none; }
-  .vl-rat-scene { width: 225px; top: 124px; left: -17px; }
-  .vl-scout-label { top: 150px; right: 14px; left: auto; max-width: 172px; }
-  .vl-live { font-size: 13px; padding: 9px 10px; gap: 7px; }
+  .vl-rat-scene { width: 190px; top: 73px; left: -9px; }
+  .vl-scout-label { top: 112px; right: 14px; left: auto; max-width: 172px; }
+  .vl-live { font-size: 13px; line-height: 18px; padding: 9px 10px; gap: 7px; }
   .vl-live b { padding-left: 14px; font-size: 12px; }
-  .vl-scout-label p { padding: 14px 3px 0; font-size: 21px; }
-  .vl-workspace { margin-top: 180px; }
-  .vl-discovery { padding: 10px; border-radius: 10px; background: linear-gradient(115deg,#6a356a8c,#14203cbd); }
-  .vl-discovery header { margin-bottom: 9px; }.vl-discovery header > span { display: none; }.vl-discovery h2 { font-size: 12px; gap: 8px; }.vl-discovery h2 svg { width: 17px; height: 17px; }
-  .vl-find-rail { overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: thin; scrollbar-color: #a1c0e98c transparent; scroll-snap-type: x proximity; }
-  .vl-find { flex: 0 0 165px; scroll-snap-align: start; padding: 7px; }.vl-find + .vl-find { border-left-color: #b4b6ee2b; }.vl-find.active { border-color: #7efaff85; }.vl-find-mark { flex-basis: 26px; }.vl-find-arrow { display: none; }
+  .vl-scout-label p { display: none; }
+  .vl-workspace { margin-top: 130px; }
+  .vl-discovery { display: flex; align-items: center; gap: 12px; padding: 6px 10px; border-radius: 10px; background: linear-gradient(115deg,#6a356a8c,#14203cbd); }
+  .vl-discovery header { flex: 0 0 44px; margin: 0; }.vl-discovery header > span { display: none; }.vl-discovery h2 { font-size: 12px; line-height: 16px; }.vl-discovery h2 svg { display: none; }
+  .vl-find-rail { min-width: 0; overflow-x: auto; gap: 6px; padding: 0; scrollbar-width: none; scroll-snap-type: x proximity; }
+  .vl-find { flex: 0 0 auto; scroll-snap-align: start; padding: 8px 10px; height: 44px; line-height: 18px; }.vl-find + .vl-find { border-left-color: #b4b6ee2b; }.vl-find.active { border-color: #7efaff85; }.vl-find-mark, .vl-find small, .vl-find-arrow { display: none; }
   .vl-hero-surface { display: flex; flex-direction: column; margin-top: 14px; padding: 14px 16px 16px; border-radius: 15px 9px 18px 9px; backdrop-filter: blur(10px) saturate(1.3); }
-  .vl-case-topline { order: 0; gap: 7px; padding-bottom: 12px; font-size: 12px; flex-wrap: wrap; }.vl-case-topline > span:first-child { gap: 7px; }.vl-case-topline svg { width: 17px; height: 17px; }.vl-case-topline b { padding: 1px 6px; }
+  .vl-case-topline { order: 0; display: grid; grid-template-columns: 1fr; gap: 5px; padding-bottom: 12px; font-size: 12px; line-height: 18px; }.vl-case-topline > span:first-child { gap: 7px; }.vl-case-topline svg { width: 17px; height: 17px; }.vl-case-topline b { padding: 1px 6px; }
   .vl-case-status { font-size: 12px; }.vl-case-status i { width: 5px; height: 5px; }
   .vl-case-hero { order: 1; display: block; padding: 17px 0 16px; position: relative; }
-  .vl-case-art { float: right; width: 97px; height: 78px; margin: 0 0 10px 10px !important; border-radius: 5px; box-shadow: 0 0 0 2px #607fe326, 0 0 10px #7164ff70; }
+  .vl-case-art { float: right; width: 128px; height: 112px; margin: 0 0 10px 12px !important; border-radius: 5px; box-shadow: 0 0 0 2px #607fe326, 0 0 10px #7164ff70; }
   .vl-case-art img { object-position: 65% center; }.vl-case-art figcaption { font-size: 12px; padding: 3px 4px; text-align: center; line-height: 1.2; background: #12172bcf; }
   .vl-alert { display: block; font-size: 12px; line-height: 1.5; margin-bottom: 10px; max-width: 195px; }
   .vl-case-intro h1 { font-size: 36px; line-height: 1; margin: 7px 0 13px; text-wrap: initial; }
   .vl-case-intro p { clear: both; font-size: 15px; line-height: 1.55; }
+  .vl-summary { display: none; }.vl-mobile-significance { display: inline; }
   .vl-chips { gap: 6px; margin-top: 12px; }.vl-chips span { font-size: 12px; padding: 3px 6px; }
   .vl-case-bottom { display: contents; }
   .vl-primary { width: 100%; min-height: 48px; margin-bottom: 0; font-size: 13px; padding-inline: 14px; }

@@ -56,6 +56,15 @@ async function run() {
         assert.match(await page.locator("h1").innerText(), /SMELLS FAMILIAR/);
         const action = await page.getByRole("button", { name: "FOLLOW THE TRAIL", exact: true }).boundingBox();
         assert.ok(action && action.y >= 0 && action.y + action.height <= height, "primary action must be in first viewport");
+        if (width === 390) {
+          assert.match(await page.locator(".vl-case-intro p").innerText(), /also appears on three earlier launches.*That recurrence is why Rat Zero brought it to you\./s, "mobile opening must explain why the discovery matters");
+          for (const selector of [".vl-brand strong", ".vl-live", ".vl-lab-stamp b", ".vl-discovery", ".vl-case-art", "h1", ".vl-case-intro p"]) {
+            const box = await page.locator(selector).boundingBox();
+            assert.ok(box && box.x >= 0 && box.y >= 0 && box.x + box.width <= width && box.y + box.height <= height, `${selector} must fit in the mobile first viewport`);
+          }
+          const find = await page.getByRole("button", { name: "Open $MOLDY Case", exact: true }).boundingBox();
+          assert.ok(find && find.height >= 44, "compact discovery must retain a 44px touch target");
+        }
         assert.equal(await page.locator(".vl-material-switcher").count(), 0);
         const unloaded = await page.evaluate(() => [...document.images].filter((i) => !i.complete || !i.naturalWidth).map((i) => i.src));
         assert.deepEqual(unloaded, []);

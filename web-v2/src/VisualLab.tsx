@@ -157,7 +157,7 @@ export function VisualLab() {
         <div className="vl-case-topline"><span><Icon kind="folder" /> ACTIVE CASE <b>#{active.id}</b></span><span className="vl-case-status"><i /> SYNTHETIC INVESTIGATION</span></div>
         <div className="vl-case-hero">
           <figure className="vl-case-art"><img src={caseScene} width={840} height={473} alt="Pixel-art alley with a neon rat mural and wet sunset reflections" /><figcaption><span>SCENE / {active.symbol}</span>ILLUSTRATION ONLY</figcaption></figure>
-          <div className="vl-case-intro"><span className="vl-alert">RAT ZERO FOUND SOMETHING.</span><h1 id="vl-case-title">{active.headline}</h1><p>{active.summary}</p><div className="vl-chips"><span>{active.symbol}</span><span>{active.history.kind === "observed" ? `${active.history.prior.length} EARLIER MATCHES` : "HISTORY UNKNOWN"}</span><span>NO VERDICT</span></div>
+          <div className="vl-case-intro"><span className="vl-alert">RAT ZERO FOUND SOMETHING.</span><h1 id="vl-case-title">{active.headline}</h1><p><span className="vl-summary">{active.summary}</span><span className="vl-mobile-significance">{active.explanation}</span></p><div className="vl-chips"><span>{active.symbol}</span><span>{active.history.kind === "observed" ? `${active.history.prior.length} EARLIER MATCHES` : "HISTORY UNKNOWN"}</span><span>NO VERDICT</span></div>
             {step !== "NEXT" ? <button className="vl-primary" onClick={() => goStep(steps[stepIndex + 1], true)}>{["FOLLOW THE TRAIL", "CHECK RECEIPTS", "REVIEW NEXT ACTIONS"][stepIndex]}<Icon kind="arrow" /></button> : <a className="vl-primary" href="#vl-finds">RETURN TO FINDS<Icon kind="arrow" /></a>}
           </div>
         </div>
