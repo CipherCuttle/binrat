@@ -8,6 +8,7 @@ import { makeRatAnswerPlan, renderRatVoice } from '../src/telegram/voice.js';
 
 const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
 const frontdoor = readFileSync(new URL('../web/frontdoor.js', import.meta.url), 'utf8');
+const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
 const FUTURE_AS_CURRENT = /\b(buy|sell|stake to employ|get in early|earn apy|working rat live|employing tripwire|you employed)\b/i;
 
 function helpText(): string {
@@ -68,4 +69,25 @@ test('web: page-loading is CHECKING, canonical failure remains UNVERIFIED', () =
   assert.doesNotMatch(html, /data-product-status="[a-z-]+"[^>]*>UNVERIFIED</);
   assert.match(html, /data-product-status="rat-zero">CHECKING</);
   assert.match(frontdoor, /projectionSettled \? \(productRat\(id\)\?\.status \?\? "UNVERIFIED"\) : "CHECKING"/);
+});
+
+
+test('web Case tells a bounded story from find to next action', () => {
+  for (const marker of [
+    'RAT ZERO FOUND SOMETHING.',
+    'SMELLS FAMILIAR.',
+    'NOT ENOUGH HISTORY YET.',
+    '01 / SUPPORTED FACTS',
+    '02 / FOLLOW THE TRAIL',
+    'NEXT / CURRENT WATCH',
+    'COPY DEPLOYER',
+    'SEE TRIPWIRE PLAN',
+  ]) assert.ok(app.includes(marker), `Case journey drifted: ${marker}`);
+  assert.match(app, /No prior match is not a safety claim, prediction or proof that the address is globally new/);
+  assert.match(app, /Missing history stays missing; absence outside this coverage is unknown/);
+  assert.match(app, /Where enabled, Watch can alert you/);
+  assert.match(app, /When it is enabled for you, current Watch is accessed through the Telegram bot/);
+  assert.match(app, /Watch is not Tripwire/);
+  assert.match(app, /Persistent Tripwire jobs are not available yet/);
+  assert.doesNotMatch(app, /stake to employ|get in early|working rat live/i);
 });

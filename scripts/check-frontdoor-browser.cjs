@@ -48,7 +48,7 @@ const viewports = [
       assert.ok(availability.y + availability.height <= viewport.height, `availability must not be buried at ${viewport.width}`);
       assert.ok(await primary.evaluate((element) => parseFloat(getComputedStyle(element).fontSize) >= 16), 'primary CTA copy must be readable');
       let lastTop = 0;
-      for (const selector of ['#fresh-proof', '#crew', '#how', '#working-rat', '#telegram']) {
+      for (const selector of ['#fresh-proof', '#crew', '#telegram', '#how', '#working-rat']) {
         const box = await page.locator(selector).boundingBox();
         assert.ok(box && box.y > lastTop, `homepage order drift: ${selector}`);
         lastTop = box.y;
@@ -59,7 +59,12 @@ const viewports = [
       await page.locator('[data-open-case]').first().click();
       await page.locator('#drawer.open').waitFor();
       assert.match(await page.locator('#drawer').innerText(), /NOT LIVE EVIDENCE/);
-      assert.match(await page.locator('.case-next-step').innerText(), /TRIPWIRE · BUILDING[\s\S]*not available yet/);
+      assert.match(await page.locator('.case-opening').innerText(), /RAT ZERO FOUND SOMETHING\.[\s\S]*SMELLS FAMILIAR\.[\s\S]*8 earlier indexed launches/);
+      assert.match(await page.locator('.case-path').innerText(), /WHAT[\s\S]*TRAIL[\s\S]*RECEIPTS[\s\S]*NEXT/);
+      assert.match(await page.locator('#drawer').innerText(), /01 \/ SUPPORTED FACTS[\s\S]*02 \/ FOLLOW THE TRAIL/);
+      assert.match(await page.locator('.case-next-step').innerText(), /NEXT \/ CURRENT WATCH[\s\S]*Where enabled, Watch can alert you[\s\S]*Watch is not Tripwire[\s\S]*TRIPWIRE · BUILDING[\s\S]*Persistent Tripwire jobs are not available yet/);
+      assert.equal(await page.locator('.case-next-step a[href="https://t.me/BinratBot"]').count(), 1);
+      assert.equal(await page.locator('[data-copy-watch-subject]').count(), 1);
       await page.locator('[data-crew-handoff]').click();
       await page.waitForFunction(() => !document.querySelector('#drawer').classList.contains('open'));
       await page.locator('#crew-selected[data-rat="tripwire"]').waitFor();
@@ -87,12 +92,11 @@ const viewports = [
       await page.locator('.brand').click();
       await page.waitForFunction(() => document.body.dataset.view === 'home');
       assert.equal(await primary.isVisible(), true);
-      if (viewport.width <= 760) await page.locator('.section-nav summary').click();
-      const denLink = viewport.width <= 760 ? page.locator('.section-nav a[href="#den"]') : page.locator('.site-header > nav a[href="#den"]');
-      await denLink.click();
+      assert.equal(await page.locator('.site-header > nav a[href="#den"]').count(), 0);
+      assert.equal(await page.locator('.section-nav a[href="#den"]').count(), 0);
+      await page.locator('.availability-note a[href="#den"]').click();
       await page.locator('#den').waitFor();
       assert.match(await page.locator('#den').innerText(), /THE DEN · PLANNED · POST-LAUNCH[\s\S]*No production workforce/);
-      if (viewport.width <= 760) assert.equal(await page.locator('.section-nav').getAttribute('open'), null);
       assert.equal(await page.locator('.telegram-return a[href="https://t.me/BinratBot"]').count(), 1);
       assert.deepEqual(writes, [], 'browsing cannot create jobs or send writes');
       assert.deepEqual(errors, [], `page errors at ${viewport.width}`);
