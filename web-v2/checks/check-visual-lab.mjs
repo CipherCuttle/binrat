@@ -87,4 +87,5 @@ execFileSync(process.execPath, ["--import", "tsx", fileURLToPath(new URL("./chec
 
 if (!app.includes("PonsCasePreview") || !app.includes('get("ponsPreview") === "1"')) throw new Error("PONS_PREVIEW_ROUTE_NOT_ISOLATED");
 execFileSync(process.execPath, ["--test", fileURLToPath(new URL("./check-pons-readonly-preview.mjs", import.meta.url))], { stdio: "inherit" });
+execFileSync(process.execPath, ["--test", fileURLToPath(new URL("./check-pons-preview-proxy.mjs", import.meta.url))], { stdio: "inherit" });
 console.log("BINRAT visual lab invariants: PASS");

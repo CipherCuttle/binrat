@@ -1,0 +1,1280 @@
+[
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-desktop-D-1nZZBT.webp"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/foreground-trash-C7D_WlxW.webp"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "1440x900",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "390x844",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-desktop-D-1nZZBT.webp"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/foreground-trash-C7D_WlxW.webp"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "768x1024",
+    "simulated": false,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "wrong-chain",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "bad-digest",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "checkpoint-hash",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "no-snapshot",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "http-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "future-timestamp",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "expired-freshness",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "verified-stale",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "healthy-empty",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "missing-history-and-optional-data",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "rapid-case-selection",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "selected-case-disappears-initial",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "selected-case-disappears-explicit",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "retained-snapshot-after-503",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "canonical-same-checkpoint-conflict",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "hidden-tab-expiry",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "resume-before-throttled-expiry-timer",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/?visual=lab&ponsPreview=1"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-DgqaOdY_.js"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/index-BWaasxZz.css"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/alley-bg-mobile-BRoLZHcq.webp"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-sans.woff2"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/fonts/geist-mono.woff2"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/launches/latest"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/api/status"
+  },
+  {
+    "label": "missing-symbol-with-supported-name",
+    "simulated": true,
+    "method": "GET",
+    "url": "http://127.0.0.1:4188/assets/case-neon-alley-Bn3JoOEU.webp"
+  }
+]

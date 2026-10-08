@@ -90,3 +90,17 @@ test("future timestamps fail closed", async () => {
   const data = await dataset(); data.status.verifiedAtMs = now + 1000;
   await assert.rejects(loadPonsPreview({ fetchImpl: mock(data), now: () => now }), /PONS_PREVIEW_FUTURE_TIMESTAMP/);
 });
+test("a subsequent canonical snapshot cannot regress or change the same checkpoint", async () => {
+  const initial = await dataset();
+  const previous = await loadPonsPreview({ fetchImpl: mock(initial), now: () => now });
+  for (const kind of ["block", "hash", "publication", "time"]) {
+    const data = await dataset();
+    if (kind === "block") { data.feed.sourceCheckpoint = "99"; data.status.checkpointBlock = "99"; }
+    if (kind === "hash") { data.feed.checkpointBlockHash = "0x" + "f".repeat(64); data.status.checkpointBlockHash = data.feed.checkpointBlockHash; }
+    if (kind === "publication") { previous.status.publicationVersion = 2; }
+    if (kind === "time") { data.status.verifiedAtMs -= 1; }
+    data.feed.feedDigest = await canonicalSnapshotDigest(data.feed); data.status.feedDigest = data.feed.feedDigest;
+    await assert.rejects(loadPonsPreview({ fetchImpl: mock(data), now: () => now, previous }), /PONS_PREVIEW_(CHECKPOINT|PUBLICATION)_(REGRESSION|CONFLICT)/);
+    previous.status.publicationVersion = 1;
+  }
+});

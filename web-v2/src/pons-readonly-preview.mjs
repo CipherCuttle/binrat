@@ -15,7 +15,7 @@ async function readJson(fetchImpl, path, signal) {
 }
 
 /** No fallback to synthetic data, ARC feeds, or another checkpoint. */
-export async function loadPonsPreview({ fetchImpl = globalThis.fetch, signal, now = Date.now } = {}) {
+export async function loadPonsPreview({ fetchImpl = globalThis.fetch, signal, now = Date.now, previous } = {}) {
   const raw = await readJson(fetchImpl, "/api/launches/latest", signal);
   const feed = adaptLatestLaunches(raw);
   // Check canonical digest AND every adapted displayed launch field.
@@ -23,6 +23,15 @@ export async function loadPonsPreview({ fetchImpl = globalThis.fetch, signal, no
   const status = validatePublicStatus(await readJson(fetchImpl, "/api/status", signal));
   if (status.state === "NO_VERIFIED_SNAPSHOT") throw new Error("PONS_PREVIEW_NO_VERIFIED_SNAPSHOT");
   if (!bindingMatches(binding, status)) throw new Error("PONS_PREVIEW_BINDING_MISMATCH");
+  if (previous) {
+    if (BigInt(status.checkpointBlock) < BigInt(previous.status.checkpointBlock)) {
+      throw new Error("PONS_PREVIEW_CHECKPOINT_REGRESSION");
+    }
+    if (status.checkpointBlock === previous.status.checkpointBlock &&
+      !bindingMatches(binding, previous.status)) throw new Error("PONS_PREVIEW_CHECKPOINT_CONFLICT");
+    if (status.publicationVersion < previous.status.publicationVersion ||
+      status.verifiedAtMs < previous.status.verifiedAtMs) throw new Error("PONS_PREVIEW_PUBLICATION_REGRESSION");
+  }
   if (status.verifiedAtMs > now() ||
     (status.runtimeUpdatedAtMs !== null && status.runtimeUpdatedAtMs > now())) {
     throw new Error("PONS_PREVIEW_FUTURE_TIMESTAMP");

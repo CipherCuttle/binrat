@@ -342,4 +342,7 @@
 .vl-pons-preview .vl-stage p, .vl-pons-preview .vl-evidence-surface p { overflow-wrap: anywhere; }
 .vl-pons-preview .vl-receipt-body dd, .vl-pons-preview .vl-receipt-body pre { overflow-wrap: anywhere; word-break: break-word; }
 .vl-pons-preview .vl-find { max-width: 260px; }
+.vl-pons-preview .vl-find-rail { min-width: 0; overflow-x: auto; }
+.vl-pons-preview .vl-find { flex: 0 0 175px; }
+.vl-pons-preview .vl-footer > span { display: block; overflow-wrap: anywhere; }
 @media (max-width: 700px) { .vl-pons-preview .vl-command { gap: 12px; flex-wrap: wrap; } .vl-pons-preview .vl-find { min-width: 140px; } }

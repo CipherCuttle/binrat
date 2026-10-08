@@ -1,0 +1,29 @@
+{
+  "receiptScope": "PREVIOUS_CI_READBACK_NOT_CURRENT_PROVIDER_QUERY",
+  "ciRun": "https://github.com/CipherCuttle/binrat/actions/runs/37673392606",
+  "origin": "https://binrat-read-plane-stability-candidate.pettevik.workers.dev",
+  "workerName": "binrat-read-plane-stability-candidate",
+  "workerRevisionId": "1f68b4d6-3a57-4022-bb3b-c4496b864bcb",
+  "activeVersions": [
+    {
+      "id": "1f68b4d6-3a57-4022-bb3b-c4496b864bcb",
+      "percentage": 100
+    }
+  ],
+  "sourceSha": "e34a94cf1702340582266852495e28423728add0",
+  "buildId": "8e920ed18db6761fbe8b5b2825ed489050448ce9c8d6878af202a11208ac96b1",
+  "workerSha256": "ff32ecdedf0585552b2aec7235ce46f017f4e2f35e72b74e413806ac8235a50f",
+  "assetsDigest": "e5ad437248f0a84214b39627ec88397dc099e7e986aac65dd427490b0ce8e9ed",
+  "readbackSource": "CLOUDFLARE_READ_ONLY",
+  "capturedAtMs": 1791400742462,
+  "cronReadback": [
+    "* * * * *"
+  ],
+  "runtimeSemantics": {
+    "configurationSource": "CLOUDFLARE_READ_ONLY_SCHEDULE_AND_REVIEWED_CACHE_HEADERS",
+    "publicationIntervalMs": 60000,
+    "statusCacheTtlMs": 5000,
+    "feedSharedCacheTtlMs": 60000,
+    "maxStatusAgeMs": 180000
+  }
+}

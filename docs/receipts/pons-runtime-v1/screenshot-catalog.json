@@ -1,0 +1,44 @@
+[
+  {
+    "file": "desktop.png",
+    "evidence": "REAL_PUBLIC_GET",
+    "sha256": "dfa82cc144ab9372cc4dc5e389eb833494f9e66a65c0143843b980c3b990ee12",
+    "bytes": 1928769
+  },
+  {
+    "file": "mobile.png",
+    "evidence": "REAL_PUBLIC_GET",
+    "sha256": "7c8c5256d92cd1259670ba8162c24d54cd47659b7eb41e9c14597482d228167d",
+    "bytes": 478838
+  },
+  {
+    "file": "tablet.png",
+    "evidence": "REAL_PUBLIC_GET",
+    "sha256": "3439256d233d4be4b60a4dac1fcf4926ad8ce7a829a806440d5284846468a218",
+    "bytes": 1068887
+  },
+  {
+    "file": "trail.png",
+    "evidence": "REAL_PUBLIC_GET",
+    "sha256": "1a777610a6967a9ccd48fe8423a5b1ad1296c168b1615816a154ff44a1e54386",
+    "bytes": 561111
+  },
+  {
+    "file": "receipts.png",
+    "evidence": "REAL_PUBLIC_GET",
+    "sha256": "30182e58e54c1920c08c5c08f5e629a87bc05a92c5239dd0a8957b84b2f874bf",
+    "bytes": 902670
+  },
+  {
+    "file": "next.png",
+    "evidence": "REAL_PUBLIC_GET",
+    "sha256": "d76942f71877647d3f2c5e73edf435129fa30f845f8cff89b38367a136219edc",
+    "bytes": 642048
+  },
+  {
+    "file": "SIMULATED-unavailable.png",
+    "evidence": "SIMULATED_ADVERSE_CONTROL",
+    "sha256": "57e9254235f420807facabafacef52b933954ded6a639b57253a84ab20d6b70a",
+    "bytes": 483317
+  }
+]

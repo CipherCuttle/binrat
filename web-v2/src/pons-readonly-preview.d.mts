@@ -23,6 +23,9 @@ export type PonsPreview = {
     checkpointBlockHash: string;
     feedDigest: string;
     verifiedAtMs: number;
+    runtimeUpdatedAtMs: number | null;
+    publicationVersion: number;
+    lastSyncError: string | null;
     freshnessValidUntilMs: number | null;
   };
   freshness: "FRESH_VERIFIED" | "STALE_VERIFIED";
@@ -32,4 +35,5 @@ export function loadPonsPreview(options?: {
   fetchImpl?: typeof fetch;
   signal?: AbortSignal;
   now?: () => number;
+  previous?: PonsPreview | null;
 }): Promise<PonsPreview>;

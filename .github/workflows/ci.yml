@@ -25,6 +25,54 @@ jobs:
       - name: Check isolated Product Surface V2
         run: pnpm --dir web-v2 check
 
+  pons-case-runtime-proof:
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/binrat-pons-case-preview-v1' }}
+    needs: [check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir web-v2 check
+      - name: Install pinned native browser runner
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pons-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/pons-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Real Pons GET journey and simulated adverse controls
+        env:
+          BINRAT_PONS_PREVIEW: '1'
+          BINRAT_PREVIEW_URL: http://127.0.0.1:4188
+          BINRAT_PONS_OUTPUT: browser-artifacts/pons-runtime
+          BINRAT_VISUAL_OUTPUT: browser-artifacts/pons-default-lab
+        run: |
+          pnpm --dir web-v2 exec vite preview --host 127.0.0.1 --port 4188 > "$RUNNER_TEMP/pons-vite.log" 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4188/ >/dev/null; then break; fi
+            if [ "$attempt" -eq 30 ]; then cat "$RUNNER_TEMP/pons-vite.log"; exit 1; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/pons-playwright/node_modules" node web-v2/checks/pons-runtime-browser.cjs
+          NODE_PATH="$RUNNER_TEMP/pons-playwright/node_modules" node web-v2/checks/visual-lab-browser.cjs
+      - name: Preserve exact-head public receipts and browser proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pons-case-runtime-proof-${{ github.event.pull_request.head.sha }}
+          path: browser-artifacts/pons-*/
+          retention-days: 14
+          if-no-files-found: warn
+
   pons-preflight-live-readonly:
     if: ${{ github.event_name == 'pull_request' && (startsWith(github.head_ref, 'feat/binrat-pons-') || startsWith(github.head_ref, 'feat/binrat-exact-pons-') || startsWith(github.head_ref, 'feat/binrat-working-rat-') || startsWith(github.head_ref, 'integration/binrat-pons-') || github.head_ref == 'integration/binrat-launch-night-v1') }}
     runs-on: ubuntu-latest
