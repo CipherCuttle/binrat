@@ -33,7 +33,7 @@ At cutoff T, predict **CONVERGENCE_CANDIDATE** for 30-day public launch *only if
 
 1. Source-literal, target-matched OPEN_BLOCKER exists at or before T; every publicly documented blocker known by T has an explicit corresponding BLOCKER_CLOSED receipt by T. **No blocker found is UNKNOWN, not closed.**
 2. The most recent required blocker closure occurs **strictly before** a qualifying EXECUTION_COMMITMENT; closure-to-execution lag is at most **30 calendar days**.
-3. Execution is verifiable by an authoritative artifact **and** at least one independent source origin; do not count two mirrors of the same announcement as independence.
+3. Execution is verifiable by an authoritative artifact **and** at least one independent source origin; do not count two mirrors of the same announcement as independence. An official announcement plus the same announcement reposted by a block explorer is not independent. Read-only verification of the underlying chain transaction or signed production artifact is independent only if the artifact itself can be examined and bound to the specific target.
 4. Execution is no older than **30 calendar days** at cutoff T. No intervening reopened blocker is still unresolved at T.
 5. Execution is for the **same targetId and public-launch phase**, not a predecessor production chain, migration, devnet, testnet, or unconnected token TGE.
 6. The target was **not publicly launched** at or before T; launch-day or later evidence cannot enter the prediction.
@@ -57,7 +57,7 @@ Collection protocol:
 6. Record all exclusions and source searches, including failed searches. Never replenish weak cases with newly discovered winners without a **new preregistration**.
 7. Evaluator and outcome labeler must be logically separated; replay uses date-filtered evidence, not the project's future outcomes.
 
-This protocol needs independent held-out delayed **project episodes** in addition to historical launchers. Within the sealed roster, freeze at most one 90-day delayed-control anchor per project: first qualifying V0 `PRODUCTION_PREP`/ `ARMED` observation strictly before the public launch, if any, followed by >90 days of non-launch; or first qualifying anchor on a still-unlaunched verified project. An anchor is chosen **by first V0 trigger**, not by inspecting whether the V1 rule fails. If fewer than five V0-positive delayed anchors are available, the claimed false-clock reduction is `INSUFFICIENT_DATA`.
+This protocol needs independent held-out delayed **project episodes** in addition to historical launchers. For each sealed project, select **at most one** delayed-control anchor in a receipt-only first pass: the **first chronological V0 `PRODUCTION_PREP` or `ARMED`** observation for the exact target, after the first available target-specific production-readiness receipt. Do not consult the outcome date when choosing the anchor, skip to a later anchor, or require the eventual outcome to be negative when choosing it. In the second pass, label that *already-frozen anchor* as a valid delayed negative only if the project had not launched by T and remained publicly unlaunched for >=90 complete days after T; otherwise classify positive / insufficient or postlaunch-ineligible as appropriate. An anchor found to be too close to launch is **not replaced**. If fewer than five V0-positive delayed anchors are available, the claimed false-clock reduction is `INSUFFICIENT_DATA`.
 
 The 12-target pool is mostly rollups (10 rollup targets, 2 other chain/appchain targets). Conclusions may not be transported to L1s or token launches.
 
@@ -67,7 +67,7 @@ For VERIFIED historical launch targets, replay at `launchOn - [180,90,45,30,14,7
 
 At each delayed-control trigger, label false clock only if >=90 complete days of subsequent public non-launch are verified. Unresolved right-censored projects require verified observation-through date; less than 90 days => PARTIAL. Report the 31–89 day subgroup separately. Count projects, not individual correlated replay snapshots, as the primary unit.
 
-**Baseline**: run frozen Pressure V0 on precisely the same receipts-as-of-T and targets; NEVER modify V0 on this branch.
+**Baseline**: run frozen Pressure V0 on the **same timestamped underlying public-source corpus, target and cutoff**, but apply its existing P1–P6 evidence ontology. V1 uses separately typed blocker/closure/action receipts. Document every mapping and ambiguity; a V1 `BLOCKER_CLOSED` receipt cannot be silently passed as a V0 P4 audit closure, and vice versa. NEVER modify V0 or introduce additional future evidence for the baseline.
 
 Publish at minimum:
 - 14-day recall per VERIFIED launcher project: convergence candidate at T=launch-14.
