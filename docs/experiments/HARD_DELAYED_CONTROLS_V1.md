@@ -45,18 +45,17 @@ No V0 threshold or family definition is changed.
 
 Planned target: **10 strict controls**.
 
-Final strict cohort after hostile review and targeted extension: **6**.
+Final strict cohort after targeted evidence rereview: **5**.
 
-Target status: **NOT MET (6/10)**.
+Target status: **NOT MET (5/10)**.
 
-The missing six are not backfilled with weaker evidence.
+The five missing cases are not backfilled with weaker evidence.
 
 ## Frozen controls
 
 | Project | Trigger | Active V0 families | Outcome lag |
 | --- | --- | --- | ---: |
 | Tari Minotari | 2023-12-14 | P4 audit remediation + P5 release candidate | 509d |
-| ZetaChain | 2023-06-08 | P4 audit remediation + P6 genesis token distribution | 237d |
 | Neon EVM | 2022-12-12 | P4 audit remediation + P3 production infrastructure | 217d |
 | Namada | 2024-08-15 | P5 mainnet release candidate + P6 genesis distribution files | 110d |
 | zkSync Era | 2022-12-13 | P2 restricted production deployment + P4 public remediation audit | 101d |
@@ -65,10 +64,10 @@ The missing six are not backfilled with weaker evidence.
 Frozen lag summary:
 
 - minimum: **100 days**
-- median: **163.5 days**
+- median: **110 days**
 - maximum: **509 days**
 
-All six evaluate as `PRODUCTION_PREP` under the unchanged V0 rule.
+All five evaluate as `PRODUCTION_PREP` under the unchanged V0 rule.
 
 ## Why each case qualifies
 
@@ -79,17 +78,6 @@ On 2023-12-14 Tari reported that base-node and wallet audit issues had been addr
 That is clean P4 + P5.
 
 Genesis was not mined until 2025-05-06.
-
-### ZetaChain
-
-Public GitHub history shows:
-
-- 2023-05-16: Zellic audit fixes;
-- 2023-06-08: genesis token-distribution refactor.
-
-That is clean P4 + P6.
-
-Mainnet Beta did not launch until 2024-01-31.
 
 ### Neon EVM
 
@@ -133,10 +121,9 @@ Mainnet launched on 2021-11-09, 100 days later.
 
 ## Combination result
 
-Each admitted counterexample uses a different two-family combination:
+Five admitted cases span four two-family combinations:
 
 - `AUDIT_REMEDIATION + RELEASE_CANDIDATE`: 2
-- `AUDIT_REMEDIATION + TOKEN_DISTRIBUTION`: 1
 - `AUDIT_REMEDIATION + PRODUCTION_INFRA`: 1
 - `AUDIT_REMEDIATION + PRODUCTION_DEPLOYMENT`: 1
 - `RELEASE_CANDIDATE + TOKEN_DISTRIBUTION`: 1
@@ -189,6 +176,10 @@ No ontology was expanded to save a case.
 
 ## Other rejected / non-admitted candidates
 
+### ZetaChain
+
+The May 2023 commit titled `Zelic audit fixes` establishes code changes, not source-literal **final audit remediation or fix-review closure** at the 2023-06-08 cutoff. The available Zellic reports were published later, so they cannot be backdated into that cutoff. P6 genesis token distribution is valid, but P4 is unverified under the frozen strict ontology. Excluded pending an authoritative point-in-time P4 closure receipt.
+
 ### Sonic
 
 Early “mainnet” genesis and bootnode artifacts are entangled with migration from the already-live Fantom/Opera network. Target provenance is ambiguous.
@@ -225,7 +216,7 @@ The following simple claim is falsified:
 
 One valid counterexample would falsify that universal claim.
 
-This benchmark contains six strict counterexamples, spanning five different family combinations and delays from 100 to 509 days.
+This benchmark contains five strict counterexamples, spanning four different family combinations and delays from 100 to 509 days.
 
 This does **not** erase Benchmark V1's observation that V0 clustered near the final two weeks for 5/7 coverage-verified launchers.
 
@@ -241,7 +232,7 @@ They are not equivalent.
 
 ## Pressure V1 hypothesis
 
-Do not tune V0 on these four cases.
+Do not tune V0 on these five cases.
 
 A future V1 should be preregistered around a different causal model:
 
@@ -284,7 +275,7 @@ Candidate V1 concepts:
 
 ## Verdict
 
-- target of 10 strict controls: **NOT MET (6/10)**
+- target of 10 strict controls: **NOT MET (5/10)**
 - admitted evidence quality: **PASS FOR FALSIFICATION**
 - V0 as a universal <=90d clock: **FALSIFIED**
 - V0 as a late readiness alert: **STILL POTENTIALLY USEFUL**

@@ -23,35 +23,9 @@ export const HARD_DELAYED_CONTROLS_V1: readonly HardDelayedControl[] = [
     outcome: {
       kind: 'HISTORICAL_LAUNCH',
       launchOn: '2025-05-06',
-      sourceRef: 'https://rfc.tari.com/print'
+      sourceRef: 'https://github.com/tari-project/tari/blob/development/changelog-Mainnet.md'
     },
     notes: 'Official update says base-node and wallet audit issues were addressed and publishes the first release candidate believed to contain mainnet code, while explicitly saying it was not the mainnet release.'
-  },
-  {
-    projectId: 'zetachain',
-    targetLabel: 'ZetaChain Mainnet Beta',
-    triggerOn: '2023-06-08',
-    pressure: {
-      projectId: 'zetachain',
-      receipts: [
-        {
-          observedOn: '2023-05-16',
-          kind: 'AUDIT_REMEDIATION',
-          sourceRef: 'https://github.com/zeta-chain/node/commit/fb530a2ea4dbc508f2785a8bfcbb684eb1c9db27'
-        },
-        {
-          observedOn: '2023-06-08',
-          kind: 'TOKEN_DISTRIBUTION',
-          sourceRef: 'https://github.com/zeta-chain/node/commit/1d27bdfe73fd121324b39053b04e19b54066ecfe'
-        }
-      ]
-    },
-    outcome: {
-      kind: 'HISTORICAL_LAUNCH',
-      launchOn: '2024-01-31',
-      sourceRef: 'https://www.zetachain.com/blog/zetachain-mainnet-beta-is-live'
-    },
-    notes: 'Public code shows Zellic audit fixes followed by genesis token-distribution work. Mainnet Beta arrived many months later.'
   },
   {
     projectId: 'neon-evm',
