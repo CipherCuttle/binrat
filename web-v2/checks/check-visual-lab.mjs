@@ -1,12 +1,15 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const app = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const lab = readFileSync(new URL("../src/VisualLab.tsx", import.meta.url), "utf8");
 const css = readFileSync(new URL("../src/visual-lab.css", import.meta.url), "utf8");
+const fixtures = readFileSync(new URL("../src/visual-lab-fixtures.ts", import.meta.url), "utf8");
 
 for (const marker of [
-  'VISUAL LAB · SYNTHETIC · NO LIVE EVIDENCE',
+  'SYNTHETIC · NO LIVE EVIDENCE',
   'RAT ZERO FOUND SOMETHING.',
   'SMELLS FAMILIAR.',
   'WHAT',
@@ -20,7 +23,7 @@ for (const marker of [
   'SNIFFER',
   'PROVING',
 ]) {
-  if (!lab.includes(marker)) throw new Error(`VISUAL_LAB_MARKER_MISSING:${marker}`);
+  if (!(lab + fixtures).includes(marker)) throw new Error(`VISUAL_LAB_MARKER_MISSING:${marker}`);
 }
 
 for (const material of ['glass', 'refract', 'pearl']) {
@@ -35,11 +38,11 @@ if (!app.includes('get("visual") === "lab"') || !app.includes('page: "visual-lab
 if (!lab.includes('/crew/rat-avatar-48.png') || !lab.includes('/crew/tripwire.png') || !lab.includes('/crew/sniffer.png')) {
   throw new Error("VISUAL_LAB_CANONICAL_CREW_ASSETS_MISSING");
 }
-if (lab.includes("fetch(")) throw new Error("VISUAL_LAB_NETWORK_ACCESS");
+if (/\b(fetch|XMLHttpRequest|WebSocket)\s*\(/.test(lab + fixtures)) throw new Error("VISUAL_LAB_NETWORK_ACCESS");
 if (/\b(BUY NOW|APY|SAFE SCORE|RUG PROBABILITY|GUARANTEED SAFE)\b/i.test(lab)) {
   throw new Error("VISUAL_LAB_UNSUPPORTED_PRODUCT_CLAIM");
 }
-if (!css.includes("backdrop-filter") || !css.includes("@keyframes vlPearl")) {
+if (!css.includes("backdrop-filter") || !["vl-hero-surface", "vl-evidence-surface", "vl-utility"].every((name) => lab.includes(name) && css.includes(name))) {
   throw new Error("VISUAL_LAB_HOLOGRAPHIC_MATERIAL_MISSING");
 }
 if (!css.includes("@media (prefers-reduced-motion:reduce)")) {
@@ -61,6 +64,7 @@ for (const path of [
   "scene/alley-bg-desktop.webp", "scene/alley-bg-mobile.webp",
   "foreground/ratzero-dumpster-desktop.webp", "foreground/ratzero-dumpster-mobile.webp",
   "foreground/foreground-trash.webp",
+  "case-scenes/case-neon-alley.webp",
 ]) {
   const bytes = readFileSync(new URL(path, artworkRoot));
   if (bytes.toString("ascii", 0, 4) !== "RIFF" || bytes.toString("ascii", 8, 12) !== "WEBP") {
@@ -74,8 +78,11 @@ if (/vl-sky|vl-city|vl-grid-glow|vl-ground-glow/.test(lab + css)) {
 if ((lab.match(/className="vl-rat-scene"/g) || []).length !== 1) {
   throw new Error("VISUAL_LAB_DUPLICATE_RAT_FOREGROUND");
 }
-if (/public\/visual-lab\/(case-scenes|decals)\//.test(lab)) {
-  throw new Error("VISUAL_LAB_CASE_SCENE_OR_DECAL_MOUNTED");
+if (!lab.includes("ILLUSTRATION ONLY") || /vl-case-art-grid/.test(lab + css)) {
+  throw new Error("VISUAL_LAB_CASE_ART_BOUNDARY_MISSING");
 }
+if (!lab.includes('get("visualDebug") === "1"') || !lab.includes('{debug &&')) throw new Error("VISUAL_LAB_DEBUG_CONTROLS_NOT_GATED");
+
+execFileSync(process.execPath, ["--import", "tsx", fileURLToPath(new URL("./check-visual-lab-fixtures.ts", import.meta.url))], { stdio: "inherit" });
 
 console.log("BINRAT visual lab invariants: PASS");
