@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { AlleyWorld } from "./VisualLab";
+import caseScene from "../public/visual-lab/case-scenes/case-neon-alley.webp";
 import { loadPonsPreview, type PonsCase, type PonsPreview } from "./pons-readonly-preview.mjs";
 import "./visual-lab.css";
 
@@ -95,10 +96,10 @@ export function PonsCasePreview() {
         </div>}
       </section>
       {data && selectedId && !active && <p role="alert">Selected Case unavailable in this verified checkpoint. No replacement Case was selected.</p>}
-      {active && <article id="vl-case" className="vl-hero-surface" data-case={active.id}>
+      {data && active && <article id="vl-case" className="vl-hero-surface" data-case={active.id}>
         <div className="vl-case-topline"><span>RAT ZERO / CASE <b>{active.id.slice(0, 10)}…</b></span><span className="vl-case-status">{readState}</span></div>
         <div className="vl-case-hero">
-          <figure className="vl-case-art"><img src="/visual-lab/case-scenes/case-neon-alley.webp" alt="Decorative neon BINRAT alley illustration" /><figcaption>ILLUSTRATION ONLY · NOT EVIDENCE</figcaption></figure>
+          <figure className="vl-case-art"><img src={caseScene} alt="Decorative neon BINRAT alley illustration" /><figcaption>ILLUSTRATION ONLY · NOT EVIDENCE</figcaption></figure>
           <div className="vl-case-intro">
             <span className="vl-alert">RAT ZERO FOUND A PONS LAUNCH.</span>
             <h1>{active.priorLaunches > 0 ? "SMELLS FAMILIAR." : "FRESH SCRAP."}</h1>
