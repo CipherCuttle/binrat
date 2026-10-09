@@ -1,0 +1,59 @@
+name: a2-case-intelligence
+on:
+  pull_request:
+    paths:
+      - "src/public/caseOutcomes.ts"
+      - "src/cloudflare/publicCaseOutcomes.ts"
+      - "web-v2/src/CaseOutcomeBrief.tsx"
+      - "web-v2/src/caseOutcomes.ts"
+      - "test/caseOutcomes.test.ts"
+      - "test/support/a2Specimen.ts"
+      - "docs/receipts/sprint-a2/**"
+      - "web-v2/checks/*a2*"
+      - ".github/workflows/a2-case-intelligence.yml"
+permissions:
+  contents: read
+jobs:
+  compiled-case:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        with:
+          ref: 30564864f5d406414f0c09c4d2ba2be5d1e79ab8
+          path: .artifacts/a2-baseline
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile && pnpm build
+      - run: pnpm exec tsx --test test/caseOutcomes.test.ts
+      - run: pnpm --dir web-v2 build:production
+      - name: Compile exact deployed A1 baseline
+        working-directory: .artifacts/a2-baseline
+        run: pnpm install --frozen-lockfile && pnpm build && pnpm --dir web-v2 build:production
+      - name: Pinned native browser comparison and explicit adverse controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+          BINRAT_A1_WORKTREE="$PWD/.artifacts/a2-baseline" pnpm exec tsx web-v2/checks/serve-a2-preview.mjs > "$RUNNER_TEMP/a2-preview.log" 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4205/ > /dev/null; then break; fi
+            sleep 1
+          done
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-playwright/node_modules" node web-v2/checks/a2-case-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: a2-case-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/a2/browser/
+          retention-days: 14

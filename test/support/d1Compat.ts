@@ -65,7 +65,13 @@ class D1CompatPreparedStatement implements D1PreparedStatementLike {
   }
 
   runSync(): D1ResultLike {
-    const info = this.db.prepare(this.sql).run(...asSqliteValues(this.values));
+    const statement = this.db.prepare(this.sql);
+    if (statement.reader) return {
+      success: true,
+      results: statement.all(...asSqliteValues(this.values)) as Record<string, unknown>[],
+      meta: { changes: 0 }
+    };
+    const info = statement.run(...asSqliteValues(this.values));
     return { success: true, results: [], meta: { changes: Number(info.changes) } };
   }
 }
