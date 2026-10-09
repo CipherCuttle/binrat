@@ -137,3 +137,68 @@
   .a1-frontdoor .vl-scout-label { max-width: 130px; }
 }
 .a12-history-notice { order: 2; padding: 16px 22px; border-top: 1px solid #bec9f044; color: var(--vl-muted); line-height: 1.5; overflow-wrap: anywhere; }
+
+/* A1.3: readable controls over the approved alley; the Case action leads. */
+.a1-frontdoor .vl-command {
+  background: linear-gradient(112deg, #302440f5, #10172bf5 55%, #232547f5);
+}
+.a1-case-navigation .vl-utility {
+  background: #121b30ed;
+  color: #eef1ff;
+  border-color: #b0c4fb80;
+}
+.a1-frontdoor .vl-scout-label p {
+  background: #10172bed;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+.a1-frontdoor .vl-case-intro .vl-primary {
+  margin-top: 6px;
+}
+.a1-frontdoor .a12-history-notice {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #d0d4eb;
+  background: #10172bcc;
+  padding: 12px 16px;
+  border-bottom: 1px solid #bec9f044;
+}
+@media (max-width:700px) {
+  .a1-frontdoor .vl-command {
+    padding: 8px 10px;
+    border: 1px solid #b0c4fb7a;
+    border-radius: 10px;
+    gap: 10px;
+  }
+  .a1-frontdoor .vl-command .vl-lab-stamp {
+    grid-column: 1;
+    min-width: 0;
+  }
+  .a1-frontdoor .vl-lab-stamp b {
+    padding: 0;
+    background: transparent;
+    color: #eef1ff;
+  }
+  .a1-frontdoor .vl-command > .vl-utility {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+  .a1-frontdoor .vl-live {
+    background: #101c30f5;
+  }
+  .a1-case-navigation {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .a1-case-navigation .vl-utility {
+    min-height: 44px;
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+  .a1-case-navigation > span {
+    grid-column: 1 / -1;
+  }
+}
