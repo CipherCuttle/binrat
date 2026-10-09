@@ -88,7 +88,8 @@ def assets():
     # Discover the active entry and all absolute resource references transitively.
     def fetch_path(path):
         assert '..' not in Path(path).parts and not path.startswith('/')
-        a,raw=get(PRODUCTION+'/'+path);b,other=get(PREVIEW+'/'+path)
+        route='/' if path=='index.html' else '/'+path
+        a,raw=get(PRODUCTION+route);b,other=get(PREVIEW+route)
         fallback=path!='index.html' and raw.lstrip().lower().startswith((b'<!doctype html',b'<html'))
         valid=a==200 and b==200 and raw==other and not fallback
         if valid:
@@ -107,6 +108,7 @@ def assets():
                     path=match.group(1)[1:]
                     if path not in done:pending.add(path)
     verified=[x for x in done.values() if x['verified']]
+    save('rollback-assets-observation.json',list(done.values()))
     assert any(re.match(r'assets/frontdoor-candidate-.*\.js$',x['path']) for x in verified)
     assert any(re.match(r'assets/frontdoor-candidate-.*\.css$',x['path']) for x in verified)
     assert all(f['path'] in {x['path'] for x in verified} for f in manifest['files'] if not re.match(r'assets/frontdoor-candidate-.*\.(js|css)$',f['path']))
