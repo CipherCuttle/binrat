@@ -3,6 +3,9 @@ import { AlleyWorld } from "./VisualLab";
 import caseScene from "../public/visual-lab/case-scenes/case-neon-alley.webp";
 import { loadPonsPreview, loadPonsCreatorTrail, inspectPonsHistoricalSource, type PonsCase, type PonsPreview, type PonsCreatorTrail } from "./pons-readonly-preview.mjs";
 import { loadHistoricalCase, type HistoricalCaseItem } from "./historicalCase";
+import { loadCaseOutcomes } from "./caseOutcomes";
+import { CaseOutcomeBrief } from "./CaseOutcomeBrief";
+import type { VerifiedCaseOutcomes } from "../../src/public/caseOutcomes.js";
 import type { CaseEnvelope } from "../../src/public/caseEvidence.js";
 import "./visual-lab.css";
 import "./frontdoor-discovery.css";
@@ -31,6 +34,7 @@ export function PonsCasePreview() {
   const [retry, setRetry] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(requestedCase);
   const [historical, setHistorical] = useState<{ id: string; snapshot: PonsPreview; state: "VERIFIED_HISTORICAL" | "HISTORICAL_SOURCE_ONLY" | "UNAVAILABLE"; error: string; envelope?: CaseEnvelope; item?: HistoricalCaseItem } | null>(null);
+  const [outcomeState, setOutcomeState] = useState<{id:string;snapshot:PonsPreview;value?:VerifiedCaseOutcomes;error?:string} | null>(null);
   const [stage, setStage] = useState<Stage>("WHAT");
   const [trail, setTrail] = useState<PonsCreatorTrail | null>(null);
   const [trailError, setTrailError] = useState("");
@@ -111,6 +115,16 @@ export function PonsCasePreview() {
       });
     return () => { mounted = false; controller.abort(); };
   }, [selectedId, data, currentCase, loading]);
+  const outcomes = outcomeState?.id === selectedId && outcomeState.snapshot === data ? outcomeState : null;
+  useEffect(() => {
+    if (!active || !data || loading) return;
+    let mounted = true;
+    const controller = new AbortController();
+    loadCaseOutcomes({ id: active.id, snapshot: data, current: currentCase, signal: controller.signal })
+      .then(value => { if (mounted) setOutcomeState({id:active.id,snapshot:data,value}); })
+      .catch(cause => { if (mounted) setOutcomeState({id:active.id,snapshot:data,error:cause instanceof Error ? cause.message : "CASE_OUTCOMES_UNAVAILABLE"}); });
+    return () => { mounted = false; controller.abort(); };
+  }, [active?.id, currentCase, data, loading]);
   const filtered = filter === "familiar" ? cases.filter((item) => item.priorLaunches > 0) : cases;
   const visibleCases = expanded ? filtered : filtered.slice(0, 4);
   const isFresh = !error && data?.freshness === "FRESH_VERIFIED" &&
@@ -264,6 +278,8 @@ export function PonsCasePreview() {
           </button>)}
         </div>
         <section role="tabpanel" id={"vl-panel-" + stage} aria-labelledby={"vl-tab-" + stage} className="vl-stage" tabIndex={0}>
+          {stage !== "NEXT" && outcomes?.value && <CaseOutcomeBrief value={outcomes.value} stage={stage} fresh={isFresh} />}
+          {stage !== "NEXT" && !outcomes?.value && <p className="vl-provenance" role="status">{outcomes?.error ? "Outcome evidence unavailable at this checkpoint. Launch evidence remains separate; no outcome was inferred. (" + outcomes.error + ")" : "Checking this Case’s fixed-age outcome receipts…"}</p>}
           {stage === "WHAT" && <div className="vl-what">
             <div><span className="vl-eyebrow">WHY HE BROUGHT IT</span><h2>{tokenLabel(active)} · observed at block {active.block}</h2>
               <p>{active.priorLaunches > 0 ? "This reported deployer appears on earlier indexed launches. Follow the source records before drawing a conclusion." : "Pons reported this launch. No earlier matching launch is recorded in our partial index. Missing history is not a clean bill."}</p>
@@ -281,7 +297,7 @@ export function PonsCasePreview() {
             {!isHistorical && <a className="vl-text-action" href={"/api/creator/" + active.reportedCreatorAddress + "/summary"} target="_blank" rel="noreferrer">OPEN DEPLOYER SOURCE ↗</a>}</div>}
           {stage === "RECEIPTS" && <div className="vl-receipts-view"><div className="vl-stage-heading"><div><span className="vl-eyebrow">CHECK THE RECEIPTS</span><h2>Exact source-bound record.</h2></div></div>
             <details className="vl-receipt"><summary><strong>Pons indexed launch and checkpoint</strong> · EXPAND</summary>
-              <div className="vl-receipt-body"><dl><div><dt>Chain</dt><dd>Pons / Robinhood 4663</dd></div><div><dt>Block</dt><dd>{active.block}</dd></div><div><dt>Source receipt</dt><dd>{active.receipt}</dd></div><div><dt>{isHistorical ? "Case evidence digest" : "Feed digest"}</dt><dd>{isHistorical ? historicalEnvelope!.digest : currentCase!.feedDigest}</dd></div><div><dt>Verified at</dt><dd>{new Date(data.status.verifiedAtMs).toISOString()}</dd></div><div><dt>Source</dt><dd><a href={isHistorical ? "/api/bag/" + active.id + "/evidence" : sourceRoute} target="_blank" rel="noreferrer">{isHistorical ? "Canonical Case evidence envelope ↗" : "Same-origin Pons public feed ↗"}</a> · <a href={"/api/bag/" + active.id} target="_blank" rel="noreferrer">Exact Case source ↗</a></dd></div><div><dt>Limits</dt><dd>Partial index. Optional intelligence and replay are not shown. Human ownership, intent, sellability and profitability remain unknown.</dd></div></dl>
+              <div className="vl-receipt-body"><dl><div><dt>Chain</dt><dd>Pons / Robinhood 4663</dd></div><div><dt>Block</dt><dd>{active.block}</dd></div><div><dt>Source receipt</dt><dd>{active.receipt}</dd></div><div><dt>{isHistorical ? "Case evidence digest" : "Feed digest"}</dt><dd>{isHistorical ? historicalEnvelope!.digest : currentCase!.feedDigest}</dd></div><div><dt>Verified at</dt><dd>{new Date(data.status.verifiedAtMs).toISOString()}</dd></div><div><dt>Source</dt><dd><a href={isHistorical ? "/api/bag/" + active.id + "/evidence" : sourceRoute} target="_blank" rel="noreferrer">{isHistorical ? "Canonical Case evidence envelope ↗" : "Same-origin Pons public feed ↗"}</a> · <a href={"/api/bag/" + active.id} target="_blank" rel="noreferrer">Exact Case source ↗</a></dd></div><div><dt>Limits</dt><dd>Partial index. Outcome samples, when available, are limited to their recorded blocks. Archived replay is not shown. Human ownership, intent, sellability and profitability remain unknown.</dd></div></dl>
                 <pre tabIndex={0}>{JSON.stringify(isHistorical ? historicalEnvelope : { chainId: 4663, launchId: active.id, token: active.token, txHash: active.txHash, reportedDeployer: active.reportedCreatorAddress, blockNumber: active.block, checkpointBlock: data.status.checkpointBlock, checkpointBlockHash: data.status.checkpointBlockHash, feedDigest: data.status.feedDigest, priorLaunchCount: active.priorLaunches, coverage: "PARTIAL" }, null, 2)}</pre>
               </div></details><p className="vl-provenance">{isHistorical ? "Case digest, canonical launch/event identities, provenance derivation, window count and publication binding are checked. The index is the source authority; this is not independent RPC verification or archived replay." : "Feed/status digest binding is checked. This UI does not independently verify transaction execution from RPC."}</p></div>}
           {stage === "NEXT" && <div className="vl-next-view"><span className="vl-eyebrow">YOUR NEXT MOVE</span><h2>Inspect, then decide.</h2>

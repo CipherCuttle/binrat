@@ -158,7 +158,7 @@ async function visit(c, route) {
         `${w}: meaningful bounded TRAIL and recomputable complete RECEIPTS`,
         async () => {
           await p.getByRole("tab", { name: /TRAIL/ }).click();
-          assert.equal(await p.locator(".vl-source-trail li").count(), 20);
+          assert.equal(await p.locator(".vl-trail-view > .vl-source-trail li").count(), 20);
           assert.match(
             await p.getByRole("tabpanel").innerText(),
             /not the latest-feed count/,
@@ -170,8 +170,8 @@ async function visit(c, route) {
           );
           await capture(p, `trail-${w}x${h}`);
           await p.getByRole("tab", { name: /RECEIPTS/ }).click();
-          await p.locator("summary").click();
-          const shown = JSON.parse(await p.locator("pre").innerText());
+          await p.locator(".vl-receipts-view .vl-receipt summary").click();
+          const shown = JSON.parse(await p.locator(".vl-receipts-view pre").innerText());
           assert.equal(shown.digest, e.digest);
           assert.deepEqual(shown, e);
           assert.equal(
@@ -219,8 +219,8 @@ async function visit(c, route) {
           current.launchId,
         );
         await p.getByRole("tab", { name: /RECEIPTS/ }).click();
-        await p.locator("summary").click();
-        const receipt = JSON.parse(await p.locator("pre").innerText());
+        await p.locator(".vl-receipts-view .vl-receipt summary").click();
+        const receipt = JSON.parse(await p.locator(".vl-receipts-view pre").innerText());
         assert.equal(receipt.priorLaunchCount, current.priorLaunchCount);
         assert.equal(receipt.feedDigest, feed.feedDigest);
         assert.ok(
