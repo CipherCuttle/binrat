@@ -7,14 +7,24 @@ assert.equal(runner('playwright/package.json').version, '1.56.1');
 const { chromium } = runner('playwright');
 const base = process.env.BINRAT_FRONTDOOR_URL || 'http://127.0.0.1:4189';
 const origin = 'https://binrat.tech';
+const publicGet = async route => {
+  // Match the preview's bounded IPv4 GET transport; forward no browser credentials.
+  const {stdout}=await require('node:util').promisify(require('node:child_process').execFile)('curl',['-4','--silent','--show-error','--max-time','20','--write-out','\n%{http_code}',origin+route],{maxBuffer:2*1024*1024});
+  const split=stdout.lastIndexOf('\n');
+  return {status:Number(stdout.slice(split+1)),body:JSON.parse(stdout.slice(0,split))};
+};
 const out = path.resolve(process.env.BINRAT_LIVE_OUTPUT || '.artifacts/sprint-a1/live');fs.mkdirSync(out,{recursive:true});
-const report={provenance:'COMPILED_LOCAL_FRONTEND_REAL_PRODUCTION_PUBLIC_GETS',origin,checkedAt:new Date().toISOString(),checks:[],requests:[],errors:[],verdict:'FAIL'};
+const report={provenance:'COMPILED_LOCAL_FRONTEND_REAL_PRODUCTION_PUBLIC_GETS',origin,checkedAt:new Date().toISOString(),sourceSha:require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),checks:[],requests:[],errors:[],verdict:'FAIL'};
+fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(report,null,2)+'\n');
 (async()=>{const browser=await chromium.launch({headless:true});try{
   for(const [width,height] of [[1440,900],[768,1024],[390,844],[320,800]]){
     const c=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'});
     const p=await c.newPage();p.on('pageerror',e=>report.errors.push(e.message));
     const responses={};
-    await c.route('**/api/**',async r=>{const route=new URL(r.request().url()).pathname;assert.equal(r.request().method(),'GET');assert.ok(['/api/status','/api/launches/latest'].includes(route)||/^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(route));const response=await c.request.get(origin+route,{headers:{accept:'application/json'},timeout:20000});const body=await response.json();responses[route]=body;report.requests.push({method:'GET',route,status:response.status(),body});await r.fulfill({status:response.status(),contentType:'application/json',body:JSON.stringify(body)});});
+    await c.route('**/api/**',async r=>{const route=new URL(r.request().url()).pathname;assert.equal(r.request().method(),'GET');assert.ok(['/api/status','/api/launches/latest'].includes(route)||/^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(route));
+      try{const response=await publicGet(route);responses[route]=response.body;report.requests.push({method:'GET',route,status:response.status,body:response.body});await r.fulfill({status:response.status,contentType:'application/json',body:JSON.stringify(response.body)});}
+      catch(error){report.errors.push('PUBLIC_GET_TRANSPORT_FAILED:'+route);await r.fulfill({status:503,contentType:'application/json',body:'{"error":"PUBLIC_GET_TRANSPORT_FAILED"}'});}
+    });
     // Bounded real-source freshness sampling. Preserve every failed observation.
     for(let attempt=1;attempt<=3;attempt++){
       await p.goto(base,{waitUntil:'networkidle'});
@@ -44,7 +54,7 @@ const report={provenance:'COMPILED_LOCAL_FRONTEND_REAL_PRODUCTION_PUBLIC_GETS',o
       await p.screenshot({path:path.join(out,'trail.png')});
       await p.getByRole('tab',{name:/\bRECEIPTS\b/}).click();await p.locator('summary').click();
       const receipt=JSON.parse(await p.locator('pre').innerText());assert.equal(receipt.launchId,selected.launchId);assert.equal(receipt.token,selected.token);assert.equal(receipt.feedDigest,feed.feedDigest);assert.equal(receipt.priorLaunchCount,selected.priorLaunchCount);
-      const source=await c.request.get(origin+'/api/bag/'+selected.launchId);assert.equal(source.status(),200);const value=await source.json();assert.equal(value.bag.id,selected.launchId);report.exactCase=value;await p.screenshot({path:path.join(out,'receipts.png')});report.caseUrl=origin+'/bag/'+selected.launchId;
+      const source=await publicGet('/api/bag/'+selected.launchId);assert.equal(source.status,200);const value=source.body;assert.equal(value.bag.id,selected.launchId);report.exactCase=value;await p.screenshot({path:path.join(out,'receipts.png')});report.caseUrl=origin+'/bag/'+selected.launchId;
     }
     report.checks.push(`${width}x${height} fresh real feed, supported recurrence, exact Case and no overflow`);console.log('PASS '+report.checks.at(-1));await c.close();
   }
