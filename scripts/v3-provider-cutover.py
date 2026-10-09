@@ -269,9 +269,7 @@ def package_read():
     return manifest
 
 
-def billing_guard(gates):
-    baseline = read(gates['billingBaselinePath'])
-    current = read(gates['billingCurrentPath'])
+def budget_identity(baseline, current):
     require(current['readbackSource'] == 'AUTHENTICATED_OWNER_BROWSER_READ_ONLY' and current['scope'] == 'ACCOUNT_WIDE', 'BILLING_EVIDENCE_UNAUTHENTICATED')
     elapsed = (datetime.now(timezone.utc) - datetime.fromisoformat(current['observedAt'].replace('Z', '+00:00'))).total_seconds()
     require(0 <= elapsed < 600, 'BILLING_RECEIPT_TOO_OLD')
@@ -279,6 +277,10 @@ def billing_guard(gates):
     require(0 <= incremental <= 1 and float(current['displayedRemainingUsd']) >= 5, 'OWNER_BUDGET_STOP')
     return {'observedAt': current['observedAt'], 'usageUsd': current['computedUsageUsd'],
             'incrementalUsd': incremental, 'remainingUsd': current['displayedRemainingUsd']}
+
+
+def billing_guard(gates):
+    return budget_identity(read(gates['billingBaselinePath']), read(gates['billingCurrentPath']))
 
 
 def acceptance(manifest):
@@ -532,12 +534,28 @@ def rollback():
 def selftest():
     # Failure controls are exercised without credentials, network or mutations.
     count = 0
-    for condition, code in [(False, 'STALE_GATE'), (False, 'MODULE_DRIFT'), (False, 'WRONG_BINDING'), (False, 'BUDGET_STOP')]:
+    baseline = {'computedUsageUsd': 0.55}
+    current = {'computedUsageUsd': 0.56, 'displayedRemainingUsd': 9.44,
+               'readbackSource': 'AUTHENTICATED_OWNER_BROWSER_READ_ONLY', 'scope': 'ACCOUNT_WIDE', 'observedAt': now()}
+    require(round(budget_identity(baseline, current)['incrementalUsd'], 2) == 0.01, 'VALID_BUDGET_REJECTED')
+    for change, code in [({'computedUsageUsd': 1.551}, 'OWNER_BUDGET_STOP'),
+                         ({'displayedRemainingUsd': 4.99}, 'OWNER_BUDGET_STOP'),
+                         ({'observedAt': '2026-01-01T00:00:00+00:00'}, 'BILLING_RECEIPT_TOO_OLD'),
+                         ({'scope': 'ONE_APP'}, 'BILLING_EVIDENCE_UNAUTHENTICATED')]:
         try:
-            require(condition, code)
+            budget_identity(baseline, {**current, **change})
         except RuntimeError as error:
             require(str(error) == code, 'FAULT_CONTROL_FAILED')
             count += 1
+        else:
+            raise RuntimeError('INVALID_BUDGET_NOT_REJECTED')
+    try:
+        module_identity({'modules': [{'name': 'worker.js', 'content_base64': base64.b64encode(b'changed-module').decode()}]})
+    except RuntimeError as error:
+        require(str(error) == 'EXACT_BACKEND_MODULE_MISMATCH', 'MODULE_FAULT_CONTROL_FAILED')
+        count += 1
+    else:
+        raise RuntimeError('MODULE_DRIFT_NOT_REJECTED')
     secret = binding_map([{'name': 'RPC', 'type': 'secret_text', 'text': 'must-not-survive'}])
     require(secret == {'RPC': {'name': 'RPC', 'type': 'secret_text'}}, 'SECRET_SANITIZER_FAILED')
     fixture = {'bindings': {'DB': {'id': DB}}, 'runtime': {'compatibility_date': '2026-09-18'},
