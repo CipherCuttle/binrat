@@ -21,7 +21,7 @@
       "history": "PARTIAL",
       "resultLimit": 20,
       "countScope": "EARLIER_RECORDS_IN_RETURNED_WINDOW",
-      "olderLaunchesOmitted": true
+      "olderHistory": "NOT_ENUMERATED"
     },
     "priorLaunchCount": 19,
     "records": [
@@ -727,5 +727,5 @@
       }
     ]
   },
-  "digest": "5b85e1442a8ecdfba3246714dedde964d12e6fcf4b24cee20c8e96bc1459d00c"
+  "digest": "c2f0e7658021bc9587c265a3d172f230d4e203cc15b2ebfd24b049e6ed6ac1a3"
 }

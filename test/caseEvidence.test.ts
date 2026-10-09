@@ -196,8 +196,10 @@ test("publication movement and durable checkpoint hash contradiction fail closed
   const db = await capturedCaseDatabase();
   try {
     await db
-      .prepare("UPDATE chain_checkpoints SET block_hash=? WHERE chain_id=4663")
-      .bind("0x" + "f".repeat(64))
+      .prepare(
+        "UPDATE chain_checkpoints SET block_number=?,block_hash=? WHERE chain_id=4663",
+      )
+      .bind(capture.snapshot.checkpoint_block, "0x" + "f".repeat(64))
       .run();
     await assert.rejects(readPublicCaseEvidence(db, id), /SOURCE_MOVED/);
   } finally {
@@ -255,6 +257,78 @@ test("GET-only additive Worker route, missing evidence unavailable, legacy respo
       (await worker.fetch(new Request(url + "/evidence"), { DB: db })).status,
       503,
     );
+  } finally {
+    db.close();
+  }
+});
+
+test("a publication changing between the two snapshot SELECTs fails closed", async () => {
+  const db = await capturedCaseDatabase();
+  let reads = 0;
+  const spy: D1DatabaseLike = {
+    prepare(sql) {
+      const statement = db.prepare(sql);
+      if (!sql.includes("FROM binrat_public_snapshots")) return statement;
+      return {
+        bind(...values) {
+          const bound = statement.bind(...values);
+          return {
+            ...bound,
+            run: () => bound.run(),
+            all: () => bound.all(),
+            bind: (...more) => bound.bind(...more),
+            async first<T>() {
+              reads++;
+              if (reads === 2)
+                await db
+                  .prepare(
+                    "UPDATE binrat_public_snapshots SET publication_version=publication_version+1 WHERE chain_id=4663",
+                  )
+                  .run();
+              return bound.first<T>();
+            },
+          };
+        },
+        run: () => statement.run(),
+        all: () => statement.all(),
+        first: () => statement.first(),
+      };
+    },
+    batch: (s) => db.batch(s),
+    exec: (s) => db.exec(s),
+  };
+  try {
+    await assert.rejects(readPublicCaseEvidence(spy, id), /SOURCE_MOVED/);
+  } finally {
+    db.close();
+  }
+});
+test("oversized stored authority and a missing publication fail closed without truncation", async () => {
+  const db = await capturedCaseDatabase();
+  try {
+    await db
+      .prepare("UPDATE launches SET authority_json=? WHERE launch_id=?")
+      .bind("x".repeat(8193), id)
+      .run();
+    await assert.rejects(readPublicCaseEvidence(db, id));
+    await db.prepare("DELETE FROM binrat_public_snapshots").run();
+    await assert.rejects(readPublicCaseEvidence(db, id), /NO_PUBLICATION/);
+  } finally {
+    db.close();
+  }
+});
+
+// Explicit adverse local control: retain just the real selected source record.
+test("a one-record window reports zero earlier records without asserting omitted launches exist", async () => {
+  const db = await capturedCaseDatabase();
+  try {
+    await db.prepare("DELETE FROM launches WHERE launch_id<>?").bind(id).run();
+    const e = await readPublicCaseEvidence(db, id);
+    assert.ok(e);
+    assert.equal(e.material.priorLaunchCount, 0);
+    assert.equal(e.material.records.length, 1);
+    assert.equal(e.material.coverage.olderHistory, "NOT_ENUMERATED");
+    await verifyCaseEnvelope(e, id, e.material.publication);
   } finally {
     db.close();
   }

@@ -37,7 +37,7 @@ export const CASE_COVERAGE = {
   history: "PARTIAL",
   resultLimit: 20,
   countScope: "EARLIER_RECORDS_IN_RETURNED_WINDOW",
-  olderLaunchesOmitted: true,
+  olderHistory: "NOT_ENUMERATED",
 } as const;
 export type CaseMaterial = {
   schemaVersion: typeof CASE_EVIDENCE_SCHEMA;

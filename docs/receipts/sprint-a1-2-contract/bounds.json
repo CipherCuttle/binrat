@@ -1,7 +1,7 @@
 {
   "queries": 5,
   "returnedRecords": 20,
-  "payloadBytes": 28144,
+  "payloadBytes": 28148,
   "maxBytes": 65536,
   "plan": [
     {
