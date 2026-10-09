@@ -1,0 +1,113 @@
+/* Sprint A1: the approved world supports one reading surface and a quiet feed. */
+.a1-frontdoor { font-size: 17px; }
+.a1-frontdoor .vl-topbar { grid-template-columns: calc(29% - 10px) minmax(0, 1fr); }
+.a1-frontdoor .vl-command { min-height: 78px; }
+.a1-frontdoor .vl-lab-stamp { margin: 0; text-align: left; }
+.a1-frontdoor .vl-lab-stamp b { font-family: "VL Sans", sans-serif; font-size: 16px; }
+.a1-frontdoor .vl-command > .vl-utility { flex: 0 0 112px; }
+.a1-frontdoor .vl-workspace { margin-top: 36px; }
+.a1-hero { padding: 32px 36px 30px; margin-top: 0; }
+.a1-hero h1 { color: var(--vl-cream); font-size: clamp(38px, 4.2vw, 66px); font-weight: 900; line-height: 1.03; letter-spacing: -.055em; margin: 15px 0 22px; }
+.a1-hero h1 span { color: #bcf5ef; font-size: .77em; letter-spacing: -.04em; }
+.a1-support { color: #f0e8fc; font-size: 20px; line-height: 1.45; max-width: 600px; }
+.a1-explainer { font-size: 17px; line-height: 1.6; color: var(--vl-muted); max-width: 630px; margin-top: 12px !important; }
+.a1-actions { display: flex; align-items: start; gap: 12px; margin-top: 24px; position: relative; }
+.a1-actions > .vl-primary { min-width: 225px; }
+.a1-crew { position: relative; }
+.a1-crew summary { cursor: pointer; list-style: none; min-height: 49px; font-size: 13px; }
+.a1-crew summary::-webkit-details-marker { display: none; }
+.a1-crew[open] summary > span { transform: rotate(45deg); }
+.a1-crew-content { position: absolute; top: calc(100% + 12px); right: 0; width: 390px; max-width: calc(100vw - 56px); background: linear-gradient(125deg, #30244ffb, #11192aff); border: 1px solid #b8aff4; border-radius: 12px; padding: 20px; box-shadow: 0 14px 35px #070820b3; z-index: 20; }
+.a1-crew-content h2 { font: 650 14px/1.5 var(--vl-mono); color: var(--vl-cream); }
+.a1-crew-member { display: grid; grid-template-columns: 44px minmax(0,1fr); gap: 12px; padding: 16px 0; border-bottom: 1px solid #a6b0d940; }
+.a1-crew-member img { border-radius: 50%; object-fit: cover; }
+.a1-crew-name { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.a1-crew-name strong { font-size: 16px; }
+.a1-crew-name b { color: var(--vl-cyan); font: 600 12px var(--vl-mono); }
+.a1-crew-member p, .a1-future p { font-size: 15px; color: var(--vl-muted); line-height: 1.5; margin-top: 6px; }
+.a1-future { padding-top: 16px; }
+.a1-future strong { font: 600 13px var(--vl-mono); color: #c9bddf; }
+.a1-frontdoor .a1-discovery { display: block; margin-top: 28px; padding: 20px 22px; scroll-margin-top: 16px; }
+.a1-discovery header { margin-bottom: 16px; }
+.a1-frontdoor .a1-discovery h2 { display: block; font: 800 clamp(21px, 2vw, 27px)/1.2 "VL Sans", sans-serif; color: var(--vl-cream); letter-spacing: -.025em; margin-top: 7px; }
+.a1-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.a1-filters .vl-utility { font: 600 15px "VL Sans", sans-serif; padding: 10px 14px; }
+.a1-filters [aria-pressed="true"] { border-color: #9af2ef; background: #9be8ff21; color: #d9fff9; }
+.a1-coverage { color: var(--vl-muted); font-size: 14px; line-height: 1.5; margin: 12px 0 8px !important; }
+.a1-frontdoor .a1-find-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; overflow: visible; }
+.a1-frontdoor .a1-find-grid .vl-find { position: relative; display: grid; grid-template-columns: 30px minmax(0,1fr); width: 100%; min-width: 0; max-width: none; min-height: 136px; height: auto; padding: 14px 4px; border: 0; border-top: 1px solid #bec9f044; border-radius: 0; align-items: start; gap: 10px; }
+.a1-frontdoor .a1-find-grid .vl-find:hover { background: #cbe2ff0c; }
+.a1-frontdoor .a1-find-grid .vl-find-mark { display: grid; margin-top: 2px; }
+.a1-find-copy { min-width: 0; }
+.a1-frontdoor .a1-find-grid strong { display: block; font-size: 18px; line-height: 1.3; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.a1-frontdoor .a1-find-grid small { display: block; font-size: 14px; line-height: 1.45; margin-top: 5px; }
+.a1-token { font-family: var(--vl-mono); font-size: 12px !important; overflow-wrap: anywhere; }
+.a1-frontdoor .a1-find-grid .a1-recurrence { color: #b9f8e4; }
+.a1-open { grid-column: 2; font: 650 13px var(--vl-mono); color: var(--vl-cyan); margin-top: 1px; }
+.a1-more { margin-top: 12px; }
+.a1-case-navigation { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 18px; }
+.a1-case-navigation > span { flex-basis: 100%; font-size: 14px; }
+.a1-case-navigation > span:empty { display: none; }
+.a1-active-case { animation: a1-open-case 180ms ease-out; }
+@keyframes a1-open-case { from { opacity: .6; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.a1-frontdoor .vl-case-intro p, .a1-frontdoor .vl-stage p { font-size: 17px; }
+.a1-frontdoor .vl-case-intro h1 { overflow-wrap: anywhere; }
+.a1-frontdoor .vl-stage h2, .a1-frontdoor .vl-chips span { overflow-wrap: anywhere; }
+.a1-frontdoor .vl-text-action { min-height: 44px; font-size: 14px; }
+.a1-frontdoor .vl-footer { font-family: "VL Sans", sans-serif; font-size: 14px; }
+.a1-frontdoor .vl-footer > span { font-size: 12px; }
+@media (max-width:1000px) and (min-width:701px) {
+  .a1-frontdoor .vl-topbar { grid-template-columns: 205px minmax(0,1fr); }
+  .a1-frontdoor .vl-command { display: flex; min-height: 100px; }
+  .a1-frontdoor .vl-workspace { width: 100%; margin-top: 38px; }
+  .a1-frontdoor .vl-rat-scene { width: 245px; top: 150px; left: -22px; }
+  .a1-frontdoor .vl-scout-label { top: 400px; left: 24px; right: auto; max-width: 205px; }
+  .a1-frontdoor .vl-scout-label p { text-align: left; font-size: 19px; }
+  .a1-hero { width: calc(100% - 205px); margin-left: auto; padding: 26px 24px; }
+  .a1-hero h1 { font-size: 42px; }
+  .a1-hero h1 span { font-size: .76em; }
+  .a1-support { font-size: 18px; }
+  .a1-actions { flex-wrap: wrap; }
+}
+@media (max-width:700px) {
+  .a1-frontdoor .vl-topbar { grid-template-columns: 1fr auto; }
+  .a1-frontdoor .vl-command { min-height: 44px; display: flex; }
+  .a1-frontdoor .vl-command > .vl-utility { flex-basis: auto; }
+  .a1-frontdoor .vl-lab-stamp { position: absolute; top: 55px; left: 0; width: auto; }
+  .a1-frontdoor .vl-lab-stamp b { font-size: 14px; line-height: 20px; }
+  .a1-frontdoor .vl-world { position: absolute; }
+  .a1-frontdoor .vl-rat-scene { width: 178px; top: 86px; left: -12px; }
+  .a1-frontdoor .vl-scout-label { top: 110px; right: 16px; max-width: 158px; }
+  .a1-frontdoor .vl-workspace { margin-top: 170px; }
+  .a1-hero { padding: 21px 18px 22px; }
+  .a1-hero h1 { font-size: clamp(31px, 8.9vw, 44px); margin: 12px 0 15px; }
+  .a1-hero h1 span { font-size: .72em; }
+  .a1-support { font-size: 17px; line-height: 1.45; }
+  .a1-explainer { font-size: 17px; line-height: 1.5; margin-top: 10px !important; }
+  .a1-actions { flex-direction: column; gap: 8px; margin-top: 18px; }
+  .a1-actions > .vl-primary { width: 100%; }
+  .a1-crew { width: 100%; }
+  .a1-crew summary { width: 100%; min-height: 44px; }
+  .a1-crew-content { position: static; width: 100%; max-width: none; margin-top: 12px; padding: 16px 12px; box-shadow: none; }
+  .a1-frontdoor .a1-discovery { margin-top: 22px; padding: 18px 16px; }
+  .a1-frontdoor .a1-discovery header { display: block; }
+  .a1-frontdoor .a1-find-grid { grid-template-columns: 1fr; }
+  .a1-frontdoor .a1-find-grid .vl-find { min-height: 126px; }
+  .a1-frontdoor .vl-footer { display: block; }
+  .a1-frontdoor .vl-footer p { margin-top: 12px; }
+  .a1-frontdoor[data-view="case"] .vl-workspace { margin-top: 158px; }
+  .a1-frontdoor .vl-case-intro .vl-primary { min-width: 0; }
+  .a1-case-navigation .vl-utility { padding-inline: 10px; }
+}
+@media (max-width:360px) {
+  .a1-frontdoor .vl-workspace { margin-top: 148px; }
+  .a1-frontdoor .vl-rat-scene { width: 158px; }
+  .a1-frontdoor .vl-scout-label { max-width: 138px; right: 12px; }
+  .a1-hero { padding: 18px 14px; }
+  .a1-hero h1 { font-size: 31px; }
+  .a1-explainer { line-height: 1.45; }
+  .a1-actions { margin-top: 14px; }
+  .a1-frontdoor .a1-discovery { padding: 16px 12px; }
+  .a1-filters .vl-utility { font-size: 14px; padding-inline: 10px; }
+  .a1-frontdoor[data-view="case"] .vl-workspace { margin-top: 142px; }
+}

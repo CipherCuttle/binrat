@@ -1,0 +1,130 @@
+{
+  "checks": [
+    "1440x900 frontdoor, visible CTA, bounded feed, art and fonts",
+    "1440x900 discovery filters, recurrence and deliberate selection",
+    "1440x900 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "768x1024 frontdoor, visible CTA, bounded feed, art and fonts",
+    "768x1024 discovery filters, recurrence and deliberate selection",
+    "768x1024 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "390x844 frontdoor, visible CTA, bounded feed, art and fonts",
+    "390x844 discovery filters, recurrence and deliberate selection",
+    "390x844 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "320x800 frontdoor, visible CTA, bounded feed, art and fonts",
+    "320x800 discovery filters, recurrence and deliberate selection",
+    "320x800 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "430x932 frontdoor, visible CTA, bounded feed, art and fonts",
+    "430x932 discovery filters, recurrence and deliberate selection",
+    "430x932 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "360x800 frontdoor, visible CTA, bounded feed, art and fonts",
+    "360x800 discovery filters, recurrence and deliberate selection",
+    "360x800 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "1024x768 frontdoor, visible CTA, bounded feed, art and fonts",
+    "1024x768 discovery filters, recurrence and deliberate selection",
+    "1024x768 exact Case, WHY \u2192 TRAIL \u2192 RECEIPTS \u2192 NEXT, keyboard and return",
+    "browser back/forward, reload and exact deep links",
+    "targeted H3: unavailable Case skip destination and exact source",
+    "compact approved crew, inactive future jobs, keyboard Escape",
+    "historical routes fail closed; synthetic lab remains isolated",
+    "controlled http-503 truth and recovery",
+    "controlled verified-empty truth and recovery",
+    "controlled no-recurrence truth and recovery",
+    "controlled partial-metadata truth and recovery",
+    "controlled wrong-chain truth and recovery",
+    "controlled tampered-digest truth and recovery",
+    "controlled retained-after-503 truth and recovery",
+    "controlled fresh-bound-replay truth and recovery",
+    "controlled expired-freshness truth and recovery",
+    "controlled bad-checkpoint-hash truth and recovery",
+    "controlled no-snapshot truth and recovery",
+    "controlled future-timestamp truth and recovery",
+    "targeted H2: recheck retains Case, receipt focus and scroll; reduced motion and bounded reads",
+    "delayed unavailable read has checking UI and retained exact URL",
+    "same-origin public GETs only, bounded initial activity, no broken assets or JS errors"
+  ],
+  "errors": [],
+  "measurements": [
+    {
+      "width": 1440,
+      "height": 900,
+      "cta": {
+        "x": 464.6875,
+        "y": 564.953125,
+        "width": 225,
+        "height": 49
+      },
+      "cls": 0
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "cta": {
+        "x": 246,
+        "y": 543,
+        "width": 225,
+        "height": 49
+      },
+      "cls": 0.03290311433374882
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "cta": {
+        "x": 31,
+        "y": 602.984375,
+        "width": 328,
+        "height": 48
+      },
+      "cls": 0.00020177743836242076
+    },
+    {
+      "width": 320,
+      "height": 800,
+      "cta": {
+        "x": 25,
+        "y": 601.53125,
+        "width": 270,
+        "height": 48
+      },
+      "cls": 0.0002737109375
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "cta": {
+        "x": 31,
+        "y": 588.5,
+        "width": 368,
+        "height": 48
+      },
+      "cls": 0.00015007965552146202
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "cta": {
+        "x": 25,
+        "y": 552.25,
+        "width": 310,
+        "height": 48
+      },
+      "cls": 0.00024329861111111112
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "cta": {
+        "x": 344.046875,
+        "y": 525.328125,
+        "width": 225,
+        "height": 49
+      },
+      "cls": 0.00020154014540215331
+    }
+  ],
+  "provenance": "RECORDED_PRODUCTION_PUBLIC_GET_REPLAY",
+  "controls": "SIMULATED_ADVERSE_STATES",
+  "verdict": "PASS",
+  "ownerVisualApproval": "PENDING",
+  "productionAuthorization": false,
+  "sourceNote": "Rendered from the final implementation worktree. Final clean commit/package identity is printed by build:production and check-frontdoor-package.mjs after committing this evidence."
+}

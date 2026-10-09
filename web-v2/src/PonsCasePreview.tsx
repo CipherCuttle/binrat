@@ -3,17 +3,22 @@ import { AlleyWorld } from "./VisualLab";
 import caseScene from "../public/visual-lab/case-scenes/case-neon-alley.webp";
 import { loadPonsPreview, loadPonsCreatorTrail, type PonsCase, type PonsPreview, type PonsCreatorTrail } from "./pons-readonly-preview.mjs";
 import "./visual-lab.css";
+import "./frontdoor-discovery.css";
+import { DiscoveryCrew } from "./DiscoveryCrew";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS" | "NEXT";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS", "NEXT"];
 const sourceRoute = "/api/launches/latest";
 const candidateSite = import.meta.env.VITE_BINRAT_V3_CANDIDATE === "1";
 const productionSite = import.meta.env.VITE_BINRAT_V3_PRODUCTION === "1";
-const tokenLabel = (item: PonsCase) => item.symbol || item.token.slice(0, 10) + "…";
+const shortAddress = (address: string) => address.slice(0, 6) + "…" + address.slice(-4);
+const tokenLabel = (item: PonsCase) => item.name.trim() || item.symbol.trim() || "Unnamed launch";
 function requestedCase() {
   const query = new URLSearchParams(window.location.search);
+  const pathId = /^\/bag\/([0-9a-f]{64})\/?$/.exec(window.location.pathname)?.[1];
+  if (pathId) return query.has("case") && query.get("case") !== pathId ? "INVALID_CASE" : pathId;
   if (query.has("case")) return query.get("case") || "INVALID_CASE";
-  return /^\/bag\/([0-9a-f]{64})\/?$/.exec(window.location.pathname)?.[1] ?? null;
+  return null;
 }
 
 /** Same-origin Pons Cases for the approved V3 entry and isolated read preview. */
@@ -28,11 +33,17 @@ export function PonsCasePreview() {
   const [trailError, setTrailError] = useState("");
   const [trailLoading, setTrailLoading] = useState(false);
   const [clock, setClock] = useState(Date.now());
+  const [filter, setFilter] = useState<"latest" | "familiar">("latest");
+  const [expanded, setExpanded] = useState(false);
+  const [shareNotice, setShareNotice] = useState("");
+  const caseRef = useRef<HTMLElement>(null);
+  const findsRef = useRef<HTMLElement>(null);
+  const returningCase = useRef<string | null>(null);
   const stageTabs = useRef<(HTMLButtonElement | null)[]>([]);
   const lastVerified = useRef<PonsPreview | null>(null);
 
   useEffect(() => {
-    const navigate = () => { setSelectedId(requestedCase()); setStage("WHAT"); };
+    const navigate = () => { setSelectedId(requestedCase()); setStage("WHAT"); setShareNotice(""); };
     window.addEventListener("popstate", navigate);
     return () => window.removeEventListener("popstate", navigate);
   }, []);
@@ -44,7 +55,6 @@ export function PonsCasePreview() {
     loadPonsPreview({ signal: controller.signal, previous: lastVerified.current }).then((verified) => {
       if (!mounted) return;
       lastVerified.current = verified;
-      setSelectedId((id) => id === null ? verified.cases[0]?.id ?? null : id);
       setData(verified); setClock(Date.now()); setError(""); setLoading(false);
     }).catch((cause: unknown) => {
       if (!mounted) return;
@@ -74,14 +84,28 @@ export function PonsCasePreview() {
   }, []);
 
   const cases = data?.cases ?? [];
-  // Select first only on initial load. Never silently replace a lost selected Case.
+  // Discovery starts without a selection. Never replace a lost selected Case.
   const active: PonsCase | undefined =
-    selectedId === null ? cases[0] : cases.find((item) => item.id === selectedId);
+    selectedId === null ? undefined : cases.find((item) => item.id === selectedId);
+  const filtered = filter === "familiar" ? cases.filter((item) => item.priorLaunches > 0) : cases;
+  const visibleCases = expanded ? filtered : filtered.slice(0, 4);
   const isFresh = !error && data?.freshness === "FRESH_VERIFIED" &&
     data.status.freshnessValidUntilMs !== null && data.status.freshnessValidUntilMs > clock;
   const readState = !data ? (loading ? "LOADING" : "UNAVAILABLE") :
     isFresh ? "FRESH_VERIFIED" : "STALE_VERIFIED";
   const activeStageIndex = stages.indexOf(stage);
+  const caseReady = Boolean(data) || !loading;
+
+  useEffect(() => {
+    if (selectedId) {
+      caseRef.current?.focus({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: "instant" });
+    } else if (window.location.hash === "#vl-finds") {
+      const card = returningCase.current && document.getElementById("find-" + returningCase.current);
+      (card || findsRef.current)?.focus({ preventScroll: true });
+      findsRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
+    }
+  }, [selectedId, caseReady]);
 
   useEffect(() => { setTrail(null); setTrailError(""); }, [selectedId, data]);
   useEffect(() => {
@@ -97,7 +121,13 @@ export function PonsCasePreview() {
 
   function advance(next: Stage, focus = false) {
     setStage(next);
-    if (focus) stageTabs.current[stages.indexOf(next)]?.focus({ preventScroll: true });
+    if (focus) {
+      const tab = stageTabs.current[stages.indexOf(next)];
+      tab?.focus({ preventScroll: true });
+      if (window.matchMedia("(max-width:700px)").matches) {
+        tab?.closest(".vl-case-steps")?.scrollIntoView({ block: "start", behavior: "instant" });
+      }
+    }
   }
   function onStageKey(event: KeyboardEvent<HTMLButtonElement>) {
     let n = activeStageIndex;
@@ -111,51 +141,75 @@ export function PonsCasePreview() {
   }
   const refresh = () => setRetry((n) => n + 1);
   function selectCase(id: string) {
+    returningCase.current = id;
     setSelectedId(id);
     setStage("WHAT");
-    if (candidateSite) {
-      const url = new URL(window.location.href);
-      url.pathname = "/";
-      url.searchParams.delete("visual");
-      url.searchParams.delete("ponsPreview");
-      url.searchParams.set("case", id);
-      window.history.pushState(window.history.state, "", url.pathname + url.search);
-    }
+    setShareNotice("");
+    window.history.pushState(null, "", "/bag/" + id);
+  }
+  function returnToFinds() {
+    window.history.pushState(null, "", "/#vl-finds");
+    setSelectedId(null); setStage("WHAT"); setShareNotice("");
+  }
+  function startDigging() {
+    window.history.replaceState(window.history.state, "", "/#vl-finds");
+    findsRef.current?.focus({ preventScroll: true });
+    findsRef.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  }
+  async function copyCaseLink() {
+    if (!active) return;
+    const url = new URL("/bag/" + active.id, window.location.origin).href;
+    try { await navigator.clipboard.writeText(url); setShareNotice("Case link copied."); }
+    catch { setShareNotice("Copy the exact Case link from your browser’s address bar."); }
   }
 
-  return <div className="visual-lab vl-pons-preview" data-material="pearl">
+  return <div className="visual-lab vl-pons-preview a1-frontdoor" data-material="pearl" data-view={selectedId ? "case" : "discovery"}>
     <AlleyWorld />
-    <a className="vl-skip" href="#vl-case">Skip to Case</a>
+    <a className="vl-skip" href={selectedId ? "#vl-case" : "#vl-finds"}>Skip to {selectedId ? "Case" : "discovery"}</a>
     <header className="vl-topbar">
-      <a className="vl-brand" href={candidateSite ? "/" : "/visual-lab"}><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
+      <a className="vl-brand" href="/"><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
       <div className="vl-command">
-        <span>PONS / ROBINHOOD 4663</span>
-        <div className="vl-lab-stamp"><span>{productionSite ? "REAL LAUNCHES. CHECKABLE RECEIPTS." : "ISOLATED CANDIDATE PREVIEW"}</span><b>PONS READ-ONLY · {readState}</b></div>
+        <div className="vl-lab-stamp"><span>{productionSite ? "PONS / ROBINHOOD CHAIN" : candidateSite ? "ISOLATED CANDIDATE PREVIEW" : "PONS READ PREVIEW"}</span><b data-read-state={readState}>{loading ? "Checking launches…" : isFresh ? "Source checked · up to date" : data ? "Earlier receipts · updates paused" : "Launches unavailable"}</b></div>
         <button type="button" className="vl-utility" onClick={refresh} disabled={loading}>{loading ? "CHECKING…" : "RECHECK"}</button>
       </div>
     </header>
-    <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>{isFresh ? "SCOUT / LIVE" : "SCOUT / " + (loading ? "CHECKING" : "PAUSED")}</b></span><p>Find launches.<br /><strong>Check the trail.</strong></p></aside>
+    <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>{isFresh ? "SCOUT / LIVE" : "SCOUT / " + (loading ? "CHECKING" : "PAUSED")}</b></span><p>The Rat remembers.<br /><strong>You check the receipts.</strong></p></aside>
     <main className="vl-workspace">
-      <section className="vl-discovery" id="vl-finds" aria-label="Validated Pons launches">
-        <header><h2>{isFresh ? "FRESH FINDS" : "INDEXED FINDS"}</h2><span>{readState} · CHECKPOINT {data?.status.checkpointBlock ?? "UNKNOWN"}</span></header>
-        {error && <p role="alert">READ DEGRADED: {data ? "Last verified snapshot retained, now STALE." : "No verified Cases available."} ({error})</p>}
-        {!data && <p role="status">{loading ? "Checking source and cryptographic digest…" : "Pons evidence is unavailable. Nothing was substituted."}</p>}
-        {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No Cases to open.</p>}
-        {data && cases.length > 0 && <div className="vl-find-rail">
-          {cases.map((item) => <button type="button" key={item.id} aria-label={"Open Case " + item.id} className={"vl-find " + (active?.id === item.id ? "active" : "")}
-            aria-pressed={active?.id === item.id} onClick={() => selectCase(item.id)}>
-            <span className="vl-find-mark">{item.symbol.slice(0, 1) || "?"}</span><span><strong>{tokenLabel(item)}</strong><small>BLOCK {item.block}</small></span>
+      {!selectedId && <>
+      <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
+        <span className="vl-eyebrow">RAT ZERO / PONS LAUNCH SCOUT</span>
+        <h1 id="a1-title">YOU CAN'T WATCH<br />ALL THIS SHIT.<br /><span>RAT ZERO IS DIGGING.</span></h1>
+        <p className="a1-support">Fresh Pons launches. Familiar deployers. Receipts you can check.</p>
+        <p className="a1-explainer">Rat Zero automatically finds Pons launches. BINRAT remembers earlier evidence, so you can follow relationships and inspect the receipts. More Rats are in the works.</p>
+        <div className="a1-actions"><button className="vl-primary" onClick={startDigging}>START DIGGING <span aria-hidden="true">→</span></button><DiscoveryCrew live={isFresh} checking={loading} /></div>
+      </section>
+      <section ref={findsRef} tabIndex={-1} className="vl-discovery a1-discovery" id="vl-finds" aria-labelledby="a1-finds-title">
+        <header><div><span className="vl-eyebrow">FRESH FINDS / REAL PONS LAUNCHES</span><h2 id="a1-finds-title">WHAT JUST HIT THE DUMPSTER?</h2></div></header>
+        <div className="a1-filters" role="group" aria-label="Launch views"><button className="vl-utility" aria-pressed={filter === "latest"} onClick={() => { setFilter("latest"); setExpanded(false); }}>Latest launches</button><button className="vl-utility" aria-pressed={filter === "familiar"} onClick={() => { setFilter("familiar"); setExpanded(false); }}>Familiar deployers</button></div>
+        <p className="a1-coverage">{data ? <>{isFresh ? "Source checked" : "Updates paused · last source check"} <time dateTime={new Date(data.status.verifiedAtMs).toISOString()}>{new Date(data.status.verifiedAtMs).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</time>. Latest {cases.length} indexed launches · partial history.</> : "Pons / Robinhood Chain · partial launch history."}</p>
+        {error && <p role="alert">{data ? "Updates paused. Last verified snapshot retained, now stale. Recheck to try again." : "We could not verify the Pons source. Recheck to try again."}</p>}
+        {!data && <p role="status">{loading ? "Rat Zero is checking the source. Launches appear here once verified." : "Pons launches are unavailable. Recheck to try again. Nothing was substituted."}</p>}
+        {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
+        {data && cases.length > 0 && filtered.length === 0 && <p role="status">No familiar deployers in these launches. No earlier launch matches in our partial index; this does not prove a clean history.</p>}
+        {data && filtered.length > 0 && <div className="vl-find-rail a1-find-grid">
+          {visibleCases.map((item) => <button type="button" id={"find-" + item.id} key={item.id} aria-label={"Open Case " + tokenLabel(item) + " " + shortAddress(item.token)} data-case-id={item.id} className="vl-find"
+            onClick={() => selectCase(item.id)}>
+            <span className="vl-find-mark" aria-hidden="true">{item.symbol.trim().slice(0, 1) || "↗"}</span><span className="a1-find-copy"><strong>{tokenLabel(item)}</strong><small className="a1-token">{item.symbol.trim() && item.name.trim() ? item.symbol + " · " : ""}{shortAddress(item.token)} · block {item.block}</small><small className={item.priorLaunches > 0 ? "a1-recurrence" : ""}>{item.priorLaunches > 0 ? "Same deployer · " + item.priorLaunches + " earlier indexed " + (item.priorLaunches === 1 ? "launch" : "launches") : "No earlier match in our partial index"}</small></span><span className="a1-open">OPEN CASE <span aria-hidden="true">↗</span></span>
           </button>)}
         </div>}
+        {!expanded && filtered.length > 4 && <button className="vl-utility a1-more" onClick={() => setExpanded(true)}>SHOW ALL {filtered.length} LAUNCHES <span aria-hidden="true">↓</span></button>}
       </section>
-      {!data && loading && <article className="vl-hero-surface vl-loading-case" aria-busy="true" aria-label="Checking Pons Cases">
+      </>}
+      {selectedId && <div className="a1-case-navigation"><button className="vl-utility" onClick={returnToFinds}>← BACK TO DISCOVERY</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}<span role="status">{shareNotice}</span></div>}
+      {selectedId && !data && loading && <article ref={caseRef} tabIndex={-1} id="vl-case" className="vl-hero-surface vl-loading-case" aria-busy="true" aria-label="Checking Pons Cases">
         <div className="vl-case-topline">RAT ZERO / CHECKING THE RECEIPTS</div>
         <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>
         <div className="vl-case-steps vl-skeleton" /><div className="vl-stage"><p>Verified Cases appear here. A missing source stays unavailable.</p></div>
       </article>}
-      {data && selectedId && !active && <div className="vl-evidence-surface vl-missing-case"><p role="alert">Selected Case unavailable in this verified checkpoint. No replacement Case was selected.</p><a className="vl-utility" href="/">RETURN TO FINDS →</a></div>}
-      {data && active && <article id="vl-case" className="vl-hero-surface" data-case={active.id}>
-        <div className="vl-case-topline"><span>RAT ZERO / CASE <b>{active.id.slice(0, 10)}…</b></span><span className="vl-case-status">{readState}</span></div>
+      {selectedId && !loading && !active && <article ref={caseRef} tabIndex={-1} id="vl-case" aria-label="Requested Case unavailable" className="vl-hero-surface vl-missing-case"><h1>CASE UNAVAILABLE.</h1><p role="alert">{data ? "Selected Case unavailable in this verified checkpoint. No replacement Case was selected." : "The Pons source is unavailable. Recheck to try again; your exact Case link is preserved."}</p><p>This Case may be outside the latest launches. Its source record can still be checked if it is indexed.</p><p className="vl-address">REQUESTED CASE <code>{selectedId}</code></p>{/^[0-9a-f]{64}$/.test(selectedId) && <a className="vl-utility" href={"/api/bag/" + selectedId} target="_blank" rel="noreferrer">CHECK EXACT SOURCE RECORD ↗</a>}</article>}
+      {data && active && <article ref={caseRef} tabIndex={-1} aria-label={"Case " + tokenLabel(active)} id="vl-case" className="vl-hero-surface a1-active-case" data-case={active.id}>
+        <div className="vl-case-topline"><span>RAT ZERO / CASE <b>{active.id.slice(0, 10)}…</b></span><span className="vl-case-status" data-read-state={readState}>{isFresh ? "SOURCE CHECKED" : "UPDATES PAUSED"}</span></div>
+        {error && <p role="alert">Last verified snapshot retained, now stale. Recheck to try again.</p>}
         <div className="vl-case-hero">
           <figure className="vl-case-art"><img src={caseScene} alt="Decorative neon BINRAT alley illustration" /><figcaption>ILLUSTRATION ONLY · NOT EVIDENCE</figcaption></figure>
           <div className="vl-case-intro">
@@ -164,10 +218,10 @@ export function PonsCasePreview() {
             <p>{active.priorLaunches > 0
               ? "Same deployer. " + active.priorLaunches + " earlier indexed launches. Rat Zero brings the trail and receipts."
               : "A real Pons launch. Rat Zero brings the reported deployer and receipts. Earlier history is unknown."}</p>
-            <div className="vl-chips"><span>{tokenLabel(active)}</span><span>HISTORY PARTIAL</span><span>NO VERDICT</span></div>
+            <div className="vl-chips"><span>{tokenLabel(active)} · {shortAddress(active.token)}</span><span>HISTORY PARTIAL</span></div>
             {stage !== "NEXT" ? <button className="vl-primary" onClick={() => advance(stages[activeStageIndex + 1], true)}>
               {stage === "WHAT" ? "FOLLOW THE TRAIL" : stage === "TRAIL" ? "CHECK RECEIPTS" : "REVIEW NEXT ACTIONS"} →
-            </button> : <a className="vl-primary" href="#vl-finds">RETURN TO FINDS →</a>}
+            </button> : <button className="vl-primary" onClick={returnToFinds}>RETURN TO FINDS →</button>}
           </div>
         </div>
         <div className="vl-case-steps" role="tablist" aria-label="Pons Case journey">

@@ -1,0 +1,38 @@
+{
+  "provenance": "COMPILED_LOCAL_FRONTEND_REAL_PRODUCTION_PUBLIC_GETS",
+  "origin": "https://binrat.tech",
+  "checkedAt": "2026-10-09T15:09:44.285Z",
+  "checks": [
+    "1440x900 fresh real feed, supported recurrence, exact Case and no overflow",
+    "768x1024 fresh real feed, supported recurrence, exact Case and no overflow",
+    "390x844 fresh real feed, supported recurrence, exact Case and no overflow",
+    "320x800 fresh real feed, supported recurrence, exact Case and no overflow"
+  ],
+  "errors": [],
+  "verdict": "PASS",
+  "caseUrl": "https://binrat.tech/bag/0e1f03a71e4c3ea75e0e42e2abf5275324ff26068ff5933b29d5f048e958fa44",
+  "publicGetResponses": 9,
+  "exactCaseId": "0e1f03a71e4c3ea75e0e42e2abf5275324ff26068ff5933b29d5f048e958fa44",
+  "finalInteractiveLocalCheck": {
+    "verdict": "PASS",
+    "provenance": "REAL_LOCAL_REVIEW_SERVER_PUBLIC_PRODUCTION_GETS",
+    "requests": [
+      {
+        "url": "http://127.0.0.1:4192/api/launches/latest",
+        "method": "GET"
+      },
+      {
+        "url": "http://127.0.0.1:4192/api/status",
+        "method": "GET"
+      },
+      {
+        "url": "http://127.0.0.1:4192/api/creator/0x10a7f8c716e5ea0fb48362d9acc09d8c71dbc74e/summary",
+        "method": "GET"
+      }
+    ],
+    "errors": [],
+    "caseId": "623b78e23d8d061c915fe60c94f1813593f1832aefd3a2fda8dc4c413790e28b",
+    "caseUrl": "http://127.0.0.1:4192/bag/623b78e23d8d061c915fe60c94f1813593f1832aefd3a2fda8dc4c413790e28b"
+  },
+  "productionAuthorization": false
+}
