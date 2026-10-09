@@ -136,3 +136,4 @@
   .a1-frontdoor .vl-workspace, .a1-frontdoor[data-view="case"] .vl-workspace { margin-top: 115px; }
   .a1-frontdoor .vl-scout-label { max-width: 130px; }
 }
+.a12-history-notice { order: 2; padding: 16px 22px; border-top: 1px solid #bec9f044; color: var(--vl-muted); line-height: 1.5; overflow-wrap: anywhere; }
