@@ -42,6 +42,12 @@ export type PonsCreatorTrail = {
   checkpointBlock: string;
   launches: { launchId: string; token: string; symbol: string; name: string; blockNumber: string; txHash: string }[];
 };
+export function inspectPonsHistoricalSource(options: {
+  id: string;
+  snapshot: PonsPreview;
+  fetchImpl?: typeof fetch;
+  signal?: AbortSignal;
+}): Promise<"HISTORICAL_SOURCE_ONLY">;
 export function loadPonsCreatorTrail(options: {
   item: PonsCase;
   snapshot: PonsPreview;

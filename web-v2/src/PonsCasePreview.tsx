@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { AlleyWorld } from "./VisualLab";
 import caseScene from "../public/visual-lab/case-scenes/case-neon-alley.webp";
-import { loadPonsPreview, loadPonsCreatorTrail, type PonsCase, type PonsPreview, type PonsCreatorTrail } from "./pons-readonly-preview.mjs";
+import { loadPonsPreview, loadPonsCreatorTrail, inspectPonsHistoricalSource, type PonsCase, type PonsPreview, type PonsCreatorTrail } from "./pons-readonly-preview.mjs";
 import "./visual-lab.css";
 import "./frontdoor-discovery.css";
 import { DiscoveryCrew } from "./DiscoveryCrew";
@@ -28,6 +28,7 @@ export function PonsCasePreview() {
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(requestedCase);
+  const [historical, setHistorical] = useState<{ id: string; snapshot: PonsPreview; state: "HISTORICAL_SOURCE_ONLY" | "UNAVAILABLE"; error: string } | null>(null);
   const [stage, setStage] = useState<Stage>("WHAT");
   const [trail, setTrail] = useState<PonsCreatorTrail | null>(null);
   const [trailError, setTrailError] = useState("");
@@ -87,6 +88,17 @@ export function PonsCasePreview() {
   // Discovery starts without a selection. Never replace a lost selected Case.
   const active: PonsCase | undefined =
     selectedId === null ? undefined : cases.find((item) => item.id === selectedId);
+  const historicalResult = historical?.id === selectedId && historical.snapshot === data ? historical : null;
+  const checkingHistorical = Boolean(selectedId && /^[0-9a-f]{64}$/.test(selectedId) && data && !active && !historicalResult);
+  useEffect(() => {
+    if (!selectedId || !/^[0-9a-f]{64}$/.test(selectedId) || !data || active || loading) return;
+    let mounted = true;
+    const controller = new AbortController();
+    inspectPonsHistoricalSource({ id: selectedId, snapshot: data, signal: controller.signal })
+      .then((state) => { if (mounted) setHistorical({ id: selectedId, snapshot: data, state, error: "" }); })
+      .catch((cause: unknown) => { if (mounted) setHistorical({ id: selectedId, snapshot: data, state: "UNAVAILABLE", error: cause instanceof Error ? cause.message : "PONS_HISTORICAL_UNAVAILABLE" }); });
+    return () => { mounted = false; controller.abort(); };
+  }, [selectedId, data, active, loading]);
   const filtered = filter === "familiar" ? cases.filter((item) => item.priorLaunches > 0) : cases;
   const visibleCases = expanded ? filtered : filtered.slice(0, 4);
   const isFresh = !error && data?.freshness === "FRESH_VERIFIED" &&
@@ -169,24 +181,24 @@ export function PonsCasePreview() {
     <header className="vl-topbar">
       <a className="vl-brand" href="/"><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
       <div className="vl-command">
-        <div className="vl-lab-stamp"><span>{productionSite ? "PONS / ROBINHOOD CHAIN" : candidateSite ? "ISOLATED CANDIDATE PREVIEW" : "PONS READ PREVIEW"}</span><b data-read-state={readState}>{loading ? "Checking launches…" : isFresh ? "Source checked · up to date" : data ? "Earlier receipts · updates paused" : "Launches unavailable"}</b></div>
+        <div className="vl-lab-stamp"><span>{productionSite ? "PONS / ROBINHOOD CHAIN" : candidateSite ? "ISOLATED CANDIDATE PREVIEW" : "PONS READ PREVIEW"}</span><b data-read-state={readState}>{loading ? "Checking launches…" : isFresh ? "Publication checked" : data ? "Updates paused · earlier receipts" : "Launches unavailable"}</b></div>
         <button type="button" className="vl-utility" onClick={refresh} disabled={loading}>{loading ? "CHECKING…" : "RECHECK"}</button>
       </div>
     </header>
-    <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>{isFresh ? "SCOUT / LIVE" : "SCOUT / " + (loading ? "CHECKING" : "PAUSED")}</b></span><p>The Rat remembers.<br /><strong>You check the receipts.</strong></p></aside>
+    <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>PONS LAUNCH SCOUT</b></span><p>The Rat remembers.<br /><strong>You check the receipts.</strong></p></aside>
     <main className="vl-workspace">
       {!selectedId && <>
       <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
         <span className="vl-eyebrow">RAT ZERO / PONS LAUNCH SCOUT</span>
         <h1 id="a1-title">YOU CAN'T WATCH<br />ALL THIS SHIT.<br /><span>RAT ZERO IS DIGGING.</span></h1>
-        <p className="a1-support">Fresh Pons launches. Familiar deployers. Receipts you can check.</p>
-        <p className="a1-explainer">Rat Zero automatically finds Pons launches. BINRAT remembers earlier evidence, so you can follow relationships and inspect the receipts. More Rats are in the works.</p>
+        <p className="a1-support">Indexed Pons launches. Familiar deployer addresses. Receipts you can check.</p>
+        <p className="a1-explainer">Rat Zero automatically finds Pons launches and links earlier indexed evidence. Follow reported addresses and inspect receipts. More Rats are in the works.</p>
         <div className="a1-actions"><button className="vl-primary" onClick={startDigging}>START DIGGING <span aria-hidden="true">→</span></button><DiscoveryCrew live={isFresh} checking={loading} /></div>
       </section>
       <section ref={findsRef} tabIndex={-1} className="vl-discovery a1-discovery" id="vl-finds" aria-labelledby="a1-finds-title">
-        <header><div><span className="vl-eyebrow">FRESH FINDS / REAL PONS LAUNCHES</span><h2 id="a1-finds-title">WHAT JUST HIT THE DUMPSTER?</h2></div></header>
+        <header><div><span className="vl-eyebrow">{isFresh ? "SOURCE CHECKED / PONS LAUNCHES" : data ? "EARLIER FINDS / UPDATES PAUSED" : "PONS LAUNCH DISCOVERY"}</span><h2 id="a1-finds-title">{isFresh ? "LATEST IN THE INDEX." : data ? "FROM THE LAST SOURCE CHECK." : "WHAT DID THE RAT FIND?"}</h2></div></header>
         <div className="a1-filters" role="group" aria-label="Launch views"><button className="vl-utility" aria-pressed={filter === "latest"} onClick={() => { setFilter("latest"); setExpanded(false); }}>Latest launches</button><button className="vl-utility" aria-pressed={filter === "familiar"} onClick={() => { setFilter("familiar"); setExpanded(false); }}>Familiar deployers</button></div>
-        <p className="a1-coverage">{data ? <>{isFresh ? "Source checked" : "Updates paused · last source check"} <time dateTime={new Date(data.status.verifiedAtMs).toISOString()}>{new Date(data.status.verifiedAtMs).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</time>. Latest {cases.length} indexed launches · partial history.</> : "Pons / Robinhood Chain · partial launch history."}</p>
+        <p className="a1-coverage">{data ? <>{isFresh ? "Source checked" : "Updates paused · last source check"} <time dateTime={new Date(data.status.verifiedAtMs).toISOString()}>{new Date(data.status.verifiedAtMs).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</time>. Latest {cases.length} indexed launches · partial history.</> : "Pons / Robinhood Chain · partial launch history."} Publication freshness describes the source check, not launch age. Blocks show launch order. Recurrence counts earlier indexed launches from the same reported address; they establish neither human identity nor profitability.</p>
         {error && <p role="alert">{data ? "Updates paused. Last verified snapshot retained, now stale. Recheck to try again." : "We could not verify the Pons source. Recheck to try again."}</p>}
         {!data && <p role="status">{loading ? "Rat Zero is checking the source. Launches appear here once verified." : "Pons launches are unavailable. Recheck to try again. Nothing was substituted."}</p>}
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
@@ -206,7 +218,13 @@ export function PonsCasePreview() {
         <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>
         <div className="vl-case-steps vl-skeleton" /><div className="vl-stage"><p>Verified Cases appear here. A missing source stays unavailable.</p></div>
       </article>}
-      {selectedId && !loading && !active && <article ref={caseRef} tabIndex={-1} id="vl-case" aria-label="Requested Case unavailable" className="vl-hero-surface vl-missing-case"><h1>CASE UNAVAILABLE.</h1><p role="alert">{data ? "Selected Case unavailable in this verified checkpoint. No replacement Case was selected." : "The Pons source is unavailable. Recheck to try again; your exact Case link is preserved."}</p><p>This Case may be outside the latest launches. Its source record can still be checked if it is indexed.</p><p className="vl-address">REQUESTED CASE <code>{selectedId}</code></p>{/^[0-9a-f]{64}$/.test(selectedId) && <a className="vl-utility" href={"/api/bag/" + selectedId} target="_blank" rel="noreferrer">CHECK EXACT SOURCE RECORD ↗</a>}</article>}
+      {selectedId && !loading && !active && <article ref={caseRef} tabIndex={-1} id="vl-case" aria-label="Requested Case unavailable" className="vl-hero-surface vl-missing-case" data-historical-state={checkingHistorical ? "CHECKING" : historicalResult?.state ?? "UNAVAILABLE"}>
+        <h1>{checkingHistorical ? "CHECKING EXACT SOURCE." : historicalResult?.state === "HISTORICAL_SOURCE_ONLY" ? "HISTORICAL SOURCE ONLY." : "CASE UNAVAILABLE."}</h1>
+        <p role={checkingHistorical ? "status" : "alert"}>{checkingHistorical ? "This Case is outside the latest launch window. Checking its exact source record…" : historicalResult?.state === "HISTORICAL_SOURCE_ONLY" ? "The exact source record exists, but its historical projection cannot be verified by this UI. No replacement Case was selected." : data ? "The exact historical source is unavailable or could not be validated. No replacement Case was selected." : "The Pons source is unavailable. Recheck to try again; your exact Case link is preserved."}</p>
+        <p>Historical records use a separate publication projection with unverified history. Its digest and recurrence counts are not the latest feed's evidence. This link preserves the launch identity, not an archived publication.</p>
+        {historicalResult?.error && <p className="vl-provenance">Source check: {historicalResult.error}</p>}
+        <p className="vl-address">REQUESTED CASE <code>{selectedId}</code></p>{/^[0-9a-f]{64}$/.test(selectedId) && <a className="vl-utility" href={"/api/bag/" + selectedId} target="_blank" rel="noreferrer">CHECK EXACT SOURCE RECORD ↗</a>}
+      </article>}
       {data && active && <article ref={caseRef} tabIndex={-1} aria-label={"Case " + tokenLabel(active)} id="vl-case" className="vl-hero-surface a1-active-case" data-case={active.id}>
         <div className="vl-case-topline"><span>RAT ZERO / CASE <b>{active.id.slice(0, 10)}…</b></span><span className="vl-case-status" data-read-state={readState}>{isFresh ? "SOURCE CHECKED" : "UPDATES PAUSED"}</span></div>
         {error && <p role="alert">Last verified snapshot retained, now stale. Recheck to try again.</p>}
@@ -214,7 +232,7 @@ export function PonsCasePreview() {
           <figure className="vl-case-art"><img src={caseScene} alt="Decorative neon BINRAT alley illustration" /><figcaption>ILLUSTRATION ONLY · NOT EVIDENCE</figcaption></figure>
           <div className="vl-case-intro">
             <span className="vl-alert">RAT ZERO FOUND A PONS LAUNCH.</span>
-            <h1>{active.priorLaunches > 0 ? "SMELLS FAMILIAR." : isFresh ? "FRESH SCRAP." : "INDEXED SCRAP."}</h1>
+            <h1>{active.priorLaunches > 0 ? "SMELLS FAMILIAR." : "INDEXED SCRAP."}</h1>
             <p>{active.priorLaunches > 0
               ? "Same deployer. " + active.priorLaunches + " earlier indexed launches. Rat Zero brings the trail and receipts."
               : "A real Pons launch. Rat Zero brings the reported deployer and receipts. Earlier history is unknown."}</p>

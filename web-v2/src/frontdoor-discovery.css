@@ -56,6 +56,8 @@
 .a1-frontdoor .vl-text-action { min-height: 44px; font-size: 14px; }
 .a1-frontdoor .vl-footer { font-family: "VL Sans", sans-serif; font-size: 14px; }
 .a1-frontdoor .vl-footer > span { font-size: 12px; }
+.a1-frontdoor .vl-missing-case .vl-address code { overflow-wrap: anywhere; }
+.a1-frontdoor .vl-missing-case p { overflow-wrap: anywhere; }
 @media (max-width:1000px) and (min-width:701px) {
   .a1-frontdoor .vl-topbar { grid-template-columns: 205px minmax(0,1fr); }
   .a1-frontdoor .vl-command { display: flex; min-height: 100px; }
@@ -110,4 +112,27 @@
   .a1-frontdoor .a1-discovery { padding: 16px 12px; }
   .a1-filters .vl-utility { font-size: 14px; padding-inline: 10px; }
   .a1-frontdoor[data-view="case"] .vl-workspace { margin-top: 142px; }
+}
+
+/* A1.1: give the source status its own full-width row above Rat Zero. */
+@media (max-width:700px) {
+  .a1-frontdoor .vl-topbar { grid-template-columns: minmax(0,1fr); gap: 8px; }
+  .a1-frontdoor .vl-command { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; min-height: 52px; }
+  .a1-frontdoor .vl-lab-stamp { position: static; max-width: none; width: auto; order: 0; }
+  .a1-frontdoor .vl-command > .vl-utility { grid-column: 2; grid-row: 1; }
+  .a1-frontdoor .vl-lab-stamp b { display: block; padding: 8px 10px; font-size: 14px; line-height: 1.5; }
+  .a1-frontdoor .vl-rat-scene { top: 119px; }
+  .a1-frontdoor .vl-scout-label { top: 147px; }
+  .a1-frontdoor .vl-workspace { margin-top: 133px; }
+  .a1-frontdoor[data-view="case"] .vl-workspace { margin-top: 133px; }
+  .a1-frontdoor .a1-hero { padding: 18px 18px 20px; }
+  .a1-frontdoor .a1-hero h1 { margin-top: 0; }
+  .a1-frontdoor .a1-hero > .vl-eyebrow { display: none; }
+  .a1-frontdoor .vl-live { gap: 4px; padding: 10px; }
+  .a1-frontdoor .a1-discovery { margin-top: 18px; }
+}
+@media (max-width:360px) {
+  .a1-frontdoor .a1-hero { padding: 18px 14px; }
+  .a1-frontdoor .vl-workspace, .a1-frontdoor[data-view="case"] .vl-workspace { margin-top: 115px; }
+  .a1-frontdoor .vl-scout-label { max-width: 130px; }
 }
