@@ -56,6 +56,8 @@ export interface SyncQueueBatchLike<T = unknown> {
 
 export interface CloudflareSyncEnv {
   DB: D1DatabaseLike;
+  /** Release profile: Pons indexing and bounded public reads only. */
+  BINRAT_PONS_READ_ONLY?: string;
   SYNC_QUEUE?: SyncQueueProducerLike;
   ARC_RPC_URL?: string;
   /** Optional production RPC; the public Robinhood endpoint is the safe fallback. */
@@ -263,6 +265,12 @@ export async function handleSyncQueueBatch(
       message.ack();
       continue;
     }
+    // These messages are poll requests, not stored alert payloads. Keep all
+    // persistent watch/outbox state intact while suspending legacy consumers.
+    if (env.BINRAT_PONS_READ_ONLY === 'true' && message.body.kind !== 'PONS_SYNC_CYCLE') {
+      message.ack();
+      continue;
+    }
     try {
       if (message.body.kind === 'OBSERVATION_CYCLE') {
         const result = await runCloudflareObservationCycle(env, message.body, deps);
@@ -282,6 +290,7 @@ export async function handleSyncQueueBatch(
             console.error(JSON.stringify({ event: 'PONS_CATCH_UP_ENQUEUE_FAILED', code: syncErrorCode(error) }));
           });
         }
+        if (env.BINRAT_PONS_READ_ONLY === 'true') continue;
         if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_OUTCOME_ENABLED === 'true') {
           await enqueuePonsOutcomeCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event:'PONS_OUTCOME_ENQUEUE_FAILED', code:syncErrorCode(error) }));

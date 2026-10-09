@@ -183,6 +183,10 @@ export default {
     return handleWorkerRequest(request, env);
   },
   async scheduled(_controller: unknown, env: BinratWorkerEnv): Promise<void> {
+    if (env.BINRAT_PONS_READ_ONLY === 'true') {
+      await enqueuePonsSyncCycle(env);
+      return;
+    }
     const now = Date.now();
     // Opportunistic daily physical deletion; conversation TTL is enforced on every read.
     const utc = new Date(now);
@@ -213,6 +217,14 @@ export async function handleWorkerRequest(
     origin = url.origin;
   } catch {
     return json(400, { error: 'INVALID_PATH' });
+  }
+
+  if (env.BINRAT_PONS_READ_ONLY === 'true') {
+    if (request.method !== 'GET') return json(405, { error: 'READ_ONLY_RELEASE' });
+    const boundedRead = ['/health', '/api/health', '/api/status', '/api/launches/latest'].includes(pathname) ||
+      /^\/api\/bag\/[0-9a-f]{64}$/.test(pathname) ||
+      /^\/api\/creator\/0x[0-9a-fA-F]{40}\/summary$/.test(pathname);
+    if (!boundedRead) return json(pathname === '/api/feed' ? 410 : 404, { error: 'NOT_IN_READ_ONLY_RELEASE' });
   }
 
   if (request.method === 'POST' && pathname === '/__candidate/rat-smoke') {
