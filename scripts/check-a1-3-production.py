@@ -111,7 +111,11 @@ def assets():
     save('rollback-assets-observation.json',list(done.values()))
     assert any(re.match(r'assets/frontdoor-candidate-.*\.js$',x['path']) for x in verified)
     assert any(re.match(r'assets/frontdoor-candidate-.*\.css$',x['path']) for x in verified)
-    assert all(f['path'] in {x['path'] for x in verified} for f in manifest['files'] if not re.match(r'assets/frontdoor-candidate-.*\.(js|css)$',f['path']))
+    # New package files need not exist on production (e.g. root Telegram copies).
+    # The approved artwork, fonts and current runtime resources must match.
+    required=[f for f in manifest['files'] if re.match(r'assets/.*\.webp$',f['path']) or f['path'] in ['fonts/geist-sans.woff2','fonts/geist-mono.woff2','crew/rat-avatar-48.png','favicon.png']]
+    by_path={x['path']:x for x in verified}
+    assert all(f['path'] in by_path and by_path[f['path']]['sha256']==f['sha256'] for f in required), 'APPROVED_ARTWORK_OR_FONT_DRIFT'
     return {'at':now(),'versionId':VERSION,'verdict':'PASS','verifiedAssets':verified,
         'unavailableLegacyPaths':[x for x in done.values() if not x['verified']],
         'scope':'Deployed V3 resources plus known retained legacy paths; the provider version retains its complete bound asset snapshot.',
