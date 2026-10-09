@@ -1,0 +1,260 @@
+{
+  "checkedAt": "2026-10-09T16:49:18.513921+00:00",
+  "url": "https://binrat-edge-v0.pettevik.workers.dev/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+  "status": 200,
+  "body": {
+    "schemaVersion": "binrat.public-feed/0.1",
+    "chainId": 4663,
+    "asOfBlock": "84309323",
+    "historyCoverage": "UNVERIFIED",
+    "bag": {
+      "id": "742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "source": "PONS_V2",
+      "token": "0xea9054a9106d11e8525fad7c0d43070695abdaf3",
+      "symbol": "",
+      "name": "",
+      "blockNumber": "84243094",
+      "blockHash": "0x0e4e4cfccc63a0f7f9a3180e78c2127f84775a592bedad1063dbd462b92fb1ca",
+      "txHash": "0x84047e3087046d66e67f04731b8d3871ea6c3777ebb658043a46ae62e953d924",
+      "logIndex": 61,
+      "reportedCreatorAddress": "0xca11bde05977b3631167028862be2a173976ca11",
+      "pool": "0x858a7b4b3d4f55580d13688283cce9c3159a3803",
+      "metadata": {
+        "imageUri": "",
+        "website": "",
+        "twitter": "",
+        "telegram": ""
+      },
+      "trashTrail": {
+        "priorLaunchCount": 19,
+        "coverage": "UNVERIFIED",
+        "prior": [
+          {
+            "launchId": "59ad298a97101796852a6d3c4d28a3a184b05c5861d53790650ed2772de23ce6",
+            "token": "0xb164bd7a3482c7e1bae54d7c6e90b04e234cd117",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81058491",
+            "blockHash": "0x46eb429f14e661cf946b4d1fc8967440616554d7cd3749779d77dabe781d1b6a",
+            "sourceFactId": "binrat-fact:4663:59ad298a97101796852a6d3c4d28a3a184b05c5861d53790650ed2772de23ce6"
+          },
+          {
+            "launchId": "dda96ac54b47a277ade19d875da9f3bdfff4f8301af272116d99bd0ecdba0b16",
+            "token": "0xaae80aa07245f6202b9bff761463aad05848a3dc",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81071182",
+            "blockHash": "0x9e213e1f803992641a1e4b5aa12d242631a9f245f2601cef1788ed94f00b0786",
+            "sourceFactId": "binrat-fact:4663:dda96ac54b47a277ade19d875da9f3bdfff4f8301af272116d99bd0ecdba0b16"
+          },
+          {
+            "launchId": "ef4aaffa99afe8b85d65ce2c6642e7f26b2bf547bc443ae53cd69a2e965a6761",
+            "token": "0x56da144fa27c8e31cbe87e2487c2afacdae0388d",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81077020",
+            "blockHash": "0xccfd67209e212cd28c73a854b47b529b840e9712b2e2dec0677d89a26ec6b016",
+            "sourceFactId": "binrat-fact:4663:ef4aaffa99afe8b85d65ce2c6642e7f26b2bf547bc443ae53cd69a2e965a6761"
+          },
+          {
+            "launchId": "3cab5098d596f6765b16692f0358ec4ac4cc18894449d9e61b9d0fc5c61219ab",
+            "token": "0xe022102f32ea94be2ea8ad5cc66a7e88aa9e5f20",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81088476",
+            "blockHash": "0xf6033f1115bb241c09b4d1f742ade56ba309a87e0ba72a8d9221ab78236bcea0",
+            "sourceFactId": "binrat-fact:4663:3cab5098d596f6765b16692f0358ec4ac4cc18894449d9e61b9d0fc5c61219ab"
+          },
+          {
+            "launchId": "255170203a88cf33b6dcf0762d6fca9ff9d2e38a5f39a8b68ecbf7e529b9cb45",
+            "token": "0x496e9f8387f8de8cae186312eb278077244d6f26",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81101901",
+            "blockHash": "0x5d859109f8faf7a4eb610c3544aa64edf1075e7d60c6361e765c3f130d58342c",
+            "sourceFactId": "binrat-fact:4663:255170203a88cf33b6dcf0762d6fca9ff9d2e38a5f39a8b68ecbf7e529b9cb45"
+          },
+          {
+            "launchId": "fe7d11d953bb36d372e5b0477482e0d4b2e76da2847176dac5de0d2534b79eb7",
+            "token": "0x564452ed843660169092da2bb043a71c7e9de92c",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81129049",
+            "blockHash": "0x6e6e04e00b69894bc947f008d38e1ee46867bf53f7a190c8b6eea6b6b811e6d7",
+            "sourceFactId": "binrat-fact:4663:fe7d11d953bb36d372e5b0477482e0d4b2e76da2847176dac5de0d2534b79eb7"
+          },
+          {
+            "launchId": "67861b0f72fe845f635c66b2d9e151f5fc5d2ed0fd5690f713f4c3425ae42456",
+            "token": "0x71beb2fc1ed5569fd46a428b5ead24761523dc48",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81695354",
+            "blockHash": "0xb253b8f8ffa39ce9cc61f9a610b24e84e8325533251c847ea436ed465041071c",
+            "sourceFactId": "binrat-fact:4663:67861b0f72fe845f635c66b2d9e151f5fc5d2ed0fd5690f713f4c3425ae42456"
+          },
+          {
+            "launchId": "fa41b9deb828999e90f3f6da1f4acd4afa33da3fe280e968f358b7752ea461de",
+            "token": "0xf6599ca71ba2a96ea32e3ab22ee947876e34176d",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81703339",
+            "blockHash": "0xbf5da63351874bda21accbe80a0fb81c63fbb8b00dc204c78d5339feb83fe893",
+            "sourceFactId": "binrat-fact:4663:fa41b9deb828999e90f3f6da1f4acd4afa33da3fe280e968f358b7752ea461de"
+          },
+          {
+            "launchId": "966bc6f44cf1e5d7f7e0aae1b62227bd8d918ad1e1289ed6e1c6e1e6e219417f",
+            "token": "0x9996c8c11c7054c9ead9fb101ab84c9152d7fa55",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81725090",
+            "blockHash": "0xcd215d1b0178024bcc6f8ea25f49db521a1078d24583895c60d70ada4c91d125",
+            "sourceFactId": "binrat-fact:4663:966bc6f44cf1e5d7f7e0aae1b62227bd8d918ad1e1289ed6e1c6e1e6e219417f"
+          },
+          {
+            "launchId": "cc037ca32e58c54f24eb5a73d74782417abb48b14febb21c46d4ef6599d417b5",
+            "token": "0x6bbe7124afe9df07224976b0887fe3ff8e8e16bd",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81736108",
+            "blockHash": "0x52600016053c4471580e69ffb2ad40fe5d76ebe81dd1108a5d0c84b7004f49f8",
+            "sourceFactId": "binrat-fact:4663:cc037ca32e58c54f24eb5a73d74782417abb48b14febb21c46d4ef6599d417b5"
+          },
+          {
+            "launchId": "c6fac066896326a259eef1264e6ed089fcfb2a3079dc6916f27757afc1361f13",
+            "token": "0x0f2b40acd63090056f241d4361b3f2e023403a67",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81889773",
+            "blockHash": "0x9385931631ced95c9dee1e0db61ba9c3cba85da04cc642fc852177eaa6adf613",
+            "sourceFactId": "binrat-fact:4663:c6fac066896326a259eef1264e6ed089fcfb2a3079dc6916f27757afc1361f13"
+          },
+          {
+            "launchId": "1ac58389104360e94299a1d3a15638daff7bf32b943d2be82950cd8605ac668c",
+            "token": "0xa846eaf572d83d79d16a2db74c9b8cfdd7621a1f",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81890985",
+            "blockHash": "0xe725d2ae66ef2335b73c8e9d2ce029a59b8cf3f53ce36e84794b3066f8d84499",
+            "sourceFactId": "binrat-fact:4663:1ac58389104360e94299a1d3a15638daff7bf32b943d2be82950cd8605ac668c"
+          },
+          {
+            "launchId": "dc2ade42cf30a00e60c048fcbab9e5ef3c695884525f569d9019706033eb45b4",
+            "token": "0x16175df6e9fec19c51d1419c81809293b06b732b",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81929152",
+            "blockHash": "0x5a32e42fd790ea92657a457eff3085a023a0a8e16fdd605e2deea1b71b653e51",
+            "sourceFactId": "binrat-fact:4663:dc2ade42cf30a00e60c048fcbab9e5ef3c695884525f569d9019706033eb45b4"
+          },
+          {
+            "launchId": "f5555a4f092bedd11150baf997a8f91f73b9b40ab16c004c87825c477a447f4a",
+            "token": "0x90e9d02cc8289a60d51d46d73fd91f8a1e66787b",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81937338",
+            "blockHash": "0xeda59b7743a2a5badfa473c53d2d0674abc1493f42df7788327cbfcfeaa579a3",
+            "sourceFactId": "binrat-fact:4663:f5555a4f092bedd11150baf997a8f91f73b9b40ab16c004c87825c477a447f4a"
+          },
+          {
+            "launchId": "6c350519ed11c8fa2b1bd4e68be425c56d41a02db6e1db2f61eadfdb461ee4d4",
+            "token": "0x402cb1bd0431454a64fc735b78b1959e34417852",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "81949325",
+            "blockHash": "0x9d825c45ae550f8b4600e17eeba5555b4a7a0b2c4950557da074977f9355f670",
+            "sourceFactId": "binrat-fact:4663:6c350519ed11c8fa2b1bd4e68be425c56d41a02db6e1db2f61eadfdb461ee4d4"
+          },
+          {
+            "launchId": "499edff846378573dd52c68448992fc4b61866235e19f6a69daf295695a837d0",
+            "token": "0xfaacdc8a663f779bbe55285cf7f70c7670b18572",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "82481917",
+            "blockHash": "0x20cf27cf204466a52111eaf2732f00799b35258904aea832aac037d307892939",
+            "sourceFactId": "binrat-fact:4663:499edff846378573dd52c68448992fc4b61866235e19f6a69daf295695a837d0"
+          },
+          {
+            "launchId": "454d17b48e70e5afd87b5b19e41633d392fbc80f448a5a8c803c14b45b217664",
+            "token": "0x16c4f817549dbad1f7a6729b0191f307927da665",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "82500137",
+            "blockHash": "0xe02df2d8ec6cca94ace592cb16fb209bfacf4bc94285e7d2746efaa3653a3344",
+            "sourceFactId": "binrat-fact:4663:454d17b48e70e5afd87b5b19e41633d392fbc80f448a5a8c803c14b45b217664"
+          },
+          {
+            "launchId": "4a6bd75548b748650b7b10233c046d3f6636a60a0359398bb75fb28d3187e80f",
+            "token": "0xfbd3e35ce1359f451c344732ebcd146e9f43e9c2",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "82655367",
+            "blockHash": "0x69fbaec81f296c26821bec65381500920cb7ae887a80d9926f2b0a7ed14f854e",
+            "sourceFactId": "binrat-fact:4663:4a6bd75548b748650b7b10233c046d3f6636a60a0359398bb75fb28d3187e80f"
+          },
+          {
+            "launchId": "11decf3edc8014622179b68bb0cbb6dae5429946a087eafefbca9afac374453b",
+            "token": "0xb51d1c855e915f1c1c866babcfb6fabbc1990064",
+            "symbol": "",
+            "name": "",
+            "blockNumber": "82744529",
+            "blockHash": "0x792ff569a276598827b5ec96dea07cffc5959ffb674e2d2510fdf8391feedf8d",
+            "sourceFactId": "binrat-fact:4663:11decf3edc8014622179b68bb0cbb6dae5429946a087eafefbca9afac374453b"
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "state": "OBSERVED",
+          "code": "PONS_REPORTED_DEPLOYER",
+          "text": "Pons reported this deployer address on the canonical launch event.",
+          "sourceFactIds": [
+            "binrat-fact:4663:742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01"
+          ]
+        },
+        {
+          "state": "NOTED",
+          "code": "REPORTED_CREATOR_PRIOR_LAUNCHES",
+          "text": "The same Pons-reported deployer address appears on 19 earlier indexed launches present in this projection input.",
+          "sourceFactIds": [
+            "binrat-fact:4663:742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+            "binrat-fact:4663:59ad298a97101796852a6d3c4d28a3a184b05c5861d53790650ed2772de23ce6",
+            "binrat-fact:4663:dda96ac54b47a277ade19d875da9f3bdfff4f8301af272116d99bd0ecdba0b16",
+            "binrat-fact:4663:ef4aaffa99afe8b85d65ce2c6642e7f26b2bf547bc443ae53cd69a2e965a6761",
+            "binrat-fact:4663:3cab5098d596f6765b16692f0358ec4ac4cc18894449d9e61b9d0fc5c61219ab",
+            "binrat-fact:4663:255170203a88cf33b6dcf0762d6fca9ff9d2e38a5f39a8b68ecbf7e529b9cb45",
+            "binrat-fact:4663:fe7d11d953bb36d372e5b0477482e0d4b2e76da2847176dac5de0d2534b79eb7",
+            "binrat-fact:4663:67861b0f72fe845f635c66b2d9e151f5fc5d2ed0fd5690f713f4c3425ae42456",
+            "binrat-fact:4663:fa41b9deb828999e90f3f6da1f4acd4afa33da3fe280e968f358b7752ea461de",
+            "binrat-fact:4663:966bc6f44cf1e5d7f7e0aae1b62227bd8d918ad1e1289ed6e1c6e1e6e219417f",
+            "binrat-fact:4663:cc037ca32e58c54f24eb5a73d74782417abb48b14febb21c46d4ef6599d417b5",
+            "binrat-fact:4663:c6fac066896326a259eef1264e6ed089fcfb2a3079dc6916f27757afc1361f13",
+            "binrat-fact:4663:1ac58389104360e94299a1d3a15638daff7bf32b943d2be82950cd8605ac668c",
+            "binrat-fact:4663:dc2ade42cf30a00e60c048fcbab9e5ef3c695884525f569d9019706033eb45b4",
+            "binrat-fact:4663:f5555a4f092bedd11150baf997a8f91f73b9b40ab16c004c87825c477a447f4a",
+            "binrat-fact:4663:6c350519ed11c8fa2b1bd4e68be425c56d41a02db6e1db2f61eadfdb461ee4d4",
+            "binrat-fact:4663:499edff846378573dd52c68448992fc4b61866235e19f6a69daf295695a837d0",
+            "binrat-fact:4663:454d17b48e70e5afd87b5b19e41633d392fbc80f448a5a8c803c14b45b217664",
+            "binrat-fact:4663:4a6bd75548b748650b7b10233c046d3f6636a60a0359398bb75fb28d3187e80f",
+            "binrat-fact:4663:11decf3edc8014622179b68bb0cbb6dae5429946a087eafefbca9afac374453b"
+          ]
+        },
+        {
+          "state": "UNKNOWN",
+          "code": "OUTCOMES_NOT_PROJECTED_V0",
+          "text": "Outcome, distribution, and sellability observations are not part of PUBLIC_PROJECTION_V0.",
+          "sourceFactIds": []
+        }
+      ]
+    },
+    "receipt": {
+      "projectionVersion": "BINRAT_PUBLIC_PROJECTION_V0",
+      "chainId": 4663,
+      "asOfBlock": "84309323",
+      "asOfBlockHash": "0x8cf76bd838f4d848c6f8d9cff638da9dc5fc7e419c60ecb21ca5fd223a134b60",
+      "historyCoverage": "UNVERIFIED",
+      "inputDigest": "30bd8f63d6256bf6a8cc6b4f69884a4d1ec0427b90857148ce132d68d59e7ab5",
+      "outputDigest": "9660e01a909bf6035553c502532b83275b125d0cd6ddf17dfbe15ab1d36a5ec3",
+      "receiptId": "binrat-public:046c5dddbadacdc01922252a864fc0b27a18b4ec03e4e18df685f9fc9464f767"
+    }
+  }
+}
