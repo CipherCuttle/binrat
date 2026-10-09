@@ -47,8 +47,8 @@ export async function capturedCaseDatabase() {
     )
     .run();
   await store.commitCheckpoint({
-    blockNumber: BigInt(s.checkpoint_block),
-    blockHash: s.checkpoint_block_hash,
+    blockNumber: BigInt(productionCapture.checkpoint.block_number),
+    blockHash: productionCapture.checkpoint.block_hash,
     guardBlockNumber: null,
     guardBlockHash: null,
   });
