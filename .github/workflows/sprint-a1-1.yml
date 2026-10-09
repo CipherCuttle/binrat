@@ -32,6 +32,7 @@ jobs:
           pnpm rebuild better-sqlite3
           node web-v2/checks/check-pons-readonly-preview.mjs
           node web-v2/checks/check-pons-historical-source.mjs
+          node scripts/build-public-release.mjs
           pnpm exec tsx --test test/cloudflareWorker.test.ts test/publicProjection.test.ts
       - name: Compile reviewed base and changed head
         shell: bash
