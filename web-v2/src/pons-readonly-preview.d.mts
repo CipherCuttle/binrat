@@ -37,3 +37,14 @@ export function loadPonsPreview(options?: {
   now?: () => number;
   previous?: PonsPreview | null;
 }): Promise<PonsPreview>;
+export type PonsCreatorTrail = {
+  chainId: 4663;
+  checkpointBlock: string;
+  launches: { launchId: string; token: string; symbol: string; name: string; blockNumber: string; txHash: string }[];
+};
+export function loadPonsCreatorTrail(options: {
+  item: PonsCase;
+  snapshot: PonsPreview;
+  fetchImpl?: typeof fetch;
+  signal?: AbortSignal;
+}): Promise<PonsCreatorTrail>;

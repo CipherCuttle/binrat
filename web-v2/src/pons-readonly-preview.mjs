@@ -42,3 +42,38 @@ export async function loadPonsPreview({ fetchImpl = globalThis.fetch, signal, no
       ? "FRESH_VERIFIED" : "STALE_VERIFIED";
   return { feed, status, freshness, cases: feed.bags };
 }
+
+/** Optional historical trail. A different publication is never mixed into a Case. */
+export async function loadPonsCreatorTrail({ item, snapshot, fetchImpl = globalThis.fetch, signal }) {
+  const value = await readJson(fetchImpl, "/api/creator/" + encodeURIComponent(item.reportedCreatorAddress) + "/summary", signal);
+  const id = /^[0-9a-f]{64}$/, address = /^0x[0-9a-f]{40}$/, hash = /^0x[0-9a-f]{64}$/;
+  if (value?.schemaVersion !== "binrat.creator-summary/0.1" || value.chainId !== 4663 ||
+      value.reportedCreatorAddress !== item.reportedCreatorAddress ||
+      value.checkpointBlock !== snapshot.status.checkpointBlock ||
+      value.checkpointBlockHash !== snapshot.status.checkpointBlockHash ||
+      value.feedDigest !== snapshot.status.feedDigest ||
+      value.coverage?.mode !== "LATEST_4_VERIFIED_PONS_LAUNCHES" ||
+      value.coverage.resultLimit !== 4 || value.coverage.olderLaunchesOmitted !== true ||
+      !Array.isArray(value.launches) || value.launches.length < 1 || value.launches.length > 4) {
+    throw new Error("PONS_TRAIL_BINDING_MISMATCH");
+  }
+  const seen = new Set();
+  for (const launch of value.launches) {
+    if (!id.test(launch?.launchId) || seen.has(launch.launchId) || !address.test(launch.token) ||
+        !hash.test(launch.blockHash) || !hash.test(launch.txHash) ||
+        typeof launch.blockNumber !== "string" || !/^(0|[1-9]\d*)$/.test(launch.blockNumber) ||
+        BigInt(launch.blockNumber) > BigInt(value.checkpointBlock) ||
+        typeof launch.symbol !== "string" || typeof launch.name !== "string" ||
+        launch.evidence?.factId !== "binrat-fact:4663:" + launch.launchId ||
+        !id.test(launch.evidence?.digest) || !id.test(launch.evidence?.sourceEventId)) {
+      throw new Error("PONS_TRAIL_RECORD_INVALID");
+    }
+    seen.add(launch.launchId);
+  }
+  const selected = value.launches.find((launch) => launch.launchId === item.id);
+  if (!selected || selected.token !== item.token || selected.txHash !== item.txHash ||
+      selected.blockNumber !== item.block || selected.symbol !== item.symbol || selected.name !== item.name) {
+    throw new Error("PONS_TRAIL_CASE_MISMATCH");
+  }
+  return value;
+}
