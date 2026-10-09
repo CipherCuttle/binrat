@@ -1,0 +1,31 @@
+name: case-evidence-contract
+on:
+  pull_request:
+    paths:
+      - 'src/public/caseEvidence.ts'
+      - 'src/cloudflare/publicCaseEvidence.ts'
+      - 'test/caseEvidence.test.ts'
+      - '.github/workflows/case-evidence.yml'
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/build-public-release.mjs
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm exec tsx --test test/caseEvidence.test.ts test/publicProjection.test.ts test/cloudflareWorker.test.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: case-evidence-contract-${{ github.event.pull_request.head.sha }}
+          path: docs/receipts/sprint-a1-2-contract/

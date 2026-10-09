@@ -1,0 +1,20 @@
+{
+  "queries": 5,
+  "returnedRecords": 20,
+  "payloadBytes": 28144,
+  "maxBytes": 65536,
+  "plan": [
+    {
+      "id": 7,
+      "parent": 0,
+      "notused": 49,
+      "detail": "SEARCH l USING INDEX idx_launches_chain_source_creator_block_numeric (chain_id=? AND source=? AND creator=? AND <expr><?)"
+    },
+    {
+      "id": 30,
+      "parent": 0,
+      "notused": 46,
+      "detail": "SEARCH f USING INDEX sqlite_autoindex_provenance_facts_2 (launch_id=?) LEFT-JOIN"
+    }
+  ]
+}
