@@ -4,6 +4,8 @@ import { createServer } from 'node:http';
 import { createReadStream, existsSync, statSync, readFileSync } from 'node:fs';
 import { resolve, extname } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import worker from '../../dist/src/cloudflare/worker.js';
 import { capturedCaseDatabase } from '../../test/support/caseProductionCapture.ts';
 const db = await capturedCaseDatabase();
@@ -11,6 +13,8 @@ const site = resolve('.artifacts/v3-frontdoor/site');
 const evidence = resolve('.artifacts/a1-3-evidence');
 const manifest = JSON.parse(readFileSync(resolve(site, '../manifest.json')));
 if (manifest.sourceDirty || manifest.sourceSha !== execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim()) throw new Error('EXACT_CLEAN_BUILD_REQUIRED');
+if (execFileSync('git', ['status', '--porcelain'], {encoding:'utf8'}).trim()) throw new Error('SOURCE_MUST_BE_CLEAN');
+const curl = promisify(execFile);
 const mime = {'.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.woff2':'font/woff2', '.png':'image/png', '.webp':'image/webp', '.jpg':'image/jpeg', '.json':'application/json'};
 const allowed = p => ['/health','/api/status','/api/launches/latest'].includes(p) || /^\/api\/bag\/[0-9a-f]{64}(\/evidence)?$/.test(p) || /^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(p);
 const servers = [];
@@ -26,7 +30,7 @@ for (const [port, live] of [[4192,false], [4193,true]]) {
         let response;
         if (live) {
           // Fixed HTTPS destination, no redirects, no credential forwarding or fallback.
-          const raw = execFileSync('curl',['-4','--silent','--show-error','--max-time','20','--write-out','\n%{http_code}','https://binrat.tech'+u.pathname],{maxBuffer:2*1024*1024});
+          const { stdout: raw } = await curl('curl',['-4','--silent','--show-error','--max-time','20','--write-out','\n%{http_code}','https://binrat.tech'+u.pathname],{maxBuffer:2*1024*1024,encoding:'buffer'});
           const split=raw.lastIndexOf(10), status=Number(raw.subarray(split+1).toString());
           res.writeHead(status,{'content-type':'application/json','cache-control':'no-store'}).end(raw.subarray(0,split));return;
         }
