@@ -45,6 +45,7 @@ import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1Store } from './d1Store.js';
 import { publicStatus, readPublicSnapshot } from './publicSnapshot.js';
 import { readCreatorSummary } from './creatorSummaryReadModel.js';
+import { readPublicCaseEvidence } from './publicCaseEvidence.js';
 import { readPublicCaseFeed } from './publicCaseReadModel.js';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { observedPublicRelease } from '../public/releaseIdentity.js';
@@ -222,9 +223,13 @@ export async function handleWorkerRequest(
   if (env.BINRAT_PONS_READ_ONLY === 'true') {
     if (request.method !== 'GET') return json(405, { error: 'READ_ONLY_RELEASE' });
     const boundedRead = ['/health', '/api/health', '/api/status', '/api/launches/latest'].includes(pathname) ||
-      /^\/api\/bag\/[0-9a-f]{64}$/.test(pathname) ||
+      /^\/api\/bag\/[0-9a-f]{64}(?:\/evidence)?$/.test(pathname) ||
       /^\/api\/creator\/0x[0-9a-fA-F]{40}\/summary$/.test(pathname);
     if (!boundedRead) return json(pathname === '/api/feed' ? 410 : 404, { error: 'NOT_IN_READ_ONLY_RELEASE' });
+  }
+
+  if (/^\/api\/bag\/[0-9a-f]{64}\/evidence$/.test(pathname) && request.method !== 'GET') {
+    return json(405, { error: 'METHOD_NOT_ALLOWED' });
   }
 
   if (request.method === 'POST' && pathname === '/__candidate/rat-smoke') {
@@ -495,6 +500,11 @@ export async function handleBinratApiRequest(
       if (!summary) return json(404,{error:'CREATOR_NOT_INDEXED'});
       return publicJson(request,200,summary,await sha256Hex(summary),
         'public, max-age=15, s-maxage=60, stale-while-revalidate=300, stale-if-error=86400');
+    }
+    const evidenceMatch = /^\/api\/bag\/([0-9a-f]{64})\/evidence$/.exec(pathname);
+    if (evidenceMatch) {
+      const envelope = await readPublicCaseEvidence(env.DB,evidenceMatch[1]!);
+      return envelope ? json(200,envelope) : json(404,{error:'BAG_NOT_FOUND'});
     }
     if (pathname.startsWith('/api/bag/')) {
       const match = /^\/api\/bag\/([0-9a-f]{64})(?:\/(intelligence|replay))?$/.exec(pathname);
