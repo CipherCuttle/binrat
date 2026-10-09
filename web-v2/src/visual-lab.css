@@ -346,3 +346,51 @@
 .vl-pons-preview .vl-find { flex: 0 0 175px; }
 .vl-pons-preview .vl-footer > span { display: block; overflow-wrap: anywhere; }
 @media (max-width: 700px) { .vl-pons-preview .vl-command { gap: 12px; flex-wrap: wrap; } .vl-pons-preview .vl-find { min-width: 140px; } }
+
+/* Production refinements: keep the frozen art and optical materials intact. */
+.vl-pons-preview .vl-discovery { min-height: 92px; }
+.vl-pons-preview .vl-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.vl-pons-preview .vl-footer > span { flex-basis: 100%; }
+.vl-pons-preview .vl-case-status { color: var(--vl-cream); }
+.vl-pons-preview .vl-address { margin-top: 14px; font: 500 12px/1.6 var(--vl-mono); }
+.vl-pons-preview .vl-address code { display: block; color: var(--vl-text); }
+.vl-source-trail { list-style: none; margin: 18px 0; padding: 0; }
+.vl-source-trail li { display: grid; gap: 5px; padding: 14px 0; border-bottom: 1px solid #c1b6ed3b; }
+.vl-source-trail code { overflow-wrap: anywhere; font: 400 12px/1.6 var(--vl-mono); }
+.vl-missing-case { margin-top: 18px; }
+.vl-missing-case .vl-utility { margin-top: 14px; }
+.vl-loading-case { min-height: 640px; }
+.vl-loading-case .vl-case-steps { height: 88px; }
+.vl-skeleton { background: linear-gradient(115deg, #9bc4ee12, #b19efb0b); }
+.vl-pons-preview .vl-next-view { display: block; }
+.vl-pons-preview .vl-next-view > .vl-utility { margin: 18px 0; }
+@media (max-width: 1000px) and (min-width: 701px) {
+  .vl-pons-preview .vl-world { bottom: auto; height: 1150px; }
+  .vl-pons-preview .vl-command { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 120px; }
+  .vl-pons-preview .vl-lab-stamp { grid-column: 1 / -1; max-width: none; width: auto; margin: 0; display: block; }
+  .vl-pons-preview .vl-workspace { margin-top: 190px; }
+}
+@media (max-width: 700px) {
+  .vl-pons-preview .vl-command > span { display: none; }
+  .vl-pons-preview .vl-workspace { margin-top: 130px; }
+  .vl-pons-preview .vl-discovery { min-height: 58px; flex-wrap: wrap; gap: 6px 12px; }
+  .vl-pons-preview .vl-discovery > p { flex-basis: 100%; font-size: 14px; }
+  .vl-pons-preview .vl-find-rail { flex: 1; }
+  .vl-pons-preview .vl-case-art { width: 106px; height: 102px; }
+  .vl-pons-preview .vl-case-hero { padding-top: 13px; }
+  .vl-pons-preview .vl-case-intro h1 { font-size: 32px; margin-bottom: 12px; }
+  .vl-pons-preview .vl-alert { margin-bottom: 6px; }
+  .vl-pons-preview .vl-case-intro p { line-height: 1.45; }
+  .vl-pons-preview .vl-chips { margin-top: 10px; }
+  .vl-pons-preview .vl-live b { padding-left: 0; }
+  .vl-pons-preview .vl-loading-case { min-height: 670px; }
+}
+@media (max-width: 360px) {
+  .vl-pons-preview .vl-scout-label { top: 107px; right: 12px; max-width: 145px; }
+  .vl-pons-preview .vl-rat-scene { width: 170px; }
+  .vl-pons-preview .vl-case-art { width: 92px; height: 88px; margin-left: 9px !important; }
+  .vl-pons-preview .vl-case-intro h1 { font-size: 30px; }
+  .vl-pons-preview .vl-hero-surface { padding: 12px; }
+  .vl-pons-preview .vl-chips { gap: 5px; }
+  .vl-pons-preview .vl-chips span { padding-inline: 4px; }
+}

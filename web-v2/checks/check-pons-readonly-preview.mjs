@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { canonicalSnapshotDigest } from "../../web/snapshot-contract.js";
-import { loadPonsPreview } from "../src/pons-readonly-preview.mjs";
+import { loadPonsPreview, loadPonsCreatorTrail } from "../src/pons-readonly-preview.mjs";
 
 const launchId = "a".repeat(64);
 const txHash = "0x" + "b".repeat(64);
@@ -103,4 +103,35 @@ test("a subsequent canonical snapshot cannot regress or change the same checkpoi
     await assert.rejects(loadPonsPreview({ fetchImpl: mock(data), now: () => now, previous }), /PONS_PREVIEW_(CHECKPOINT|PUBLICATION)_(REGRESSION|CONFLICT)/);
     previous.status.publicationVersion = 1;
   }
+});
+
+test("creator trail validates its selected Case and the exact published checkpoint", async () => {
+  const data = await dataset();
+  const snapshot = await loadPonsPreview({ fetchImpl: mock(data), now: () => now });
+  const item = snapshot.cases[0];
+  const value = {
+    schemaVersion: "binrat.creator-summary/0.1", chainId: 4663,
+    reportedCreatorAddress: deployer, checkpointBlock: "100", checkpointBlockHash: blockHash,
+    feedDigest: data.feed.feedDigest,
+    coverage: { mode: "LATEST_4_VERIFIED_PONS_LAUNCHES", resultLimit: 4, olderLaunchesOmitted: true },
+    launches: [{ launchId, token, symbol: "TEST", name: "Test Pons Launch", blockNumber: "99",
+      blockHash, txHash, evidence: { factId: "binrat-fact:4663:" + launchId, digest: "e".repeat(64), sourceEventId: "f".repeat(64) } }],
+  };
+  const paths = [];
+  const read = (body) => loadPonsCreatorTrail({ item, snapshot, fetchImpl: async (path, init) => {
+    paths.push([path, init.method]); return { ok: true, json: async () => body };
+  } });
+  assert.deepEqual(await read(value), value);
+  assert.deepEqual(paths, [["/api/creator/" + deployer + "/summary", "GET"]]);
+  for (const change of [
+    (x) => { x.chainId = 5042; }, (x) => { x.checkpointBlock = "101"; },
+    (x) => { x.checkpointBlockHash = txHash; }, (x) => { x.feedDigest = "f".repeat(64); },
+    (x) => { x.reportedCreatorAddress = token; }, (x) => { x.launches[0].token = deployer; },
+    (x) => { x.launches[0].blockNumber = "101"; }, (x) => { x.launches[0].evidence.digest = "bad"; },
+    (x) => { x.launches.push(structuredClone(x.launches[0])); },
+  ]) {
+    const changed = structuredClone(value); change(changed);
+    await assert.rejects(read(changed), /PONS_TRAIL_(BINDING_MISMATCH|CASE_MISMATCH|RECORD_INVALID)/);
+  }
+  await assert.rejects(loadPonsCreatorTrail({ item, snapshot, fetchImpl: async () => ({ ok: false, status: 503 }) }), /HTTP_503/);
 });
