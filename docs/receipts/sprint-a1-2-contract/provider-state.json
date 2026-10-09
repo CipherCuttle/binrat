@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-09T16:29:23.624872+00:00",
+  "worker": "binrat-edge-v0",
+  "deploymentId": "c1e20773-0d34-4d3c-8963-0ff1b3250437",
+  "traffic": [
+    {
+      "version_id": "abe4c68d-e38e-4591-889b-77b2ca2abfe7",
+      "percentage": 100
+    }
+  ],
+  "version": {
+    "id": "abe4c68d-e38e-4591-889b-77b2ca2abfe7",
+    "number": 105,
+    "modules": [
+      {
+        "name": "worker.js",
+        "bytes": 2298388,
+        "sha256": "2634728884ac8327ccaaa2118f1c94f8237a893e57a604fd6af35ee65b32ee22"
+      }
+    ]
+  }
+}

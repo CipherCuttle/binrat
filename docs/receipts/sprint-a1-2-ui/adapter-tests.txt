@@ -1,0 +1,31 @@
+✔ complete validator yields source-bound historical item with own bounded count and no feed digest (11.138944ms)
+✔ stream byte bound does not trust content-length (1.357709ms)
+✔ 503 and missing proof do not produce a historical item (0.453393ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 192.737707
+✔ verified single Pons launch and exact canonical binding (6.33814ms)
+✔ verified empty is not unavailable (0.645266ms)
+✔ stale verified never upgrades to fresh (0.497363ms)
+✔ expired fresh becomes stale, without extending TTL (0.397067ms)
+✔ wrong chain fails closed (0.549978ms)
+✔ bad feed digest fails closed (0.398541ms)
+✔ same-height different block hash fails closed (0.408215ms)
+✔ status with no verified snapshot fails closed (0.446145ms)
+✔ read error never produces a synthetic fallback (0.196955ms)
+✔ future timestamps fail closed (0.446181ms)
+✔ a subsequent canonical snapshot cannot regress or change the same checkpoint (1.493104ms)
+✔ creator trail validates its selected Case and the exact published checkpoint (1.202663ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20.801447

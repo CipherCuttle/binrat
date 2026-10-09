@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-09T16:49:20.939233+00:00",
+  "authority": "READ_ONLY_SELECT_ON_PRODUCTION_D1",
+  "sql": "SELECT l.launch_id,l.creator,l.block_number,l.log_index,\n  CASE WHEN length(l.authority_json)<=8192 THEN l.authority_json END AS authority_json,\n  CASE WHEN length(f.payload_json)<=2048 THEN f.payload_json END AS payload_json,\n  CASE WHEN length(l.authority_json)<=8192 THEN (json_extract(l.authority_json,'$.launchId')=l.launch_id AND json_extract(l.authority_json,'$.eventId')=l.event_id AND json_extract(l.authority_json,'$.chainId')=l.chain_id AND json_extract(l.authority_json,'$.blockNumber')=l.block_number AND json_extract(l.authority_json,'$.blockHash')=l.block_hash AND json_extract(l.authority_json,'$.source')=l.source AND json_extract(l.authority_json,'$.launcher')=l.launcher AND json_extract(l.authority_json,'$.txHash')=l.tx_hash AND json_extract(l.authority_json,'$.logIndex')=l.log_index AND json_extract(l.authority_json,'$.token')=l.token AND json_extract(l.authority_json,'$.creator')=l.creator AND json_extract(l.authority_json,'$.pool')=l.pool AND json_extract(l.authority_json,'$.name')=l.name AND json_extract(l.authority_json,'$.symbol')=l.symbol AND json_extract(l.authority_json,'$.imageUri')=l.image_uri AND json_extract(l.authority_json,'$.website')=l.website AND json_extract(l.authority_json,'$.twitter')=l.twitter AND json_extract(l.authority_json,'$.telegram')=l.telegram) END AS column_binding,\n  f.fact_id,f.evidence_digest\n  FROM launches l INDEXED BY idx_launches_chain_source_creator_block_numeric LEFT JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id\n  WHERE l.chain_id=4663 AND l.source='PONS_V2' AND l.creator=?\n    AND CAST(l.block_number AS INTEGER)<=CAST(? AS INTEGER)\n    AND (CAST(l.block_number AS INTEGER)<CAST(? AS INTEGER)\n      OR (l.block_number=? AND (l.log_index<? OR (l.log_index=? AND l.launch_id<=?))))\n  ORDER BY CAST(l.block_number AS INTEGER) DESC,l.log_index DESC,l.launch_id DESC LIMIT 20",
+  "params": [
+    "0xca11bde05977b3631167028862be2a173976ca11",
+    "84243094",
+    "84243094",
+    "84243094",
+    61,
+    61,
+    "742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01"
+  ],
+  "returnedRecords": 20,
+  "allColumnBindingsValid": true,
+  "meta": {
+    "served_by": "v3-prod",
+    "served_by_region": "WEUR",
+    "served_by_colo": "LHR",
+    "served_by_primary": true,
+    "timings": {
+      "sql_duration_ms": 2.9481
+    },
+    "duration": 2.9481,
+    "changes": 0,
+    "last_row_id": 1,
+    "changed_db": false,
+    "size_after": 294027264,
+    "rows_read": 40,
+    "rows_written": 0,
+    "total_attempts": 1
+  }
+}
