@@ -1,0 +1,24 @@
+PASS 1440: original historical URL, own 19-count WHY and explicit reconstruction
+PASS 1440: meaningful bounded TRAIL and recomputable complete RECEIPTS
+PASS 390: original historical URL, own 19-count WHY and explicit reconstruction
+PASS 390: meaningful bounded TRAIL and recomputable complete RECEIPTS
+PASS 320: original historical URL, own 19-count WHY and explicit reconstruction
+PASS 320: meaningful bounded TRAIL and recomputable complete RECEIPTS
+PASS 430: original historical URL, own 19-count WHY and explicit reconstruction
+PASS 430: meaningful bounded TRAIL and recomputable complete RECEIPTS
+PASS 1024: original historical URL, own 19-count WHY and explicit reconstruction
+PASS 1024: meaningful bounded TRAIL and recomputable complete RECEIPTS
+PASS current Case uses latest counts, digest and receipts without requesting historical evidence
+PASS field-tamper preserves exact identity and fails closed
+PASS wrong-chain preserves exact identity and fails closed
+PASS wrong-case preserves exact identity and fails closed
+PASS wrong-checkpoint preserves exact identity and fails closed
+PASS projection-count preserves exact identity and fails closed
+PASS missing-evidence preserves exact identity and fails closed
+PASS 503-source-only preserves exact identity and fails closed
+PASS 404-unavailable preserves exact identity and fails closed
+PASS unavailable-publication preserves exact identity and fails closed
+PASS pending historical proof cannot replace current Case after navigation
+PASS historical evidence 503 recovers only after complete revalidation
+PASS explicit fresh-publication control retains historical launch identity and bounded count
+HISTORICAL_CASE_BROWSER_PASS 23

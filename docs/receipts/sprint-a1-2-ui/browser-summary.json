@@ -1,0 +1,1094 @@
+{
+  "provenance": "COMPILED_LOCAL_FRONTEND_LOCAL_WORKER_CAPTURED_PRODUCTION_D1",
+  "controls": "EXPLICIT_SIMULATED_ADVERSE_RESPONSES",
+  "productionEndpointDeployed": false,
+  "checks": [
+    "1440: original historical URL, own 19-count WHY and explicit reconstruction",
+    "1440: meaningful bounded TRAIL and recomputable complete RECEIPTS",
+    "390: original historical URL, own 19-count WHY and explicit reconstruction",
+    "390: meaningful bounded TRAIL and recomputable complete RECEIPTS",
+    "320: original historical URL, own 19-count WHY and explicit reconstruction",
+    "320: meaningful bounded TRAIL and recomputable complete RECEIPTS",
+    "430: original historical URL, own 19-count WHY and explicit reconstruction",
+    "430: meaningful bounded TRAIL and recomputable complete RECEIPTS",
+    "1024: original historical URL, own 19-count WHY and explicit reconstruction",
+    "1024: meaningful bounded TRAIL and recomputable complete RECEIPTS",
+    "current Case uses latest counts, digest and receipts without requesting historical evidence",
+    "field-tamper preserves exact identity and fails closed",
+    "wrong-chain preserves exact identity and fails closed",
+    "wrong-case preserves exact identity and fails closed",
+    "wrong-checkpoint preserves exact identity and fails closed",
+    "projection-count preserves exact identity and fails closed",
+    "missing-evidence preserves exact identity and fails closed",
+    "503-source-only preserves exact identity and fails closed",
+    "404-unavailable preserves exact identity and fails closed",
+    "unavailable-publication preserves exact identity and fails closed",
+    "pending historical proof cannot replace current Case after navigation",
+    "historical evidence 503 recovers only after complete revalidation",
+    "explicit fresh-publication control retains historical launch identity and bounded count"
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-desktop-D-1nZZBT.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/foreground-trash-C7D_WlxW.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-desktop-BjdXMcip.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-desktop-D-1nZZBT.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/foreground-trash-C7D_WlxW.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-desktop-BjdXMcip.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-desktop-D-1nZZBT.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/foreground-trash-C7D_WlxW.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-desktop-BjdXMcip.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-desktop-D-1nZZBT.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/foreground-trash-C7D_WlxW.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-desktop-BjdXMcip.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/8f18ec5af83ac80c9b769d8f688d47e3dff529fef70193d99e71b90ada5ce013",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-sans.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/fonts/geist-mono.woff2",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-CXIx1Pkj.js",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/frontdoor-candidate-BhITa07A.css",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/status",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4192/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET"
+    }
+  ],
+  "sourceHashes": {
+    "src/public/caseEvidence.ts": "6e44ca2087cf4dcbc318014733dd64fa0e164a388d17a392452c8dd3f402fd51",
+    "src/cloudflare/publicCaseEvidence.ts": "35761fc787f46e79dbf3d7b3ab280564b5b7ef547be8e5add11f424173c5e8ba",
+    "src/cloudflare/worker.ts": "8e30e473e1c78c879afc384ec4453626ff6077f98d8c943558c31daf0219a110",
+    "web-v2/src/PonsCasePreview.tsx": "ed0ac68c969d474e0e87f49c3c59b87d707513a05811d6253ff5c3463bfc7e0d",
+    "web-v2/src/historicalCase.ts": "37b328a481e5c544f813d99b272a7a4e020d5ea32b8e660ba8ee5c8e85f371fc",
+    "web-v2/src/frontdoor-discovery.css": "df5b4435f8c5760d94eb4c3980829bd658ee12948259e04afd6eed9c1d49eab7"
+  },
+  "verdict": "PASS",
+  "browser": "141.0.7390.37",
+  "frontendRuntimeSourceCommit": "a85eba15880228f14e709174d6979a7dca6b9b8b",
+  "backendRuntimeSourceCommit": "1b5d0a05dae900128065bc81c41013d6e24566ee",
+  "frontendBase": "db13d4d8568bd99d72c6f318462664a8157e88eb"
+}
