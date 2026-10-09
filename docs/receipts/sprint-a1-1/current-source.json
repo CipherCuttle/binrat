@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "binrat.public-feed/0.1",
+  "chainId": 4663,
+  "asOfBlock": "84274428",
+  "historyCoverage": "UNVERIFIED",
+  "bag": {
+    "id": "52767f5c62ff622891a4fa42ccd84e1dd88ab6fff4baeb37173590e5b38d5386",
+    "source": "PONS_V2",
+    "token": "0xbbb6f55a299cd6b988561dffa773ce7489899bfe",
+    "symbol": "",
+    "name": "",
+    "blockNumber": "84274161",
+    "blockHash": "0x989732acc3f6b7a162d21437966f7eda3c2d2390771466127434c0d13c6b9097",
+    "txHash": "0x4281293f4c7dd41bc60e11d013fe4ed180f8060dd88f38f59d98b23a3a8fefe3",
+    "logIndex": 29,
+    "reportedCreatorAddress": "0xca61fb0cadad9ef206572264144e9c6fdd50c96c",
+    "pool": "0x40ba5d3d82ecf4e78b0759e3b391d8d577ceb2be",
+    "metadata": {
+      "imageUri": "",
+      "website": "",
+      "twitter": "",
+      "telegram": ""
+    },
+    "trashTrail": {
+      "priorLaunchCount": 0,
+      "coverage": "UNVERIFIED",
+      "prior": []
+    },
+    "evidence": [
+      {
+        "state": "OBSERVED",
+        "code": "PONS_REPORTED_DEPLOYER",
+        "text": "Pons reported this deployer address on the canonical launch event.",
+        "sourceFactIds": [
+          "binrat-fact:4663:52767f5c62ff622891a4fa42ccd84e1dd88ab6fff4baeb37173590e5b38d5386"
+        ]
+      },
+      {
+        "state": "UNKNOWN",
+        "code": "PRIOR_HISTORY_NOT_ESTABLISHED",
+        "text": "No earlier matching launch is present in this projection input. PUBLIC_PROJECTION_V0 does not claim complete history coverage.",
+        "sourceFactIds": [
+          "binrat-fact:4663:52767f5c62ff622891a4fa42ccd84e1dd88ab6fff4baeb37173590e5b38d5386"
+        ]
+      },
+      {
+        "state": "UNKNOWN",
+        "code": "OUTCOMES_NOT_PROJECTED_V0",
+        "text": "Outcome, distribution, and sellability observations are not part of PUBLIC_PROJECTION_V0.",
+        "sourceFactIds": []
+      }
+    ]
+  },
+  "receipt": {
+    "projectionVersion": "BINRAT_PUBLIC_PROJECTION_V0",
+    "chainId": 4663,
+    "asOfBlock": "84274428",
+    "asOfBlockHash": "0x10cc15f25b3d24c78d39f64e3492c6ab0d4aacef07e619b7468e20bbd9d3d46d",
+    "historyCoverage": "UNVERIFIED",
+    "inputDigest": "044a05fe75c06991ede66d3f7c616074ed637b2ee50b4086246d7f72c83717bd",
+    "outputDigest": "29aadee932eda31e05955038e9529137a3b50f9ec93ec0edc457fb1936662fb0",
+    "receiptId": "binrat-public:1f502ed77f01738dd2225d7168549d8b7d7b3e9a72da2b56f4adfeacff278986"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "binrat.public-status/0.1",
+  "chainId": 4663,
+  "state": "FRESH_VERIFIED",
+  "checkpointBlock": "84274428",
+  "checkpointBlockHash": "0x10cc15f25b3d24c78d39f64e3492c6ab0d4aacef07e619b7468e20bbd9d3d46d",
+  "feedDigest": "7d922050fab3da48fb8a0ee4067f616de91f6441497b506058d07eb294904fe9",
+  "verifiedAtMs": 1791560970694,
+  "publicationVersion": 625,
+  "freshnessValidUntilMs": 1791561150694,
+  "runtimeUpdatedAtMs": 1791560970694,
+  "lastSyncError": null
+}

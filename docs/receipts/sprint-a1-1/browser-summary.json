@@ -1,0 +1,111 @@
+{
+  "baseSha": "3aedca9d2ea9bfca1aa66d54aab3c8b86df8ef2b",
+  "provenance": "COMPILED_FRONTEND_RECORDED_PUBLIC_GET_REPLAY",
+  "controls": "SIMULATED_ADVERSE_STATES_AND_FRESH_STATUS",
+  "checks": [
+    "390x844: stale label, Rat Zero, CTA and discovery reach",
+    "390: one CTA brings first exact discovery payoff into view",
+    "390: current Case uses verified feed fields",
+    "320x800: stale label, Rat Zero, CTA and discovery reach",
+    "320: one CTA brings first exact discovery payoff into view",
+    "320: current Case uses verified feed fields",
+    "1440x900: stale label, Rat Zero, CTA and discovery reach",
+    "1440: one CTA brings first exact discovery payoff into view",
+    "1440: current Case uses verified feed fields",
+    "original exact URL after Case leaves actual latest-20 window",
+    "current-url",
+    "historical-unavailable",
+    "projection-mismatch",
+    "checkpoint-mismatch",
+    "fresh-source",
+    "503-recovery",
+    "late-response-navigation",
+    "initial 503 exact identity preserved and recovery requires verified evidence",
+    "compiled browser forwards real production GETs: current Case and old exact URL"
+  ],
+  "errors": [],
+  "measurements": [
+    {
+      "width": 390,
+      "height": 844,
+      "cta": {
+        "x": 31,
+        "y": 592.984375,
+        "width": 328,
+        "height": 48
+      }
+    },
+    {
+      "width": 320,
+      "height": 800,
+      "cta": {
+        "x": 27,
+        "y": 585.890625,
+        "width": 266,
+        "height": 48
+      }
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "cta": {
+        "x": 464.6875,
+        "y": 566.765625,
+        "width": 225,
+        "height": 49
+      }
+    }
+  ],
+  "requests": [
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/launches/latest",
+    "/api/status",
+    "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+    "/api/launches/latest",
+    "/api/launches/latest",
+    "/api/status"
+  ],
+  "historicalCasePermalink": "BLOCKED",
+  "sourceHashes": {
+    "web-v2/src/PonsCasePreview.tsx": "fce9b0439a87208bdbf774e2507fdc4aecb2c7836cbe6200de6ef64e852e07b4",
+    "web-v2/src/frontdoor-discovery.css": "100a3eadb85aa06c7f205b6f89e20c4137ad8124188f0b1f7fbe3d5fb973882e",
+    "web-v2/src/pons-readonly-preview.mjs": "89a72e34f06e87a3ae831b6df4cc17ea657f17da8eba93b75b1cf1382c602cef",
+    "web-v2/src/pons-readonly-preview.d.mts": "6b891dc6042ac6bc0283ffb0980943a61ed4e964f54fe11f901f92dfb94da310"
+  },
+  "verdict": "PASS_SCOPED_WITH_HISTORICAL_BLOCKER",
+  "browser": "141.0.7390.37"
+}

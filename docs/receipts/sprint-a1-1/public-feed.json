@@ -1,0 +1,350 @@
+{
+  "chainId": 4663,
+  "checkpointBlockHash": "0x10cc15f25b3d24c78d39f64e3492c6ab0d4aacef07e619b7468e20bbd9d3d46d",
+  "feedDigest": "7d922050fab3da48fb8a0ee4067f616de91f6441497b506058d07eb294904fe9",
+  "historyCoverage": "PARTIAL",
+  "launches": [
+    {
+      "blockNumber": "84274161",
+      "deployer": "0xca61fb0cadad9ef206572264144e9c6fdd50c96c",
+      "factId": "binrat-fact:4663:52767f5c62ff622891a4fa42ccd84e1dd88ab6fff4baeb37173590e5b38d5386",
+      "launchId": "52767f5c62ff622891a4fa42ccd84e1dd88ab6fff4baeb37173590e5b38d5386",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xbbb6f55a299cd6b988561dffa773ce7489899bfe",
+      "txHash": "0x4281293f4c7dd41bc60e11d013fe4ed180f8060dd88f38f59d98b23a3a8fefe3"
+    },
+    {
+      "blockNumber": "84273942",
+      "deployer": "0xc7e62201fdd5df2627144b771cf2b375d3bc706d",
+      "factId": "binrat-fact:4663:960c47640f24aee5f16b8de6a75db151517fb5e669ca90579ddad8ae50576d1b",
+      "launchId": "960c47640f24aee5f16b8de6a75db151517fb5e669ca90579ddad8ae50576d1b",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 1,
+      "symbol": "",
+      "token": "0xfc22bc1d999111dc4970de1e2e71bbb8a01a48b4",
+      "txHash": "0x000530a745238adff7c119059da8cb1ae6ee6652aac5cc0890f76411c257ab83"
+    },
+    {
+      "blockNumber": "84273423",
+      "deployer": "0x840e6ffab2539ccc753f715db2d695a567afbeaf",
+      "factId": "binrat-fact:4663:37bc12899c484e30b00c38e522b4990111f48e552517de8424c4c1e3be14348e",
+      "launchId": "37bc12899c484e30b00c38e522b4990111f48e552517de8424c4c1e3be14348e",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x44910b7cf3598ee0c40ad9b2132154da6f200965",
+      "txHash": "0x65ea190efb02b10cd7e9509e71a5cedf0affb2fcb923b747b31ee836425be94c"
+    },
+    {
+      "blockNumber": "84273271",
+      "deployer": "0x0e7a24692c656c935279d1e3406185aad7ffefa0",
+      "factId": "binrat-fact:4663:a49ed33237f0a5b7ba2b3f6b5fcd478c77d76a4bc15af960adebe7a7708a7883",
+      "launchId": "a49ed33237f0a5b7ba2b3f6b5fcd478c77d76a4bc15af960adebe7a7708a7883",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 1,
+      "symbol": "",
+      "token": "0xe0b13e29e27abd99c8c8db20cbc667a8bfd012cf",
+      "txHash": "0x454f99aa23f21ff7e8357b3cfcee531828c2fe09b46281f1ed61ca9d7b334e82"
+    },
+    {
+      "blockNumber": "84273243",
+      "deployer": "0xa4ee2db4c605f8567c4a404a9d0afa34619d6aaa",
+      "factId": "binrat-fact:4663:8ca99b1fdfade962fff4c04da3a563c81d11f32617005ac5a3f9455b1bbbb44a",
+      "launchId": "8ca99b1fdfade962fff4c04da3a563c81d11f32617005ac5a3f9455b1bbbb44a",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x7c5c6a5e41c503f1be6aedea0a32dbea1e29ed65",
+      "txHash": "0xc4c0f2e66a8074c33fb9c4a8ec1311d37f5d79f88d5d77da985bb03762203c7e"
+    },
+    {
+      "blockNumber": "84272793",
+      "deployer": "0xf27e5b3a6e4e49dcab8bc7fd84aad4a30b938f4f",
+      "factId": "binrat-fact:4663:6cd95fbfcef9b56d6c308016bc2cebf90633088e421fb40917df99b1974e8477",
+      "launchId": "6cd95fbfcef9b56d6c308016bc2cebf90633088e421fb40917df99b1974e8477",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xbba4a82784b0a487356fe68061c56fb562aa1fa1",
+      "txHash": "0xbdafd93075937332ee56c92ecd1d159fea23507cbcef9345820823447ff88263"
+    },
+    {
+      "blockNumber": "84272461",
+      "deployer": "0x3813b6e9e83470dbaee35666d37d0b566ae77efd",
+      "factId": "binrat-fact:4663:5de132f3021db865b553dadde106e589c1f9107b58402e9a0d42ee39b57010ce",
+      "launchId": "5de132f3021db865b553dadde106e589c1f9107b58402e9a0d42ee39b57010ce",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xbd2e5c390b9630af0f60d1cd0b3a79cbe6b9b6e8",
+      "txHash": "0x16009a578b3ee05e56bbbe9ff2992ae0642403679722ea585a78fdbf3968f4b4"
+    },
+    {
+      "blockNumber": "84272307",
+      "deployer": "0xc9bdb99c6efd33dca2e5b9ca814286fa2eb89560",
+      "factId": "binrat-fact:4663:eee7f67113421a9eed5483d6872907de34d49657e5be4658663e7ac2763df337",
+      "launchId": "eee7f67113421a9eed5483d6872907de34d49657e5be4658663e7ac2763df337",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xae319b365f81a368684c0972a8062d052bbb0951",
+      "txHash": "0x41a650ef601eafe84b96c8b7ed765b654fe98463dfcc95390e5448b56cb09824"
+    },
+    {
+      "blockNumber": "84271951",
+      "deployer": "0x265aea4acbcc91a9c6d65b8604503b16e377d9bd",
+      "factId": "binrat-fact:4663:7f2776d0746aab2595c0fa9061edc92910914feeafe917453b7a4333f8ec0d89",
+      "launchId": "7f2776d0746aab2595c0fa9061edc92910914feeafe917453b7a4333f8ec0d89",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x07b97e44de546df6d930d492e94e46150ae1a651",
+      "txHash": "0x49e94f7ae9e47b7cddf1f3861e46c2422a9bc43d4d4b8b2fca89a16dd026c643"
+    },
+    {
+      "blockNumber": "84271870",
+      "deployer": "0xc7e62201fdd5df2627144b771cf2b375d3bc706d",
+      "factId": "binrat-fact:4663:7a3be3d57a9d7db7c155945751a1e7d455a99ed6b249b6309065ff2c3eb0f568",
+      "launchId": "7a3be3d57a9d7db7c155945751a1e7d455a99ed6b249b6309065ff2c3eb0f568",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x649d1359062905fc7940b875686c64ec57b3ce36",
+      "txHash": "0x563ec3ac5a733685c1337c4b0bb7dddc69995b4ca388903e01997bd13ab1ca44"
+    },
+    {
+      "blockNumber": "84271788",
+      "deployer": "0x0e7a24692c656c935279d1e3406185aad7ffefa0",
+      "factId": "binrat-fact:4663:fbee76be4216dc9fd58a04bcc870f4789dd7fbd10dd27d5e1a9433c58d49b742",
+      "launchId": "fbee76be4216dc9fd58a04bcc870f4789dd7fbd10dd27d5e1a9433c58d49b742",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x6687647cbba1e7b1755bb562cd5f4ab633cadcdd",
+      "txHash": "0xb40d6cdfe39746f37032e1004e906b443667f79d3bc986a0ab0b52acef7ddc87"
+    },
+    {
+      "blockNumber": "84271068",
+      "deployer": "0xb48687bf978fbb1243b90d1bac7ddb6e1020bdc6",
+      "factId": "binrat-fact:4663:7aa6a3130ead3906dd4a856a6daba25204de10e2c266fa16bb2563834c728ed1",
+      "launchId": "7aa6a3130ead3906dd4a856a6daba25204de10e2c266fa16bb2563834c728ed1",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x5dd9d64299151e7cf8d09d49d365eb0b456e739a",
+      "txHash": "0x883835de49e1f3285ed4a2d710cfdc826d260bfdd0611863c95491cc10766024"
+    },
+    {
+      "blockNumber": "84270995",
+      "deployer": "0x7034dbfc29e5bb0e19ecf276bc1a1b193b09f783",
+      "factId": "binrat-fact:4663:4d3390d78e905777958d23e61428b5b967101fe7a05e59fb24fad9b32183e3d9",
+      "launchId": "4d3390d78e905777958d23e61428b5b967101fe7a05e59fb24fad9b32183e3d9",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xb1c4bf758e586a170caeb16316971769484a6e02",
+      "txHash": "0x7394adc56e815f3728967fda65df0e7fbe01064623ba4fc794079c27147ec7ec"
+    },
+    {
+      "blockNumber": "84270939",
+      "deployer": "0x87905283954759ddd6852b145f87599f311eb395",
+      "factId": "binrat-fact:4663:a4ecceff88cba14bfab6e169d33ecb688d275c5f9dc23ac969179a40a23b88c7",
+      "launchId": "a4ecceff88cba14bfab6e169d33ecb688d275c5f9dc23ac969179a40a23b88c7",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xbc5f2c80f427529b9386b773c5eba81b3ed0a9b6",
+      "txHash": "0x1f3c4b90f323243414ec07490fddabd720c04dc50754c78b981c481b68acde2d"
+    },
+    {
+      "blockNumber": "84270781",
+      "deployer": "0x35f8b8716c5858dc1e30e9957fc18d6019649168",
+      "factId": "binrat-fact:4663:3ad4873e13f95e95ec2d2be20e15ec81f7b10c44dc8c9b5cd134f83cabf0d165",
+      "launchId": "3ad4873e13f95e95ec2d2be20e15ec81f7b10c44dc8c9b5cd134f83cabf0d165",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x1fb7f8679f6d7c3d9bcbf95dc71487e13c67b763",
+      "txHash": "0x371f835ded923caac8ef55e624ce9f186744c678e6aa043bc5ddc88efe0f8a19"
+    },
+    {
+      "blockNumber": "84270750",
+      "deployer": "0x63b88c1eac6ce69b3e23f97a663a754245ecd21a",
+      "factId": "binrat-fact:4663:0a32208689e8b87dcce0299595a4ff8de150c1e25f19974b466b3c0a93d2c054",
+      "launchId": "0a32208689e8b87dcce0299595a4ff8de150c1e25f19974b466b3c0a93d2c054",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xa03a791bb174d7d99d2693bad0c97fe00325dddb",
+      "txHash": "0x698134ef30cd22944e32605356013266fae50ef51297fad60921423be8544cb9"
+    },
+    {
+      "blockNumber": "84270427",
+      "deployer": "0x58b8501d951d11bd7875ec830a9935384b215acd",
+      "factId": "binrat-fact:4663:cf5aa2cb8b1fbdb58af0443dc08e1c40e14d5b80b06fc461995d75b6273061f2",
+      "launchId": "cf5aa2cb8b1fbdb58af0443dc08e1c40e14d5b80b06fc461995d75b6273061f2",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 21,
+      "symbol": "",
+      "token": "0x8604ccb5139ddcd92922927ccea654dd3a602065",
+      "txHash": "0x9e4fb6cd7be39023b6ad5f5c59b1b4b1274555e4c71fb1831fe3a56d67490216"
+    },
+    {
+      "blockNumber": "84270293",
+      "deployer": "0xc6818b0138a3abce0a35214283e6d0bdc0733f8d",
+      "factId": "binrat-fact:4663:00e05a1bd48b299131ef53e68351860a899c1ee9968d147424f035ea2aefc5cd",
+      "launchId": "00e05a1bd48b299131ef53e68351860a899c1ee9968d147424f035ea2aefc5cd",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0xf125bf5ace843127519f7698fdc4028462f813d9",
+      "txHash": "0x640bea080f4e55e7521b7c9106e254b0c93b36d78cef168b9417bc9607eb243f"
+    },
+    {
+      "blockNumber": "84269876",
+      "deployer": "0xe67a1de47088dbbfa92de15456a2b8fe4d0edbd1",
+      "factId": "binrat-fact:4663:1499b1d6d7741ec0cc44ae687651ca89938068ebbfce1d294a4e642fd380d37b",
+      "launchId": "1499b1d6d7741ec0cc44ae687651ca89938068ebbfce1d294a4e642fd380d37b",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 1,
+      "symbol": "",
+      "token": "0xdd1af7026488b94b4deb8cd9eb7762260d635717",
+      "txHash": "0xd01546ff2bf8980de03a910f6ff0f8430823bd849fbd6e3bc913a0a1aa433d57"
+    },
+    {
+      "blockNumber": "84269416",
+      "deployer": "0xbe6ecd75d043e646edaf28d4d463ba2b3a7fa019",
+      "factId": "binrat-fact:4663:5e77e5f543321db809e6b9ef05f8e0b9e6bf490662fd580b0438d49784ce33c2",
+      "launchId": "5e77e5f543321db809e6b9ef05f8e0b9e6bf490662fd580b0438d49784ce33c2",
+      "metadata": {
+        "imageUri": "",
+        "telegram": "",
+        "twitter": "",
+        "website": ""
+      },
+      "name": "",
+      "priorLaunchCount": 0,
+      "symbol": "",
+      "token": "0x013ef15f0e05377a722803920dcf7a5b884d584d",
+      "txHash": "0xde4cb33943668e657541d70dd3a999e85e2942e1f99a9e74adb3cbc4cff5acff"
+    }
+  ],
+  "schemaVersion": "binrat.latest-launches/0.1",
+  "sourceCheckpoint": "84274428"
+}

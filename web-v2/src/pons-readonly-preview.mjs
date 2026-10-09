@@ -1,6 +1,6 @@
 // Isolated Pons/Robinhood 4663 read-only preview.
 // Reuse current public validators; never touch the historical ARC 5042 V2 adapter.
-import { adaptLatestLaunches } from "../../web/data-source.js";
+import { adaptLatestLaunches, adaptPublicFeed } from "../../web/data-source.js";
 import { verifyFeedBinding, bindingMatches } from "../../web/snapshot-contract.js";
 import { validatePublicStatus } from "../../web/read-plane.js";
 
@@ -41,6 +41,31 @@ export async function loadPonsPreview({ fetchImpl = globalThis.fetch, signal, no
     status.freshnessValidUntilMs !== null && status.freshnessValidUntilMs > now()
       ? "FRESH_VERIFIED" : "STALE_VERIFIED";
   return { feed, status, freshness, cases: feed.bags };
+}
+
+/** Diagnostic only. V0 returns one bag but hashes the whole projection: its
+ * output digest cannot be recomputed here. Never return its fields as a Case,
+ * promote UNVERIFIED history, or attach the latest-feed digest to this record. */
+export async function inspectPonsHistoricalSource({ id, snapshot, fetchImpl = globalThis.fetch, signal }) {
+  if (!/^[0-9a-f]{64}$/.test(id)) throw new Error("PONS_HISTORICAL_ID_INVALID");
+  const value = await readJson(fetchImpl, "/api/bag/" + id, signal);
+  const receipt = value?.receipt;
+  if (value?.bag?.id !== id || value.schemaVersion !== "binrat.public-feed/0.1" ||
+      value.chainId !== 4663 || value.historyCoverage !== "UNVERIFIED" ||
+      receipt?.projectionVersion !== "BINRAT_PUBLIC_PROJECTION_V0" ||
+      receipt.chainId !== 4663 || receipt.historyCoverage !== "UNVERIFIED" ||
+      !/^[0-9a-f]{64}$/.test(receipt.inputDigest) || !/^[0-9a-f]{64}$/.test(receipt.outputDigest) ||
+      !/^binrat-public:[0-9a-f]{64}$/.test(receipt.receiptId)) {
+    throw new Error("PONS_HISTORICAL_PROJECTION_MISMATCH");
+  }
+  if (value.asOfBlock !== snapshot.status.checkpointBlock ||
+      receipt.asOfBlock !== value.asOfBlock ||
+      receipt.asOfBlockHash !== snapshot.status.checkpointBlockHash) {
+    throw new Error("PONS_HISTORICAL_CHECKPOINT_MISMATCH");
+  }
+  // Reuse V0 structural validation only; it is not a digest/provenance check.
+  adaptPublicFeed({ ...value, asOfBlockHash: receipt.asOfBlockHash, bags: [value.bag] });
+  return "HISTORICAL_SOURCE_ONLY";
 }
 
 /** Optional historical trail. A different publication is never mixed into a Case. */

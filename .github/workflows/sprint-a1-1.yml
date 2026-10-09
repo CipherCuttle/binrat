@@ -1,0 +1,61 @@
+name: sprint-a1-1
+on:
+  pull_request:
+    paths:
+      - 'web-v2/src/PonsCasePreview.tsx'
+      - 'web-v2/src/pons-readonly-preview.*'
+      - 'web-v2/src/frontdoor-discovery.css'
+      - 'web-v2/checks/*historical*'
+      - 'web-v2/checks/sprint-a1-1-browser.cjs'
+      - '.github/workflows/sprint-a1-1.yml'
+permissions:
+  contents: read
+jobs:
+  scoped-browser:
+    if: github.head_ref == 'feat/binrat-sprint-a1-frontdoor-discovery'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Targeted contract checks
+        run: |
+          pnpm rebuild better-sqlite3
+          node web-v2/checks/check-pons-readonly-preview.mjs
+          node web-v2/checks/check-pons-historical-source.mjs
+          node scripts/build-public-release.mjs
+          pnpm exec tsx --test test/cloudflareWorker.test.ts test/publicProjection.test.ts
+      - name: Compile reviewed base and changed head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin 3aedca9d2ea9bfca1aa66d54aab3c8b86df8ef2b
+          git worktree add --detach "$RUNNER_TEMP/binrat-a1-reviewed" 3aedca9d2ea9bfca1aa66d54aab3c8b86df8ef2b
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/binrat-a1-reviewed/node_modules"
+          ln -s "$GITHUB_WORKSPACE/web-v2/node_modules" "$RUNNER_TEMP/binrat-a1-reviewed/web-v2/node_modules"
+          (cd "$RUNNER_TEMP/binrat-a1-reviewed" && node web-v2/checks/build-frontdoor-candidate.mjs --production)
+          mkdir -p .artifacts/sprint-a1-1
+          cp -a "$RUNNER_TEMP/binrat-a1-reviewed/.artifacts/v3-frontdoor/site" .artifacts/sprint-a1-1/before-site
+          node web-v2/checks/build-frontdoor-candidate.mjs --production
+      - name: Pinned compiled browser evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-playwright/node_modules" node web-v2/checks/sprint-a1-1-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sprint-a1-1-${{ github.event.pull_request.head.sha }}
+          path: docs/receipts/sprint-a1-1/
+          retention-days: 14

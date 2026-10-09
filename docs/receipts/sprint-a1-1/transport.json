@@ -1,0 +1,25 @@
+{
+  "provenance": "REAL_PRODUCTION_PUBLIC_GETS",
+  "requests": [
+    {
+      "path": "/api/launches/latest",
+      "status": 200,
+      "checkedAt": "2026-10-09T15:50:03.572Z"
+    },
+    {
+      "path": "/api/status",
+      "status": 200,
+      "checkedAt": "2026-10-09T15:50:03.660Z"
+    },
+    {
+      "path": "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "status": 200,
+      "checkedAt": "2026-10-09T15:50:03.844Z"
+    },
+    {
+      "path": "/api/bag/52767f5c62ff622891a4fa42ccd84e1dd88ab6fff4baeb37173590e5b38d5386",
+      "status": 200,
+      "checkedAt": "2026-10-09T15:50:04.011Z"
+    }
+  ]
+}
