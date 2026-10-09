@@ -15,7 +15,7 @@ const feed = JSON.parse(fs.readFileSync(path.join(root, 'docs/receipts/sprint-a1
 const status = JSON.parse(fs.readFileSync(path.join(root, 'docs/receipts/sprint-a1/public-status.json')));
 const manifest = JSON.parse(fs.readFileSync(path.join(root, '.artifacts/v3-frontdoor/manifest.json')));
 const report = { sourceSha: manifest.sourceSha, sourceDirty: manifest.sourceDirty, checks: [], errors: [], measurements: [], requests: [], provenance: 'RECORDED_PRODUCTION_PUBLIC_GET_REPLAY', controls: 'SIMULATED_ADVERSE_STATES', ownerVisualApproval: 'PENDING', productionAuthorization: false, verdict: 'FAIL' };
-const allowed = p => ['/api/status', '/api/launches/latest'].includes(p) || /^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(p);
+const allowed = p => ['/api/status', '/api/launches/latest'].includes(p) || /^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(p) || /^\/api\/bag\/[0-9a-f]{64}(\/evidence)?$/.test(p);
 const tab = (p, s) => p.getByRole('tab', { name: new RegExp('\\b' + s + '\\b') });
 async function check(name, fn) { await fn(); report.checks.push(name); console.log('PASS ' + name); }
 async function capture(p, name) { await p.screenshot({ path: path.join(out, name + '.png') }); }
@@ -36,6 +36,8 @@ async function contextFor(b, viewport, state = { feed, status }) {
     const p = new URL(route.request().url()).pathname;
     assert.equal(route.request().method(), 'GET'); assert.ok(allowed(p), p);
     if (state.delayMs) await new Promise(r => setTimeout(r, state.delayMs));
+    // This older feed-only replay has no historical source capture. Fail closed.
+    if (p.startsWith('/api/bag/')) return route.fulfill({ status: 404, contentType: 'application/json', body: '{"error":"HISTORICAL_SOURCE_UNAVAILABLE_IN_FEED_REPLAY"}' });
     if (p.startsWith('/api/creator/')) return route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"REPLAY_HAS_NO_CREATOR_DETAIL"}' });
     return route.fulfill({ status: state.unavailable ? 503 : 200, contentType: 'application/json', body: JSON.stringify(state.unavailable ? { error: 'SIMULATED_UNAVAILABLE' } : p.endsWith('/status') ? state.status : state.feed) });
   });
@@ -167,7 +169,7 @@ async function recheck(p) { await p.getByRole('button', { name: 'RECHECK', exact
         else if(name==='verified-empty')assert.match(await p.locator('#vl-finds').innerText(),/Verified empty feed/);
         else if(name==='no-recurrence'){await p.getByRole('button',{name:'Familiar deployers',exact:true}).click();assert.equal(await p.locator('[data-case-id]').count(),0);assert.match(await p.locator('#vl-finds').innerText(),/No familiar deployers/);}
         else if(name==='partial-metadata'){assert.match(await p.locator('#vl-finds').innerText(),/Name without symbol/);assert.match(await p.locator('#vl-finds').innerText(),/SYMBOLONLY/);}
-        else if(['fresh-bound-replay','expired-freshness'].includes(name)){assert.equal(await p.locator('[data-read-state]').getAttribute('data-read-state'),name==='fresh-bound-replay'?'FRESH_VERIFIED':'STALE_VERIFIED');assert.match(await p.locator('.vl-live').innerText(),name==='fresh-bound-replay'?/LIVE/:/PAUSED/);}
+        else if(['fresh-bound-replay','expired-freshness'].includes(name)){assert.equal(await p.locator('[data-read-state]').getAttribute('data-read-state'),name==='fresh-bound-replay'?'FRESH_VERIFIED':'STALE_VERIFIED');assert.match(await p.locator('.vl-lab-stamp').innerText(),name==='fresh-bound-replay'?/Publication checked/:/Updates paused/);}
         else {assert.equal(await p.locator('[data-case-id]').count(),0);assert.match(await p.locator('#vl-finds').innerText(),/Nothing was substituted/);}
         await noOverflow(p,390);await capture(p,'controlled-'+name);
       });await c.close();

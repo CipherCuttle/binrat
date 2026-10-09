@@ -11,7 +11,7 @@ const runner = require("node:module").createRequire(
 assert.equal(runner("playwright/package.json").version, "1.56.1");
 const { chromium } = runner("playwright");
 const base = "http://127.0.0.1:4192",
-  out = path.resolve("docs/receipts/sprint-a1-2-ui");
+  out = path.resolve(process.env.BINRAT_CASE_OUTPUT || "docs/receipts/sprint-a1-2-ui");
 fs.mkdirSync(out, { recursive: true });
 const e = JSON.parse(
     fs.readFileSync(
