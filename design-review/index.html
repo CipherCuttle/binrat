@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow">
+  <title>BINRAT / Frontend review desk</title>
+  <link rel="stylesheet" href="./review.css">
+  <script src="./review.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">BINRAT <span>/ DESIGN REVIEW DESK</span><small> · historical frontend experiments</small></div>
+    <nav class="top-nav"><a href="#catalog-title">Versions</a><a href="#review-title">Feedback</a><a href="#summary-title">Your preferences</a></nav>
+  </header>
+  <section class="intro">
+    <h1>See every version. Keep only what works.</h1>
+    <p>Each immutable GitHack snapshot has a separate review. Rate the individual choices you like and dislike, not just the overall page. Feedback stays on your device until you export it or submit a GitHub issue yourself.</p>
+    <p class="notice"><b>Archive boundaries:</b> historical frontends are not production data sources. Some rely on retired APIs. G6a GitHack is source-only and lacks the eight approved PNGs. Old Grain Wave experiments are included for comparison, not endorsed or reactivated.</p>
+    <p class="help"><b>Privacy:</b> GitHack shares a browser origin across repositories. Other pages on raw.githack.com could read its local storage. Do not put private information or credentials in these notes; use JSON export if you need to move them.</p>
+  </section>
+  <main class="layout">
+    <aside class="panel catalog" aria-labelledby="catalog-title">
+      <div class="panel-head"><h2 id="catalog-title">Design versions <span id="count"></span></h2><p class="help">Select a version to review and open its snapshot.</p></div>
+      <div class="tools">
+        <label for="search">Find a design</label>
+        <input type="search" id="search" placeholder="e.g. cinematic, bento, mobile">
+        <label for="group">Filter era</label>
+        <select id="group"></select>
+      </div>
+      <ul id="versionList" class="version-list"></ul>
+    </aside>
+    <section class="panel preview" aria-labelledby="current-title">
+      <div class="headline">
+        <p id="current-group" class="tag"></p>
+        <h2 id="current-title">Choose a design</h2>
+        <p id="description"></p>
+        <div id="flags"></div>
+        <div class="actions">
+          <a id="openPreview" class="btn primary" target="_blank" rel="noopener noreferrer">Open original GitHack ↗</a>
+          <button id="loadIframe" class="btn secondary" type="button">Show preview here</button>
+          <button id="copyLink" class="btn secondary" type="button">Copy feedback link</button>
+          <a href="#review-title" class="btn secondary">Rate this design ↓</a>
+        </div>
+        <p id="source" class="help"></p>
+      </div>
+      <div class="preview-shell">
+        <div id="previewBox" class="preview-box"><p>Load the historical snapshot here or open the original GitHack in a new tab. Embedded views may fail for versions that require their original backend or browser permissions.</p></div>
+        <p class="help">The original snapshot is never modified. This wrapper adds feedback around it, not inside it.</p>
+      </div>
+    </section>
+    <section class="panel review" aria-labelledby="review-title">
+      <div class="panel-head">
+        <h2 id="review-title">Your feedback</h2>
+        <p class="help">Reviewing <strong id="reviewVersion"></strong>. Blank scores are not interpreted as neutral.</p>
+        <div id="saveStatus" class="save" role="status" aria-live="polite"></div>
+      </div>
+      <div class="form">
+        <div class="row2">
+          <div><label for="device">Viewed on</label><select id="device"><option value="">Not selected</option><option>Desktop</option><option>Android phone 390px</option><option>Small phone 320px</option><option>Tablet</option><option>Multiple</option></select></div>
+          <div><label for="area">Judging</label><select id="area"><option value="">Whole concept</option><option>Homepage</option><option>Rat Radar</option><option>Mobile layout</option><option>Scanner</option><option>Investigation / Rat Trap</option><option>Cards / modules</option></select></div>
+        </div>
+        <h3>Score only what you've seen</h3><p class="help">1 = dislike, 5 = love. Leave anything untested blank.</p>
+        <div id="ratings" class="ratings"></div>
+        <h3>Explicit likes</h3><p class="help">Select the design decisions you want to preserve.</p>
+        <div id="likes" class="facet-grid" aria-label="Design features you like"></div>
+        <h3>Explicit dislikes</h3><p class="help">Select what should change or never return.</p>
+        <div id="dislikes" class="facet-grid" aria-label="Design features you dislike"></div>
+        <div class="field"><label for="keep"><strong>Keep this even if the design changes</strong></label><textarea id="keep" placeholder="Be specific: which feature, color, placement or atmosphere?"></textarea></div>
+        <div class="field"><label for="cut"><strong>Remove / change this</strong></label><textarea id="cut" placeholder="What bothers you, on which device, and where?"></textarea></div>
+        <div class="field"><label for="why"><strong>Why it works or doesn't</strong></label><textarea id="why" placeholder="Mood, density, hierarchy, scanner feel, reveal payoff…"></textarea></div>
+        <label class="check"><input type="checkbox" id="dealbreaker"> This version has a dealbreaker I would not ship</label>
+        <div class="actions"><button type="button" class="btn primary" id="save">Save this review</button><button type="button" class="btn secondary" id="clear">Clear this version</button></div>
+        <p class="help">Auto-saved locally as you edit. Clear affects this version only.</p>
+        <div class="bar"></div>
+        <h3>Send feedback to your next design sprint</h3>
+        <p class="help">Copy a structured handoff for ChatGPT, export your full review history as JSON, or open a <b>public GitHub issue draft</b>. A GitHub issue is not posted until you submit it there.</p>
+        <div class="actions">
+          <button type="button" class="btn" id="copyDigest">Copy review for ChatGPT</button>
+          <button type="button" class="btn" id="export">Download all JSON</button>
+          <a id="issue" class="btn secondary" target="_blank" rel="noopener noreferrer">Open public GitHub issue draft ↗</a>
+        </div>
+        <div class="bar"></div>
+        <h2 id="summary-title">Preference evidence</h2>
+        <p class="help">Counts of choices you explicitly made across your reviewed versions, not invented general design rules.</p>
+        <pre class="summary" id="summary"></pre>
+        <div class="row2">
+          <div><label for="versus">Compare against</label><select id="versus"><option value="">Choose another version</option></select></div>
+          <div><label for="choice">I prefer</label><select id="choice"><option value="">Not chosen</option><option value="A">This version</option><option value="B">The other version</option><option value="tie">Tie / different strengths</option></select></div>
+        </div>
+        <div class="field"><label for="compareWhy">What exact difference matters?</label><textarea id="compareWhy" placeholder="e.g. I like G4-R's Radar but G4a's text legibility"></textarea></div>
+        <button id="saveComparison" class="btn secondary" type="button">Save comparison</button>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">Local-first, no analytics or automatic server writes. Snapshot links are frozen historical frontends, not proof of live intelligence. You choose what to export or publish.</footer>
+  <script id="catalog" type="application/json">[
+  {
+    "id": "g6a",
+    "name": "G6a · Static pixel-sunset source",
+    "group": "Static sunset",
+    "sha": "959da17b0573dff016808d597737b4cf186bed62",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Latest static composition and card slots, but the eight safe G6 PNGs are NOT in this GitHack snapshot.",
+    "pr": 53,
+    "flags": [
+      "art missing",
+      "draft"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/959da17b0573dff016808d597737b4cf186bed62/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g6-bridge",
+    "name": "G6 · Static sunset bridge",
+    "group": "Static sunset",
+    "sha": "962c34e9a529546cffa88e08420e540be17cab8a",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Static CSS placeholder before the G6 art integration.",
+    "pr": 53,
+    "flags": [
+      "placeholder"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/962c34e9a529546cffa88e08420e540be17cab8a/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "r5",
+    "name": "R5 · Composed official Grain Wave",
+    "group": "Effect experiments",
+    "sha": "ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Historical official demo wave integrated with the rat and responsive phone layout; superseded by static art.",
+    "pr": 52,
+    "flags": [
+      "superseded motion"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "r5-isolated",
+    "name": "R5 · Isolated effect reference",
+    "group": "Effect experiments",
+    "sha": "ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597",
+    "path": "prototype/g3a/dist/index.html?demo-isolate=1",
+    "description": "Official effect demo without BINRAT foreground; useful to distinguish effect preference from composition preference.",
+    "pr": 52,
+    "flags": [
+      "effect reference"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597/prototype/g3a/dist/index.html?demo-isolate=1"
+  },
+  {
+    "id": "r4",
+    "name": "R4 · Licensed Grain Wave island",
+    "group": "Effect experiments",
+    "sha": "8d1378f2a1c834b49ef66cd8ebe1886738b80755",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Historical official licensed component in Svelte, now rejected as BINRAT direction.",
+    "pr": 51,
+    "flags": [
+      "superseded motion"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/8d1378f2a1c834b49ef66cd8ebe1886738b80755/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g4r2",
+    "name": "G4-R2 · Original grained sky",
+    "group": "Effect experiments",
+    "sha": "3d3f4da17609b76658edd92364992fc93ea35526",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Custom moving pixel-grained sunset behind the original rat.",
+    "pr": 50,
+    "flags": [
+      "superseded motion"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/3d3f4da17609b76658edd92364992fc93ea35526/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g4-cta",
+    "name": "G4-R · CTA-style atmosphere",
+    "group": "Effect experiments",
+    "sha": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Self-authored CTA-inspired moving header, not the proprietary paid component.",
+    "pr": 49,
+    "flags": [
+      "superseded motion"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/6faec5d1a6a1920c2aa311ef6b9864854650c842/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g4r",
+    "name": "G4-R · Cinematic Intelligence",
+    "group": "Svelte explorations",
+    "sha": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Dark cinematic sunset and Rat Radar workspace with contrasting paper case file.",
+    "pr": 48,
+    "flags": [
+      "draft"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/f9ec83f663fe5e0446b8a1dc61ccd507bc00027d/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g4a",
+    "name": "G4a · The Rat's Field Instrument",
+    "group": "Svelte explorations",
+    "sha": "65e983a5ba7655f063be57a7ee12b23cfcc91e06",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Light restrained industrial field instrument with quieter evidence surfaces.",
+    "pr": 47,
+    "flags": [
+      "draft"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/65e983a5ba7655f063be57a7ee12b23cfcc91e06/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g3c",
+    "name": "G3c · Mobile-hardened arcade",
+    "group": "Svelte explorations",
+    "sha": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Underground Arcade with Android back navigation, keyboard access and receipt-source hardening.",
+    "pr": 46,
+    "flags": [
+      "historical"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/cd7e7e986d0412c72ee00b45ffe98146a40e16ae/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g3b",
+    "name": "G3b · Rat Trap reveal",
+    "group": "Svelte explorations",
+    "sha": "0eb819369602f6f153c58dae14212d5e9308059c",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "Scanner plus separate explicitly fictional MOLD first-discovery demonstration.",
+    "pr": 45,
+    "flags": [
+      "fictional demo"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/0eb819369602f6f153c58dae14212d5e9308059c/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "g3a",
+    "name": "G3a · First scanner prototype",
+    "group": "Svelte explorations",
+    "sha": "1eb17fc462f78e0e05430ba3d45d2f0c08059be7",
+    "path": "prototype/g3a/dist/index.html",
+    "description": "First Svelte scanner interaction before the Rat Trap reveal.",
+    "pr": 45,
+    "flags": [
+      "historical"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/1eb17fc462f78e0e05430ba3d45d2f0c08059be7/prototype/g3a/dist/index.html"
+  },
+  {
+    "id": "bento-final",
+    "name": "Pons Bento · Later preview",
+    "group": "V2 and Bento",
+    "sha": "f6165bd5a9b433f12fbbc6644b92aeaf22dc4027",
+    "path": "index.html",
+    "description": "Later Pons-first bento snapshot; its historical external read proxy may be unavailable.",
+    "pr": 31,
+    "flags": [
+      "external API"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/f6165bd5a9b433f12fbbc6644b92aeaf22dc4027/index.html"
+  },
+  {
+    "id": "bento-v1",
+    "name": "Pons Bento · First preview",
+    "group": "V2 and Bento",
+    "sha": "c31b1d4726eade25ba257f48022879e538394394",
+    "path": "index.html",
+    "description": "First bento design on a frozen historical Pons snapshot; not a current live feed.",
+    "pr": 31,
+    "flags": [
+      "external API"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/c31b1d4726eade25ba257f48022879e538394394/index.html"
+  },
+  {
+    "id": "g2-demo",
+    "name": "Product surface G2 preview",
+    "group": "V2 and Bento",
+    "sha": "4d1df2121018d2c4291489d3e9dc91236a8c02ff",
+    "path": "index.html",
+    "description": "Early standalone product-surface demo, distinct from the unhosted Figma concept studies.",
+    "pr": 31,
+    "flags": [
+      "external API"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/4d1df2121018d2c4291489d3e9dc91236a8c02ff/index.html"
+  },
+  {
+    "id": "dumpster-d1",
+    "name": "Dumpster OS · D1 industrial",
+    "group": "V2 and Bento",
+    "sha": "e34501add2c1ac17526cf4b56826a90f84a68d08",
+    "path": "web-v2/dist/index.html",
+    "description": "Industrial visual shell, rusted textures, glyphs and design lab.",
+    "pr": 25,
+    "flags": [
+      "static DEMO"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/e34501add2c1ac17526cf4b56826a90f84a68d08/web-v2/dist/index.html"
+  },
+  {
+    "id": "mobile-m1",
+    "name": "M1 · Mobile-first app",
+    "group": "V2 and Bento",
+    "sha": "8487754822c4dfef1d634d1f8ca5981b51f9aadd",
+    "path": "web-v2/dist/index.html",
+    "description": "Discover, Radar, Saved and More task-first mobile navigation.",
+    "pr": 24,
+    "flags": [
+      "static DEMO"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/8487754822c4dfef1d634d1f8ca5981b51f9aadd/web-v2/dist/index.html"
+  },
+  {
+    "id": "v2",
+    "name": "V2 · Feed and Creator surface",
+    "group": "V2 and Bento",
+    "sha": "6905d0cecd8ec24134ca5196f69f0a602daba305",
+    "path": "web-v2/dist/index.html",
+    "description": "Earlier Feed, Creator, Replay and Ledger interface in static demonstration mode.",
+    "pr": 23,
+    "flags": [
+      "static DEMO"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/6905d0cecd8ec24134ca5196f69f0a602daba305/web-v2/dist/index.html"
+  },
+  {
+    "id": "astra",
+    "name": "Astra · Terminal",
+    "group": "Early concepts",
+    "sha": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+    "path": "web/index.html?fixtures=1",
+    "description": "Compact older Arc research terminal; GitHack cannot provide its original live Render API.",
+    "pr": 11,
+    "flags": [
+      "backend unavailable"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e/web/index.html?fixtures=1"
+  },
+  {
+    "id": "hero",
+    "name": "Original hero fidelity",
+    "group": "Early concepts",
+    "sha": "445a034afbce8c99b02f84e82fae576b03c84a60",
+    "path": "web/index.html",
+    "description": "Early landing page with the high-fidelity original mascot image.",
+    "pr": 10,
+    "flags": [
+      "historical"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/445a034afbce8c99b02f84e82fae576b03c84a60/web/index.html"
+  },
+  {
+    "id": "dumpster-v0",
+    "name": "THE DUMPSTER · First fixture shell",
+    "group": "Early concepts",
+    "sha": "d8388b8dccfbaf64896e6617c0e78dddcb42ac95",
+    "path": "web/index.html",
+    "description": "Original zero-dependency fixture shell and HOT GARBAGE cards, before canonical hero art.",
+    "pr": 4,
+    "flags": [
+      "fixture"
+    ],
+    "url": "https://raw.githack.com/CipherCuttle/binrat/d8388b8dccfbaf64896e6617c0e78dddcb42ac95/web/index.html"
+  }
+]</script>
+</body></html>
