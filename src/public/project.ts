@@ -50,11 +50,13 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
       return projectTrailItem(candidate, priorFact);
     });
 
+    const sourceLabel = launch.source === 'PONS_V2' ? 'Pons' : 'ArcPad';
+    const roleLabel = launch.source === 'PONS_V2' ? 'deployer' : 'creator';
     const evidence: PublicBag['evidence'] = [
       {
         state: 'OBSERVED',
-        code: 'ARCPAD_REPORTED_CREATOR',
-        text: 'ArcPad reported this address on the launch event.',
+        code: launch.source === 'PONS_V2' ? 'PONS_REPORTED_DEPLOYER' : 'ARCPAD_REPORTED_CREATOR',
+        text: `${sourceLabel} reported this ${roleLabel} address on the canonical launch event.`,
         sourceFactIds: [fact.factId]
       }
     ];
@@ -63,7 +65,7 @@ export async function projectPublicFeed(input: PublicProjectionInput): Promise<P
       evidence.push({
         state: 'NOTED',
         code: 'REPORTED_CREATOR_PRIOR_LAUNCHES',
-        text: `The same ArcPad-reported creator address appears on ${prior.length} earlier indexed launch${prior.length === 1 ? '' : 'es'} present in this projection input.`,
+        text: `The same ${sourceLabel}-reported ${roleLabel} address appears on ${prior.length} earlier indexed launch${prior.length === 1 ? '' : 'es'} present in this projection input.`,
         sourceFactIds: [fact.factId, ...prior.map((item) => item.sourceFactId)]
       });
     } else {
@@ -181,20 +183,20 @@ async function validateInput(input: PublicProjectionInput, launches: LaunchObser
 
   for (const launch of launches) {
     if (launch.chainId !== input.chainId) throw new Error(`PUBLIC_CHAIN_MISMATCH:${launch.launchId}`);
-    if (launch.source !== 'ARCPAD') throw new Error(`PUBLIC_SOURCE_UNSUPPORTED:${launch.launchId}`);
+    if (launch.source !== 'ARCPAD' && launch.source !== 'PONS_V2') throw new Error(`PUBLIC_SOURCE_UNSUPPORTED:${launch.launchId}`);
     if (launch.blockNumber > input.asOfBlock) throw new Error(`PUBLIC_FUTURE_LAUNCH:${launch.launchId}`);
 
     const expectedLaunchId = await deriveLaunchId({
       chainId: launch.chainId,
       launcher: launch.launcher,
       txHash: launch.txHash,
-      token: launch.token
+      token: launch.token, source: launch.source
     });
     const expectedEventId = await deriveEventId({
       chainId: launch.chainId,
       launcher: launch.launcher,
       txHash: launch.txHash,
-      logIndex: launch.logIndex
+      logIndex: launch.logIndex, source: launch.source
     });
     if (launch.launchId !== expectedLaunchId || launch.eventId !== expectedEventId) {
       throw new Error(`PUBLIC_LAUNCH_IDENTITY_MISMATCH:${launch.launchId}`);

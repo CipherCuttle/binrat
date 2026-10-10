@@ -1,0 +1,43 @@
+name: cloudflare-dry-run
+
+on:
+  pull_request:
+    paths:
+      - "src/cloudflare/**"
+      - "cloudflare/**"
+      - "web/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/cloudflare-dry-run.yml"
+  workflow_dispatch:
+
+jobs:
+  wrangler-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Prepare non-deploying candidate config
+        shell: bash
+        run: |
+          cp cloudflare/wrangler.example.jsonc wrangler.jsonc
+          sed -i 's/REPLACE_WITH_D1_DATABASE_ID/00000000-0000-0000-0000-000000000000/g' wrangler.jsonc
+          sed -i 's#https://REPLACE_WITH_PUBLIC_SITE#https://example.invalid#g' wrangler.jsonc
+
+      - name: Bundle Worker with pinned Wrangler
+        run: pnpm dlx wrangler@4.135.0 deploy --dry-run --outdir .wrangler-dry-run
+
+      - name: Assert bundle artifact exists
+        shell: bash
+        run: |
+          test -d .wrangler-dry-run
+          test -n "$(find .wrangler-dry-run -type f -print -quit)"

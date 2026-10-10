@@ -8,17 +8,32 @@
     "node": ">=20"
   },
   "scripts": {
+    "start": "node dist/src/server.js",
+    "serve:live": "tsx src/server.ts",
     "build": "tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts",
-    "check": "pnpm check:backend-only && pnpm build && pnpm test",
+    "web:serve": "node scripts/serve-web.mjs",
+    "web:check": "node --check web/fixtures.js && node --check web/data-source.js && node --check web/share-card.js && node --check web/app.js && node --check web/react-bits-island.js && node --check web/app/app.js && node scripts/check-web.mjs && node scripts/check-share-card.mjs && node scripts/check-launch-presentation.mjs",
+    "check": "pnpm build && pnpm test && pnpm web:check",
+    "verify:launch-mechanics:rpc": "tsx scripts/verify-launch-mechanics-rpc.ts",
     "backfill": "tsx src/cli.ts backfill",
     "watch": "tsx src/cli.ts watch",
     "inspect": "tsx src/cli.ts inspect",
-    "check:backend-only": "node scripts/check-backend-only.mjs"
+    "probe:observations": "tsx src/observationProbeCli.ts",
+    "test:observations": "tsx --test test/observations.test.ts test/observationSync.test.ts",
+    "telegram:serve": "tsx src/telegram/server.ts",
+    "verify:production-binding-parity": "tsx scripts/verify-production-binding-parity.ts",
+    "telegram:plan": "tsx src/telegram/configCli.ts plan",
+    "telegram:apply": "tsx src/telegram/configCli.ts apply",
+    "telegram:verify": "tsx src/telegram/configCli.ts verify",
+    "telegram:private-menu-activate": "tsx src/telegram/configCli.ts private-menu-activate",
+    "telegram:private-menu-restore": "tsx src/telegram/configCli.ts private-menu-restore",
+    "telegram:smoke": "tsx src/telegram/configCli.ts smoke"
   },
   "dependencies": {
     "better-sqlite3": "12.10.1",
-    "viem": "2.56.3"
+    "viem": "2.56.3",
+    "compromise": "14.16.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "9.6.0",

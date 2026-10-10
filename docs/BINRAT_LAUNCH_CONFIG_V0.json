@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "binrat.launch-config/0.1",
+  "configVersion": "BINRAT_LAUNCH_CONFIG_V0",
+  "frozenOn": "2026-09-21",
+  "chainId": 5042,
+  "launchRail": {
+    "railId": "arcpad-arc-mainnet-usdc-standard-v0",
+    "mode": "STANDARD_CREATOR_REWARDS",
+    "launchMechanicsReceipt": {
+      "path": "docs/LAUNCH_MECHANICS_VERIFICATION_V0.json",
+      "digest": "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6"
+    }
+  },
+  "authorities": {
+    "treasury": {
+      "role": "TREASURY",
+      "address": "0xab063A9b53a2Ab832a941aE5890ea05c1672339D"
+    },
+    "projectFeeRecipient": {
+      "role": "PROJECT_FEE_RECIPIENT",
+      "address": "0xba5Ee49734b50Cf62d0B538584fbaC0eFFB79866"
+    },
+    "roleBinding": "EXPLICIT_NON_INTERCHANGEABLE",
+    "custodyEvidence": "OWNER_DECLARATION_ONLY",
+    "onChainRoleProof": "NOT_YET_AVAILABLE"
+  },
+  "launchPolicy": {
+    "privatePresale": "NONE",
+    "discountedInsiderRound": "NONE",
+    "hiddenTeamAllocation": "NONE",
+    "privilegedCreatorFirstBuy": "DISABLED",
+    "founderProjectPrivilegedLaunchAllocation": "NONE",
+    "founderProjectLaunchBlockPrivilegedPurchase": "NONE",
+    "founderProjectPublicMarketPurchaseAtLaunch": "NOT_PLANNED_FOR_LAUNCH"
+  },
+  "token": {
+    "state": "NOT_LAUNCHED",
+    "addressState": "NOT_YET_CREATED",
+    "address": null,
+    "launchTransaction": null,
+    "launchBlock": null,
+    "launchBlockHash": null,
+    "supply": null,
+    "pool": null,
+    "liquidityPosition": null,
+    "locker": null
+  },
+  "holderGate": {
+    "status": "TOKEN_AUTHORITY_NOT_CONFIGURED",
+    "productionEligibilityActive": false,
+    "rawBalanceThresholdStatus": "UNRESOLVED",
+    "policyVersion": null,
+    "effectiveBlock": null,
+    "effectiveTime": null,
+    "reviewedBalanceSource": null,
+    "displayAuthorityInheritance": "TREASURY_AND_PROJECT_FEE_ROLES_ONLY"
+  },
+  "dumpsterLedger": {
+    "accountingActivationStatus": "DISABLED_PRE_LAUNCH",
+    "accountingActive": false,
+    "configuredAuthorityStatus": "OWNER_SELECTED_PRE_LAUNCH",
+    "tokenAddress": null,
+    "effectiveLaunchBlock": null,
+    "accountingObserverActivated": false,
+    "requiredBeforeActivation": [
+      "ACTUAL_BINRAT_TOKEN_ADDRESS",
+      "EFFECTIVE_LAUNCH_BLOCK",
+      "BOUND_LAUNCH_MECHANICS_RECEIPT",
+      "EXPLICIT_ACCOUNTING_OBSERVER_ACTIVATION"
+    ]
+  },
+  "allocationDisclosure": {
+    "evidenceClass": "OWNER_POLICY",
+    "privatePresale": "NO",
+    "discountedInsiderRound": "NO",
+    "hiddenTeamAllocation": "NO",
+    "privilegedCreatorFirstBuy": "NO",
+    "founderProjectLaunchBlockPrivilegedPurchase": "NO",
+    "founderProjectOrdinaryPublicMarketPurchaseAtLaunch": "NOT_PLANNED",
+    "treasuryTokenInventory": "ZERO_NOT_YET_CREATED",
+    "tokenAddress": "NOT_YET_CREATED",
+    "postLaunchOnChainVerification": "REQUIRED_NOT_YET_AVAILABLE"
+  },
+  "legalCompliance": {
+    "status": "NOT_SATISFIED"
+  },
+  "launchAuthority": {
+    "explicitOwnerLaunchAuthorityState": "NOT_GRANTED",
+    "launchAuthorization": "BLOCKED",
+    "launchAuthorized": false,
+    "marketingAuthorized": false,
+    "configurationAuthorizesLaunch": false
+  },
+  "launchTiming": {
+    "status": "UNRESOLVED"
+  },
+  "configDigest": "f631e43287a3bcb6a6da6a7f405d1ad2e3b17c9648b5928dc7c8a3a32890e1f8"
+}

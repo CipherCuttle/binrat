@@ -1,0 +1,515 @@
+{
+  "schemaVersion": "binrat.launch-mechanics-verification/0.1",
+  "verifiedAt": "2026-09-21T00:16:16Z",
+  "chainId": 5042,
+  "launchRail": {
+    "railId": "arcpad-arc-mainnet-usdc-standard-v0",
+    "selectionStatus": "CANDIDATE_PENDING_OWNER_INPUT",
+    "selectedVariant": {
+      "name": "ArcPad USDC standard creator-rewards launch",
+      "authority": {
+        "launcherAddress": "0x24196CD6e534cfCE8F480B53E70809b68Ea86F29",
+        "lockerAddress": "0x69A615DD32B89fE40D87b2e3123baE4162f2d450",
+        "tokenFactoryAddress": "0x48EecE92e20f3431B00FD5Bc49D94aBe058E7E8f"
+      },
+      "quoteTokenAddress": "0x3600000000000000000000000000000000000000",
+      "rewardMode": "STANDARD_CREATOR_REWARDS"
+    },
+    "excludedCurrentVariant": {
+      "name": "ArcPad non-USDC pair launcher",
+      "launcherAddress": "0x9D328ea13957C74103781aa6B060124f3c1Bd82B",
+      "reason": "Different launcher, factory and locker; not the candidate BINRAT USDC standard rail."
+    }
+  },
+  "launcher": {
+    "identity": {
+      "claimId": "launcher.identity",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "address": "0x24196CD6e534cfCE8F480B53E70809b68Ea86F29",
+        "runtimeBytecodeBytes": 17227,
+        "runtimeBytecodeKeccak256": "0x7d7dd41fb043033027a3061e2bb2dcf65489a72f1adc83ce1fdf983c91bfce68",
+        "creationTransaction": "0xda831a6c0e23a0cd82a93db1b19e981444ce29fb3091f4ec05329423c67a8d13",
+        "creationBlock": 19014715,
+        "initializationTransaction": "0xf8118989242ef1746652de69db2e5e40c08a9a438badb2642327c2713da12c40",
+        "initializationBlock": 19014815
+      },
+      "evidenceRefs": ["arc_rpc", "arcscan_launcher", "arcpad_live_bundle"]
+    },
+    "proxyAndUpgradeability": {
+      "claimId": "launcher.proxy-upgradeability",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "proxy": false,
+        "eip1967ImplementationSlotZero": true,
+        "eip1967AdminSlotZero": true,
+        "eip1967BeaconSlotZero": true,
+        "upgradeEntryPointObserved": false
+      },
+      "evidenceRefs": ["arc_rpc", "arcscan_launcher"]
+    },
+    "administration": {
+      "claimId": "launcher.administration",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "owner": "0x0F7972E8012EEEF3c4fd8084A2739D802f8bFA7f",
+        "treasury": "0xa71200705Ed02c5837961b5331EaC119Ecd37746",
+        "pauseAuthorityObserved": false,
+        "ownershipTransferable": true,
+        "ownerCanSetBannedLaunchNameHashes": true,
+        "mutableLaunchEconomicsObserved": false
+      },
+      "evidenceRefs": ["arc_rpc", "arcpad_live_bundle"]
+    },
+    "creationPath": {
+      "claimId": "launcher.creation-path",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "tokenFactory": "0x48EecE92e20f3431B00FD5Bc49D94aBe058E7E8f",
+        "uniswapV3Factory": "0xf0db7b58379503491d857dB50AC9ece64c653918",
+        "positionManager": "0x39654A85A4C05127f5Fd6ED22CAeC077A0fB1377",
+        "locker": "0x69A615DD32B89fE40D87b2e3123baE4162f2d450",
+        "tokenCreatedByFactory": true,
+        "poolCreatedOrResolvedByV3Factory": true,
+        "positionMintedToLocker": true
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"]
+    },
+    "sourceBinding": {
+      "claimId": "launcher.source-binding",
+      "status": "PARTIAL",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "explorerVerifiedSource": false,
+        "arcPadPublicRepositoryLocated": false,
+        "compilerMetadataIndicates": "Solidity 0.8.24",
+        "compilerMetadataIpfsCid": "QmPAN8cEgraXgV1WtiRVv9ybKkxbwB7eQvzUFZ6umLtDam",
+        "sourceMatchedToDeployedBytecode": false
+      },
+      "evidenceRefs": ["arcscan_launcher", "arc_rpc"],
+      "qualification": "Compiler metadata is embedded in bytecode, but retrievable source matching the deployment was not available. No ArcPad contract claim is SOURCE_VERIFIED."
+    }
+  },
+  "tokenMechanics": {
+    "implementationAuthority": {
+      "claimId": "token.implementation-authority",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "factoryAddress": "0x48EecE92e20f3431B00FD5Bc49D94aBe058E7E8f",
+        "factoryRuntimeBytecodeBytes": 18107,
+        "factoryRuntimeBytecodeKeccak256": "0xe79405b2e8893091aca83455e5fd5d035f2a607b0a413f470d8ef99f0f8f5212",
+        "factoryCreationTransaction": "0x302c3427eb73a1e00111e787aa61ac36f017987049de7e279dd6e3a0a2d396af",
+        "factoryCreationBlock": 19014793,
+        "compilerMetadataIndicates": "Solidity 0.8.24",
+        "compilerMetadataIpfsCid": "QmRTZA2Qos8ywDKoNMK7sM4Hqp3oSEccLdxLk6s9kTpAKs",
+        "sampleTokensShareCodeFamily": true,
+        "rawRuntimeHashesDifferBecauseConstructorImmutables": true
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"]
+    },
+    "fixedSupply": {
+      "claimId": "token.fixed-supply",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "decimals": 18,
+        "totalSupplyRaw": "1000000000000000000000000000",
+        "totalSupplyTokens": "1000000000",
+        "postCreationMintCapabilityObserved": false,
+        "burnFunctionObserved": false,
+        "totalSupplyDecreasesOnFeeBurn": false
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"]
+    },
+    "privileges": {
+      "claimId": "token.privileges",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "ownerRenouncedToZero": true,
+        "upgradeable": false,
+        "pauseCapabilityObserved": false,
+        "blacklistOrDenylistCapabilityObserved": false,
+        "transferTaxOrTaxHookObserved": false,
+        "temporaryRecipientBalanceCapHook": true,
+        "oneTimePadMigrationExemptionSetterPresent": true,
+        "migrationExemptionUsedInSamples": false
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"]
+    },
+    "initialAllocation": {
+      "claimId": "token.initial-allocation",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "mintRecipient": "LAUNCHER",
+        "nominalSupplyFractionSeededToPosition": "approximately 100%",
+        "exactFullSupplyEnteredLiquidity": false,
+        "noDevBuySampleLauncherRemainderRaw": "326357976",
+        "noDevBuySampleLauncherRemainderTokens": "0.000000000326357976",
+        "creatorOrTeamAllocationInNoDevBuySamples": "0",
+        "optionalCreatorFirstBuyCanCreateCreatorInventory": true
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"],
+      "qualification": "The platform phrase 'full supply added to liquidity' is directionally close but not exact at raw-unit precision."
+    }
+  },
+  "uniswap": {
+    "deployment": {
+      "claimId": "uniswap.deployment",
+      "status": "VERIFIED",
+      "evidenceClass": "SOURCE_VERIFIED",
+      "value": {
+        "version": "Uniswap V3",
+        "factoryAddress": "0xf0db7b58379503491d857dB50AC9ece64c653918",
+        "factoryRuntimeBytecodeBytes": 24535,
+        "factoryRuntimeBytecodeKeccak256": "0x621c4819f7b62d7ddb153206bc30950bcc3f5cc9d24c45661f8c2f31dcbd166d",
+        "factoryDeploymentTransaction": "0x603dae1a5f2d5c6a98fb241550934263aab2b71a48135d174b6129886a39bf6a",
+        "positionManagerAddress": "0x39654A85A4C05127f5Fd6ED22CAeC077A0fB1377",
+        "positionManagerRuntimeBytecodeBytes": 24384,
+        "positionManagerRuntimeBytecodeKeccak256": "0xcad0552151ba7675afe512ebe77fcc6eed68a0cb65775d31e38d44823e6796a0",
+        "positionManagerDeploymentTransaction": "0xa22913d1279c8beb6fcf108011cc5c4416941d62f49e0fcdc0c760936fea53f0",
+        "deploymentCommit": "534603a",
+        "manifestRepositoryCommit": "37936185dee7decf681360ec799c124e0e034672"
+      },
+      "evidenceRefs": ["uniswap_5042_manifest", "arc_rpc"]
+    },
+    "poolConfiguration": {
+      "claimId": "uniswap.pool-configuration",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "quoteTokenAddress": "0x3600000000000000000000000000000000000000",
+        "quoteSymbol": "USDC",
+        "quoteDecimals": 6,
+        "feeTierHundredthsBps": 10000,
+        "feePercent": "1.00",
+        "tickSpacing": 200,
+        "launcherTickFloor": -403600,
+        "launcherTickCeil": -276800,
+        "positionRangeWhenLaunchTokenIsToken0": [-403600, 887200],
+        "positionRangeWhenLaunchTokenIsToken1": [-887200, 403600]
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"]
+    }
+  },
+  "liquidity": {
+    "lockerIdentity": {
+      "claimId": "liquidity.locker-identity",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "address": "0x69A615DD32B89fE40D87b2e3123baE4162f2d450",
+        "runtimeBytecodeBytes": 5439,
+        "runtimeBytecodeKeccak256": "0x769201a0a9390ea37aadc2e468dc0f1260baea3f58b30be7bbf4a385d8b22b78",
+        "creationTransaction": "0x1a19ba4bd70085b968522cab759971e0e87e12f2b3921b44e28eb5f24d560615",
+        "creationBlock": 19014782,
+        "compilerMetadataIndicates": "Solidity 0.8.24",
+        "compilerMetadataIpfsCid": "QmbqFByqkyimKgKXfUNX5qKwu7NaGaaQikstpCeg6uK9G6",
+        "proxy": false,
+        "eip1967SlotsZero": true
+      },
+      "evidenceRefs": ["arc_rpc", "arcscan_locker"]
+    },
+    "positionCustody": {
+      "claimId": "liquidity.position-custody",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "nftOwner": "LOCKER_CONTRACT",
+        "withdrawOrDecreaseLiquidityEntryPointObserved": false,
+        "positionTransferEntryPointObserved": false,
+        "sampleInitialPositionLiquidity": "1723358097522708349",
+        "lockerUpgradeabilityObserved": false,
+        "lpCannotBeWithdrawnUnderObservedRuntime": true,
+        "lpExistsForeverProven": false,
+        "lpRemainsInRangeForever": false,
+        "canBecomeEconomicallyInactiveOutsideRange": true
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx"],
+      "qualification": "Non-withdrawal is a runtime-code finding, not a claim that the position will remain in range or economically active forever."
+    },
+    "administration": {
+      "claimId": "liquidity.locker-administration",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "positionOwnerCanChange": false,
+        "launcherOwnerCanRedirectFutureCreatorQuoteFees": true,
+        "creatorCannotRedirectOwnFees": true,
+        "treasuryCannotRedirectCreatorFees": true,
+        "pauseAuthorityObserved": false
+      },
+      "evidenceRefs": ["arc_rpc", "arcpad_live_bundle"],
+      "qualification": "The ArcPad launcher owner is an external trust dependency for the creator-fee destination."
+    }
+  },
+  "fees": {
+    "standardMode": {
+      "claimId": "fees.standard-mode",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "poolFeePercent": "1.00",
+        "collection": "permissionless locker.collect(positionId)",
+        "quoteAsset": "USDC",
+        "creatorShareOfQuoteFeesBps": 5000,
+        "protocolTreasuryShareOfQuoteFeesBps": 5000,
+        "creatorOverallBuySideEquivalentPercent": "0.50",
+        "creatorReceivesLaunchTokenSideFees": false,
+        "launchTokenSideFeesDestination": "0x000000000000000000000000000000000000dEaD",
+        "creatorClaimRequired": true,
+        "protocolTreasuryAddress": "0xa71200705Ed02c5837961b5331EaC119Ecd37746",
+        "defaultCreatorPayout": "LAUNCH_CREATOR",
+        "payoutCanBeRedirected": true,
+        "redirectAuthority": "CURRENT_LAUNCHER_OWNER"
+      },
+      "evidenceRefs": ["arc_rpc", "mooncat_fee_tx", "titcoin_mixed_fee_tx"]
+    },
+    "observedAccounting": {
+      "claimId": "fees.observed-accounting",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "mooncatCollection": {
+          "transaction": "0x021092bbbdd243a0726b468ccdb8307643b4004c233c08ade5c4a40446bbd795",
+          "block": 21878496,
+          "collectedUsdcRaw": "100999",
+          "treasuryUsdcRaw": "50500",
+          "creatorClaimableUsdcRaw": "50499"
+        },
+        "titcoinMixedCollection": {
+          "transaction": "0x3840ed856ed22dd2e6425f5c9c7f8374cc02e08392aff17be7bafc90f2bd8ba0",
+          "block": 21707910,
+          "collectedUsdcRaw": "2845400",
+          "treasuryUsdcRaw": "1422700",
+          "collectedLaunchTokenRawSentToDead": "745030083883844075935269"
+        }
+      },
+      "evidenceRefs": ["arc_rpc", "mooncat_fee_tx", "titcoin_mixed_fee_tx"]
+    },
+    "holderRewardsAlternative": {
+      "claimId": "fees.holder-rewards-alternative",
+      "status": "PARTIAL",
+      "evidenceClass": "PLATFORM_CLAIM",
+      "value": {
+        "offeredByCurrentUi": true,
+        "creatorCutRangePercent": "0-45",
+        "selectedForCandidateRail": false,
+        "independentlyVerifiedInThisReceipt": false
+      },
+      "evidenceRefs": ["arcpad_live_bundle", "arcpad_about"],
+      "qualification": "This receipt binds the standard creator-rewards mode only."
+    }
+  },
+  "antiSnipe": {
+    "walletCap": {
+      "claimId": "anti-snipe.wallet-cap",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "enforcedIn": "TOKEN_TRANSFER_RECIPIENT_BALANCE_CHECK",
+        "capRaw": "20000000000000000000000000",
+        "capTokens": "20000000",
+        "capPercentOfSupply": "2.00",
+        "durationBlocks": 1200,
+        "deadlineInclusive": true,
+        "sampleLaunchBlock": 21878384,
+        "sampleLastCappedBlock": 21879584,
+        "firstUncappedBlock": 21879585,
+        "directUniswapPurchasesCovered": true,
+        "multipleWalletBypassPossible": true,
+        "contractWalletCountsAsRecipientWallet": true,
+        "sybilResistance": false,
+        "configuredPerTokenAtCreation": true,
+        "mutableAfterCreationObserved": false,
+        "exemptions": ["LAUNCHER", "POOL", "LOCKER", "POSITION_MANAGER"]
+      },
+      "evidenceRefs": ["arc_rpc", "sample_mooncat_tx"],
+      "qualification": "The rule is block-based. At observed Arc block cadence, 1200 blocks was about ten minutes; the UI's '~2 min' text is not authoritative."
+    }
+  },
+  "creatorBuy": {
+    "semantics": {
+      "claimId": "creator-buy.semantics",
+      "status": "VERIFIED",
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "value": {
+        "supported": true,
+        "configuredInitialPurchase": true,
+        "sameTransactionAsLaunch": true,
+        "launchBlockPurchase": true,
+        "executesAgainstNewPublicPool": true,
+        "occursBeforeThirdPartyTransactionsCanEnter": true,
+        "hiddenTokenAllocation": false,
+        "privilegedTransactionOrdering": true,
+        "executedForBinrat": false,
+        "mooncatExampleInputUsdcRaw": "100000",
+        "mooncatExampleCreatorOutputTokenRaw": "33332636015742865668472"
+      },
+      "evidenceRefs": ["sample_mooncat_tx", "arc_rpc", "arcpad_live_bundle"]
+    }
+  },
+  "sampleLaunches": [
+    {
+      "name": "MoonCat",
+      "launchTransaction": "0xd8399b178274900222abb7892a1e4a02836463ad6a769d5416db4f9e14e355d3",
+      "launchBlock": 21878384,
+      "creatorAddress": "0x53dfC0D1725FB49AcF929920F0D012C8A7F6b635",
+      "tokenAddress": "0x33791dde0Af120cf8DBFbb015f53f62C2A1F6B14",
+      "poolAddress": "0x3fcc327C14Df41926f9F8f2F3b06D14F3490a5b5",
+      "positionId": "43108",
+      "lockerAddress": "0x69A615DD32B89fE40D87b2e3123baE4162f2d450",
+      "rewardMode": "STANDARD",
+      "creatorFirstBuy": true,
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "evidenceRefs": ["sample_mooncat_tx", "arc_rpc"]
+    },
+    {
+      "name": "TITCOIN",
+      "launchTransaction": "0xc412e709858e4fea70a600d8ca05bc6178c15529e4ee740cc7676d845264ab31",
+      "launchBlock": 21704358,
+      "creatorAddress": "0x6b632E44ecb4A63f0F5F7657BD7B3FBeb0D86eC6",
+      "tokenAddress": "0x3BA3182081fb79c60209a32789137145fD03e7f1",
+      "poolAddress": "0xCC1fe4d5A7660152EecBe8eab3deC89B09E35DF3",
+      "positionId": "41000",
+      "lockerAddress": "0x69A615DD32B89fE40D87b2e3123baE4162f2d450",
+      "rewardMode": "STANDARD",
+      "creatorFirstBuy": false,
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "evidenceRefs": ["sample_titcoin_tx", "arc_rpc"]
+    },
+    {
+      "name": "EMPTYOT",
+      "launchTransaction": "0x2b19355aa1f8fe91b6c75b0cdf57d1543ed1f6e317f578b184355cd9ebb8b418",
+      "launchBlock": 21652070,
+      "creatorAddress": "0x4e9cD60f92701edffd9069240E6c64AbaEE2b80A",
+      "tokenAddress": "0xa7ef970A9cC2f2238b9ab8f9de8076F76F192Cd7",
+      "poolAddress": "0xF021624FFE2667F93Dff2D717ea3b634E88356d0",
+      "positionId": "40163",
+      "lockerAddress": "0x69A615DD32B89fE40D87b2e3123baE4162f2d450",
+      "rewardMode": "STANDARD",
+      "creatorFirstBuy": false,
+      "evidenceClass": "ON_CHAIN_VERIFIED",
+      "evidenceRefs": ["sample_emptyot_tx", "arc_rpc"]
+    }
+  ],
+  "allocationDisclosure": {
+    "status": "PRELAUNCH_DETERMINISTIC_PENDING_FINAL_LAUNCH_RECEIPT",
+    "privatePresale": "NO_UNDER_SELECTED_MECHANICS",
+    "discountedInsiderRound": "NO_UNDER_SELECTED_MECHANICS",
+    "teamAllocation": "NO_UNDER_SELECTED_MECHANICS",
+    "hiddenPrivilegedInventory": "NO_CREATOR_OR_TEAM_ALLOCATION; RAW_UNIT_LAUNCHER_DUST_EXISTS; FINAL_STATE_REQUIRES_ACTUAL_LAUNCH_RECEIPT",
+    "founderProjectPublicPurchase": "UNRESOLVED",
+    "treasuryInventory": "NONE_FROM_SELECTED_LAUNCH_MECHANICS; LATER_PUBLIC_PURCHASE_OR_TRANSFER_UNRESOLVED",
+    "evidenceClass": "ON_CHAIN_VERIFIED",
+    "evidenceRefs": ["sample_mooncat_tx", "sample_titcoin_tx", "sample_emptyot_tx", "arc_rpc"],
+    "satisfiesCanonicalLaunchGate": false
+  },
+  "platformClaimsNotIndependentlyVerified": [
+    {
+      "claimId": "platform.full-supply-liquidity",
+      "status": "PARTIAL",
+      "evidenceClass": "PLATFORM_CLAIM",
+      "value": "100% supply added to liquidity",
+      "evidenceRefs": ["arcpad_about"],
+      "qualification": "Observed launches leave sub-token raw-unit dust at the launcher."
+    },
+    {
+      "claimId": "platform.permanent-liquidity",
+      "status": "PARTIAL",
+      "evidenceClass": "PLATFORM_CLAIM",
+      "value": "Liquidity is locked forever",
+      "evidenceRefs": ["arcpad_about"],
+      "qualification": "Observed runtime exposes no withdrawal path, but perpetual existence and perpetual in-range economic activity are not proven."
+    },
+    {
+      "claimId": "platform.creator-every-swap",
+      "status": "PARTIAL",
+      "evidenceClass": "PLATFORM_CLAIM",
+      "value": "Creator earns 0.5% on every swap",
+      "evidenceRefs": ["arcpad_about"],
+      "qualification": "The locker shares quote-side fees; launch-token-side fees are sent to the dead address."
+    },
+    {
+      "claimId": "platform.two-minute-cap",
+      "status": "PARTIAL",
+      "evidenceClass": "PLATFORM_CLAIM",
+      "value": "2% cap for about two minutes",
+      "evidenceRefs": ["arcpad_live_bundle"],
+      "qualification": "The deployed rule is exactly 1200 blocks and was about ten minutes at the observed cadence."
+    }
+  ],
+  "ownerInputRequired": [
+    { "decisionId": "creator_fee_recipient", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "treasury_wallet", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "founder_project_public_market_purchase", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "confirm_standard_creator_rewards_mode", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "holder_gate_raw_balance_threshold", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "launch_metadata", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "exact_launch_timing", "status": "OWNER_INPUT_REQUIRED", "value": null },
+    { "decisionId": "legal_compliance_authorization", "status": "OWNER_INPUT_REQUIRED", "value": null }
+  ],
+  "unresolvedFindings": [
+    {
+      "unresolvedId": "arcpad_source_match",
+      "status": "UNRESOLVED",
+      "description": "ArcPad launcher, token factory and locker verified source tied to deployed bytecode was not available."
+    },
+    {
+      "unresolvedId": "future_platform_mutation",
+      "status": "UNRESOLVED",
+      "description": "ArcPad may replace the live launcher before a future BINRAT launch; the receipt must be refreshed immediately before authorization."
+    },
+    {
+      "unresolvedId": "owner_inputs",
+      "status": "UNRESOLVED",
+      "description": "Wallets, purchase decision, metadata, threshold, time and legal authorization remain unset."
+    }
+  ],
+  "dumpsterLedgerHandoff": {
+    "state": "INACTIVE_OWNER_INPUT_REQUIRED",
+    "chainId": 5042,
+    "tokenAddress": null,
+    "feeRecipientAddress": null,
+    "treasuryAddress": null,
+    "effectiveLaunchBlock": null,
+    "selectedLaunchMechanicsReceiptDigest": null,
+    "digestBindingRule": "Copy this receipt's receiptDigest into the separately frozen production authority record after owner inputs and actual launch evidence exist."
+  },
+  "holderGateHandoff": {
+    "state": "INACTIVE_OWNER_INPUT_REQUIRED",
+    "chainId": 5042,
+    "tokenAddress": null,
+    "rawBalanceThreshold": null,
+    "policyVersion": null,
+    "effectiveTime": null,
+    "effectiveBlock": null,
+    "reviewedBalanceSource": null
+  },
+  "launchAuthority": {
+    "launchAuthorization": "BLOCKED",
+    "marketingAuthorized": false,
+    "tokenState": "NOT_LAUNCHED",
+    "receiptAuthorizesLaunch": false
+  },
+  "sources": [
+    { "id": "arc_rpc", "url": "https://rpc.mainnet.arc.io", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "arcscan_launcher", "url": "https://api.arc-scan.org/v1/address/0x24196CD6e534cfCE8F480B53E70809b68Ea86F29", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "arcscan_locker", "url": "https://api.arc-scan.org/v1/address/0x69A615DD32B89fE40D87b2e3123baE4162f2d450", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "arcpad_about", "url": "https://arcpad.meme/about", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "arcpad_live_bundle", "url": "https://arcpad.meme/assets/index-DbmpXoBA.js", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "uniswap_5042_manifest", "url": "https://raw.githubusercontent.com/Uniswap/contracts/37936185dee7decf681360ec799c124e0e034672/deployments/json/5042.json", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "sample_mooncat_tx", "url": "https://arc-scan.org/tx/0xd8399b178274900222abb7892a1e4a02836463ad6a769d5416db4f9e14e355d3", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "sample_titcoin_tx", "url": "https://arc-scan.org/tx/0xc412e709858e4fea70a600d8ca05bc6178c15529e4ee740cc7676d845264ab31", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "sample_emptyot_tx", "url": "https://arc-scan.org/tx/0x2b19355aa1f8fe91b6c75b0cdf57d1543ed1f6e317f578b184355cd9ebb8b418", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "mooncat_fee_tx", "url": "https://arc-scan.org/tx/0x021092bbbdd243a0726b468ccdb8307643b4004c233c08ade5c4a40446bbd795", "retrievedAt": "2026-09-21T00:16:16Z" },
+    { "id": "titcoin_mixed_fee_tx", "url": "https://arc-scan.org/tx/0x3840ed856ed22dd2e6425f5c9c7f8374cc02e08392aff17be7bafc90f2bd8ba0", "retrievedAt": "2026-09-21T00:16:16Z" }
+  ],
+  "receiptDigest": "aff37d6d82cced00a34284453c0327bb51e5624b5761b621264f55602e8245e6"
+}
