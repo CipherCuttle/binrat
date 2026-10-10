@@ -71,6 +71,7 @@ export interface PonsOutcomeObservationSource {
 
 export interface PonsOutcomeObservationSyncOptions {
   maxReceiptsPerSync: number;
+  expectedLaunchTimestampMs?: number;
   horizons?: readonly {label: string; ms: number}[];
 }
 
@@ -93,12 +94,14 @@ export class RpcPonsOutcomeObservationSource implements PonsOutcomeObservationSo
     archiveRpcUrl:string;
     discoveryClient?:PublicClient;
     archiveClient?:PublicClient;
+    boundedFetch?:typeof fetch;
   }) {
     this.blockClient=options.discoveryClient ?? createPublicClient({
       chain:robinhoodMainnet(options.discoveryRpcUrl),
       transport:http(options.discoveryRpcUrl,{
-        timeout:PONS_RPC_TIMEOUT_MS,
-        retryCount:PONS_RPC_RETRY_COUNT,
+        timeout:options.boundedFetch ? 3000 : PONS_RPC_TIMEOUT_MS,
+        fetchFn:options.boundedFetch,
+        retryCount:options.boundedFetch ? 0 : PONS_RPC_RETRY_COUNT,
         retryDelay:PONS_RPC_RETRY_DELAY_MS
       })
     });
@@ -106,8 +109,9 @@ export class RpcPonsOutcomeObservationSource implements PonsOutcomeObservationSo
       client:options.archiveClient ?? createPublicClient({
         chain:robinhoodMainnet(options.archiveRpcUrl),
         transport:http(options.archiveRpcUrl,{
-          timeout:PONS_RPC_TIMEOUT_MS,
-          retryCount:PONS_RPC_RETRY_COUNT,
+          timeout:options.boundedFetch ? 3000 : PONS_RPC_TIMEOUT_MS,
+          fetchFn:options.boundedFetch,
+          retryCount:options.boundedFetch ? 0 : PONS_RPC_RETRY_COUNT,
           retryDelay:PONS_RPC_RETRY_DELAY_MS
         })
       })
@@ -129,6 +133,7 @@ export class RpcPonsOutcomeObservationSource implements PonsOutcomeObservationSo
 
   async getBlockPoint(blockNumber:bigint):Promise<PonsOutcomeBlockPoint> {
     const block=await this.blockClient.getBlock({blockNumber});
+    if (block.number!==blockNumber) throw new Error('PONS_OUTCOME_BLOCK_NUMBER_INVALID');
     if (!block.hash) throw new Error(`PONS_OUTCOME_BLOCK_HASH_MISSING:${blockNumber}`);
     const timestampMs=Number(block.timestamp*1000n);
     if (!Number.isSafeInteger(timestampMs)) throw new Error('PONS_OUTCOME_BLOCK_TIMESTAMP_INVALID');
@@ -386,6 +391,15 @@ export async function syncPonsOutcomeObservations(
 
     const launchPoint = await source.getBlockPoint(launch.blockNumber);
     assertHash('PONS_OUTCOME_LAUNCH_REORG', launch.blockNumber, launch.blockHash, launchPoint.blockHash);
+    if (options.expectedLaunchTimestampMs!==undefined && launchPoint.timestampMs!==options.expectedLaunchTimestampMs) {
+      throw new Error('PONS_OUTCOME_JOB_TARGET_MISMATCH');
+    }
+    for (const receipt of existing) {
+      if (receipt.targetTimestampMs!==launchPoint.timestampMs+receipt.horizonMs ||
+        receipt.observedBlock>checkpoint.blockNumber || receipt.observedTimestampMs>checkpointPoint.timestampMs) {
+        throw new Error('PONS_OUTCOME_STORED_BINDING_INVALID');
+      }
+    }
 
     for (const horizon of horizons) {
       if (remaining <= 0) break;
@@ -400,7 +414,8 @@ export async function syncPonsOutcomeObservations(
         source,
         launch.blockNumber,
         checkpoint.blockNumber,
-        targetTimestampMs
+        targetTimestampMs,
+        checkpointPoint
       );
       if (!observed) {
         pendingMaturity += 1;
@@ -428,6 +443,9 @@ export async function syncPonsOutcomeObservations(
         targetTimestampMs,
         capability
       });
+      const checkpointAgain=await source.getBlockPoint(checkpoint.blockNumber);
+      assertHash('PONS_OUTCOME_CHECKPOINT_REORG_DURING_READ',checkpoint.blockNumber,checkpoint.blockHash,checkpointAgain.blockHash);
+      if (checkpointAgain.timestampMs!==checkpointPoint.timestampMs) throw new Error('PONS_OUTCOME_CHECKPOINT_TIMESTAMP_DRIFT');
       const result = await store.put(receipt);
       if (result === 'INSERTED') inserted += 1;
       else duplicates += 1;
@@ -449,10 +467,12 @@ export async function findFirstPonsOutcomeBlockAtOrAfterTimestamp(
   source: Pick<PonsOutcomeObservationSource, 'getBlockPoint'>,
   lowBlock: bigint,
   highBlock: bigint,
-  targetTimestampMs: number
+  targetTimestampMs: number,
+  verifiedHighPoint?: PonsOutcomeBlockPoint
 ): Promise<PonsOutcomeBlockPoint | null> {
   if (lowBlock > highBlock) return null;
-  const highPoint = await source.getBlockPoint(highBlock);
+  const highPoint = verifiedHighPoint ?? await source.getBlockPoint(highBlock);
+  if (highPoint.blockNumber!==highBlock) throw new Error('PONS_OUTCOME_BLOCK_NUMBER_INVALID');
   if (highPoint.timestampMs < targetTimestampMs) return null;
   let low = lowBlock;
   let high = highBlock;

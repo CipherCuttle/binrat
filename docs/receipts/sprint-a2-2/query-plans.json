@@ -1,0 +1,66 @@
+{
+  "provenance": "offline SQLite / explicit synthetic fixture",
+  "plans": [
+    {
+      "name": "due-job",
+      "sql": "SELECT * FROM pons_outcome_jobs INDEXED BY idx_pons_outcome_due\n WHERE pilot_id=? AND state='READY' AND due_ms<=?\n ORDER BY due_ms,launch_id,horizon_ms LIMIT 1",
+      "params": [
+        "fixture",
+        1790640600000
+      ],
+      "plan": [
+        {
+          "id": 5,
+          "parent": 0,
+          "notused": 50,
+          "detail": "SEARCH pons_outcome_jobs USING INDEX idx_pons_outcome_due (pilot_id=? AND state=? AND due_ms<?)"
+        }
+      ]
+    },
+    {
+      "name": "recent-fallback",
+      "sql": "SELECT launch_id,token,pool,block_number,block_hash\n FROM launches INDEXED BY idx_launches_chain_source_block_numeric\n WHERE chain_id=4663 AND source='PONS_V2'\n ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC LIMIT ?",
+      "params": [
+        2
+      ],
+      "plan": [
+        {
+          "id": 7,
+          "parent": 0,
+          "notused": 61,
+          "detail": "SEARCH launches USING INDEX idx_launches_chain_source_block_numeric (chain_id=? AND source=?)"
+        }
+      ]
+    },
+    {
+      "name": "exact-launch",
+      "sql": "SELECT * FROM launches WHERE launch_id=? LIMIT 1",
+      "params": [
+        "8bc60ed33289cc578caa7b0613ee93611f58ee77f70249f0a3d66ea88079f788"
+      ],
+      "plan": [
+        {
+          "id": 4,
+          "parent": 0,
+          "notused": 39,
+          "detail": "SEARCH launches USING INDEX sqlite_autoindex_launches_1 (launch_id=?)"
+        }
+      ]
+    },
+    {
+      "name": "receipts",
+      "sql": "SELECT payload_json FROM pons_outcome_receipts WHERE chain_id=4663 AND launch_id=? AND observation_version='BINRAT_PONS_OUTCOME_OBSERVATION_V1' AND horizon_ms IN (300000,3600000,86400000) ORDER BY horizon_ms LIMIT 3",
+      "params": [
+        "8bc60ed33289cc578caa7b0613ee93611f58ee77f70249f0a3d66ea88079f788"
+      ],
+      "plan": [
+        {
+          "id": 5,
+          "parent": 0,
+          "notused": 61,
+          "detail": "SEARCH pons_outcome_receipts USING INDEX idx_pons_outcome_launch_horizon (chain_id=? AND launch_id=? AND horizon_ms=?)"
+        }
+      ]
+    }
+  ]
+}

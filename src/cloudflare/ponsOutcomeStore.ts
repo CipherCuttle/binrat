@@ -25,48 +25,8 @@ export class D1PonsOutcomeObservationStore implements PonsOutcomeObservationStor
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
       throw new Error('PONS_OUTCOME_CANDIDATE_LIMIT_INVALID');
     }
-    const oldestLimit=Math.ceil(limit/2);
-    const newestLimit=Math.floor(limit/2);
-    const result = await this.db.prepare(`
-      WITH incomplete AS (
-        SELECT l.launch_id,l.token,l.pool,l.block_number,l.block_hash,l.log_index,
-               CAST(l.block_number AS INTEGER) AS block_sort
-        FROM launches l
-        LEFT JOIN pons_outcome_receipts r
-          ON r.launch_id=l.launch_id
-         AND r.observation_version=?
-         AND r.horizon_ms IN (300000,3600000,86400000)
-        WHERE l.chain_id=4663 AND l.source='PONS_V2'
-        GROUP BY l.launch_id,l.token,l.pool,l.block_number,l.block_hash,l.log_index
-        HAVING COUNT(DISTINCT r.horizon_ms)<3
-      ),
-      oldest AS (
-        SELECT * FROM incomplete
-        ORDER BY block_sort ASC,log_index ASC,launch_id ASC
-        LIMIT ?
-      ),
-      newest AS (
-        SELECT * FROM incomplete
-        ORDER BY block_sort DESC,log_index DESC,launch_id DESC
-        LIMIT ?
-      ),
-      selected AS (
-        SELECT * FROM oldest
-        UNION
-        SELECT * FROM newest
-      )
-      SELECT launch_id,token,pool,block_number,block_hash
-      FROM selected
-      ORDER BY block_sort ASC,log_index ASC,launch_id ASC
-      LIMIT ?
-    `).bind(PONS_OUTCOME_OBSERVATION_VERSION, oldestLimit, newestLimit, limit)
-      .all<{
-        launch_id: string;
-        token: Hex;
-        pool: Hex;
-        block_number: string;
-        block_hash: Hex;
-      }>();
+    const result = await this.db.prepare(RECENT_OUTCOME_CANDIDATES_SQL).bind(limit)
+      .all<{launch_id:string;token:Hex;pool:Hex;block_number:string;block_hash:Hex}>();
     if (!result.success) throw new Error('PONS_OUTCOME_CANDIDATE_QUERY_FAILED');
     return (result.results ?? []).map((row) => ({
       launchId: row.launch_id,
@@ -79,27 +39,48 @@ export class D1PonsOutcomeObservationStore implements PonsOutcomeObservationStor
 
   async listForLaunch(launchId: string): Promise<PonsOutcomeObservationReceipt[]> {
     const result = await this.db.prepare(`
-      SELECT payload_json
+      SELECT *,CASE WHEN length(payload_json)<=8192 THEN payload_json END AS bounded_payload
       FROM pons_outcome_receipts
       WHERE chain_id=4663 AND launch_id=?
-      ORDER BY horizon_ms,observation_version,observation_id
-    `).bind(launchId).all<{payload_json: string}>();
+      AND observation_version='BINRAT_PONS_OUTCOME_OBSERVATION_V1' AND horizon_ms IN (300000,3600000,86400000)
+      ORDER BY horizon_ms LIMIT 3
+    `).bind(launchId).all<Record<string,unknown>>();
     if (!result.success) throw new Error('PONS_OUTCOME_LIST_QUERY_FAILED');
     const receipts: PonsOutcomeObservationReceipt[] = [];
     for (const row of result.results ?? []) {
-      receipts.push(await parsePonsOutcomeObservationReceipt(row.payload_json));
+      if (typeof row.bounded_payload!=='string') throw new Error('PONS_OUTCOME_STORED_BINDING_INVALID');
+      const r=await parsePonsOutcomeObservationReceipt(row.bounded_payload);
+      const columns:Record<string,unknown>={observation_id:r.observationId,observation_version:r.observationVersion,
+        chain_id:r.chainId,launch_id:r.launchId,token:r.token,curve:r.curve,horizon_ms:r.horizonMs,
+        target_timestamp_ms:r.targetTimestampMs,observed_block:r.observedBlock.toString(),observed_block_hash:r.observedBlockHash,
+        observed_timestamp_ms:r.observedTimestampMs,phase:r.phase,pair_token:r.pairToken,quote_decimals:r.quoteDecimals,
+        estimated_fdv_quote_raw:r.estimatedFdvQuoteRaw?.toString()??null,status:r.status,evidence_digest:r.evidenceDigest};
+      if (Object.entries(columns).some(([key,value])=>row[key]!==value)) throw new Error('PONS_OUTCOME_STORED_BINDING_INVALID');
+      receipts.push(r);
     }
     return receipts;
   }
 
   async put(receipt: PonsOutcomeObservationReceipt): Promise<'INSERTED' | 'DUPLICATE'> {
+    return this.write(receipt);
+  }
+
+  async putAuthorized(receipt:PonsOutcomeObservationReceipt,pilotId:string,nowMs:number,owner:string):Promise<'INSERTED'|'DUPLICATE'> {
+    return this.write(receipt,{pilotId,nowMs,owner});
+  }
+
+  private async write(receipt:PonsOutcomeObservationReceipt,auth?:{pilotId:string;nowMs:number;owner:string}):Promise<'INSERTED'|'DUPLICATE'> {
     const payload = canonicalJson(receipt);
     const result = await this.db.prepare(`
       INSERT OR IGNORE INTO pons_outcome_receipts (
         observation_id,observation_version,chain_id,launch_id,token,curve,horizon_ms,
         target_timestamp_ms,observed_block,observed_block_hash,observed_timestamp_ms,
         phase,pair_token,quote_decimals,estimated_fdv_quote_raw,status,evidence_digest,payload_json
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+       ) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? ${auth ? `WHERE EXISTS (
+        SELECT 1 FROM pons_outcome_pilots WHERE pilot_id=? AND enabled=1 AND valid_from_ms<=? AND expires_ms>?
+        AND EXISTS (SELECT 1 FROM binrat_sync_leases WHERE lease_name='binrat:pons-sync' AND owner_token=? AND lease_until_ms>?)
+        AND EXISTS (SELECT 1 FROM binrat_sync_leases WHERE lease_name='binrat:pons-outcome' AND owner_token=? AND lease_until_ms>?)
+      )` : ''}
     `).bind(
       receipt.observationId,
       receipt.observationVersion,
@@ -118,8 +99,14 @@ export class D1PonsOutcomeObservationStore implements PonsOutcomeObservationStor
       receipt.estimatedFdvQuoteRaw?.toString() ?? null,
       receipt.status,
       receipt.evidenceDigest,
-      payload
+      payload,
+      ...(auth ? [auth.pilotId,auth.nowMs,auth.nowMs,auth.owner,auth.nowMs,auth.owner,auth.nowMs] : [])
     ).run();
+    if (!result.success) throw new Error('PONS_OUTCOME_WRITE_FAILED');
+    if (auth) {
+      const p=await this.db.prepare('SELECT enabled,expires_ms FROM pons_outcome_pilots WHERE pilot_id=?').bind(auth.pilotId).first<{enabled:number;expires_ms:number}>();
+      if (!p || p.enabled!==1 || p.expires_ms<=auth.nowMs) throw new Error('PONS_OUTCOME_NOT_AUTHORIZED');
+    }
     if (changes(result) === 1) return 'INSERTED';
 
     const existing = await this.db.prepare(`
@@ -149,3 +136,9 @@ export class D1PonsOutcomeObservationStore implements PonsOutcomeObservationStor
 function changes(result: D1ResultLike): number {
   return Number(result.meta?.changes ?? 0);
 }
+
+// Bounded fallback for offline/legacy callers. The controlled Worker uses exact due jobs.
+export const RECENT_OUTCOME_CANDIDATES_SQL = `SELECT launch_id,token,pool,block_number,block_hash
+ FROM launches INDEXED BY idx_launches_chain_source_block_numeric
+ WHERE chain_id=4663 AND source='PONS_V2'
+ ORDER BY CAST(block_number AS INTEGER) DESC,log_index DESC,launch_id DESC LIMIT ?`;
