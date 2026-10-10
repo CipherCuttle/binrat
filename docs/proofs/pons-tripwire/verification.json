@@ -1,0 +1,74 @@
+{
+  "verifiedAtUtc": "2026-10-10T17:18:19.295196+00:00",
+  "baselineSha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+  "scope": "LOCAL_CANDIDATE_ONLY",
+  "productionMutations": 0,
+  "realTelegramMessages": 0,
+  "rpcRequests": 0,
+  "checks": [
+    {
+      "command": "pnpm exec tsc --noEmit",
+      "exitCode": 0
+    },
+    {
+      "command": "pnpm exec tsx --test test/ponsTripwireWorker.test.ts test/ponsTripwire.test.ts test/autonomousRat.test.ts test/ponsReadOnlyRelease.test.ts test/ratWatch.test.ts",
+      "exitCode": 0,
+      "tests": 60,
+      "pass": 60,
+      "fail": 0
+    },
+    {
+      "command": "pnpm check",
+      "exitCode": 0,
+      "tests": 609,
+      "pass": 609,
+      "fail": 0,
+      "webInvariants": "PASS"
+    },
+    {
+      "command": "pnpm --dir web-v2 check",
+      "exitCode": 0
+    },
+    {
+      "command": "pnpm --dir web-v2 build:frontdoor-candidate",
+      "exitCode": 0,
+      "packageFiles": 36
+    },
+    {
+      "command": "node web-v2/checks/pons-tripwire-browser.cjs",
+      "exitCode": 0,
+      "checks": 19,
+      "evidence": "ui/browser-proof.json"
+    },
+    {
+      "command": "BINRAT_FRONTDOOR_TOOLS=<pinned-wrangler-4.135.0-node_modules> node web-v2/checks/check-frontdoor-routing.mjs",
+      "exitCode": 0,
+      "checks": 209,
+      "evidence": "local-routing.json"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "sourceFileSha256": {
+    "src/cloudflare/ponsTripwire.ts": "c3d5c80ddbdb1a28b6834ef69396a4ff8279326a95ff4839bcaed2e9fe834e9b",
+    "src/cloudflare/ponsTripwireHttp.ts": "958b1ddc81d43509c796d5105e1cc453d9bf4e010ae05f8cbf0562058f6b1a34",
+    "src/cloudflare/syncQueue.ts": "f578d647fec2bac5164406909c5427f79327bec8f34ab41ceb39cf6a4ac98dbe",
+    "src/cloudflare/worker.ts": "7e9f2cd59c6e705a4740f8c56d8a2c9f6553eff3f269214cf804bf98d4578173",
+    "src/cloudflare/d1Schema.ts": "6a6c2ecb5104058b9213a27442f26ba4f37d72412e2e764125cfa5033eb0da9d",
+    "cloudflare/schema.sql": "a4d76df500e877ba1793bb509e2ef0912d711c765a2a7ac566233fd1554060c2",
+    "cloudflare/migrations/20261010_pons_tripwire_v1.sql": "5ac787c6d8dd02ec7ad2e959781a51b8666e26f8c50c7539b2e7d2e297c625d1",
+    "web-v2/src/PonsCasePreview.tsx": "938c6050f35b471176b1a3ea85ed000bc79cd8bcaf6f643cccfe7a7dfc5cdddc",
+    "web-v2/src/PonsTripwireWatch.tsx": "5fb0ad19b2f83080a272339881193839814c58fca16eee4d48f117a0ca0cde39",
+    "web-v2/src/ponsTripwireClient.ts": "f96e8344bd01f03191d4f2be501b70c5b8188876e38bf42c91a85c119e87c30f",
+    "web-v2/src/pons-tripwire.css": "d12c55739981c303aef3b33fd1c11dba94ec039455b4fe1f8641ba9f7ddbbd85",
+    "web-v2/checks/pons-tripwire-browser.cjs": "9b607a39842fcd3ac7d0b4fd61676bc02e74a778744cd9feec7420c9f224bccb",
+    "web-v2/checks/serve-pons-tripwire-local.ts": "9c629b12179749e33edd645d38b5be36362fc75e5f995a09e4de48d30420763a",
+    "test/ponsTripwire.test.ts": "844aac26fcd0021fd8a532abd4c5d3ad9306b2471035741a27feeaf4933197a1",
+    "test/ponsTripwireWorker.test.ts": "6c3292e32e71df0e19ac7c3b46eb7e7602a385f7e9686c9a322b7e46d06a1533",
+    "test/support/ponsTripwireFixture.ts": "f5ce43bd3ec0d8e28f053e501efe35e777052e95d43be0cfb95c31f4266449b0",
+    "test/fixtures/pons-tripwire-production.json": "b26686599070b2636cbe5a211f76643b58735ed75f53da75ee829cf94029e8b8",
+    ".github/workflows/pons-tripwire-offline.yml": "5b86fa4646a323c2b61fa88622848a4d33fd4edfe489a273bc18126c8a908b9b"
+  }
+}

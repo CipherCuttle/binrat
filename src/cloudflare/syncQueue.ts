@@ -30,6 +30,7 @@ import {
 } from '../observations/syncObservations.js';
 import { D1RuntimeStateStore, verifiedRuntimeTarget, type D1RuntimeState } from './runtimeState.js';
 import { D1RatWatchStore, ratWatchAlertText } from './ratWatch.js';
+import { runPonsTripwireCycle, ponsTripwireTelegramTransport } from './ponsTripwire.js';
 import { D1RatRadarStore } from './ratRadarStore.js';
 import { D1PonsOutcomeObservationStore } from './ponsOutcomeStore.js';
 import { D1PonsTokenIdentityStore } from './ponsTokenIdentityStore.js';
@@ -72,6 +73,11 @@ export interface CloudflareSyncEnv {
   BINRAT_PONS_CATCHUP_WORK_BUDGET_MS?: string;
   BINRAT_PONS_NEAR_HEAD_BLOCKS?: string;
   BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
+  /** Dedicated opt-in owner pilot; never activates Arc/autonomous Watch. */
+  BINRAT_PONS_TRIPWIRE_ENABLED?: string;
+  BINRAT_PONS_TRIPWIRE_ALLOWED_USER_ID?: string;
+  /** Separate delivery gate, disabled unless exactly true. */
+  BINRAT_PONS_TRIPWIRE_DELIVERY_ENABLED?: string;
   BINRAT_PONS_OUTCOME_ENABLED?: string;
   BINRAT_PONS_OUTCOME_MAX_PER_CYCLE?: string;
   BINRAT_PONS_TOKEN_IDENTITY_ENABLED?: string;
@@ -92,7 +98,7 @@ export interface CloudflareSyncEnv {
 }
 
 export interface BinratSyncMessage {
-  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'PONS_TOKEN_IDENTITY_CYCLE' | 'PONS_FUNDING_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
+  kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_TRIPWIRE_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'PONS_TOKEN_IDENTITY_CYCLE' | 'PONS_FUNDING_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
 }
@@ -108,6 +114,8 @@ export interface CloudflareSyncDeps {
   ratRadarSource?: RatRadarSource;
   externalFetch?: typeof fetch;
   watchSource?: WatchSource;
+  /** Never inherits an Arc source from legacy Watch tests or consumers. */
+  ponsTripwireSource?: WatchSource;
 }
 
 export type SyncCycleResult =
@@ -215,6 +223,41 @@ export async function enqueuePonsFundingCycle(
   await env.SYNC_QUEUE.send({ kind:'PONS_FUNDING_CYCLE', cycleId, enqueuedAtMs:nowMs });
 }
 
+export async function enqueuePonsTripwireCycle(
+  env:CloudflareSyncEnv,nowMs=Date.now(),cycleId=crypto.randomUUID()
+):Promise<void> {
+  if(env.BINRAT_PONS_TRIPWIRE_ENABLED!=='true') return;
+  if(!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
+  await env.SYNC_QUEUE.send({kind:'PONS_TRIPWIRE_CYCLE',cycleId,enqueuedAtMs:nowMs});
+}
+
+export async function runCloudflarePonsTripwireCycle(
+  env:CloudflareSyncEnv,message:BinratSyncMessage,deps:CloudflareSyncDeps={now:Date.now}
+):Promise<{status:'SUCCESS';examined:number;enqueued:number;sent:number;paused?:string}|{status:'BUSY'}|{status:'RETRY';code:string}> {
+  if(!isSyncMessage(message)||message.kind!=='PONS_TRIPWIRE_CYCLE') return {status:'RETRY',code:'PONS_TRIPWIRE_MESSAGE_INVALID'};
+  if(env.BINRAT_PONS_TRIPWIRE_ENABLED!=='true') return {status:'SUCCESS',examined:0,enqueued:0,sent:0};
+  const allowed=env.BINRAT_PONS_TRIPWIRE_ALLOWED_USER_ID;
+  if(!allowed||!/^[1-9][0-9]{0,15}$/.test(allowed)||!Number.isSafeInteger(Number(allowed))) {
+    return {status:'SUCCESS',examined:0,enqueued:0,sent:0,paused:'PONS_TRIPWIRE_OWNER_NOT_CONFIGURED'};
+  }
+  // Unique attempt token also fences concurrent deliveries of the same queue ID.
+  const lease=new D1SyncLeaseStore(env.DB),owner=crypto.randomUUID();
+  if(!(await lease.claim('binrat:pons-tripwire',owner,deps.now(),120_000))) return {status:'BUSY'};
+  try {
+    const source=deps.ponsTripwireSource??robinhoodWatchSource(env.ROBINHOOD_RPC_URL??ROBINHOOD_PUBLIC_RPC_FALLBACK_URL);
+    const deliver=env.BINRAT_PONS_TRIPWIRE_DELIVERY_ENABLED==='true'&&env.TELEGRAM_BOT_TOKEN
+      ?ponsTripwireTelegramTransport(env.TELEGRAM_BOT_TOKEN,deps.externalFetch??fetch):undefined;
+    const report=await runPonsTripwireCycle(env.DB,source,{now:deps.now,ownerId:`telegram:${allowed}`,deliver});
+    return {status:'SUCCESS',...report};
+  } catch(error) {
+    // Poll work is deliberately deferred to a future healthy scanner publication.
+    // Nothing stale/reorged triggers an alert or an unbounded queue retry loop.
+    const code=error instanceof Error&&/^PONS_TRIPWIRE_[A-Z_]+$/.test(error.message)?error.message:'PONS_TRIPWIRE_SOURCE_UNAVAILABLE';
+    console.error(JSON.stringify({event:'PONS_TRIPWIRE_PAUSED',code}));
+    return {status:'SUCCESS',examined:0,enqueued:0,sent:0,paused:code};
+  } finally {await lease.release('binrat:pons-tripwire',owner);}
+}
+
 export async function enqueueObservationCycle(
   env: CloudflareSyncEnv,
   nowMs = Date.now(),
@@ -267,7 +310,8 @@ export async function handleSyncQueueBatch(
     }
     // These messages are poll requests, not stored alert payloads. Keep all
     // persistent watch/outbox state intact while suspending legacy consumers.
-    if (env.BINRAT_PONS_READ_ONLY === 'true' && message.body.kind !== 'PONS_SYNC_CYCLE') {
+    if (env.BINRAT_PONS_READ_ONLY === 'true' && message.body.kind !== 'PONS_SYNC_CYCLE' &&
+        !(message.body.kind === 'PONS_TRIPWIRE_CYCLE' && env.BINRAT_PONS_TRIPWIRE_ENABLED === 'true')) {
       message.ack();
       continue;
     }
@@ -288,6 +332,11 @@ export async function handleSyncQueueBatch(
         if (result.status === 'SUCCESS' && !result.liveCaughtUp) {
           await enqueuePonsSyncCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event: 'PONS_CATCH_UP_ENQUEUE_FAILED', code: syncErrorCode(error) }));
+          });
+        }
+        if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_TRIPWIRE_ENABLED === 'true') {
+          await enqueuePonsTripwireCycle(env, deps.now()).catch((error) => {
+            console.error(JSON.stringify({ event:'PONS_TRIPWIRE_ENQUEUE_FAILED', code:syncErrorCode(error) }));
           });
         }
         if (env.BINRAT_PONS_READ_ONLY === 'true') continue;
@@ -311,6 +360,13 @@ export async function handleSyncQueueBatch(
             console.error(JSON.stringify({ event: 'PONS_RAT_WATCH_ENQUEUE_FAILED', code: syncErrorCode(error) }));
           });
         }
+        continue;
+      }
+
+      if (message.body.kind === 'PONS_TRIPWIRE_CYCLE') {
+        const result=await runCloudflarePonsTripwireCycle(env,message.body,deps);
+        if (result.status === 'RETRY') message.retry({delaySeconds:30});
+        else message.ack();
         continue;
       }
 
@@ -1514,6 +1570,7 @@ function isSyncMessage(value: unknown): value is BinratSyncMessage {
     (
       item.kind === 'SYNC_CYCLE' ||
       item.kind === 'PONS_SYNC_CYCLE' ||
+      item.kind === 'PONS_TRIPWIRE_CYCLE' ||
       item.kind === 'PONS_OUTCOME_CYCLE' ||
       item.kind === 'PONS_TOKEN_IDENTITY_CYCLE' ||
       item.kind === 'PONS_FUNDING_CYCLE' ||

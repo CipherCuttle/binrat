@@ -1,0 +1,19 @@
+{
+  "capturedAt": "2026-10-10T16:51:21.188125+00:00",
+  "route": "/api/status",
+  "httpStatus": 200,
+  "sha256": "6dfb3e3da365041ccfc3d21b991958cd9cffbd62865174ed45952e72e1eb38ae",
+  "body": {
+    "schemaVersion": "binrat.public-status/0.1",
+    "chainId": 4663,
+    "state": "FRESH_VERIFIED",
+    "checkpointBlock": "85150834",
+    "checkpointBlockHash": "0x66cf2806c2dd61075f69c408374a1bd8195fe2fe346872574682e399f4a00467",
+    "feedDigest": "fe16b3acc2054d213c6fa06016484376d5d22b98843fc124ec0826bace037da5",
+    "verifiedAtMs": 1791651042279,
+    "publicationVersion": 2284,
+    "freshnessValidUntilMs": 1791651222279,
+    "runtimeUpdatedAtMs": 1791651042279,
+    "lastSyncError": null
+  }
+}

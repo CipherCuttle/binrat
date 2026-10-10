@@ -1,0 +1,1465 @@
+{
+  "sourceSha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+  "sourceDirty": true,
+  "provenance": "LOCAL_WORKERD_REAL_HANDLER_NO_IO",
+  "wrangler": "4.135.0",
+  "providerVerified": false,
+  "productionAuthorization": false,
+  "webhook": "/telegram/webhook",
+  "checks": [
+    {
+      "path": "/",
+      "method": "GET",
+      "navigate": false,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/",
+      "method": "GET",
+      "navigate": true,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/bag/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET",
+      "navigate": false,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/bag/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET",
+      "navigate": true,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/visual-lab",
+      "method": "GET",
+      "navigate": false,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/visual-lab",
+      "method": "GET",
+      "navigate": true,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/radar",
+      "method": "GET",
+      "navigate": false,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/radar",
+      "method": "GET",
+      "navigate": true,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/watch",
+      "method": "GET",
+      "navigate": false,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/watch",
+      "method": "GET",
+      "navigate": true,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/replay",
+      "method": "GET",
+      "navigate": false,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/replay",
+      "method": "GET",
+      "navigate": true,
+      "destination": "V3_HTML",
+      "status": 200
+    },
+    {
+      "path": "/api",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/status",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/status",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/status",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 400
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 400
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/bootstrap",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 400
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 400
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 400
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 400
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/miniapp/case-intelligence",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/challenge",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 503
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/holder/session",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/api/future-route",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 200
+    },
+    {
+      "path": "/health",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 200
+    },
+    {
+      "path": "/health",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/health",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 500
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 500
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/telegram/webhook",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/rat-smoke",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "GET",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "GET",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "HEAD",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "HEAD",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "POST",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "POST",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "PUT",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "PUT",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "PATCH",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "PATCH",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "DELETE",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "DELETE",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "OPTIONS",
+      "navigate": false,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/__candidate/pons-bootstrap",
+      "method": "OPTIONS",
+      "navigate": true,
+      "destination": "WORKER",
+      "status": 404
+    },
+    {
+      "path": "/assets/alley-bg-desktop-D-1nZZBT.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/alley-bg-mobile-BRoLZHcq.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/foreground-trash-C7D_WlxW.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ratzero-dumpster-desktop-BjdXMcip.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ratzero-dumpster-mobile-DN8MUwYV.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/binrat-hero.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/fonts/geist-mono.woff2",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/fonts/geist-sans.woff2",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/fonts/plex-condensed-bold.woff2",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/fonts/plex-mono-medium.woff2",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/fonts/plex-mono-regular.woff2",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    },
+    {
+      "path": "/roadmap-sniff.webp",
+      "method": "GET",
+      "destination": "STATIC_ASSET",
+      "status": 200
+    }
+  ],
+  "verdict": "LOCAL_PASS",
+  "missingAssetBehavior": {
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "limitation": "SPA fallback returns HTML for absent chunks. Retain a complete prior release for cutover/rollback; never claim unknown old chunks load."
+  }
+}

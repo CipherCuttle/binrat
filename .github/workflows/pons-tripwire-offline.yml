@@ -1,0 +1,59 @@
+name: Pons Tripwire offline proof
+
+on:
+  pull_request:
+    branches: [integration/binrat-a1-3-visual-gate]
+    paths:
+      - '.github/workflows/pons-tripwire-offline.yml'
+      - 'src/**'
+      - 'test/**'
+      - 'cloudflare/**'
+      - 'web-v2/**'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-proof:
+    if: github.head_ref == 'feat/pons-tripwire-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm exec tsx --test test/ponsTripwireWorker.test.ts test/ponsTripwire.test.ts test/autonomousRat.test.ts test/ponsReadOnlyRelease.test.ts test/ratWatch.test.ts
+      - run: pnpm --dir web-v2 build:frontdoor-candidate
+      - name: Install pinned native browser
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tripwire-browser" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/tripwire-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Compiled V3 journey with local SQLite and mock Telegram only
+        env:
+          BINRAT_FRONTDOOR_TOOLS: ${{ runner.temp }}/tripwire-browser/node_modules
+          BINRAT_TRIPWIRE_UI_OUTPUT: browser-artifacts/pons-tripwire
+        run: |
+          pnpm exec tsx web-v2/checks/serve-pons-tripwire-local.ts > "$RUNNER_TEMP/tripwire-local.log" 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4194/__offline/meta >/dev/null; then break; fi
+            if [ "$attempt" -eq 30 ]; then cat "$RUNNER_TEMP/tripwire-local.log"; exit 1; fi
+            sleep 1
+          done
+          node web-v2/checks/pons-tripwire-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pons-tripwire-${{ github.event.pull_request.head.sha }}
+          path: browser-artifacts/pons-tripwire/
+          retention-days: 14
+          if-no-files-found: error
