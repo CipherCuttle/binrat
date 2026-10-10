@@ -262,7 +262,7 @@ test('D1 rewind removes reorged Pons outcome receipts without deleting an earlie
 });
 
 
-test('candidate selection reserves capacity for both oldest recovery gaps and newest launches', async () => {
+test('candidate fallback is bounded and prioritizes recent launches', async () => {
   const db=new D1CompatDatabase();
   await db.exec(D1_SCHEMA_SQL);
   const baseStore=new D1Store(db,ROBINHOOD_CHAIN_ID);
@@ -272,7 +272,7 @@ test('candidate selection reserves capacity for both oldest recovery gaps and ne
     }
     const store=new D1PonsOutcomeObservationStore(db);
     const selected=await store.listCandidates(2);
-    assert.deepEqual(selected.map((item)=>item.blockNumber),[10n,13n]);
+    assert.deepEqual(selected.map((item)=>item.blockNumber),[13n,12n]);
   } finally { db.close(); }
 });
 

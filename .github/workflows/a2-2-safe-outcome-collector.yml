@@ -1,0 +1,54 @@
+name: a2-2-safe-outcome-collector
+on:
+  pull_request:
+    paths:
+      - 'src/cloudflare/ponsOutcome*'
+      - 'src/cloudflare/syncQueue.ts'
+      - 'src/pons/outcomeReceipts.ts'
+      - 'cloudflare/migrations/20261010_pons_outcome_pilot.sql'
+      - 'test/ponsOutcome*'
+      - 'test/support/outcomePilotFixture.ts'
+      - 'web-v2/checks/*a2-2*'
+      - '.github/workflows/a2-2-safe-outcome-collector.yml'
+permissions:
+  contents: read
+jobs:
+  offline-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile && pnpm build
+      - run: pnpm exec tsx --test test/ponsOutcomePilot.test.ts test/ponsOutcomeReceipts.test.ts test/ponsOutcomeCapability.test.ts test/ponsReadOnlyRelease.test.ts test/cloudflareSyncQueue.test.ts test/caseOutcomes.test.ts
+      - run: pnpm --dir web-v2 build:production
+      - name: Pinned local browser runner
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binrat-playwright" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-playwright/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Synthetic collector to compiled WHY / TRAIL / RECEIPTS
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm exec tsx web-v2/checks/serve-a2-2-preview.mjs > "$RUNNER_TEMP/a2-2-preview.log" 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:4206/ >/dev/null; then break; fi
+            if [ "$attempt" -eq 30 ]; then cat "$RUNNER_TEMP/a2-2-preview.log"; exit 1; fi
+            sleep 1
+          done
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-playwright/node_modules" node web-v2/checks/a2-2-collector-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: a2-2-offline-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/a2-2/
+          retention-days: 14

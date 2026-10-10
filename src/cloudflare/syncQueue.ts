@@ -1,3 +1,5 @@
+import { D1OutcomePilot, outcomePilotConfigured, OUTCOME_RPC_LIMIT, OUTCOME_WORK_MS } from './ponsOutcomePilot.js';
+import { OutcomeWorkBudget } from './ponsOutcomeBudget.js';
 import { ArcPadLaunchSource } from '../arc/arcpadSource.js';
 import { deliverFindings, enqueueFindings } from '../autonomous/delivery.js';
 import { arcWatchSource, robinhoodWatchSource, type WatchSource } from '../autonomous/source.js';
@@ -73,6 +75,8 @@ export interface CloudflareSyncEnv {
   BINRAT_PONS_NEAR_HEAD_BLOCKS?: string;
   BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS?: string;
   BINRAT_PONS_OUTCOME_ENABLED?: string;
+  BINRAT_PONS_OUTCOME_COLLECT_AUTHORIZED?: string;
+  BINRAT_PONS_OUTCOME_PILOT_ID?: string;
   BINRAT_PONS_OUTCOME_MAX_PER_CYCLE?: string;
   BINRAT_PONS_TOKEN_IDENTITY_ENABLED?: string;
   BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE?: string;
@@ -95,6 +99,7 @@ export interface BinratSyncMessage {
   kind: 'SYNC_CYCLE' | 'PONS_SYNC_CYCLE' | 'PONS_OUTCOME_CYCLE' | 'PONS_TOKEN_IDENTITY_CYCLE' | 'PONS_FUNDING_CYCLE' | 'OBSERVATION_CYCLE' | 'RAT_WATCH_CYCLE' | 'RAT_RADAR_CYCLE';
   cycleId: string;
   enqueuedAtMs: number;
+  outcomePilotId?: string;
 }
 
 export interface CloudflareSyncDeps {
@@ -194,7 +199,11 @@ export async function enqueuePonsOutcomeCycle(
   cycleId = crypto.randomUUID()
 ): Promise<void> {
   if (!env.SYNC_QUEUE) throw new Error('MISSING_BINDING:SYNC_QUEUE');
-  await env.SYNC_QUEUE.send({ kind:'PONS_OUTCOME_CYCLE', cycleId, enqueuedAtMs:nowMs });
+  if (!outcomePilotConfigured(env)) return;
+  const pilot=new D1OutcomePilot(env,()=>nowMs);
+  await pilot.healthy();
+  if (!await pilot.schedule(cycleId)) return;
+  await env.SYNC_QUEUE.send({kind:'PONS_OUTCOME_CYCLE',cycleId,enqueuedAtMs:nowMs,outcomePilotId:env.BINRAT_PONS_OUTCOME_PILOT_ID});
 }
 
 export async function enqueuePonsTokenIdentityCycle(
@@ -267,7 +276,8 @@ export async function handleSyncQueueBatch(
     }
     // These messages are poll requests, not stored alert payloads. Keep all
     // persistent watch/outbox state intact while suspending legacy consumers.
-    if (env.BINRAT_PONS_READ_ONLY === 'true' && message.body.kind !== 'PONS_SYNC_CYCLE') {
+    if (env.BINRAT_PONS_READ_ONLY === 'true' && message.body.kind !== 'PONS_SYNC_CYCLE' &&
+      !(message.body.kind==='PONS_OUTCOME_CYCLE' && outcomePilotConfigured(env) && message.body.outcomePilotId===env.BINRAT_PONS_OUTCOME_PILOT_ID)) {
       message.ack();
       continue;
     }
@@ -290,12 +300,12 @@ export async function handleSyncQueueBatch(
             console.error(JSON.stringify({ event: 'PONS_CATCH_UP_ENQUEUE_FAILED', code: syncErrorCode(error) }));
           });
         }
-        if (env.BINRAT_PONS_READ_ONLY === 'true') continue;
-        if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_OUTCOME_ENABLED === 'true') {
-          await enqueuePonsOutcomeCycle(env, deps.now()).catch((error) => {
-            console.error(JSON.stringify({ event:'PONS_OUTCOME_ENQUEUE_FAILED', code:syncErrorCode(error) }));
+        if (result.status==='SUCCESS' && result.liveCaughtUp && outcomePilotConfigured(env)) {
+          await enqueuePonsOutcomeCycle(env,deps.now()).catch(error=>{
+            console.error(JSON.stringify({event:'PONS_OUTCOME_ENQUEUE_FAILED',code:syncErrorCode(error)}));
           });
         }
+        if (env.BINRAT_PONS_READ_ONLY === 'true') continue;
         if (result.status === 'SUCCESS' && result.liveCaughtUp && env.BINRAT_PONS_TOKEN_IDENTITY_ENABLED === 'true') {
           await enqueuePonsTokenIdentityCycle(env, deps.now()).catch((error) => {
             console.error(JSON.stringify({ event:'PONS_TOKEN_IDENTITY_ENQUEUE_FAILED', code:syncErrorCode(error) }));
@@ -316,8 +326,8 @@ export async function handleSyncQueueBatch(
 
       if (message.body.kind === 'PONS_OUTCOME_CYCLE') {
         const result=await runCloudflarePonsOutcomeCycle(env,message.body,deps);
-        if (result.status === 'RETRY') message.retry({delaySeconds:30});
-        else message.ack();
+        // Attempts live in the durable finite job; queue redelivery cannot repeat RPC work.
+        message.ack();
         continue;
       }
 
@@ -877,36 +887,48 @@ export async function runCloudflarePonsOutcomeCycle(
   if (!isSyncMessage(message) || message.kind!=='PONS_OUTCOME_CYCLE') {
     return {status:'RETRY',code:'PONS_OUTCOME_MESSAGE_INVALID'};
   }
-  if (env.BINRAT_PONS_OUTCOME_ENABLED!=='true') {
+  if (!outcomePilotConfigured(env) || message.outcomePilotId!==env.BINRAT_PONS_OUTCOME_PILOT_ID) {
     return {status:'SUCCESS',inserted:0,duplicates:0,pendingMaturity:0,alreadyPresent:0,launchesVisited:0};
   }
 
+  const pilot=new D1OutcomePilot(env,deps.now);
+  try {await pilot.authorize();} catch {return {status:'BUSY'};}
+  const owner=crypto.randomUUID(); // Delivery identity is not a concurrent lease owner.
   const lease=new D1SyncLeaseStore(env.DB);
-  if (!(await lease.claim(PONS_OUTCOME_LEASE_NAME,message.cycleId,deps.now(),PONS_OUTCOME_LEASE_MS))) {
+  if (!(await lease.claim(PONS_OUTCOME_LEASE_NAME,owner,deps.now(),PONS_OUTCOME_LEASE_MS))) {
     return {status:'BUSY'};
   }
   let ponsWriterClaimed=false;
-  if (!(await lease.claim(PONS_SYNC_LEASE_NAME,message.cycleId,deps.now(),PONS_SYNC_LEASE_MS))) {
-    await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
+  if (!(await lease.claim(PONS_SYNC_LEASE_NAME,owner,deps.now(),PONS_SYNC_LEASE_MS))) {
+    await lease.release(PONS_OUTCOME_LEASE_NAME,owner);
     return {status:'BUSY'};
   }
   ponsWriterClaimed=true;
 
+  let reserved=false;
+  let job:Awaited<ReturnType<D1OutcomePilot['next']>>=null;
+  const budget=new OutcomeWorkBudget(deps.now,OUTCOME_WORK_MS,OUTCOME_RPC_LIMIT,async()=>{
+    await pilot.authorize();
+  });
   try {
-    const runtime=await new D1RuntimeStateStore(env.DB,ROBINHOOD_CHAIN_ID).get();
-    if (!runtime || !runtime.sourceVerified || !runtime.liveCaughtUp || runtime.lastSyncError) {
-      return {status:'SUCCESS',inserted:0,duplicates:0,pendingMaturity:0,alreadyPresent:0,launchesVisited:0};
-    }
-
-    const source=deps.ponsOutcomeSource ?? new RpcPonsOutcomeObservationSource({
+    await pilot.healthy();
+    if (!await pilot.consume(message.cycleId)) return {status:'BUSY'};
+    reserved=true;
+    job=await pilot.next();
+    if (!job) return {status:'BUSY'};
+    await pilot.attempt(job);
+    const store=await pilot.store(job,()=>budget.check(),owner);
+    const rawSource=deps.ponsOutcomeSource ?? new RpcPonsOutcomeObservationSource({
       discoveryRpcUrl:resolveRobinhoodRpcUrl(env),
-      archiveRpcUrl:resolveRobinhoodArchiveRpcUrl(env)
+      archiveRpcUrl:resolveRobinhoodArchiveRpcUrl(env),
+      boundedFetch:budget.fetch(deps.externalFetch ?? fetch)
     });
-    const report=await syncPonsOutcomeObservations(
-      source,
-      new D1PonsOutcomeObservationStore(env.DB),
-      {maxReceiptsPerSync:integerSetting(env.BINRAT_PONS_OUTCOME_MAX_PER_CYCLE,1,1,12)}
-    );
+    const source=budget.source(rawSource);
+    const report=await syncPonsOutcomeObservations(source,store,{
+      maxReceiptsPerSync:1,horizons:[{label:'controlled',ms:job.horizon_ms}],expectedLaunchTimestampMs:job.launch_timestamp_ms
+    });
+    if (report.inserted+report.duplicates+report.alreadyPresent!==1) throw new Error('PONS_OUTCOME_JOB_INCOMPLETE');
+    await pilot.finish(job);
     console.error(JSON.stringify({
       event:'PONS_OUTCOME_RECEIPT',
       cycleId:message.cycleId,
@@ -915,7 +937,8 @@ export async function runCloudflarePonsOutcomeCycle(
       duplicates:report.duplicates,
       pendingMaturity:report.pendingMaturity,
       alreadyPresent:report.alreadyPresent,
-      launchesVisited:report.launchesVisited
+      launchesVisited:report.launchesVisited,
+      rpcCalls:budget.rpcCalls,rpcReserved:OUTCOME_RPC_LIMIT
     }));
     return {
       status:'SUCCESS',
@@ -927,11 +950,18 @@ export async function runCloudflarePonsOutcomeCycle(
     };
   } catch(error) {
     const code=syncErrorCode(error);
+    if (job) await pilot.finish(job,code);
     console.error(JSON.stringify({event:'PONS_OUTCOME_FAILED',cycleId:message.cycleId,code}));
     return {status:'RETRY',code};
   } finally {
-    if (ponsWriterClaimed) await lease.release(PONS_SYNC_LEASE_NAME,message.cycleId);
-    await lease.release(PONS_OUTCOME_LEASE_NAME,message.cycleId);
+    budget.stop();
+    try {
+      if (reserved) await pilot.refundUnused(budget.rpcCalls);
+    } finally {
+      try {
+        if (ponsWriterClaimed) await lease.release(PONS_SYNC_LEASE_NAME,owner);
+      } finally {await lease.release(PONS_OUTCOME_LEASE_NAME,owner);}
+    }
   }
 }
 
