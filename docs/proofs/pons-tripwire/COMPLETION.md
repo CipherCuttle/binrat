@@ -71,6 +71,12 @@ compiled SPA routing with all IO disabled; provider routing for a future
 candidate remains unverified. CI results, when available, belong to the PR's
 exact head and must not be inferred from these local results.
 
+The first offline CI run exposed a workflow prerequisite: clean checkouts must
+run the existing `build-public-release.mjs` generator before TypeScript. That
+single setup correction was added and generation/type checking verified locally;
+the executable Tripwire source and browser bundle are unchanged. Final CI status
+is recorded on the same draft PR.
+
 ## One hostile review and one targeted rereview
 
 The single review covered the requested attack surfaces. Three High findings

@@ -29,6 +29,7 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
+      - run: node scripts/build-public-release.mjs
       - run: pnpm exec tsc --noEmit
       - run: pnpm exec tsx --test test/ponsTripwireWorker.test.ts test/ponsTripwire.test.ts test/autonomousRat.test.ts test/ponsReadOnlyRelease.test.ts test/ratWatch.test.ts
       - run: pnpm --dir web-v2 build:frontdoor-candidate

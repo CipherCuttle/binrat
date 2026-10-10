@@ -49,6 +49,11 @@
     {
       "command": "git diff --check",
       "exitCode": 0
+    },
+    {
+      "command": "node scripts/build-public-release.mjs && pnpm exec tsc --noEmit",
+      "exitCode": 0,
+      "purpose": "CI generated-module prerequisite before type checking"
     }
   ],
   "sourceFileSha256": {
@@ -69,6 +74,6 @@
     "test/ponsTripwireWorker.test.ts": "6c3292e32e71df0e19ac7c3b46eb7e7602a385f7e9686c9a322b7e46d06a1533",
     "test/support/ponsTripwireFixture.ts": "f5ce43bd3ec0d8e28f053e501efe35e777052e95d43be0cfb95c31f4266449b0",
     "test/fixtures/pons-tripwire-production.json": "b26686599070b2636cbe5a211f76643b58735ed75f53da75ee829cf94029e8b8",
-    ".github/workflows/pons-tripwire-offline.yml": "5b86fa4646a323c2b61fa88622848a4d33fd4edfe489a273bc18126c8a908b9b"
+    ".github/workflows/pons-tripwire-offline.yml": "4f5bb141650d936f285b5121f6bcc68e63162c8be33055c8bd53c516db325cf8"
   }
 }
