@@ -1,0 +1,286 @@
+{
+  "capturedAt": "2026-10-10T16:55:02.614728+00:00",
+  "worker": "binrat-edge-v0",
+  "number": 106,
+  "versionId": "28ebc65b-bb14-4862-b677-cbe74b6aad2b",
+  "deployment": {
+    "id": "2d526347-5375-449c-8300-e6cb3496bf15",
+    "source": "api",
+    "strategy": "percentage",
+    "author_email": "pettevik@gmail.com",
+    "annotations": {
+      "workers/message": "Owner-authorized exact BINRAT A1.3 production cutover",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "28ebc65b-bb14-4862-b677-cbe74b6aad2b",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-09T22:39:06.690078Z"
+  },
+  "bindings": {
+    "AI": {
+      "name": "AI",
+      "project": "<catalog>",
+      "type": "ai"
+    },
+    "ARC_RPC_URL": {
+      "name": "ARC_RPC_URL",
+      "type": "secret_text"
+    },
+    "BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID": {
+      "name": "BINRAT_AUTONOMOUS_RAT_ALLOWED_USER_ID",
+      "type": "secret_text"
+    },
+    "BINRAT_AUTONOMOUS_RAT_ENABLED": {
+      "name": "BINRAT_AUTONOMOUS_RAT_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED": {
+      "name": "BINRAT_AUTONOMOUS_RAT_PUBLIC_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_CONFIRMATIONS": {
+      "name": "BINRAT_CONFIRMATIONS",
+      "text": "2",
+      "type": "plain_text"
+    },
+    "BINRAT_HOLDER_GATE_ENABLED": {
+      "name": "BINRAT_HOLDER_GATE_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_HOLDER_WALLET_AUTH_ENABLED": {
+      "name": "BINRAT_HOLDER_WALLET_AUTH_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_LIVE_LOOKBACK_BLOCKS": {
+      "name": "BINRAT_LIVE_LOOKBACK_BLOCKS",
+      "text": "1000",
+      "type": "plain_text"
+    },
+    "BINRAT_MAX_BATCH_BLOCKS": {
+      "name": "BINRAT_MAX_BATCH_BLOCKS",
+      "text": "10000",
+      "type": "plain_text"
+    },
+    "BINRAT_MAX_OBSERVATIONS_PER_SYNC": {
+      "name": "BINRAT_MAX_OBSERVATIONS_PER_SYNC",
+      "text": "1",
+      "type": "plain_text"
+    },
+    "BINRAT_MAX_STATUS_AGE_MS": {
+      "name": "BINRAT_MAX_STATUS_AGE_MS",
+      "text": "180000",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS": {
+      "name": "BINRAT_PONS_CATCHUP_MAX_BATCH_BLOCKS",
+      "text": "4096",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_CATCHUP_MAX_BATCHES": {
+      "name": "BINRAT_PONS_CATCHUP_MAX_BATCHES",
+      "text": "4",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_CATCHUP_WORK_BUDGET_MS": {
+      "name": "BINRAT_PONS_CATCHUP_WORK_BUDGET_MS",
+      "text": "60000",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_FUNDING_ENABLED": {
+      "name": "BINRAT_PONS_FUNDING_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_MAX_BATCH_BLOCKS": {
+      "name": "BINRAT_PONS_MAX_BATCH_BLOCKS",
+      "text": "1024",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS": {
+      "name": "BINRAT_PONS_MAX_CANONICAL_LAUNCH_BLOCKS",
+      "text": "128",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_NEAR_HEAD_BLOCKS": {
+      "name": "BINRAT_PONS_NEAR_HEAD_BLOCKS",
+      "text": "2048",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_OUTCOME_ENABLED": {
+      "name": "BINRAT_PONS_OUTCOME_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_OUTCOME_MAX_PER_CYCLE": {
+      "name": "BINRAT_PONS_OUTCOME_MAX_PER_CYCLE",
+      "text": "1",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_READ_ONLY": {
+      "name": "BINRAT_PONS_READ_ONLY",
+      "text": "true",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_TOKEN_IDENTITY_ENABLED": {
+      "name": "BINRAT_PONS_TOKEN_IDENTITY_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE": {
+      "name": "BINRAT_PONS_TOKEN_IDENTITY_MAX_PER_CYCLE",
+      "text": "1",
+      "type": "plain_text"
+    },
+    "BINRAT_PUBLIC_SITE_URL": {
+      "name": "BINRAT_PUBLIC_SITE_URL",
+      "text": "https://binrat-edge-v0.pettevik.workers.dev",
+      "type": "plain_text"
+    },
+    "BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS": {
+      "name": "BINRAT_RAT_RADAR_MAX_BATCH_BLOCKS",
+      "text": "10000",
+      "type": "plain_text"
+    },
+    "BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE": {
+      "name": "BINRAT_RAT_RADAR_MAX_POOLS_PER_CYCLE",
+      "text": "4",
+      "type": "plain_text"
+    },
+    "BINRAT_RELEASE_SHA": {
+      "name": "BINRAT_RELEASE_SHA",
+      "text": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+      "type": "plain_text"
+    },
+    "BINRAT_ROBINHOOD_ARCHIVE_RPC_URL": {
+      "name": "BINRAT_ROBINHOOD_ARCHIVE_RPC_URL",
+      "type": "secret_text"
+    },
+    "BINRAT_TELEGRAM_MEDIA_ENABLED": {
+      "name": "BINRAT_TELEGRAM_MEDIA_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_TELEGRAM_UI_V2_ENABLED": {
+      "name": "BINRAT_TELEGRAM_UI_V2_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "BINRAT_WORKER_VERSION": {
+      "name": "BINRAT_WORKER_VERSION",
+      "type": "version_metadata"
+    },
+    "CAPABILITY_MANIFEST_JSON": {
+      "name": "CAPABILITY_MANIFEST_JSON",
+      "type": "secret_text"
+    },
+    "DB": {
+      "database_id": "46814564-1a41-449a-88e5-c1349eed3a27",
+      "id": "46814564-1a41-449a-88e5-c1349eed3a27",
+      "name": "DB",
+      "type": "d1"
+    },
+    "RAT_AI_ENABLED": {
+      "name": "RAT_AI_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "RAT_AI_TRIAL_EXPIRES_AT_MS": {
+      "name": "RAT_AI_TRIAL_EXPIRES_AT_MS",
+      "text": "1790929656130",
+      "type": "plain_text"
+    },
+    "RAT_CANDIDATE_ALLOWED_USER_ID": {
+      "name": "RAT_CANDIDATE_ALLOWED_USER_ID",
+      "type": "secret_text"
+    },
+    "RAT_CANDIDATE_SMOKE_ENABLED": {
+      "name": "RAT_CANDIDATE_SMOKE_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "RAT_CANDIDATE_SMOKE_SECRET": {
+      "name": "RAT_CANDIDATE_SMOKE_SECRET",
+      "type": "secret_text"
+    },
+    "RAT_CONVERSATION_ENABLED": {
+      "name": "RAT_CONVERSATION_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "RAT_FEEDBACK_ENABLED": {
+      "name": "RAT_FEEDBACK_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "ROBINHOOD_RPC_URL": {
+      "name": "ROBINHOOD_RPC_URL",
+      "type": "secret_text"
+    },
+    "SYNC_QUEUE": {
+      "name": "SYNC_QUEUE",
+      "queue_name": "binrat-sync-v0",
+      "type": "queue"
+    },
+    "TELEGRAM_BOT_TOKEN": {
+      "name": "TELEGRAM_BOT_TOKEN",
+      "type": "secret_text"
+    },
+    "TELEGRAM_MAX_MESSAGES_PER_MINUTE": {
+      "name": "TELEGRAM_MAX_MESSAGES_PER_MINUTE",
+      "text": "12",
+      "type": "plain_text"
+    },
+    "TELEGRAM_REPLIES_ENABLED": {
+      "name": "TELEGRAM_REPLIES_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    "TELEGRAM_WEBHOOK_SECRET": {
+      "name": "TELEGRAM_WEBHOOK_SECRET",
+      "type": "secret_text"
+    },
+    "TELEGRAM_WEBHOOK_SECRET_NEXT": {
+      "name": "TELEGRAM_WEBHOOK_SECRET_NEXT",
+      "type": "secret_text"
+    }
+  },
+  "runtime": {
+    "assets": {
+      "html_handling": "auto-trailing-slash",
+      "not_found_handling": "single-page-application",
+      "static_routing": {
+        "user_worker": [
+          "/api",
+          "/api/*",
+          "/health",
+          "/telegram/*",
+          "/__candidate/*"
+        ]
+      },
+      "serve_directly": true,
+      "raw_run_worker_first": [
+        "/api",
+        "/api/*",
+        "/health",
+        "/telegram/*",
+        "/__candidate/*"
+      ],
+      "base_path": "/"
+    },
+    "compatibility_date": "2026-09-18",
+    "compatibility_flags": [
+      "nodejs_compat"
+    ],
+    "usage_model": "standard"
+  },
+  "secretValuesRead": false,
+  "productionMutations": 0
+}

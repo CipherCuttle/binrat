@@ -77,6 +77,7 @@ import { consumeExactDigPrompt, loadActiveDigPrompt, replaceDigPrompt } from '..
 import { parseTarget } from '../autonomous/model.js';
 import { telegramProductConfig } from '../telegram/config.js';
 import { verifyTelegramInitData } from '../telegram/miniAppAuth.js';
+import { handlePonsTripwireRequest, handlePonsTripwireStart } from './ponsTripwireHttp.js';
 
 export interface BinratWorkerEnv extends CloudflareSyncEnv, HolderPolicyEnv {
   BINRAT_WORKER_VERSION?: { id: string; tag?: string; timestamp?: string };
@@ -162,6 +163,7 @@ export interface WorkerDeps {
   now: () => number;
   holderEligibilitySource?: HolderEligibilitySource;
   watchSource?: WatchSource;
+  ponsTripwireSource?: WatchSource;
   ponsCaseBlockSource?: BinratPonsCaseBlockPointReader;
 }
 
@@ -218,6 +220,13 @@ export async function handleWorkerRequest(
     origin = url.origin;
   } catch {
     return json(400, { error: 'INVALID_PATH' });
+  }
+
+  if (env.BINRAT_PONS_TRIPWIRE_ENABLED === 'true' && /^\/api\/pons-tripwire\/(watch|status|cancel)$/.test(pathname)) {
+    return handlePonsTripwireRequest(request, env, deps);
+  }
+  if (env.BINRAT_PONS_READ_ONLY === 'true' && env.BINRAT_PONS_TRIPWIRE_ENABLED === 'true' && request.method === 'POST' && pathname === '/telegram/webhook') {
+    return handlePonsTripwireStart(request, env, deps);
   }
 
   if (env.BINRAT_PONS_READ_ONLY === 'true') {
