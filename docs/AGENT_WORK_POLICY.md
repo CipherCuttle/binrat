@@ -2,6 +2,8 @@
 
 **Always read [FOUNDER NORTH STAR](BINRAT_FOUNDER_NORTH_STAR.md) first.** This is the practical short-form execution contract for any assistant, agent, Codex CLI/worktree or GitHub-browser session. Branch-specific \`AGENTS.md\`, higher-authority owner approvals and verified runtime/source evidence still apply.
 
+**Engineering/stack decisions:** Read [ENGINEERING STACK NORTH STAR V1](ENGINEERING_STACK_NORTH_STAR.md) before suggesting new dependencies, agent/MCP frameworks, infrastructure, signal paths or runtime changes. This file retains stricter task-budget and approval rules.
+
 ## Mission-lock card (required before tools)
 
 \`\`\`text
