@@ -1,5 +1,7 @@
 # BINRAT — repository orientation
 
+**START HERE: [Canonical Authority Index](docs/CANONICAL_AUTHORITY.md)** — the one document that routes competing product, engineering, runtime, launch and historical claims to the correct authority.
+
 **Founder north star: [A crew of Rats users can actually employ](docs/BINRAT_FOUNDER_NORTH_STAR.md).**
 
 **Agent operating rules: [bounded execution, kill criteria and retries](docs/AGENT_WORK_POLICY.md).**
