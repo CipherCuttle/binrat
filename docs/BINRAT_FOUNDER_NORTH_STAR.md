@@ -3,6 +3,8 @@
 **Founder-confirmed direction:** 2026-10-11. **Status:** product/agent orchestration authority; **not** runtime, legal, token, deployment, signing, or capability-status authority.
 **Canonical question:** **"Can the user employ a Rat, leave, and come back to useful, source-backed work?"**
 
+**Current engineering/stack companion:** [ENGINEERING STACK NORTH STAR V1](ENGINEERING_STACK_NORTH_STAR.md). This founder document remains product authority; the engineering companion freezes lean technology decisions, signal flow, cost and quality gates, not deployed capabilities.
+
 ## 1. Do not lose the plot
 
 > **BINRAT is a bounded workforce of specialized Rats that investigate crypto for the user, exchange evidence through typed handoffs, remember what they find, and return when something matters.**
