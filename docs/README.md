@@ -9,7 +9,7 @@
 3. [Agent Work Policy](AGENT_WORK_POLICY.md) — Codex/browser startup card, budget/retry defaults, stopping conditions.
 4. [Root AGENTS.md](../AGENTS.md) — local tooling/release restrictions for the selected branch.
 
-**Superseded specs:** [ArcPad V0 PRD](PRD.md) and [ArcPad V0 public read-plane](PUBLIC_READ_PLANE.md) remain for historical contract/provenance only. Never apply their old no-website/Arc-only assumptions to current BINRAT.
+**Scoped legacy documents:** [ArcPad V0 PRD](PRD.md) is historical product scope. [V0 public read-plane](PUBLIC_READ_PLANE.md) remains an active versioned schema/identity/provenance/coverage/receipt contract wherever implemented, including Pons Case projections. Only its old no-frontend and ArcPad-only source assumptions are superseded.
 
 **Historical/reviewed planning sources (may be absent from this checkout):**
 

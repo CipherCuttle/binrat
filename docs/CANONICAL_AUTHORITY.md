@@ -33,7 +33,7 @@
 | Earlier or competing text | Status today | Replacement / interpretation |
 | --- | --- | --- |
 | `docs/PRD.md` — ArcPad V0, “no website”, pre-frontend gate | **HISTORICAL** | Founder North Star for current product; Engineering Stack North Star for current architecture |
-| `docs/PUBLIC_READ_PLANE.md` — ArcPad `PUBLIC_PROJECTION_V0` | **HISTORICAL CONTRACT** | Pons read-plane and verified active runtime/Case contracts. Keep V0 evidence law where applicable, not old chain/UI boundaries |
+| `docs/PUBLIC_READ_PLANE.md` — `PUBLIC_PROJECTION_V0` | **ACTIVE VERSIONED CONTRACT; HISTORICAL SOURCE/UI ASSUMPTIONS** | `binrat.public-feed/0.1`, `BINRAT_PUBLIC_PROJECTION_V0`, identity/provenance, `UNVERIFIED` history coverage and digest-bound receipts still govern implementations using that projection, including Pons Cases. Only ArcPad-only source assumptions and the no-frontend boundary are superseded; newer Case schemas keep their own exact contracts |
 | `docs/CODEPLAN.md`, `docs/INTELLIGENCE_V1.md` (on integration branches) | **HISTORICAL/BRANCH-SCOPED** | Not today's default implementation plan or Pons authority |
 | `docs/ROADMAP_V0.md` and old token/genesis schedules | **HISTORICAL PLANNING** | Founder MVP sequencing, exact current token gates and verified runtime status; no launch/entitlement escalation |
 | `docs/ROADMAP.md` (“canonical future-product authority”) on integration | **FUTURE FEATURE MAP ONLY** | Founder North Star controls *strategic product priorities*; roadmap may enumerate ambitions but never outranks founder, evidence, launch/legal or current runtime |
@@ -41,7 +41,7 @@
 | `docs/BINRAT_LAUNCH_NIGHT_CANON_V1.md`, `docs/TOKEN_LAUNCH_DOCTRINE.md` | **SCOPED LAUNCH PLANNING** | Exact reviewed Pons manifest/gates/verified receipts/legal + owner grant decide launch actions |
 | `docs/CAPABILITY_MANIFEST_V0.json` committed snapshot | **VERSIONED REPOSITORY SNAPSHOT** | Current live capability claims require verified runtime-served manifest + active deployment provenance; repo snapshot alone cannot prove current live |
 | Visual lab/demo/status receipts/old infrastructure docs | **EXACT-VERSION EVIDENCE ONLY** | Approved visual freeze only for the exact asset/source; runtime needs its own verified acceptance |
-| Self-hosted migration `RESTORE_VERIFIED` / VM `ACCESS_PASS` | **BOUNDED RECOVERY FACTS ONLY** | Historic Cases/local UI run; live scanner, deployment, external backup custody and DNS independence are separate, still-gated proofs |
+| Self-hosted migration / VM access reports | **EXACT-VERSION EVIDENCE ONLY** | Use the pinned sources in section 6; a restore, access or local UI result proves only its measured scope, never scanner/deployment/custody/DNS acceptance |
 
 The older files may exist on other branches with headings such as `CANONICAL`, `FROZEN`, `CURRENT` or `LIVE`. Those headings only describe the original phase/contract unless the above domain authority and up-to-date evidence also support them. **Do not search-and-replace historical results.**
 
@@ -65,8 +65,24 @@ Do not equate:
 - Do not rewrite immutable evidence/receipts, historical commits, signed manifests or security controls; historical documents receive a warning header only when warranted.
 - If branch-level docs disagree, report **AUTHORITY_CONFLICT** with concrete paths and SHAs before implementation. Promote this index into each active source branch through an explicit reviewed integration; **a draft PR cannot make all branches consistent by itself**.
 
-## 6. Current migration boundary (as of 2026-10-11)
+## 6. Exact evidence lookup (review snapshot 2026-10-11)
 
-BINRAT recovered production D1 history and passed **local** restore, Case and React/Caddy verification, and the previously documented Qnty VM identity/SSH read-only check passed. The collector has **no accepted live Pons event** in that self-hosted path; the diagnostic ledger stands at **11/12** with no additional budget grant; independent backup/key custody and remote deployment/cutover remain unproven. QntyLab/Frontier may not be disrupted, and the Cloudflare invoice is a **separate** unresolved billing matter. These are dated reports subject to later direct verification, not global current status flags.
+These are source locators, not current operational status or renewed action grants. Read the selected document at the stated SHA, distinguish its contract from its historical acceptance results, and reconcile any later evidence for the same environment before making a present-tense claim.
+
+| Domain | Pinned source to inspect |
+| --- | --- |
+| Pons public truth and source-bound Cases | Integration `30564864f5d406414f0c09c4d2ba2be5d1e79ab8`: [public truth contract](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_PUBLIC_TRUTH_ACCEPTANCE_V1.md), [additive Case evidence contract](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_SPRINT_A1_2_CASE_CONTRACT.md). These do not retire the still-used V0 projection |
+| React V3 visual/source selection | Same integration SHA: [visual direction freeze](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_REACT_VISUAL_V3_FREEZE_V1.md), [Pons read-integration boundaries](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_REACT_PONS_READ_INTEGRATION_V1.md), [dated release source/build procedure](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_V3_PRODUCTION_SPRINT_20261009.md). Neither a direction freeze nor a past cutover grant authorizes a new release |
+| Pons token execution and publication gates | Same integration SHA: [launch authority contract](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_PONS_LAUNCH_AUTHORITY_V1.md), [Pons plan](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/BINRAT_PONS_LAUNCH_PLAN_V1.json), [Pons gate matrix](https://github.com/CipherCuttle/binrat/blob/30564864f5d406414f0c09c4d2ba2be5d1e79ab8/docs/LAUNCH_GATE_MATRIX_PONS_V1.json). Plans/snapshots are not fresh upstream proof or owner authorization |
+
+Migration evidence is local on `migration/binrat-survival-v1` at **`a269d8272ec93e41b00ebfcf6c528074a2c4c898`**, inspected in `/home/swirky/DevHub/worktrees/binrat-survival-v1`. At that exact commit, read:
+
+- `docs/migration/LOCAL_COMMIT_OFFLINE_REVIEW.md` for the checkpoint and unresolved gates;
+- `docs/migration/D1_RESTORE_PROOF.md` and `docs/migration/PRODUCTION_RESTORE_EVIDENCE.json` for recovered production history;
+- `docs/migration/SELF_HOSTED_REPLACEMENT_PROOF.md` and `docs/migration/BLOCKER_CLOSURE_PROOF.md` for local runtime/Case/browser evidence and its limits;
+- `docs/migration/BLOCKER_CLOSURE_EVIDENCE.json`, `docs/migration/HETZNER_DEPLOYMENT_CHECKLIST.md` and `docs/migration/OFF_DEVICE_BACKUP_CUSTODY.md` for source, environment and custody gates;
+- `docs/migration/OFFICIAL_RPC_CANDIDATE.md` and `docs/migration/OFFICIAL_RPC_CANARY_PLAN.json` for the unexecuted, separately gated diagnostic proposal.
+
+Use `git show a269d8272ec93e41b00ebfcf6c528074a2c4c898:docs/migration/LOCAL_COMMIT_OFFLINE_REVIEW.md` and the other exact paths above when that object is available. This local commit is not assumed published or present in every clone. If unavailable, report the missing evidence; do not substitute old Cloudflare status. Any later VM `ACCESS_PASS` report requires its exact receipt, environment and time reconciled with this checkpoint before it can change the recorded identity blocker. This router does not certify such a pass. Qnty/QntyLab/Frontier remain outside BINRAT's action scope; billing, deployment, DNS, source collection and backup custody each need their own evidence and authorization.
 
 **This file and its PR grant no new spend, remote write, deployment, merge, DNS change, provider bypass, public notification, trading or token transaction.**

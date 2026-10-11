@@ -1,6 +1,6 @@
-# BINRAT PUBLIC READ PLANE V0 — HISTORICAL CONTRACT
+# BINRAT PUBLIC READ PLANE V0
 
-> This is the original ArcPad V0 public-projection contract, preserved as evidence of its own scope. It does **not** replace current Pons/Robinhood 4663, React V3 or self-hosted read-plane facts and should not be read as a current capability or architecture mandate. See [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) and [Engineering Stack North Star V1](ENGINEERING_STACK_NORTH_STAR.md).
+> **ACTIVE VERSIONED CONTRACT; HISTORICAL SOURCE/UI ASSUMPTIONS.** The `binrat.public-feed/0.1` / `BINRAT_PUBLIC_PROJECTION_V0` schema, independent identity/provenance checks, frozen `UNVERIFIED` history coverage and digest-bound receipts remain binding wherever implemented, including Pons Case projections in the integration and portable runtime. The ArcPad-only source descriptions and no-frontend boundary below are historical; Pons roles require their exact source-bound contracts, not inferred ownership. Separately versioned Case evidence has its own contract and does not retire this projection. Follow the [Canonical Authority Index](CANONICAL_AUTHORITY.md); this contract does not prove current deployment or freshness. Original body preserved below.
 
 ## Objective
 
