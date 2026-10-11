@@ -92,7 +92,7 @@ Every agent task must declare before work: **hypothesis, product consequence, ba
 ## 7. Agent startup and exit contract (Codex, browser-based agents, reviewers)
 
 **At START:**
-1. Read root \`AGENTS.md\` and this file, then \`docs/AGENT_WORK_POLICY.md\`; identify source branch and deployed runtime separately.
+1. Read \`docs/CANONICAL_AUTHORITY.md\` first, then branch-root \`AGENTS.md\` and the relevant product/engineering/work policy docs; identify source branch and deployed runtime separately.
 2. Read \`docs/BINRAT_LAUNCH_NIGHT_CANON_V1.md\` and \`docs/ROADMAP.md\` **where they exist on the selected current branch**; consult PR #148/#151 for historical intent, #123/#128/#132/#133 for offline workforce design, and PR #178 for owner Tripwire candidate.
 3. Reconcile \`main\` versus active worktrees/PRs. The **default main branch is an older ArcPad backend snapshot**, not the current product/runtime authority. Do not infer "no approved frontend" from its old files.
 4. Write a 1-sentence **USER VALUE** and 1-sentence **KILL CONDITION**. If impossible, do not start coding.
