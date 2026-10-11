@@ -2,9 +2,9 @@
 
 # BINRAT
 
-BINRAT is an autonomous Arc launch-intelligence project. New launches are **HOT GARBAGE**. BINRAT watches launch events, preserves chain-authoritative facts, reconstructs creator history, records point-in-time observations, and publishes replayable receipts.
+**Historical V0 description (ArcPad/Arc 5042 only):** BINRAT began as an Arc launch-intelligence project that watched events, preserved facts and published receipts. Current Pons/Robinhood 4663 and React V3 direction is defined by the linked Founder and Engineering North Stars; this V0 text is not the present product scope.
 
-The current public beta runs on Cloudflare: static web assets + Worker API + D1 persistence + Queue-driven live/history/observation work + the Telegram Rat. Local development still supports SQLite-backed CLI workflows.
+**Historical infrastructure note:** The earlier public beta used Cloudflare static assets, Worker API, D1, Queues and Telegram. This is **not a claim of present availability or freshness** after the October 2026 Cloudflare containment and self-hosting rescue. The recovered SQLite proof and independent deployment have separate acceptance gates.
 
 The token is not launched. This repository does not contain signing, trading, buy/sell recommendation, or capital-execution authority. Token launch and token marketing remain explicitly blocked in the canonical capability manifest.
 
