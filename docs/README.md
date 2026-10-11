@@ -2,9 +2,12 @@
 
 **Read these first in every branch:**
 
-1. [BINRAT Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) — frozen founder vision, roadmap separation, crew, MVP definition, kill criteria and evidence precedence.
-2. [Agent Work Policy](AGENT_WORK_POLICY.md) — Codex/browser startup card, budget/retry defaults, stopping conditions.
-3. [Root AGENTS.md](../AGENTS.md) — local tooling/release restrictions for the selected branch.
+1. [BINRAT Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) — frozen product vision, workforce, crew, MVP definition, kill criteria and evidence precedence.
+2. [Engineering Stack North Star V1](ENGINEERING_STACK_NORTH_STAR.md) — **current technology, signal flow, tooling candidate/adoption policy, quality and cost authority**.
+3. [Agent Work Policy](AGENT_WORK_POLICY.md) — Codex/browser startup card, budget/retry defaults, stopping conditions.
+4. [Root AGENTS.md](../AGENTS.md) — local tooling/release restrictions for the selected branch.
+
+**Superseded specs:** [ArcPad V0 PRD](PRD.md) and [ArcPad V0 public read-plane](PUBLIC_READ_PLANE.md) remain for historical contract/provenance only. Never apply their old no-website/Arc-only assumptions to current BINRAT.
 
 **Historical/reviewed planning sources (may be absent from this checkout):**
 
