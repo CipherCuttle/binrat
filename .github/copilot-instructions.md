@@ -1,6 +1,6 @@
 # BINRAT GitHub agent instructions
 
-Read [root AGENTS.md](../AGENTS.md), [founder north star](../docs/BINRAT_FOUNDER_NORTH_STAR.md), [agent work policy](../docs/AGENT_WORK_POLICY.md) before planning.
+Read [root AGENTS.md](../AGENTS.md), [founder north star](../docs/BINRAT_FOUNDER_NORTH_STAR.md), [engineering stack north star](../docs/ENGINEERING_STACK_NORTH_STAR.md), [agent work policy](../docs/AGENT_WORK_POLICY.md) before planning. Do not promote candidate OSS tools, runtime modules or agent/MCP frameworks without a measured bounded trial.
 
 **Product:** Users employ specialized Rats to investigate crypto; Rats collaborate with typed receipt-bound handoffs, run within explicit budgets, and return findings. **FIND → EMPLOY → LEAVE → RETURN.** The Pons scanner is Rat Zero's source, not the complete product. Token launch remains a separately authorized exact/legal/mechanical track; no false live workforce/stake claim.
 
