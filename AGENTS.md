@@ -1,3 +1,5 @@
+> **Authority routing (2026-10-11):** Read [docs/CANONICAL_AUTHORITY.md](docs/CANONICAL_AUTHORITY.md) first; its product, engineering, runtime, launch and historical domain rules take precedence over *planning labels* in this branch. This file remains binding for branch-local checks/stop conditions but grants no new execution authority. Do not infer current Cloudflare, Pons or deploy status from older branch documents.
+
 # BINRAT agent/operator tooling defaults
 
 Scope: this repository, including the V2 frontend and release-candidate checks.
