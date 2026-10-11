@@ -1,4 +1,6 @@
-# BINRAT PUBLIC READ PLANE V0
+# BINRAT PUBLIC READ PLANE V0 — HISTORICAL CONTRACT
+
+> This is the original ArcPad V0 public-projection contract, preserved as evidence of its own scope. It does **not** replace current Pons/Robinhood 4663, React V3 or self-hosted read-plane facts and should not be read as a current capability or architecture mandate. See [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) and [Engineering Stack North Star V1](ENGINEERING_STACK_NORTH_STAR.md).
 
 ## Objective
 
