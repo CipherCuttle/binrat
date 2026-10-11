@@ -1,0 +1,125 @@
+# Emergency portable backup: GitHub public repo artifacts MUST NOT contain raw D1 SQL.
+# This workflow encrypts to the owner's existing published GitHub SSH public keys
+# before upload. It aborts if no suitable SSH encryption recipient is present.
+name: BINRAT encrypted D1 rescue (2026-10-11)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/binrat-cloudflare-d1-encrypted-backup-20261011.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-d1-encrypted-backup-rescue
+  cancel-in-progress: false
+
+jobs:
+  rescue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Verify owner-controlled age recipients
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p backup
+          curl --fail --silent --show-error --max-time 20 \
+            https://github.com/CipherCuttle.keys -o backup/github-ssh-keys.txt
+          grep -E '^(ssh-ed25519|ssh-rsa) [A-Za-z0-9+/=]+' \
+            backup/github-ssh-keys.txt > backup/recipients.txt || true
+          test -s backup/recipients.txt || {
+            echo 'BLOCKED_NO_OWNER_SSH_PUBLIC_KEYS: no portable encryption recipient'
+            exit 1
+          }
+          echo "SSH_ENCRYPTION_RECIPIENTS_PRESENT: $(wc -l < backup/recipients.txt)"
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq age >/dev/null
+
+      - name: Export exact D1 and encrypt before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 - <<'PY'
+          import json
+          import os
+          import shutil
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+          token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+          expected_account = "8927d39146b901d0f463b971a1d039e6"
+          database_id = "46814564-1a41-449a-88e5-c1349eed3a27"
+          if account != expected_account or not token:
+              raise SystemExit("BLOCKED_CLOUDFLARE_ACCOUNT_OR_TOKEN")
+          root = f"https://api.cloudflare.com/client/v4/accounts/{account}/d1/database/{database_id}"
+          def api(method, path, payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              req = urllib.request.Request(
+                  root + path,
+                  data=data,
+                  method=method,
+                  headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"}
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=25) as response:
+                      obj = json.load(response)
+              except urllib.error.HTTPError as e:
+                  raise RuntimeError(f"D1_API_HTTP_{e.code}") from None
+              if obj.get("success") is not True:
+                  raise RuntimeError("D1_API_RESULT_NOT_SUCCESS")
+              return obj.get("result") or {}
+
+          info = api("GET", "")
+          if info.get("name") != "binrat-v0":
+              raise SystemExit("BLOCKED_WRONG_D1_DATABASE")
+          print("DATABASE_IDENTITY_VERIFIED: binrat-v0")
+          bookmark = None
+          signed_url = None
+          for attempt in range(30):
+              body = {"output_format": "polling"}
+              if bookmark:
+                  body["current_bookmark"] = bookmark
+              result = api("POST", "/export", body)
+              if result.get("status") == "error":
+                  raise RuntimeError("D1_EXPORT_PROVIDER_ERROR")
+              if result.get("status") == "complete":
+                  signed_url = (result.get("result") or {}).get("signed_url")
+                  break
+              bookmark = result.get("at_bookmark") or bookmark
+              if not bookmark:
+                  raise RuntimeError("D1_EXPORT_NO_BOOKMARK")
+              time.sleep(5)
+          if not isinstance(signed_url, str) or urllib.parse.urlparse(signed_url).scheme != "https":
+              raise RuntimeError("D1_EXPORT_NOT_COMPLETE_OR_INVALID_SIGNED_URL")
+          out_path = "backup/binrat-v0-20261011.sql"
+          request = urllib.request.Request(signed_url, headers={"User-Agent": "binrat-d1-encrypted-rescue/1.0"})
+          with urllib.request.urlopen(request, timeout=120) as response, open(out_path, "wb") as output:
+              shutil.copyfileobj(response, output)
+          if os.path.getsize(out_path) <= 100:
+              raise RuntimeError("D1_EXPORT_TOO_SMALL")
+          print("D1_EXPORT_RECEIVED_PRIVATE_RUNNER_ONLY")
+          PY
+          age -R backup/recipients.txt -o backup/binrat-v0-20261011.sql.age \
+            backup/binrat-v0-20261011.sql
+          test -s backup/binrat-v0-20261011.sql.age
+          rm -f backup/binrat-v0-20261011.sql backup/github-ssh-keys.txt
+          echo "ENCRYPTED_D1_BACKUP_READY: plaintext removed; only .age upload permitted."
+
+      - name: Upload ENCRYPTED ciphertext only
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-d1-encrypted-rescue-20261011
+          path: backup/binrat-v0-20261011.sql.age
+          if-no-files-found: error
+          retention-days: 14
