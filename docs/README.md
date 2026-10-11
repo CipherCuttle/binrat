@@ -17,7 +17,8 @@
 
 ## Explicit historical or limited-scope files
 
-- [ArcPad V0 PRD](PRD.md), [ArcPad V0 Public Read Plane](PUBLIC_READ_PLANE.md), [V0 Code Plan](CODEPLAN.md), [Arc Intelligence V1](INTELLIGENCE_V1.md), [Roadmap V0](ROADMAP_V0.md) — historical context/evidence, **not** today's product/chain/engineering instructions.
+- [ArcPad V0 PRD](PRD.md), [V0 Code Plan](CODEPLAN.md), [Arc Intelligence V1](INTELLIGENCE_V1.md), [Roadmap V0](ROADMAP_V0.md) — historical context/evidence, **not** today's product/chain/engineering instructions.
+- [V0 Public Read Plane](PUBLIC_READ_PLANE.md) — **active versioned technical contract** for implementations still using its schema, identity/provenance, `UNVERIFIED` coverage and digest-bound receipts, including Pons Cases. Only ArcPad-only source assumptions and no-frontend scope are historical.
 - [Roadmap](ROADMAP.md) — **future feature map**, subordinate to Founder North Star and verified live capability.
 - [Philosophy V0](PHILOSOPHY.md) — durable evidence principles, **not** a complete current architecture or token execution grant.
 - [Launch Night Canon V1](BINRAT_LAUNCH_NIGHT_CANON_V1.md), [Token Launch Doctrine](TOKEN_LAUNCH_DOCTRINE.md), [capability-manifest snapshot](CAPABILITY_MANIFEST_V0.json) — scoped plans and historic/draft source data; exact verified runtime/launch gate evidence and owner grant decide actions.
