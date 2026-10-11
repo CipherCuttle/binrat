@@ -1,0 +1,123 @@
+# One-shot emergency stop for BINRAT's Cloudflare metered sync workload.
+# Triggered once by this file's addition to main, rerunnable manually.
+# No D1 data, deployments, Worker scripts, routes, DNS, secrets or billing changes.
+name: BINRAT emergency Cloudflare freeze (2026-10-11)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/binrat-cloudflare-emergency-freeze-20261011.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-cloudflare-emergency-freeze
+  cancel-in-progress: false
+
+jobs:
+  pause-indexer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Verify exact BINRAT resources; pause queue and remove cron
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          expected_account = "8927d39146b901d0f463b971a1d039e6"
+          worker = "binrat-edge-v0"
+          queue_name = "binrat-sync-v0"
+          account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+          token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+          if account != expected_account or not token:
+              raise SystemExit("BLOCKED: missing credential or wrong Cloudflare account identity")
+
+          root = f"https://api.cloudflare.com/client/v4/accounts/{account}"
+          def api(method, path, payload=None):
+              data = None if payload is None else json.dumps(payload, separators=(",", ":")).encode()
+              req = urllib.request.Request(
+                  root + path,
+                  data=data,
+                  method=method,
+                  headers={
+                      "Authorization": "Bearer " + token,
+                      "Content-Type": "application/json",
+                      "Accept": "application/json",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=20) as res:
+                      parsed = json.load(res)
+              except urllib.error.HTTPError as error:
+                  raise RuntimeError(f"Cloudflare {method} {path.split('?')[0]} HTTP {error.code}") from None
+              except Exception as error:
+                  raise RuntimeError(f"Cloudflare {method} request failed: {type(error).__name__}") from None
+              if parsed.get("success") is not True:
+                  codes = [x.get("code") for x in (parsed.get("errors") or [])]
+                  raise RuntimeError(f"Cloudflare {method} API rejected request, codes={codes}")
+              return parsed.get("result")
+
+          # Preflight both resources before *any* write; do not modify other workloads.
+          sched_path = f"/workers/scripts/{worker}/schedules"
+          schedules = api("GET", sched_path)
+          current_crons = [x.get("cron") for x in (schedules or {}).get("schedules", [])]
+          if current_crons not in ([], ["* * * * *"]):
+              raise SystemExit("BLOCKED: unexpected production cron configuration")
+
+          queues = api("GET", "/queues?per_page=100")
+          if not isinstance(queues, list):
+              raise SystemExit("BLOCKED: unexpected Cloudflare queue-list response")
+          matching = [q for q in queues if q.get("queue_name") == queue_name]
+          if len(matching) != 1:
+              raise SystemExit("BLOCKED: target queue absent or ambiguous")
+          queue_id = matching[0].get("queue_id")
+          if not isinstance(queue_id, str) or not queue_id:
+              raise SystemExit("BLOCKED: missing target queue ID")
+          path = f"/queues/{queue_id}"
+          current = api("GET", path)
+          if not isinstance(current, dict) or current.get("queue_name") != queue_name:
+              raise SystemExit("BLOCKED: queue identity changed")
+          consumers = api("GET", path + "/consumers")
+          if not isinstance(consumers, list) or not consumers:
+              raise SystemExit("BLOCKED: cannot verify queue consumer identity")
+          if any(c.get("script_name") != worker or c.get("type") != "worker" for c in consumers):
+              raise SystemExit("BLOCKED: unexpected queue consumer; won't pause unrelated work")
+          print("PREFLIGHT_PASS: exact Cloudflare account, Worker, one-minute cron and queue consumer")
+
+          # Cloudflare queue update is a full replacement: preserve original settings.
+          settings = current.get("settings") or {}
+          if not isinstance(settings, dict):
+              raise SystemExit("BLOCKED: unexpected queue settings")
+          if settings.get("delivery_paused") is not True:
+              payload = {
+                  "queue_name": queue_name,
+                  "settings": dict(settings, delivery_paused=True),
+              }
+              if current.get("jurisdiction") in ("eu", "us", "fedramp"):
+                  payload["jurisdiction"] = current["jurisdiction"]
+              api("PUT", path, payload)
+          check_queue = api("GET", path)
+          if (check_queue.get("settings") or {}).get("delivery_paused") is not True:
+              raise SystemExit("FAILED: queue pause readback did not match")
+          print("QUEUE_DELIVERY_PAUSED_VERIFIED")
+
+          if current_crons:
+              api("PUT", sched_path, [])
+          check_sched = api("GET", sched_path)
+          if (check_sched or {}).get("schedules") != []:
+              raise SystemExit("FAILED: cron removal readback did not match")
+          print("CRON_TRIGGERS_REMOVED_VERIFIED")
+          print("EMERGENCY_FREEZE_PASS: queue and cron stopped; database and Worker preserved")
+          print("NOTE: public feed will go stale; this does NOT cancel paid subscriptions or the invoice.")
+          PY
