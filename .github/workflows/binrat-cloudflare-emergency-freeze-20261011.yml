@@ -91,6 +91,7 @@ jobs:
           consumers = api("GET", path + "/consumers")
           if not isinstance(consumers, list) or not consumers:
               raise SystemExit("BLOCKED: cannot verify queue consumer identity")
+          print("QUEUE_CONSUMER_IDENTITY_READBACK:", json.dumps([{"type": c.get("type"), "script_name": c.get("script_name")} for c in consumers], sort_keys=True))
           if any(c.get("script_name") != worker or c.get("type") != "worker" for c in consumers):
               raise SystemExit("BLOCKED: unexpected queue consumer; won't pause unrelated work")
           print("PREFLIGHT_PASS: exact Cloudflare account, Worker, one-minute cron and queue consumer")
