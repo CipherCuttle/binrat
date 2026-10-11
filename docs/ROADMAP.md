@@ -1,7 +1,7 @@
 # BINRAT ROADMAP
 
-Status: **canonical future-product authority**
-Current capability/deployment status: runtime `/api/capabilities` backed by `CAPABILITY_MANIFEST_JSON`
+Status: **FUTURE FEATURE MAP ONLY — delegated under [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md)**. This roadmap does not independently outrank founder strategy, engineering policy, verified runtime status, launch/legal gates or owner authority. See [Canonical Authority Index](CANONICAL_AUTHORITY.md).
+Current capability/deployment status: **verify the current deployed runtime** `/api/capabilities` and its backing manifest/revision/freshness; this branch's snapshots and tables are dated plans, not guaranteed present capability
 Language: `docs/PRODUCT_LANGUAGE.md`
 Principles: `docs/PHILOSOPHY.md`
 

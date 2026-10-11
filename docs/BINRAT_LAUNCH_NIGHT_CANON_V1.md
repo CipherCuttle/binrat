@@ -1,3 +1,5 @@
+> **SCOPED LAUNCH-NIGHT PLANNING, not universal product/engineering canon.** Its original exact-phase restrictions remain for that workstream. Current source routing is [Canonical Authority Index](CANONICAL_AUTHORITY.md); all token signing, deploy and marketing actions still require fresh exact-source, legal and owner authority.
+
 # BINRAT — LAUNCH NIGHT CANON V1
 
 Date: 2026-10-07

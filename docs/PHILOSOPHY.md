@@ -1,3 +1,5 @@
+> **PRESERVED EVIDENCE/FAIR-LAUNCH PRINCIPLES — not current execution authority.** These principles retain value, but time-scoped ArcPad examples, token proposals and references to a committed capability manifest are historical. Current authority routing: [Canonical Authority Index](CANONICAL_AUTHORITY.md). Do not turn this document into live deployment, wallet/token, stack or budget permission.
+
 # BINRAT PHILOSOPHY V0
 
 Status: product doctrine / early fair-launch commitment  

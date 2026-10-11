@@ -1,3 +1,5 @@
+> **HISTORICAL ARC INTELLIGENCE V1 WORKSTREAM, not the active Pons implementation/stack canon.** Retain valid immutable evidence and time-integrity invariants; do not reinterpret its frozen Arc horizons or `IMPLEMENTATION ACTIVE` phase label as a current launch/branch/runtime instruction. See [Canonical Authority Index](CANONICAL_AUTHORITY.md).
+
 # BINRAT Intelligence V1
 
 Status: IMPLEMENTATION ACTIVE  
