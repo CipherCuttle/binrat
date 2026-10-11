@@ -1,3 +1,5 @@
+> **Current source-of-truth entrypoint:** [docs/CANONICAL_AUTHORITY.md](docs/CANONICAL_AUTHORITY.md). This integration branch contains multiple **historical ArcPad / Cloudflare V0 statements below**. They are retained for project history and do **not** describe current Pons V2 / React V3 production, self-hosting status or token authorization. Read [Founder North Star](docs/BINRAT_FOUNDER_NORTH_STAR.md) for product direction, [Engineering Stack North Star](docs/ENGINEERING_STACK_NORTH_STAR.md) for technical choices, and [Agent Work Policy](docs/AGENT_WORK_POLICY.md) for bounded execution. Only current deployed/verified evidence decides actual live capability.
+
 # BINRAT
 
 BINRAT is an autonomous Arc launch-intelligence project. New launches are **HOT GARBAGE**. BINRAT watches launch events, preserves chain-authoritative facts, reconstructs creator history, records point-in-time observations, and publishes replayable receipts.
