@@ -1,4 +1,6 @@
-# BINRAT V0 PRD
+# BINRAT V0 PRD — HISTORICAL / SUPERSEDED
+
+> **Not an active product, frontend, chain or stack authority.** This document describes the original **ArcPad-only V0 experiment**, including its then-valid "no website" and other now-stale decisions. Do not apply these statements to Pons V2 / Robinhood 4663, React V3, autonomous workforce planning or current self-hosted migration. The current product authority is [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md); engineering/stack choices are governed by [Engineering Stack North Star V1](ENGINEERING_STACK_NORTH_STAR.md). Original text is preserved below as historical evidence.
 
 ## Product thesis
 
