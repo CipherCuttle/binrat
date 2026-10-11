@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED — ORIGINAL ARCPAD V0 PRD.** The no-website/ArcPad-only and 72-hour pre-frontend statements below are past experiment scope, **not** current Pons V2 / React V3 product decisions. Current product: [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md); stack: [Engineering Stack North Star](ENGINEERING_STACK_NORTH_STAR.md); precedence: [Canonical Authority Index](CANONICAL_AUTHORITY.md). Preserve original text as historical evidence.
+
 # BINRAT V0 PRD
 
 ## Product thesis
