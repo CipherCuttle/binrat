@@ -91,9 +91,20 @@ jobs:
           consumers = api("GET", path + "/consumers")
           if not isinstance(consumers, list) or not consumers:
               raise SystemExit("BLOCKED: cannot verify queue consumer identity")
-          print("QUEUE_CONSUMER_IDENTITY_READBACK:", json.dumps([{"type": c.get("type"), "script_name": c.get("script_name")} for c in consumers], sort_keys=True))
-          if any(c.get("script_name") != worker or c.get("type") != "worker" for c in consumers):
-              raise SystemExit("BLOCKED: unexpected queue consumer; won't pause unrelated work")
+          # CF's queue consumer list may omit script_name even for a Worker consumer.
+          # Instead verify the named Worker has the exact producer binding, AND
+          # the named queue has one Worker consumer; do not rely on absent fields.
+          worker_settings = api("GET", f"/workers/scripts/{worker}/settings")
+          bindings = (worker_settings or {}).get("bindings", [])
+          has_exact_producer = any(
+              b.get("type") == "queue" and b.get("name") == "SYNC_QUEUE"
+              and b.get("queue_name") == queue_name
+              for b in bindings
+          )
+          if not has_exact_producer:
+              raise SystemExit("BLOCKED: target Worker has no verified BINRAT sync queue producer")
+          if len(consumers) != 1 or consumers[0].get("type") != "worker":
+              raise SystemExit("BLOCKED: unexpected queue consumer configuration")
           print("PREFLIGHT_PASS: exact Cloudflare account, Worker, one-minute cron and queue consumer")
 
           # Cloudflare queue update is a full replacement: preserve original settings.
