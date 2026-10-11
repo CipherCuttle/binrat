@@ -167,3 +167,40 @@ jobs:
           } for s in result]
           print("BILLING_READ_PASS: account subscriptions (no IDs or payment data):", json.dumps(safe))
           PY
+
+
+      - name: Diagnose historical metered charges by Cloudflare product (read-only)
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import collections
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+          token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+          if account != "8927d39146b901d0f463b971a1d039e6" or not token:
+              raise SystemExit("BILLABLE_USAGE_READ_BLOCKED")
+          url = f"https://api.cloudflare.com/client/v4/accounts/{account}/billable-usage?from=2026-09-08&to=2026-10-08"
+          req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
+          try:
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  data = json.load(response)
+          except urllib.error.HTTPError as e:
+              raise SystemExit(f"BILLABLE_USAGE_READ_UNAVAILABLE: HTTP {e.code}")
+          if data.get("success") is not True or not isinstance(data.get("result"), list):
+              raise SystemExit("BILLABLE_USAGE_READ_UNAVAILABLE: unexpected response")
+          costs = collections.defaultdict(float)
+          for row in data["result"]:
+              if not isinstance(row, dict):
+                  continue
+              service = row.get("ServiceName") or row.get("ServiceFamilyName") or "unknown"
+              costs[str(service)[:100]] += float(row.get("BilledCost") or 0)
+          ranking = sorted(costs.items(), key=lambda kv: -kv[1])
+          print("BILLABLE_USAGE_PRODUCT_TOTALS_USD_20260908_TO_20261008:", json.dumps([{"service": k, "amount_usd": round(v, 2)} for k,v in ranking[:12]]))
+          print("BILLABLE_USAGE_TOTAL_METERED_USD:", round(sum(costs.values()), 2), "rows:", len(data["result"]))
+          print("NOTE: usage API excludes fixed subscription fees and adjustments; not an invoice reconciliation.")
+          PY
