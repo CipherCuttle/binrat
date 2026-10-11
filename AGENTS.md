@@ -1,3 +1,11 @@
+# Founder vision lock — applies to every agent session
+
+**Before exploring or coding read [docs/BINRAT_FOUNDER_NORTH_STAR.md](docs/BINRAT_FOUNDER_NORTH_STAR.md) and [docs/AGENT_WORK_POLICY.md](docs/AGENT_WORK_POLICY.md).** User goal: **"a crew of Rats you can actually employ"**. Loop: **FIND → EMPLOY → LEAVE → RETURN**. Rat Zero is the on-ramp, not the whole product. Rat collaboration means typed source-linked handoffs under one enforced budget, not unlimited chats. Real MVP requires a real persistent bounded assignment and truthful return; the full workforce is *not* automatically a token transaction blocker.
+
+At task start freeze USER JOB, evidence, exact source branch+production status, PASS, KILL and call/time/$ budget. Default: no paid calls, spending, external messages, production writes, deployments, merges, launch or signing without owner-scoped authority. One scope → targeted test → one hostile review → Critical/High fixes → at most one targeted rereview → STOP. Do not restart stale RPC/recurrent-address research without new falsifying evidence. Report actual user outcome vs synthetic proof.
+
+## Existing branch-local technical/tooling rules (preserved)
+
 # BINRAT agent/operator tooling defaults
 
 Scope: this repository, including the V2 frontend and release-candidate checks.
