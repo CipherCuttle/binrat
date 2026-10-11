@@ -1,6 +1,8 @@
 # BINRAT — agent and product document map
 
-**Read these first in every branch:**
+**Read [CANONICAL_AUTHORITY.md](CANONICAL_AUTHORITY.md) FIRST.** It is the single authority router; the documents below are **domain-scoped**, not competing global canons. This index is for source selection, not claims of live deployment.
+
+**Domain authorities, in reading order:**
 
 1. [BINRAT Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) — frozen product vision, workforce, crew, MVP definition, kill criteria and evidence precedence.
 2. [Engineering Stack North Star V1](ENGINEERING_STACK_NORTH_STAR.md) — **current technology, signal flow, tooling candidate/adoption policy, quality and cost authority**.
