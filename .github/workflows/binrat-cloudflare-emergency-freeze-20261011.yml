@@ -133,3 +133,37 @@ jobs:
           print("EMERGENCY_FREEZE_PASS: queue and cron stopped; database and Worker preserved")
           print("NOTE: public feed will go stale; this does NOT cancel paid subscriptions or the invoice.")
           PY
+
+
+      - name: Probe billing read permission (no subscription mutation)
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+          token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+          if account != "8927d39146b901d0f463b971a1d039e6" or not token:
+              raise SystemExit("BILLING_READ_BLOCKED: account mismatch")
+          path = f"https://api.cloudflare.com/client/v4/accounts/{account}/subscriptions"
+          req = urllib.request.Request(path, headers={"Authorization": "Bearer " + token})
+          try:
+              with urllib.request.urlopen(req, timeout=20) as response:
+                  data = json.load(response)
+          except urllib.error.HTTPError as e:
+              raise SystemExit(f"BILLING_READ_UNAVAILABLE: HTTP {e.code}")
+          if not data.get("success"):
+              raise SystemExit("BILLING_READ_UNAVAILABLE: provider rejected")
+          result = data.get("result") or []
+          if not isinstance(result, list):
+              raise SystemExit("BILLING_READ_UNAVAILABLE: unexpected shape")
+          safe = [{
+              "plan": str((s.get("rate_plan") or {}).get("public_name") or (s.get("rate_plan") or {}).get("id") or "unknown")[:100],
+              "state": str(s.get("state") or "unknown")[:40]
+          } for s in result]
+          print("BILLING_READ_PASS: account subscriptions (no IDs or payment data):", json.dumps(safe))
+          PY
