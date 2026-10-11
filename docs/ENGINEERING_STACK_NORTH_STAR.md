@@ -2,7 +2,7 @@
 
 **Founder-confirmed engineering direction:** 2026-10-11.
 **Scope:** Product engineering, signal flow, agent/tool choices, measurable quality, and infrastructure cost discipline.
-**Authority:** Companion to [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) and [Agent Work Policy](AGENT_WORK_POLICY.md). This is a **decision contract and target architecture, not a statement of deployed capabilities or permission to install, migrate, merge, spend, or deploy.**
+**Authority:** Delegated **engineering/technology domain** under the [single Canonical Authority Index](CANONICAL_AUTHORITY.md), alongside [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) (product) and [Agent Work Policy](AGENT_WORK_POLICY.md) (execution). This is a **decision contract and target architecture, not a statement of deployed capabilities or permission to install, migrate, merge, spend, or deploy.**
 
 ## 1. Engineering thesis
 
