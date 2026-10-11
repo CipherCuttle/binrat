@@ -1,3 +1,5 @@
+> **HISTORICAL / BRANCH-SCOPED ARCPAD V0 CONTRACT.** Keep its independent identity/provenance/coverage protections where applicable, but its ArcPad-only schema and frontend exclusions are not current Pons 4663/React V3 runtime authority. See [Canonical Authority Index](CANONICAL_AUTHORITY.md) and live verified Pons Case/read-plane receipts.
+
 # BINRAT PUBLIC READ PLANE V0
 
 ## Objective
