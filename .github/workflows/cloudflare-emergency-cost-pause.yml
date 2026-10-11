@@ -1,0 +1,46 @@
+name: cloudflare-emergency-cost-pause
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Inspect, or explicitly pause the known BINRAT production Cron and queue
+        required: true
+        default: inspect
+        type: choice
+        options:
+          - inspect
+          - pause
+      confirmation:
+        description: For pause only, enter PAUSE_BINRAT_2026_10_11
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binrat-cloudflare-emergency-cost-pause
+  cancel-in-progress: false
+
+jobs:
+  emergency-containment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail closed without explicit owner confirmation
+        env:
+          OPERATION: ${{ inputs.operation }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "$OPERATION" = 'inspect' || { test "$OPERATION" = 'pause' && test "$CONFIRMATION" = 'PAUSE_BINRAT_2026_10_11'; }
+      - name: Inspect or pause known BINRAT workloads (no deploy, no deletes)
+        env:
+          OPERATION: ${{ inputs.operation }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          python3 scripts/cloudflare_emergency_pause.py --mode "$OPERATION" --confirm "$CONFIRMATION"
