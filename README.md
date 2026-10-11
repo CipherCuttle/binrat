@@ -1,8 +1,12 @@
 # BINRAT — repository orientation
 
+**START HERE: [Canonical Authority Index](docs/CANONICAL_AUTHORITY.md)** — the one document that routes competing product, engineering, runtime, launch and historical claims to the correct authority.
+
 **Founder north star: [A crew of Rats users can actually employ](docs/BINRAT_FOUNDER_NORTH_STAR.md).**
 
 **Agent operating rules: [bounded execution, kill criteria and retries](docs/AGENT_WORK_POLICY.md).**
+
+**Current engineering stack and signal-flow authority: [ENGINEERING STACK NORTH STAR V1](docs/ENGINEERING_STACK_NORTH_STAR.md).** Tool suggestions are not installed dependencies or permission to change production.
 
 BINRAT's selected product direction is a bounded workforce of specialized crypto-investigation Rats. **Rat Zero** finds Pons V2 launches and opens Cases; **Tripwire** is a future-event Watcher under owner-pilot verification; **Sniffer** investigates funding trails and exchanges typed handoffs; the **Den** will organize jobs. The user journey is **FIND → EMPLOY → LEAVE → RETURN**. User-facing truth comes from verified deployment/source evidence, not merely these docs.
 

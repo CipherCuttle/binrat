@@ -1,6 +1,6 @@
 # BINRAT — agent entrypoint (founder vision first)
 
-**READ FIRST:** [Founder North Star](docs/BINRAT_FOUNDER_NORTH_STAR.md) and [Agent Work Policy](docs/AGENT_WORK_POLICY.md).
+**READ FIRST:** [Canonical Authority Index](docs/CANONICAL_AUTHORITY.md), which routes the [Founder North Star](docs/BINRAT_FOUNDER_NORTH_STAR.md), [Engineering Stack North Star](docs/ENGINEERING_STACK_NORTH_STAR.md), [Agent Work Policy](docs/AGENT_WORK_POLICY.md), runtime/receipt proof and historical docs to their separate domains. This entrypoint does **not** set a competing precedence. No new tooling/capability or production action is authorized by a doc link.
 
 **North star:** **A crew of specialized Rats users can actually employ.** FIND → EMPLOY → LEAVE → RETURN. Rat Zero finds Cases; Tripwire watches; Sniffer follows funding and hands off evidence; the Den will organize bounded jobs. This is the product direction; never confuse plans/offline proofs with deployed features.
 

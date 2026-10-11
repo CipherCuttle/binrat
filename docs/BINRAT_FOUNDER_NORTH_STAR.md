@@ -3,6 +3,8 @@
 **Founder-confirmed direction:** 2026-10-11. **Status:** product/agent orchestration authority; **not** runtime, legal, token, deployment, signing, or capability-status authority.
 **Canonical question:** **"Can the user employ a Rat, leave, and come back to useful, source-backed work?"**
 
+**Single authority router:** [CANONICAL AUTHORITY INDEX](CANONICAL_AUTHORITY.md). This document alone governs **product vision and priorities**; the [Engineering Stack North Star](ENGINEERING_STACK_NORTH_STAR.md) owns technology decisions, [Agent Work Policy](AGENT_WORK_POLICY.md) owns task execution, and verified current runtime/owner authority decide capabilities and external actions. None is a competing universal canon.
+
 ## 1. Do not lose the plot
 
 > **BINRAT is a bounded workforce of specialized Rats that investigate crypto for the user, exchange evidence through typed handoffs, remember what they find, and return when something matters.**
@@ -90,7 +92,7 @@ Every agent task must declare before work: **hypothesis, product consequence, ba
 ## 7. Agent startup and exit contract (Codex, browser-based agents, reviewers)
 
 **At START:**
-1. Read root \`AGENTS.md\` and this file, then \`docs/AGENT_WORK_POLICY.md\`; identify source branch and deployed runtime separately.
+1. Read \`docs/CANONICAL_AUTHORITY.md\` first, then branch-root \`AGENTS.md\` and the relevant product/engineering/work policy docs; identify source branch and deployed runtime separately.
 2. Read \`docs/BINRAT_LAUNCH_NIGHT_CANON_V1.md\` and \`docs/ROADMAP.md\` **where they exist on the selected current branch**; consult PR #148/#151 for historical intent, #123/#128/#132/#133 for offline workforce design, and PR #178 for owner Tripwire candidate.
 3. Reconcile \`main\` versus active worktrees/PRs. The **default main branch is an older ArcPad backend snapshot**, not the current product/runtime authority. Do not infer "no approved frontend" from its old files.
 4. Write a 1-sentence **USER VALUE** and 1-sentence **KILL CONDITION**. If impossible, do not start coding.

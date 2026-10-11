@@ -1,6 +1,8 @@
 # BINRAT — AGENT WORK POLICY (CODEx + BROWSER)
 
-**Always read [FOUNDER NORTH STAR](BINRAT_FOUNDER_NORTH_STAR.md) first.** This is the practical short-form execution contract for any assistant, agent, Codex CLI/worktree or GitHub-browser session. Branch-specific \`AGENTS.md\`, higher-authority owner approvals and verified runtime/source evidence still apply.
+**First read the [CANONICAL AUTHORITY INDEX](CANONICAL_AUTHORITY.md); then read [FOUNDER NORTH STAR](BINRAT_FOUNDER_NORTH_STAR.md) for product direction and the [ENGINEERING STACK NORTH STAR](ENGINEERING_STACK_NORTH_STAR.md) for technology choices.** This is the practical short-form execution contract for any assistant, agent, Codex CLI/worktree or GitHub-browser session. Branch-specific \`AGENTS.md\`, higher-authority owner approvals and verified runtime/source evidence still apply.
+
+**Canonical router:** [CANONICAL AUTHORITY INDEX](CANONICAL_AUTHORITY.md) decides which source governs product, technical choices, runtime status, launch and historical documents. This file owns **agent execution/budget/stop rules only**. Read [ENGINEERING STACK NORTH STAR V1](ENGINEERING_STACK_NORTH_STAR.md) for technology decisions; neither grants remote, provider or spending authority.
 
 ## Mission-lock card (required before tools)
 

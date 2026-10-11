@@ -1,6 +1,6 @@
 # BINRAT — assistant startup for browser and coding agents
 
-**Mandatory first read:** [docs/BINRAT_FOUNDER_NORTH_STAR.md](docs/BINRAT_FOUNDER_NORTH_STAR.md), [docs/AGENT_WORK_POLICY.md](docs/AGENT_WORK_POLICY.md), then [AGENTS.md](AGENTS.md).
+**Mandatory first read:** [docs/CANONICAL_AUTHORITY.md](docs/CANONICAL_AUTHORITY.md) — the **only authority router**; then read the linked Founder North Star, Engineering Stack North Star and Agent Work Policy for their respective domains, plus branch-local [AGENTS.md](AGENTS.md). Do not invent new precedence from this entrypoint or turn tooling candidates into adopted runtime.
 
 Founder vision: **a crew of specialized Rats users can actually employ**, not merely an indexer. **FIND → EMPLOY → LEAVE → RETURN**. Typed evidence handoffs, shared origin-job limits, persistent real work and a truthful return. Product MVP is an admitted bounded job; full workforce is not automatically a token launch prerequisite. Never upgrade planned/owner pilot/offline synthetic Rat features into PUBLIC_LIVE.
 
