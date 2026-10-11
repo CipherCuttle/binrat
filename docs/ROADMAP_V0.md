@@ -1,3 +1,5 @@
+> **HISTORICAL V0 ROADMAP / DATED 2026-09 to early 2026-10 CONTEXT.** Its then-current Cloudflare/Arc, token acceleration and active-stake assumptions are not live facts or approval now. [Canonical Authority Index](CANONICAL_AUTHORITY.md) routes current product scope, stack, exact token mechanics and runtime truth separately. Preserve for historical accountability.
+
 # BINRAT ROADMAP V0
 
 Status: planning document
