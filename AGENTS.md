@@ -1,6 +1,6 @@
 # BINRAT — agent entrypoint (founder vision first)
 
-**READ FIRST:** [Founder North Star](docs/BINRAT_FOUNDER_NORTH_STAR.md) and [Agent Work Policy](docs/AGENT_WORK_POLICY.md).
+**READ FIRST:** [Founder North Star](docs/BINRAT_FOUNDER_NORTH_STAR.md), [Engineering Stack North Star](docs/ENGINEERING_STACK_NORTH_STAR.md), and [Agent Work Policy](docs/AGENT_WORK_POLICY.md). Current engineering decisions: evidence-first viem + SQLite + existing Node API/React V3; other tools are candidates until bounded adoption proof. No production MCP swarm or costly new services by default.
 
 **North star:** **A crew of specialized Rats users can actually employ.** FIND → EMPLOY → LEAVE → RETURN. Rat Zero finds Cases; Tripwire watches; Sniffer follows funding and hands off evidence; the Den will organize bounded jobs. This is the product direction; never confuse plans/offline proofs with deployed features.
 
