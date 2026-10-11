@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED ARCPAD V0 IMPLEMENTATION SEQUENCE.** Do not restart its 72-hour experiment, block the React V3 UI, or interpret its later phases as current work. The [Canonical Authority Index](CANONICAL_AUTHORITY.md) delegates current product priorities to the [Founder North Star](BINRAT_FOUNDER_NORTH_STAR.md) and tooling/signal decisions to the [Engineering Stack North Star](ENGINEERING_STACK_NORTH_STAR.md). Original phases retained for audit.
+
 # BINRAT code plan
 
 Operate using `PLAN -> CHANGESET -> VERIFY -> VERDICT`.
