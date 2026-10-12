@@ -1,0 +1,43 @@
+{
+  "results": [
+    {
+      "chain_id": 4663,
+      "source_verified": 1,
+      "live_caught_up": 1,
+      "head_block": "85153141",
+      "target_block": "85153139",
+      "observation_ready": 0,
+      "history_backfill_complete": 0,
+      "history_backfill_target_block": null,
+      "last_sync_error": null,
+      "last_history_error": null,
+      "last_observation_error": null,
+      "updated_at_ms": 1791651278576,
+      "checkpoint_block": "85153139",
+      "checkpoint_block_hash": "0x360805ca6b51894e3eceaec9c2b95ce95ec96411223cd0414a44e92f9cf719af",
+      "published_checkpoint_block": "85153139",
+      "published_checkpoint_block_hash": "0x360805ca6b51894e3eceaec9c2b95ce95ec96411223cd0414a44e92f9cf719af",
+      "feed_digest": "ec0e38cb14b48367000472355ab5d808ec8f7a2a73f06e06147b3345b5f677f3",
+      "verified_at_ms": 1791651278576,
+      "publication_version": 2288
+    }
+  ],
+  "success": true,
+  "meta": {
+    "served_by": "v3-prod",
+    "served_by_region": "WEUR",
+    "served_by_colo": "LHR",
+    "served_by_primary": true,
+    "timings": {
+      "sql_duration_ms": 0.2795
+    },
+    "duration": 0.2795,
+    "changes": 0,
+    "last_row_id": 0,
+    "changed_db": false,
+    "size_after": 307777536,
+    "rows_read": 3,
+    "rows_written": 0,
+    "total_attempts": 1
+  }
+}

@@ -1,0 +1,11 @@
+.pons-tripwire { margin-top: 18px; }
+.pons-tripwire h3 { margin: 14px 0 8px; font: 700 20px var(--vl-sans); letter-spacing: -.025em; }
+.pons-tripwire .pons-tripwire-address { display: block; color: var(--vl-cyan); overflow-wrap: anywhere; font: 500 13px var(--vl-mono); line-height: 1.6; }
+.a1-frontdoor .pons-tripwire .pons-tripwire-note { font-size: 13px; line-height: 1.6; color: var(--vl-muted); }
+.pons-tripwire-consent { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; font-size: 15px; line-height: 1.5; }
+.pons-tripwire-consent input { width: 20px; height: 20px; flex: 0 0 20px; accent-color: var(--vl-cyan); margin-top: 2px; }
+.pons-tripwire .vl-primary { margin-top: 0; min-width: 0; }
+.pons-tripwire button:disabled { opacity: .55; cursor: default; transform: none; }
+.pons-tripwire [role="alert"] { color: #ffd5bb; }
+.pons-tripwire-case-action { margin-top: 12px; }
+@media (max-width: 700px) { .pons-tripwire .vl-utility { width: 100%; justify-content: center; } }

@@ -1,0 +1,45 @@
+{
+  "capturedAt": "2026-10-10T16:51:20.176132+00:00",
+  "route": "/health",
+  "httpStatus": 200,
+  "sha256": "1790ff1b0861d0a0a76b13522afa13403202fd96debb653cf86f788b0183db30",
+  "body": {
+    "ok": true,
+    "service": "binrat-cloudflare-edge",
+    "capabilityStatus": "ENGINEERING_PASS",
+    "launchAuthorization": "BLOCKED",
+    "releaseSha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+    "release": {
+      "schemaVersion": "binrat.public-release/1",
+      "sourceSha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+      "sourceTreeDigest": "c51549b57d87b400c724c094be79483fb58e42a7d3e1ef7302bd92df5507424e",
+      "sourceClean": true,
+      "manifestRevision": "2026-10-03",
+      "manifestDigest": "892013e815672b36af1c10de1b891751668a99b778732ce65fe878aa035783c8",
+      "mappingDigest": "9779b811e3892dd9a80c00ae92d9eaeae41d7f2061d0c5f22b9ab310e1292e57",
+      "assetsDigest": "bfe6d4fda521c80309939e6e018c139a08753b626cc9a388a98f2acb175c2b8c",
+      "runtimeSemantics": {
+        "configurationSource": "cloudflare/wrangler.example.jsonc + Worker cache headers",
+        "publicationIntervalMs": 60000,
+        "statusCacheTtlMs": 5000,
+        "feedSharedCacheTtlMs": 60000,
+        "maxStatusAgeMs": 180000
+      },
+      "buildId": "0599c7766ad403a2dfba6fe959f59f2f3a9402f31da4027c31e1c95f92491d0d",
+      "observedManifestDigest": "e9f90c1087ac30eef317b68c646173cb16fa33fc0b28f7d3fdaf3ce4daa4ab70",
+      "sourceBinding": "UNVERIFIED",
+      "deploymentBinding": "REQUIRES_DEPLOYMENT_RECEIPT",
+      "workerRevisionId": "28ebc65b-bb14-4862-b677-cbe74b6aad2b",
+      "effectiveMaxStatusAgeMs": 180000
+    },
+    "repliesEnabled": false,
+    "conversationEnabled": false,
+    "aiEnabled": false,
+    "aiTrialExpiresAtMs": "1790929656130",
+    "feedbackEnabled": false,
+    "autonomousRatEnabled": false,
+    "autonomousRatPublicEnabled": false,
+    "telegramUiV2Enabled": false,
+    "telegramMediaEnabled": false
+  }
+}

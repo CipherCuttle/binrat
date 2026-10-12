@@ -1,0 +1,507 @@
+{
+  "provenance": "LOCAL_WORKER_SQLITE_CAPTURED_PRODUCTION_IDENTITIES_SIMULATED_CLOCK_MOCK_TELEGRAM",
+  "productionWrites": 0,
+  "realTelegramMessages": 0,
+  "productionTimestampProof": false,
+  "checks": [
+    "ordinary website requires exact Case Telegram authentication; no implicit Watch",
+    "actual Worker rejects forged authentication before showing opt-in",
+    "stale Case cannot arm a new Watch",
+    "unavailable saved status fails closed without invented Watch success",
+    "malformed saved status fails closed without invented Watch success",
+    "exact address and explicit future-only opt-in",
+    "lost mutation response leaves success unconfirmed and requires status recheck",
+    "actual Worker creates persistent authenticated Watch",
+    "SQLite Watch survives server restart and frontend reload",
+    "saved Watch responsive controls without overflow at 1440px",
+    "saved Watch responsive controls without overflow at 390px",
+    "saved Watch responsive controls without overflow at 320px",
+    "saved Watch responsive controls without overflow at 430px",
+    "saved Watch responsive controls without overflow at 1024px",
+    "historical opened launch never yields a Telegram alert after opt-in",
+    "real later matching launch produces one mock Telegram notification with exact new Case URL",
+    "duplicate queue delivery creates no duplicate notification",
+    "notification Case return resolves exact new evidence",
+    "authenticated cancellation confirms durable state and prevents further alerts"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-mobile-BRoLZHcq.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-mobile-BRoLZHcq.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-desktop-D-1nZZBT.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/foreground-trash-C7D_WlxW.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-mobile-BRoLZHcq.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-desktop-D-1nZZBT.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/foreground-trash-C7D_WlxW.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/watch",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/watch",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-desktop-D-1nZZBT.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/foreground-trash-C7D_WlxW.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-mobile-BRoLZHcq.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/bag/cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-desktop-D-1nZZBT.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/foreground-trash-C7D_WlxW.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-mobile-BRoLZHcq.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-mobile-DN8MUwYV.webp"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/cancel",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+    },
+    {
+      "method": "GET",
+      "path": "/bag/cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-sans.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/fonts/geist-mono.woff2"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-C9kRjHzu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/frontdoor-candidate-DF-wK97y.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/alley-bg-desktop-D-1nZZBT.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/foreground-trash-C7D_WlxW.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ratzero-dumpster-desktop-BjdXMcip.webp"
+    },
+    {
+      "method": "GET",
+      "path": "/api/launches/latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bag/cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1/evidence"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/case-neon-alley-Bn3JoOEU.webp"
+    },
+    {
+      "method": "POST",
+      "path": "/api/pons-tripwire/status",
+      "bodyKeys": [
+        "caseId",
+        "initData"
+      ],
+      "caseId": "cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+    }
+  ],
+  "errors": [],
+  "verdict": "PASS",
+  "build": {
+    "sourceSha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+    "sourceDirty": true,
+    "bundles": [
+      {
+        "path": "assets/frontdoor-candidate-C9kRjHzu.js",
+        "bytes": 290668,
+        "sha256": "6e7dc66079a75cb20dc198fe63d6838055ffd10c2dc5517e0fc232a99643c4f2"
+      },
+      {
+        "path": "assets/frontdoor-candidate-DF-wK97y.css",
+        "bytes": 81186,
+        "sha256": "61f1094cc1a2667b5d0a3557cc13c32493406af4925ea09859a736fdb31d7a51"
+      }
+    ]
+  },
+  "browser": "141.0.7390.37",
+  "openedCase": "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558",
+  "laterCase": "cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1",
+  "exactDeployer": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+  "mockNotification": {
+    "chat_id": 424242,
+    "text": "Your watched Pons deployer launched again.\nExact Pons-reported deployer: 0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\nNew canonical launch: cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1\nBlock: 85105947\nBlock hash: 0x03c09a6f3dafaa82994f0122b2a902d2c59e197b660c2528fb342887cc9b25a5\nEvidence digest: 49673cb00a197c0baa727214ead8e4d494e6d888275ff05cafab17c43c76acf6\nOpen the Case: https://binrat.tech/bag/cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1\nSame reported address does not prove the same person. This is an observation, not a buy call.",
+    "reply_markup": {
+      "inline_keyboard": [
+        [
+          {
+            "text": "Open the Case",
+            "url": "https://binrat.tech/bag/cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+          }
+        ]
+      ]
+    }
+  }
+}

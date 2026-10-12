@@ -7,6 +7,7 @@ import type { CaseEnvelope } from "../../src/public/caseEvidence.js";
 import "./visual-lab.css";
 import "./frontdoor-discovery.css";
 import { DiscoveryCrew } from "./DiscoveryCrew";
+import { PonsTripwireWatch } from "./PonsTripwireWatch";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS" | "NEXT";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS", "NEXT"];
@@ -252,6 +253,7 @@ export function PonsCasePreview() {
             {stage !== "NEXT" ? <button className="vl-primary" onClick={() => advance(stages[activeStageIndex + 1], true)}>
               {stage === "WHAT" ? "FOLLOW THE TRAIL" : stage === "TRAIL" ? "CHECK RECEIPTS" : "REVIEW NEXT ACTIONS"} →
             </button> : <button className="vl-primary" onClick={returnToFinds}>RETURN TO FINDS →</button>}
+            {stage !== "NEXT" && <button type="button" className="vl-utility pons-tripwire-case-action" onClick={() => advance("NEXT", true)}>WATCH THIS DEPLOYER →</button>}
           </div>
         </div>
         {isHistorical && <p className="a12-history-notice">Historical launch observation at block {active.block}, reconstructed from the indexed source at published checkpoint {active.asOfBlock}. {isFresh ? "Publication source checked." : "Publication updates paused; evidence is stale."} This is not an immutable archived publication or a historical point-in-time replay. The same-origin index supplies source authority; the browser checks digest, identity and provenance derivation without independently querying the chain.</p>}
@@ -285,9 +287,7 @@ export function PonsCasePreview() {
                 <pre tabIndex={0}>{JSON.stringify(isHistorical ? historicalEnvelope : { chainId: 4663, launchId: active.id, token: active.token, txHash: active.txHash, reportedDeployer: active.reportedCreatorAddress, blockNumber: active.block, checkpointBlock: data.status.checkpointBlock, checkpointBlockHash: data.status.checkpointBlockHash, feedDigest: data.status.feedDigest, priorLaunchCount: active.priorLaunches, coverage: "PARTIAL" }, null, 2)}</pre>
               </div></details><p className="vl-provenance">{isHistorical ? "Case digest, canonical launch/event identities, provenance derivation, window count and publication binding are checked. The index is the source authority; this is not independent RPC verification or archived replay." : "Feed/status digest binding is checked. This UI does not independently verify transaction execution from RPC."}</p></div>}
           {stage === "NEXT" && <div className="vl-next-view"><span className="vl-eyebrow">YOUR NEXT MOVE</span><h2>Inspect, then decide.</h2>
-            <p>Return for new verified finds. Open the Telegram Rat to check your actual access; opening the bot creates no Watch or alert.</p>
-            <a className="vl-utility" href="https://t.me/BinratBot" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM RAT ↗</a>
-            <div className="vl-evidence-surface"><div className="vl-section-title">WATCH <span>UNAVAILABLE ON THIS SITE</span></div><p>WATCH IS NOT TRIPWIRE. Tripwire is BUILDING; Sniffer is PROVING. Working Rat is PLANNED; entitlement is inactive.</p><p>$BINRAT has not launched. No staking, payments, trading or wallet actions are available here.</p></div>
+            <PonsTripwireWatch key={active.id} caseId={active.id} deployer={active.reportedCreatorAddress} fresh={Boolean(isFresh)} />
           </div>}
         </section>
         <div className="vl-case-bottom"><p>PARTIAL INDEX · DEPLOYER ADDRESS IS NOT A HUMAN IDENTITY · NO BUY/SELL RECOMMENDATION</p></div>

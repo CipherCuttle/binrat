@@ -1,0 +1,195 @@
+[
+  {
+    "label": "frame-before",
+    "capturedAt": "2026-10-10T16:55:03.416645+00:00",
+    "sql": "SELECT r.*,c.block_number AS checkpoint_block,c.block_hash AS checkpoint_block_hash,\n s.checkpoint_block AS published_checkpoint_block,s.checkpoint_block_hash AS published_checkpoint_block_hash,\n s.feed_digest,s.verified_at_ms,s.publication_version\n FROM binrat_runtime_state r JOIN chain_checkpoints c ON c.chain_id=r.chain_id\n JOIN binrat_public_snapshots s ON s.chain_id=r.chain_id WHERE r.chain_id=? LIMIT 1",
+    "params": [
+      4663
+    ],
+    "readCap": 6,
+    "plan": [
+      {
+        "id": 6,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH r USING INTEGER PRIMARY KEY (rowid=?)"
+      },
+      {
+        "id": 9,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+      },
+      {
+        "id": 13,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH s USING INTEGER PRIMARY KEY (rowid=?)"
+      }
+    ],
+    "planMeta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WEUR",
+      "served_by_colo": "LHR",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.4808
+      },
+      "duration": 0.4808,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 307777536,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    },
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WEUR",
+      "served_by_colo": "LHR",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.3634
+      },
+      "duration": 0.3634,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 307777536,
+      "rows_read": 3,
+      "rows_written": 0,
+      "total_attempts": 1
+    },
+    "returnedRows": 1
+  },
+  {
+    "label": "launch-pair-current",
+    "capturedAt": "2026-10-10T16:55:03.911477+00:00",
+    "sql": "SELECT l.*,f.fact_id,f.evidence_digest,f.payload_json,\n (f.chain_id=l.chain_id AND f.launch_id=l.launch_id AND f.creator=l.creator\n AND f.observed_block=l.block_number AND f.observed_block_hash=l.block_hash\n AND f.log_index=l.log_index AND f.source_event_id=l.event_id) AS column_binding\n FROM launches l JOIN provenance_facts f ON f.launch_id=l.launch_id AND f.chain_id=l.chain_id\n WHERE l.launch_id IN (?,?) AND l.chain_id=4663 AND l.source='PONS_V2'\n ORDER BY CAST(l.block_number AS INTEGER),l.log_index,l.launch_id LIMIT 2",
+    "params": [
+      "c91989e87923beeae04c3377e0e08bf6912c0c13bff8fad75f2da9fa71a61558",
+      "cf87c2a1efedc264ea7ca58be141504f1a06c96ecd5315878f42ac7f0b9c19e1"
+    ],
+    "readCap": 8,
+    "plan": [
+      {
+        "id": 7,
+        "parent": 0,
+        "notused": 56,
+        "detail": "SEARCH l USING INDEX sqlite_autoindex_launches_1 (launch_id=?)"
+      },
+      {
+        "id": 30,
+        "parent": 0,
+        "notused": 46,
+        "detail": "SEARCH f USING INDEX sqlite_autoindex_provenance_facts_2 (launch_id=?)"
+      },
+      {
+        "id": 114,
+        "parent": 0,
+        "notused": 0,
+        "detail": "USE TEMP B-TREE FOR ORDER BY"
+      }
+    ],
+    "planMeta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WEUR",
+      "served_by_colo": "LHR",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.376
+      },
+      "duration": 0.376,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 307777536,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    },
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WEUR",
+      "served_by_colo": "LHR",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 1.0183
+      },
+      "duration": 1.0183,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 307777536,
+      "rows_read": 8,
+      "rows_written": 0,
+      "total_attempts": 1
+    },
+    "returnedRows": 2
+  },
+  {
+    "label": "frame-after",
+    "capturedAt": "2026-10-10T16:55:04.385414+00:00",
+    "sql": "SELECT r.*,c.block_number AS checkpoint_block,c.block_hash AS checkpoint_block_hash,\n s.checkpoint_block AS published_checkpoint_block,s.checkpoint_block_hash AS published_checkpoint_block_hash,\n s.feed_digest,s.verified_at_ms,s.publication_version\n FROM binrat_runtime_state r JOIN chain_checkpoints c ON c.chain_id=r.chain_id\n JOIN binrat_public_snapshots s ON s.chain_id=r.chain_id WHERE r.chain_id=? LIMIT 1",
+    "params": [
+      4663
+    ],
+    "readCap": 6,
+    "plan": [
+      {
+        "id": 6,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH r USING INTEGER PRIMARY KEY (rowid=?)"
+      },
+      {
+        "id": 9,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+      },
+      {
+        "id": 13,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH s USING INTEGER PRIMARY KEY (rowid=?)"
+      }
+    ],
+    "planMeta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WEUR",
+      "served_by_colo": "LHR",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.2943
+      },
+      "duration": 0.2943,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 307777536,
+      "rows_read": 0,
+      "rows_written": 0,
+      "total_attempts": 1
+    },
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WEUR",
+      "served_by_colo": "LHR",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.2795
+      },
+      "duration": 0.2795,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 307777536,
+      "rows_read": 3,
+      "rows_written": 0,
+      "total_attempts": 1
+    },
+    "returnedRows": 1
+  }
+]
