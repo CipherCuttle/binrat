@@ -46,6 +46,7 @@ import { D1Store } from './d1Store.js';
 import { publicStatus, readPublicSnapshot } from './publicSnapshot.js';
 import { readCreatorSummary } from './creatorSummaryReadModel.js';
 import { readPublicCaseEvidence } from './publicCaseEvidence.js';
+import { readPublicCaseOutcomes } from './publicCaseOutcomes.js';
 import { readPublicCaseFeed } from './publicCaseReadModel.js';
 import { canonicalJson, sha256Hex } from '../evidence/canonical.js';
 import { observedPublicRelease } from '../public/releaseIdentity.js';
@@ -503,7 +504,11 @@ export async function handleBinratApiRequest(
     }
     const evidenceMatch = /^\/api\/bag\/([0-9a-f]{64})\/evidence$/.exec(pathname);
     if (evidenceMatch) {
-      const envelope = await readPublicCaseEvidence(env.DB,evidenceMatch[1]!);
+      const include = url.searchParams.get('include');
+      if (include !== null && include !== 'outcomes') return json(400,{error:'CASE_EVIDENCE_INCLUDE_INVALID'});
+      const envelope = include === 'outcomes'
+        ? await readPublicCaseOutcomes(env.DB,evidenceMatch[1]!)
+        : await readPublicCaseEvidence(env.DB,evidenceMatch[1]!);
       return envelope ? json(200,envelope) : json(404,{error:'BAG_NOT_FOUND'});
     }
     if (pathname.startsWith('/api/bag/')) {

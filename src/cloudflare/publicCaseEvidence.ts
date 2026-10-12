@@ -78,6 +78,14 @@ export async function readPublicCaseEvidence(
       provenance.evidenceDigest !== row.evidence_digest
     )
       throw new Error("CASE_EVIDENCE_STORED_BINDING_INVALID");
+    // Legacy authorities also stored ingestion time. It is not chain evidence
+    // and is deliberately absent from CaseAuthority. Validate before removing
+    // this one known field; all other unknown fields still fail the validator.
+    if (Object.hasOwn(launch, "observedAtMs")) {
+      if (!Number.isSafeInteger(launch.observedAtMs) || launch.observedAtMs < 0)
+        throw new Error("CASE_EVIDENCE_INGESTION_TIME_INVALID");
+      delete launch.observedAtMs;
+    }
     const record = {
       launch,
       provenance,

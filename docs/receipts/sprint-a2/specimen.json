@@ -1,0 +1,1145 @@
+{
+  "source": "ACTUAL_PRODUCTION_D1_READ_ONLY_CAPTURE",
+  "capturedAt": "2026-10-09T23:29:26.253988+00:00",
+  "deployedSource": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+  "caseId": "a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992",
+  "deployer": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+  "rows": [
+    {
+      "launch_id": "a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76069792",
+      "log_index": 28,
+      "authority_json": "{\"blockHash\":\"0x31a0ef700c39fcf55a956bdd623a150363f339a1483702416f4231af06cbef2c\",\"blockNumber\":\"76069792\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"2535ff80370014b71ab061932536f7a5468a227bb7197db84ca167f8f01e428e\",\"imageUri\":\"\",\"launchId\":\"a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":28,\"name\":\"\",\"observedAtMs\":1790797691675,\"pool\":\"0xf4bdcfb179ed4e6b19088621b2d191029b3e36c0\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0x8898da024052ab4d66982d9f3bb4c11187a8b770\",\"twitter\":\"\",\"txHash\":\"0x121cabc4f0faab73e9889c2dec4a8ae538f9b5444081a87f307a34d161db022b\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"76e74bec192e54d5835cbadc93ea03dee80718a1e4d12925e1d3534ed9a3cd93\",\"factId\":\"binrat-fact:4663:a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992\",\"logIndex\":28,\"observedBlock\":\"76069792\",\"observedBlockHash\":\"0x31a0ef700c39fcf55a956bdd623a150363f339a1483702416f4231af06cbef2c\",\"sourceEventId\":\"2535ff80370014b71ab061932536f7a5468a227bb7197db84ca167f8f01e428e\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992",
+      "evidence_digest": "76e74bec192e54d5835cbadc93ea03dee80718a1e4d12925e1d3534ed9a3cd93"
+    },
+    {
+      "launch_id": "e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76065736",
+      "log_index": 5,
+      "authority_json": "{\"blockHash\":\"0xa624b40151074c98cbde934cd8ad68e2ac82cdaea99eded96d14565520e49d3c\",\"blockNumber\":\"76065736\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"7b2be52533539ba3881c99faa004152db8658e9e3d0d3281eab0e3bbf74dbc5d\",\"imageUri\":\"\",\"launchId\":\"e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":5,\"name\":\"\",\"observedAtMs\":1790797365994,\"pool\":\"0x23a1caf6121dc9ee485a34bc5b492976e8b3fd24\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0xa77c390bc21e5ae81988679564d0405664cfe88f\",\"twitter\":\"\",\"txHash\":\"0xdae8508515deaf25c030d6c418742c34a541ae244f2a0e77b792325dce64dae4\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"4803e1492ddce60d8b7ad304bae09b7eb4d4776ca7d37448b8e1dfc3abd2b398\",\"factId\":\"binrat-fact:4663:e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2\",\"logIndex\":5,\"observedBlock\":\"76065736\",\"observedBlockHash\":\"0xa624b40151074c98cbde934cd8ad68e2ac82cdaea99eded96d14565520e49d3c\",\"sourceEventId\":\"7b2be52533539ba3881c99faa004152db8658e9e3d0d3281eab0e3bbf74dbc5d\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2",
+      "evidence_digest": "4803e1492ddce60d8b7ad304bae09b7eb4d4776ca7d37448b8e1dfc3abd2b398"
+    },
+    {
+      "launch_id": "1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76061938",
+      "log_index": 5,
+      "authority_json": "{\"blockHash\":\"0xec8dff283671571129efdcc113976f18c0f50bcc9ea7a7715e8c297d423de2f5\",\"blockNumber\":\"76061938\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"888b41c7da33f82d2e0879f2e81bffc560be1fbb17c0af6cb5c6cc76b5af479b\",\"imageUri\":\"\",\"launchId\":\"1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":5,\"name\":\"\",\"observedAtMs\":1790797056786,\"pool\":\"0x9ebdc916b75aa365b485321ee90d0a0414591211\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0x9332870422ce3969670ddb5d308a896439c45953\",\"twitter\":\"\",\"txHash\":\"0x2f4fdd480ef1d4e0891d7e37daae12a474b351e35d9aee51d9872669d8d6b94c\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"6dee54100209274af5549204c2a22a8501d133c4a0adac70f76abb2a294855fb\",\"factId\":\"binrat-fact:4663:1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274\",\"logIndex\":5,\"observedBlock\":\"76061938\",\"observedBlockHash\":\"0xec8dff283671571129efdcc113976f18c0f50bcc9ea7a7715e8c297d423de2f5\",\"sourceEventId\":\"888b41c7da33f82d2e0879f2e81bffc560be1fbb17c0af6cb5c6cc76b5af479b\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274",
+      "evidence_digest": "6dee54100209274af5549204c2a22a8501d133c4a0adac70f76abb2a294855fb"
+    },
+    {
+      "launch_id": "64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76053192",
+      "log_index": 308,
+      "authority_json": "{\"blockHash\":\"0x94381a0afbf079a41c030dd92609a4d1913371e464f73fdf94039b8610dbdc75\",\"blockNumber\":\"76053192\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"979819b46899ec991bed4948c31caf5703399788f76065b29a3a6f99cd282a52\",\"imageUri\":\"\",\"launchId\":\"64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":308,\"name\":\"\",\"observedAtMs\":1790796722561,\"pool\":\"0xfbc58d686f548d99665c6ed3b3530df5883ed1e8\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0x2ba4733fcc16714b7604ef08e908594745ca3d07\",\"twitter\":\"\",\"txHash\":\"0x053176ad6ea946339bbb57f12a6d3dd31c9e9cfe833044a58b4621b4da765127\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"41fd3f2baa20ce9f9585b69c3fb6e2890da5efa43bef070f5e98a3f922be397b\",\"factId\":\"binrat-fact:4663:64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a\",\"logIndex\":308,\"observedBlock\":\"76053192\",\"observedBlockHash\":\"0x94381a0afbf079a41c030dd92609a4d1913371e464f73fdf94039b8610dbdc75\",\"sourceEventId\":\"979819b46899ec991bed4948c31caf5703399788f76065b29a3a6f99cd282a52\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a",
+      "evidence_digest": "41fd3f2baa20ce9f9585b69c3fb6e2890da5efa43bef070f5e98a3f922be397b"
+    },
+    {
+      "launch_id": "fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76047223",
+      "log_index": 16,
+      "authority_json": "{\"blockHash\":\"0x8db22f967b45035a826a9d8bfebaaae0502bbf4c8c7d86641a67e622c440b550\",\"blockNumber\":\"76047223\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"67de5e4209f1b4d2441b14ca2f0180e332034a5004fc6398f99946e141952e4f\",\"imageUri\":\"\",\"launchId\":\"fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":16,\"name\":\"\",\"observedAtMs\":1790724873467,\"pool\":\"0xda118201c823c0ef275649817956daea7d5c149b\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0xb4b247c489e7881557d756e9d9a4713b7aa14284\",\"twitter\":\"\",\"txHash\":\"0xf406fc4b29261ca488bb7614b6634a282bdcfd44197b06b91e3e204f3c72d0b5\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"b093fb4a230e21880f970b950f91618896de1e3b8dcab7fc84c66b38e333e319\",\"factId\":\"binrat-fact:4663:fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458\",\"logIndex\":16,\"observedBlock\":\"76047223\",\"observedBlockHash\":\"0x8db22f967b45035a826a9d8bfebaaae0502bbf4c8c7d86641a67e622c440b550\",\"sourceEventId\":\"67de5e4209f1b4d2441b14ca2f0180e332034a5004fc6398f99946e141952e4f\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458",
+      "evidence_digest": "b093fb4a230e21880f970b950f91618896de1e3b8dcab7fc84c66b38e333e319"
+    },
+    {
+      "launch_id": "e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76046864",
+      "log_index": 7,
+      "authority_json": "{\"blockHash\":\"0xbeff93581ebb12706a86fc3b0b1b2f11da52bb3dd6805ba9ff7b23fc49eaa6cc\",\"blockNumber\":\"76046864\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"1ae0ce1478fe2ad4f8a5aed8a8e5550815d9c6e9957a9f8f5867ee6bb7d0495e\",\"imageUri\":\"\",\"launchId\":\"e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":7,\"name\":\"\",\"observedAtMs\":1790724873467,\"pool\":\"0xfd94a545ffaae06bdf732c06c0bd5ed5ca907d60\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0x910be5a9c7912ff4386e29bdadee43ca4a8ee10a\",\"twitter\":\"\",\"txHash\":\"0x69fb0f429e5b69334c147cc4dfebef889a389c74f30fa39b1e369688103642f7\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"73692cc77ca6cf224a72a3f3eff0d8b88ce6f2d9b70a4e9879f591a69c42c804\",\"factId\":\"binrat-fact:4663:e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18\",\"logIndex\":7,\"observedBlock\":\"76046864\",\"observedBlockHash\":\"0xbeff93581ebb12706a86fc3b0b1b2f11da52bb3dd6805ba9ff7b23fc49eaa6cc\",\"sourceEventId\":\"1ae0ce1478fe2ad4f8a5aed8a8e5550815d9c6e9957a9f8f5867ee6bb7d0495e\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18",
+      "evidence_digest": "73692cc77ca6cf224a72a3f3eff0d8b88ce6f2d9b70a4e9879f591a69c42c804"
+    },
+    {
+      "launch_id": "deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76035105",
+      "log_index": 216,
+      "authority_json": "{\"blockHash\":\"0x5fd769145d77b592035743412125aa71f21b9b26c1667103b7d2b74e04b9404a\",\"blockNumber\":\"76035105\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"d060b2200ea22bfb9a18a175545fc699f063d3496caa10554eb83f7e39b48439\",\"imageUri\":\"\",\"launchId\":\"deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":216,\"name\":\"\",\"observedAtMs\":1790723998468,\"pool\":\"0x3620233c61ec619743e785e8c10a90b8a23fcd16\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0xf058c7b99e8f1404d95591014215ca8cbd0a8dd6\",\"twitter\":\"\",\"txHash\":\"0x14d9f5a55eb2ff07cc97b6cc928051bbaaecb8bbe35046b885216f5eac575cff\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"e57bda799a65801805f8fa2c0f3a25ebdc76a13d3daeccb17be78b7bcdefca9a\",\"factId\":\"binrat-fact:4663:deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784\",\"logIndex\":216,\"observedBlock\":\"76035105\",\"observedBlockHash\":\"0x5fd769145d77b592035743412125aa71f21b9b26c1667103b7d2b74e04b9404a\",\"sourceEventId\":\"d060b2200ea22bfb9a18a175545fc699f063d3496caa10554eb83f7e39b48439\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784",
+      "evidence_digest": "e57bda799a65801805f8fa2c0f3a25ebdc76a13d3daeccb17be78b7bcdefca9a"
+    },
+    {
+      "launch_id": "68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "76028626",
+      "log_index": 42,
+      "authority_json": "{\"blockHash\":\"0x757f3859a58f8bd4f81151e7a53d5b0ab15de545647c4d78af5acee827ab4d9e\",\"blockNumber\":\"76028626\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"8b7aa0d0e8ab1b088c2f5a22ec94f36ae39366580a5cd8f8f68483a555401570\",\"imageUri\":\"\",\"launchId\":\"68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":42,\"name\":\"\",\"observedAtMs\":1790723380229,\"pool\":\"0x83d82daaf9ce94e41b100dc019191cd877be59b7\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0x83cba65eb75e3bb863bc1eb72c49e7c5abccaeee\",\"twitter\":\"\",\"txHash\":\"0x61cc80f9ce69c79074152535a5ccf02071c36c9430fba396696f324272e6a03c\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"17c709ad84eac384f40039df36f3a92ce25198a652e1a3faf1c5e799da0d048d\",\"factId\":\"binrat-fact:4663:68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0\",\"logIndex\":42,\"observedBlock\":\"76028626\",\"observedBlockHash\":\"0x757f3859a58f8bd4f81151e7a53d5b0ab15de545647c4d78af5acee827ab4d9e\",\"sourceEventId\":\"8b7aa0d0e8ab1b088c2f5a22ec94f36ae39366580a5cd8f8f68483a555401570\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0",
+      "evidence_digest": "17c709ad84eac384f40039df36f3a92ce25198a652e1a3faf1c5e799da0d048d"
+    },
+    {
+      "launch_id": "9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "75949749",
+      "log_index": 9,
+      "authority_json": "{\"blockHash\":\"0xf55161d7100df576cf90a1cf30e5b001a0013c432899f8245722be15822f4634\",\"blockNumber\":\"75949749\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"493dadbf2613608666e65b335cf61ef8917d1c0ade40f20ca61428062693bfc4\",\"imageUri\":\"\",\"launchId\":\"9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":9,\"name\":\"\",\"observedAtMs\":1790714395360,\"pool\":\"0xa2f8c8e362c2e51a8de6129b54c73376e211d3b3\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0x8581c554ee40386faa973f96ce9d16a6b876e3fd\",\"twitter\":\"\",\"txHash\":\"0xf5ad9e1f0562b5c4dd2961f09032f5618a51414197107d5eb7ba505a6ae59e97\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"8ab1704d05bb7cecbd621dd09c3092089c7a88bc835916dd1e4dd0827178efb4\",\"factId\":\"binrat-fact:4663:9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520\",\"logIndex\":9,\"observedBlock\":\"75949749\",\"observedBlockHash\":\"0xf55161d7100df576cf90a1cf30e5b001a0013c432899f8245722be15822f4634\",\"sourceEventId\":\"493dadbf2613608666e65b335cf61ef8917d1c0ade40f20ca61428062693bfc4\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520",
+      "evidence_digest": "8ab1704d05bb7cecbd621dd09c3092089c7a88bc835916dd1e4dd0827178efb4"
+    },
+    {
+      "launch_id": "8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "75949046",
+      "log_index": 6,
+      "authority_json": "{\"blockHash\":\"0x5f56473bca8598301bd98d9b271c25f181b4a3ec9d5aa07d4bca423dd6149fff\",\"blockNumber\":\"75949046\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"7913427a0d618235b913c21e4ca9088e4eac30f683088917223c20817d74aaea\",\"imageUri\":\"\",\"launchId\":\"8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":6,\"name\":\"\",\"observedAtMs\":1790714297631,\"pool\":\"0xeecc686b73acfc91f2a2f3bb258f8f17fbca82ee\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0xdebc1c4ea1689a7507568ecfeacb42599b493b60\",\"twitter\":\"\",\"txHash\":\"0xbb4f4a157521e627c12b39cdc7fedd274707ef97d5774c4068b35595bc182b5d\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"dd87af762b90e5f0c0d026b43d4a894076ae96810b131583e8b21a86e4d00d23\",\"factId\":\"binrat-fact:4663:8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff\",\"logIndex\":6,\"observedBlock\":\"75949046\",\"observedBlockHash\":\"0x5f56473bca8598301bd98d9b271c25f181b4a3ec9d5aa07d4bca423dd6149fff\",\"sourceEventId\":\"7913427a0d618235b913c21e4ca9088e4eac30f683088917223c20817d74aaea\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff",
+      "evidence_digest": "dd87af762b90e5f0c0d026b43d4a894076ae96810b131583e8b21a86e4d00d23"
+    },
+    {
+      "launch_id": "2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "75930229",
+      "log_index": 56,
+      "authority_json": "{\"blockHash\":\"0xaaeb827df9a621eb101103ae580660b71aa7998c424330d29d30795d5a740e37\",\"blockNumber\":\"75930229\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"f9c05b26f0c55ef8ce30a0b5bf9bb28668293579759cf6ba3d7ff14f47dc1bee\",\"imageUri\":\"\",\"launchId\":\"2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":56,\"name\":\"\",\"observedAtMs\":1790712412377,\"pool\":\"0x52679607580395c51efe6aacb1f58b974e175e9e\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0xf2dd2b00369f05697c28c3bfe877db32c905d9a4\",\"twitter\":\"\",\"txHash\":\"0x9d39e675bcefee72b3d7613a970063a4800f92f1337902bf7bde408bc18a5990\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"32ced18f249796e1073718fb3c87be31da36aab27fbd245b843957c68629f06b\",\"factId\":\"binrat-fact:4663:2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496\",\"logIndex\":56,\"observedBlock\":\"75930229\",\"observedBlockHash\":\"0xaaeb827df9a621eb101103ae580660b71aa7998c424330d29d30795d5a740e37\",\"sourceEventId\":\"f9c05b26f0c55ef8ce30a0b5bf9bb28668293579759cf6ba3d7ff14f47dc1bee\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496",
+      "evidence_digest": "32ced18f249796e1073718fb3c87be31da36aab27fbd245b843957c68629f06b"
+    },
+    {
+      "launch_id": "3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b",
+      "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+      "block_number": "75926232",
+      "log_index": 59,
+      "authority_json": "{\"blockHash\":\"0x285cb4f1972d375530c820bf202972d5aa08627e7cd2a894ce28fc481ed03bef\",\"blockNumber\":\"75926232\",\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"eventId\":\"42188db4f14a152decff3b19360515d2099260c1a432ad6fbbe2d07ff1fc6388\",\"imageUri\":\"\",\"launchId\":\"3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b\",\"launcher\":\"0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e\",\"logIndex\":59,\"name\":\"\",\"observedAtMs\":1790712053115,\"pool\":\"0x9eda75d6a472c86e7183f2e32170e368c9c26f97\",\"source\":\"PONS_V2\",\"symbol\":\"\",\"telegram\":\"\",\"token\":\"0xaead3b6b04882b56a2dc9abbf49af407fe1ad901\",\"twitter\":\"\",\"txHash\":\"0x2f12422dff40cd9f8a9f53c1f7377491fd4afd04be75c623e0e4d3ce850215f9\",\"website\":\"\"}",
+      "payload_json": "{\"chainId\":4663,\"creator\":\"0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b\",\"evidenceDigest\":\"9bb6f32b1d6bb024eca0929a6b47c0b10d2454a3fc6abe978bd4e6a84e623b31\",\"factId\":\"binrat-fact:4663:3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b\",\"kind\":\"PONS_REPORTED_DEPLOYER\",\"launchId\":\"3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b\",\"logIndex\":59,\"observedBlock\":\"75926232\",\"observedBlockHash\":\"0x285cb4f1972d375530c820bf202972d5aa08627e7cd2a894ce28fc481ed03bef\",\"sourceEventId\":\"42188db4f14a152decff3b19360515d2099260c1a432ad6fbbe2d07ff1fc6388\"}",
+      "column_binding": 1,
+      "fact_id": "binrat-fact:4663:3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b",
+      "evidence_digest": "9bb6f32b1d6bb024eca0929a6b47c0b10d2454a3fc6abe978bd4e6a84e623b31"
+    }
+  ],
+  "outcomes": [
+    {
+      "launch_id": "3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"70788154f3ab47232364d19696bba06c8c7cd29ae1472b6d0c135df18b4d5c9f\",\"chainId\":4663,\"curve\":\"0x9eda75d6a472c86e7183f2e32170e368c9c26f97\",\"estimatedFdvQuoteRaw\":\"175925668621110124856582\",\"evidenceDigest\":\"c3fea4467e537a3839557b7f8aeb3dd08286404345fb107f4d7707b36ebdb1f3\",\"horizonMs\":300000,\"launchId\":\"3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b\",\"missing\":[],\"observationId\":\"dce528ebd587a46dd997b912a5464ee821ebc943b9259625f15f1f8f8b3047ae\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75929230\",\"observedBlockHash\":\"0xb27e005120bd36c8b6f0ffba0a6b596f3b7fb62d4a8808453aedbcd5b528ebf5\",\"observedTimestampMs\":1790712307000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"136329373245721606436084\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790712307000,\"token\":\"0xaead3b6b04882b56a2dc9abbf49af407fe1ad901\",\"tokenReserve\":\"774925991836547847536804271\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"22d9645acd2f7528e1f3a0e6557953d26d3d334cc8f0eca619a72f93f3b55dcf\",\"chainId\":4663,\"curve\":\"0x52679607580395c51efe6aacb1f58b974e175e9e\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"1776f7f69686be22b4bc5e8c354f42b869101f5972e2fa96956c6a24e17d428d\",\"horizonMs\":300000,\"launchId\":\"2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496\",\"missing\":[],\"observationId\":\"01fd55b32b33e6a7383c30c58760daf13c0b693328ab9424ff2460092909ef62\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75933235\",\"observedBlockHash\":\"0x773745934fd2952112ce861358a55135fb5273eee7a0dae3e4fd2e75e9a8c6a1\",\"observedTimestampMs\":1790712707000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790712707000,\"token\":\"0xf2dd2b00369f05697c28c3bfe877db32c905d9a4\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"8cf055144d3c3726eb33b6f67d7fa7ff6b49e9b06cb579f7f8a182bb5ea7a173\",\"chainId\":4663,\"curve\":\"0xeecc686b73acfc91f2a2f3bb258f8f17fbca82ee\",\"estimatedFdvQuoteRaw\":\"144440294406836632876938\",\"evidenceDigest\":\"96eb1e9e2aba2b86d2d456ebaadc7f8236a051092fd88e3b307cfca031da7ab1\",\"horizonMs\":300000,\"launchId\":\"8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff\",\"missing\":[],\"observationId\":\"e05dc8af507b85e08423965904a0963fb480fd14bce0577d2bae62b180dd5fa1\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75952027\",\"observedBlockHash\":\"0xdbceb213223d98f062bed4f2eb118cf3a16a3cc4a7dc0376df44c324ceb00d05\",\"observedTimestampMs\":1790714590000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"123529025527304366216573\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790714590000,\"token\":\"0xdebc1c4ea1689a7507568ecfeacb42599b493b60\",\"tokenReserve\":\"855225517467911664175169839\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"c738c935af1626f6d8477a72cdacf320d687e138abf1d11f124705c74f995f8a\",\"chainId\":4663,\"curve\":\"0xa2f8c8e362c2e51a8de6129b54c73376e211d3b3\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"0865ba8478e60be9935faec59e0780ddf9c932ea47575c6b03ffbfaf7f337084\",\"horizonMs\":300000,\"launchId\":\"9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520\",\"missing\":[],\"observationId\":\"c6ee27649073c516427c64ab6f16aee4392ca310ee984222964328a5cde8856a\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75952723\",\"observedBlockHash\":\"0xe0c90f2077d7c47fc16400577fb1546bc7055fd838c8adfed544c031d3f795fa\",\"observedTimestampMs\":1790714660000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790714660000,\"token\":\"0x8581c554ee40386faa973f96ce9d16a6b876e3fd\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"0615546a05cdb380378a418df869e68c4ab5a5063d47fc2e33eb7da030165e47\",\"chainId\":4663,\"curve\":\"0x9eda75d6a472c86e7183f2e32170e368c9c26f97\",\"estimatedFdvQuoteRaw\":\"298925291108751479198253\",\"evidenceDigest\":\"1479d2eed1e004fb3d17cf12ea38c2580b72f4ad767e7444c5c2f6e79b535de3\",\"horizonMs\":3600000,\"launchId\":\"3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b\",\"missing\":[],\"observationId\":\"79746aebf9d74b60a81a216eab9834070c5d641860f87648a3dcba85422a0aec\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75962169\",\"observedBlockHash\":\"0x90ccc9bf0888b722f19b592a99c7f3122af9985d7925797a34982de4f220a23c\",\"observedTimestampMs\":1790715607000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"177707666196527212723144\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790715607000,\"token\":\"0xaead3b6b04882b56a2dc9abbf49af407fe1ad901\",\"tokenReserve\":\"594488561129729576256713719\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"45addafd303d5652f7958972d2a3b49e5e34cdedc4bebf01c77394753974e080\",\"chainId\":4663,\"curve\":\"0x52679607580395c51efe6aacb1f58b974e175e9e\",\"estimatedFdvQuoteRaw\":\"109027636578224450468153\",\"evidenceDigest\":\"8f3ab6d8bd2646d0b994abffaa0ae0e63e61cf661feca70e0b05732adca0da4a\",\"horizonMs\":3600000,\"launchId\":\"2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496\",\"missing\":[],\"observationId\":\"680eaa5a7e8ad59e0b422bc96d9d2ed7c6987f08b8285504068e2b3b3f72850b\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75966158\",\"observedBlockHash\":\"0x281307ecacb611b5e9c70201194a863e1d5cef01c0dc49eda0f6b3e58f925b9c\",\"observedTimestampMs\":1790716007000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"107323081031232275284470\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790716007000,\"token\":\"0xf2dd2b00369f05697c28c3bfe877db32c905d9a4\",\"tokenReserve\":\"984365839703686490663550692\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"04a0b4696ad91e47eecd93d0192efe5f3b9da2fcff3837f1b8d9a39db1dee7d4\",\"chainId\":4663,\"curve\":\"0xeecc686b73acfc91f2a2f3bb258f8f17fbca82ee\",\"estimatedFdvQuoteRaw\":\"145395495082440375893807\",\"evidenceDigest\":\"370eed63b1fdf5db5f98f8dabbdb5cbbcdac363568b4372e6ab64fa25b64807b\",\"horizonMs\":3600000,\"launchId\":\"8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff\",\"missing\":[],\"observationId\":\"aab9a94f04bf333184626870d8e7168a2f39026b6e10e871eab363e27a54eab5\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75984976\",\"observedBlockHash\":\"0xef1ad17401b82d13449763dfb945579de4352929c79aae0606519a852c27d79e\",\"observedTimestampMs\":1790717890000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"123936808455149798088355\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790717890000,\"token\":\"0xdebc1c4ea1689a7507568ecfeacb42599b493b60\",\"tokenReserve\":\"852411612786741874732564574\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"e89d25a600d804059cb37d799b9506e29d21b927c6893ebbf68d73b5b2156491\",\"chainId\":4663,\"curve\":\"0xa2f8c8e362c2e51a8de6129b54c73376e211d3b3\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"e2f2b9b421526914b9f5d8562db83649d9f51f063f4e5cb5ff595d049d2e4b4a\",\"horizonMs\":3600000,\"launchId\":\"9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520\",\"missing\":[],\"observationId\":\"31d4894755af2fa3142de9141a43ed1274709eae8e446724e40c6dab5d9c0be7\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"75985672\",\"observedBlockHash\":\"0x2dde78176523e972538b0b5d9870871ea57c75aac24b09039694d1fd7f86f528\",\"observedTimestampMs\":1790717960000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790717960000,\"token\":\"0x8581c554ee40386faa973f96ce9d16a6b876e3fd\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"9c08abb06b585f142d32ceaf870b639442424704c52a1fd604f8b03267f8caf5\",\"chainId\":4663,\"curve\":\"0x83d82daaf9ce94e41b100dc019191cd877be59b7\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"abd8c793597e7aff27fde831d8bc24d79cf5995ac3ca50af6e734545b1865e3f\",\"horizonMs\":300000,\"launchId\":\"68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0\",\"missing\":[],\"observationId\":\"99fc4013bf0ad5fd685d0e269808782613865156662364c5708bff2eaf57fd33\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76031621\",\"observedBlockHash\":\"0xd57667ba93af5cacf2ee5979ab545eb87c511556e1ae1c30f5f78cf41623eb27\",\"observedTimestampMs\":1790722572000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790722572000,\"token\":\"0x83cba65eb75e3bb863bc1eb72c49e7c5abccaeee\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"f26f90eb97555c0cb1d6a653d55e88f31a2e92a9694db921af1ada4fc64a5768\",\"chainId\":4663,\"curve\":\"0x3620233c61ec619743e785e8c10a90b8a23fcd16\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"c35a7fb9aa10bb81bd3e221305305f771da41446326c4470215ec9a84ef5a6a1\",\"horizonMs\":300000,\"launchId\":\"deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784\",\"missing\":[],\"observationId\":\"101471e609c47255f0bfd944ff11957b35116c5f1f72b4777cdb6c52ecddf1f3\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76038107\",\"observedBlockHash\":\"0xdc2082cd2d605ef6ef46472bad8dbc72a83cf49c7e23d91bacf56e5779095548\",\"observedTimestampMs\":1790723221000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790723221000,\"token\":\"0xf058c7b99e8f1404d95591014215ca8cbd0a8dd6\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"7871c98ea7c4eec28c118dbab294547958457276dcfaa9215247081b4d3c2687\",\"chainId\":4663,\"curve\":\"0xfd94a545ffaae06bdf732c06c0bd5ed5ca907d60\",\"estimatedFdvQuoteRaw\":\"105645174778895746122345\",\"evidenceDigest\":\"db1ea17d7fcaf838bb2f26daf7ce6b8abbf92d22476d4f22f25e9fbe1830d516\",\"horizonMs\":300000,\"launchId\":\"e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18\",\"missing\":[],\"observationId\":\"73e48e3ad894e7883e31cfa728b8edd347441b9458589dcaa689fbd535bc530d\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76049854\",\"observedBlockHash\":\"0x99256ae795dbd7b92a7fb7f2d701960868f7affdd145b2457c1c3244a679ed15\",\"observedTimestampMs\":1790724398000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122345\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790724398000,\"token\":\"0x910be5a9c7912ff4386e29bdadee43ca4a8ee10a\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"6d5c4ead9dfd751ec817b0e8917316257bd3c03defc43a7bdc844f2a80c1eb40\",\"chainId\":4663,\"curve\":\"0xda118201c823c0ef275649817956daea7d5c149b\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"56e7f3effcd3489c2f2fe13d6704d52adf2485f30b5e6a2b01d7539b425b16cf\",\"horizonMs\":300000,\"launchId\":\"fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458\",\"missing\":[],\"observationId\":\"3bd9eed6257f6c0d5836ff34cad702ffeed66d198fd38403b1683c60477f9ed1\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76050230\",\"observedBlockHash\":\"0x15355ee310892fce4a4decd4870a549c16e945492bdc5ba95400a80c896d2cda\",\"observedTimestampMs\":1790724436000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790724436000,\"token\":\"0xb4b247c489e7881557d756e9d9a4713b7aa14284\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"ee8eb73636c0ce57315b8dc322c70ffbfd5212a37ae7b27a66b3622c429ffe50\",\"chainId\":4663,\"curve\":\"0xfbc58d686f548d99665c6ed3b3530df5883ed1e8\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"139b489d49a1090881a7bb4e982112171abb95dcc6d94c48166e03ba518f7caa\",\"horizonMs\":300000,\"launchId\":\"64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a\",\"missing\":[],\"observationId\":\"037dad3abd0d84487f5e89f3e7b8f6f9565e3eb85b04655182cb43a175c64b72\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76056132\",\"observedBlockHash\":\"0xc8573355f5fa7fb1634f6d1b44c47e020fb2d2614782deafe2ac273b3dc580fc\",\"observedTimestampMs\":1790725031000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790725031000,\"token\":\"0x2ba4733fcc16714b7604ef08e908594745ca3d07\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"760c80a5d2325858501f15f47469d0454ddf389f32edec2a60f610c715952614\",\"chainId\":4663,\"curve\":\"0x83d82daaf9ce94e41b100dc019191cd877be59b7\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"91b31465acf19380bf8521c619438386fec2b30168776c4801fc9a6844bb1bbe\",\"horizonMs\":3600000,\"launchId\":\"68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0\",\"missing\":[],\"observationId\":\"2500cd4376983f2b304971275b542ec650c1c58d6c33daf16a54b047f9f75bbc\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76064562\",\"observedBlockHash\":\"0x47b1884baacf7c0574649a55a3b34cd38fbe53be295bae0376942da2b7de06b1\",\"observedTimestampMs\":1790725872000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790725872000,\"token\":\"0x83cba65eb75e3bb863bc1eb72c49e7c5abccaeee\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"a74eb94d06c745431e3a1ac6abb23cf10d4b67f04ffdf5d0eb51bf24b1d0ef97\",\"chainId\":4663,\"curve\":\"0x9ebdc916b75aa365b485321ee90d0a0414591211\",\"estimatedFdvQuoteRaw\":\"105645174778895746122362\",\"evidenceDigest\":\"61eac02b1797cfb911623b5c873831e7fde4369d23d94f3666ec772ced56c992\",\"horizonMs\":300000,\"launchId\":\"1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274\",\"missing\":[],\"observationId\":\"26132e70517cc18260d98384c8c6c34e58141f8220e87fe678e9e78a61e904d7\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76064933\",\"observedBlockHash\":\"0x781a42595ee4df9e4dd23f3e02245285f9181dde4053db1750a07c0ebec56ad2\",\"observedTimestampMs\":1790725910000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122362\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790725910000,\"token\":\"0x9332870422ce3969670ddb5d308a896439c45953\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"9cd632341f9376945187f0684eb3e4f7e93f31ea2d741f7e110908ecd1954187\",\"chainId\":4663,\"curve\":\"0x23a1caf6121dc9ee485a34bc5b492976e8b3fd24\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"06f84fada88a34165b36d4e55c97306ef0cc78b899e002aa9ef3f0ee0e530819\",\"horizonMs\":300000,\"launchId\":\"e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2\",\"missing\":[],\"observationId\":\"14b2aee2e7ef44fcae5bd6d5fab8653db022f39923cb099b16203cd3bd916084\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76068743\",\"observedBlockHash\":\"0x775cd0a559b67e2a1669a72ae1da02578698e198c0410576dcbb35332f40693b\",\"observedTimestampMs\":1790726292000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790726292000,\"token\":\"0xa77c390bc21e5ae81988679564d0405664cfe88f\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"e6dc7e3d575a692ebd136b0f252edda19b7a14fe81924c60e9489024fad0ab49\",\"chainId\":4663,\"curve\":\"0x3620233c61ec619743e785e8c10a90b8a23fcd16\",\"estimatedFdvQuoteRaw\":\"109348559141179816279738\",\"evidenceDigest\":\"ce411f31f134294e163f6324909f4e6082ae3ccdb06c0400e2a25fa7cce8fbfa\",\"horizonMs\":3600000,\"launchId\":\"deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784\",\"missing\":[],\"observationId\":\"6180ca489a2d6122c1ded97d3e228df33f7401b48f8da50ad20750b353c19428\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76071014\",\"observedBlockHash\":\"0x65e6c2695e70f15d65c0bcb4c808ef6bac3bfbb0a882a6f93eac7cd2e126525e\",\"observedTimestampMs\":1790726521000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"107480917572796892343862\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790726521000,\"token\":\"0xf058c7b99e8f1404d95591014215ca8cbd0a8dd6\",\"tokenReserve\":\"982920291012050613681644872\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"d77a68bbb8de0ef6cb131dd1143f60612b89e604e873a025fec7d39c08f90ba6\",\"chainId\":4663,\"curve\":\"0xf4bdcfb179ed4e6b19088621b2d191029b3e36c0\",\"estimatedFdvQuoteRaw\":\"121860430374098137975357\",\"evidenceDigest\":\"4bf91ed0bd5cf3742f214e70ba6c83dcf2476a6ba9a4638507b7e7b00e1e7da6\",\"horizonMs\":300000,\"launchId\":\"a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992\",\"missing\":[],\"observationId\":\"cc90927d2ebed9be7c2683cfcbaa452401e0190daf1d8cfbc723458a0a2e6ae9\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76072779\",\"observedBlockHash\":\"0x66a6b525c40bd0b7cdd88c1adae20d7553c007d99d730829e38ba738d948f84d\",\"observedTimestampMs\":1790726697000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"113463502790558399535047\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790726697000,\"token\":\"0x8898da024052ab4d66982d9f3bb4c11187a8b770\",\"tokenReserve\":\"931093895222903013323817446\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"3574be46479b0a9d7e6c31009c23c76f71c4ce0b296d3628a1fb6c5b5df75a69\",\"chainId\":4663,\"curve\":\"0xfd94a545ffaae06bdf732c06c0bd5ed5ca907d60\",\"estimatedFdvQuoteRaw\":\"105645174778895746122346\",\"evidenceDigest\":\"c33d7f01c0e1f7a593aa8ae0ef61f8601221ba14fcdf6c2b0dc438cc2f596844\",\"horizonMs\":3600000,\"launchId\":\"e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18\",\"missing\":[],\"observationId\":\"2ac034aa9aeeb7616b44b97a73c225131ff44c76cccb2fd020027b656d059b32\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76082763\",\"observedBlockHash\":\"0xcca5147317c318785582b67dfdf9f93f6eb85c92abcacfd4dc102656b5cd6657\",\"observedTimestampMs\":1790727698000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122346\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790727698000,\"token\":\"0x910be5a9c7912ff4386e29bdadee43ca4a8ee10a\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"9f41d6ef7c0eb8eeb5a1b013daa8d915a40dd3dc104a1a89529bb043edcde19a\",\"chainId\":4663,\"curve\":\"0xda118201c823c0ef275649817956daea7d5c149b\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"a77d36f3156af4adec6fefcab4683cebd7da9746d94b3d11ede9e2e6c8a2b3fa\",\"horizonMs\":3600000,\"launchId\":\"fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458\",\"missing\":[],\"observationId\":\"7c3c0bc868718407c86a3bb99e724aa683ec6f85b3099eb8b63fbf31dab185d7\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76083140\",\"observedBlockHash\":\"0xaf10d8deb9c07b2584afee559d6ccc39cd3927bdd440829ca5ea969c2327139c\",\"observedTimestampMs\":1790727736000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790727736000,\"token\":\"0xb4b247c489e7881557d756e9d9a4713b7aa14284\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"5e579f5246ffe01db162004be4b2468eb730d7b2b1f182369cb2fbb747075cc9\",\"chainId\":4663,\"curve\":\"0xfbc58d686f548d99665c6ed3b3530df5883ed1e8\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"ad180f4fd8107c9adcf8962234abaeb1c7f722efde0519ca639e36f114eccb9b\",\"horizonMs\":3600000,\"launchId\":\"64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a\",\"missing\":[],\"observationId\":\"4ce555c609b990520040f8d3bee6286ee71f039aa62b9e709e4079a414d144fb\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76089073\",\"observedBlockHash\":\"0xd198b1fb57472574f37cea13c1d2267ebc3513504b3fa1e063d7d0e4168ae0f0\",\"observedTimestampMs\":1790728331000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790728331000,\"token\":\"0x2ba4733fcc16714b7604ef08e908594745ca3d07\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"5bc1cda5f3b3bd80ee5f617d7b832a87c1e7140ea92dceedb8ff7bf9944ed1a7\",\"chainId\":4663,\"curve\":\"0x9ebdc916b75aa365b485321ee90d0a0414591211\",\"estimatedFdvQuoteRaw\":\"105645174778895746122363\",\"evidenceDigest\":\"26143e7fb7e73d3f7a70807a56f9233e3f95ee24e7cba5674a19a1851e3f210e\",\"horizonMs\":3600000,\"launchId\":\"1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274\",\"missing\":[],\"observationId\":\"b3293710db169f8c898e6b90a6efabfb727fda2e0b3b749b6e43ad990b40b93c\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76097824\",\"observedBlockHash\":\"0x6aafda14d0035bdc608f41b6578c641d079846607dd083c34416a76469e7b672\",\"observedTimestampMs\":1790729210000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122363\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790729210000,\"token\":\"0x9332870422ce3969670ddb5d308a896439c45953\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"097c1b41720d1671ccf118716b24a3676acb091303eb05396916173059cda501\",\"chainId\":4663,\"curve\":\"0x23a1caf6121dc9ee485a34bc5b492976e8b3fd24\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"1140110f1653ee1d930e4595d55b94fc9f1d412de9909fc5031eeb68d46c0d79\",\"horizonMs\":3600000,\"launchId\":\"e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2\",\"missing\":[],\"observationId\":\"76b3e637faba688cf43ea4103c24b8767b8348a0d623c62b0552ace3d9f2af49\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76101636\",\"observedBlockHash\":\"0x9dd0adbb5a807ea21f4cb10205da6feed37c3f0681c68f836d497cf15c7898c3\",\"observedTimestampMs\":1790729592000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790729592000,\"token\":\"0xa77c390bc21e5ae81988679564d0405664cfe88f\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"f9e57b2821bb37799a7f8d53d1c5d123f15efc7a60849100ccf0e32ef044fc66\",\"chainId\":4663,\"curve\":\"0xf4bdcfb179ed4e6b19088621b2d191029b3e36c0\",\"estimatedFdvQuoteRaw\":\"123406000715255836252163\",\"evidenceDigest\":\"5b6ee5999b43c9775e22aa3e64d8f869b8cd7d16af5aa89738c266cacf6fdd43\",\"horizonMs\":3600000,\"launchId\":\"a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992\",\"missing\":[],\"observationId\":\"9a7a949736c2a7beda948c225ff2436337eea0d07c868635e790956786b6ba61\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76105669\",\"observedBlockHash\":\"0x4c074cad4533d4e591e44749655576a7b8d3b0d93b781d5456cc8e3f9c6450e5\",\"observedTimestampMs\":1790729997000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"114180771210951873997936\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790729997000,\"token\":\"0x8898da024052ab4d66982d9f3bb4c11187a8b770\",\"tokenReserve\":\"925244887194829007255397325\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"3ee8dd773f21f25d4196ed43874a8da7ee21f98d96b7559329ffe5b4e1640f2b\",\"chainId\":4663,\"curve\":\"0x9eda75d6a472c86e7183f2e32170e368c9c26f97\",\"estimatedFdvQuoteRaw\":null,\"evidenceDigest\":\"1d486ac1f0238f7152e35101436b4404ad12f6b6b26a9002da1b970668b87d78\",\"horizonMs\":86400000,\"launchId\":\"3505b63b75a19b9a13b3b27d5740b74fff91f47e6bcb9ed12ccd31a46ab23c5b\",\"missing\":[\"V4_POOL_STATE\"],\"observationId\":\"675703b7216265781af87e1b821a3bc49766f05ae6da1cdad186fb49c732fe52\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76785421\",\"observedBlockHash\":\"0x893b7dc442045c334fece415aeb241c2ef098f133b79b954a40eee42072d145f\",\"observedTimestampMs\":1790798407000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"GRADUATED\",\"quoteDecimals\":18,\"quoteReserve\":null,\"status\":\"PARTIAL\",\"targetTimestampMs\":1790798407000,\"token\":\"0xaead3b6b04882b56a2dc9abbf49af407fe1ad901\",\"tokenReserve\":null,\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"4a944bf75cef84d76c327ec14c7a53b7523b349c308c1ba4cada372e59f15bc5\",\"chainId\":4663,\"curve\":\"0x52679607580395c51efe6aacb1f58b974e175e9e\",\"estimatedFdvQuoteRaw\":\"105645174778895746122345\",\"evidenceDigest\":\"fa58394d40850dcd851e169d4c556baa894c31b1f451ab019ffe64b3160c73e4\",\"horizonMs\":86400000,\"launchId\":\"2bcd85d6db02471d5ae6a5a45a05298dc5aba1fcc65397210a02ef1d28467496\",\"missing\":[],\"observationId\":\"27b18cb2607984a866b83bb1fbd282717c4dff94768c6ba173c2711b6bc7b881\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76789404\",\"observedBlockHash\":\"0xa56f56655e06a9a161c0e5a93bc34e1b74861c9703617273859253c5c87bba6a\",\"observedTimestampMs\":1790798807000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122345\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790798807000,\"token\":\"0xf2dd2b00369f05697c28c3bfe877db32c905d9a4\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"bf31d89df9dec42ace68fe1cfd2c0fc585205a15725e6c94712d185663e642ed\",\"chainId\":4663,\"curve\":\"0xeecc686b73acfc91f2a2f3bb258f8f17fbca82ee\",\"estimatedFdvQuoteRaw\":\"147212225379206875260745\",\"evidenceDigest\":\"7a6baa265bc12a4b8645f763aafacdbc4bf47977fd18c4fcef212d1a7dfe2a60\",\"horizonMs\":86400000,\"launchId\":\"8d2042217714bf41c9bbd97767e62aa725a4443d64d5e98c9b7b466c92a49fff\",\"missing\":[],\"observationId\":\"a8774297c4def65e02489715e53ae695d426f1f332824f65a3f65c2757d243bc\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76808172\",\"observedBlockHash\":\"0x4ae73540e3174e31e0c2c66b90a318602106cb7ce9b181adafa12fcee77df155\",\"observedTimestampMs\":1790800690000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"124708705709651651584308\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790800690000,\"token\":\"0xdebc1c4ea1689a7507568ecfeacb42599b493b60\",\"tokenReserve\":\"847135524161882863631102860\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"06388c8808e07e121727426bf12336db2b2b81ad56ac2a8e1b968056f91dec9a\",\"chainId\":4663,\"curve\":\"0xa2f8c8e362c2e51a8de6129b54c73376e211d3b3\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"fd045391300b8f32e93964569d8a4402560e92be4f07404a2e7db1ddfd628efc\",\"horizonMs\":86400000,\"launchId\":\"9738a359842b29ed48a6bdb529110d06b75c714a0626a2a7cd6827fe37f14520\",\"missing\":[],\"observationId\":\"c3d12807af637c96e640cbbc2e26d0021f45619fbbde3a5987c17c71c9c9bfa0\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76808890\",\"observedBlockHash\":\"0x4fefc9d955933e84905083a0d73ae4b9110ecbac582510712310e22056a88cc1\",\"observedTimestampMs\":1790800760000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790800760000,\"token\":\"0x8581c554ee40386faa973f96ce9d16a6b876e3fd\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"a9b7fa3bea8296afcae697d7e1637ff7f9f708182132796f224eb8f7daf49334\",\"chainId\":4663,\"curve\":\"0x83d82daaf9ce94e41b100dc019191cd877be59b7\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"9426df0db334a1cd782eb231165e8fc132e326aae18282135d6eaeeb1640be50\",\"horizonMs\":86400000,\"launchId\":\"68fb6a582c76670b7c46dffbae3dc9d03ebb7f870b6932c02125850979a544c0\",\"missing\":[],\"observationId\":\"5980d85062f9b37a582a22da879652f0291653e1f4e177f0ea67244e5d122b38\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76887642\",\"observedBlockHash\":\"0xe78c3f2a884c1991589f4c6d72fc0afa4fda2eaa4acf1d3e3f197e776c256e3b\",\"observedTimestampMs\":1790808672000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790808672000,\"token\":\"0x83cba65eb75e3bb863bc1eb72c49e7c5abccaeee\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"ea3b40eae4321f4014d501625d5d5a350d355e4ed91765e3b11df78baa3564c5\",\"chainId\":4663,\"curve\":\"0x3620233c61ec619743e785e8c10a90b8a23fcd16\",\"estimatedFdvQuoteRaw\":\"109348559141179816279739\",\"evidenceDigest\":\"203234be0bba03c15722ed420f4857ac98f53d4252506f0697cc0a38e4b281db\",\"horizonMs\":86400000,\"launchId\":\"deb4c91c80462a14fcfaa80e5ef8488cf00bb75cdf9b00a073e164c6c2a8f784\",\"missing\":[],\"observationId\":\"4083ba91c1b3c179b52ee65494117f5075a9aec86d2b88a8e479dffef7363e18\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76894086\",\"observedBlockHash\":\"0x240d2610793b817606f1f05ca4b76ccd22cb6a1227dfe724a7bf1c9e2d8ef795\",\"observedTimestampMs\":1790809321000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"107480917572796892343863\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790809321000,\"token\":\"0xf058c7b99e8f1404d95591014215ca8cbd0a8dd6\",\"tokenReserve\":\"982920291012050613681644872\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"44fa5114878327b79163572ca84ecea47945fba7ab854850c65013fc2995cbc0\",\"chainId\":4663,\"curve\":\"0xfd94a545ffaae06bdf732c06c0bd5ed5ca907d60\",\"estimatedFdvQuoteRaw\":\"105645174778895746122346\",\"evidenceDigest\":\"597e636df4f1ff69c227998a2ab8f093dd71a6356dbaf6be5b7000867ec7f70f\",\"horizonMs\":86400000,\"launchId\":\"e95238bd5d2a480ba3d4a5ae2e6ecf307d0d463b1f10ecb616db6969e8c99d18\",\"missing\":[],\"observationId\":\"4e0840ce0bf412b6e0593f9efeb5a87a8976885c62828ac50bc318fb77cd2218\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76905800\",\"observedBlockHash\":\"0xe8e1694104c5c711725b97a035bf8cae40e0f8b47bd752a02aac60b89a244a7e\",\"observedTimestampMs\":1790810498000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122346\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790810498000,\"token\":\"0x910be5a9c7912ff4386e29bdadee43ca4a8ee10a\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"d67f033472417f0bcb20c495fc7654cc4a7b4c439cdc7503adb03ce85880dd2d\",\"chainId\":4663,\"curve\":\"0xda118201c823c0ef275649817956daea7d5c149b\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"4d7b20a52b87069d9d4f02e70c73fce5cedda183e54d811411f643398fa11a0b\",\"horizonMs\":86400000,\"launchId\":\"fae3354d69e0d1bce6b5ee44c5ad1d3fd6d9d0b4c96ce18151766fe2052d6458\",\"missing\":[],\"observationId\":\"078bb1a930316c30a2613f7a3a21bd4c5536094b52f3f97efc1b9ab4c703f65b\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76906176\",\"observedBlockHash\":\"0xf24697ef51ddb8805ab2eb0c43f1644e7dc74cf0f8ba2d174e46dba7649fae14\",\"observedTimestampMs\":1790810536000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790810536000,\"token\":\"0xb4b247c489e7881557d756e9d9a4713b7aa14284\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"1ad872594f5ccf7c4de2ad15ac81636f4fe9ed20c5621d842121561a51d4e0df\",\"chainId\":4663,\"curve\":\"0xfbc58d686f548d99665c6ed3b3530df5883ed1e8\",\"estimatedFdvQuoteRaw\":\"105645174778895746122343\",\"evidenceDigest\":\"23a8956836d32f1c83d83f67434beefb69016062c126376824e844f16d5ab461\",\"horizonMs\":86400000,\"launchId\":\"64a578239c3b7eddcb71273a4194b5f3ec02cc3fb02c21833ad5c5d035c78d1a\",\"missing\":[],\"observationId\":\"24205301a926464ef44037b82c925ab6cb8ab9289d7c637e47657b323eb87acd\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76912104\",\"observedBlockHash\":\"0x2b5f7b1a2604b9dacf24997703bdf7c39660c24c9e72f88270a33bced7c07a51\",\"observedTimestampMs\":1790811131000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122343\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790811131000,\"token\":\"0x2ba4733fcc16714b7604ef08e908594745ca3d07\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"8923838c8a8ae6dcd7c414631e92f065b855b3937e7d1f11b83662e6d5c60dd7\",\"chainId\":4663,\"curve\":\"0x9ebdc916b75aa365b485321ee90d0a0414591211\",\"estimatedFdvQuoteRaw\":\"105645174778895746122363\",\"evidenceDigest\":\"5377a4e969cdb251331a93b496df4c564103779aba9f5e4fa71ae3b096301688\",\"horizonMs\":86400000,\"launchId\":\"1173f40444dd78b705e3b93163a71ca7368bef66e6d6e3606bb53f99d1086274\",\"missing\":[],\"observationId\":\"4411797c29a78e1fc3fef1776e897fbf1de5a884dba61d14fb7e9d7c42c0dc9b\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76920832\",\"observedBlockHash\":\"0xc37c6e95a26a421ac6878c10f98fbb804bcf2977b87aa7a82c85a2e7ee2c9476\",\"observedTimestampMs\":1790812010000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122363\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790812010000,\"token\":\"0x9332870422ce3969670ddb5d308a896439c45953\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"b6ae6a04cc80ad00b4218576996fb9eb978cc472424da5f1d0d697d14cc1f134\",\"chainId\":4663,\"curve\":\"0x23a1caf6121dc9ee485a34bc5b492976e8b3fd24\",\"estimatedFdvQuoteRaw\":\"105645174778895746122344\",\"evidenceDigest\":\"7e7f820d79f9854d6ca37ef49a9ebe4c40ad266a6aba4987d5014b23054adda8\",\"horizonMs\":86400000,\"launchId\":\"e34f903866b2bfd34f9feb210ab1bebb79545fb00ed66342a8da223777b223e2\",\"missing\":[],\"observationId\":\"5bffa4a29d025f4f31bc6b9712e3994e92aeba5393a89d2196281dd4c8759172\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76924610\",\"observedBlockHash\":\"0x29675886f79817e049cdd09632335c91dfc7214bb38ba981cde6e248c62273bf\",\"observedTimestampMs\":1790812392000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"105645174778895746122344\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790812392000,\"token\":\"0xa77c390bc21e5ae81988679564d0405664cfe88f\",\"tokenReserve\":\"1000000000000000000000000000\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    },
+    {
+      "launch_id": "a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992",
+      "payload_json": "{\"capabilityEvidenceDigest\":\"607f858c913603bceacf41002587d1d85d77008c81c3f5f7f3a01e4484083d24\",\"chainId\":4663,\"curve\":\"0xf4bdcfb179ed4e6b19088621b2d191029b3e36c0\",\"estimatedFdvQuoteRaw\":\"123406000715255836252163\",\"evidenceDigest\":\"4c155f3d0c73479c9400597a5666e4e741967d7fa139ed9b7b52486836956487\",\"horizonMs\":86400000,\"launchId\":\"a990a51200774466822d24e4a17961447396b9749cdd2cdcc9d5fe4b22f1b992\",\"missing\":[],\"observationId\":\"d3ae5ce0425fddce816df634e2d7aa3e2779e243b370bdc73843433d71409ecd\",\"observationVersion\":\"BINRAT_PONS_OUTCOME_OBSERVATION_V1\",\"observedBlock\":\"76928621\",\"observedBlockHash\":\"0xc3538f16f8d28bd32409378cc56f15b653bf7738b335cd617a9e00cb667a73a9\",\"observedTimestampMs\":1790812797000,\"pairToken\":\"0xaa07a0e9209e16ac99708c3ec70159c6ef3128a3\",\"phase\":\"CURVE\",\"quoteDecimals\":18,\"quoteReserve\":\"114180771210951873997936\",\"status\":\"COMPLETE\",\"targetTimestampMs\":1790812797000,\"token\":\"0x8898da024052ab4d66982d9f3bb4c11187a8b770\",\"tokenReserve\":\"925244887194829007255397325\",\"totalSupply\":\"1000000000000000000000000000\"}"
+    }
+  ],
+  "snapshot": {
+    "chain_id": 4663,
+    "checkpoint_block": "84543560",
+    "checkpoint_block_hash": "0x0f30527e05a10378d7e4a1eb824155da64b9679cda8d88f29876915743e374fd",
+    "feed_digest": "90f8a3fc8a8332ac0a7d0c3fa91da51698bceb4898e8f3d1e3a1855fb4d2187b",
+    "snapshot_json": "{\"chainId\":4663,\"checkpointBlockHash\":\"0x0f30527e05a10378d7e4a1eb824155da64b9679cda8d88f29876915743e374fd\",\"feedDigest\":\"90f8a3fc8a8332ac0a7d0c3fa91da51698bceb4898e8f3d1e3a1855fb4d2187b\",\"historyCoverage\":\"PARTIAL\",\"launches\":[{\"blockNumber\":\"84543559\",\"deployer\":\"0xed056bb8768487a3a255a568fe7a27d976cfc4ba\",\"factId\":\"binrat-fact:4663:f7e5c89c7923ccdd855bd2bfb9f0d44a21ac5051afd4180fb8af1944e30e2cbf\",\"launchId\":\"f7e5c89c7923ccdd855bd2bfb9f0d44a21ac5051afd4180fb8af1944e30e2cbf\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x6d8abcd1973fb1e8c0eff2f5657727f8d0e15ece\",\"txHash\":\"0x9c77646363f72e09cf5c0ae441af43bfc3339fc226911e160a17d2c24f5f6ee4\"},{\"blockNumber\":\"84543252\",\"deployer\":\"0x7fcc2e4921e6ba0f05ba3d90d7763b4f8316a18d\",\"factId\":\"binrat-fact:4663:13bf3483c1c28ebc38af95e02b89e9b82540901492db5e7419b037dafc81080d\",\"launchId\":\"13bf3483c1c28ebc38af95e02b89e9b82540901492db5e7419b037dafc81080d\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xd3dafc4df52199224278e8b9b101465653a703af\",\"txHash\":\"0x8d3ddb2c3eb226e46f828c63c55acc5a04a68ad75374d16f10815757ae196488\"},{\"blockNumber\":\"84543225\",\"deployer\":\"0x9638f4ae63a1d5137ba10e0e2276707a3b737152\",\"factId\":\"binrat-fact:4663:7fc8bf3e9a363152bce17c82e4ce05b053a77f4b46848a09cc2fe734827537ad\",\"launchId\":\"7fc8bf3e9a363152bce17c82e4ce05b053a77f4b46848a09cc2fe734827537ad\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":3,\"symbol\":\"\",\"token\":\"0xed5e8449d17cc66abb9cacadc527842f58448af3\",\"txHash\":\"0xa339ab166ae8317a8bea5d049f9587fb09b221edaa3aa2aa3851d84010d731bb\"},{\"blockNumber\":\"84542485\",\"deployer\":\"0x954bb8fbfd568270046827f89031109e234e0331\",\"factId\":\"binrat-fact:4663:023e90c3a3b5d04907d167684f9afa39d8b49662409c9627758b52c5cd334a44\",\"launchId\":\"023e90c3a3b5d04907d167684f9afa39d8b49662409c9627758b52c5cd334a44\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x26abbcfebac31c351fb245a65cae5febb7fd04d0\",\"txHash\":\"0x286fa69c61a2f0677c2dea6421ae2d36a609b6284f6cf7cc356340ae945d3c57\"},{\"blockNumber\":\"84542443\",\"deployer\":\"0x3d44e81f94048f386cac8cdc61da475efb97a8e0\",\"factId\":\"binrat-fact:4663:d634c81b4a782eb560ea2d9e2d2282f1917f92b49a73537405127dce62b6ded4\",\"launchId\":\"d634c81b4a782eb560ea2d9e2d2282f1917f92b49a73537405127dce62b6ded4\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xc1d2f242ac8164e5148d507e2a0c666053f5cbcb\",\"txHash\":\"0xdb643ca0800504e5ecc32af670c2eeab6b99a83ea74e048d759bb23e5dea4f39\"},{\"blockNumber\":\"84542257\",\"deployer\":\"0x737046c8aad018bff8462bf72980a21619b6adea\",\"factId\":\"binrat-fact:4663:afea3d0243563ea85ea5c652932abf96d66c6c70349ae89e099d85f0b9b9cf08\",\"launchId\":\"afea3d0243563ea85ea5c652932abf96d66c6c70349ae89e099d85f0b9b9cf08\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xad323b74261c7537b1aaed4be72e0955071e143e\",\"txHash\":\"0x57181b5eca4fceb4cbece87c05875a92c40c24d2062fc94b79381d73a37b1ac0\"},{\"blockNumber\":\"84542098\",\"deployer\":\"0x9638f4ae63a1d5137ba10e0e2276707a3b737152\",\"factId\":\"binrat-fact:4663:aad8baa2f307dd92c947716eccd62012e1b362b14e0c3d7a715d173dfab8bcba\",\"launchId\":\"aad8baa2f307dd92c947716eccd62012e1b362b14e0c3d7a715d173dfab8bcba\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":2,\"symbol\":\"\",\"token\":\"0x4203de65c93f051cc2674a5c4959b3f72061b5ea\",\"txHash\":\"0x58e26b835ca9c64f3c6b9702ca07b020bb7b987706cd758acf184944c95ece12\"},{\"blockNumber\":\"84541878\",\"deployer\":\"0x7a023495df209947669d502e1d444da20e72cafc\",\"factId\":\"binrat-fact:4663:9778bfc5c072d1a121abc033477206e3ad88876399482bc1aa8f82deaa135695\",\"launchId\":\"9778bfc5c072d1a121abc033477206e3ad88876399482bc1aa8f82deaa135695\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x8a5e0ff9978192987081960bb3cd78e2c7122a6e\",\"txHash\":\"0x1c93ab1358efe767df6ebf116f8a9a7a10e32aa5f954ef426440219b23cc6095\"},{\"blockNumber\":\"84541268\",\"deployer\":\"0xee1c2e2bc79f056a4e0adf91eee4616934754744\",\"factId\":\"binrat-fact:4663:9aaa9144837bad67727bca88bf2a3b7704270096a4006e6b050edf4fc4252ae7\",\"launchId\":\"9aaa9144837bad67727bca88bf2a3b7704270096a4006e6b050edf4fc4252ae7\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x1f210f7feeb73ab9a91ae8c19a81caa1d0c8c294\",\"txHash\":\"0xe0981bd77ce313088da363aaefb75efcea86507155e464a96c526bbf3b7ba5c3\"},{\"blockNumber\":\"84540489\",\"deployer\":\"0x37ee51e76e5a50da3fcc43f8137e5107538e1c02\",\"factId\":\"binrat-fact:4663:e3640fe2061d1c697fc056e13f4f7713d526d4e85bc37d7ea0f1eb6f0699c4f2\",\"launchId\":\"e3640fe2061d1c697fc056e13f4f7713d526d4e85bc37d7ea0f1eb6f0699c4f2\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xf2e4f638335e2ad280ec1c6205b82162d82faa66\",\"txHash\":\"0x6ed1443dc8eaaefd9eb1fedf90656d96a45fca47ac69130f21665761c687dba9\"},{\"blockNumber\":\"84540362\",\"deployer\":\"0x98f4a945d8ee86e9be51f34d55057dd241f8d4a1\",\"factId\":\"binrat-fact:4663:314ef91d89bc69924a57464be457749a4c4c1403105addf20acadb1edde5521d\",\"launchId\":\"314ef91d89bc69924a57464be457749a4c4c1403105addf20acadb1edde5521d\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x6aa037b44da4f4c99e3059661e79d95718741ea1\",\"txHash\":\"0x6f9bc395abd07d5bdce0e3a195c76acb4f23468b25e44ac9b6558861c2f76320\"},{\"blockNumber\":\"84539655\",\"deployer\":\"0x7b560c59f35ff2e77522b6daa7f140b7a55e7d47\",\"factId\":\"binrat-fact:4663:3ee9e8a4ee22c1668a35992b51583eb80a5ce269c9921ef28793a4015f6527a0\",\"launchId\":\"3ee9e8a4ee22c1668a35992b51583eb80a5ce269c9921ef28793a4015f6527a0\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xcf86a7fd503b081fb3bc4dc771b5a1c590feff3e\",\"txHash\":\"0x3e69c09f8bf8dda24be1230a2cf0b33eae0e1d670610f0deebdc22a0db0c3595\"},{\"blockNumber\":\"84539181\",\"deployer\":\"0x9a4f3c8f3c03f4da3247d4dffe825f080e99c5d3\",\"factId\":\"binrat-fact:4663:3e6dd69d606144636c9b67dfb22456e2dedb6a07ec598dc8b0c476770d01585d\",\"launchId\":\"3e6dd69d606144636c9b67dfb22456e2dedb6a07ec598dc8b0c476770d01585d\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xb039124a3e4aad4c85fc9cdae9a0939831d6a643\",\"txHash\":\"0x4f8a6249ab0f3088fe212718fdde33cdee634122935e45af6a2a80fa29519522\"},{\"blockNumber\":\"84538911\",\"deployer\":\"0x466818b8afdd2dbb329ae5a8d68a7d36368d9d41\",\"factId\":\"binrat-fact:4663:9e3317397b1731179f44983c35f18009394387b9c9c3d65fb818c5e4d5f943b3\",\"launchId\":\"9e3317397b1731179f44983c35f18009394387b9c9c3d65fb818c5e4d5f943b3\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0xdfa7225c5c7176eee1cc1ca8ab7cdd09ea4af6a6\",\"txHash\":\"0x6fc421464a44652064275b98fff3da8a2d6cca299ed2e31ad3bf3ffa4fb73ab6\"},{\"blockNumber\":\"84538665\",\"deployer\":\"0x6857feff08044b3d108443aab8d3e257b75272ad\",\"factId\":\"binrat-fact:4663:05c5d21ff13bab45967e50464adfbc6c3c9cc882d5b3c86b30b8026db767703d\",\"launchId\":\"05c5d21ff13bab45967e50464adfbc6c3c9cc882d5b3c86b30b8026db767703d\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x648e8a3f52b693005bb99e2fb69b04bd79d82b13\",\"txHash\":\"0x2c55f71e554ebc3ce694694fef049bdf2eb7dfbead7c5ac2d6a196164e9e0bca\"},{\"blockNumber\":\"84537590\",\"deployer\":\"0x38a73c04ba5f7299da598cc0f224d38bb8a154ce\",\"factId\":\"binrat-fact:4663:284afbd28e3b23002fd839dd53de085044592bc3cd79e55fb226bdc8d5ffb579\",\"launchId\":\"284afbd28e3b23002fd839dd53de085044592bc3cd79e55fb226bdc8d5ffb579\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":1,\"symbol\":\"\",\"token\":\"0x3fcb3706d119f4d46b08184e38c80957d7470e35\",\"txHash\":\"0xbb262b1b222eef24bc80c5314e4b07ac23bf770af0d5b7cf07777c9fdc9678f3\"},{\"blockNumber\":\"84536666\",\"deployer\":\"0x6492db7e29bb3f7930be8274386f778a2b6eb22b\",\"factId\":\"binrat-fact:4663:74c721f3ad92cec51fa2759cee7472ca888e302e1e34288a79ce2b1f91f6127f\",\"launchId\":\"74c721f3ad92cec51fa2759cee7472ca888e302e1e34288a79ce2b1f91f6127f\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":472,\"symbol\":\"\",\"token\":\"0x9ab33911cb47eb9a4c347d7dfe468c1bfa1e65d2\",\"txHash\":\"0x1d48cbb112f357af4f58f312eb80082196e41c21b4248af73d13315c0c1763e2\"},{\"blockNumber\":\"84536461\",\"deployer\":\"0xc9d1b6a7b65afebb64b11f3b5d8bcb418991389f\",\"factId\":\"binrat-fact:4663:c1b89c603c52c8ca4eda9a59f21d48f8ad3f4705d41e1eaa6ad4140a35a5b897\",\"launchId\":\"c1b89c603c52c8ca4eda9a59f21d48f8ad3f4705d41e1eaa6ad4140a35a5b897\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x397a3ff0f0f1260c85ab0dd72bd6ee08199e8a9a\",\"txHash\":\"0x45040cad449bced23254c253648c078e9c2e16320c1d98ccd925a12f1df5d828\"},{\"blockNumber\":\"84536192\",\"deployer\":\"0x158504878b92d8d70e34eb0238cdc7446d8e0b7c\",\"factId\":\"binrat-fact:4663:aa6c1541d376970cea22c26778377455b3cdbbfced30d688aa1c11b5e73169a3\",\"launchId\":\"aa6c1541d376970cea22c26778377455b3cdbbfced30d688aa1c11b5e73169a3\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":0,\"symbol\":\"\",\"token\":\"0x25702a6331737a01b2541dc45a54f65e565a9d85\",\"txHash\":\"0x65b0105da9cff00e0f3495100950b20ccafcdb71e525c549cbcc632fb494e89f\"},{\"blockNumber\":\"84533722\",\"deployer\":\"0x2ff83ecbf0a42b3e3e0c334123869c9599547604\",\"factId\":\"binrat-fact:4663:f714a0c53c31d1b76cdb5daf6e8dc0850d36515ecffa9cd44fa9c866b7e2b928\",\"launchId\":\"f714a0c53c31d1b76cdb5daf6e8dc0850d36515ecffa9cd44fa9c866b7e2b928\",\"metadata\":{\"imageUri\":\"\",\"telegram\":\"\",\"twitter\":\"\",\"website\":\"\"},\"name\":\"\",\"priorLaunchCount\":1,\"symbol\":\"\",\"token\":\"0x56a289ac9589697afd2b26aa217b1c742bed3317\",\"txHash\":\"0x2905a69654bbb168d7415eafa664e6af37e54c7d0e7c1cc8abe3256efe4290d1\"}],\"schemaVersion\":\"binrat.latest-launches/0.1\",\"sourceCheckpoint\":\"84543560\"}",
+    "verified_at_ms": 1791588506971,
+    "publication_version": 1242,
+    "block_number": "84544151",
+    "block_hash": "0xfbba48066ffdf0f8400c0cb8ee74bf85eabd89e5839b3afec75490dd53c89531",
+    "runtime_json": "{\"chain_id\":4663,\"source_verified\":1,\"live_caught_up\":1,\"head_block\":\"84543562\",\"target_block\":\"84543560\",\"observation_ready\":0,\"history_backfill_complete\":0,\"history_backfill_target_block\":null,\"last_sync_error\":null,\"last_history_error\":null,\"last_observation_error\":null,\"updated_at_ms\":1791588506971}"
+  },
+  "recentEnvelope": {
+    "material": {
+      "schemaVersion": "binrat.case-evidence/1",
+      "projectionVersion": "BINRAT_PONS_HISTORICAL_CASE_V1",
+      "chainId": 4663,
+      "caseId": "1d8c52997e1375ea409e0497134c1b0b3ad24b56ccaae9f14ded1a69cfaba7f7",
+      "reconstruction": "PUBLISHED_CHECKPOINT_RECONSTRUCTION",
+      "archivedPublication": false,
+      "pointInTimeReplay": false,
+      "source": "PONS_V2",
+      "publication": {
+        "chainId": 4663,
+        "checkpointBlock": "84532533",
+        "checkpointBlockHash": "0xef452b5b22f597fc2b21667068989ac094eb1ba52263330ff9cf6ef3f2f39e99",
+        "feedDigest": "bf0c0b728c3ffd316d28e60faa0e1d8e7cc681d22dd87b02c6aa65faba42aba8",
+        "publicationVersion": 1223,
+        "verifiedAtMs": 1791587370665
+      },
+      "coverage": {
+        "mode": "LATEST_20_DEPLOYER_LAUNCHES_THROUGH_CASE",
+        "history": "PARTIAL",
+        "resultLimit": 20,
+        "countScope": "EARLIER_RECORDS_IN_RETURNED_WINDOW",
+        "olderHistory": "NOT_ENUMERATED"
+      },
+      "priorLaunchCount": 19,
+      "records": [
+        {
+          "launch": {
+            "blockHash": "0xa9259b8e77765e72522f523964432cbd412fb81c4d9a02e77c0bd994c935bdff",
+            "blockNumber": "84526314",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "8d29826a7a52067e2fd4e7d6b75e3a74f07fbae371ab41ad643520a2ffa0f832",
+            "imageUri": "",
+            "launchId": "1d8c52997e1375ea409e0497134c1b0b3ad24b56ccaae9f14ded1a69cfaba7f7",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 24,
+            "name": "",
+            "pool": "0xa2fd841ad319f3a1d8c007ea9fafa4b67da58014",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0xe4efe6024d8453fbcca8b9d4f7df6674d92c8332",
+            "twitter": "",
+            "txHash": "0xabfa125c5c027aab1a498a8921bef3101864615cfd9f708decd1b2333037073f",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "c59c4335128867c312d6f8c10d6781fc67b50b5c5384ed175583a913a71c747c",
+            "factId": "binrat-fact:4663:1d8c52997e1375ea409e0497134c1b0b3ad24b56ccaae9f14ded1a69cfaba7f7",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "1d8c52997e1375ea409e0497134c1b0b3ad24b56ccaae9f14ded1a69cfaba7f7",
+            "logIndex": 24,
+            "observedBlock": "84526314",
+            "observedBlockHash": "0xa9259b8e77765e72522f523964432cbd412fb81c4d9a02e77c0bd994c935bdff",
+            "sourceEventId": "8d29826a7a52067e2fd4e7d6b75e3a74f07fbae371ab41ad643520a2ffa0f832"
+          },
+          "authorityDigest": "33447fc3dd14049135c4637bdf8033499d703edb257c4db5f9c6bdb5cd5a3c6d"
+        },
+        {
+          "launch": {
+            "blockHash": "0xdb19e049668bdeaf7abe287c7c792759e4fd34c3172670048119dd81083a4f1f",
+            "blockNumber": "84518053",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "9ab755d0452d3d9f074e335350008b746670732c2968112b4a9ba797e076ce42",
+            "imageUri": "",
+            "launchId": "7cb7a0679fe26fb3dede1e0ca3f56cc050a2c5ecebfcd4324258c14227b43f24",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 14,
+            "name": "",
+            "pool": "0xcbe27ea7e21a504b992206b9a592ff9a6addc348",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x52ca40b015f800a1f835b55f1931c969a95529ea",
+            "twitter": "",
+            "txHash": "0x68b57b41e151e8db37a917385a917890fc279392afedb96f4e25fa36d75e6b0a",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "6867d48574757c229f2f74a9df06ae4c0dcd6a05955e0c1f8d48e1bac5766d2d",
+            "factId": "binrat-fact:4663:7cb7a0679fe26fb3dede1e0ca3f56cc050a2c5ecebfcd4324258c14227b43f24",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "7cb7a0679fe26fb3dede1e0ca3f56cc050a2c5ecebfcd4324258c14227b43f24",
+            "logIndex": 14,
+            "observedBlock": "84518053",
+            "observedBlockHash": "0xdb19e049668bdeaf7abe287c7c792759e4fd34c3172670048119dd81083a4f1f",
+            "sourceEventId": "9ab755d0452d3d9f074e335350008b746670732c2968112b4a9ba797e076ce42"
+          },
+          "authorityDigest": "a66e6c8187afc1597ce75e70606650e746b3cd74b4a93120d797d2b15636b08d"
+        },
+        {
+          "launch": {
+            "blockHash": "0x634b4ef6a0e3318d9a05c6b30a4a09285b020f9ad50b3f0199fafd16810e9591",
+            "blockNumber": "84501471",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "a109fe197651a98c7a3a8e2d0bfc868958e6df702ded7a2069c31d58c17eace6",
+            "imageUri": "",
+            "launchId": "70bfe6cdef60d5511445bb83b8a8ce6113e36ee62982644166c67952532596f8",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 12,
+            "name": "",
+            "pool": "0x419989907a3105cad824d0727118c0d04046c06e",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x08631bd60d9ef8b00d3bd1db8b10ac8a5228c04b",
+            "twitter": "",
+            "txHash": "0xa9375aa5b19fee81b763a14129580915e70c360fd766937125c8ea0b48bc3f06",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "d62d06be7bb6950a0cde7447d45d5c7824136a00a164a1a0c011fb6bd3aba46e",
+            "factId": "binrat-fact:4663:70bfe6cdef60d5511445bb83b8a8ce6113e36ee62982644166c67952532596f8",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "70bfe6cdef60d5511445bb83b8a8ce6113e36ee62982644166c67952532596f8",
+            "logIndex": 12,
+            "observedBlock": "84501471",
+            "observedBlockHash": "0x634b4ef6a0e3318d9a05c6b30a4a09285b020f9ad50b3f0199fafd16810e9591",
+            "sourceEventId": "a109fe197651a98c7a3a8e2d0bfc868958e6df702ded7a2069c31d58c17eace6"
+          },
+          "authorityDigest": "4dff8ba06dd74904610ab18a90f796ff51fb82f40deaa214e90c593f6610834e"
+        },
+        {
+          "launch": {
+            "blockHash": "0x9d00682604034f8c30eabf35eec0ccb74737cc7ac74c9fe238a583552659fb5e",
+            "blockNumber": "84492178",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "ba96d7ed6588d0b650db84e3025bb4247a97bd75eca7e66cf3794fef6d74e87e",
+            "imageUri": "",
+            "launchId": "2ee6821d848178eda3c6eef4738e568fc56340ef32431890a450b9ad3a55e6d7",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 17,
+            "name": "",
+            "pool": "0x7d38fcc9788a4e9312661e3797f7cb40ae1c8973",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x9bea561a480f0cc87d6cd2a703c6e39633fa7b3b",
+            "twitter": "",
+            "txHash": "0xd98def135ebe77eb5b221a15b19a5c3a546eb9aae7cd7148166ad35007ac1679",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "f06d87f7326428279b3fc22341abd25ad231ed7b7a70f034e615ad558c369e19",
+            "factId": "binrat-fact:4663:2ee6821d848178eda3c6eef4738e568fc56340ef32431890a450b9ad3a55e6d7",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "2ee6821d848178eda3c6eef4738e568fc56340ef32431890a450b9ad3a55e6d7",
+            "logIndex": 17,
+            "observedBlock": "84492178",
+            "observedBlockHash": "0x9d00682604034f8c30eabf35eec0ccb74737cc7ac74c9fe238a583552659fb5e",
+            "sourceEventId": "ba96d7ed6588d0b650db84e3025bb4247a97bd75eca7e66cf3794fef6d74e87e"
+          },
+          "authorityDigest": "2b45880bac041bb10bf17e0eeb9f71b1b3cbeb0e305bf7ee971ba969a69d83d1"
+        },
+        {
+          "launch": {
+            "blockHash": "0x667522ed2f2f2632171d08ff801e43a94ce7bde2ddf61120f2cf2fcb09823af5",
+            "blockNumber": "84439415",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "5e7eaf6d7c950574b08ce44bba7c1f2d91fc35d96d9e3175af20a72b84c6991b",
+            "imageUri": "",
+            "launchId": "d85fdd9dd999e9fafd84f36588aed3b517c3c80364943fca8ff9a8fd29680176",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 19,
+            "name": "",
+            "pool": "0x1db6d39f2c6be8a184c4dc5f57c9f48022ec53b3",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0xcec6e944dc78da46a06e5e6c182fef7eb7424ed5",
+            "twitter": "",
+            "txHash": "0xd0b6bec9ee3fcc5dd95f87a034f038e6fc68d80ba15115668ab19d8ab1dc2cbc",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "dbdd8cb43e2b431957729ee9baaea6b55b07769650a370a69dde9cb3d6ead914",
+            "factId": "binrat-fact:4663:d85fdd9dd999e9fafd84f36588aed3b517c3c80364943fca8ff9a8fd29680176",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "d85fdd9dd999e9fafd84f36588aed3b517c3c80364943fca8ff9a8fd29680176",
+            "logIndex": 19,
+            "observedBlock": "84439415",
+            "observedBlockHash": "0x667522ed2f2f2632171d08ff801e43a94ce7bde2ddf61120f2cf2fcb09823af5",
+            "sourceEventId": "5e7eaf6d7c950574b08ce44bba7c1f2d91fc35d96d9e3175af20a72b84c6991b"
+          },
+          "authorityDigest": "f751d2bcef20b6837d76a7067f7e57b312681f773c75dc98444ef87e9f2a036a"
+        },
+        {
+          "launch": {
+            "blockHash": "0x32cfa26318dc4088c77be81fa1ccb746410d1dbc5a35e4874c28b27825f3aa64",
+            "blockNumber": "84436774",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "a2fa49d009236a1de138a841ae02cbb6f00e536f6ea82ddd5be22d7cdbbefc4c",
+            "imageUri": "",
+            "launchId": "2dd6bec9c323acc36c8c6090567864a63607babb029d0501247723aafd506e82",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 37,
+            "name": "",
+            "pool": "0xd208e10ddf2b9d19cd17ccb7134a3ae3a8c24c6b",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x5c20b751ffdec574801b2d0fd3783dc236850434",
+            "twitter": "",
+            "txHash": "0xf9df9b9744ade0deaa8d356c78d5867ea238c0d1261cdeb2010c9156da52a443",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "42e6260a29e8210bbb2e04648bcab68dc649e3aa550d527856db21dd0b63e977",
+            "factId": "binrat-fact:4663:2dd6bec9c323acc36c8c6090567864a63607babb029d0501247723aafd506e82",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "2dd6bec9c323acc36c8c6090567864a63607babb029d0501247723aafd506e82",
+            "logIndex": 37,
+            "observedBlock": "84436774",
+            "observedBlockHash": "0x32cfa26318dc4088c77be81fa1ccb746410d1dbc5a35e4874c28b27825f3aa64",
+            "sourceEventId": "a2fa49d009236a1de138a841ae02cbb6f00e536f6ea82ddd5be22d7cdbbefc4c"
+          },
+          "authorityDigest": "dcd940e1a02c9111e7197f9d81b9141faaf05215cb075b9c026b820eab77652a"
+        },
+        {
+          "launch": {
+            "blockHash": "0x769994c95efdc4ee36f157c47d64188ed462739f72edf1d0a4dfe5e029557e76",
+            "blockNumber": "84428545",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "6d548dccf0632a827d0ecbc35e97567a6c3de9cfc3cf6668984082cf71b2cca4",
+            "imageUri": "",
+            "launchId": "fbfec1dabc947d47163d4c1b4201453bc07e91cd9e6d30947959b2e1031a3314",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 26,
+            "name": "",
+            "pool": "0xcd605bdc0185d3ac32d1201a37895bfe2536f549",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x9a84d842289de11bdfbdcbd638e4e8d406685956",
+            "twitter": "",
+            "txHash": "0x194400ea5d20a6b62c1586d4d8d0e9c99044051bf772ad947fbea994fafaeae8",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "d0ff87dcd933494114e43fc05efda2bffba2d19d75005abbd36864448e91bd7c",
+            "factId": "binrat-fact:4663:fbfec1dabc947d47163d4c1b4201453bc07e91cd9e6d30947959b2e1031a3314",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "fbfec1dabc947d47163d4c1b4201453bc07e91cd9e6d30947959b2e1031a3314",
+            "logIndex": 26,
+            "observedBlock": "84428545",
+            "observedBlockHash": "0x769994c95efdc4ee36f157c47d64188ed462739f72edf1d0a4dfe5e029557e76",
+            "sourceEventId": "6d548dccf0632a827d0ecbc35e97567a6c3de9cfc3cf6668984082cf71b2cca4"
+          },
+          "authorityDigest": "ede02f8d47e5901d5cc53aee13fd85d8d04bd0b460e2e9ab0b83f54416884952"
+        },
+        {
+          "launch": {
+            "blockHash": "0x115124b5428e11385dcb68cdab7cb5e25eb46320d81f2c06dfbc67cbe605e17a",
+            "blockNumber": "84426726",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "b4edf6c3fb67febff49d3c4a89432a9fc0cee682c23d7df7d6b9cac11d5757d5",
+            "imageUri": "",
+            "launchId": "45cd3d1341b356bd22eeaa7ede10343993035c90baaafaa6b01084517f09aea9",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 22,
+            "name": "",
+            "pool": "0x93f6431df1d8c9c0cf96ec5183a855b016682855",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x3df4db269e5e29700f9d862b092607e53cc35f31",
+            "twitter": "",
+            "txHash": "0x8eb621d6da20be8ba59596cccb7ff47f33f0dfd0c98ea1bf22103306f6bf07a6",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "8d7f98d88ebc32003eaf4a642885e95829e7c565b6b7cabd7719270d9dbd9d5f",
+            "factId": "binrat-fact:4663:45cd3d1341b356bd22eeaa7ede10343993035c90baaafaa6b01084517f09aea9",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "45cd3d1341b356bd22eeaa7ede10343993035c90baaafaa6b01084517f09aea9",
+            "logIndex": 22,
+            "observedBlock": "84426726",
+            "observedBlockHash": "0x115124b5428e11385dcb68cdab7cb5e25eb46320d81f2c06dfbc67cbe605e17a",
+            "sourceEventId": "b4edf6c3fb67febff49d3c4a89432a9fc0cee682c23d7df7d6b9cac11d5757d5"
+          },
+          "authorityDigest": "3af1363a17fef21a35472293cf14950938cf60f833c6d2dc8cf5f7603e729b29"
+        },
+        {
+          "launch": {
+            "blockHash": "0xc0d0dbdc521a8e068f874dfd0bb985275d29ef3120e8e7522156603fd901ed70",
+            "blockNumber": "84405493",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "ba8ae24cf4c62553b1264c367b68b0e9e805a9b852186830d7852b9539deac39",
+            "imageUri": "",
+            "launchId": "22751f6a1fe8d42238a6f48f1a9742e12f1c02f237aa0d9a1e47f0c8b8f1f2a7",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 6,
+            "name": "",
+            "pool": "0xac9acaa98167de9a625f69a03675a6741b7a54c8",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0xcab06e35284a6dfa071561642f7290e76fc25608",
+            "twitter": "",
+            "txHash": "0xaf00d2c4197213dac20ddcaedbc50025352d2218b45717eb19e28d3380b83044",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "8da35b0d8a54308b46624621d05cf3013a615a52cd7a439f0d675963813981bc",
+            "factId": "binrat-fact:4663:22751f6a1fe8d42238a6f48f1a9742e12f1c02f237aa0d9a1e47f0c8b8f1f2a7",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "22751f6a1fe8d42238a6f48f1a9742e12f1c02f237aa0d9a1e47f0c8b8f1f2a7",
+            "logIndex": 6,
+            "observedBlock": "84405493",
+            "observedBlockHash": "0xc0d0dbdc521a8e068f874dfd0bb985275d29ef3120e8e7522156603fd901ed70",
+            "sourceEventId": "ba8ae24cf4c62553b1264c367b68b0e9e805a9b852186830d7852b9539deac39"
+          },
+          "authorityDigest": "3260c8318e3cb20f882e416cb1c722286929425c1daa015a689eb02879df2a33"
+        },
+        {
+          "launch": {
+            "blockHash": "0xdabea3c287e08dd45d09e9b6420005193206d17785abc664c9f4da2acc17184d",
+            "blockNumber": "84403830",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "9d02c0b2f093f4aeaae3b44b8d82fe011e9ec14dc40ea2e2e21bc0f8bf39158b",
+            "imageUri": "",
+            "launchId": "fc210c8b08919cf328886b03166399381deec870db4dfa5fbf1bcad501a56e76",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 5,
+            "name": "",
+            "pool": "0x3fb90bb6fa3d8ffc44f218df1e6869f90b64247c",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x40ee90a66e8b707488fb44b73e3c426febae9bf8",
+            "twitter": "",
+            "txHash": "0xb0ef37fdb53e180287f5dacf6fcf85d39fd374fc492fdc3fc290865d4fa63a5d",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "eee9ead9f997a18f2c98c32f51af96a8238fda7a16146fcb33a246743d5cbc27",
+            "factId": "binrat-fact:4663:fc210c8b08919cf328886b03166399381deec870db4dfa5fbf1bcad501a56e76",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "fc210c8b08919cf328886b03166399381deec870db4dfa5fbf1bcad501a56e76",
+            "logIndex": 5,
+            "observedBlock": "84403830",
+            "observedBlockHash": "0xdabea3c287e08dd45d09e9b6420005193206d17785abc664c9f4da2acc17184d",
+            "sourceEventId": "9d02c0b2f093f4aeaae3b44b8d82fe011e9ec14dc40ea2e2e21bc0f8bf39158b"
+          },
+          "authorityDigest": "1819fadb175adb6adcf6144d00d053421c0605df05ec28bf6f29c1da092f0898"
+        },
+        {
+          "launch": {
+            "blockHash": "0xf102fd0a587a8ec50350ca2ebf605f54dcd107a86b3b5c7346f4af99786e8ef9",
+            "blockNumber": "84354883",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "f24f599eeebcef16afe429648c7afdbc9e68cf3a78707d8a6cbf0d5325fc141d",
+            "imageUri": "",
+            "launchId": "96f46f3ec19a76a69f8ce437861687432e67d1252a690c2d7a010001288bb680",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 16,
+            "name": "",
+            "pool": "0x76ae1fb5192763493e58c05b1bd2d6b6f49a2e62",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x8fe2579327791ab81843a43b7cc19ffd6ea4d384",
+            "twitter": "",
+            "txHash": "0x0fdd882e2fcf4034cc3ae888b1438f873d53743e948a1a34c7cceb03aa5a4ae2",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "4be2d4c3ddb7397cde5e5d7595f606038e22a2182e8854a38c14a588f6aa6712",
+            "factId": "binrat-fact:4663:96f46f3ec19a76a69f8ce437861687432e67d1252a690c2d7a010001288bb680",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "96f46f3ec19a76a69f8ce437861687432e67d1252a690c2d7a010001288bb680",
+            "logIndex": 16,
+            "observedBlock": "84354883",
+            "observedBlockHash": "0xf102fd0a587a8ec50350ca2ebf605f54dcd107a86b3b5c7346f4af99786e8ef9",
+            "sourceEventId": "f24f599eeebcef16afe429648c7afdbc9e68cf3a78707d8a6cbf0d5325fc141d"
+          },
+          "authorityDigest": "7733a18812c31950a1fdbc8888e9c4ba45e4290309ca4e4aa9897a096eae880e"
+        },
+        {
+          "launch": {
+            "blockHash": "0xacf472381aa42855bf809dc4e79fd87a84a8ac15fb524ac7fd658f373164a7f7",
+            "blockNumber": "84337783",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "0d65b3529c3cca116fc5d17eb273509d9c231039d0e5152d6bee93fdea0ef27c",
+            "imageUri": "",
+            "launchId": "a19e6e8c2865839e28ae902094e04a9f8eda0cd5d322ba96a7dbcc7906c786a2",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 35,
+            "name": "",
+            "pool": "0xd4f34729cebe4ee0a8713c148cd9d7d62ab5a480",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0xed516d81f4e3966d9d660704cbc7bdd2a1d2cf1c",
+            "twitter": "",
+            "txHash": "0x4714aec7bdd3c1ae8b65724a7883aee19a499e23a5c016d6defad0623b8a5c9e",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "81c388328778a99aa70808df38658291e0f98bb322500fdeaffdec38d03c2cb6",
+            "factId": "binrat-fact:4663:a19e6e8c2865839e28ae902094e04a9f8eda0cd5d322ba96a7dbcc7906c786a2",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "a19e6e8c2865839e28ae902094e04a9f8eda0cd5d322ba96a7dbcc7906c786a2",
+            "logIndex": 35,
+            "observedBlock": "84337783",
+            "observedBlockHash": "0xacf472381aa42855bf809dc4e79fd87a84a8ac15fb524ac7fd658f373164a7f7",
+            "sourceEventId": "0d65b3529c3cca116fc5d17eb273509d9c231039d0e5152d6bee93fdea0ef27c"
+          },
+          "authorityDigest": "2c14144e5f2cd75f5c33db35efec862ce9e833c9052e559e46fd02cd851f989f"
+        },
+        {
+          "launch": {
+            "blockHash": "0x763481466a9c439d6b93c038e9ce262e9380663aacf8b6528f20578a33300190",
+            "blockNumber": "84326095",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "de91ab925ff97e7623b9fed2c0e3d440563d5beeeb710e7962b96b1a8d1826b9",
+            "imageUri": "",
+            "launchId": "6977c2e2c4d651b010f218df4fb48e56759eaaf80f7956979db1a00469ec9771",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 39,
+            "name": "",
+            "pool": "0xf6007df30fc26568a394b71ff2b4fa6898d138d2",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x959b6c539aea945717a2847dad621405d924baca",
+            "twitter": "",
+            "txHash": "0x68e7707ce7ba09c017727cf8d1b71a026631ed4e6c20badb68df346210011103",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "d02e0b3410e04983237c6dc29064c10ad1ce9ffe68272e69f6374fa3eadbaf04",
+            "factId": "binrat-fact:4663:6977c2e2c4d651b010f218df4fb48e56759eaaf80f7956979db1a00469ec9771",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "6977c2e2c4d651b010f218df4fb48e56759eaaf80f7956979db1a00469ec9771",
+            "logIndex": 39,
+            "observedBlock": "84326095",
+            "observedBlockHash": "0x763481466a9c439d6b93c038e9ce262e9380663aacf8b6528f20578a33300190",
+            "sourceEventId": "de91ab925ff97e7623b9fed2c0e3d440563d5beeeb710e7962b96b1a8d1826b9"
+          },
+          "authorityDigest": "ec3e77e3b3f0b6ee935dd5493df774a53d0d4446ea9674d1fc47dbf86be9e385"
+        },
+        {
+          "launch": {
+            "blockHash": "0x6f2d0b3bfd7d37ac68d14aac2b8a23014f6c9acebe1aa08d748e78ad057198be",
+            "blockNumber": "84314675",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "623c64464663a2362db91501c12f74b1d991231b599e6a53f32bca35e9a03e8f",
+            "imageUri": "",
+            "launchId": "80f958d2cc9829786d525ed8988e8482416306f6a22a72a07bbe167671297db2",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 5,
+            "name": "",
+            "pool": "0xbbe4900b4b9f231782556d7a57fc23f6a59f30b3",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0xe744632acacd4fce9a59553d8fbde3353a915195",
+            "twitter": "",
+            "txHash": "0x142047f37d9da3f7db0a25490ba5413b5e07a2254b3b4172ee1bf5ed24cd516e",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "86c62fff5df69cdfd2b27c6590d42200fc5d720c1a45e427b86461e1c9d04b58",
+            "factId": "binrat-fact:4663:80f958d2cc9829786d525ed8988e8482416306f6a22a72a07bbe167671297db2",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "80f958d2cc9829786d525ed8988e8482416306f6a22a72a07bbe167671297db2",
+            "logIndex": 5,
+            "observedBlock": "84314675",
+            "observedBlockHash": "0x6f2d0b3bfd7d37ac68d14aac2b8a23014f6c9acebe1aa08d748e78ad057198be",
+            "sourceEventId": "623c64464663a2362db91501c12f74b1d991231b599e6a53f32bca35e9a03e8f"
+          },
+          "authorityDigest": "5828c69e0da8c41c22f980dd4d4e90c4b14ad5e9b99eb4eaa8ba9a864e62a5cd"
+        },
+        {
+          "launch": {
+            "blockHash": "0x0c59eab2a0e9fc4c661446d7a05ee9e785d90f674e7119590d222e40c07b559a",
+            "blockNumber": "84303296",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "d061f2bed39c3506e7c28aab2fbf8c5f1a00a66fa81b083492f7ef8a6ec21361",
+            "imageUri": "",
+            "launchId": "f552120d2b69ba6294e732a1c237c23d5af1809d7a29b407a28f8c658600ee25",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 61,
+            "name": "",
+            "pool": "0x0c803f24ae3aeebc14f8d06d18d7626ce96ce6d8",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x14bfa8376a0cc0cda949a7dd072b1782c193b741",
+            "twitter": "",
+            "txHash": "0x0dce8a98d2bb66d2783ddcdab86f43f3760869553890057c284e9e1f9de067f5",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "312b4b48e22881e4e19b1cce2bc9057e0258f0ae835dd6b22408eaa7fd2500a2",
+            "factId": "binrat-fact:4663:f552120d2b69ba6294e732a1c237c23d5af1809d7a29b407a28f8c658600ee25",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "f552120d2b69ba6294e732a1c237c23d5af1809d7a29b407a28f8c658600ee25",
+            "logIndex": 61,
+            "observedBlock": "84303296",
+            "observedBlockHash": "0x0c59eab2a0e9fc4c661446d7a05ee9e785d90f674e7119590d222e40c07b559a",
+            "sourceEventId": "d061f2bed39c3506e7c28aab2fbf8c5f1a00a66fa81b083492f7ef8a6ec21361"
+          },
+          "authorityDigest": "28cbb3fd564f430e44b9b5f161f39da0a59dab2bf22f2cdb6983db6336566da6"
+        },
+        {
+          "launch": {
+            "blockHash": "0xbf8e3d8b9d6e335ad53a243310fd043f5b0e441b6e52537e6223f9dcd4a913e1",
+            "blockNumber": "84301227",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "4b288ca725ea488bd955240ea015b8e47ec15b4fa0cfdb38420f71f266be8616",
+            "imageUri": "",
+            "launchId": "290c608b6ac202af4bf1627ff834620e02c295ef254bc4becca542010678bad2",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 13,
+            "name": "",
+            "pool": "0x35ecc29c2e2178d0a46866f3f8020cb12ee0c3a1",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x1643d2d69e49e67f67d651926bca12e1c706154b",
+            "twitter": "",
+            "txHash": "0x5c91dac7db73f0215e5cacb9e3a009902d6b53ff3f265059895ba08a2b77f1a9",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "47c9b9bb6e684c0706002ca9995a2d19279e7848764704b07ecad44c38cf71d5",
+            "factId": "binrat-fact:4663:290c608b6ac202af4bf1627ff834620e02c295ef254bc4becca542010678bad2",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "290c608b6ac202af4bf1627ff834620e02c295ef254bc4becca542010678bad2",
+            "logIndex": 13,
+            "observedBlock": "84301227",
+            "observedBlockHash": "0xbf8e3d8b9d6e335ad53a243310fd043f5b0e441b6e52537e6223f9dcd4a913e1",
+            "sourceEventId": "4b288ca725ea488bd955240ea015b8e47ec15b4fa0cfdb38420f71f266be8616"
+          },
+          "authorityDigest": "6a3d313de15afacd4bc0db89da6b49d2ffd46fa3effcaee393f5bfebabb638de"
+        },
+        {
+          "launch": {
+            "blockHash": "0xa59578929bab33538342952a3994b9c22da9cda267a6d6fdac7f3c6d00087009",
+            "blockNumber": "84300948",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "cefe0e3ac6b201312cd0dba99a3afc9835b07e56be3378182323a661b69278dd",
+            "imageUri": "",
+            "launchId": "9f9c2b4946d4faacec6ae91fa1c581eb16b600ddb03d81ac887201836da307fd",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 26,
+            "name": "",
+            "pool": "0x5f4f610f2e512d6c08e26b61938a8f9641bef3c9",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x43e2a3904d11617c9bfb9d58667af446e711b433",
+            "twitter": "",
+            "txHash": "0x9d42362ed23e2de4a384febe21f9c3d54633b4323be1c37338428cdd49dccd3c",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "8fc0bd5b6d4862ca2c6e920e2865904229a4217db6307e9f2bf61c7a74ccd14d",
+            "factId": "binrat-fact:4663:9f9c2b4946d4faacec6ae91fa1c581eb16b600ddb03d81ac887201836da307fd",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "9f9c2b4946d4faacec6ae91fa1c581eb16b600ddb03d81ac887201836da307fd",
+            "logIndex": 26,
+            "observedBlock": "84300948",
+            "observedBlockHash": "0xa59578929bab33538342952a3994b9c22da9cda267a6d6fdac7f3c6d00087009",
+            "sourceEventId": "cefe0e3ac6b201312cd0dba99a3afc9835b07e56be3378182323a661b69278dd"
+          },
+          "authorityDigest": "7d6f83ed151910300098c4d21ecbcf0b7bb314b29db48f603772345637f75e24"
+        },
+        {
+          "launch": {
+            "blockHash": "0xcd3b912c136852a48d6362bd70a821db4d319486c78fef92adc362aeb5253c6c",
+            "blockNumber": "84298819",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "9bbae805baff1277300eafc3aca23e9fef4fd6e5de34ec142bac28499ca656fa",
+            "imageUri": "",
+            "launchId": "6da69528f217f8cf35ff1ea94b19813c66fce6627fcbdae4435e23d7ee53dc9b",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 58,
+            "name": "",
+            "pool": "0x7b1740d8e1e53c6e97ab1685d73f3b37827f7fd3",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x8bbc5de3dde03a7fd3812329fd156b3854612467",
+            "twitter": "",
+            "txHash": "0x75715a408ad9c8c8dc3ec80afd310ddd9b277b1ab72613f9c992dcec7f9c0001",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "bbdee94708d84132c2598bd3f90aff4afb17d8dd286b18a30f551f614f3cc320",
+            "factId": "binrat-fact:4663:6da69528f217f8cf35ff1ea94b19813c66fce6627fcbdae4435e23d7ee53dc9b",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "6da69528f217f8cf35ff1ea94b19813c66fce6627fcbdae4435e23d7ee53dc9b",
+            "logIndex": 58,
+            "observedBlock": "84298819",
+            "observedBlockHash": "0xcd3b912c136852a48d6362bd70a821db4d319486c78fef92adc362aeb5253c6c",
+            "sourceEventId": "9bbae805baff1277300eafc3aca23e9fef4fd6e5de34ec142bac28499ca656fa"
+          },
+          "authorityDigest": "b197a584ae8d735923dc464f8200e994437d2c2604ed7483e840caaab3b03ac0"
+        },
+        {
+          "launch": {
+            "blockHash": "0xa248e2673162d19079e20c86c11d8c737be31991609c9d1aad4268d78252a500",
+            "blockNumber": "84296646",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "c0332dbabaa03b8ddeadfe8d38cf66bb5a2a32c9b6d0855cce7166473fa18fe3",
+            "imageUri": "",
+            "launchId": "80fad721810e745c3e4fb86523aed59cea5e52df54bafdaf3690107055862db2",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 6,
+            "name": "",
+            "pool": "0x760b0a052bc65bf68589dd84cf726fd9c8790f10",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x569668c3641e9faa5504f4f0adc5d1273eee6556",
+            "twitter": "",
+            "txHash": "0x785560b7948c7a3f3e1d47a57d119b0d648d23f37d084dbe8634209ddce19035",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "de83860d5071d20e3599871087835bd04cd5362d7d3f2a86462fc9701497351c",
+            "factId": "binrat-fact:4663:80fad721810e745c3e4fb86523aed59cea5e52df54bafdaf3690107055862db2",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "80fad721810e745c3e4fb86523aed59cea5e52df54bafdaf3690107055862db2",
+            "logIndex": 6,
+            "observedBlock": "84296646",
+            "observedBlockHash": "0xa248e2673162d19079e20c86c11d8c737be31991609c9d1aad4268d78252a500",
+            "sourceEventId": "c0332dbabaa03b8ddeadfe8d38cf66bb5a2a32c9b6d0855cce7166473fa18fe3"
+          },
+          "authorityDigest": "96ff1a843f5ae19c798cff6251373403fc80989f44b06c69337edc40ccb54748"
+        },
+        {
+          "launch": {
+            "blockHash": "0xad5c4e4b95627e3ef96f009107219de673a61dcfa1e8588ccea06095595b36e9",
+            "blockNumber": "84257968",
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "eventId": "9843eb4b193b9e7ffd5f31a98ba084aabe984e8791e86e1447eebbd0a0def4ec",
+            "imageUri": "",
+            "launchId": "007711e28fc6ebfcca24d236df9427053bb7ca1d20ffcb62eeaef8db4c412c21",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 8,
+            "name": "",
+            "pool": "0x2d5852c3bf27341696f80c63fda6c9484100975e",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x90f207526976d183260db136ec4612a1df872d36",
+            "twitter": "",
+            "txHash": "0x18cd0bf7027440180e13d4d08be34f42fbc389752e11b81c93ee62b9785edaec",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x0e1651aec67b2a049a4fa6aeb6c1c305aabfc35b",
+            "evidenceDigest": "dc806edd905670d82fd6cbfe5e11975333373a15d09ce68977843ee769c96be4",
+            "factId": "binrat-fact:4663:007711e28fc6ebfcca24d236df9427053bb7ca1d20ffcb62eeaef8db4c412c21",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "007711e28fc6ebfcca24d236df9427053bb7ca1d20ffcb62eeaef8db4c412c21",
+            "logIndex": 8,
+            "observedBlock": "84257968",
+            "observedBlockHash": "0xad5c4e4b95627e3ef96f009107219de673a61dcfa1e8588ccea06095595b36e9",
+            "sourceEventId": "9843eb4b193b9e7ffd5f31a98ba084aabe984e8791e86e1447eebbd0a0def4ec"
+          },
+          "authorityDigest": "136046af704b102c31b9bcbc925dcc694ba871470322fec45011c1d22a43e2ee"
+        }
+      ]
+    },
+    "digest": "5bda87d4aeb1af214c3b754f7d27ac189d0a344daa8af91f40219b3015b27f1d"
+  },
+  "currentEnvelope": {
+    "material": {
+      "schemaVersion": "binrat.case-evidence/1",
+      "projectionVersion": "BINRAT_PONS_HISTORICAL_CASE_V1",
+      "chainId": 4663,
+      "caseId": "284afbd28e3b23002fd839dd53de085044592bc3cd79e55fb226bdc8d5ffb579",
+      "reconstruction": "PUBLISHED_CHECKPOINT_RECONSTRUCTION",
+      "archivedPublication": false,
+      "pointInTimeReplay": false,
+      "source": "PONS_V2",
+      "publication": {
+        "chainId": 4663,
+        "checkpointBlock": "84540695",
+        "checkpointBlockHash": "0x32fe76c530785a6a961dbe17e7c01408a0bc2730a0321675c91a45c49ae078ae",
+        "feedDigest": "c47907b4857273b2c72efc6713d496530a8299fb8a5868bd7f33f8c2a72469ef",
+        "publicationVersion": 1237,
+        "verifiedAtMs": 1791588208670
+      },
+      "coverage": {
+        "mode": "LATEST_20_DEPLOYER_LAUNCHES_THROUGH_CASE",
+        "history": "PARTIAL",
+        "resultLimit": 20,
+        "countScope": "EARLIER_RECORDS_IN_RETURNED_WINDOW",
+        "olderHistory": "NOT_ENUMERATED"
+      },
+      "priorLaunchCount": 1,
+      "records": [
+        {
+          "launch": {
+            "blockHash": "0x3a55c05ca8b6b41d4e09c994d65cc7a9a004102d00e2f4fb928fbad743a26765",
+            "blockNumber": "84537590",
+            "chainId": 4663,
+            "creator": "0x38a73c04ba5f7299da598cc0f224d38bb8a154ce",
+            "eventId": "f9ebdbfa757f13a2c575a8f34070f26d8c6c3cd99d5ab95ef55b60bdfe16294c",
+            "imageUri": "",
+            "launchId": "284afbd28e3b23002fd839dd53de085044592bc3cd79e55fb226bdc8d5ffb579",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 4,
+            "name": "",
+            "pool": "0xb94686871bc3be448288bf72f7732f60beab80c1",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x3fcb3706d119f4d46b08184e38c80957d7470e35",
+            "twitter": "",
+            "txHash": "0xbb262b1b222eef24bc80c5314e4b07ac23bf770af0d5b7cf07777c9fdc9678f3",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x38a73c04ba5f7299da598cc0f224d38bb8a154ce",
+            "evidenceDigest": "f6b5e358f0cb81d2d5d971380cf9fea3f6073a0fc97c541c927d839fe399d5d5",
+            "factId": "binrat-fact:4663:284afbd28e3b23002fd839dd53de085044592bc3cd79e55fb226bdc8d5ffb579",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "284afbd28e3b23002fd839dd53de085044592bc3cd79e55fb226bdc8d5ffb579",
+            "logIndex": 4,
+            "observedBlock": "84537590",
+            "observedBlockHash": "0x3a55c05ca8b6b41d4e09c994d65cc7a9a004102d00e2f4fb928fbad743a26765",
+            "sourceEventId": "f9ebdbfa757f13a2c575a8f34070f26d8c6c3cd99d5ab95ef55b60bdfe16294c"
+          },
+          "authorityDigest": "f06005027da9947e1243f5a8ef340674c2a450bbb468275bcc6b0668aea1ea0a"
+        },
+        {
+          "launch": {
+            "blockHash": "0xcaeb84607db010cb5eadc86d820689fc8c9b627ea985f383047c21a7c80d49a4",
+            "blockNumber": "81053111",
+            "chainId": 4663,
+            "creator": "0x38a73c04ba5f7299da598cc0f224d38bb8a154ce",
+            "eventId": "8cd62c3b68a23752369e6f895c99b7cf1ee7f3d2d39d59aab96ae5999cf1ae2d",
+            "imageUri": "",
+            "launchId": "8eae789f9816f3aabad1407517984e0d067b62e8bb7ca776318788a32538b33c",
+            "launcher": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "logIndex": 18,
+            "name": "",
+            "pool": "0x30c941800796c2aaaab5984aba577259885a85ca",
+            "source": "PONS_V2",
+            "symbol": "",
+            "telegram": "",
+            "token": "0x9089c5ac241d3171cad7345b466a6e81a831a559",
+            "twitter": "",
+            "txHash": "0x0b61b945e8d9826a53d31cfbcf71f5a892209989fbbdd4d9be52a1c146b6f700",
+            "website": ""
+          },
+          "provenance": {
+            "chainId": 4663,
+            "creator": "0x38a73c04ba5f7299da598cc0f224d38bb8a154ce",
+            "evidenceDigest": "2623b48575b416c361384a92f860bfd4818ec6653d166f3df61c13f35938ee1d",
+            "factId": "binrat-fact:4663:8eae789f9816f3aabad1407517984e0d067b62e8bb7ca776318788a32538b33c",
+            "kind": "PONS_REPORTED_DEPLOYER",
+            "launchId": "8eae789f9816f3aabad1407517984e0d067b62e8bb7ca776318788a32538b33c",
+            "logIndex": 18,
+            "observedBlock": "81053111",
+            "observedBlockHash": "0xcaeb84607db010cb5eadc86d820689fc8c9b627ea985f383047c21a7c80d49a4",
+            "sourceEventId": "8cd62c3b68a23752369e6f895c99b7cf1ee7f3d2d39d59aab96ae5999cf1ae2d"
+          },
+          "authorityDigest": "50b2502bef82f79b1614f43b68fc34b1d536a9cb127c8ac7afe5f76db7c08e14"
+        }
+      ]
+    },
+    "digest": "672c14c4584b7a5055d8918dcb37d93f12ca4e778e20640883c8b7c392d2f6fc"
+  },
+  "runtime": {
+    "chain_id": 4663,
+    "source_verified": 1,
+    "live_caught_up": 1,
+    "head_block": "84543562",
+    "target_block": "84543560",
+    "observation_ready": 0,
+    "history_backfill_complete": 0,
+    "history_backfill_target_block": null,
+    "last_sync_error": null,
+    "last_history_error": null,
+    "last_observation_error": null,
+    "updated_at_ms": 1791588506971
+  }
+}
