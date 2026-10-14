@@ -44,7 +44,7 @@ function sameHeader(a:Obj,b:Obj){return ['number','hash','parentHash','timestamp
 const candidateJson=(c:Candidate)=>({txHash:c.txHash,recipient:c.to,blockNumber:c.blockNumber.toString(),valueWei:c.valueWei.toString()});
 
 /** Recompute every expected read and score from raw responses; never trust a summary or unverified locator. */
-export function auditFunderCohort(calls:CalibrationCall[],createdAtMs=calls[0]?.reservedAtMs??0){
+export function auditFunderCohort10V2(calls:CalibrationCall[],createdAtMs=calls[0]?.reservedAtMs??0){
   const p=FUNDER_COHORT_10_V2,from=BigInt(p.fromBlock),end=BigInt(p.toBlock),ceiling=BigInt(p.outcomeThroughBlock);
   let stage='CHAIN',error:string|null=null,next:RpcRequest|null=null,start:Obj|null=null,finish:Obj|null=null,outcomeEnd:Obj|null=null;
   let pageKey:string|null=null,pages=0,pageEnded=false,lastBlock=from,returned=0,selfTransfers=0,repeatedRecipients=0;
