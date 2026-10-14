@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-14T02:41:37.395063+00:00",
+  "reviewer": "Primary orchestrator, one bounded adversarial pass per sprint; not an independent human or production audit",
+  "inputSnapshot": "2026-10-14T02:18:15.171763+00:00",
+  "finalSnapshot": "2026-10-14T02:37:43.770707+00:00",
+  "sourceSHAs": {
+    "main": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+    "integration": "160ab9c4fbb2f9cebd4a45cc20f5e75d85f57302",
+    "migration": "a269d8272ec93e41b00ebfcf6c528074a2c4c898"
+  },
+  "reviews": [
+    {
+      "sprint": "S0",
+      "reviewPasses": 1,
+      "criticalFindings": 0,
+      "highFindings": 0,
+      "criticalHighFixes": [],
+      "targetedRereview": false,
+      "tenRiskChecks": [
+        "Original dirty hashes/index/heads preserved; no historical ref deleted.",
+        "Exact donor/recovery locators retained; custody still blocked.",
+        "Complete direct/transitive graph generated.",
+        "Local recovery receipts distinguished from independent custody.",
+        "Inventory does not imply code inclusion.",
+        "Original asset/license refs protected.",
+        "All 242 workflow trees inspected statically; no push.",
+        "Merged #182/#183 router retained.",
+        "Historical deployment/restore execution forbidden.",
+        "Maintenance scope protects first persistent Rat path."
+      ],
+      "verdict": "PASS_FOR_AUTHORIZED_LOCAL_SCOPE"
+    },
+    {
+      "sprint": "S1",
+      "reviewPasses": 1,
+      "criticalFindings": 0,
+      "highFindings": 0,
+      "criticalHighFixes": [],
+      "targetedRereview": false,
+      "tenRiskChecks": [
+        "Exact donor #40/#42 original code/test/blob paths retained.",
+        "Original three-receipt and signed-offline-ledger evidence survives on exact branches.",
+        "Zero outside-family base descendants; all children precede parents.",
+        "No rollback source removed.",
+        "All comments explicitly distinguish closure from integration.",
+        "Original licensed assets/notices retained; reuse not certified.",
+        "All 120 workflow blobs have no parsed issue_comment/pull_request_target/closed trigger; malformed YAML is not certified safe. No remote action yet.",
+        "Old roadmap supersession is scoped, not rewritten.",
+        "No archive restore/push or historical deploy permitted.",
+        "Only obsolete tracking retirement proposed; useful work remains reachable."
+      ],
+      "verdict": "PASS_WITH_DECLARED_GATES"
+    },
+    {
+      "sprint": "S2",
+      "reviewPasses": 1,
+      "criticalFindings": 0,
+      "highFindings": 0,
+      "criticalHighFixes": [],
+      "targetedRereview": false,
+      "tenRiskChecks": [
+        "Actual #68/#69 and #73/#74 deltas preserve alternatives.",
+        "#91 exact head, Worker106 receipts and release172 retained.",
+        "Protected canonical chain and #94/#93 dependencies explicit.",
+        "Worker105/106 and portable rollback histories remain separate.",
+        "Ancestry/content equivalence and runtime status are distinct.",
+        "Divergent brand paths and licensing quarantined.",
+        "Historical trigger risks and exact pending patches explicit.",
+        "Canonical domain scopes unchanged.",
+        "No broad graph merge or abandoned collector restart proposed.",
+        "Two continuation lineages selected with frozen reference source."
+      ],
+      "verdict": "PASS_FOR_AUTHORIZED_LOCAL_SCOPE"
+    },
+    {
+      "sprint": "S3",
+      "reviewPasses": 1,
+      "criticalFindings": 0,
+      "highFindings": 0,
+      "criticalHighFixes": [],
+      "targetedRereview": false,
+      "tenRiskChecks": [
+        "Every current delta has an evidence pointer; unknowns quarantine.",
+        "Negative research results/prospective raw receipts preserved.",
+        "Complete snapshot covers all PR-base edges; unsafe batches absent.",
+        "Ops/release/backup refs protected independently of activity.",
+        "MERGED_REDUNDANT means reachable history only, not current-tree implementation.",
+        "Design49/53 and all unverified reuse remain blocked.",
+        "No classification authorizes push, deploy or workflow dispatch.",
+        "PR24 title/head mismatch explicitly quarantined.",
+        "Donor status does not revive experiments or budgets.",
+        "48 open quarantines are accepted rather than forcing counts down."
+      ],
+      "verdict": "PASS_FOR_AUTHORIZED_LOCAL_SCOPE"
+    },
+    {
+      "sprint": "S4",
+      "reviewPasses": 1,
+      "criticalFindings": 0,
+      "highFindings": 0,
+      "criticalHighFixes": [],
+      "targetedRereview": false,
+      "tenRiskChecks": [
+        "Deletion set empty; original remote/local refs retained.",
+        "Permanent archive not assumed created or verified.",
+        "Open dependents are independent deletion blockers.",
+        "WIP/ciphertext/key custody explicitly outside Git bundles.",
+        "Closing/ancestry alone cannot pass deletion gates.",
+        "Publication/reuse rights unresolved; no archive published.",
+        "Any future restoration is offline with no hooks/workflows; no trigger-ref push.",
+        "Historical refs preserved without current authority.",
+        "Separate archive/create/push/delete grants required.",
+        "No-deletion verdict is valid and bounded."
+      ],
+      "verdict": "PASS_FOR_AUTHORIZED_LOCAL_SCOPE"
+    },
+    {
+      "sprint": "S5",
+      "reviewPasses": 1,
+      "criticalFindings": 0,
+      "highFindings": 0,
+      "criticalHighFixes": [],
+      "targetedRereview": false,
+      "tenRiskChecks": [
+        "No product source or original WIP edited.",
+        "Reports preserve original hashes; snapshot writer refuses overwrite.",
+        "Adversarial tests reject new child, moved base and merged PR.",
+        "No migration/recovery logic changed.",
+        "CI checks frozen inventory only, not live features or execution authority.",
+        "No new code/art copied into product; notices remain.",
+        "Five patches apply and disable all jobs; remote retirement/adoption remains gated.",
+        "Entrypoints retain existing canonical router; dirty migration adaptation deferred.",
+        "New PRs name target/base/status; old workflows not silently reactivated.",
+        "Standard-library maintenance check; no new service or runtime framework."
+      ],
+      "verdict": "PASS_WITH_DECLARED_GATES"
+    }
+  ],
+  "reviewedImplementationSHA256": {
+    "scripts/audit/graveyard_check.py": "77c96541cd6c528faf92b64bd346fcf72d1cd3147d6ef28b731ea9e027f2f0a0",
+    "scripts/audit/graveyard_snapshot.py": "2f6e8f387b5759b3f8cf242d3abdeb568f42320295ade6f549b96bd11003aa89",
+    "scripts/audit/test_graveyard_check.py": "02d52501dee65fede1b9fa67e8a5c3c98a2b0a307cb8de843d69b9dace7de0e3",
+    ".github/workflows/ci.yml": "91593a541e4eb59de1a27644da1fab5a5862b8c23408e26996276324035ae4ee",
+    ".github/workflows/controlled-rat-private-rollout.yml": "8bc3b8d67971b4c531a2334b52296c9757de3e361a156065d4eadec576570471"
+  }
+}

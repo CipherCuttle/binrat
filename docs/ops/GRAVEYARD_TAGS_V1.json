@@ -1,0 +1,5 @@
+{
+  "capturedAt": "2026-10-14T02:42:16.812061+00:00",
+  "method": "git ls-remote --tags origin; no fetch or tag mutation",
+  "refs": []
+}

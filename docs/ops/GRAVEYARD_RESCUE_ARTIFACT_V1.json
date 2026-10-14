@@ -1,0 +1,17 @@
+{
+  "id": 11700131674,
+  "name": "binrat-d1-encrypted-rescue-20261011",
+  "size_in_bytes": 261866741,
+  "expired": false,
+  "created_at": "2026-10-11T10:52:10Z",
+  "updated_at": "2026-10-11T10:52:10Z",
+  "expires_at": "2026-10-25T10:52:02Z",
+  "digest": "sha256:7aeb1c228d09a98e922ececc8a55bddc5910203e1d247d7e30b348310e0c4d6f",
+  "workflow_run": {
+    "id": 38133453274,
+    "repository_id": 1374825674,
+    "head_repository_id": 1374825674,
+    "head_branch": "main",
+    "head_sha": "db2b6d6faa6632a88982b067cfdb2ce22944819f"
+  }
+}

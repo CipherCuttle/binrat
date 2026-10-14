@@ -1,0 +1,3049 @@
+{
+  "integrationSHA": "160ab9c4fbb2f9cebd4a45cc20f5e75d85f57302",
+  "records": [
+    {
+      "number": 21,
+      "head": {
+        "ref": "fix/binrat-v2-evidence-integrity-pr1",
+        "sha": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+        "label": "CipherCuttle:fix/binrat-v2-evidence-integrity-pr1"
+      },
+      "base": {
+        "ref": "feat/binrat-product-surface-v1-demo",
+        "sha": "17cce6b5a43089971a7a45fb6d02a00e30012a5f",
+        "label": "CipherCuttle:feat/binrat-product-surface-v1-demo"
+      },
+      "updated_at": "2026-09-22T21:29:40Z",
+      "mergeBase": "17cce6b5a43089971a7a45fb6d02a00e30012a5f",
+      "openDependents": [
+        22
+      ],
+      "ancestorOfIntegration": true,
+      "changedPaths": [
+        "M\t.github/workflows/ci.yml",
+        "A\ttest/frontendV2EvidenceIntegrity.test.ts",
+        "A\tweb-v2/checks/browser-smoke.cjs",
+        "M\tweb-v2/checks/check-evidence.mjs",
+        "M\tweb-v2/src/App.tsx",
+        "M\tweb-v2/src/Primitives.tsx",
+        "A\tweb-v2/src/evidenceIntegrity.ts",
+        "M\tweb-v2/src/fixtures.ts",
+        "M\tweb-v2/src/styles.css"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "change": "M",
+          "headBlob": "060b6f4542f49e7f20f441c8f5b6cd9d04dc45d2",
+          "integrationBlob": "0a2821a490878e20313acc52532b7f5a3f8b3cb8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/frontendV2EvidenceIntegrity.test.ts",
+          "change": "A",
+          "headBlob": "48cb3540416e57f41ca5b6a38fcdfb21bf5a4201",
+          "integrationBlob": "48cb3540416e57f41ca5b6a38fcdfb21bf5a4201",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/browser-smoke.cjs",
+          "change": "A",
+          "headBlob": "2fe44511a3fe3aa317ed4271d939114a23dcd787",
+          "integrationBlob": "4d796308f1f07ac9e50928ff66b2e073cbd22ba3",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/check-evidence.mjs",
+          "change": "M",
+          "headBlob": "2d82b333df4e460a9fcc8597611f658cb57858ba",
+          "integrationBlob": "b76c15b2fdab8df8747703199849a6ad45cc75c7",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/App.tsx",
+          "change": "M",
+          "headBlob": "4b0ea85db60e894e893a1751183d3cf8186f2e9f",
+          "integrationBlob": "42917e1175759ce56128a11ee986faba4e81a94a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/Primitives.tsx",
+          "change": "M",
+          "headBlob": "e455b5b1486630ab2aced66eb62c98dc7d22b8a5",
+          "integrationBlob": "486202c2a697ad565cf046e443ed4ba225849034",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/evidenceIntegrity.ts",
+          "change": "A",
+          "headBlob": "4f98125c0fb298c2c9cdbbb291b5652b3f009e33",
+          "integrationBlob": "4f98125c0fb298c2c9cdbbb291b5652b3f009e33",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/fixtures.ts",
+          "change": "M",
+          "headBlob": "839e3b3788d56f81ca99b0291322c7f300d0d651",
+          "integrationBlob": "839e3b3788d56f81ca99b0291322c7f300d0d651",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/styles.css",
+          "change": "M",
+          "headBlob": "d3429ff8c8c3da2e80407d57b95980190a5e1ac7",
+          "integrationBlob": "3824156dae3933829a0a45eb40f2f5e1524e803e",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "MERGED_REDUNDANT",
+      "reason": "Exact head ancestry into integration; preserve history and current base descendants."
+    },
+    {
+      "number": 22,
+      "head": {
+        "ref": "feat/binrat-frontend-routes-pr2",
+        "sha": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+        "label": "CipherCuttle:feat/binrat-frontend-routes-pr2"
+      },
+      "base": {
+        "ref": "fix/binrat-v2-evidence-integrity-pr1",
+        "sha": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+        "label": "CipherCuttle:fix/binrat-v2-evidence-integrity-pr1"
+      },
+      "updated_at": "2026-09-22T21:30:41Z",
+      "mergeBase": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+      "openDependents": [
+        23
+      ],
+      "ancestorOfIntegration": true,
+      "changedPaths": [
+        "A\ttest/frontendV2Routes.test.ts",
+        "M\tweb-v2/checks/browser-smoke.cjs",
+        "M\tweb-v2/checks/check-evidence.mjs",
+        "M\tweb-v2/src/App.tsx",
+        "M\tweb-v2/src/Primitives.tsx",
+        "A\tweb-v2/src/RoutePages.tsx",
+        "A\tweb-v2/src/routeIdentity.ts",
+        "M\tweb-v2/src/styles.css"
+      ],
+      "contentComparisons": [
+        {
+          "path": "test/frontendV2Routes.test.ts",
+          "change": "A",
+          "headBlob": "4c249c24aeb7eb44b81a29aab7bcf898e413cda2",
+          "integrationBlob": "4c249c24aeb7eb44b81a29aab7bcf898e413cda2",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/browser-smoke.cjs",
+          "change": "M",
+          "headBlob": "a6e17ad8438456824c3e7ecf504529ab269efb2e",
+          "integrationBlob": "4d796308f1f07ac9e50928ff66b2e073cbd22ba3",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/check-evidence.mjs",
+          "change": "M",
+          "headBlob": "b76c15b2fdab8df8747703199849a6ad45cc75c7",
+          "integrationBlob": "b76c15b2fdab8df8747703199849a6ad45cc75c7",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/App.tsx",
+          "change": "M",
+          "headBlob": "60e08fe69576826821bec126ba1930ac5ea64fad",
+          "integrationBlob": "42917e1175759ce56128a11ee986faba4e81a94a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/Primitives.tsx",
+          "change": "M",
+          "headBlob": "023af3abefae5bedec41cc6416881250e57a1937",
+          "integrationBlob": "486202c2a697ad565cf046e443ed4ba225849034",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/RoutePages.tsx",
+          "change": "A",
+          "headBlob": "82d36fce55f91996406a529ab7d53da1582784d0",
+          "integrationBlob": "f879d694ee618a90eb302c978dbdc19d49a593e8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/routeIdentity.ts",
+          "change": "A",
+          "headBlob": "eb55824fa8989a9b7b1d9e0b35a3b139cca846e7",
+          "integrationBlob": "eb55824fa8989a9b7b1d9e0b35a3b139cca846e7",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/styles.css",
+          "change": "M",
+          "headBlob": "c6a3ee15660c3450f30c29cde75b5fd0bb3654ff",
+          "integrationBlob": "3824156dae3933829a0a45eb40f2f5e1524e803e",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "MERGED_REDUNDANT",
+      "reason": "Exact head ancestry into integration; preserve history and current base descendants."
+    },
+    {
+      "number": 23,
+      "head": {
+        "ref": "feat/binrat-frontend-live-integration-pr3",
+        "sha": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+        "label": "CipherCuttle:feat/binrat-frontend-live-integration-pr3"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-routes-pr2",
+        "sha": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+        "label": "CipherCuttle:feat/binrat-frontend-routes-pr2"
+      },
+      "updated_at": "2026-09-24T01:16:53Z",
+      "mergeBase": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+      "openDependents": [
+        24
+      ],
+      "ancestorOfIntegration": true,
+      "changedPaths": [
+        "M\t.github/workflows/ci.yml",
+        "A\tAGENTS.md",
+        "M\tdocs/ROADMAP_V0.md",
+        "A\ttest/frontendLiveAdapter.test.ts",
+        "M\tweb-v2/checks/browser-smoke.cjs",
+        "A\tweb-v2/checks/live-candidate-smoke.cjs",
+        "A\tweb-v2/checks/responsive-preview.cjs",
+        "M\tweb-v2/src/App.tsx",
+        "M\tweb-v2/src/Primitives.tsx",
+        "M\tweb-v2/src/RoutePages.tsx",
+        "M\tweb-v2/src/data.ts",
+        "A\tweb-v2/src/liveAdapter.ts",
+        "M\tweb-v2/src/styles.css"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "change": "M",
+          "headBlob": "05cd19e4bc9454b73534edc1b082b657c156cf46",
+          "integrationBlob": "0a2821a490878e20313acc52532b7f5a3f8b3cb8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "AGENTS.md",
+          "change": "A",
+          "headBlob": "a89111fb65ee86b174aaf03371fb8d9553496467",
+          "integrationBlob": "f91258a4ca77d6818456b022b07a9e13f2f7f01b",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/ROADMAP_V0.md",
+          "change": "M",
+          "headBlob": "28b8e38f5082f4cb451234342fd0829050e8d408",
+          "integrationBlob": "c3cf77ab27a29f868037d706b1ddee3c4c5d60a2",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/frontendLiveAdapter.test.ts",
+          "change": "A",
+          "headBlob": "0f9d6680742f7a3932f4b0a4f0688651b5439767",
+          "integrationBlob": "0f9d6680742f7a3932f4b0a4f0688651b5439767",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/browser-smoke.cjs",
+          "change": "M",
+          "headBlob": "71fd2af67d4bfd05928b57e0970c775efa2ef422",
+          "integrationBlob": "4d796308f1f07ac9e50928ff66b2e073cbd22ba3",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/live-candidate-smoke.cjs",
+          "change": "A",
+          "headBlob": "dcdc342a293aaee33be8fe45f7971eb51e2c5878",
+          "integrationBlob": "dcdc342a293aaee33be8fe45f7971eb51e2c5878",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/responsive-preview.cjs",
+          "change": "A",
+          "headBlob": "644d6678275054057ceb163292a9be6cd67439d2",
+          "integrationBlob": "f8dd7e2b6398a597c6092db54cf0674a4d85ba27",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/App.tsx",
+          "change": "M",
+          "headBlob": "753af2736e13f561ce041ea1e132850ae2afbc12",
+          "integrationBlob": "42917e1175759ce56128a11ee986faba4e81a94a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/Primitives.tsx",
+          "change": "M",
+          "headBlob": "486202c2a697ad565cf046e443ed4ba225849034",
+          "integrationBlob": "486202c2a697ad565cf046e443ed4ba225849034",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/RoutePages.tsx",
+          "change": "M",
+          "headBlob": "f879d694ee618a90eb302c978dbdc19d49a593e8",
+          "integrationBlob": "f879d694ee618a90eb302c978dbdc19d49a593e8",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/data.ts",
+          "change": "M",
+          "headBlob": "d57e1ba324b8ceb498bacc5a9758a158d1b76d36",
+          "integrationBlob": "d57e1ba324b8ceb498bacc5a9758a158d1b76d36",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/liveAdapter.ts",
+          "change": "A",
+          "headBlob": "f0a3bc0d164c1d712208840dbced416b4bf9b341",
+          "integrationBlob": "f0a3bc0d164c1d712208840dbced416b4bf9b341",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/styles.css",
+          "change": "M",
+          "headBlob": "3824156dae3933829a0a45eb40f2f5e1524e803e",
+          "integrationBlob": "3824156dae3933829a0a45eb40f2f5e1524e803e",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "MERGED_REDUNDANT",
+      "reason": "Exact head ancestry into integration; preserve history and current base descendants."
+    },
+    {
+      "number": 24,
+      "head": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-live-integration-pr3",
+        "sha": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+        "label": "CipherCuttle:feat/binrat-frontend-live-integration-pr3"
+      },
+      "updated_at": "2026-09-25T19:59:15Z",
+      "mergeBase": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+      "openDependents": [
+        34
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "M\t.github/workflows/ci.yml",
+        "M\t.github/workflows/cloudflare-dry-run.yml",
+        "M\t.github/workflows/rat-radar-candidate-deploy.yml",
+        "M\tAGENTS.md",
+        "M\tREADME.md",
+        "M\tcloudflare/wrangler.example.jsonc",
+        "D\tdocs/ASSET_BIBLE_V0.md",
+        "D\tdocs/ASSET_INVENTORY_V0.md",
+        "D\tdocs/ASSET_PRODUCTION_BRIEF_V1.md",
+        "D\tdocs/ASTRA_FRONTEND_SPRINT.md",
+        "D\tdocs/BRAND_ASSET.md",
+        "D\tdocs/CLOUDFLARE_WEB_LIVE_ACCEPTANCE_2026_09_19.md",
+        "D\tdocs/CODEPLAN.md",
+        "M\tdocs/DONOR_PROVENANCE.md",
+        "D\tdocs/FRONTEND_V2_AUDIT.md",
+        "M\tdocs/INTELLIGENCE_V1.md",
+        "D\tdocs/LAUNCH_PRESENTATION_V0.md",
+        "M\tdocs/PRD.md",
+        "A\tdocs/PRODUCT_CAPABILITIES.md",
+        "D\tdocs/PRODUCT_SURFACE_V1.md",
+        "D\tdocs/PRODUCT_SURFACE_V1_HOSTILE_REVIEW.md",
+        "D\tdocs/PRODUCT_SURFACE_V1_VISUAL_HOSTILE_REVIEW.md",
+        "D\tdocs/PRODUCT_SURFACE_V1_VISUAL_REVIEW.md",
+        "M\tdocs/PUBLIC_READ_PLANE.md",
+        "M\tdocs/ROADMAP_V0.md",
+        "D\tdocs/SHARE_CARDS_V0.md",
+        "D\tdocs/WEB_V0.md",
+        "M\tpackage.json",
+        "M\tpnpm-lock.yaml",
+        "M\tpnpm-workspace.yaml",
+        "A\tscripts/check-backend-only.mjs",
+        "D\tscripts/check-launch-presentation.mjs",
+        "D\tscripts/check-share-card.mjs",
+        "D\tscripts/check-web.mjs",
+        "D\tscripts/deploy-cloudflare-web-assets.py",
+        "D\tscripts/serve-web.mjs",
+        "M\tsrc/server.ts",
+        "D\ttest/frontendLiveAdapter.test.ts",
+        "D\ttest/frontendV2EvidenceIntegrity.test.ts",
+        "D\ttest/frontendV2Routes.test.ts",
+        "M\ttest/launchMechanicsReceipt.test.ts",
+        "D\tweb-v2/checks/browser-smoke.cjs",
+        "D\tweb-v2/checks/check-evidence.mjs",
+        "D\tweb-v2/checks/live-candidate-smoke.cjs",
+        "D\tweb-v2/checks/responsive-preview.cjs",
+        "D\tweb-v2/index.html",
+        "D\tweb-v2/package.json",
+        "D\tweb-v2/src/App.tsx",
+        "D\tweb-v2/src/Primitives.tsx",
+        "D\tweb-v2/src/RoutePages.tsx",
+        "D\tweb-v2/src/data.ts",
+        "D\tweb-v2/src/evidenceIntegrity.ts",
+        "D\tweb-v2/src/fixtures.ts",
+        "D\tweb-v2/src/liveAdapter.ts",
+        "D\tweb-v2/src/main.tsx",
+        "D\tweb-v2/src/routeIdentity.ts",
+        "D\tweb-v2/src/styles.css",
+        "D\tweb-v2/src/types.ts",
+        "D\tweb-v2/src/vite-env.d.ts",
+        "D\tweb-v2/tsconfig.app.json",
+        "D\tweb-v2/tsconfig.json",
+        "D\tweb-v2/tsconfig.node.json",
+        "D\tweb-v2/vite.config.ts",
+        "D\tweb/app.js",
+        "D\tweb/assets/binrat-hero.webp",
+        "D\tweb/assets/favicon.png",
+        "D\tweb/assets/fonts/LICENSE.txt",
+        "D\tweb/assets/fonts/plex-condensed-bold.woff2",
+        "D\tweb/assets/fonts/plex-mono-medium.woff2",
+        "D\tweb/assets/fonts/plex-mono-regular.woff2",
+        "D\tweb/binrat-mascot-128.webp",
+        "D\tweb/data-source.js",
+        "D\tweb/evidence-semantics.css",
+        "D\tweb/fixtures.js",
+        "D\tweb/index.html",
+        "D\tweb/launch-presentation.css",
+        "D\tweb/react-bits-island.js",
+        "D\tweb/share-card.css",
+        "D\tweb/share-card.js",
+        "D\tweb/styles.css"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "change": "M",
+          "headBlob": "c5be96d437b9e0f029fbf13830cddaa0409c7b67",
+          "integrationBlob": "0a2821a490878e20313acc52532b7f5a3f8b3cb8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/cloudflare-dry-run.yml",
+          "change": "M",
+          "headBlob": "8b17b2ed89d6fa249ff664cd83d836ee9f5b0da6",
+          "integrationBlob": "53c1bda2298773cfd570bf5f2cad1ff98a53c1e2",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/rat-radar-candidate-deploy.yml",
+          "change": "M",
+          "headBlob": "8a768dc388c9234526e1d580e9a365e878230222",
+          "integrationBlob": "302992d46cebdbdeb325d199005f0b013be58b47",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "AGENTS.md",
+          "change": "M",
+          "headBlob": "d8c6ee34be58cdde8abad2e43c4420115efe9e95",
+          "integrationBlob": "f91258a4ca77d6818456b022b07a9e13f2f7f01b",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "README.md",
+          "change": "M",
+          "headBlob": "c39ec1ff6d5d8f92ccb13066fcfc7fe463b19992",
+          "integrationBlob": "af8fa7ee54d1608a9b9774b2472b9b9493497a18",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "cloudflare/wrangler.example.jsonc",
+          "change": "M",
+          "headBlob": "5dd24d83d22bbeb3c4bbebf4dd0f7936378557dd",
+          "integrationBlob": "fe781ce31da0d4965490124c600880ed5b614b35",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/ASSET_BIBLE_V0.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "879d1d373b1aec8dbddfc4736f231caa7e791c33",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/ASSET_INVENTORY_V0.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "63a77c435ad7b4d323c9e424cf8f15b72181dc51",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/ASSET_PRODUCTION_BRIEF_V1.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "baff3ec94d012ffe422879f08b8158e0e96f180e",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/ASTRA_FRONTEND_SPRINT.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "2b23a7816dbfe4d7585275dfc326e4bef7cab196",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/BRAND_ASSET.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "604398d0797463eb7446f35e8e462159f176d010",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/CLOUDFLARE_WEB_LIVE_ACCEPTANCE_2026_09_19.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "3c0b7d349c35a557d30698b3537d60d902e0c010",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/CODEPLAN.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "13ce2549dbb462534bc0b7d72ef31e6f7e2daa2d",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/DONOR_PROVENANCE.md",
+          "change": "M",
+          "headBlob": "b246ac1a9fa225978ec0a1ec37a76c5cfa97990c",
+          "integrationBlob": "aa67ccca39d834aee777daaf182ee9594530152f",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/FRONTEND_V2_AUDIT.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "731b8fa035f650666f0c772798106e50a6312555",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/INTELLIGENCE_V1.md",
+          "change": "M",
+          "headBlob": "4c7a37928514cba1917c527f4b76869f2d2b32cc",
+          "integrationBlob": "1bd639292b6d1b3f13dcfb846a6fee56d6431cc7",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/LAUNCH_PRESENTATION_V0.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "ac98bfdad4c84d6aee7f632bb679bbce9821c365",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/PRD.md",
+          "change": "M",
+          "headBlob": "819a720046ddd8df5aa89f3ad78a131de52380d4",
+          "integrationBlob": "0f1d1684a5a1e64200b3c936f34b152d9b63c119",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/PRODUCT_CAPABILITIES.md",
+          "change": "A",
+          "headBlob": "4d37a5cc3d1fb4264dbb476b8bf9ad7865718708",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "docs/PRODUCT_SURFACE_V1.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "a692d01f9bd5b3b3f647ed5ee8ebfaaa7fd8646f",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/PRODUCT_SURFACE_V1_HOSTILE_REVIEW.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "6ed1856ec5948275fb9ba3dca482a3540bee6081",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/PRODUCT_SURFACE_V1_VISUAL_HOSTILE_REVIEW.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "e14df595dadbfd7d8ccd554c72d59c22d6ba027d",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/PRODUCT_SURFACE_V1_VISUAL_REVIEW.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "4f4767c437d399690bd5d6f7276356db4ce6462c",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/PUBLIC_READ_PLANE.md",
+          "change": "M",
+          "headBlob": "bb5c0c086e1aa1f41f9e3b7ff523acec57222a50",
+          "integrationBlob": "fc544f142caa1cc9f96dd2a71f76613ff1b8e063",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/ROADMAP_V0.md",
+          "change": "M",
+          "headBlob": "5e478da1dc9c4bf4e9bbf8b15aef771048355226",
+          "integrationBlob": "c3cf77ab27a29f868037d706b1ddee3c4c5d60a2",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/SHARE_CARDS_V0.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "777933c915f9e2ab3a46d9cf4808dc4952deaf6e",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/WEB_V0.md",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "e953dccaed31edc3a3063188132bb88c05418cdf",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "package.json",
+          "change": "M",
+          "headBlob": "6e108c488b16c52ef16633b5bf32566907f1ecc4",
+          "integrationBlob": "9241f427aa6fba58c9a8963d254aca373a700e8b",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "change": "M",
+          "headBlob": "19163cab837cb6ad510c3061c9a7de831c2d27fb",
+          "integrationBlob": "1655577c6416467db76e3dc8569d36b8c97f43a9",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "pnpm-workspace.yaml",
+          "change": "M",
+          "headBlob": "d05a7e7dc84aba3dc59ec807282d9cf49b5e795f",
+          "integrationBlob": "9aaa6d3564921884ddd2a4904c837a13cf073bca",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/check-backend-only.mjs",
+          "change": "A",
+          "headBlob": "5cc8ea4efe2405183fd7ffe6e946ef4aa7c0b6f8",
+          "integrationBlob": "1763a9d318a65b09f5ebac2ecccd1c4711044734",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/check-launch-presentation.mjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "5947633b57140b1a4c183171e6dc52a7b086f751",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/check-share-card.mjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "4f22b12ced23d8aa65f9c3d3ee575ea985e843a8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/check-web.mjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "e05fe9c041fabf026f8086de4751fe97f29ee6da",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/deploy-cloudflare-web-assets.py",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "4657dae01d95278ef3cf173bda0562432c191294",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/serve-web.mjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "f058bc4d77f56a3bfebb92d5f7dca402bf85c458",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/server.ts",
+          "change": "M",
+          "headBlob": "a286588a7ede0e76694fc3e25cc96521d3c7c158",
+          "integrationBlob": "9cc0abde827cb4b3d8c06ad3858860fb92919105",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/frontendLiveAdapter.test.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "0f9d6680742f7a3932f4b0a4f0688651b5439767",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/frontendV2EvidenceIntegrity.test.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "48cb3540416e57f41ca5b6a38fcdfb21bf5a4201",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/frontendV2Routes.test.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "4c249c24aeb7eb44b81a29aab7bcf898e413cda2",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/launchMechanicsReceipt.test.ts",
+          "change": "M",
+          "headBlob": "b9e97df25e62579b7955119917a85becbb89b17f",
+          "integrationBlob": "f753f016dc974ad065592edd0662b94a0aae8a56",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/browser-smoke.cjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "4d796308f1f07ac9e50928ff66b2e073cbd22ba3",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/check-evidence.mjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "b76c15b2fdab8df8747703199849a6ad45cc75c7",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/live-candidate-smoke.cjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "dcdc342a293aaee33be8fe45f7971eb51e2c5878",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/checks/responsive-preview.cjs",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "f8dd7e2b6398a597c6092db54cf0674a4d85ba27",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/index.html",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "156d3548f76a826eead16cf63fb84b39c3dfe61d",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/package.json",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "c0ad7e6553cd32b334f9543d42384e214bd5f16a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/App.tsx",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "42917e1175759ce56128a11ee986faba4e81a94a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/Primitives.tsx",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "486202c2a697ad565cf046e443ed4ba225849034",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/RoutePages.tsx",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "f879d694ee618a90eb302c978dbdc19d49a593e8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/data.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "d57e1ba324b8ceb498bacc5a9758a158d1b76d36",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/evidenceIntegrity.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "4f98125c0fb298c2c9cdbbb291b5652b3f009e33",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/fixtures.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "839e3b3788d56f81ca99b0291322c7f300d0d651",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/liveAdapter.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "f0a3bc0d164c1d712208840dbced416b4bf9b341",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/main.tsx",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "d0d169fa3472cd2fca25c2416db01aaf6afb54ec",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/routeIdentity.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "eb55824fa8989a9b7b1d9e0b35a3b139cca846e7",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/styles.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "3824156dae3933829a0a45eb40f2f5e1524e803e",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/types.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "465ab4ddbe43a9bee85ba3a2855ac2ec266fe399",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/src/vite-env.d.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "11f02fe2a0061d6e6e1f271b21da95423b448b32",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/tsconfig.app.json",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "e935337c4f4097887626cfa43dcb106e3130d948",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/tsconfig.json",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/tsconfig.node.json",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "18587bab83e6313fbc07a79e57c134eaa508645f",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web-v2/vite.config.ts",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "3dbdbfe9e5ee090d996718da02e7b4313ea2613c",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/app.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "fefe97cd354ef5355507d283c45b76e1dc877d84",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/binrat-hero.webp",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "06b06f692484884fa0b24025d358040e755d3f3b",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/favicon.png",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "ed63aa481ba14b9a492160bd6c81f200f71ce128",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/fonts/LICENSE.txt",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "71ccaba274da39b5757409da0e14f59842b31235",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/fonts/plex-condensed-bold.woff2",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "c3352fe9c89b038907308472eea43f7acca7a06f",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/fonts/plex-mono-medium.woff2",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "e76f660219178a15f5e9131c3ce832d3b8a0c13a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/fonts/plex-mono-regular.woff2",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "c3329d94213ac79f9972bbdf7b5f760a039ee0e4",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/binrat-mascot-128.webp",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "b191f01ff319e2dd240eef5a9fbb3eb00cddc614",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/data-source.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "038ff1b042c6e7342e16dc9fe78a073b1e042da7",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/evidence-semantics.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "3a7099e5797e87690558e34a40f8830776a09ec9",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/fixtures.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "2fedc7e8b91eb99536bee79d35ef58d59ee97cf8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/index.html",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "82b1ee613f98e3409d90ca8513c8403b98f22926",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/launch-presentation.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "a1c771fee687f1a388195cce5d1d8b9369fb1fb7",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/react-bits-island.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "6add873ded17250962bdfb19182eba307b12413c",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/share-card.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "6bdd91870fd198370146aa8d089d3f1f25a8acac",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/share-card.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "fbb5dc0d5f65cdcf67b3d2019a33ff5ac4f2c0af",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/styles.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": "b49df5b0ce4dcafa1850bf637011e406589299a6",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "QUARANTINE",
+      "reason": "Metadata/content mismatch: actual head 3ca6cf59 is the backend-only reset and deletes web-v2/assets/tests versus #23, despite the mobile-M1 title. #34 branches from historical 5f1766a1, so current PR-base name and content lineage differ. Exact retirement rationale remains unresolved."
+    },
+    {
+      "number": 34,
+      "head": {
+        "ref": "feat/binrat-rat-conversation-free-ai-v1",
+        "sha": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+        "label": "CipherCuttle:feat/binrat-rat-conversation-free-ai-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "5f1766a165a3755d620a952b3a1fec20e9206206",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      },
+      "updated_at": "2026-09-25T20:06:20Z",
+      "mergeBase": "5f1766a165a3755d620a952b3a1fec20e9206206",
+      "openDependents": [
+        36
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "M\t.env.example",
+        "A\t.github/workflows/rat-ai-cost-gateway-gate.yml",
+        "A\t.github/workflows/rat-ai-free-plan-check.yml",
+        "A\t.github/workflows/rat-ai-real-model-smoke.yml",
+        "A\t.github/workflows/rat-conversation-candidate-deploy.yml",
+        "A\t.github/workflows/rat-conversation-live-deploy.yml",
+        "A\tcloudflare/migrations/20260925_rat_conversation.sql",
+        "A\tcloudflare/migrations/20260925_rat_feedback.sql",
+        "A\tcloudflare/migrations/20260925_rat_smalltalk_turns.sql",
+        "M\tcloudflare/schema.sql",
+        "M\tcloudflare/wrangler.example.jsonc",
+        "A\tdocs/RAT_CONVERSATION_FREE_AI_V1.md",
+        "A\tdocs/RAT_PAID_COST_GUARD_V1.md",
+        "A\tscripts/check-rat-ai-plan.mjs",
+        "A\tscripts/deploy-rat-conversation-candidate.mjs",
+        "A\tscripts/deploy-rat-conversation-live.mjs",
+        "A\tscripts/provision-rat-ai-gateway.mjs",
+        "A\tscripts/smoke-rat-ai-live.mjs",
+        "M\tsrc/cloudflare/d1Schema.ts",
+        "A\tsrc/cloudflare/ratCandidateSmoke.ts",
+        "A\tsrc/cloudflare/ratConversation.ts",
+        "A\tsrc/cloudflare/ratFeedback.ts",
+        "M\tsrc/cloudflare/worker.ts",
+        "M\tsrc/telegram/voice.ts",
+        "A\ttest/cloudflareRatConversationWorker.test.ts",
+        "A\ttest/cloudflareRatFeedbackWorker.test.ts",
+        "A\ttest/ratCandidateSmoke.test.ts",
+        "A\ttest/ratConversation.test.ts",
+        "A\ttest/ratFeedback.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".env.example",
+          "change": "M",
+          "headBlob": "e263e48b8a88ea4192f8daa6d2b2e725c2aabcc0",
+          "integrationBlob": "e263e48b8a88ea4192f8daa6d2b2e725c2aabcc0",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/rat-ai-cost-gateway-gate.yml",
+          "change": "A",
+          "headBlob": "4583e5de90a41d3e519161aa4e0fd3abcc08efe0",
+          "integrationBlob": "4583e5de90a41d3e519161aa4e0fd3abcc08efe0",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/rat-ai-free-plan-check.yml",
+          "change": "A",
+          "headBlob": "ee713737fbb3137b538917421bc3f9c5f98704fb",
+          "integrationBlob": "ee713737fbb3137b538917421bc3f9c5f98704fb",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/rat-ai-real-model-smoke.yml",
+          "change": "A",
+          "headBlob": "5e3620bb5e6802339165c611a24b4de6059840d6",
+          "integrationBlob": "5e3620bb5e6802339165c611a24b4de6059840d6",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/rat-conversation-candidate-deploy.yml",
+          "change": "A",
+          "headBlob": "b5eee7d29512e3dd3021d391da1ea11439421813",
+          "integrationBlob": "b5eee7d29512e3dd3021d391da1ea11439421813",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": ".github/workflows/rat-conversation-live-deploy.yml",
+          "change": "A",
+          "headBlob": "54dbc91dc400b6c02d0bcc0da3c216486078e5b6",
+          "integrationBlob": "54dbc91dc400b6c02d0bcc0da3c216486078e5b6",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "cloudflare/migrations/20260925_rat_conversation.sql",
+          "change": "A",
+          "headBlob": "75ad850f7908c7be399126b867bdc72e9762a281",
+          "integrationBlob": "75ad850f7908c7be399126b867bdc72e9762a281",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "cloudflare/migrations/20260925_rat_feedback.sql",
+          "change": "A",
+          "headBlob": "df35ad0f7c103a6be8aa404cec884d09b9d39922",
+          "integrationBlob": "df35ad0f7c103a6be8aa404cec884d09b9d39922",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "cloudflare/migrations/20260925_rat_smalltalk_turns.sql",
+          "change": "A",
+          "headBlob": "e7fcd1b700396fe64aaeb059d9341379c668c0ac",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "cloudflare/schema.sql",
+          "change": "M",
+          "headBlob": "d3cd7ba83d3885995f54182689b5aa7913340aba",
+          "integrationBlob": "86044325084e9454774f475d30c70bc4c5809e90",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "cloudflare/wrangler.example.jsonc",
+          "change": "M",
+          "headBlob": "a2f00c5e2d0087d304ec349aca3c48ba57e6e9e1",
+          "integrationBlob": "fe781ce31da0d4965490124c600880ed5b614b35",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/RAT_CONVERSATION_FREE_AI_V1.md",
+          "change": "A",
+          "headBlob": "15c783bbadd199b92acb0f99926df507d78d1ae2",
+          "integrationBlob": "df5d138cbc4c23c4639eeb4925965570a7c3baf1",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/RAT_PAID_COST_GUARD_V1.md",
+          "change": "A",
+          "headBlob": "c48b74255b172af68e28d4670ff7c8dc3a5e5b9e",
+          "integrationBlob": "c48b74255b172af68e28d4670ff7c8dc3a5e5b9e",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/check-rat-ai-plan.mjs",
+          "change": "A",
+          "headBlob": "fa48073acf89bfdaf628245afed54744aac1184e",
+          "integrationBlob": "fa48073acf89bfdaf628245afed54744aac1184e",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/deploy-rat-conversation-candidate.mjs",
+          "change": "A",
+          "headBlob": "4fb0d0f669604883b45fa7ea5cbbb1266af9cf7f",
+          "integrationBlob": "4fb0d0f669604883b45fa7ea5cbbb1266af9cf7f",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/deploy-rat-conversation-live.mjs",
+          "change": "A",
+          "headBlob": "1d40aa136a7b6613c35e89e81d914b5e4aaa121f",
+          "integrationBlob": "57061c5c3ccdb6bb6659ddb28ef3d40dd35d8113",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/provision-rat-ai-gateway.mjs",
+          "change": "A",
+          "headBlob": "6dfb85eb6a19a521860e771ef5d46ae986119c7f",
+          "integrationBlob": "6dfb85eb6a19a521860e771ef5d46ae986119c7f",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/smoke-rat-ai-live.mjs",
+          "change": "A",
+          "headBlob": "62b04a2c39c629104dc0ebe636e9d2b03e55dc8b",
+          "integrationBlob": "62b04a2c39c629104dc0ebe636e9d2b03e55dc8b",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/d1Schema.ts",
+          "change": "M",
+          "headBlob": "1884bea9e7d355cf335ee1dcd392c31c5bfe4aa6",
+          "integrationBlob": "cfe2b5eb9088988536053c1d3f6deb576556d4dc",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/ratCandidateSmoke.ts",
+          "change": "A",
+          "headBlob": "87ca97ef245e7007649c4bd212b28a51e28f6ff9",
+          "integrationBlob": "87ca97ef245e7007649c4bd212b28a51e28f6ff9",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/ratConversation.ts",
+          "change": "A",
+          "headBlob": "459590c9e5e87a62e564929762e61cbd01521227",
+          "integrationBlob": "a13524d626898a729df2cb26e6d7d1d7557597b0",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/ratFeedback.ts",
+          "change": "A",
+          "headBlob": "4800f4dca9559670fafa95dcfbd51db577f0606f",
+          "integrationBlob": "4800f4dca9559670fafa95dcfbd51db577f0606f",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/worker.ts",
+          "change": "M",
+          "headBlob": "0318011b84b7c40598c278374b9c8d0802cca435",
+          "integrationBlob": "b7bcacf4961d5dd525428cb020feed82d9e5736a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/telegram/voice.ts",
+          "change": "M",
+          "headBlob": "a6d8ec50ad6e695860c39e12fa6072aceeca28e1",
+          "integrationBlob": "f8654956bc42f7bb3ab5fa2f2f251ea467a2aa3b",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/cloudflareRatConversationWorker.test.ts",
+          "change": "A",
+          "headBlob": "8ab15c077f001cce312fe6f4316f1cc1eaeee33c",
+          "integrationBlob": "53739c78d65739330b220d380e315b98d0b5667c",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/cloudflareRatFeedbackWorker.test.ts",
+          "change": "A",
+          "headBlob": "a50636ab55178b61c9a839fa4c1bed974e694ffd",
+          "integrationBlob": "a50636ab55178b61c9a839fa4c1bed974e694ffd",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/ratCandidateSmoke.test.ts",
+          "change": "A",
+          "headBlob": "fb8efcc305bf882b4287d17a2dc6daf3d9ec125b",
+          "integrationBlob": "fb8efcc305bf882b4287d17a2dc6daf3d9ec125b",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/ratConversation.test.ts",
+          "change": "A",
+          "headBlob": "4a4813579044e00efe455e50801223c43181359d",
+          "integrationBlob": "e33bf5d433c913fc65c57d935e23253ba4f2f26c",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/ratFeedback.test.ts",
+          "change": "A",
+          "headBlob": "06812a112762d0619d6c766e9a2b30338df69192",
+          "integrationBlob": "06812a112762d0619d6c766e9a2b30338df69192",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Original Cloudflare AI/conversation/schema/memory candidate; recorded CODED/DRY-RUN PASS and LIVE BLOCKED BY CREDENTIALS. Preserve implementation, source receipts and deployment gates; no activation or automatic continuation."
+    },
+    {
+      "number": 36,
+      "head": {
+        "ref": "feat/binrat-telegram-scout-v0",
+        "sha": "d433f0d4c588325c280ac58d5acaca570ee248f1",
+        "label": "CipherCuttle:feat/binrat-telegram-scout-v0"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-conversation-free-ai-v1",
+        "sha": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+        "label": "CipherCuttle:feat/binrat-rat-conversation-free-ai-v1"
+      },
+      "updated_at": "2026-09-25T19:50:33Z",
+      "mergeBase": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "openDependents": [],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tcloudflare/migrations/20260925_rat_scout_progress.sql",
+        "M\tcloudflare/schema.sql",
+        "A\tdocs/TELEGRAM_MOOD_ASSETS_V1.md",
+        "A\tdocs/TELEGRAM_SCOUT_V0.md",
+        "M\tsrc/cloudflare/d1Schema.ts",
+        "A\tsrc/cloudflare/scoutProgress.ts",
+        "M\tsrc/cloudflare/worker.ts",
+        "A\tsrc/telegram/scout.ts",
+        "A\tsrc/telegram/scoutMedia.ts",
+        "M\ttest/cloudflareTelegramWorker.test.ts",
+        "A\ttest/telegramScout.test.ts",
+        "A\ttest/telegramScoutMedia.test.ts",
+        "A\tweb/assets/telegram/alert.png",
+        "A\tweb/assets/telegram/cheeky.png",
+        "A\tweb/assets/telegram/digging.png",
+        "A\tweb/assets/telegram/empty-paws.png",
+        "A\tweb/assets/telegram/error.png",
+        "A\tweb/assets/telegram/evidence-found.png",
+        "A\tweb/assets/telegram/idle-neutral.png",
+        "A\tweb/assets/telegram/inquisitive.png",
+        "A\tweb/assets/telegram/insulted.png",
+        "A\tweb/assets/telegram/manifest.json",
+        "A\tweb/assets/telegram/profile.png",
+        "A\tweb/assets/telegram/repeat-creator.png"
+      ],
+      "contentComparisons": [
+        {
+          "path": "cloudflare/migrations/20260925_rat_scout_progress.sql",
+          "change": "A",
+          "headBlob": "3b9e1649d291e208a2ec3cd089494d50589b6ea8",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "cloudflare/schema.sql",
+          "change": "M",
+          "headBlob": "89a644b7af5d76bc1bd6fe719c35365b62093fae",
+          "integrationBlob": "86044325084e9454774f475d30c70bc4c5809e90",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/TELEGRAM_MOOD_ASSETS_V1.md",
+          "change": "A",
+          "headBlob": "345c8cc4c8b3c5af97bc12c4ff48326ef1aa59a0",
+          "integrationBlob": "345c8cc4c8b3c5af97bc12c4ff48326ef1aa59a0",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "docs/TELEGRAM_SCOUT_V0.md",
+          "change": "A",
+          "headBlob": "97ce02d88d29f92f6a1bd38651910077d1fdbd1c",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/cloudflare/d1Schema.ts",
+          "change": "M",
+          "headBlob": "32971ca118cc412553d88c1d15a76fe2d2b88a09",
+          "integrationBlob": "cfe2b5eb9088988536053c1d3f6deb576556d4dc",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/scoutProgress.ts",
+          "change": "A",
+          "headBlob": "4681118663855a383342dd92260f8e0f17223535",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/cloudflare/worker.ts",
+          "change": "M",
+          "headBlob": "2b42efc99d32ff9dbc8c3649844b70e768a79551",
+          "integrationBlob": "b7bcacf4961d5dd525428cb020feed82d9e5736a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/telegram/scout.ts",
+          "change": "A",
+          "headBlob": "10637d600d358ad5bf91c38cd23486837934a405",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/telegram/scoutMedia.ts",
+          "change": "A",
+          "headBlob": "01507bc37a13739398e4e3e94fc9ba5e44195cc7",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/cloudflareTelegramWorker.test.ts",
+          "change": "M",
+          "headBlob": "08c600a7da0e8bc17d07b3cad78c53d209b77ae4",
+          "integrationBlob": "6f6ad753bc8c56c1974e6e95204ec2a3ef38899b",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/telegramScout.test.ts",
+          "change": "A",
+          "headBlob": "c2083d11f439200c92c0a453588ca7dc181b87e0",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/telegramScoutMedia.test.ts",
+          "change": "A",
+          "headBlob": "d347e47b4dd41c628e4a844a0d5d243542e21c02",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "web/assets/telegram/alert.png",
+          "change": "A",
+          "headBlob": "36f6df57f4cb469d2b8ea63eff65588a0b3f8b37",
+          "integrationBlob": "36f6df57f4cb469d2b8ea63eff65588a0b3f8b37",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/cheeky.png",
+          "change": "A",
+          "headBlob": "54279a79e9e080a7cb69a58f10d264be2e3f9085",
+          "integrationBlob": "54279a79e9e080a7cb69a58f10d264be2e3f9085",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/digging.png",
+          "change": "A",
+          "headBlob": "9b15800059df77447017c9fd4ca58e2455b8b858",
+          "integrationBlob": "9b15800059df77447017c9fd4ca58e2455b8b858",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/empty-paws.png",
+          "change": "A",
+          "headBlob": "10c2fdcaf46c7c73ea4616316cf2f9f7d19245c9",
+          "integrationBlob": "10c2fdcaf46c7c73ea4616316cf2f9f7d19245c9",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/error.png",
+          "change": "A",
+          "headBlob": "5c74f19e363d1267bcce75125ad1db2f97887574",
+          "integrationBlob": "5c74f19e363d1267bcce75125ad1db2f97887574",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/evidence-found.png",
+          "change": "A",
+          "headBlob": "20cb2e82679bddf782c8bfa1a23f46928392bcde",
+          "integrationBlob": "20cb2e82679bddf782c8bfa1a23f46928392bcde",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/idle-neutral.png",
+          "change": "A",
+          "headBlob": "c75f616445f1310e985e69f1840f275c667ff8b9",
+          "integrationBlob": "c75f616445f1310e985e69f1840f275c667ff8b9",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/inquisitive.png",
+          "change": "A",
+          "headBlob": "2b91d048214aa473c7d2359afffbb2bcbdd02a9d",
+          "integrationBlob": "2b91d048214aa473c7d2359afffbb2bcbdd02a9d",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/insulted.png",
+          "change": "A",
+          "headBlob": "487f6b10a09756404ac637e621eb17a59cf02665",
+          "integrationBlob": "487f6b10a09756404ac637e621eb17a59cf02665",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/manifest.json",
+          "change": "A",
+          "headBlob": "40ffbc0e1a3dea77f185ae9a72ed077a0c996452",
+          "integrationBlob": "40ffbc0e1a3dea77f185ae9a72ed077a0c996452",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/profile.png",
+          "change": "A",
+          "headBlob": "12663c0d67f320cdd51658f98bf54de542a21119",
+          "integrationBlob": "12663c0d67f320cdd51658f98bf54de542a21119",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/assets/telegram/repeat-creator.png",
+          "change": "A",
+          "headBlob": "60f0fd1e4ac298f73840eabaa3c2049bdfebf1d0",
+          "integrationBlob": "60f0fd1e4ac298f73840eabaa3c2049bdfebf1d0",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Original graphical 14-day Telegram Scout progress/media implementation and tests. Its scoutProgress migration is absent from integration; preserve as a donor rather than assume #69 includes it."
+    },
+    {
+      "number": 48,
+      "head": {
+        "ref": "experiment/binrat-g4r-cinematic-20260926",
+        "sha": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+        "label": "CipherCuttle:experiment/binrat-g4r-cinematic-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g3b-reviewed-20260926",
+        "sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+        "label": "CipherCuttle:experiment/binrat-g3b-reviewed-20260926"
+      },
+      "updated_at": "2026-09-26T18:37:29Z",
+      "mergeBase": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "openDependents": [
+        49
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "M\t.github/workflows/g3a-prototype.yml",
+        "A\tprototype/g3a/G4R_REVIEW.md",
+        "D\tprototype/g3a/dist/assets/index-DIN_qNcp.js",
+        "A\tprototype/g3a/dist/assets/index-DY0GRLJD.css",
+        "A\tprototype/g3a/dist/assets/index-IDr-Y9tx.js",
+        "D\tprototype/g3a/dist/assets/index-t3YLU-NT.css",
+        "M\tprototype/g3a/dist/index.html",
+        "M\tprototype/g3a/src/App.svelte",
+        "M\tprototype/g3a/src/fixture.ts",
+        "M\tprototype/g3a/src/styles.css",
+        "A\tprototype/g3a/tests/g4r.spec.ts",
+        "M\tprototype/g3a/tests/journey.spec.ts",
+        "A\tprototype/g3a/tests/mobile-hardening.spec.ts",
+        "M\tprototype/g3a/tests/published.spec.ts",
+        "M\tprototype/g3a/tests/rat-trap.spec.ts",
+        "M\tprototype/g3a/tests/screenshots.spec.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/g3a-prototype.yml",
+          "change": "M",
+          "headBlob": "3ef74e6f2372f87269cbc6f819e1fc2021ef9252",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/G4R_REVIEW.md",
+          "change": "A",
+          "headBlob": "874f7a64b8d0b2fbe366d87b19f39e0dc61d55b7",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-DIN_qNcp.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-DY0GRLJD.css",
+          "change": "A",
+          "headBlob": "88cfc53ffbeb5b2e2e4004dba384a57d99a9ef5c",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-IDr-Y9tx.js",
+          "change": "A",
+          "headBlob": "12f349fc3caeef7e97c7387f007589c385666264",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-t3YLU-NT.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/index.html",
+          "change": "M",
+          "headBlob": "ffad2613be0a1e6f631ca68fb8dc1e0118023690",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/App.svelte",
+          "change": "M",
+          "headBlob": "e66c18d70a3ef6ba1a3194d02ae1e0af882fa404",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/fixture.ts",
+          "change": "M",
+          "headBlob": "65894466c14542b34e5ef070183231be75d9b362",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/styles.css",
+          "change": "M",
+          "headBlob": "979291f0ef8be11683040a8c2f1efc73bd0dbcd5",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/g4r.spec.ts",
+          "change": "A",
+          "headBlob": "7225044fe45018991fb2370b5b752b37f337bb31",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/journey.spec.ts",
+          "change": "M",
+          "headBlob": "b7488560f81edf26dfb6ee6e6b6dc1df27a1e7e0",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/mobile-hardening.spec.ts",
+          "change": "A",
+          "headBlob": "f562a16a81df6f18a62c0f22f401bde82c549369",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/published.spec.ts",
+          "change": "M",
+          "headBlob": "f352defe557ab1bf0bf1afe10a886ced66c7b188",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/rat-trap.spec.ts",
+          "change": "M",
+          "headBlob": "0f2c527ed0fc8f61e05a3422d169fc6b83a03a7b",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/screenshots.spec.ts",
+          "change": "M",
+          "headBlob": "8226b97ad5ff9e3c94f2c05656f1c04e88b02abe",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Original Svelte G4-R world/Radar/case prototype and tests under prototype/g3a, absent from integration. Selected frontend is React V3; retain prototype mechanics and approved experimental evidence without promoting it to current design authority."
+    },
+    {
+      "number": 49,
+      "head": {
+        "ref": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+        "sha": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+        "label": "CipherCuttle:experiment/binrat-g4r-header-cta5-inspired-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4r-cinematic-20260926",
+        "sha": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+        "label": "CipherCuttle:experiment/binrat-g4r-cinematic-20260926"
+      },
+      "updated_at": "2026-09-26T19:05:01Z",
+      "mergeBase": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+      "openDependents": [
+        50
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "M\t.github/workflows/g3a-prototype.yml",
+        "A\tprototype/g3a/HEADER_EFFECT_EXPERIMENT.md",
+        "A\tprototype/g3a/dist/assets/index-CNwguaZW.js",
+        "R091\tprototype/g3a/dist/assets/index-DY0GRLJD.css\tprototype/g3a/dist/assets/index-DAawFzKJ.css",
+        "D\tprototype/g3a/dist/assets/index-IDr-Y9tx.js",
+        "M\tprototype/g3a/dist/index.html",
+        "M\tprototype/g3a/src/App.svelte",
+        "M\tprototype/g3a/src/styles.css",
+        "A\tprototype/g3a/tests/header-effect.spec.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/g3a-prototype.yml",
+          "change": "M",
+          "headBlob": "229eee5e894697be6a92d254995b07f840e1e373",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/HEADER_EFFECT_EXPERIMENT.md",
+          "change": "A",
+          "headBlob": "61e2423af7aadbcd86385987eab190da00b76131",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-CNwguaZW.js",
+          "change": "A",
+          "headBlob": "6d464308c2e408160d1c5956cf558059869a11b4",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-DAawFzKJ.css",
+          "change": "R091",
+          "headBlob": "66b281765ca61a8634c4e89521e13ec5fa029bcb",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-IDr-Y9tx.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/index.html",
+          "change": "M",
+          "headBlob": "8c32be14b37a90602f188b283a58b721f2da21a5",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/App.svelte",
+          "change": "M",
+          "headBlob": "3601d516290d2249fe3961124a01b3f0c4b1cce0",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/styles.css",
+          "change": "M",
+          "headBlob": "bd3d1c0e9793e2c8de71598e4e99fb6b2aeb10ee",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/header-effect.spec.ts",
+          "change": "A",
+          "headBlob": "4232ea77fb1024d915e2b6c4b451f10f7b424ee8",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "QUARANTINE",
+      "reason": "Self-authored CTA-style effect is a distinct Svelte prototype; original author explicitly excludes paid CTA 5 source/license rights. Preserve original license boundary and descendants #50; owner reuse/retirement decision remains unresolved."
+    },
+    {
+      "number": 50,
+      "head": {
+        "ref": "experiment/binrat-g4r2-grain-wave-20260927",
+        "sha": "521998d988fc1113dc7ef081250fe1b3147b48b0",
+        "label": "CipherCuttle:experiment/binrat-g4r2-grain-wave-20260927"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+        "sha": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+        "label": "CipherCuttle:experiment/binrat-g4r-header-cta5-inspired-20260926"
+      },
+      "updated_at": "2026-09-26T23:33:02Z",
+      "mergeBase": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+      "openDependents": [],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "M\t.github/workflows/g3a-prototype.yml",
+        "M\tprototype/g3a/HEADER_EFFECT_EXPERIMENT.md",
+        "A\tprototype/g3a/dist/assets/index-CBV861VR.css",
+        "D\tprototype/g3a/dist/assets/index-CNwguaZW.js",
+        "D\tprototype/g3a/dist/assets/index-DAawFzKJ.css",
+        "A\tprototype/g3a/dist/assets/index-GPsLUkfo.js",
+        "M\tprototype/g3a/dist/index.html",
+        "M\tprototype/g3a/src/App.svelte",
+        "A\tprototype/g3a/src/grainWave.ts",
+        "M\tprototype/g3a/src/styles.css",
+        "M\tprototype/g3a/tests/header-effect.spec.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/g3a-prototype.yml",
+          "change": "M",
+          "headBlob": "ce74bb1509b38c1526a6c5ff1ef9cd2c93d4d2a5",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/HEADER_EFFECT_EXPERIMENT.md",
+          "change": "M",
+          "headBlob": "1109976ded031d390171cce30377072a4724db41",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-CBV861VR.css",
+          "change": "A",
+          "headBlob": "1a82eb6c23582991c6f2e55f754b98a423089f90",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-CNwguaZW.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-DAawFzKJ.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-GPsLUkfo.js",
+          "change": "A",
+          "headBlob": "b8dbe0b20dec5bc1b5e35f30c22f3cd4d3c6ea42",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/index.html",
+          "change": "M",
+          "headBlob": "59b2a6a18740d5e0d4d129f4b57e940177e88f67",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/App.svelte",
+          "change": "M",
+          "headBlob": "f198f60987b10a0225188a2028a5bc7412f68df1",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/grainWave.ts",
+          "change": "A",
+          "headBlob": "33375b18ec4ed4da728591bb79eebaca69371548",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/styles.css",
+          "change": "M",
+          "headBlob": "a27ea48ccd0cdeda07feb8389395b52bf871db3b",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/header-effect.spec.ts",
+          "change": "M",
+          "headBlob": "e6647f07e0d12615d21c31f7f091d3970f816eda",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Original grainWave.ts and pixel-sunset prototype replace the earlier glow; original docs claim no paid React Bits source, new dependency or media download. Preserve original code and this limited provenance claim; no wider rights certification."
+    },
+    {
+      "number": 53,
+      "head": {
+        "ref": "integration/binrat-r5-approved-20260927",
+        "sha": "959da17b0573dff016808d597737b4cf186bed62",
+        "label": "CipherCuttle:integration/binrat-r5-approved-20260927"
+      },
+      "base": {
+        "ref": "experiment/binrat-g3b-reviewed-20260926",
+        "sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+        "label": "CipherCuttle:experiment/binrat-g3b-reviewed-20260926"
+      },
+      "updated_at": "2026-09-27T22:04:01Z",
+      "mergeBase": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "openDependents": [],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\t.github/workflows/binrat-frontend-integration.yml",
+        "D\t.github/workflows/g3a-prototype.yml",
+        "M\tprototype/g3a/.gitignore",
+        "A\tprototype/g3a/ART_DIRECTION_G6_PIXEL_SUNSET.md",
+        "A\tprototype/g3a/FRONTEND_INTEGRATION.md",
+        "A\tprototype/g3a/G6A_ASSET_INTEGRATION.md",
+        "A\tprototype/g3a/G6A_SAFE_ASSET_MANIFEST.json",
+        "M\tprototype/g3a/README.md",
+        "A\tprototype/g3a/dist/assets/index-BCQWvCTF.js",
+        "A\tprototype/g3a/dist/assets/index-Bxax-6Zi.css",
+        "D\tprototype/g3a/dist/assets/index-DIN_qNcp.js",
+        "D\tprototype/g3a/dist/assets/index-t3YLU-NT.css",
+        "M\tprototype/g3a/dist/index.html",
+        "M\tprototype/g3a/playwright.config.ts",
+        "M\tprototype/g3a/pnpm-lock.yaml",
+        "M\tprototype/g3a/src/App.svelte",
+        "M\tprototype/g3a/src/fixture.ts",
+        "M\tprototype/g3a/src/styles.css",
+        "A\tprototype/g3a/tests/g4r.spec.ts",
+        "M\tprototype/g3a/tests/journey.spec.ts",
+        "A\tprototype/g3a/tests/mobile-hardening.spec.ts",
+        "M\tprototype/g3a/tests/published.spec.ts",
+        "M\tprototype/g3a/tests/rat-trap.spec.ts",
+        "M\tprototype/g3a/tests/screenshots.spec.ts",
+        "A\tprototype/g3a/tests/static-hero.spec.ts",
+        "M\tprototype/g3a/tsconfig.json"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/binrat-frontend-integration.yml",
+          "change": "A",
+          "headBlob": "7330f25d80fe638a5545a38ddb16d92075c762b3",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": ".github/workflows/g3a-prototype.yml",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/.gitignore",
+          "change": "M",
+          "headBlob": "d13f69a37fa0e2a69801b82d9ade3913413333d1",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/ART_DIRECTION_G6_PIXEL_SUNSET.md",
+          "change": "A",
+          "headBlob": "3865d5f4c3c6c6c6f0556503f8f44701d0f4f072",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/FRONTEND_INTEGRATION.md",
+          "change": "A",
+          "headBlob": "594875104da622ef88c3c9268ced5debfb872d76",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/G6A_ASSET_INTEGRATION.md",
+          "change": "A",
+          "headBlob": "5df0817628aeddf8d237b6621dda86eb3fee2e1a",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/G6A_SAFE_ASSET_MANIFEST.json",
+          "change": "A",
+          "headBlob": "5dce62bb6079c36db0a8584fd74c1fa3814a31e3",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/README.md",
+          "change": "M",
+          "headBlob": "acdf4b1738b111f346782d2c72a798e5ca7cdddb",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-BCQWvCTF.js",
+          "change": "A",
+          "headBlob": "f46eb41fb68adab3529d37ece7713545e933c377",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-Bxax-6Zi.css",
+          "change": "A",
+          "headBlob": "4bade2baa13d55f278f13c8e757dcf711a22d36a",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-DIN_qNcp.js",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/assets/index-t3YLU-NT.css",
+          "change": "D",
+          "headBlob": null,
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/dist/index.html",
+          "change": "M",
+          "headBlob": "b95b89e64444864b5e9e15d158bd92ccdf1b1fb4",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/playwright.config.ts",
+          "change": "M",
+          "headBlob": "2b5ca05334140a0af9e6637d685fc1006b08cc6b",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/pnpm-lock.yaml",
+          "change": "M",
+          "headBlob": "db91159789e00773c5653784e763d70743e7ce86",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/App.svelte",
+          "change": "M",
+          "headBlob": "fe9ac051bf51d9e462f4d2aa2730b6f27e7dca4b",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/fixture.ts",
+          "change": "M",
+          "headBlob": "65894466c14542b34e5ef070183231be75d9b362",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/src/styles.css",
+          "change": "M",
+          "headBlob": "0195853c3e9f524eade843567d88921f9ded7150",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/g4r.spec.ts",
+          "change": "A",
+          "headBlob": "e57efe92226365ca4b88f4548518b56bc7e09976",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/journey.spec.ts",
+          "change": "M",
+          "headBlob": "3222879a08cd0660a272998651206cf79efe8e0a",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/mobile-hardening.spec.ts",
+          "change": "A",
+          "headBlob": "f562a16a81df6f18a62c0f22f401bde82c549369",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/published.spec.ts",
+          "change": "M",
+          "headBlob": "8510044ba8591bbe282811b73993212a6b83ca2c",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/rat-trap.spec.ts",
+          "change": "M",
+          "headBlob": "0f2c527ed0fc8f61e05a3422d169fc6b83a03a7b",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/screenshots.spec.ts",
+          "change": "M",
+          "headBlob": "e3b4518ae1f3b41399e98837dfd530c07a1aeb6f",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tests/static-hero.spec.ts",
+          "change": "A",
+          "headBlob": "40de281fe743edddce13ada98e54e3cbd50966e9",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "prototype/g3a/tsconfig.json",
+          "change": "M",
+          "headBlob": "e0010d3ef7e5b84ab5d5d6e978954ad345e414c9",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "QUARANTINE",
+      "reason": "Original G6 integration manifest says eight G6 PNGs are absent and independent exact-head live smoke is unconfirmed. Preserve fallback/art requirements; missing asset custody and approval must be resolved before reuse or retirement."
+    },
+    {
+      "number": 152,
+      "head": {
+        "ref": "experiment/binrat-prelaunch-scout-v0",
+        "sha": "c75e11654b6f7850068875bf0b89e23024113121",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-scout-v0"
+      },
+      "base": {
+        "ref": "integration/binrat-launch-night-v1",
+        "sha": "261a7207907816a770b2a51504186a021f0ffb8e",
+        "label": "CipherCuttle:integration/binrat-launch-night-v1"
+      },
+      "updated_at": "2026-10-07T12:57:11Z",
+      "mergeBase": "261a7207907816a770b2a51504186a021f0ffb8e",
+      "openDependents": [
+        153
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/PRELAUNCH_SCOUT_V0.md",
+        "A\tsrc/intelligence/prelaunchScout.ts",
+        "A\ttest/prelaunchScout.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/PRELAUNCH_SCOUT_V0.md",
+          "change": "A",
+          "headBlob": "51d250f4f7168b6ac64198aff11301eee8698122",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/prelaunchScout.ts",
+          "change": "A",
+          "headBlob": "b416aa5d47fc07de7e999c9b6dbcda8b0d95e2fa",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/prelaunchScout.test.ts",
+          "change": "A",
+          "headBlob": "2e4890e57547ac3ddb508e54c78f108458d99858",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Prelaunch scout implementation, test and falsification protocol; no active integration ancestry. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 153,
+      "head": {
+        "ref": "experiment/binrat-prelaunch-benchmark-v1",
+        "sha": "a2e2608a39e42138e24b31865492812462744f1f",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-benchmark-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-prelaunch-scout-v0",
+        "sha": "c75e11654b6f7850068875bf0b89e23024113121",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-scout-v0"
+      },
+      "updated_at": "2026-10-07T13:51:20Z",
+      "mergeBase": "c75e11654b6f7850068875bf0b89e23024113121",
+      "openDependents": [
+        154
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tsrc/intelligence/prelaunchBenchmark.ts",
+        "A\ttest/fixtures/prelaunchBenchmarkProjects.ts",
+        "A\ttest/prelaunchBenchmark.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "src/intelligence/prelaunchBenchmark.ts",
+          "change": "A",
+          "headBlob": "e5c83046781a9ea8465344e94b0966afba8f6023",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/prelaunchBenchmarkProjects.ts",
+          "change": "A",
+          "headBlob": "ca8b315d0b3e4ec78fb5b4138fb51828c53951f1",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/prelaunchBenchmark.test.ts",
+          "change": "A",
+          "headBlob": "958b9885497008f59199656561bb418a059d35b4",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Twenty-project paired historical prelaunch benchmark; preserve source and limits as research. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 154,
+      "head": {
+        "ref": "experiment/binrat-launch-pressure-v0",
+        "sha": "ebaebce361671f17c0638453d690c5f8da64d560",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-v0"
+      },
+      "base": {
+        "ref": "experiment/binrat-prelaunch-benchmark-v1",
+        "sha": "a2e2608a39e42138e24b31865492812462744f1f",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-benchmark-v1"
+      },
+      "updated_at": "2026-10-07T18:41:37Z",
+      "mergeBase": "a2e2608a39e42138e24b31865492812462744f1f",
+      "openDependents": [
+        155
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/LAUNCH_PRESSURE_V0.md",
+        "A\tsrc/intelligence/launchPressure.ts",
+        "A\tsrc/intelligence/launchPressureBenchmark.ts",
+        "A\ttest/fixtures/launchPressurePilot.ts",
+        "A\ttest/launchPressure.test.ts",
+        "A\ttest/launchPressureBenchmark.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/LAUNCH_PRESSURE_V0.md",
+          "change": "A",
+          "headBlob": "51c5aaf9ec265e4c099ad0f5735249a774693e9d",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/launchPressure.ts",
+          "change": "A",
+          "headBlob": "669349669287bfa82873c1a06bea5d0d8748cbd5",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/launchPressureBenchmark.ts",
+          "change": "A",
+          "headBlob": "c3a1985682892fe1647f5bce208ffacdf9df9830",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/launchPressurePilot.ts",
+          "change": "A",
+          "headBlob": "a598e3cd01fd4f2eecdbd1e385f92b68411a2db1",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/launchPressure.test.ts",
+          "change": "A",
+          "headBlob": "79db639ec019e376fed8997aea497d2088863245",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/launchPressureBenchmark.test.ts",
+          "change": "A",
+          "headBlob": "568e17ea589a90b9bc64f7fec4390b52e093393d",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Frozen launch-pressure state machine and three-project historical pilot; next falsification was a separate gated step. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 155,
+      "head": {
+        "ref": "experiment/binrat-launch-pressure-benchmark-v1",
+        "sha": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-benchmark-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-pressure-v0",
+        "sha": "ebaebce361671f17c0638453d690c5f8da64d560",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-v0"
+      },
+      "updated_at": "2026-10-07T19:17:19Z",
+      "mergeBase": "ebaebce361671f17c0638453d690c5f8da64d560",
+      "openDependents": [
+        156
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/LAUNCH_PRESSURE_BENCHMARK_V1.md",
+        "A\tsrc/intelligence/launchPressureBenchmarkV1.ts",
+        "A\ttest/fixtures/launchPressureBenchmarkV1.ts",
+        "A\ttest/launchPressureBenchmarkV1.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/LAUNCH_PRESSURE_BENCHMARK_V1.md",
+          "change": "A",
+          "headBlob": "01c6d246c70dd13e9392be2fc170afc9d58d0194",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/launchPressureBenchmarkV1.ts",
+          "change": "A",
+          "headBlob": "294e98ace31b4cafab92c1b73271c5b7a92911f1",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/launchPressureBenchmarkV1.ts",
+          "change": "A",
+          "headBlob": "d170f1302c7fbccdaf37e38657493a5691e75ae7",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/launchPressureBenchmarkV1.test.ts",
+          "change": "A",
+          "headBlob": "ff0c630bef48044dd98fc17659fb0fdea80bf6b7",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Pressure benchmark and delayed-control requirements; historical verified controls were not sufficient hard delayed controls. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 156,
+      "head": {
+        "ref": "experiment/binrat-hard-delayed-controls-v1",
+        "sha": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+        "label": "CipherCuttle:experiment/binrat-hard-delayed-controls-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-pressure-benchmark-v1",
+        "sha": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-benchmark-v1"
+      },
+      "updated_at": "2026-10-08T00:18:36Z",
+      "mergeBase": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+      "openDependents": [
+        158
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/HARD_DELAYED_CONTROLS_V1.md",
+        "A\tsrc/intelligence/hardDelayedControlsBenchmark.ts",
+        "A\ttest/fixtures/hardDelayedControlsV1.ts",
+        "A\ttest/hardDelayedControlsV1.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/HARD_DELAYED_CONTROLS_V1.md",
+          "change": "A",
+          "headBlob": "872c01fe2cf75c7f98de33cd919278ebf43b2f52",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/hardDelayedControlsBenchmark.ts",
+          "change": "A",
+          "headBlob": "15c348372f1697ca19b0f84b3d2bf28072b602c3",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/hardDelayedControlsV1.ts",
+          "change": "A",
+          "headBlob": "ceca493b141a77706e3da1e4d2eb917dc2af4a8c",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/hardDelayedControlsV1.test.ts",
+          "change": "A",
+          "headBlob": "3f74e6062aeab17571a31029b65397809026e4fc",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Hard-delayed-control fixtures falsify universal two-family pressure => launch-within-90-days claim; preserve negative evidence and excluded-candidate chronology. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 157,
+      "head": {
+        "ref": "test/binrat-launch-comprehension-browser",
+        "sha": "118934655bfd443a6181793806a270412eb01339",
+        "label": "CipherCuttle:test/binrat-launch-comprehension-browser"
+      },
+      "base": {
+        "ref": "integration/binrat-launch-night-v1",
+        "sha": "e34a94cf1702340582266852495e28423728add0",
+        "label": "CipherCuttle:integration/binrat-launch-night-v1"
+      },
+      "updated_at": "2026-10-08T00:48:39Z",
+      "mergeBase": "e34a94cf1702340582266852495e28423728add0",
+      "openDependents": [],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "M\t.github/workflows/ci.yml",
+        "M\tscripts/check-web.mjs",
+        "A\tsrc/autonomous/homeCopy.ts",
+        "M\tsrc/autonomous/rats.ts",
+        "M\tsrc/autonomous/telegram.ts",
+        "M\tsrc/cloudflare/worker.ts",
+        "M\tsrc/telegram/ui/cards.ts",
+        "M\tsrc/telegram/voice.ts",
+        "A\ttest/launchComprehension.test.ts",
+        "M\ttest/telegramUiCallback.test.ts",
+        "M\ttest/telegramUiMessaging.test.ts",
+        "M\tweb/app.js",
+        "M\tweb/frontdoor.js",
+        "M\tweb/index.html"
+      ],
+      "contentComparisons": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "change": "M",
+          "headBlob": "ec93dc44264d75847ae26a0dfceea05b1cd00d82",
+          "integrationBlob": "0a2821a490878e20313acc52532b7f5a3f8b3cb8",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "scripts/check-web.mjs",
+          "change": "M",
+          "headBlob": "f0714709efa2c94cb71b74474dea679fee5abc9e",
+          "integrationBlob": "e05fe9c041fabf026f8086de4751fe97f29ee6da",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/autonomous/homeCopy.ts",
+          "change": "A",
+          "headBlob": "7094e73073cc2069810cf8bb4b664b8c54a98b59",
+          "integrationBlob": "7094e73073cc2069810cf8bb4b664b8c54a98b59",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/autonomous/rats.ts",
+          "change": "M",
+          "headBlob": "e1291bfdf5dd4a5833964cc6fcbde7b4a8629b17",
+          "integrationBlob": "e1291bfdf5dd4a5833964cc6fcbde7b4a8629b17",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/autonomous/telegram.ts",
+          "change": "M",
+          "headBlob": "6a12030319fcc3ffdc71d7cd010a2fceeed1ae66",
+          "integrationBlob": "6a12030319fcc3ffdc71d7cd010a2fceeed1ae66",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/cloudflare/worker.ts",
+          "change": "M",
+          "headBlob": "7bc1f3b790df83fe1b71285cace9f4be2b95b7e4",
+          "integrationBlob": "b7bcacf4961d5dd525428cb020feed82d9e5736a",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/telegram/ui/cards.ts",
+          "change": "M",
+          "headBlob": "e57a19a20b14408e538803062fa4208fb09e9bdb",
+          "integrationBlob": "e57a19a20b14408e538803062fa4208fb09e9bdb",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "src/telegram/voice.ts",
+          "change": "M",
+          "headBlob": "f8654956bc42f7bb3ab5fa2f2f251ea467a2aa3b",
+          "integrationBlob": "f8654956bc42f7bb3ab5fa2f2f251ea467a2aa3b",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/launchComprehension.test.ts",
+          "change": "A",
+          "headBlob": "b5925011c27eb18b2cd8f6b7618c3ee0e17c3c0e",
+          "integrationBlob": "c04547cfe63f36ab48fc350d37165ce8ae4edc28",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/telegramUiCallback.test.ts",
+          "change": "M",
+          "headBlob": "500ea04abe77ae7ec00f4b37451490f2aa9d00af",
+          "integrationBlob": "500ea04abe77ae7ec00f4b37451490f2aa9d00af",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "test/telegramUiMessaging.test.ts",
+          "change": "M",
+          "headBlob": "c5e01d6952dcd6f589834f80ea3b9f62e8da519b",
+          "integrationBlob": "c5e01d6952dcd6f589834f80ea3b9f62e8da519b",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/app.js",
+          "change": "M",
+          "headBlob": "b5a363c2978acfaa881991bec63affe54a82731d",
+          "integrationBlob": "fefe97cd354ef5355507d283c45b76e1dc877d84",
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/frontdoor.js",
+          "change": "M",
+          "headBlob": "b1ac3a06611e0f2233f85857f08e0e0969781ac6",
+          "integrationBlob": "b1ac3a06611e0f2233f85857f08e0e0969781ac6",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        },
+        {
+          "path": "web/index.html",
+          "change": "M",
+          "headBlob": "82b1ee613f98e3409d90ca8513c8403b98f22926",
+          "integrationBlob": "82b1ee613f98e3409d90ca8513c8403b98f22926",
+          "sameBlobAtIntegration": true,
+          "absentAtIntegration": false
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Historical launch-comprehension browser/copy checks; not equivalent to current React V3 browser acceptance. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 158,
+      "head": {
+        "ref": "experiment/binrat-launch-convergence-prereg-v1",
+        "sha": "5b14957836643b516ada1e706b7e05220530fe8f",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-prereg-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-hard-delayed-controls-v1",
+        "sha": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+        "label": "CipherCuttle:experiment/binrat-hard-delayed-controls-v1"
+      },
+      "updated_at": "2026-10-08T00:38:59Z",
+      "mergeBase": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+      "openDependents": [
+        159
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/LAUNCH_CONVERGENCE_PREREG_V1.md",
+        "A\tsrc/intelligence/launchConvergencePrereg.ts",
+        "A\ttest/fixtures/launchConvergenceHoldoutV1.ts",
+        "A\ttest/launchConvergencePrereg.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/LAUNCH_CONVERGENCE_PREREG_V1.md",
+          "change": "A",
+          "headBlob": "aaa4a7fddb9e9970f0aff824f58d463931089d1f",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/launchConvergencePrereg.ts",
+          "change": "A",
+          "headBlob": "7321c1ece34f592840145c5586284cc76a21e5e0",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/launchConvergenceHoldoutV1.ts",
+          "change": "A",
+          "headBlob": "8a9981a2d890c68403dc9ae9e67c29a4772d73a6",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/launchConvergencePrereg.test.ts",
+          "change": "A",
+          "headBlob": "74ee3e32bd7c9287d7269f294aff41a62084c43d",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Frozen blocker-closure/independent-production-action preregistration; hypothesis remains unproven. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 159,
+      "head": {
+        "ref": "experiment/binrat-launch-convergence-replay-v1",
+        "sha": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-replay-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-convergence-prereg-v1",
+        "sha": "5b14957836643b516ada1e706b7e05220530fe8f",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-prereg-v1"
+      },
+      "updated_at": "2026-10-08T00:53:11Z",
+      "mergeBase": "5b14957836643b516ada1e706b7e05220530fe8f",
+      "openDependents": [
+        160
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/LAUNCH_CONVERGENCE_FIRST_PASS_V1.md",
+        "A\tsrc/intelligence/launchConvergenceReplayV1.ts",
+        "A\ttest/fixtures/launchConvergenceEvidenceInventoryV1.ts",
+        "A\ttest/launchConvergenceReplayV1.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/LAUNCH_CONVERGENCE_FIRST_PASS_V1.md",
+          "change": "A",
+          "headBlob": "370bf56cd13ed443108d02c529ef7f737f9e9f85",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/launchConvergenceReplayV1.ts",
+          "change": "A",
+          "headBlob": "8cb3be5f04a10fed2bc767df60d8c47ca791fd9e",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/launchConvergenceEvidenceInventoryV1.ts",
+          "change": "A",
+          "headBlob": "de61ccf52b5da8676af951ab4f7459caad1d111e",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/launchConvergenceReplayV1.test.ts",
+          "change": "A",
+          "headBlob": "8c2a55a2b092bfef7eb326a549dcb903e533c575",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Historical convergence replay has 0/12 coverage-verified targets and INSUFFICIENT_DATA; never label missing evidence verified negatives. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 160,
+      "head": {
+        "ref": "experiment/binrat-shadow-evidence-v1",
+        "sha": "832eb5c099d129129db702540a02a4a118226c52",
+        "label": "CipherCuttle:experiment/binrat-shadow-evidence-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-convergence-replay-v1",
+        "sha": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-replay-v1"
+      },
+      "updated_at": "2026-10-08T00:57:16Z",
+      "mergeBase": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+      "openDependents": [
+        161
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/SHADOW_EVIDENCE_FIRST_PROSPECTIVE_V1.md",
+        "A\tsrc/intelligence/datedLaunchBaselineV1.ts",
+        "A\ttest/datedLaunchBaselineV1.test.ts",
+        "A\ttest/fixtures/datedLaunchDiagnosticV1.ts",
+        "A\ttest/fixtures/prospectiveShadowRosterV1.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/SHADOW_EVIDENCE_FIRST_PROSPECTIVE_V1.md",
+          "change": "A",
+          "headBlob": "efaa84ca3953ab9ac2e28cd0690afd8113074683",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "src/intelligence/datedLaunchBaselineV1.ts",
+          "change": "A",
+          "headBlob": "ca2182d9972f8cd39ff43a209f335df7aa7d9bdd",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/datedLaunchBaselineV1.test.ts",
+          "change": "A",
+          "headBlob": "a064088bec4b2227f2fdde91fdd79bd10a041e6f",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/datedLaunchDiagnosticV1.ts",
+          "change": "A",
+          "headBlob": "1d198dce2a73ab55e1fd8d698b20ac775f52ecde",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/prospectiveShadowRosterV1.ts",
+          "change": "A",
+          "headBlob": "e28ac0c98f93e4dfdc561c3b6cac38af65803289",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Exploratory dated baseline/prospective roster; 0 VERIFIED cases and no predictive accuracy claim. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 161,
+      "head": {
+        "ref": "experiment/binrat-two-case-source-audit-v1",
+        "sha": "45bdf8258eeade825748eb6eaf6d55f015228662",
+        "label": "CipherCuttle:experiment/binrat-two-case-source-audit-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-shadow-evidence-v1",
+        "sha": "832eb5c099d129129db702540a02a4a118226c52",
+        "label": "CipherCuttle:experiment/binrat-shadow-evidence-v1"
+      },
+      "updated_at": "2026-10-08T01:20:08Z",
+      "mergeBase": "832eb5c099d129129db702540a02a4a118226c52",
+      "openDependents": [
+        162
+      ],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/LAUNCH_CONVERGENCE_TWO_CASE_SOURCE_AUDIT_V1.md",
+        "A\ttest/fixtures/twoCaseSourceAuditV1.ts",
+        "A\ttest/twoCaseSourceAuditV1.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/LAUNCH_CONVERGENCE_TWO_CASE_SOURCE_AUDIT_V1.md",
+          "change": "A",
+          "headBlob": "3f3da4cb8431eca7e646cb4c9b22b274688f28e5",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/twoCaseSourceAuditV1.ts",
+          "change": "A",
+          "headBlob": "dae2b706f4c586a5759fa8b66ea5d306a6e7862e",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/twoCaseSourceAuditV1.test.ts",
+          "change": "A",
+          "headBlob": "7a43390af7c879f4cf5af28cafb01609aaae242a",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Two-case source audit has 0/1 fully verified pairs; partial post-outcome diagnostic, not prospective validation. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    },
+    {
+      "number": 162,
+      "head": {
+        "ref": "experiment/binrat-prospective-capture-20261008-v1",
+        "sha": "335f8b0383366d2eb5031d52cbbc9f6c7b4d5bad",
+        "label": "CipherCuttle:experiment/binrat-prospective-capture-20261008-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-two-case-source-audit-v1",
+        "sha": "45bdf8258eeade825748eb6eaf6d55f015228662",
+        "label": "CipherCuttle:experiment/binrat-two-case-source-audit-v1"
+      },
+      "updated_at": "2026-10-08T01:53:18Z",
+      "mergeBase": "45bdf8258eeade825748eb6eaf6d55f015228662",
+      "openDependents": [],
+      "ancestorOfIntegration": false,
+      "changedPaths": [
+        "A\tdocs/experiments/PROSPECTIVE_EVIDENCE_CAPTURE_20261008.md",
+        "A\tdocs/experiments/receipts/2026-10-08/miden-node-pr2743.json",
+        "A\tdocs/experiments/receipts/2026-10-08/miden-node-pr2744.json",
+        "A\tdocs/experiments/receipts/2026-10-08/miden-node-v0.17.2-release.json",
+        "A\ttest/fixtures/prospectiveEvidenceCapture20261008.ts",
+        "A\ttest/prospectiveEvidenceCapture20261008.test.ts"
+      ],
+      "contentComparisons": [
+        {
+          "path": "docs/experiments/PROSPECTIVE_EVIDENCE_CAPTURE_20261008.md",
+          "change": "A",
+          "headBlob": "43a422d2345b54e52d69ee10ff9b17312ace15d3",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "docs/experiments/receipts/2026-10-08/miden-node-pr2743.json",
+          "change": "A",
+          "headBlob": "e8abf6d2ae315dfbf3fa4df640c1032ca0086fba",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "docs/experiments/receipts/2026-10-08/miden-node-pr2744.json",
+          "change": "A",
+          "headBlob": "ad2202bf8e3e898bd60292e323e31aedd677e735",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "docs/experiments/receipts/2026-10-08/miden-node-v0.17.2-release.json",
+          "change": "A",
+          "headBlob": "809b199a2d7f4a054fb14327e68fcdd0fc8cecb2",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/fixtures/prospectiveEvidenceCapture20261008.ts",
+          "change": "A",
+          "headBlob": "b6cf47429e4a4f946ccac693fc50780b008ded96",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        },
+        {
+          "path": "test/prospectiveEvidenceCapture20261008.test.ts",
+          "change": "A",
+          "headBlob": "0036e497b75a69d40911fdda027cdca3fb0dee92",
+          "integrationBlob": null,
+          "sameBlobAtIntegration": false,
+          "absentAtIntegration": true
+        }
+      ],
+      "classification": "DONOR",
+      "reason": "Frozen October 8 prospective receipt capture, including exact Miden release/PR JSON; zero V0/V1 admission claims. Preserve as research outside the selected persistent-Rat workstream; no closure or new external research is authorized here."
+    }
+  ]
+}

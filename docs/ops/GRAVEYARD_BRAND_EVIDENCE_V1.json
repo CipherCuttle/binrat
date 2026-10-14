@@ -1,0 +1,146 @@
+[
+  {
+    "branch": "origin/design/binrat-brand-assets-v0",
+    "sha": "1db118b285dcda3f0e5fb63a944afaa3822f95ef",
+    "ancestorIntegration": true,
+    "assetBrandLicensePaths": 2,
+    "exactEqualInIntegration": 0,
+    "differentOrAbsent": 2
+  },
+  {
+    "branch": "origin/design/binrat-brand-system-v1",
+    "sha": "770c7aa8741236ee5d8fc8ddd6411bc2addfdade",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 64,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 42
+  },
+  {
+    "branch": "origin/design/binrat-copy-library-v1",
+    "sha": "91cee9f12563f2d4286736155400910ad1ca1cb5",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 62,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 40
+  },
+  {
+    "branch": "origin/design/binrat-dumpster-web-v0",
+    "sha": "d8388b8dccfbaf64896e6617c0e78dddcb42ac95",
+    "ancestorIntegration": true,
+    "assetBrandLicensePaths": 1,
+    "exactEqualInIntegration": 0,
+    "differentOrAbsent": 1
+  },
+  {
+    "branch": "origin/design/binrat-export-pack-v1",
+    "sha": "de0fa94edbe4412054fc6bbd388f7c66165fc747",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 70,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 48
+  },
+  {
+    "branch": "origin/design/binrat-frontend-astra-v1",
+    "sha": "b70f21da98d32fa516a40eb9da9ea7a97c29685b",
+    "ancestorIntegration": true,
+    "assetBrandLicensePaths": 8,
+    "exactEqualInIntegration": 7,
+    "differentOrAbsent": 1
+  },
+  {
+    "branch": "origin/design/binrat-hero-image-fidelity-v0",
+    "sha": "445a034afbce8c99b02f84e82fae576b03c84a60",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 2,
+    "exactEqualInIntegration": 0,
+    "differentOrAbsent": 2
+  },
+  {
+    "branch": "origin/design/binrat-launch-presentation-v0",
+    "sha": "43c259e05f31a612083fbacb1d371a7913539627",
+    "ancestorIntegration": true,
+    "assetBrandLicensePaths": 2,
+    "exactEqualInIntegration": 0,
+    "differentOrAbsent": 2
+  },
+  {
+    "branch": "origin/design/binrat-motion-identity-v1",
+    "sha": "0b96eead965a788f4b14d9c714692f995b090545",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 65,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 43
+  },
+  {
+    "branch": "origin/design/binrat-north-star-v1",
+    "sha": "3946935b0db2179d17962349a1c98a65f3756474",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 9,
+    "exactEqualInIntegration": 8,
+    "differentOrAbsent": 1
+  },
+  {
+    "branch": "origin/design/binrat-public-identity-v0",
+    "sha": "9a294a13a17d9622bd4e5b0bf09fa8a34d2ef3b3",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 4,
+    "exactEqualInIntegration": 0,
+    "differentOrAbsent": 4
+  },
+  {
+    "branch": "origin/design/binrat-rive-machine-demo-v0",
+    "sha": "57d493f1511652b644363b7b5927cec5d40b7999",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 9,
+    "exactEqualInIntegration": 8,
+    "differentOrAbsent": 1
+  },
+  {
+    "branch": "origin/design/binrat-rive-signal-prototype-v0",
+    "sha": "64936b74981518f6d12d722f67165c3377436fa2",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 9,
+    "exactEqualInIntegration": 8,
+    "differentOrAbsent": 1
+  },
+  {
+    "branch": "origin/design/binrat-roadmap-brand-v1",
+    "sha": "95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 94,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 72
+  },
+  {
+    "branch": "origin/design/binrat-share-cards-v0",
+    "sha": "373c3e9d4271fdfe38c178bf5f46a3aac4fa04a6",
+    "ancestorIntegration": true,
+    "assetBrandLicensePaths": 2,
+    "exactEqualInIntegration": 0,
+    "differentOrAbsent": 2
+  },
+  {
+    "branch": "origin/design/binrat-social-production-v1",
+    "sha": "568b0a3c7214e3252e3c7278ba35c2c382955814",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 69,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 47
+  },
+  {
+    "branch": "origin/integration/binrat-brand-v1-composed",
+    "sha": "0343d3815e509c45ef6b4991a7f8d438e2f4deb1",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 95,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 73
+  },
+  {
+    "branch": "origin/review/binrat-brand-v1-integration",
+    "sha": "74527474fab29f6a05fab1affc751a3d187cda34",
+    "ancestorIntegration": false,
+    "assetBrandLicensePaths": 66,
+    "exactEqualInIntegration": 22,
+    "differentOrAbsent": 44
+  }
+]

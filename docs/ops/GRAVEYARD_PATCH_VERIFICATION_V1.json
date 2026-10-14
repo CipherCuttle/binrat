@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-10-14T02:36:59.631417+00:00",
+  "patches": [
+    {
+      "branch": "ops/cloudflare-deploy-v0",
+      "expectedHeadSHA": "5672736c09981287c5df1ea3e2c5e91254e57eb9",
+      "patchSHA256": "33eeeff425b6b3f225a4661b18a39eb935900c2f5f76cc46d436fcb58f15d936",
+      "gitApplyCheck": "PASS",
+      "patchedYAML": "PASS",
+      "allJobsDisabled": true,
+      "scope": "Temporary file fixture only; no historical ref modified"
+    },
+    {
+      "branch": "feat/binrat-rat-radar-v0",
+      "expectedHeadSHA": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "patchSHA256": "35c93ba844d3e0366b272c5b011897bedc064ffa8d6ff46432ad933ec96d1a9c",
+      "gitApplyCheck": "PASS",
+      "patchedYAML": "PASS",
+      "allJobsDisabled": true,
+      "scope": "Temporary file fixture only; no historical ref modified"
+    },
+    {
+      "branch": "feat/binrat-rat-conversation-free-ai-v1",
+      "expectedHeadSHA": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "patchSHA256": "abdd44faf751ee4cad9354c2bfc3b0826f7f55d52e26af34973b65af105f401c",
+      "gitApplyCheck": "PASS",
+      "patchedYAML": "PASS",
+      "allJobsDisabled": true,
+      "scope": "Temporary file fixture only; no historical ref modified"
+    },
+    {
+      "branch": "ops/binrat-miniapp-preview-v1",
+      "expectedHeadSHA": "128e2a47f322d3b6dc44ec8672871daae7cacc86",
+      "patchSHA256": "5d16b99bfd11a475a5d09f214a4176f87ade3544ea8a8505b6728ef3b69e2424",
+      "gitApplyCheck": "PASS",
+      "patchedYAML": "PASS",
+      "allJobsDisabled": true,
+      "scope": "Temporary file fixture only; no historical ref modified"
+    },
+    {
+      "branch": "ops/binrat-miniapp-preview-v2",
+      "expectedHeadSHA": "b1e8f40aae9773828a11d3cd013e66b7e66ad127",
+      "patchSHA256": "fd550dbfd7ddf0e1514f69e1e73a69c31c8247cb8458dbbf77d4bbcc8ccea2a7",
+      "gitApplyCheck": "PASS",
+      "patchedYAML": "PASS",
+      "allJobsDisabled": true,
+      "scope": "Temporary file fixture only; no historical ref modified"
+    }
+  ],
+  "modifiedMainYAML": "PASS",
+  "remoteWrites": 0
+}

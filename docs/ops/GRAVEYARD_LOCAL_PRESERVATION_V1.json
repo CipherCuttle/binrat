@@ -1,0 +1,11 @@
+{
+  "timestampUTC": "2026-10-14T02:38:00.254760+00:00",
+  "verifiedDirtyFiles": 726,
+  "changes": [],
+  "verdict": "PASS",
+  "scope": "Previously dirty/untracked content hashes; excludes newly created cleanup tree and ignored files. No original dirty files are changed by this verification.",
+  "originalWorktreeHeadsChecked": 51,
+  "originalStatusSetsChecked": 51,
+  "dirtyIndexEntriesChecked": 35,
+  "topologyOrIndexChanges": []
+}

@@ -1,0 +1,3140 @@
+{
+  "schemaVersion": 1,
+  "inventory": {
+    "capturedAt": "2026-10-14T02:18:15.171763+00:00",
+    "repository": "CipherCuttle/binrat",
+    "allPRs": 182,
+    "openPRs": 151,
+    "remoteBranches": 242,
+    "pages": {
+      "prs": 2,
+      "branches": 3
+    },
+    "paginationCeilingEach": 5
+  },
+  "scope": "No deletion during this operation; protection is not selection as active product source.",
+  "remoteRefs": [
+    {
+      "branch": "agent/arc-launch-ingest-v0",
+      "headSHA": "1d59ed3a39bf4f8cffef62e4dfa22f6c56d089b6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "agent/binrat-public-read-plane-v0",
+      "headSHA": "a76651e5c43abe7f3f8d1736996d063ea2592e42",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "binrat-dumpster-os-d1-githack",
+      "headSHA": "e34501add2c1ac17526cf4b56826a90f84a68d08",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "binrat-mobile-m1-githack",
+      "headSHA": "8487754822c4dfef1d634d1f8ca5981b51f9aadd",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "binrat-v2-githack-pr23",
+      "headSHA": "6905d0cecd8ec24134ca5196f69f0a602daba305",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "codex/binrat-prelaunch-release-a911c23",
+      "headSHA": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "codex/prelaunch-hardening-v1",
+      "headSHA": "a911c23b70ea5e2286afaf0d9a3dfef5fc697a85",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "codex/telegram-as-code-private-v2",
+      "headSHA": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-brand-assets-v0",
+      "headSHA": "1db118b285dcda3f0e5fb63a944afaa3822f95ef",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-brand-system-v1",
+      "headSHA": "770c7aa8741236ee5d8fc8ddd6411bc2addfdade",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-copy-library-v1",
+      "headSHA": "91cee9f12563f2d4286736155400910ad1ca1cb5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-dumpster-web-v0",
+      "headSHA": "d8388b8dccfbaf64896e6617c0e78dddcb42ac95",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-export-pack-v1",
+      "headSHA": "de0fa94edbe4412054fc6bbd388f7c66165fc747",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-frontend-astra-v1",
+      "headSHA": "b70f21da98d32fa516a40eb9da9ea7a97c29685b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-hero-image-fidelity-v0",
+      "headSHA": "445a034afbce8c99b02f84e82fae576b03c84a60",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-launch-presentation-v0",
+      "headSHA": "43c259e05f31a612083fbacb1d371a7913539627",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-motion-identity-v1",
+      "headSHA": "0b96eead965a788f4b14d9c714692f995b090545",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-north-star-v1",
+      "headSHA": "3946935b0db2179d17962349a1c98a65f3756474",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-public-identity-v0",
+      "headSHA": "9a294a13a17d9622bd4e5b0bf09fa8a34d2ef3b3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-rive-machine-demo-v0",
+      "headSHA": "57d493f1511652b644363b7b5927cec5d40b7999",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-rive-signal-prototype-v0",
+      "headSHA": "64936b74981518f6d12d722f67165c3377436fa2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-roadmap-brand-v1",
+      "headSHA": "95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-share-cards-v0",
+      "headSHA": "373c3e9d4271fdfe38c178bf5f46a3aac4fa04a6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "design/binrat-social-production-v1",
+      "headSHA": "568b0a3c7214e3252e3c7278ba35c2c382955814",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "diag/binrat-observability-readonly-20260924",
+      "headSHA": "72d3369b1373ff31f285ea55e2ed980f65561697",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/authority-reconcile-react-pons-v1-20261011",
+      "headSHA": "4e79d91e1280072281f80dcb0982135cb45c8d23",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-active-workforce-guardrails-20261011",
+      "headSHA": "2e90210f90ebe83374d192044342ac4e952f9b91",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-founder-vision-guardrails-20261011",
+      "headSHA": "11c009549f12e0b5e6eef2b368130afd611a0e44",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-launch-genesis-funnel-v1",
+      "headSHA": "70501f0e8f30d3fa46a8a6dc04b63fd9284d17f7",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-launch-night-canon-v1",
+      "headSHA": "0921ecbcb565ebb2fdb826fcb7a05056955f4666",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-pons-launch-authority-v1",
+      "headSHA": "bb5d7a862021b3362d078c876a2a7243fe90c015",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-pons-production-runtime-triage-v1",
+      "headSHA": "cd889687c97f21b62fb166a7f72ded28df4243fb",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-ponsvault-forensic-pin-v1",
+      "headSHA": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-ponsvault-staking-forensic-pin-v1",
+      "headSHA": "8667d32182f3013a4ec255d340403f54d3db6c93",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-ponsvault-staking-forensic-v1",
+      "headSHA": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-production-reliability-freeze-v1",
+      "headSHA": "e62cfcc54269ea9fc5fec1344a8518041513315c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-staking-authority-rebind-v1",
+      "headSHA": "4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-staking-authority-reconcile-v1",
+      "headSHA": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/binrat-staking-l1b-v1",
+      "headSHA": "e2cc2ecbeb05ddcbd5b9081cb683c9c04a930684",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/engineering-stack-north-star-v1-20261011",
+      "headSHA": "4745768c54c3b86372fe67ba56bcbbf86bc6e235",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "docs/telegram-web-forensics-split-v1",
+      "headSHA": "fe48aad43506c4cca72d7abe0fe0e982dff27b29",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-comms-eval-20261006-v1",
+      "headSHA": "24549d2605696d99c06531485990ff5d7d0c5536",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-comms-eval-20261006-v2",
+      "headSHA": "594eadad301c226ba5a7243fa5768dc5620b0b62",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-comms-eval-20261006-v3",
+      "headSHA": "795588dc80df2a9ed7bf913c10469e11403ea93f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-comms-shadow-20261006-v2",
+      "headSHA": "8ec70f8ca8cb562338ebd7268a281934f4249921",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-comms-shadow-20261006-v3",
+      "headSHA": "02183840b87dfa5fb64160e78ace47c810871ef3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-comms-shadow-20261006",
+      "headSHA": "cfb9b7334694b6359356ebe9b7b4d445f0c54da3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-design-review-gallery-20260928",
+      "headSHA": "368e0097e784098bab20572fcf13ec78f343df9e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g3b-reviewed-20260926",
+      "headSHA": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g3c-mobile-20260926",
+      "headSHA": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4a-field-instrument-20260926",
+      "headSHA": "65e983a5ba7655f063be57a7ee12b23cfcc91e06",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4a-integration-20260926",
+      "headSHA": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4r2-grain-wave-20260927",
+      "headSHA": "521998d988fc1113dc7ef081250fe1b3147b48b0",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4r4-official-grain-wave-20260927",
+      "headSHA": "8d1378f2a1c834b49ef66cd8ebe1886738b80755",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4r5-demo-first-20260927",
+      "headSHA": "ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4r-cinematic-20260926",
+      "headSHA": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+      "headSHA": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-hard-delayed-controls-v1",
+      "headSHA": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-launch-convergence-prereg-v1",
+      "headSHA": "5b14957836643b516ada1e706b7e05220530fe8f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-launch-convergence-replay-v1",
+      "headSHA": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-launch-pressure-benchmark-v1",
+      "headSHA": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-launch-pressure-v0",
+      "headSHA": "ebaebce361671f17c0638453d690c5f8da64d560",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-prelaunch-benchmark-v1",
+      "headSHA": "a2e2608a39e42138e24b31865492812462744f1f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-prelaunch-scout-v0",
+      "headSHA": "c75e11654b6f7850068875bf0b89e23024113121",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-prospective-capture-20261008-v1",
+      "headSHA": "335f8b0383366d2eb5031d52cbbc9f6c7b4d5bad",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-reactbits-license-probe-20260926",
+      "headSHA": "abe86822757029c5654394c57380f72fb87e945c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-sentry-kill-fast-rpc-v1",
+      "headSHA": "90296437d8846df71311f9523a4e7a29d9968798",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-shadow-evidence-v1",
+      "headSHA": "832eb5c099d129129db702540a02a4a118226c52",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-sniffer-gpt41mini-20261005",
+      "headSHA": "9f63e3a6ffc3be1863cc44c5e7e475e4e6f7d2f1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/binrat-two-case-source-audit-v1",
+      "headSHA": "45bdf8258eeade825748eb6eaf6d55f015228662",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "experiment/72h-hot-garbage-v0",
+      "headSHA": "5dbde0691da758a50cd41f802932f51d5a4020b4",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-a1-2-case-contract",
+      "headSHA": "695e813eacb8f70e169d45b814ecc180ec01d50e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-a1-2-case-ui",
+      "headSHA": "ac5e2b97d1ec1b8d870b1d2b02e1b55818ebac59",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-a2-2-safe-outcome-collector",
+      "headSHA": "6ce3d8260011d9f0e6b00cef0f95d23f55976773",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-a2-case-intelligence",
+      "headSHA": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-autonomous-rat-v1",
+      "headSHA": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-case-adapter-v1",
+      "headSHA": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-case-endpoint-v1",
+      "headSHA": "7a96a3c111af14b6d34585cd425904a59068b4be",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-case-journey-convergence-v1",
+      "headSHA": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-case-model-convergence-v1",
+      "headSHA": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-case-model-v1",
+      "headSHA": "9dbc44b923b9e86b57d81aa9b1b7c573f840fa07",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-case-surface-v1",
+      "headSHA": "c9bcb01c01433147ca6d774ed807efafffaa437e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-cloudflare-d1-v0",
+      "headSHA": "f1d093fc3d7b0dc865f3196ee41c486d2cc2d9e9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-comms-rat-shadow-v1",
+      "headSHA": "ac5ad85629c76ceecb512bb7d72eafa62d25833e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-comms-rat-writer-v1",
+      "headSHA": "1b54e042157d03c898ae03364e073195e2efd71c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-consecutive-discovery-v1",
+      "headSHA": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-degen-frontdoor-v1",
+      "headSHA": "64ec4702ca71330f41a2f8a8f575eeff44958f12",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-dumpster-os-d1",
+      "headSHA": "ee44442ce434f577dc628871931c4cd4c9dac8fe",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-exact-pons-launch-rehearsal-v1",
+      "headSHA": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-frontdoor-journey-v1",
+      "headSHA": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-frontend-live-integration-pr3",
+      "headSHA": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-frontend-mobile-m1",
+      "headSHA": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-frontend-routes-pr2",
+      "headSHA": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-frontend-visual-lab-ci",
+      "headSHA": "e1fafaf759da049c00f818ad1aa4bbcc09bf709e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-funder-cohort-v1",
+      "headSHA": "34527586e0f20df963513109794b1b770f81415f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-g0-g1-capacity-foundation-v1",
+      "headSHA": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-g2a-a1-pons-receipt-proof-v1",
+      "headSHA": "55af899617fc38af71b746e3e90a9f2de3e6e53a",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-g2a-pons-source-candidate-v1",
+      "headSHA": "a6f03dd3191dbeb9309d1af5d49608dfcc965fc2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-g2b-funding-ledger-v1",
+      "headSHA": "c8f55a221e88b3f7cab4cacf6302c5d171f75a48",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-g2b-prepaid-entitlements-candidate-v1",
+      "headSHA": "1e043cda038ed8b94ee7694416385ce807727964",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-indexed-archive-probe-v1",
+      "headSHA": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-indexed-calibration-v1",
+      "headSHA": "68a61758db8912557fb6cd0eae2091877493e12d",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-indexed-funder-discovery-v1",
+      "headSHA": "55380186538ccae65c43518742730fb507989730",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-indexed-observation-v1",
+      "headSHA": "96812356cc609925d1a5cfe6655f618eed4a8b7f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-intelligence-v1",
+      "headSHA": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-live-candidate-v1",
+      "headSHA": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-live-read-v0",
+      "headSHA": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-local-den-v1",
+      "headSHA": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-local-rat-job-v1",
+      "headSHA": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-miniapp-hierarchy-v1",
+      "headSHA": "19fc3cdf42c3972dbf95dae4d9e407725d0d35bc",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-miniapp-hot-garbage-stability-v1",
+      "headSHA": "3eba47cc2ab6d72b057f13a4e561bda168447a29",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-miniapp-rat-trap-integration-v1",
+      "headSHA": "f9c16850b32405a25b1847c7aaabb787c29582c1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-next-query-eval-v1",
+      "headSHA": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-north-star-slice-g0-g2",
+      "headSHA": "ad718032dc70da08bd38cb0b75b13e2ca43892a1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-offline-workforce-benchmark-v1",
+      "headSHA": "9759e02a44c9a6a60390d33db70f57166916e90c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-candidate-worker-routes-v1",
+      "headSHA": "eefda7326c283b54ec415c8abd948a274a9df674",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-candidate-worker-v1",
+      "headSHA": "b787a54744929cf0d8ccb3f8307a498004d8c6e3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-case-preview-v1",
+      "headSHA": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-cutover-candidate-v1",
+      "headSHA": "462d70b8d00adafdd69adfd01ddf9f904ede01fa",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-discovery-consistency-v1",
+      "headSHA": "f1411ab83eddb25ed18c88584b6e26e75e86f163",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-funding-collector-v1",
+      "headSHA": "1175423a864ed6ac28c5473a55b850443f65076e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-funding-provenance-v1",
+      "headSHA": "95968749eac6691d2645344bf8cb7b2a0a227ade",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-funding-recurrence-read-v1",
+      "headSHA": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-funding-storage-v1",
+      "headSHA": "90296437d8846df71311f9523a4e7a29d9968798",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-holder-balance-probe-v1",
+      "headSHA": "5e7d8fa0e37b007d7d58d0acc9cc223b27c79095",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-launch-receipt-v0",
+      "headSHA": "5b38cdf00e7e170af7c1f1cc18f9d1a24160c928",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-outcome-capability-v1",
+      "headSHA": "04d559af941a1043847e8ea1c2909cd66d3f7bcf",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-outcome-o1-v1",
+      "headSHA": "9b50940e81b24727422deb64d16f94dba4736c98",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-outcome-receipts-v1",
+      "headSHA": "1cd72433af067eeaca3bd7d3ccf9a9f22051e319",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-outcome-v1",
+      "headSHA": "bd8d21dfa1353664057f772e5b7a7fcd223d48d5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-preflight-v1",
+      "headSHA": "ccc677985ce07f438648a2499611e72c36729491",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-replay-lab-v1",
+      "headSHA": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-replay-receipt-v1",
+      "headSHA": "843f7e1866b2a96dd57fe9e47ab0574d407d48d3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-siwe-bound-candidate-v1",
+      "headSHA": "1479adc08e3b171d47b171e51867d8d0c607a86e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-token-identity-livebase-v1",
+      "headSHA": "1eed71b8652c78762894bc685199bd33e5154116",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-token-identity-production-v1",
+      "headSHA": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-token-identity-runtime-v1",
+      "headSHA": "df71f614f00c8d7f595b9508d964dca276c15326",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-pons-token-identity-v1",
+      "headSHA": "d40ff86ddc708d23e2f7880d248267590b45809b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-product-surface-v1-demo",
+      "headSHA": "17cce6b5a43089971a7a45fb6d02a00e30012a5f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-prospective-capture-v1",
+      "headSHA": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-public-read-plane-stability-v1",
+      "headSHA": "5bd247bbef968ea8570532bbd6edc1d5ee543421",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-radar-calibration-v1",
+      "headSHA": "ed1cd81f3fce097f53b1b4c9337df16fdb696f0c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-radar-case-file-v1",
+      "headSHA": "73c0b016cb265e892ea220b820f5ed7f2f45bfff",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-radar-final-v1",
+      "headSHA": "817fb44f8d082e25604591f1d158494fb224b82c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-radar-workbench-v1",
+      "headSHA": "b27fdc48054b49bbe8fc80b8c5a637bab675d94f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rat-conversation-free-ai-v1",
+      "headSHA": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rat-radar-v0",
+      "headSHA": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rat-trap-presentation-v1",
+      "headSHA": "206fb4d868a3fdeef2bb054edfb09837437306dd",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rat-trap-projection-v1",
+      "headSHA": "677f2046525fcb95c58a520054bd556c702ed404",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rat-watch-v0",
+      "headSHA": "b5755fef349a4badc153fee9e9811461cac1a919",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rat-workforce-offline-v1",
+      "headSHA": "ed2807f6d49c853713770fba099159e20bfd173b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-rats-share-v1",
+      "headSHA": "083d4fe4bd662dfe9e7733cb37fbed40e06f3fc9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-recorded-evidence-v1",
+      "headSHA": "c9abb46633418c0f5a0e1f48a278d7595e86b23e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-remember-livebase-v1",
+      "headSHA": "7ef47cd2c2a7da8e005efbd40dc0c478b5370d0d",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-reserved-followup-v1",
+      "headSHA": "b4eda1169d101e524d539fcc4a64cccc77c3c28c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-roadmap-living-scenes-v1",
+      "headSHA": "ab844e4814d553b4485b7d3351e176c8376712a6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-robinhood-live-rat-v1",
+      "headSHA": "5fed3ed3c6f6405617348e150275378b23c24a59",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-shadow-economy-v0",
+      "headSHA": "b85d9c5f39072e32aec331d299e8f38ba6b6a499",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-sniffer-capture-runner-v1",
+      "headSHA": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-sniffer-competence-eval-v1",
+      "headSHA": "d47e9c30f3d089c754b1da37b2016d2a57ec23dc",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-sprint-a1-frontdoor-discovery",
+      "headSHA": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-telegram-messaging-v1",
+      "headSHA": "95da66edb428114ab7f7ff2aabdfdb7989134861",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-telegram-mood-art-v1",
+      "headSHA": "b5fc2f56846979ef7164a1db92a5b739da77901d",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-telegram-rat-v0",
+      "headSHA": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-telegram-scout-v0",
+      "headSHA": "d433f0d4c588325c280ac58d5acaca570ee248f1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-telegram-ux-v2",
+      "headSHA": "7fece313958558a7bb9789e9592aafee894422b5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-trash-trails-v1",
+      "headSHA": "0f9ec9f1127f132a279713c28cfe748ab150a2a9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-v3-frontdoor-cutover-candidate-v1",
+      "headSHA": "07737938ef48bf886293ba34c5225ac9e1e5ed2b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-visual-lab-v1",
+      "headSHA": "bffc309e98e6ba6e07595564782844344dd443d7",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/binrat-working-rat-l2-v1",
+      "headSHA": "c23defaa9ed338e13ba2be72c482af51660aac56",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/pons-tripwire-v1",
+      "headSHA": "216647d214a7df05d1eb48e99d8af27dc4262392",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "feat/telegram-messaging-v1",
+      "headSHA": "2d2f27ed5cb1a5e575226b757df0b219d8eac43a",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-4663-surface-authority-v1",
+      "headSHA": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-capture-used-capped-key-v1",
+      "headSHA": "665aee695cd904d10aa9848d4658de0aac84798f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-comms-eval-failure-receipts-v1",
+      "headSHA": "66137462bb2a61b2ce6f3ba93cf820b896bef2d7",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-history-before-funding-v1",
+      "headSHA": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-launch-comprehension-v1",
+      "headSHA": "c5a4809b0eb763d50fae378b0c50dc9d278ed1cd",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-offline-proposal-validation-v1",
+      "headSHA": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-pons-provider-head-regression-base-v1",
+      "headSHA": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-pons-provider-head-regression-v1",
+      "headSHA": "9d7d926f10db93802e76eab96b655ba449f23db1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-prod-readonly-inspection-verdict-v1",
+      "headSHA": "e03ae70db7a25229db773b2c1530178f42f10721",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-provenance-incremental-repair-base-v1",
+      "headSHA": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-provenance-incremental-repair-v1",
+      "headSHA": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-read-plane-frontend-resilience-v1",
+      "headSHA": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/binrat-v2-evidence-integrity-pr1",
+      "headSHA": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "fix/pons-rpc-limit-diagnostics-v1",
+      "headSHA": "c31ddf8ae70806a0a2abf444c9879c3e418bb2ae",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "g3a-interactive-prototype-20260926",
+      "headSHA": "0eb819369602f6f153c58dae14212d5e9308059c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "gh-pages",
+      "headSHA": "7fd586cf62900acda541321485f1812046db9b9b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "hotfix/pons-catchup-throughput-v1",
+      "headSHA": "0f9878ca82ad9cc6002797738495c22bfb9d089a",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "hotfix/pons-launch-identity-retry-v1",
+      "headSHA": "982b0ac761bf687a0281668acc693c163919c2c6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-a1-3-visual-gate",
+      "headSHA": "160ab9c4fbb2f9cebd4a45cc20f5e75d85f57302",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-brand-v1-composed",
+      "headSHA": "0343d3815e509c45ef6b4991a7f8d438e2f4deb1",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-case-canonical-v1",
+      "headSHA": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-launch-night-v1",
+      "headSHA": "e34a94cf1702340582266852495e28423728add0",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-pons-launch-authority-sprint-v1",
+      "headSHA": "4fbd2d71317ce99d0d96b42bc82b1b299afbe99f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-pons-launch-canonical-v1",
+      "headSHA": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-public-read-plane-stability-v1",
+      "headSHA": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-public-truth-launch-v1",
+      "headSHA": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "integration/binrat-r5-approved-20260927",
+      "headSHA": "959da17b0573dff016808d597737b4cf186bed62",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "main",
+      "headSHA": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-case-canonical-private-preview-v1",
+      "headSHA": "fae06e675bd68271a7f583a662b69e2451906236",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-case-surface-private-preview-v1",
+      "headSHA": "f5934950011455061569075fc6111d0022a11629",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-case-version-url-preview-v1",
+      "headSHA": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-domain-cutover-v1",
+      "headSHA": "dc72fe57b6f5927c8245cba6994c3811a6d0ef96",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-frontend-preview-gallery-v1",
+      "headSHA": "65ded06e1c7eb147a3e6c491f3ebda3ada2b8ee2",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-miniapp-preview-v1",
+      "headSHA": "128e2a47f322d3b6dc44ec8672871daae7cacc86",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-miniapp-preview-v2",
+      "headSHA": "b1e8f40aae9773828a11d3cd013e66b7e66ad127",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-o2-production-base-v1",
+      "headSHA": "525bab62a21061c576099215d247d96ae8541e01",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-o2-production-rollout-v1",
+      "headSHA": "7d223924f1dda8a50270c61443969c4a415bfd1c",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-pons-provider-regression-deploy-v1",
+      "headSHA": "7a03a7cc6ffb5c79843ed5c1df1c4b58d4483d8e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-pons-replay-production-inspect-v1",
+      "headSHA": "1d55af75c55a98be696eb84a784383e0caa98939",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-provenance-repair-deploy-v1",
+      "headSHA": "e2e8934f1821502873211131c535dd58f1abcd75",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-rat-trap-production-inspect-v1",
+      "headSHA": "ab789594d12e334960eded3c571e08135f390516",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-repo-cleanup-manifest-v1",
+      "headSHA": "a3efccb9b8d449605cfe2a18d6deb5236463044d",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/binrat-token-identity-production-rollout-v1",
+      "headSHA": "65dd428f3916aee336cc460d5cb67ac37094d391",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/cloudflare-deploy-v0",
+      "headSHA": "5672736c09981287c5df1ea3e2c5e91254e57eb9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/cloudflare-emergency-containment-20261011",
+      "headSHA": "aee9a91b0de87351ed219e4174836dce4ff9afad",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/cloudflare-readonly-inspect",
+      "headSHA": "e71938139dd3e901cebb9b8167cb5b1f3e24fda8",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/fix-controlled-rat-workflow-yaml-20260930",
+      "headSHA": "69aa1aad0c9f83d8a7d3b08fb2935683171e6252",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "ops/register-controlled-rat-workflow-20260930",
+      "headSHA": "e12a01d3a1d41c231a2cf4bb9496e3520fa40afb",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "plan/binrat-network-roadmap-v0",
+      "headSHA": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "plan/binrat-pons-canonical-selection-v1",
+      "headSHA": "614363b77ce288384ac27f5a7dc1aa018076a8d3",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "plan/binrat-token-prelaunch-control-v1",
+      "headSHA": "bd7fbe608e82d86c28ab23a01198013f550e1cd5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "plan/binrat-v0",
+      "headSHA": "9115033c8d407405927b710d86b233e5ea6847bb",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "planning/binrat-g1a-prefigma-2026-09-26",
+      "headSHA": "582eaa66449c8ca4b2bbed3ab21353da64c0ec4f",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "planning/binrat-pons-hybrid-blueprint-2026-09-26",
+      "headSHA": "d54933ceb1d6d4f0c63e9948dc96c7afcbd2f4a4",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "preview-binrat-bento-pr31",
+      "headSHA": "f6165bd5a9b433f12fbbc6644b92aeaf22dc4027",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "preview-binrat-bento-v1",
+      "headSHA": "c31b1d4726eade25ba257f48022879e538394394",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "preview-binrat-g2",
+      "headSHA": "4d1df2121018d2c4291489d3e9dc91236a8c02ff",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "release/binrat-autonomous-rat-v1-1",
+      "headSHA": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "release/binrat-backend-read-only-20261009",
+      "headSHA": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "release/binrat-v3-production-20261009",
+      "headSHA": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "research/binrat-pons-vault-pins-v1",
+      "headSHA": "21623f1c79850baee833317d08990d76760aaed9",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "research/pons-gates-holder-econ-v1",
+      "headSHA": "54825038129d9bf4c9730664919cb7e83dd74211",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "research/rat-radar-evidence-lab-v0",
+      "headSHA": "4c5695951998430f1fa57dcc341a157cb8c375cb",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "reset/backend-only-main-20260925",
+      "headSHA": "a4e97f4a420f19d34bf3429cba50b7733666ab71",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "reset/binrat-backend-only-20260925",
+      "headSHA": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "review/binrat-brand-v1-integration",
+      "headSHA": "74527474fab29f6a05fab1affc751a3d187cda34",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "test/binrat-case-journey-browser",
+      "headSHA": "0df3a4a41a4f386e70855fb05e2ea54f55a933b5",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "test/binrat-comms-shadow-eval-v1",
+      "headSHA": "ef2ef0b8955ab03908588dd94138ad0e3126704b",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "test/binrat-launch-comprehension-browser",
+      "headSHA": "118934655bfd443a6181793806a270412eb01339",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    },
+    {
+      "branch": "test/binrat-prospective-confirmation-v1",
+      "headSHA": "e8a722b456293e5ef092ed1f60db30f6d7f18831",
+      "protectionReason": "Retain original source/evidence until individual permanent preservation + dependencies + deployment/reference/license review is complete.",
+      "mayDelete": false
+    }
+  ],
+  "localRefs": [
+    {
+      "ref": "refs/heads/codex/pons-funding-convergence-v1",
+      "sha": "90296437d8846df71311f9523a4e7a29d9968798",
+      "upstream": "",
+      "lastCommitDate": "2026-10-02T23:14:51+02:00",
+      "subject": "fix: converge Pons funding retry authority",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 62,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/binrat-launch-genesis-funnel-v1",
+        "refs/remotes/origin/docs/binrat-launch-night-canon-v1",
+        "refs/remotes/origin/docs/binrat-pons-launch-authority-v1",
+        "refs/remotes/origin/docs/binrat-ponsvault-forensic-pin-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/codex/telegram-as-code-private-v2",
+      "sha": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "upstream": "refs/remotes/origin/codex/telegram-as-code-private-v2",
+      "lastCommitDate": "2026-10-01T01:02:48+02:00",
+      "subject": "fix: encode private Telegram chat id as integer",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 115,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/design/binrat-roadmap-brand-v1",
+      "sha": "95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee",
+      "upstream": "refs/remotes/origin/design/binrat-roadmap-brand-v1",
+      "lastCommitDate": "2026-10-02T23:55:02+02:00",
+      "subject": "docs(roadmap): record v2 extraction proof",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/design/binrat-roadmap-brand-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-a1-2-case-contract",
+      "sha": "695e813eacb8f70e169d45b814ecc180ec01d50e",
+      "upstream": "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+      "lastCommitDate": "2026-10-09T19:06:33+02:00",
+      "subject": "docs(api): record production source, bounds and A1.2 contract verification",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-a1-2-case-ui",
+      "sha": "ac5e2b97d1ec1b8d870b1d2b02e1b55818ebac59",
+      "upstream": "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+      "lastCommitDate": "2026-10-09T19:08:23+02:00",
+      "subject": "docs(web): record exact historical Case browser evidence and owner screenshots",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 5,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence",
+        "refs/remotes/origin/feat/pons-tripwire-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-a2-2-safe-outcome-collector",
+      "sha": "6ce3d8260011d9f0e6b00cef0f95d23f55976773",
+      "upstream": "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+      "lastCommitDate": "2026-10-10T17:26:09+02:00",
+      "subject": "fix(pons): isolate and bound disabled outcome pilot collection",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-a2-case-intelligence",
+      "sha": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+      "upstream": "",
+      "lastCommitDate": "2026-10-10T01:42:22+02:00",
+      "subject": "test(case): preserve A1 checks alongside optional outcome proof",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-exact-pons-launch-rehearsal-v1",
+      "sha": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+      "upstream": "refs/remotes/origin/feat/binrat-exact-pons-launch-rehearsal-v1",
+      "lastCommitDate": "2026-10-04T00:47:09+02:00",
+      "subject": "feat: add exact Pons launch rehearsal v1",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-exact-pons-launch-rehearsal-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-rat-select-v2",
+      "sha": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "upstream": "",
+      "lastCommitDate": "2026-10-05T00:45:16+02:00",
+      "subject": "ops(candidate): set ROBINHOOD_RPC_URL=rpc.ordofi.network in generated candidate config (public robinhood RPC rejects Worker-egress getLogs; production-parity value per deploymentBindingParity; pinned SHA unchanged)",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 37,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/experiment/binrat-sniffer-gpt41mini-20261005",
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-roadmap-living-scenes-v1",
+      "sha": "48fade876e60af6c408f3fcdf5a2298bae519119",
+      "upstream": "refs/remotes/origin/feat/binrat-roadmap-living-scenes-v1",
+      "lastCommitDate": "2026-10-01T17:37:10+02:00",
+      "subject": "feat(roadmap): render SNIFF from approved raster",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 9,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1",
+        "refs/remotes/origin/design/binrat-motion-identity-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-sprint-a1-frontdoor-discovery",
+      "sha": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+      "upstream": "refs/remotes/origin/feat/binrat-sprint-a1-frontdoor-discovery",
+      "lastCommitDate": "2026-10-09T18:11:37+02:00",
+      "subject": "ci: generate release identity before scoped read-contract tests",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 6,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence",
+        "refs/remotes/origin/feat/binrat-sprint-a1-frontdoor-discovery"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-telegram-messaging-v1",
+      "sha": "30badbd63c687a4d3376896cdcb6bba03c476dcb",
+      "upstream": "refs/remotes/origin/feat/binrat-telegram-messaging-v1",
+      "lastCommitDate": "2026-10-01T09:27:26+02:00",
+      "subject": "feat: compress Telegram messaging hierarchy",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 112,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1",
+        "refs/remotes/origin/design/binrat-motion-identity-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-visual-lab-v1",
+      "sha": "8d7bb44b3062d3fcf0889a01d1e8c8468851fee2",
+      "upstream": "refs/remotes/origin/feat/binrat-visual-lab-v1",
+      "lastCommitDate": "2026-10-08T19:55:37+02:00",
+      "subject": "feat(web-v2): refine PEARL optics and mobile Case opening",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 9,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-working-rat-l2-v1",
+      "sha": "c23defaa9ed338e13ba2be72c482af51660aac56",
+      "upstream": "refs/remotes/origin/feat/binrat-working-rat-l2-v1",
+      "lastCommitDate": "2026-10-03T23:27:00+02:00",
+      "subject": "feat: add fail-closed Pons stake reader",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-working-rat-l2-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/pons-tripwire-v1",
+      "sha": "8ae1e0e2f3c356fe0a7ca3810b5a50a551abf944",
+      "upstream": "refs/remotes/origin/feat/pons-tripwire-v1",
+      "lastCommitDate": "2026-10-11T04:52:15+02:00",
+      "subject": "docs: freeze BINRAT employable-Rats founder vision",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/fix/binrat-launch-comprehension-v1",
+      "sha": "c5a4809b0eb763d50fae378b0c50dc9d278ed1cd",
+      "upstream": "",
+      "lastCommitDate": "2026-10-08T01:19:21+02:00",
+      "subject": "fix(frontend): converge launch comprehension across web and Telegram",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 11,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence"
+      ]
+    },
+    {
+      "ref": "refs/heads/fix/binrat-read-plane-frontend-resilience-v1",
+      "sha": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+      "upstream": "refs/remotes/origin/fix/binrat-read-plane-frontend-resilience-v1",
+      "lastCommitDate": "2026-10-04T01:26:55+02:00",
+      "subject": "fix(web): retain verified feed through refresh failures",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 38,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/experiment/binrat-sniffer-gpt41mini-20261005",
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector"
+      ]
+    },
+    {
+      "ref": "refs/heads/forensics/a2-1-outcome-coverage",
+      "sha": "f20e3a3f853ebdd7c7d96d2becb7278b83b7285b",
+      "upstream": "",
+      "lastCommitDate": "2026-10-10T16:46:37+02:00",
+      "subject": "docs: trace outcome coverage gates and bounded A2.2 repair",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/hotfix/pons-catchup-throughput-v1",
+      "sha": "b732b8e0e52ff4a9560ec69f132cfb4288f07d03",
+      "upstream": "refs/remotes/origin/hotfix/pons-catchup-throughput-v1",
+      "lastCommitDate": "2026-09-30T23:48:53+02:00",
+      "subject": "fix: retain progressing Pons recovery candidate",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/hotfix/pons-launch-identity-retry-v1",
+      "sha": "982b0ac761bf687a0281668acc693c163919c2c6",
+      "upstream": "refs/remotes/origin/hotfix/pons-launch-identity-retry-v1",
+      "lastCommitDate": "2026-09-30T21:20:54+02:00",
+      "subject": "fix: resolve tagged recovery candidate",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/hotfix/pons-catchup-throughput-v1",
+        "refs/remotes/origin/hotfix/pons-launch-identity-retry-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-a1-3-visual-gate",
+      "sha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+      "upstream": "",
+      "lastCommitDate": "2026-10-10T00:17:37+02:00",
+      "subject": "test(a1): bound IPv4 public reads and clear stale live receipts",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 4,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence",
+        "refs/remotes/origin/feat/pons-tripwire-v1",
+        "refs/remotes/origin/integration/binrat-a1-3-visual-gate"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-brand-v1-composed",
+      "sha": "0343d3815e509c45ef6b4991a7f8d438e2f4deb1",
+      "upstream": "refs/remotes/origin/integration/binrat-brand-v1-composed",
+      "lastCommitDate": "2026-10-02T23:20:56+02:00",
+      "subject": "docs(brand): record v1 composition receipt [skip ci]",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/design/binrat-roadmap-brand-v1",
+        "refs/remotes/origin/integration/binrat-brand-v1-composed"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-case-canonical-v1",
+      "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "upstream": "refs/remotes/origin/integration/binrat-case-canonical-v1",
+      "lastCommitDate": "2026-10-02T23:44:35+02:00",
+      "subject": "feat: reconstruct canonical Pons case stack",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 60,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/binrat-launch-genesis-funnel-v1",
+        "refs/remotes/origin/docs/binrat-launch-night-canon-v1",
+        "refs/remotes/origin/docs/binrat-pons-launch-authority-v1",
+        "refs/remotes/origin/docs/binrat-ponsvault-forensic-pin-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-launch-night-v1",
+      "sha": "261a7207907816a770b2a51504186a021f0ffb8e",
+      "upstream": "refs/remotes/origin/integration/binrat-launch-night-v1",
+      "lastCommitDate": "2026-10-07T03:15:01+02:00",
+      "subject": "fix(integration): bind public Staking and entitlement truth to C2",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 12,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-pons-launch-authority-sprint-v1",
+      "sha": "4fbd2d71317ce99d0d96b42bc82b1b299afbe99f",
+      "upstream": "refs/remotes/origin/integration/binrat-pons-launch-authority-sprint-v1",
+      "lastCommitDate": "2026-10-07T01:45:38+02:00",
+      "subject": "feat: freeze exact Pons launch authority sprint",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 13,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-product-surface-authority-v1",
+      "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "upstream": "",
+      "lastCommitDate": "2026-10-02T23:44:35+02:00",
+      "subject": "feat: reconstruct canonical Pons case stack",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 60,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/binrat-launch-genesis-funnel-v1",
+        "refs/remotes/origin/docs/binrat-launch-night-canon-v1",
+        "refs/remotes/origin/docs/binrat-pons-launch-authority-v1",
+        "refs/remotes/origin/docs/binrat-ponsvault-forensic-pin-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/integration/binrat-public-truth-launch-v1",
+      "sha": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+      "upstream": "refs/remotes/origin/integration/binrat-public-truth-launch-v1",
+      "lastCommitDate": "2026-10-07T02:44:18+02:00",
+      "subject": "Build generated modules before CI Worker dry-run",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 13,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector",
+        "refs/remotes/origin/feat/binrat-a2-case-intelligence"
+      ]
+    },
+    {
+      "ref": "refs/heads/main",
+      "sha": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+      "upstream": "refs/remotes/origin/main",
+      "lastCommitDate": "2026-09-30T02:23:18+02:00",
+      "subject": "fix: quote controlled rollout workflow description",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 129,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/HEAD",
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/ops/binrat-case-canonical-private-preview-v1",
+      "sha": "fae06e675bd68271a7f583a662b69e2451906236",
+      "upstream": "refs/remotes/origin/ops/binrat-case-canonical-private-preview-v1",
+      "lastCommitDate": "2026-10-03T00:31:47+02:00",
+      "subject": "ops: prepare canonical Case private preview checks",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 3,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-public-read-plane-stability-v1",
+        "refs/remotes/origin/ops/binrat-case-canonical-private-preview-v1",
+        "refs/remotes/origin/ops/binrat-case-version-url-preview-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/ops/binrat-case-version-url-preview-v1",
+      "sha": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+      "upstream": "refs/remotes/origin/ops/binrat-case-version-url-preview-v1",
+      "lastCommitDate": "2026-10-03T03:21:53+02:00",
+      "subject": "Add canonical Version URL private preview gate",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-public-read-plane-stability-v1",
+        "refs/remotes/origin/ops/binrat-case-version-url-preview-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/ops/binrat-domain-cutover-v1",
+      "sha": "dc72fe57b6f5927c8245cba6994c3811a6d0ef96",
+      "upstream": "refs/remotes/origin/ops/binrat-domain-cutover-v1",
+      "lastCommitDate": "2026-10-03T03:03:05+02:00",
+      "subject": "docs: record active binrat custom domain",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/ops/binrat-domain-cutover-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/pr-60",
+      "sha": "7fece313958558a7bb9789e9592aafee894422b5",
+      "upstream": "",
+      "lastCommitDate": "2026-09-30T02:28:03+02:00",
+      "subject": "fix: quote controlled rollout workflow description",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 117,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/test/binrat-launch-comprehension-browser",
+      "sha": "118934655bfd443a6181793806a270412eb01339",
+      "upstream": "refs/remotes/origin/test/binrat-launch-comprehension-browser",
+      "lastCommitDate": "2026-10-08T02:48:35+02:00",
+      "subject": "ci: exercise launch comprehension browser smoke",
+      "commonDir": "/home/swirky/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/test/binrat-launch-comprehension-browser"
+      ]
+    },
+    {
+      "ref": "refs/heads/codex/binrat-prelaunch-release-a911c23",
+      "sha": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+      "upstream": "",
+      "lastCommitDate": "2026-09-29T12:01:06+02:00",
+      "subject": "docs: record BINRAT edge v0 public-beta release",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 144,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23",
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/codex/prelaunch-hardening-v1",
+      "sha": "a911c23b70ea5e2286afaf0d9a3dfef5fc697a85",
+      "upstream": "",
+      "lastCommitDate": "2026-09-28T02:43:06+02:00",
+      "subject": "fix: harden initial navigation and mobile shell",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/prelaunch-hardening-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/design/binrat-frontend-astra-v1",
+      "sha": "b70f21da98d32fa516a40eb9da9ea7a97c29685b",
+      "upstream": "refs/remotes/origin/design/binrat-frontend-astra-v1",
+      "lastCommitDate": "2026-09-17T23:52:27+02:00",
+      "subject": "design: rebuild BINRAT as a compact launch intelligence terminal",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 194,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23",
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23"
+      ]
+    },
+    {
+      "ref": "refs/heads/design/binrat-north-star-v1",
+      "sha": "3946935b0db2179d17962349a1c98a65f3756474",
+      "upstream": "refs/remotes/origin/design/binrat-north-star-v1",
+      "lastCommitDate": "2026-09-21T21:26:53+02:00",
+      "subject": "design: freeze BINRAT north star v1",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 6,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/prelaunch-hardening-v1",
+        "refs/remotes/origin/design/binrat-north-star-v1",
+        "refs/remotes/origin/feat/binrat-radar-calibration-v1",
+        "refs/remotes/origin/feat/binrat-radar-case-file-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/docs/authority-hostile-fixes-182-20261011",
+      "sha": "4745768c54c3b86372fe67ba56bcbbf86bc6e235",
+      "upstream": "",
+      "lastCommitDate": "2026-10-11T23:48:15+02:00",
+      "subject": "docs: correct authority scope and evidence routing",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 3,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/HEAD",
+        "refs/remotes/origin/docs/engineering-stack-north-star-v1-20261011",
+        "refs/remotes/origin/main"
+      ]
+    },
+    {
+      "ref": "refs/heads/docs/authority-hostile-fixes-183-20261011",
+      "sha": "4e79d91e1280072281f80dcb0982135cb45c8d23",
+      "upstream": "",
+      "lastCommitDate": "2026-10-11T23:48:15+02:00",
+      "subject": "docs: correct authority scope and evidence routing",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/integration/binrat-a1-3-visual-gate"
+      ]
+    },
+    {
+      "ref": "refs/heads/docs/authority-hostile-fixes-survival-20261011",
+      "sha": "9083b12e7dab4e49a4328497ac10e4f59262a20c",
+      "upstream": "",
+      "lastCommitDate": "2026-10-11T23:48:15+02:00",
+      "subject": "docs: reconcile authority on preserved migration baseline",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/experiment/binrat-deterministic-idle-v1",
+      "sha": "bd7fbe608e82d86c28ab23a01198013f550e1cd5",
+      "upstream": "",
+      "lastCommitDate": "2026-09-29T15:08:52+02:00",
+      "subject": "docs: add BINRAT token prelaunch control plane v1",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/plan/binrat-token-prelaunch-control-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-autonomous-rat-v1",
+      "sha": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+      "upstream": "refs/remotes/origin/feat/binrat-autonomous-rat-v1",
+      "lastCommitDate": "2026-09-29T13:22:44+02:00",
+      "subject": "docs: record verification and owner handoff",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-autonomous-rat-v1",
+        "refs/remotes/origin/feat/binrat-rats-share-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-exact-pons-launch-rehearsal-v1",
+      "sha": "ccc677985ce07f438648a2499611e72c36729491",
+      "upstream": "refs/remotes/origin/feat/binrat-pons-preflight-v1",
+      "lastCommitDate": "2026-10-03T23:09:48+02:00",
+      "subject": "ci: use official Robinhood RPC for current-state preflight",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 37,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/docs/binrat-pons-production-runtime-triage-v1",
+        "refs/remotes/origin/experiment/binrat-hard-delayed-controls-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-frontdoor-brand-convergence-v1",
+      "sha": "517388a2b97839a1d201c96f40a2336c203d0b5a",
+      "upstream": "",
+      "lastCommitDate": "2026-10-03T22:44:50+02:00",
+      "subject": "feat: converge frontdoor typography on Geist",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/feat/binrat-live-read-v0",
+      "sha": "6db511a79d1c2f2fbbd807a52745c735dbb81bd8",
+      "upstream": "refs/remotes/origin/feat/binrat-live-read-v0",
+      "lastCommitDate": "2026-09-18T01:10:35+02:00",
+      "subject": "design: improve live terminal readability and filters",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 193,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23",
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-pons-case-preview-v1",
+      "sha": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "upstream": "refs/remotes/origin/feat/binrat-pons-case-preview-v1",
+      "lastCommitDate": "2026-10-08T21:04:46+02:00",
+      "subject": "prove real Pons Case runtime in isolated V3 preview",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 15,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/docs/binrat-pons-production-runtime-triage-v1",
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-product-surface-v1-demo",
+      "sha": "57fa0a2cbff6132b7715be6f2affc4f530f0c78c",
+      "upstream": "refs/remotes/origin/feat/binrat-product-surface-v1-demo",
+      "lastCommitDate": "2026-09-21T19:32:37+02:00",
+      "subject": "feat: polish BINRAT product surface visual direction",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 168,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23",
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-public-read-plane-stability-v1",
+      "sha": "5bd247bbef968ea8570532bbd6edc1d5ee543421",
+      "upstream": "refs/remotes/origin/feat/binrat-public-read-plane-stability-v1",
+      "lastCommitDate": "2026-10-04T01:22:21+02:00",
+      "subject": "feat: publish stable verified public read snapshots",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-public-read-plane-stability-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-radar-calibration-v1",
+      "sha": "ed1cd81f3fce097f53b1b4c9337df16fdb696f0c",
+      "upstream": "refs/remotes/origin/feat/binrat-radar-calibration-v1",
+      "lastCommitDate": "2026-09-21T22:03:36+02:00",
+      "subject": "feat: calibrate BINRAT north-star world shell",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 5,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/prelaunch-hardening-v1",
+        "refs/remotes/origin/feat/binrat-radar-calibration-v1",
+        "refs/remotes/origin/feat/binrat-radar-case-file-v1",
+        "refs/remotes/origin/feat/binrat-radar-final-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-radar-case-file-v1",
+      "sha": "73c0b016cb265e892ea220b820f5ed7f2f45bfff",
+      "upstream": "refs/remotes/origin/feat/binrat-radar-case-file-v1",
+      "lastCommitDate": "2026-09-21T23:34:49+02:00",
+      "subject": "feat: add Rat Radar evidence case file",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 3,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/prelaunch-hardening-v1",
+        "refs/remotes/origin/feat/binrat-radar-case-file-v1",
+        "refs/remotes/origin/feat/binrat-radar-final-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-radar-final-v1",
+      "sha": "817fb44f8d082e25604591f1d158494fb224b82c",
+      "upstream": "refs/remotes/origin/feat/binrat-radar-final-v1",
+      "lastCommitDate": "2026-09-22T00:01:23+02:00",
+      "subject": "docs: record Rat Radar freeze commit",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/prelaunch-hardening-v1",
+        "refs/remotes/origin/feat/binrat-radar-final-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-radar-workbench-v1",
+      "sha": "b27fdc48054b49bbe8fc80b8c5a637bab675d94f",
+      "upstream": "refs/remotes/origin/feat/binrat-radar-workbench-v1",
+      "lastCommitDate": "2026-09-21T22:57:29+02:00",
+      "subject": "feat: add BINRAT Radar evidence workbench",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 4,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/prelaunch-hardening-v1",
+        "refs/remotes/origin/feat/binrat-radar-case-file-v1",
+        "refs/remotes/origin/feat/binrat-radar-final-v1",
+        "refs/remotes/origin/feat/binrat-radar-workbench-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-rat-radar-v0",
+      "sha": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "upstream": "refs/remotes/origin/feat/binrat-rat-radar-v0",
+      "lastCommitDate": "2026-09-21T17:55:48+02:00",
+      "subject": "launch: add execution rehearsal dry run",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 183,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23",
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-rat-watch-v0",
+      "sha": "b5755fef349a4badc153fee9e9811461cac1a919",
+      "upstream": "refs/remotes/origin/feat/binrat-rat-watch-v0",
+      "lastCommitDate": "2026-09-19T02:49:10+02:00",
+      "subject": "docs: mark Rat Watch subscription live acceptance pass",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 186,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23",
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-rats-share-v1",
+      "sha": "083d4fe4bd662dfe9e7733cb37fbed40e06f3fc9",
+      "upstream": "refs/remotes/origin/feat/binrat-rats-share-v1",
+      "lastCommitDate": "2026-09-29T15:19:30+02:00",
+      "subject": "docs: record Rats and receipt verification handoff",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-rats-share-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-robinhood-live-rat-v1",
+      "sha": "b65cc4f51061e6d12a3f0ce84048ea910e3fde6b",
+      "upstream": "refs/remotes/origin/feat/binrat-robinhood-live-rat-v1",
+      "lastCommitDate": "2026-09-29T21:21:12+02:00",
+      "subject": "fix: retain Pons transport diagnostics",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 141,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-telegram-ux-v2",
+      "sha": "3e19c2fef0588309754b283328322eb8cca780d2",
+      "upstream": "refs/remotes/origin/feat/binrat-telegram-ux-v2",
+      "lastCommitDate": "2026-09-30T02:03:49+02:00",
+      "subject": "ops: add private Telegram UX V2 activation gate",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 138,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-v3-frontdoor-cutover-candidate-v1",
+      "sha": "07737938ef48bf886293ba34c5225ac9e1e5ed2b",
+      "upstream": "refs/remotes/origin/feat/binrat-v3-frontdoor-cutover-candidate-v1",
+      "lastCommitDate": "2026-10-08T23:20:38+02:00",
+      "subject": "test(frontdoor): verify static cutover safety gates for issue 171",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-v3-frontdoor-cutover-candidate-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/feat/binrat-visual-lab-v1",
+      "sha": "8d7bb44b3062d3fcf0889a01d1e8c8468851fee2",
+      "upstream": "refs/remotes/origin/feat/binrat-visual-lab-v1",
+      "lastCommitDate": "2026-10-08T19:55:37+02:00",
+      "subject": "feat(web-v2): refine PEARL optics and mobile Case opening",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 16,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/docs/binrat-pons-production-runtime-triage-v1",
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract"
+      ]
+    },
+    {
+      "ref": "refs/heads/fix/binrat-history-before-funding-v1",
+      "sha": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+      "upstream": "refs/remotes/origin/fix/binrat-history-before-funding-v1",
+      "lastCommitDate": "2026-10-06T01:43:58+02:00",
+      "subject": "fix: reconcile verified history when delayed funding arrives",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 14,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-consecutive-discovery-v1",
+        "refs/remotes/origin/feat/binrat-funder-cohort-v1",
+        "refs/remotes/origin/feat/binrat-indexed-archive-probe-v1",
+        "refs/remotes/origin/feat/binrat-indexed-calibration-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/fix/binrat-offline-proposal-validation-v1",
+      "sha": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+      "upstream": "refs/remotes/origin/fix/binrat-offline-proposal-validation-v1",
+      "lastCommitDate": "2026-10-06T00:54:06+02:00",
+      "subject": "feat: validate offline workforce proposals against receipts",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 16,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/feat/binrat-consecutive-discovery-v1",
+        "refs/remotes/origin/feat/binrat-funder-cohort-v1",
+        "refs/remotes/origin/feat/binrat-indexed-archive-probe-v1",
+        "refs/remotes/origin/feat/binrat-indexed-calibration-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/fix/pons-rpc-limit-diagnostics-v1",
+      "sha": "0256a71714a04774f86d98417ad4c1d5088672ae",
+      "upstream": "refs/remotes/origin/fix/pons-rpc-limit-diagnostics-v1",
+      "lastCommitDate": "2026-10-09T00:29:40+02:00",
+      "subject": "fix(pons): preserve RPC limit diagnostics and record recovery blocker",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 12,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui"
+      ]
+    },
+    {
+      "ref": "refs/heads/incident-9b001d9-backup",
+      "sha": "9b001d9fdc0a83af1f2cf2db7565a59d1071ba42",
+      "upstream": "",
+      "lastCommitDate": "2026-09-29T21:16:33+02:00",
+      "subject": "fix: isolate Pons Worker bootstrap operations",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/integration/binrat-public-read-plane-stability-v1",
+      "sha": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "upstream": "refs/remotes/origin/integration/binrat-public-read-plane-stability-v1",
+      "lastCommitDate": "2026-10-05T00:45:16+02:00",
+      "subject": "ops(candidate): set ROBINHOOD_RPC_URL=rpc.ordofi.network in generated candidate config (public robinhood RPC rejects Worker-egress getLogs; production-parity value per deploymentBindingParity; pinned SHA unchanged)",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 58,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/docs/binrat-pons-production-runtime-triage-v1",
+        "refs/remotes/origin/experiment/binrat-hard-delayed-controls-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/main",
+      "sha": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+      "upstream": "refs/remotes/origin/main",
+      "lastCommitDate": "2026-09-17T22:30:32+02:00",
+      "subject": "Merge PR #8: freeze BINRAT prelaunch presentation",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 231,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/HEAD",
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23"
+      ]
+    },
+    {
+      "ref": "refs/heads/migration/binrat-survival-v1",
+      "sha": "a269d8272ec93e41b00ebfcf6c528074a2c4c898",
+      "upstream": "refs/remotes/origin/integration/binrat-a1-3-visual-gate",
+      "lastCommitDate": "2026-10-11T21:55:54+02:00",
+      "subject": "Preserve self-hosting proof and gated official RPC canary packet",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/ops/binrat-repo-cleanup-manifest-v1",
+      "sha": "a3efccb9b8d449605cfe2a18d6deb5236463044d",
+      "upstream": "refs/remotes/origin/ops/binrat-repo-cleanup-manifest-v1",
+      "lastCommitDate": "2026-10-03T00:44:11+02:00",
+      "subject": "docs(ops): BINRAT repo cleanup manifest v1 V2 update (post-5958fb7 snapshot: +1 branch ops/binrat-case-canonical-private-preview-v1, A ACTIVE)",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/ops/binrat-repo-cleanup-manifest-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/ops/cloudflare-deploy-v0",
+      "sha": "b3e6b49801ebf524f0485358cfe0e8d920244709",
+      "upstream": "refs/remotes/origin/ops/cloudflare-deploy-v0",
+      "lastCommitDate": "2026-09-19T01:42:12+02:00",
+      "subject": "ci: syntax-check Cloudflare web deploy helper",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 188,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/binrat-dumpster-os-d1-githack",
+        "refs/remotes/origin/binrat-mobile-m1-githack",
+        "refs/remotes/origin/binrat-v2-githack-pr23",
+        "refs/remotes/origin/codex/binrat-prelaunch-release-a911c23"
+      ]
+    },
+    {
+      "ref": "refs/heads/ops/cloudflare-readonly-inspect",
+      "sha": "e71938139dd3e901cebb9b8167cb5b1f3e24fda8",
+      "upstream": "refs/remotes/origin/ops/cloudflare-readonly-inspect",
+      "lastCommitDate": "2026-10-05T01:28:03+02:00",
+      "subject": "ops(readonly): add Cloudflare production read-only inspection broker workflow (workflow_dispatch, GitHub-secrets-only, fail-closed guards, SELECT/PRAGMA-only D1, GET-only API, sanitized artifact)",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/ops/cloudflare-readonly-inspect"
+      ]
+    },
+    {
+      "ref": "refs/heads/ops/graveyard-local-preparation-20261014",
+      "sha": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+      "upstream": "",
+      "lastCommitDate": "2026-10-12T00:12:22+02:00",
+      "subject": "docs: canonical authority router and engineering north star (#182)",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 2,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/HEAD",
+        "refs/remotes/origin/main"
+      ]
+    },
+    {
+      "ref": "refs/heads/plan/binrat-token-prelaunch-control-v1",
+      "sha": "bd7fbe608e82d86c28ab23a01198013f550e1cd5",
+      "upstream": "refs/remotes/origin/plan/binrat-token-prelaunch-control-v1",
+      "lastCommitDate": "2026-09-29T15:08:52+02:00",
+      "subject": "docs: add BINRAT token prelaunch control plane v1",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/plan/binrat-token-prelaunch-control-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/qa/launch-self-service-checks-v1",
+      "sha": "09fad7aa228a6375f2fe38ff9d1c9e8ebd5705c2",
+      "upstream": "",
+      "lastCommitDate": "2026-10-04T00:41:41+02:00",
+      "subject": "test(qa): launch-day self-service Playwright checks (TEST-ONLY, xfail C1/H1/H2/H5)",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/release/binrat-autonomous-rat-v1-1",
+      "sha": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
+      "upstream": "refs/remotes/origin/release/binrat-autonomous-rat-v1-1",
+      "lastCommitDate": "2026-09-29T17:48:29+02:00",
+      "subject": "fix: surface bounded sync diagnostics",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 142,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/codex/telegram-as-code-private-v2",
+        "refs/remotes/origin/design/binrat-brand-system-v1",
+        "refs/remotes/origin/design/binrat-copy-library-v1",
+        "refs/remotes/origin/design/binrat-export-pack-v1"
+      ]
+    },
+    {
+      "ref": "refs/heads/release/binrat-backend-read-only-20261009",
+      "sha": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+      "upstream": "",
+      "lastCommitDate": "2026-10-09T04:48:38+02:00",
+      "subject": "fix(cloudflare): isolate Pons read-only backend release",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 11,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/feat/binrat-a1-2-case-contract",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui"
+      ]
+    },
+    {
+      "ref": "refs/heads/release/binrat-v3-production-20261009",
+      "sha": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+      "upstream": "",
+      "lastCommitDate": "2026-10-09T15:29:05+02:00",
+      "subject": "test(release): exercise provider billing and identity failure gates",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 9,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/docs/authority-reconcile-react-pons-v1-20261011",
+        "refs/remotes/origin/docs/binrat-active-workforce-guardrails-20261011",
+        "refs/remotes/origin/feat/binrat-a1-2-case-ui",
+        "refs/remotes/origin/feat/binrat-a2-2-safe-outcome-collector"
+      ]
+    },
+    {
+      "ref": "refs/heads/temp/binrat-integration-gate-v1",
+      "sha": "a05717e7a64c46e6be7376de4b9e0ef5f29e68ae",
+      "upstream": "",
+      "lastCommitDate": "2026-10-04T19:10:00+02:00",
+      "subject": "fix(read-plane): use bounded creator summary endpoint in drawer (gate scenario 11)",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/test/pons-alchemy-feasibility-v1",
+      "sha": "c86f4fbf46dfa35528e381349a6200ebcf8a575a",
+      "upstream": "",
+      "lastCommitDate": "2026-10-09T00:51:50+02:00",
+      "subject": "docs: preserve bounded Alchemy feasibility evidence and handoff",
+      "commonDir": "/home/swirky/DevHub/repos/binrat/.git",
+      "remoteTrackingRefsContainingHeadCount": 0,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": true,
+      "containingRemoteRefExamples": []
+    },
+    {
+      "ref": "refs/heads/migration/binrat-survival-v1",
+      "sha": "d1ab7570e99995bca1e5812cc22cf88e0bf416c2",
+      "upstream": "refs/remotes/origin/migration/binrat-survival-v1",
+      "lastCommitDate": "2026-10-11T18:12:55+02:00",
+      "subject": "feat(survival): add offline portable Pons runtime and private rescue gate",
+      "commonDir": "/home/swirky/DevHub/worktrees/binrat-survival-v1/.artifacts/clean-room/.git",
+      "remoteTrackingRefsContainingHeadCount": 1,
+      "remoteReachabilityBasis": "Current local remote-tracking refs; not independently fetched by this worker",
+      "localOnlyByTrackingReachability": false,
+      "containingRemoteRefExamples": [
+        "refs/remotes/origin/migration/binrat-survival-v1"
+      ]
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "/home/swirky/Desktop/binrat",
+      "headSHA": null,
+      "branch": null,
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/binrat",
+      "headSHA": "2d507045327bd4269a5c0dd4f2050805488f60ee",
+      "branch": null,
+      "dirtyCount": 583,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/binrat-autonomous-rat-v1",
+      "headSHA": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+      "branch": "feat/binrat-autonomous-rat-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/binrat-brand-convergence",
+      "headSHA": "517388a2b97839a1d201c96f40a2336c203d0b5a",
+      "branch": "feat/binrat-frontdoor-brand-convergence-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/binrat-integration-gate-v1",
+      "headSHA": "a05717e7a64c46e6be7376de4b9e0ef5f29e68ae",
+      "branch": "temp/binrat-integration-gate-v1",
+      "dirtyCount": 34,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/binrat-public-read-plane-stability-v1",
+      "headSHA": "5bd247bbef968ea8570532bbd6edc1d5ee543421",
+      "branch": "feat/binrat-public-read-plane-stability-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/binrat-rats-share-v1",
+      "headSHA": "083d4fe4bd662dfe9e7733cb37fbed40e06f3fc9",
+      "branch": "feat/binrat-rats-share-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-alchemy-feasibility-v1",
+      "headSHA": "c86f4fbf46dfa35528e381349a6200ebcf8a575a",
+      "branch": "test/pons-alchemy-feasibility-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-authority-review-182",
+      "headSHA": "4745768c54c3b86372fe67ba56bcbbf86bc6e235",
+      "branch": "docs/authority-hostile-fixes-182-20261011",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-authority-review-183",
+      "headSHA": "4e79d91e1280072281f80dcb0982135cb45c8d23",
+      "branch": "docs/authority-hostile-fixes-183-20261011",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-authority-review-survival",
+      "headSHA": "9083b12e7dab4e49a4328497ac10e4f59262a20c",
+      "branch": "docs/authority-hostile-fixes-survival-20261011",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-autonomous-rat-v1-1",
+      "headSHA": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
+      "branch": "release/binrat-autonomous-rat-v1-1",
+      "dirtyCount": 3,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-backend-release-20261009",
+      "headSHA": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+      "branch": "release/binrat-backend-read-only-20261009",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-exact-pons-launch-rehearsal-v1",
+      "headSHA": "ccc677985ce07f438648a2499611e72c36729491",
+      "branch": "feat/binrat-exact-pons-launch-rehearsal-v1",
+      "dirtyCount": 1,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-graveyard-20261014",
+      "headSHA": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+      "branch": "ops/graveyard-local-preparation-20261014",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-history-before-funding-v1",
+      "headSHA": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+      "branch": "fix/binrat-history-before-funding-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-offline-proposal-validation-v1",
+      "headSHA": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+      "branch": "fix/binrat-offline-proposal-validation-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-original-runner-125",
+      "headSHA": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+      "branch": null,
+      "dirtyCount": 1,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-p0-pons-rpc-recovery",
+      "headSHA": "0256a71714a04774f86d98417ad4c1d5088672ae",
+      "branch": "fix/pons-rpc-limit-diagnostics-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-pons-alchemy-paid-recovery-20261009",
+      "headSHA": "c31ddf8ae70806a0a2abf444c9879c3e418bb2ae",
+      "branch": null,
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-pons-case-preview-v1",
+      "headSHA": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "branch": "feat/binrat-pons-case-preview-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-pons-catchup-throughput-v1",
+      "headSHA": "b732b8e0e52ff4a9560ec69f132cfb4288f07d03",
+      "branch": "hotfix/pons-catchup-throughput-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-production-preflight-20261009",
+      "headSHA": "c31ddf8ae70806a0a2abf444c9879c3e418bb2ae",
+      "branch": null,
+      "dirtyCount": 3,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-robinhood-live-rat-v1",
+      "headSHA": "b65cc4f51061e6d12a3f0ce84048ea910e3fde6b",
+      "branch": "feat/binrat-robinhood-live-rat-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-survival-v1",
+      "headSHA": "a269d8272ec93e41b00ebfcf6c528074a2c4c898",
+      "branch": "migration/binrat-survival-v1",
+      "dirtyCount": 48,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-survival-v1/.artifacts/clean-room",
+      "headSHA": "d1ab7570e99995bca1e5812cc22cf88e0bf416c2",
+      "branch": "migration/binrat-survival-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-telegram-ux-v2",
+      "headSHA": "3e19c2fef0588309754b283328322eb8cca780d2",
+      "branch": "feat/binrat-telegram-ux-v2",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-v3-cutover-candidate-v1",
+      "headSHA": "1d2fa150131bad4350300319fb849ae3b259c4e6",
+      "branch": null,
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-v3-production-20261009",
+      "headSHA": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+      "branch": "release/binrat-v3-production-20261009",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/DevHub/worktrees/binrat-visual-lab-v1",
+      "headSHA": "07737938ef48bf886293ba34c5225ac9e1e5ed2b",
+      "branch": "feat/binrat-v3-frontdoor-cutover-candidate-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat",
+      "headSHA": "95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee",
+      "branch": "design/binrat-roadmap-brand-v1",
+      "dirtyCount": 10,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-a1-2-contract",
+      "headSHA": "695e813eacb8f70e169d45b814ecc180ec01d50e",
+      "branch": "feat/binrat-a1-2-case-contract",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-a1-2-ui",
+      "headSHA": "ac5e2b97d1ec1b8d870b1d2b02e1b55818ebac59",
+      "branch": "feat/binrat-a1-2-case-ui",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-a1-3-integration",
+      "headSHA": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+      "branch": "integration/binrat-a1-3-visual-gate",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-a2-1-outcome-coverage",
+      "headSHA": "f20e3a3f853ebdd7c7d96d2becb7278b83b7285b",
+      "branch": "forensics/a2-1-outcome-coverage",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-a2-2-safe-outcome-collector",
+      "headSHA": "6ce3d8260011d9f0e6b00cef0f95d23f55976773",
+      "branch": "feat/binrat-a2-2-safe-outcome-collector",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-a2-case-intelligence",
+      "headSHA": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+      "branch": "feat/binrat-a2-case-intelligence",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-case-canonical",
+      "headSHA": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "branch": "integration/binrat-product-surface-authority-v1",
+      "dirtyCount": 1,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-case-private-preview",
+      "headSHA": "fae06e675bd68271a7f583a662b69e2451906236",
+      "branch": "ops/binrat-case-canonical-private-preview-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-domain-cutover-v1",
+      "headSHA": "dc72fe57b6f5927c8245cba6994c3811a6d0ef96",
+      "branch": "ops/binrat-domain-cutover-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-funding-convergence",
+      "headSHA": "90296437d8846df71311f9523a4e7a29d9968798",
+      "branch": "codex/pons-funding-convergence-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-hotfix",
+      "headSHA": "982b0ac761bf687a0281668acc693c163919c2c6",
+      "branch": "hotfix/pons-launch-identity-retry-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-launch-authority-sprint-v1",
+      "headSHA": "4fbd2d71317ce99d0d96b42bc82b1b299afbe99f",
+      "branch": "integration/binrat-pons-launch-authority-sprint-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-launch-night-v1",
+      "headSHA": "261a7207907816a770b2a51504186a021f0ffb8e",
+      "branch": "integration/binrat-launch-night-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-pons-tripwire-v1",
+      "headSHA": "8ae1e0e2f3c356fe0a7ca3810b5a50a551abf944",
+      "branch": "feat/pons-tripwire-v1",
+      "dirtyCount": 17,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-public-truth-launch-v1",
+      "headSHA": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+      "branch": "integration/binrat-public-truth-launch-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-rat-select-v2",
+      "headSHA": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "branch": "feat/binrat-rat-select-v2",
+      "dirtyCount": 24,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-read-plane-frontend-resilience-v1",
+      "headSHA": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+      "branch": "fix/binrat-read-plane-frontend-resilience-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-sprint-a1",
+      "headSHA": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+      "branch": "feat/binrat-sprint-a1-frontdoor-discovery",
+      "dirtyCount": 1,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-version-url-preview-v1",
+      "headSHA": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+      "branch": "feat/binrat-exact-pons-launch-rehearsal-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-visual-lab-v2",
+      "headSHA": "8d7bb44b3062d3fcf0889a01d1e8c8468851fee2",
+      "branch": "feat/binrat-visual-lab-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/home/swirky/binrat-working-rat-l2-v1",
+      "headSHA": "c23defaa9ed338e13ba2be72c482af51660aac56",
+      "branch": "feat/binrat-working-rat-l2-v1",
+      "dirtyCount": 0,
+      "exists": true,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/tmp/binrat-c1-ci-packaging-clean-ibsiqqet",
+      "headSHA": null,
+      "branch": null,
+      "dirtyCount": null,
+      "exists": false,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/tmp/binrat-launch-comprehension-r2",
+      "headSHA": null,
+      "branch": "refs/heads/test/binrat-launch-comprehension-browser",
+      "dirtyCount": null,
+      "exists": false,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/tmp/binrat-qa-launch",
+      "headSHA": null,
+      "branch": "refs/heads/qa/launch-self-service-checks-v1",
+      "dirtyCount": null,
+      "exists": false,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    },
+    {
+      "path": "/tmp/binrat-sniffer-eval",
+      "headSHA": null,
+      "branch": null,
+      "dirtyCount": null,
+      "exists": false,
+      "protectionReason": "Protect checkout, index and uncommitted files; missing registrations are not prune authorization."
+    }
+  ],
+  "recoveryArtifacts": "GRAVEYARD_CIPHERTEXT_VERIFICATION_V1.json",
+  "localWIPHashes": "GRAVEYARD_LOCAL_TOPOLOGY_V1.json",
+  "ownerGrantUsed": "Read-only inventory and isolated local preparation only",
+  "outputBranch": {
+    "name": "ops/graveyard-local-preparation-20261014",
+    "baseSHA": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+    "scope": "New isolated output branch created by this operation; local preparation commit may advance it. It is excluded from original-worktree preservation checks."
+  },
+  "tags": []
+}

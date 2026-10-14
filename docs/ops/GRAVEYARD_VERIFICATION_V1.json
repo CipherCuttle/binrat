@@ -1,0 +1,47 @@
+{
+  "verifiedAt": "2026-10-14T02:41:37.395063+00:00",
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s scripts/audit -p 'test_graveyard_check.py'",
+      "exitCode": 0,
+      "passed": 11,
+      "failed": 0,
+      "wallSeconds": 0.221
+    },
+    {
+      "command": "python3 scripts/audit/graveyard_check.py --fresh-snapshot docs/ops/GRAVEYARD_FINAL_SNAPSHOT_V1.json",
+      "exitCode": 0,
+      "result": "182 PRs / 242 branches; no state/head/base/dependency drift"
+    },
+    {
+      "check": "Original donor40 offline verifier / collector tests; donor42 funding tests",
+      "result": "Verifier OK, 3 receipts, collector 7/7, funding 3/3; original source in scratch, existing dependencies only",
+      "receipt": "GRAVEYARD_WAVE3_CLOSURE_V1.json#offlineVerification"
+    },
+    {
+      "check": "Five workflow patches",
+      "result": "5/5 git apply --check + fixture application + YAML all-job false guards",
+      "receipt": "GRAVEYARD_PATCH_VERIFICATION_V1.json"
+    },
+    {
+      "check": "Git object existence",
+      "result": "2427 recorded commit/tree/blob objects present; exact comparison methods in Git evidence"
+    },
+    {
+      "check": "Original WIP preservation",
+      "result": "726/726 hashes unchanged; 51 original worktree HEAD/status sets and 35 index entries unchanged",
+      "receipt": "GRAVEYARD_LOCAL_PRESERVATION_V1.json"
+    },
+    {
+      "check": "Encrypted ciphertext existence/size/hash",
+      "result": "3/3 match; independent off-device custody unproved",
+      "receipt": "GRAVEYARD_CIPHERTEXT_VERIFICATION_V1.json"
+    }
+  ],
+  "scope": "Offline/local and GitHub metadata only; no present production/runtime/RPC/Telegram proof",
+  "remoteMutationCount": 0,
+  "paidSpend": 0,
+  "blockchainTransactions": 0,
+  "productionMutations": 0,
+  "liveMessages": 0
+}

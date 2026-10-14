@@ -1,9 +1,6 @@
 name: controlled-rat-private-rollout
 
 on:
-  push:
-    branches:
-      - feat/binrat-robinhood-live-rat-v1
   workflow_dispatch:
     inputs:
       activation_mode:
@@ -28,7 +25,7 @@ concurrency:
 
 jobs:
   controlled-private-rat:
-    if: ${{ contains(github.event.head_commit.message, '[deploy-controlled-rat]') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -38,7 +35,7 @@ jobs:
       CONTROLLED_RAT_ALLOWED_USER_ID: ${{ vars.RAT_CANDIDATE_ALLOWED_USER_ID }}
       CONTROLLED_RAT_ALLOWED_USER_ID_FALLBACK: ${{ vars.RAT_FEEDBACK_ADMIN_USER_ID }}
       CONTROLLED_RAT_DEPLOY_APPROVED: 'true'
-      CONTROLLED_RAT_ACTIVATION_MODE: ${{ github.event_name == 'push' && 'autonomous-text-private' || inputs.activation_mode }}
+      CONTROLLED_RAT_ACTIVATION_MODE: ${{ inputs.activation_mode }}
       CONTROLLED_RAT_UI_V2_CONFIRMATION: ${{ inputs.confirmation }}
 
     steps:

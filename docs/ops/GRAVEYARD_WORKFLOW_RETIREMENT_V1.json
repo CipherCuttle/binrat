@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "status": "AWAITING_OWNER_GRANT",
+  "authorizationEffect": "NONE",
+  "ownerGrant": null,
+  "executedRemoteWrites": 0,
+  "scope": "Separate grant required to apply/push exact workflow-retirement changes to these historical refs. No patches applied to historical branches.",
+  "patches": [
+    {
+      "branch": "ops/cloudflare-deploy-v0",
+      "expectedHeadSHA": "5672736c09981287c5df1ea3e2c5e91254e57eb9",
+      "path": ".github/workflows/cloudflare-candidate-deploy.yml",
+      "originalBlobSHA": "7348ba6f45aec0c9409a8d0a5bbeb2a2494f7c4c",
+      "patchPath": "docs/ops/graveyard-workflow-patches/01-cloudflare-candidate-deploy.yml.patch",
+      "jobsDisabled": 1,
+      "allJobConditions": "${{ false }}",
+      "method": "Retain workflow/trigger source; freeze each job with literal false condition.",
+      "originalYAMLParseError": null,
+      "requiresOwnerGrant": true
+    },
+    {
+      "branch": "feat/binrat-rat-radar-v0",
+      "expectedHeadSHA": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "path": ".github/workflows/rat-radar-candidate-deploy.yml",
+      "originalBlobSHA": "302992d46cebdbdeb325d199005f0b013be58b47",
+      "patchPath": "docs/ops/graveyard-workflow-patches/02-rat-radar-candidate-deploy.yml.patch",
+      "jobsDisabled": 1,
+      "allJobConditions": "${{ false }}",
+      "method": "Replace malformed historical YAML with inert manual-only stub; exact original retained in pinned commit/blob and patch.",
+      "originalYAMLParseError": "while scanning a simple key",
+      "requiresOwnerGrant": true
+    },
+    {
+      "branch": "feat/binrat-rat-conversation-free-ai-v1",
+      "expectedHeadSHA": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "path": ".github/workflows/rat-conversation-candidate-deploy.yml",
+      "originalBlobSHA": "b5eee7d29512e3dd3021d391da1ea11439421813",
+      "patchPath": "docs/ops/graveyard-workflow-patches/03-rat-conversation-candidate-deploy.yml.patch",
+      "jobsDisabled": 1,
+      "allJobConditions": "${{ false }}",
+      "method": "Retain workflow/trigger source; freeze each job with literal false condition.",
+      "originalYAMLParseError": null,
+      "requiresOwnerGrant": true
+    },
+    {
+      "branch": "ops/binrat-miniapp-preview-v1",
+      "expectedHeadSHA": "128e2a47f322d3b6dc44ec8672871daae7cacc86",
+      "path": ".github/workflows/binrat-miniapp-preview-deploy.yml",
+      "originalBlobSHA": "9eae559519c0c4b4b0614e46a66ee1b2d97f4303",
+      "patchPath": "docs/ops/graveyard-workflow-patches/04-binrat-miniapp-preview-deploy.yml.patch",
+      "jobsDisabled": 1,
+      "allJobConditions": "${{ false }}",
+      "method": "Retain workflow/trigger source; freeze each job with literal false condition.",
+      "originalYAMLParseError": null,
+      "requiresOwnerGrant": true
+    },
+    {
+      "branch": "ops/binrat-miniapp-preview-v2",
+      "expectedHeadSHA": "b1e8f40aae9773828a11d3cd013e66b7e66ad127",
+      "path": ".github/workflows/binrat-miniapp-preview-deploy-v2.yml",
+      "originalBlobSHA": "671f8e7a201d3b34d6f385263cf7bbff0cb6626a",
+      "patchPath": "docs/ops/graveyard-workflow-patches/05-binrat-miniapp-preview-deploy-v2.yml.patch",
+      "jobsDisabled": 1,
+      "allJobConditions": "${{ false }}",
+      "method": "Retain workflow/trigger source; freeze each job with literal false condition.",
+      "originalYAMLParseError": null,
+      "requiresOwnerGrant": true
+    }
+  ],
+  "localMainPreparation": {
+    "sourceSHA": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+    "path": ".github/workflows/controlled-rat-private-rollout.yml",
+    "change": "Remove automatic push entry and commit-marker activation; retain explicit manual dispatch packaging. Local only."
+  }
+}

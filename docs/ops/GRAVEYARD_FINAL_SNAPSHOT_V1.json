@@ -1,0 +1,5232 @@
+{
+  "inventory": {
+    "capturedAt": "2026-10-14T02:37:43.770707+00:00",
+    "repository": "CipherCuttle/binrat",
+    "allPRs": 182,
+    "openPRs": 151,
+    "remoteBranches": 242,
+    "pages": {
+      "prs": 2,
+      "branches": 3
+    },
+    "paginationCeilingEach": 5
+  },
+  "prs": [
+    {
+      "number": 1,
+      "title": "plan: freeze BINRAT V0 product and engineering contract",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T17:47:19Z",
+      "updated_at": "2026-09-17T18:02:57Z",
+      "closed_at": "2026-09-17T18:02:57Z",
+      "merged_at": "2026-09-17T18:02:57Z",
+      "merge_commit_sha": "6080fadaceafa508c5038ffb74b5929f5a47b00c",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/1",
+      "head": {
+        "ref": "plan/binrat-v0",
+        "sha": "9115033c8d407405927b710d86b233e5ea6847bb",
+        "label": "CipherCuttle:plan/binrat-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "3b3618da89ab7ae5757ddf4edb047bbe8787667b",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 2,
+      "title": "feat: add ArcPad launch ingestion and provenance V0",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T17:51:41Z",
+      "updated_at": "2026-09-17T18:04:33Z",
+      "closed_at": "2026-09-17T18:04:32Z",
+      "merged_at": "2026-09-17T18:04:32Z",
+      "merge_commit_sha": "f35d5282cc7fe13567c47645633a07c1f0e3fa06",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/2",
+      "head": {
+        "ref": "agent/arc-launch-ingest-v0",
+        "sha": "1d59ed3a39bf4f8cffef62e4dfa22f6c56d089b6",
+        "label": "CipherCuttle:agent/arc-launch-ingest-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "6080fadaceafa508c5038ffb74b5929f5a47b00c",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 3,
+      "title": "experiment: preregister and finalize 72h HOT GARBAGE V0",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-17T18:15:01Z",
+      "updated_at": "2026-09-20T18:33:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/3",
+      "head": {
+        "ref": "experiment/72h-hot-garbage-v0",
+        "sha": "5dbde0691da758a50cd41f802932f51d5a4020b4",
+        "label": "CipherCuttle:experiment/72h-hot-garbage-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "f35d5282cc7fe13567c47645633a07c1f0e3fa06",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 4,
+      "title": "design: scaffold THE DUMPSTER fixture shell",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T18:37:27Z",
+      "updated_at": "2026-09-17T18:54:17Z",
+      "closed_at": "2026-09-17T18:54:17Z",
+      "merged_at": "2026-09-17T18:54:17Z",
+      "merge_commit_sha": "20f38bc0666c8008760c6f31ca5fa633642e5c28",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/4",
+      "head": {
+        "ref": "design/binrat-dumpster-web-v0",
+        "sha": "d8388b8dccfbaf64896e6617c0e78dddcb42ac95",
+        "label": "CipherCuttle:design/binrat-dumpster-web-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "f35d5282cc7fe13567c47645633a07c1f0e3fa06",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 5,
+      "title": "design: pin canonical BINRAT mascot",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T18:59:35Z",
+      "updated_at": "2026-09-17T20:12:51Z",
+      "closed_at": "2026-09-17T20:12:51Z",
+      "merged_at": "2026-09-17T20:12:50Z",
+      "merge_commit_sha": "1ba6a6040f70b714b9b82485c1002b39d782e1ff",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/5",
+      "head": {
+        "ref": "design/binrat-brand-assets-v0",
+        "sha": "1db118b285dcda3f0e5fb63a944afaa3822f95ef",
+        "label": "CipherCuttle:design/binrat-brand-assets-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "20f38bc0666c8008760c6f31ca5fa633642e5c28",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 6,
+      "title": "feat: add claim-safe BINRAT public read plane",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T19:44:09Z",
+      "updated_at": "2026-09-17T20:13:26Z",
+      "closed_at": "2026-09-17T20:13:26Z",
+      "merged_at": "2026-09-17T20:13:26Z",
+      "merge_commit_sha": "3484455c41a25bc490a5b38bc4a3f2720c8f0cd2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/6",
+      "head": {
+        "ref": "agent/binrat-public-read-plane-v0",
+        "sha": "a76651e5c43abe7f3f8d1736996d063ea2592e42",
+        "label": "CipherCuttle:agent/binrat-public-read-plane-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "1ba6a6040f70b714b9b82485c1002b39d782e1ff",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 7,
+      "title": "design: add deterministic BINRAT share cards",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T20:08:01Z",
+      "updated_at": "2026-09-17T20:13:54Z",
+      "closed_at": "2026-09-17T20:13:54Z",
+      "merged_at": "2026-09-17T20:13:54Z",
+      "merge_commit_sha": "6f3fe0484422c3d05f90f7421904b26a79fa165e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/7",
+      "head": {
+        "ref": "design/binrat-share-cards-v0",
+        "sha": "373c3e9d4271fdfe38c178bf5f46a3aac4fa04a6",
+        "label": "CipherCuttle:design/binrat-share-cards-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "3484455c41a25bc490a5b38bc4a3f2720c8f0cd2",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 8,
+      "title": "design: freeze BINRAT prelaunch presentation",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-17T20:17:12Z",
+      "updated_at": "2026-09-17T20:30:33Z",
+      "closed_at": "2026-09-17T20:30:32Z",
+      "merged_at": "2026-09-17T20:30:32Z",
+      "merge_commit_sha": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/8",
+      "head": {
+        "ref": "design/binrat-launch-presentation-v0",
+        "sha": "43c259e05f31a612083fbacb1d371a7913539627",
+        "label": "CipherCuttle:design/binrat-launch-presentation-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "6f3fe0484422c3d05f90f7421904b26a79fa165e",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 9,
+      "title": "chore: freeze BINRAT public identity acquisition boundary",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-17T20:33:57Z",
+      "updated_at": "2026-09-17T20:39:36Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/9",
+      "head": {
+        "ref": "design/binrat-public-identity-v0",
+        "sha": "9a294a13a17d9622bd4e5b0bf09fa8a34d2ef3b3",
+        "label": "CipherCuttle:design/binrat-public-identity-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 10,
+      "title": "fix: restore high-fidelity BINRAT hero art",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-17T21:04:47Z",
+      "updated_at": "2026-09-17T22:31:18Z",
+      "closed_at": "2026-09-17T22:31:18Z",
+      "merged_at": null,
+      "merge_commit_sha": "d35bff5eb1415e828dffa804503a80664b26d6d1",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/10",
+      "head": {
+        "ref": "design/binrat-hero-image-fidelity-v0",
+        "sha": "445a034afbce8c99b02f84e82fae576b03c84a60",
+        "label": "CipherCuttle:design/binrat-hero-image-fidelity-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 11,
+      "title": "feat: ship Astra terminal with live ArcPad public read",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-17T22:30:52Z",
+      "updated_at": "2026-09-17T23:34:53Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/11",
+      "head": {
+        "ref": "feat/binrat-live-read-v0",
+        "sha": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+        "label": "CipherCuttle:feat/binrat-live-read-v0"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 12,
+      "title": "feat: build BINRAT Intelligence V1",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-18T00:07:13Z",
+      "updated_at": "2026-09-18T01:38:52Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "bc6c5690004683b32086b316e097ee1e868b7d41",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/12",
+      "head": {
+        "ref": "feat/binrat-intelligence-v1",
+        "sha": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+        "label": "CipherCuttle:feat/binrat-intelligence-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-live-read-v0",
+        "sha": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+        "label": "CipherCuttle:feat/binrat-live-read-v0"
+      }
+    },
+    {
+      "number": 13,
+      "title": "feat: add deterministic Arc evidence Replay Lab",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-18T01:38:31Z",
+      "updated_at": "2026-10-14T01:53:37Z",
+      "closed_at": "2026-10-14T01:53:37Z",
+      "merged_at": null,
+      "merge_commit_sha": "95def621f2c30d771a8714e533d22eb9a851ea9e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/13",
+      "head": {
+        "ref": "feat/binrat-live-candidate-v1",
+        "sha": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
+        "label": "CipherCuttle:feat/binrat-live-candidate-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-intelligence-v1",
+        "sha": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+        "label": "CipherCuttle:feat/binrat-intelligence-v1"
+      }
+    },
+    {
+      "number": 14,
+      "title": "docs: define BINRAT network roadmap, philosophy, and Telegram Rat",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-18T01:53:10Z",
+      "updated_at": "2026-09-18T23:50:51Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "23fb925a16ac2495c818c1201631504dff706d07",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/14",
+      "head": {
+        "ref": "plan/binrat-network-roadmap-v0",
+        "sha": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+        "label": "CipherCuttle:plan/binrat-network-roadmap-v0"
+      },
+      "base": {
+        "ref": "feat/binrat-intelligence-v1",
+        "sha": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+        "label": "CipherCuttle:feat/binrat-intelligence-v1"
+      }
+    },
+    {
+      "number": 15,
+      "title": "feat: add Telegram Rat v0",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-18T01:55:31Z",
+      "updated_at": "2026-09-18T23:50:03Z",
+      "closed_at": "2026-09-18T23:50:02Z",
+      "merged_at": "2026-09-18T23:50:02Z",
+      "merge_commit_sha": "55eefba28d933f2aecbf8dad45796dcf13591971",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/15",
+      "head": {
+        "ref": "feat/binrat-telegram-rat-v0",
+        "sha": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
+        "label": "CipherCuttle:feat/binrat-telegram-rat-v0"
+      },
+      "base": {
+        "ref": "plan/binrat-network-roadmap-v0",
+        "sha": "0877146c204509aa81cfdadf740354e085408e00",
+        "label": "CipherCuttle:plan/binrat-network-roadmap-v0"
+      }
+    },
+    {
+      "number": 16,
+      "title": "feat: add Cloudflare D1 persistence adapter",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-18T19:41:49Z",
+      "updated_at": "2026-09-18T23:50:21Z",
+      "closed_at": "2026-09-18T23:50:20Z",
+      "merged_at": "2026-09-18T23:50:20Z",
+      "merge_commit_sha": "a54c8a216c0e5e0b7deebc20c058402fa3c0fb68",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/16",
+      "head": {
+        "ref": "feat/binrat-cloudflare-d1-v0",
+        "sha": "f1d093fc3d7b0dc865f3196ee41c486d2cc2d9e9",
+        "label": "CipherCuttle:feat/binrat-cloudflare-d1-v0"
+      },
+      "base": {
+        "ref": "plan/binrat-network-roadmap-v0",
+        "sha": "55eefba28d933f2aecbf8dad45796dcf13591971",
+        "label": "CipherCuttle:plan/binrat-network-roadmap-v0"
+      }
+    },
+    {
+      "number": 17,
+      "title": "ci: gate Cloudflare Worker bundle with Wrangler dry-run",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-18T20:23:02Z",
+      "updated_at": "2026-09-18T23:50:49Z",
+      "closed_at": "2026-09-18T23:50:49Z",
+      "merged_at": "2026-09-18T23:50:49Z",
+      "merge_commit_sha": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/17",
+      "head": {
+        "ref": "ops/cloudflare-deploy-v0",
+        "sha": "5672736c09981287c5df1ea3e2c5e91254e57eb9",
+        "label": "CipherCuttle:ops/cloudflare-deploy-v0"
+      },
+      "base": {
+        "ref": "plan/binrat-network-roadmap-v0",
+        "sha": "a54c8a216c0e5e0b7deebc20c058402fa3c0fb68",
+        "label": "CipherCuttle:plan/binrat-network-roadmap-v0"
+      }
+    },
+    {
+      "number": 18,
+      "title": "feat: add Rat Watch V0 creator recurrence alerts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-18T23:54:35Z",
+      "updated_at": "2026-09-19T00:49:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "c50cf737892d3ae56c4bc94cd416d4fc350ad0d6",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/18",
+      "head": {
+        "ref": "feat/binrat-rat-watch-v0",
+        "sha": "b5755fef349a4badc153fee9e9811461cac1a919",
+        "label": "CipherCuttle:feat/binrat-rat-watch-v0"
+      },
+      "base": {
+        "ref": "plan/binrat-network-roadmap-v0",
+        "sha": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+        "label": "CipherCuttle:plan/binrat-network-roadmap-v0"
+      }
+    },
+    {
+      "number": 19,
+      "title": "feat: add Rat Radar V0 wallet intelligence lane",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-19T00:58:04Z",
+      "updated_at": "2026-09-21T15:56:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4c653c44a487d31fc2e83eb590655ef483975685",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/19",
+      "head": {
+        "ref": "feat/binrat-rat-radar-v0",
+        "sha": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+        "label": "CipherCuttle:feat/binrat-rat-radar-v0"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-watch-v0",
+        "sha": "b5755fef349a4badc153fee9e9811461cac1a919",
+        "label": "CipherCuttle:feat/binrat-rat-watch-v0"
+      }
+    },
+    {
+      "number": 20,
+      "title": "feat: add read-only Pons launch readiness receipt",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-22T02:28:39Z",
+      "updated_at": "2026-09-22T15:44:32Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b16d23878ac9be431b990f2a255a76a46e9583da",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/20",
+      "head": {
+        "ref": "feat/binrat-pons-launch-receipt-v0",
+        "sha": "5b38cdf00e7e170af7c1f1cc18f9d1a24160c928",
+        "label": "CipherCuttle:feat/binrat-pons-launch-receipt-v0"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-radar-v0",
+        "sha": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+        "label": "CipherCuttle:feat/binrat-rat-radar-v0"
+      }
+    },
+    {
+      "number": 21,
+      "title": "fix(frontend): fail-closed bag identity and honest evidence interactions",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-22T20:51:36Z",
+      "updated_at": "2026-09-22T21:29:40Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "3c935dfd1f55dbecb08628efd3b70b745d704d77",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/21",
+      "head": {
+        "ref": "fix/binrat-v2-evidence-integrity-pr1",
+        "sha": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+        "label": "CipherCuttle:fix/binrat-v2-evidence-integrity-pr1"
+      },
+      "base": {
+        "ref": "feat/binrat-product-surface-v1-demo",
+        "sha": "17cce6b5a43089971a7a45fb6d02a00e30012a5f",
+        "label": "CipherCuttle:feat/binrat-product-surface-v1-demo"
+      }
+    },
+    {
+      "number": 22,
+      "title": "feat(frontend): shareable Radar and Creator dossiers with truthful product routes",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-22T21:26:38Z",
+      "updated_at": "2026-09-22T21:30:41Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ab62837bd6c787e30a97396e1440db3ebe773eb7",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/22",
+      "head": {
+        "ref": "feat/binrat-frontend-routes-pr2",
+        "sha": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+        "label": "CipherCuttle:feat/binrat-frontend-routes-pr2"
+      },
+      "base": {
+        "ref": "fix/binrat-v2-evidence-integrity-pr1",
+        "sha": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+        "label": "CipherCuttle:fix/binrat-v2-evidence-integrity-pr1"
+      }
+    },
+    {
+      "number": 23,
+      "title": "feat(frontend): validated LIVE Feed, Creator, Replay and Ledger (PR3)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-23T08:40:41Z",
+      "updated_at": "2026-09-24T01:16:53Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4c78632e6b75bcae600dde4aecfe981c050906f3",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/23",
+      "head": {
+        "ref": "feat/binrat-frontend-live-integration-pr3",
+        "sha": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+        "label": "CipherCuttle:feat/binrat-frontend-live-integration-pr3"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-routes-pr2",
+        "sha": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+        "label": "CipherCuttle:feat/binrat-frontend-routes-pr2"
+      }
+    },
+    {
+      "number": 24,
+      "title": "feat(frontend): BINRAT mobile-first M1 app surfaces",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T01:27:39Z",
+      "updated_at": "2026-09-25T19:59:15Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "096532fee7cfa7ae1da12e57fa4ce0491665000b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/24",
+      "head": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-live-integration-pr3",
+        "sha": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+        "label": "CipherCuttle:feat/binrat-frontend-live-integration-pr3"
+      }
+    },
+    {
+      "number": 25,
+      "title": "feat(frontend): Dumpster OS D1 industrial art and icon system",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-24T02:20:01Z",
+      "updated_at": "2026-10-14T01:53:40Z",
+      "closed_at": "2026-10-14T01:53:40Z",
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/25",
+      "head": {
+        "ref": "feat/binrat-dumpster-os-d1",
+        "sha": "ee44442ce434f577dc628871931c4cd4c9dac8fe",
+        "label": "CipherCuttle:feat/binrat-dumpster-os-d1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "5f1766a165a3755d620a952b3a1fec20e9206206",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      }
+    },
+    {
+      "number": 26,
+      "title": "docs: select Robinhood/Pons token direction while preserving Arc evidence",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T03:34:29Z",
+      "updated_at": "2026-09-24T03:34:29Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b52b0a9fdf1d23ebb3a6324f3a0fed07423ff517",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/26",
+      "head": {
+        "ref": "plan/binrat-pons-canonical-selection-v1",
+        "sha": "614363b77ce288384ac27f5a7dc1aa018076a8d3",
+        "label": "CipherCuttle:plan/binrat-pons-canonical-selection-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-launch-receipt-v0",
+        "sha": "5b38cdf00e7e170af7c1f1cc18f9d1a24160c928",
+        "label": "CipherCuttle:feat/binrat-pons-launch-receipt-v0"
+      }
+    },
+    {
+      "number": 27,
+      "title": "feat: add fail-closed Robinhood holder balance probe (candidate-only)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T03:37:50Z",
+      "updated_at": "2026-09-24T03:40:30Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "619e0798f0cb0bd24f493a61b64bae2b8fd368ff",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/27",
+      "head": {
+        "ref": "feat/binrat-pons-holder-balance-probe-v1",
+        "sha": "5e7d8fa0e37b007d7d58d0acc9cc223b27c79095",
+        "label": "CipherCuttle:feat/binrat-pons-holder-balance-probe-v1"
+      },
+      "base": {
+        "ref": "plan/binrat-pons-canonical-selection-v1",
+        "sha": "614363b77ce288384ac27f5a7dc1aa018076a8d3",
+        "label": "CipherCuttle:plan/binrat-pons-canonical-selection-v1"
+      }
+    },
+    {
+      "number": 28,
+      "title": "feat: add isolated Robinhood 4663 SIWE candidate with additive D1 tables",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T03:46:13Z",
+      "updated_at": "2026-09-24T03:51:37Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "1a9981ef0952ea3ac8e31cc65f33debf1311f81d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/28",
+      "head": {
+        "ref": "feat/binrat-pons-siwe-bound-candidate-v1",
+        "sha": "1479adc08e3b171d47b171e51867d8d0c607a86e",
+        "label": "CipherCuttle:feat/binrat-pons-siwe-bound-candidate-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-holder-balance-probe-v1",
+        "sha": "5e7d8fa0e37b007d7d58d0acc9cc223b27c79095",
+        "label": "CipherCuttle:feat/binrat-pons-holder-balance-probe-v1"
+      }
+    },
+    {
+      "number": 29,
+      "title": "feat: wire default-off Pons candidate Worker login and D1 rate controls",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T03:58:54Z",
+      "updated_at": "2026-09-24T12:40:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "376e1b961b0fc2569e385e20fd336fec42115415",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/29",
+      "head": {
+        "ref": "feat/binrat-pons-candidate-worker-routes-v1",
+        "sha": "eefda7326c283b54ec415c8abd948a274a9df674",
+        "label": "CipherCuttle:feat/binrat-pons-candidate-worker-routes-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-siwe-bound-candidate-v1",
+        "sha": "1479adc08e3b171d47b171e51867d8d0c607a86e",
+        "label": "CipherCuttle:feat/binrat-pons-siwe-bound-candidate-v1"
+      }
+    },
+    {
+      "number": 30,
+      "title": "feat: bind blocked Pons token successor to Arc evidence and funding boundaries",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T13:25:59Z",
+      "updated_at": "2026-09-24T13:29:50Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "632916d7a67f2d4b4138318c96bf4b03a789c4f2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/30",
+      "head": {
+        "ref": "feat/binrat-pons-cutover-candidate-v1",
+        "sha": "462d70b8d00adafdd69adfd01ddf9f904ede01fa",
+        "label": "CipherCuttle:feat/binrat-pons-cutover-candidate-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-candidate-worker-routes-v1",
+        "sha": "eefda7326c283b54ec415c8abd948a274a9df674",
+        "label": "CipherCuttle:feat/binrat-pons-candidate-worker-routes-v1"
+      }
+    },
+    {
+      "number": 31,
+      "title": "reset: remove all frontend and lock-in design; backend-only foundation",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-24T13:47:44Z",
+      "updated_at": "2026-09-25T20:03:22Z",
+      "closed_at": "2026-09-25T19:59:13Z",
+      "merged_at": "2026-09-25T19:59:13Z",
+      "merge_commit_sha": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/31",
+      "head": {
+        "ref": "feat/binrat-north-star-slice-g0-g2",
+        "sha": "ad718032dc70da08bd38cb0b75b13e2ca43892a1",
+        "label": "CipherCuttle:feat/binrat-north-star-slice-g0-g2"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "5f1766a165a3755d620a952b3a1fec20e9206206",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      }
+    },
+    {
+      "number": 32,
+      "title": "feat: align blocked Pons discovery across site, Telegram and listing draft",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T16:01:33Z",
+      "updated_at": "2026-09-25T11:11:42Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "e51b373692a41fa3fd6fd093b39f25050b3bc8fb",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/32",
+      "head": {
+        "ref": "feat/binrat-pons-discovery-consistency-v1",
+        "sha": "f1411ab83eddb25ed18c88584b6e26e75e86f163",
+        "label": "CipherCuttle:feat/binrat-pons-discovery-consistency-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-cutover-candidate-v1",
+        "sha": "462d70b8d00adafdd69adfd01ddf9f904ede01fa",
+        "label": "CipherCuttle:feat/binrat-pons-cutover-candidate-v1"
+      }
+    },
+    {
+      "number": 33,
+      "title": "research: isolated Rat Radar evidence and attribution falsification lab",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-24T23:30:47Z",
+      "updated_at": "2026-10-14T01:53:43Z",
+      "closed_at": "2026-10-14T01:53:43Z",
+      "merged_at": null,
+      "merge_commit_sha": "9e2f589227efd37cc5e048ceaa9a96a2bd4acc39",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/33",
+      "head": {
+        "ref": "research/rat-radar-evidence-lab-v0",
+        "sha": "4c5695951998430f1fa57dcc341a157cb8c375cb",
+        "label": "CipherCuttle:research/rat-radar-evidence-lab-v0"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "5f1766a165a3755d620a952b3a1fec20e9206206",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      }
+    },
+    {
+      "number": 34,
+      "title": "experiment(rat): opt-in conversational memory and quota-gated free Workers AI",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T23:32:28Z",
+      "updated_at": "2026-09-25T20:06:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/34",
+      "head": {
+        "ref": "feat/binrat-rat-conversation-free-ai-v1",
+        "sha": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+        "label": "CipherCuttle:feat/binrat-rat-conversation-free-ai-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontend-mobile-m1",
+        "sha": "5f1766a165a3755d620a952b3a1fec20e9206206",
+        "label": "CipherCuttle:feat/binrat-frontend-mobile-m1"
+      }
+    },
+    {
+      "number": 35,
+      "title": "research: Pons launch gates, dual-chain capacity and self-funding plan",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-24T23:39:27Z",
+      "updated_at": "2026-09-25T09:15:41Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ff1002c2196a595f73b4a5edeb5004bc13d644a0",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/35",
+      "head": {
+        "ref": "research/pons-gates-holder-econ-v1",
+        "sha": "54825038129d9bf4c9730664919cb7e83dd74211",
+        "label": "CipherCuttle:research/pons-gates-holder-econ-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-discovery-consistency-v1",
+        "sha": "f1411ab83eddb25ed18c88584b6e26e75e86f163",
+        "label": "CipherCuttle:feat/binrat-pons-discovery-consistency-v1"
+      }
+    },
+    {
+      "number": 36,
+      "title": "draft: Telegram Scout V0 \u2014 graphical 14-day creator discovery",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T09:25:52Z",
+      "updated_at": "2026-09-25T19:50:33Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "1870c35f1d7d74872b9a328a5a6ecdfc6dde0283",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/36",
+      "head": {
+        "ref": "feat/binrat-telegram-scout-v0",
+        "sha": "d433f0d4c588325c280ac58d5acaca570ee248f1",
+        "label": "CipherCuttle:feat/binrat-telegram-scout-v0"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-conversation-free-ai-v1",
+        "sha": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+        "label": "CipherCuttle:feat/binrat-rat-conversation-free-ai-v1"
+      }
+    },
+    {
+      "number": 37,
+      "title": "draft: G0/G1 offline 10K-capacity foundation and telemetry",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T09:28:42Z",
+      "updated_at": "2026-09-25T09:43:46Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "9c7aae600d31bbf3f787d78688da100a64d0bf20",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/37",
+      "head": {
+        "ref": "feat/binrat-g0-g1-capacity-foundation-v1",
+        "sha": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+        "label": "CipherCuttle:feat/binrat-g0-g1-capacity-foundation-v1"
+      },
+      "base": {
+        "ref": "research/pons-gates-holder-econ-v1",
+        "sha": "54825038129d9bf4c9730664919cb7e83dd74211",
+        "label": "CipherCuttle:research/pons-gates-holder-econ-v1"
+      }
+    },
+    {
+      "number": 38,
+      "title": "G2A: source-pinned Pons 4663 launch adapter (offline candidate)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T10:08:13Z",
+      "updated_at": "2026-09-25T11:14:17Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "e19267ecfd7a658c11fd3eea51a9faf3f61854da",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/38",
+      "head": {
+        "ref": "feat/binrat-g2a-pons-source-candidate-v1",
+        "sha": "a6f03dd3191dbeb9309d1af5d49608dfcc965fc2",
+        "label": "CipherCuttle:feat/binrat-g2a-pons-source-candidate-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-g0-g1-capacity-foundation-v1",
+        "sha": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+        "label": "CipherCuttle:feat/binrat-g0-g1-capacity-foundation-v1"
+      }
+    },
+    {
+      "number": 39,
+      "title": "G2B: isolated prepaid quota ledger (offline candidate)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T10:10:59Z",
+      "updated_at": "2026-09-25T11:14:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "2d696c592bc35ca98340a7d201ae61b3b0e2dec9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/39",
+      "head": {
+        "ref": "feat/binrat-g2b-prepaid-entitlements-candidate-v1",
+        "sha": "1e043cda038ed8b94ee7694416385ce807727964",
+        "label": "CipherCuttle:feat/binrat-g2b-prepaid-entitlements-candidate-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-g0-g1-capacity-foundation-v1",
+        "sha": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+        "label": "CipherCuttle:feat/binrat-g0-g1-capacity-foundation-v1"
+      }
+    },
+    {
+      "number": 40,
+      "title": "G2A A1: bounded read-only Pons 4663 three-receipt proof collector",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T11:22:32Z",
+      "updated_at": "2026-09-25T20:04:30Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8c563825f75275ded6e2b46d97f4061d8701d958",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/40",
+      "head": {
+        "ref": "feat/binrat-g2a-a1-pons-receipt-proof-v1",
+        "sha": "55af899617fc38af71b746e3e90a9f2de3e6e53a",
+        "label": "CipherCuttle:feat/binrat-g2a-a1-pons-receipt-proof-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-g2a-pons-source-candidate-v1",
+        "sha": "a6f03dd3191dbeb9309d1af5d49608dfcc965fc2",
+        "label": "CipherCuttle:feat/binrat-g2a-pons-source-candidate-v1"
+      }
+    },
+    {
+      "number": 41,
+      "title": "reset(main): remove remaining original frontend and visual lock-in",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-25T20:01:21Z",
+      "updated_at": "2026-09-25T20:03:00Z",
+      "closed_at": "2026-09-25T20:03:00Z",
+      "merged_at": "2026-09-25T20:03:00Z",
+      "merge_commit_sha": "28c4553d54164f086e19a87fbf25d410d2d647fb",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/41",
+      "head": {
+        "ref": "reset/backend-only-main-20260925",
+        "sha": "a4e97f4a420f19d34bf3429cba50b7733666ab71",
+        "label": "CipherCuttle:reset/backend-only-main-20260925"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 42,
+      "title": "G2B: append-only signed offline funding receipt ledger",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T20:04:56Z",
+      "updated_at": "2026-09-25T20:04:56Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "5c6597db0306822b63351ac4f53f011919950c18",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/42",
+      "head": {
+        "ref": "feat/binrat-g2b-funding-ledger-v1",
+        "sha": "c8f55a221e88b3f7cab4cacf6302c5d171f75a48",
+        "label": "CipherCuttle:feat/binrat-g2b-funding-ledger-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-g2b-prepaid-entitlements-candidate-v1",
+        "sha": "1e043cda038ed8b94ee7694416385ce807727964",
+        "label": "CipherCuttle:feat/binrat-g2b-prepaid-entitlements-candidate-v1"
+      }
+    },
+    {
+      "number": 43,
+      "title": "docs: preserve Pons-first BINRAT hybrid UX, data and LLM-design blueprint",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-25T22:31:34Z",
+      "updated_at": "2026-09-25T22:38:52Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "fe1949c4486d8dab109fe0465933e299683eaf4e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/43",
+      "head": {
+        "ref": "planning/binrat-pons-hybrid-blueprint-2026-09-26",
+        "sha": "d54933ceb1d6d4f0c63e9948dc96c7afcbd2f4a4",
+        "label": "CipherCuttle:planning/binrat-pons-hybrid-blueprint-2026-09-26"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "28c4553d54164f086e19a87fbf25d410d2d647fb",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 44,
+      "title": "docs(G1a): freeze Pons-first pre-Figma fixture, skill provenance and 3 hybrid studies",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-25T22:51:41Z",
+      "updated_at": "2026-10-14T01:53:47Z",
+      "closed_at": "2026-10-14T01:53:46Z",
+      "merged_at": null,
+      "merge_commit_sha": "986b44e57bccd2bf1827a453c1883c575ffa335f",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/44",
+      "head": {
+        "ref": "planning/binrat-g1a-prefigma-2026-09-26",
+        "sha": "582eaa66449c8ca4b2bbed3ab21353da64c0ec4f",
+        "label": "CipherCuttle:planning/binrat-g1a-prefigma-2026-09-26"
+      },
+      "base": {
+        "ref": "planning/binrat-pons-hybrid-blueprint-2026-09-26",
+        "sha": "d54933ceb1d6d4f0c63e9948dc96c7afcbd2f4a4",
+        "label": "CipherCuttle:planning/binrat-pons-hybrid-blueprint-2026-09-26"
+      }
+    },
+    {
+      "number": 45,
+      "title": "feat(prototype): G3a scanning + G3b fictional Rat Trap reveal",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-26T11:12:59Z",
+      "updated_at": "2026-09-26T13:23:36Z",
+      "closed_at": "2026-09-26T13:23:36Z",
+      "merged_at": "2026-09-26T13:23:36Z",
+      "merge_commit_sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/45",
+      "head": {
+        "ref": "g3a-interactive-prototype-20260926",
+        "sha": "0eb819369602f6f153c58dae14212d5e9308059c",
+        "label": "CipherCuttle:g3a-interactive-prototype-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g3b-reviewed-20260926",
+        "sha": "582eaa66449c8ca4b2bbed3ab21353da64c0ec4f",
+        "label": "CipherCuttle:experiment/binrat-g3b-reviewed-20260926"
+      }
+    },
+    {
+      "number": 46,
+      "title": "G3c: harden Android navigation, Rat Trap accessibility and receipt provenance",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-26T15:04:35Z",
+      "updated_at": "2026-10-14T01:53:49Z",
+      "closed_at": "2026-10-14T01:53:49Z",
+      "merged_at": null,
+      "merge_commit_sha": "1399dc7fae94c64ba0c02aaa7442097362c49cd4",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/46",
+      "head": {
+        "ref": "experiment/binrat-g3c-mobile-20260926",
+        "sha": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+        "label": "CipherCuttle:experiment/binrat-g3c-mobile-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g3b-reviewed-20260926",
+        "sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+        "label": "CipherCuttle:experiment/binrat-g3b-reviewed-20260926"
+      }
+    },
+    {
+      "number": 47,
+      "title": "G4a (draft): The Rat's Field Instrument \u2014 isolated visual hypothesis",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-26T17:25:15Z",
+      "updated_at": "2026-10-14T01:39:25Z",
+      "closed_at": "2026-10-14T01:39:25Z",
+      "merged_at": null,
+      "merge_commit_sha": "2137f8fb9047275990d1f53aa3f35ea7f6410abb",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/47",
+      "head": {
+        "ref": "experiment/binrat-g4a-field-instrument-20260926",
+        "sha": "65e983a5ba7655f063be57a7ee12b23cfcc91e06",
+        "label": "CipherCuttle:experiment/binrat-g4a-field-instrument-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4a-integration-20260926",
+        "sha": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+        "label": "CipherCuttle:experiment/binrat-g4a-integration-20260926"
+      }
+    },
+    {
+      "number": 48,
+      "title": "G4-R: Cinematic BINRAT world and evidence-first Rat Radar (experiment)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-26T18:30:00Z",
+      "updated_at": "2026-09-26T18:37:29Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ff71fab3aaa5f29a160f2c88b6aa447f8e99d500",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/48",
+      "head": {
+        "ref": "experiment/binrat-g4r-cinematic-20260926",
+        "sha": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+        "label": "CipherCuttle:experiment/binrat-g4r-cinematic-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g3b-reviewed-20260926",
+        "sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+        "label": "CipherCuttle:experiment/binrat-g3b-reviewed-20260926"
+      }
+    },
+    {
+      "number": 49,
+      "title": "G4-R experiment: restrained CTA 5-inspired moving atmosphere for homepage header",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-26T19:02:29Z",
+      "updated_at": "2026-09-26T19:05:01Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "864642291102d7a8d9a56120c4081477c991ba94",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/49",
+      "head": {
+        "ref": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+        "sha": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+        "label": "CipherCuttle:experiment/binrat-g4r-header-cta5-inspired-20260926"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4r-cinematic-20260926",
+        "sha": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+        "label": "CipherCuttle:experiment/binrat-g4r-cinematic-20260926"
+      }
+    },
+    {
+      "number": 50,
+      "title": "G4-R2: Original Grain Wave cinematic header (experimental)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-26T22:55:13Z",
+      "updated_at": "2026-09-26T23:33:02Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "e2d00f79864580cb868cc715c69b0e2a34ec40ea",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/50",
+      "head": {
+        "ref": "experiment/binrat-g4r2-grain-wave-20260927",
+        "sha": "521998d988fc1113dc7ef081250fe1b3147b48b0",
+        "label": "CipherCuttle:experiment/binrat-g4r2-grain-wave-20260927"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+        "sha": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+        "label": "CipherCuttle:experiment/binrat-g4r-header-cta5-inspired-20260926"
+      }
+    },
+    {
+      "number": 51,
+      "title": "BINRAT R4 \u2014 official licensed React Bits Grain Wave (no imitation)",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-27T06:17:35Z",
+      "updated_at": "2026-10-14T01:53:52Z",
+      "closed_at": "2026-10-14T01:53:52Z",
+      "merged_at": null,
+      "merge_commit_sha": "c5b2f86cdb5c59c8d3b09c11a0a8a18341aeab44",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/51",
+      "head": {
+        "ref": "experiment/binrat-g4r4-official-grain-wave-20260927",
+        "sha": "8d1378f2a1c834b49ef66cd8ebe1886738b80755",
+        "label": "CipherCuttle:experiment/binrat-g4r4-official-grain-wave-20260927"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4r2-grain-wave-20260927",
+        "sha": "521998d988fc1113dc7ef081250fe1b3147b48b0",
+        "label": "CipherCuttle:experiment/binrat-g4r2-grain-wave-20260927"
+      }
+    },
+    {
+      "number": 52,
+      "title": "BINRAT R5 \u2014 actual demo Grain Wave, responsive hero, Android visual gate",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-27T06:59:14Z",
+      "updated_at": "2026-10-14T01:39:29Z",
+      "closed_at": "2026-10-14T01:39:28Z",
+      "merged_at": null,
+      "merge_commit_sha": "0ceb8596fbc8c9e74720ec7d2f67b12ed3a7ce88",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/52",
+      "head": {
+        "ref": "experiment/binrat-g4r5-demo-first-20260927",
+        "sha": "ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597",
+        "label": "CipherCuttle:experiment/binrat-g4r5-demo-first-20260927"
+      },
+      "base": {
+        "ref": "experiment/binrat-g4r4-official-grain-wave-20260927",
+        "sha": "8d1378f2a1c834b49ef66cd8ebe1886738b80755",
+        "label": "CipherCuttle:experiment/binrat-g4r4-official-grain-wave-20260927"
+      }
+    },
+    {
+      "number": 53,
+      "title": "BINRAT G6a \u2014 static pixel-sunset integration (draft; safe art pending)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-27T11:13:35Z",
+      "updated_at": "2026-09-27T22:04:01Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "0be2279eae41cad3a669290002e201e85f65a1d7",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/53",
+      "head": {
+        "ref": "integration/binrat-r5-approved-20260927",
+        "sha": "959da17b0573dff016808d597737b4cf186bed62",
+        "label": "CipherCuttle:integration/binrat-r5-approved-20260927"
+      },
+      "base": {
+        "ref": "experiment/binrat-g3b-reviewed-20260926",
+        "sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+        "label": "CipherCuttle:experiment/binrat-g3b-reviewed-20260926"
+      }
+    },
+    {
+      "number": 54,
+      "title": "Design review desk: 21 frozen frontend previews with per-version feedback",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-27T22:26:12Z",
+      "updated_at": "2026-10-14T01:39:32Z",
+      "closed_at": "2026-10-14T01:39:32Z",
+      "merged_at": null,
+      "merge_commit_sha": "c16de4f5c3137c4d6480c355ebd668f3426eb940",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/54",
+      "head": {
+        "ref": "experiment/binrat-design-review-gallery-20260928",
+        "sha": "368e0097e784098bab20572fcf13ec78f343df9e",
+        "label": "CipherCuttle:experiment/binrat-design-review-gallery-20260928"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "28c4553d54164f086e19a87fbf25d410d2d647fb",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 55,
+      "title": "fix: harden initial navigation and mobile shell",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-09-28T16:11:18Z",
+      "updated_at": "2026-10-14T01:53:56Z",
+      "closed_at": "2026-10-14T01:53:56Z",
+      "merged_at": null,
+      "merge_commit_sha": "a3432a2e3fe2f158b6c9ecf42c8354b037b1886f",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/55",
+      "head": {
+        "ref": "codex/prelaunch-hardening-v1",
+        "sha": "a911c23b70ea5e2286afaf0d9a3dfef5fc697a85",
+        "label": "CipherCuttle:codex/prelaunch-hardening-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-radar-final-v1",
+        "sha": "817fb44f8d082e25604591f1d158494fb224b82c",
+        "label": "CipherCuttle:feat/binrat-radar-final-v1"
+      }
+    },
+    {
+      "number": 56,
+      "title": "feat: Autonomous Rat V1 \u2014 DIG, WATCH, future alerts and WHY",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-29T11:23:17Z",
+      "updated_at": "2026-09-29T11:25:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "e54e7cf5b1644719fc8285778803cfcb373b6834",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/56",
+      "head": {
+        "ref": "feat/binrat-autonomous-rat-v1",
+        "sha": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+        "label": "CipherCuttle:feat/binrat-autonomous-rat-v1"
+      },
+      "base": {
+        "ref": "codex/binrat-prelaunch-release-a911c23",
+        "sha": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+        "label": "CipherCuttle:codex/binrat-prelaunch-release-a911c23"
+      }
+    },
+    {
+      "number": 57,
+      "title": "docs: add BINRAT token prelaunch control plane v1",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-29T13:09:10Z",
+      "updated_at": "2026-09-29T13:09:10Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "c69f9cf5ad4baad5d1aa1d2d89e4fd8b71588d3a",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/57",
+      "head": {
+        "ref": "plan/binrat-token-prelaunch-control-v1",
+        "sha": "bd7fbe608e82d86c28ab23a01198013f550e1cd5",
+        "label": "CipherCuttle:plan/binrat-token-prelaunch-control-v1"
+      },
+      "base": {
+        "ref": "codex/binrat-prelaunch-release-a911c23",
+        "sha": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+        "label": "CipherCuttle:codex/binrat-prelaunch-release-a911c23"
+      }
+    },
+    {
+      "number": 58,
+      "title": "feat: Rats discovery and shareable receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-29T13:21:14Z",
+      "updated_at": "2026-09-29T13:21:14Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "09560cd26939ed8f31431b452e6607bdc4396f92",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/58",
+      "head": {
+        "ref": "feat/binrat-rats-share-v1",
+        "sha": "083d4fe4bd662dfe9e7733cb37fbed40e06f3fc9",
+        "label": "CipherCuttle:feat/binrat-rats-share-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-autonomous-rat-v1",
+        "sha": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+        "label": "CipherCuttle:feat/binrat-autonomous-rat-v1"
+      }
+    },
+    {
+      "number": 59,
+      "title": "feat: Robinhood-first live rat and Telegram visual UX",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-29T16:57:19Z",
+      "updated_at": "2026-09-29T20:47:04Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "7fd7bcea798e2da2befe0f8a67cb5c4e6d97571e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/59",
+      "head": {
+        "ref": "feat/binrat-robinhood-live-rat-v1",
+        "sha": "5fed3ed3c6f6405617348e150275378b23c24a59",
+        "label": "CipherCuttle:feat/binrat-robinhood-live-rat-v1"
+      },
+      "base": {
+        "ref": "release/binrat-autonomous-rat-v1-1",
+        "sha": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
+        "label": "CipherCuttle:release/binrat-autonomous-rat-v1-1"
+      }
+    },
+    {
+      "number": 60,
+      "title": "feat: Telegram UX V2 interaction system",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-29T21:16:36Z",
+      "updated_at": "2026-09-30T00:28:05Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4a15a637c0818d7a4e4c06eb684b993da43ae50a",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/60",
+      "head": {
+        "ref": "feat/binrat-telegram-ux-v2",
+        "sha": "7fece313958558a7bb9789e9592aafee894422b5",
+        "label": "CipherCuttle:feat/binrat-telegram-ux-v2"
+      },
+      "base": {
+        "ref": "feat/binrat-robinhood-live-rat-v1",
+        "sha": "5fed3ed3c6f6405617348e150275378b23c24a59",
+        "label": "CipherCuttle:feat/binrat-robinhood-live-rat-v1"
+      }
+    },
+    {
+      "number": 61,
+      "title": "ops: register controlled Rat rollout workflow",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-30T00:16:45Z",
+      "updated_at": "2026-09-30T00:19:23Z",
+      "closed_at": "2026-09-30T00:17:43Z",
+      "merged_at": "2026-09-30T00:17:43Z",
+      "merge_commit_sha": "08a42f7789e5c0ad74a3a3c044bd07d9c29c1415",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/61",
+      "head": {
+        "ref": "ops/register-controlled-rat-workflow-20260930",
+        "sha": "e12a01d3a1d41c231a2cf4bb9496e3520fa40afb",
+        "label": "CipherCuttle:ops/register-controlled-rat-workflow-20260930"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "28c4553d54164f086e19a87fbf25d410d2d647fb",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 62,
+      "title": "fix: quote controlled rollout workflow description",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-09-30T00:22:16Z",
+      "updated_at": "2026-09-30T00:23:18Z",
+      "closed_at": "2026-09-30T00:23:18Z",
+      "merged_at": "2026-09-30T00:23:18Z",
+      "merge_commit_sha": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/62",
+      "head": {
+        "ref": "ops/fix-controlled-rat-workflow-yaml-20260930",
+        "sha": "69aa1aad0c9f83d8a7d3b08fb2935683171e6252",
+        "label": "CipherCuttle:ops/fix-controlled-rat-workflow-yaml-20260930"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "08a42f7789e5c0ad74a3a3c044bd07d9c29c1415",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 63,
+      "title": "feat: Telegram-as-code, private Mini App, controlled V2 rollout",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-30T18:00:23Z",
+      "updated_at": "2026-09-30T23:07:46Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "39a028f653b462d28bd7077895df6bf395aec9c9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/63",
+      "head": {
+        "ref": "codex/telegram-as-code-private-v2",
+        "sha": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+        "label": "CipherCuttle:codex/telegram-as-code-private-v2"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 64,
+      "title": "fix: accept Pons launch re-observation timestamps",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-30T19:17:39Z",
+      "updated_at": "2026-09-30T19:30:50Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/64",
+      "head": {
+        "ref": "hotfix/pons-launch-identity-retry-v1",
+        "sha": "982b0ac761bf687a0281668acc693c163919c2c6",
+        "label": "CipherCuttle:hotfix/pons-launch-identity-retry-v1"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 65,
+      "title": "fix: bound Pons catch-up throughput recovery",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-30T19:59:56Z",
+      "updated_at": "2026-09-30T21:05:32Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/65",
+      "head": {
+        "ref": "hotfix/pons-catchup-throughput-v1",
+        "sha": "0f9878ca82ad9cc6002797738495c22bfb9d089a",
+        "label": "CipherCuttle:hotfix/pons-catchup-throughput-v1"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 66,
+      "title": "docs: freeze production reliability and OPSEC plan",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-30T21:24:42Z",
+      "updated_at": "2026-09-30T21:24:42Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "dafef2586eddbb7afa5ea0d2866c5948ed79de76",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/66",
+      "head": {
+        "ref": "docs/binrat-production-reliability-freeze-v1",
+        "sha": "e62cfcc54269ea9fc5fec1344a8518041513315c",
+        "label": "CipherCuttle:docs/binrat-production-reliability-freeze-v1"
+      },
+      "base": {
+        "ref": "codex/telegram-as-code-private-v2",
+        "sha": "5b712a7c24362cb8ac66c658d740ccc66be63b25",
+        "label": "CipherCuttle:codex/telegram-as-code-private-v2"
+      }
+    },
+    {
+      "number": 67,
+      "title": "docs: split Telegram scout from web forensics",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-30T23:36:01Z",
+      "updated_at": "2026-09-30T23:36:01Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b42bb6aff97831b6921d4c8d2aca0d77afe5427b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/67",
+      "head": {
+        "ref": "docs/telegram-web-forensics-split-v1",
+        "sha": "fe48aad43506c4cca72d7abe0fe0e982dff27b29",
+        "label": "CipherCuttle:docs/telegram-web-forensics-split-v1"
+      },
+      "base": {
+        "ref": "codex/telegram-as-code-private-v2",
+        "sha": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+        "label": "CipherCuttle:codex/telegram-as-code-private-v2"
+      }
+    },
+    {
+      "number": 68,
+      "title": "feat: compress Telegram Rat messaging",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-09-30T23:48:46Z",
+      "updated_at": "2026-10-01T00:02:55Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d885586eaf6d0ce76d05fc92461b042c450726c5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/68",
+      "head": {
+        "ref": "feat/telegram-messaging-v1",
+        "sha": "2d2f27ed5cb1a5e575226b757df0b219d8eac43a",
+        "label": "CipherCuttle:feat/telegram-messaging-v1"
+      },
+      "base": {
+        "ref": "codex/telegram-as-code-private-v2",
+        "sha": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+        "label": "CipherCuttle:codex/telegram-as-code-private-v2"
+      }
+    },
+    {
+      "number": 69,
+      "title": "feat: compress Telegram messaging hierarchy",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T07:46:23Z",
+      "updated_at": "2026-10-01T08:53:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "6a38647f5a9d65fe07670faf5ff2c1703a04956b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/69",
+      "head": {
+        "ref": "feat/binrat-telegram-messaging-v1",
+        "sha": "95da66edb428114ab7f7ff2aabdfdb7989134861",
+        "label": "CipherCuttle:feat/binrat-telegram-messaging-v1"
+      },
+      "base": {
+        "ref": "codex/telegram-as-code-private-v2",
+        "sha": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+        "label": "CipherCuttle:codex/telegram-as-code-private-v2"
+      }
+    },
+    {
+      "number": 70,
+      "title": "Roadmap: living scene spine v1",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-10-01T08:33:56Z",
+      "updated_at": "2026-10-14T01:53:59Z",
+      "closed_at": "2026-10-14T01:53:59Z",
+      "merged_at": null,
+      "merge_commit_sha": "cfd6c8ec64429ae474d15d6a9287a6c141a5f517",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/70",
+      "head": {
+        "ref": "feat/binrat-roadmap-living-scenes-v1",
+        "sha": "ab844e4814d553b4485b7d3351e176c8376712a6",
+        "label": "CipherCuttle:feat/binrat-roadmap-living-scenes-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-telegram-messaging-v1",
+        "sha": "840b8a3b4161d51e1cd2d26b4d19b2e59648d61e",
+        "label": "CipherCuttle:feat/binrat-telegram-messaging-v1"
+      }
+    },
+    {
+      "number": 71,
+      "title": "fix: unify active product on Pons 4663",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T09:10:54Z",
+      "updated_at": "2026-10-01T16:12:55Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "94967be2474cbf35f45d8c63a4e8d6ed056c408f",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/71",
+      "head": {
+        "ref": "fix/binrat-4663-surface-authority-v1",
+        "sha": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+        "label": "CipherCuttle:fix/binrat-4663-surface-authority-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-telegram-messaging-v1",
+        "sha": "95da66edb428114ab7f7ff2aabdfdb7989134861",
+        "label": "CipherCuttle:feat/binrat-telegram-messaging-v1"
+      }
+    },
+    {
+      "number": 72,
+      "title": "feat: add Pons token identity receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T16:09:20Z",
+      "updated_at": "2026-10-01T16:54:14Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d3ea5e490014c64232d84687f2f6174202957c7d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/72",
+      "head": {
+        "ref": "feat/binrat-pons-token-identity-v1",
+        "sha": "d40ff86ddc708d23e2f7880d248267590b45809b",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-4663-surface-authority-v1",
+        "sha": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+        "label": "CipherCuttle:fix/binrat-4663-surface-authority-v1"
+      }
+    },
+    {
+      "number": 73,
+      "title": "feat: add read-only Pons outcome probe",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T16:28:01Z",
+      "updated_at": "2026-10-01T16:28:01Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "6d619d21c1194e37dfa143a69510948391f57f4d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/73",
+      "head": {
+        "ref": "feat/binrat-pons-outcome-o1-v1",
+        "sha": "9b50940e81b24727422deb64d16f94dba4736c98",
+        "label": "CipherCuttle:feat/binrat-pons-outcome-o1-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-v1",
+        "sha": "d91add24fb2464d337a250cbd8c8e79100039b25",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-v1"
+      }
+    },
+    {
+      "number": 74,
+      "title": "feat: add read-only Pons historical outcome probe",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T16:45:08Z",
+      "updated_at": "2026-10-01T16:46:31Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "a3c6fc85aac10c968dc307ac2a5a5c9b02440951",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/74",
+      "head": {
+        "ref": "feat/binrat-pons-outcome-v1",
+        "sha": "bd8d21dfa1353664057f772e5b7a7fcd223d48d5",
+        "label": "CipherCuttle:feat/binrat-pons-outcome-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-v1",
+        "sha": "d91add24fb2464d337a250cbd8c8e79100039b25",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-v1"
+      }
+    },
+    {
+      "number": 75,
+      "title": "feat: prove Pons historical outcome capability",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T17:00:06Z",
+      "updated_at": "2026-10-01T19:16:18Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b2e760d564c440f9d992f91d7a5457e9eafaf5ca",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/75",
+      "head": {
+        "ref": "feat/binrat-pons-outcome-capability-v1",
+        "sha": "04d559af941a1043847e8ea1c2909cd66d3f7bcf",
+        "label": "CipherCuttle:feat/binrat-pons-outcome-capability-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-v1",
+        "sha": "d40ff86ddc708d23e2f7880d248267590b45809b",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-v1"
+      }
+    },
+    {
+      "number": 76,
+      "title": "feat: add immutable Pons outcome receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T19:28:35Z",
+      "updated_at": "2026-10-01T20:23:08Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b6d7985ccc3f147a46866971e2084d8ca970fd7c",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/76",
+      "head": {
+        "ref": "feat/binrat-pons-outcome-receipts-v1",
+        "sha": "1cd72433af067eeaca3bd7d3ccf9a9f22051e319",
+        "label": "CipherCuttle:feat/binrat-pons-outcome-receipts-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-outcome-capability-v1",
+        "sha": "04d559af941a1043847e8ea1c2909cd66d3f7bcf",
+        "label": "CipherCuttle:feat/binrat-pons-outcome-capability-v1"
+      }
+    },
+    {
+      "number": 77,
+      "title": "feat: align Mini App with Fresh Garbage journey",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T20:15:14Z",
+      "updated_at": "2026-10-01T20:23:09Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "3fd2a86f164297bf19fe0dd142aa55bc0b5ad0fd",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/77",
+      "head": {
+        "ref": "feat/binrat-miniapp-hierarchy-v1",
+        "sha": "19fc3cdf42c3972dbf95dae4d9e407725d0d35bc",
+        "label": "CipherCuttle:feat/binrat-miniapp-hierarchy-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-4663-surface-authority-v1",
+        "sha": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+        "label": "CipherCuttle:fix/binrat-4663-surface-authority-v1"
+      }
+    },
+    {
+      "number": 78,
+      "title": "ops: narrow O2 production rollout from live release",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T20:28:53Z",
+      "updated_at": "2026-10-01T22:42:01Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b403f510bf7a8c0228854e3c66db62f8ab44b8e8",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/78",
+      "head": {
+        "ref": "ops/binrat-o2-production-rollout-v1",
+        "sha": "7d223924f1dda8a50270c61443969c4a415bfd1c",
+        "label": "CipherCuttle:ops/binrat-o2-production-rollout-v1"
+      },
+      "base": {
+        "ref": "ops/binrat-o2-production-base-v1",
+        "sha": "525bab62a21061c576099215d247d96ae8541e01",
+        "label": "CipherCuttle:ops/binrat-o2-production-base-v1"
+      }
+    },
+    {
+      "number": 79,
+      "title": "fix: classify Pons provider head regression explicitly",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T21:56:41Z",
+      "updated_at": "2026-10-01T23:07:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "f58c56051717154757c97c63002d6dc6d69de7c4",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/79",
+      "head": {
+        "ref": "fix/binrat-pons-provider-head-regression-v1",
+        "sha": "9d7d926f10db93802e76eab96b655ba449f23db1",
+        "label": "CipherCuttle:fix/binrat-pons-provider-head-regression-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-pons-provider-head-regression-base-v1",
+        "sha": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+        "label": "CipherCuttle:fix/binrat-pons-provider-head-regression-base-v1"
+      }
+    },
+    {
+      "number": 80,
+      "title": "feat: add point-in-time Rat Trap projection",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T22:40:59Z",
+      "updated_at": "2026-10-01T23:11:43Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8d8902c4acda56d779747223c56a1a0b2b7138ff",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/80",
+      "head": {
+        "ref": "feat/binrat-rat-trap-projection-v1",
+        "sha": "677f2046525fcb95c58a520054bd556c702ed404",
+        "label": "CipherCuttle:feat/binrat-rat-trap-projection-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-pons-provider-head-regression-base-v1",
+        "sha": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+        "label": "CipherCuttle:fix/binrat-pons-provider-head-regression-base-v1"
+      }
+    },
+    {
+      "number": 81,
+      "title": "fix: repair Pons provenance incrementally",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T22:48:06Z",
+      "updated_at": "2026-10-01T23:07:30Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ab00d286a5e3047d4b5707bd5ca58451fa50de8f",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/81",
+      "head": {
+        "ref": "fix/binrat-provenance-incremental-repair-v1",
+        "sha": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+        "label": "CipherCuttle:fix/binrat-provenance-incremental-repair-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-provenance-incremental-repair-base-v1",
+        "sha": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+        "label": "CipherCuttle:fix/binrat-provenance-incremental-repair-base-v1"
+      }
+    },
+    {
+      "number": 82,
+      "title": "ops: add read-only Rat Trap production inspector",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T22:55:23Z",
+      "updated_at": "2026-10-02T00:26:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "506a31c53a29a2e0021069b5b0a0e24f3a4f68e0",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/82",
+      "head": {
+        "ref": "ops/binrat-rat-trap-production-inspect-v1",
+        "sha": "ab789594d12e334960eded3c571e08135f390516",
+        "label": "CipherCuttle:ops/binrat-rat-trap-production-inspect-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-trap-projection-v1",
+        "sha": "eeb2d105a1b4369e830a0539966302c12760bd66",
+        "label": "CipherCuttle:feat/binrat-rat-trap-projection-v1"
+      }
+    },
+    {
+      "number": 83,
+      "title": "feat: port Pons token identity evidence core to live release",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T23:10:12Z",
+      "updated_at": "2026-10-01T23:12:09Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "78ff61ed5069ded5c4032be0fe2c895b47f41eae",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/83",
+      "head": {
+        "ref": "feat/binrat-pons-token-identity-livebase-v1",
+        "sha": "1eed71b8652c78762894bc685199bd33e5154116",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-livebase-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-pons-provider-head-regression-base-v1",
+        "sha": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+        "label": "CipherCuttle:fix/binrat-pons-provider-head-regression-base-v1"
+      }
+    },
+    {
+      "number": 84,
+      "title": "feat: add coverage-first Rat Trap presentation model",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T23:14:10Z",
+      "updated_at": "2026-10-01T23:18:00Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "a25aab5140877b2d2ffd75e1641d793530378af6",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/84",
+      "head": {
+        "ref": "feat/binrat-rat-trap-presentation-v1",
+        "sha": "206fb4d868a3fdeef2bb054edfb09837437306dd",
+        "label": "CipherCuttle:feat/binrat-rat-trap-presentation-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-trap-projection-v1",
+        "sha": "677f2046525fcb95c58a520054bd556c702ed404",
+        "label": "CipherCuttle:feat/binrat-rat-trap-projection-v1"
+      }
+    },
+    {
+      "number": 85,
+      "title": "feat: add disabled Pons token identity runtime",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T23:14:18Z",
+      "updated_at": "2026-10-01T23:14:18Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4280095d45ee7ad89b477bf6ca9aa45458764096",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/85",
+      "head": {
+        "ref": "feat/binrat-pons-token-identity-runtime-v1",
+        "sha": "df71f614f00c8d7f595b9508d964dca276c15326",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-runtime-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-livebase-v1",
+        "sha": "1eed71b8652c78762894bc685199bd33e5154116",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-livebase-v1"
+      }
+    },
+    {
+      "number": 86,
+      "title": "feat: wire coverage-first Rat Trap into Mini App",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T23:24:13Z",
+      "updated_at": "2026-10-01T23:24:13Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "34eb9f101b97e728d211fe647a09ad6e75ffe339",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/86",
+      "head": {
+        "ref": "feat/binrat-miniapp-rat-trap-integration-v1",
+        "sha": "f9c16850b32405a25b1847c7aaabb787c29582c1",
+        "label": "CipherCuttle:feat/binrat-miniapp-rat-trap-integration-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-trap-presentation-v1",
+        "sha": "206fb4d868a3fdeef2bb054edfb09837437306dd",
+        "label": "CipherCuttle:feat/binrat-rat-trap-presentation-v1"
+      }
+    },
+    {
+      "number": 87,
+      "title": "feat: converge REMEMBER contracts on live production base",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T23:40:14Z",
+      "updated_at": "2026-10-01T23:44:19Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "afee945901ed24ed6f64b15988bb4f170d29550f",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/87",
+      "head": {
+        "ref": "feat/binrat-remember-livebase-v1",
+        "sha": "7ef47cd2c2a7da8e005efbd40dc0c478b5370d0d",
+        "label": "CipherCuttle:feat/binrat-remember-livebase-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-provenance-incremental-repair-v1",
+        "sha": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+        "label": "CipherCuttle:fix/binrat-provenance-incremental-repair-v1"
+      }
+    },
+    {
+      "number": 88,
+      "title": "feat: converge bounded Pons token identity rail on production base",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-01T23:56:54Z",
+      "updated_at": "2026-10-02T00:24:57Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "cf7bd1a9356fc0c0c9767ce32ca79d0fd904d89a",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/88",
+      "head": {
+        "ref": "feat/binrat-pons-token-identity-production-v1",
+        "sha": "75ea77d9384845c9c537248e5a757fff5efbd960",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-production-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-provenance-incremental-repair-v1",
+        "sha": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+        "label": "CipherCuttle:fix/binrat-provenance-incremental-repair-v1"
+      }
+    },
+    {
+      "number": 89,
+      "title": "feat: stabilize Mini App and restore Hot Garbage journey",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T00:13:02Z",
+      "updated_at": "2026-10-02T00:20:57Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "f9c46d86dd971eb034e399e4b278851be188c8e5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/89",
+      "head": {
+        "ref": "feat/binrat-miniapp-hot-garbage-stability-v1",
+        "sha": "3eba47cc2ab6d72b057f13a4e561bda168447a29",
+        "label": "CipherCuttle:feat/binrat-miniapp-hot-garbage-stability-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-miniapp-rat-trap-integration-v1",
+        "sha": "f9c16850b32405a25b1847c7aaabb787c29582c1",
+        "label": "CipherCuttle:feat/binrat-miniapp-rat-trap-integration-v1"
+      }
+    },
+    {
+      "number": 90,
+      "title": "feat: ship coverage-first Trash Trails",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T07:22:37Z",
+      "updated_at": "2026-10-02T07:32:23Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "2a0df969a9993dcd1fafd9f229bb69572357e6a5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/90",
+      "head": {
+        "ref": "feat/binrat-trash-trails-v1",
+        "sha": "0f9ec9f1127f132a279713c28cfe748ab150a2a9",
+        "label": "CipherCuttle:feat/binrat-trash-trails-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-production-v1",
+        "sha": "75ea77d9384845c9c537248e5a757fff5efbd960",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-production-v1"
+      }
+    },
+    {
+      "number": 91,
+      "title": "feat: add receipt-bound Pons funding provenance core",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T07:33:23Z",
+      "updated_at": "2026-10-02T20:49:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "996920718a6e39ac3d111111312de359a45ac186",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/91",
+      "head": {
+        "ref": "feat/binrat-pons-funding-provenance-v1",
+        "sha": "95968749eac6691d2645344bf8cb7b2a0a227ade",
+        "label": "CipherCuttle:feat/binrat-pons-funding-provenance-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-production-v1",
+        "sha": "75ea77d9384845c9c537248e5a757fff5efbd960",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-production-v1"
+      }
+    },
+    {
+      "number": 92,
+      "title": "feat: add point-in-time Pons Replay Lab core",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T07:44:14Z",
+      "updated_at": "2026-10-02T08:04:49Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "72780abbd7084f88a47d104cb9b3bcdec876bda9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/92",
+      "head": {
+        "ref": "feat/binrat-pons-replay-lab-v1",
+        "sha": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+        "label": "CipherCuttle:feat/binrat-pons-replay-lab-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-production-v1",
+        "sha": "75ea77d9384845c9c537248e5a757fff5efbd960",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-production-v1"
+      }
+    },
+    {
+      "number": 93,
+      "title": "feat: add default-off bounded Pons funding collector",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T07:49:10Z",
+      "updated_at": "2026-10-02T07:55:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d07bd891c25f9cbdd5d2c7fd922c5bd2f5289b4c",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/93",
+      "head": {
+        "ref": "feat/binrat-pons-funding-collector-v1",
+        "sha": "1175423a864ed6ac28c5473a55b850443f65076e",
+        "label": "CipherCuttle:feat/binrat-pons-funding-collector-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-funding-provenance-v1",
+        "sha": "623a2448dd3109a3110d2a69e19e1a02ed6d984a",
+        "label": "CipherCuttle:feat/binrat-pons-funding-provenance-v1"
+      }
+    },
+    {
+      "number": 94,
+      "title": "feat: add read-only Pons funding recurrence model",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T07:58:09Z",
+      "updated_at": "2026-10-02T07:58:09Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "fb023658ebeaa629c67b78da3f99a68ae613399b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/94",
+      "head": {
+        "ref": "feat/binrat-pons-funding-recurrence-read-v1",
+        "sha": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
+        "label": "CipherCuttle:feat/binrat-pons-funding-recurrence-read-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-funding-collector-v1",
+        "sha": "1175423a864ed6ac28c5473a55b850443f65076e",
+        "label": "CipherCuttle:feat/binrat-pons-funding-collector-v1"
+      }
+    },
+    {
+      "number": 95,
+      "title": "ops: prove Pons Replay Lab against production evidence",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T08:04:30Z",
+      "updated_at": "2026-10-02T08:07:53Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "f05528d83c9852c1742b18b16e8bcec63adf3d06",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/95",
+      "head": {
+        "ref": "ops/binrat-pons-replay-production-inspect-v1",
+        "sha": "1d55af75c55a98be696eb84a784383e0caa98939",
+        "label": "CipherCuttle:ops/binrat-pons-replay-production-inspect-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-replay-lab-v1",
+        "sha": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+        "label": "CipherCuttle:feat/binrat-pons-replay-lab-v1"
+      }
+    },
+    {
+      "number": 96,
+      "title": "feat: add portable Pons Replay receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T08:09:23Z",
+      "updated_at": "2026-10-02T08:14:05Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d318d59111e8add86172c10152611614656e30b2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/96",
+      "head": {
+        "ref": "feat/binrat-pons-replay-receipt-v1",
+        "sha": "843f7e1866b2a96dd57fe9e47ab0574d407d48d3",
+        "label": "CipherCuttle:feat/binrat-pons-replay-receipt-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-replay-lab-v1",
+        "sha": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+        "label": "CipherCuttle:feat/binrat-pons-replay-lab-v1"
+      }
+    },
+    {
+      "number": 97,
+      "title": "feat: add evidence-only Pons case composition model",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T12:12:46Z",
+      "updated_at": "2026-10-02T12:13:42Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "42e9d168906a18e8cd2ede5e7cf2893b4164a232",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/97",
+      "head": {
+        "ref": "feat/binrat-case-model-v1",
+        "sha": "9dbc44b923b9e86b57d81aa9b1b7c573f840fa07",
+        "label": "CipherCuttle:feat/binrat-case-model-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-token-identity-production-v1",
+        "sha": "75ea77d9384845c9c537248e5a757fff5efbd960",
+        "label": "CipherCuttle:feat/binrat-pons-token-identity-production-v1"
+      }
+    },
+    {
+      "number": 98,
+      "title": "feat: add evidence-only BINRAT Case Model",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T12:13:39Z",
+      "updated_at": "2026-10-02T12:25:22Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "efdee2e3178ad10325e9b594377a3e81ecc40bdb",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/98",
+      "head": {
+        "ref": "feat/binrat-case-model-convergence-v1",
+        "sha": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
+        "label": "CipherCuttle:feat/binrat-case-model-convergence-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-funding-recurrence-read-v1",
+        "sha": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
+        "label": "CipherCuttle:feat/binrat-pons-funding-recurrence-read-v1"
+      }
+    },
+    {
+      "number": 99,
+      "title": "feat: compose BINRAT Case Model from real Pons rails",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T16:02:35Z",
+      "updated_at": "2026-10-02T16:08:12Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "f830e6d65a203e096a684921aac25a66ac9f3e13",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/99",
+      "head": {
+        "ref": "feat/binrat-case-adapter-v1",
+        "sha": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
+        "label": "CipherCuttle:feat/binrat-case-adapter-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-case-model-convergence-v1",
+        "sha": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
+        "label": "CipherCuttle:feat/binrat-case-model-convergence-v1"
+      }
+    },
+    {
+      "number": 100,
+      "title": "feat: expose authenticated read-only Case endpoint",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T16:21:53Z",
+      "updated_at": "2026-10-02T16:28:17Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "96b06296dd675aac8e8be9bc99f0a413c2b309d2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/100",
+      "head": {
+        "ref": "feat/binrat-case-endpoint-v1",
+        "sha": "7a96a3c111af14b6d34585cd425904a59068b4be",
+        "label": "CipherCuttle:feat/binrat-case-endpoint-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-case-adapter-v1",
+        "sha": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
+        "label": "CipherCuttle:feat/binrat-case-adapter-v1"
+      }
+    },
+    {
+      "number": 101,
+      "title": "feat: wire Mini App to unified Case intelligence",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T16:49:47Z",
+      "updated_at": "2026-10-02T18:05:17Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8947c2800685a5986306ba585f2c063753737f08",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/101",
+      "head": {
+        "ref": "feat/binrat-case-surface-v1",
+        "sha": "c9bcb01c01433147ca6d774ed807efafffaa437e",
+        "label": "CipherCuttle:feat/binrat-case-surface-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-case-endpoint-v1",
+        "sha": "7a96a3c111af14b6d34585cd425904a59068b4be",
+        "label": "CipherCuttle:feat/binrat-case-endpoint-v1"
+      }
+    },
+    {
+      "number": 102,
+      "title": "ops: prepare private Case surface preview",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T17:40:12Z",
+      "updated_at": "2026-10-02T18:05:24Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d241d65b7697fdec0e73dc06d9d3e9bd028aa1ed",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/102",
+      "head": {
+        "ref": "ops/binrat-case-surface-private-preview-v1",
+        "sha": "f5934950011455061569075fc6111d0022a11629",
+        "label": "CipherCuttle:ops/binrat-case-surface-private-preview-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-case-surface-v1",
+        "sha": "99fead7f0cc8266d8e6e3d1ce408d08d84af23de",
+        "label": "CipherCuttle:feat/binrat-case-surface-v1"
+      }
+    },
+    {
+      "number": 103,
+      "title": "feat: add default-off Pons funding collector",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-02T20:34:54Z",
+      "updated_at": "2026-10-02T21:15:25Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "c8d2bda66e940da80200fb1b17a2d78f633f87e2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/103",
+      "head": {
+        "ref": "feat/binrat-pons-funding-storage-v1",
+        "sha": "90296437d8846df71311f9523a4e7a29d9968798",
+        "label": "CipherCuttle:feat/binrat-pons-funding-storage-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-funding-provenance-v1",
+        "sha": "623a2448dd3109a3110d2a69e19e1a02ed6d984a",
+        "label": "CipherCuttle:feat/binrat-pons-funding-provenance-v1"
+      }
+    },
+    {
+      "number": 104,
+      "title": "feat: reconstruct canonical Pons Case stack",
+      "state": "open",
+      "draft": false,
+      "created_at": "2026-10-02T21:45:35Z",
+      "updated_at": "2026-10-02T21:49:15Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8f81206e4d114519ecf3ce64ed96dc17335b5a14",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/104",
+      "head": {
+        "ref": "integration/binrat-case-canonical-v1",
+        "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+        "label": "CipherCuttle:integration/binrat-case-canonical-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-funding-storage-v1",
+        "sha": "90296437d8846df71311f9523a4e7a29d9968798",
+        "label": "CipherCuttle:feat/binrat-pons-funding-storage-v1"
+      }
+    },
+    {
+      "number": 105,
+      "title": "ops: Version-URL-first canonical Case preview",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T01:24:31Z",
+      "updated_at": "2026-10-03T01:24:31Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "2ebe71c2a4703a8c5dabb8bf49801a2d73c4d2d7",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/105",
+      "head": {
+        "ref": "ops/binrat-case-version-url-preview-v1",
+        "sha": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+        "label": "CipherCuttle:ops/binrat-case-version-url-preview-v1"
+      },
+      "base": {
+        "ref": "ops/binrat-case-canonical-private-preview-v1",
+        "sha": "fae06e675bd68271a7f583a662b69e2451906236",
+        "label": "CipherCuttle:ops/binrat-case-canonical-private-preview-v1"
+      }
+    },
+    {
+      "number": 106,
+      "title": "feat: sharpen BINRAT degen frontdoor v1",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T09:27:47Z",
+      "updated_at": "2026-10-03T19:56:25Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "9916d5e4dfc77cd80b93be64508d27ca2770d5e7",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/106",
+      "head": {
+        "ref": "feat/binrat-degen-frontdoor-v1",
+        "sha": "64ec4702ca71330f41a2f8a8f575eeff44958f12",
+        "label": "CipherCuttle:feat/binrat-degen-frontdoor-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-case-canonical-v1",
+        "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+        "label": "CipherCuttle:integration/binrat-case-canonical-v1"
+      }
+    },
+    {
+      "number": 107,
+      "title": "feat: freeze BINRAT Shadow Economy V0 contract",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T10:48:47Z",
+      "updated_at": "2026-10-03T10:48:47Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "fde397699b849a1d304ea68b05a5da15c7e789ae",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/107",
+      "head": {
+        "ref": "feat/binrat-shadow-economy-v0",
+        "sha": "b85d9c5f39072e32aec331d299e8f38ba6b6a499",
+        "label": "CipherCuttle:feat/binrat-shadow-economy-v0"
+      },
+      "base": {
+        "ref": "integration/binrat-case-canonical-v1",
+        "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+        "label": "CipherCuttle:integration/binrat-case-canonical-v1"
+      }
+    },
+    {
+      "number": 108,
+      "title": "docs: add Pons launch train and Genesis Rat funnel",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T11:33:25Z",
+      "updated_at": "2026-10-03T11:33:25Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "1096e69ebccaec90342d492775f0c73f8a04bd3f",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/108",
+      "head": {
+        "ref": "docs/binrat-launch-genesis-funnel-v1",
+        "sha": "70501f0e8f30d3fa46a8a6dc04b63fd9284d17f7",
+        "label": "CipherCuttle:docs/binrat-launch-genesis-funnel-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-case-canonical-v1",
+        "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+        "label": "CipherCuttle:integration/binrat-case-canonical-v1"
+      }
+    },
+    {
+      "number": 109,
+      "title": "feat: make Pons V1 the fail-closed launch authority",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T11:53:33Z",
+      "updated_at": "2026-10-03T12:16:12Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "0c5ed85c401bcaeca0226dbf1ee30907787b60ed",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/109",
+      "head": {
+        "ref": "docs/binrat-pons-launch-authority-v1",
+        "sha": "bb5d7a862021b3362d078c876a2a7243fe90c015",
+        "label": "CipherCuttle:docs/binrat-pons-launch-authority-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-launch-genesis-funnel-v1",
+        "sha": "70501f0e8f30d3fa46a8a6dc04b63fd9284d17f7",
+        "label": "CipherCuttle:docs/binrat-launch-genesis-funnel-v1"
+      }
+    },
+    {
+      "number": 110,
+      "title": "feat: fail closed on current PonsVault Stake & Burn candidate",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T13:22:05Z",
+      "updated_at": "2026-10-03T13:22:05Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "73da5c266d3d4b78d6db4952ed1cf73608c4251b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/110",
+      "head": {
+        "ref": "docs/binrat-ponsvault-forensic-pin-v1",
+        "sha": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+        "label": "CipherCuttle:docs/binrat-ponsvault-forensic-pin-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-pons-launch-authority-v1",
+        "sha": "bb5d7a862021b3362d078c876a2a7243fe90c015",
+        "label": "CipherCuttle:docs/binrat-pons-launch-authority-v1"
+      }
+    },
+    {
+      "number": 111,
+      "title": "feat: pin PonsVault Staking as conditional L1B candidate",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T14:13:10Z",
+      "updated_at": "2026-10-03T14:13:10Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4f01b9a717b183fa2aa36ea0806b6d58193721f3",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/111",
+      "head": {
+        "ref": "docs/binrat-ponsvault-staking-forensic-v1",
+        "sha": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+        "label": "CipherCuttle:docs/binrat-ponsvault-staking-forensic-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-ponsvault-forensic-pin-v1",
+        "sha": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+        "label": "CipherCuttle:docs/binrat-ponsvault-forensic-pin-v1"
+      }
+    },
+    {
+      "number": 112,
+      "title": "feat: pin PonsVault Staking L1B as conditional",
+      "state": "closed",
+      "draft": true,
+      "created_at": "2026-10-03T14:42:29Z",
+      "updated_at": "2026-10-03T14:43:18Z",
+      "closed_at": "2026-10-03T14:43:18Z",
+      "merged_at": null,
+      "merge_commit_sha": "f13900072eea1fa273fed6e688a8f841b63e395a",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/112",
+      "head": {
+        "ref": "docs/binrat-staking-l1b-v1",
+        "sha": "e2cc2ecbeb05ddcbd5b9081cb683c9c04a930684",
+        "label": "CipherCuttle:docs/binrat-staking-l1b-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-ponsvault-forensic-pin-v1",
+        "sha": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+        "label": "CipherCuttle:docs/binrat-ponsvault-forensic-pin-v1"
+      }
+    },
+    {
+      "number": 113,
+      "title": "docs: rebind BINRAT launch authority to conditional Staking",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T14:54:58Z",
+      "updated_at": "2026-10-03T14:56:38Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "c5e407c36b75a1d2deca4b1354ddbcd73ecb5ca5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/113",
+      "head": {
+        "ref": "docs/binrat-staking-authority-rebind-v1",
+        "sha": "4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c",
+        "label": "CipherCuttle:docs/binrat-staking-authority-rebind-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-ponsvault-staking-forensic-v1",
+        "sha": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+        "label": "CipherCuttle:docs/binrat-ponsvault-staking-forensic-v1"
+      }
+    },
+    {
+      "number": 114,
+      "title": "feat: pin PonsVault Staking L1B authority",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T15:11:28Z",
+      "updated_at": "2026-10-03T15:15:42Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "386ef876ca266fc1d1e29df1ed1c44dcecf9cd2e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/114",
+      "head": {
+        "ref": "docs/binrat-ponsvault-staking-forensic-pin-v1",
+        "sha": "8667d32182f3013a4ec255d340403f54d3db6c93",
+        "label": "CipherCuttle:docs/binrat-ponsvault-staking-forensic-pin-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-ponsvault-forensic-pin-v1",
+        "sha": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+        "label": "CipherCuttle:docs/binrat-ponsvault-forensic-pin-v1"
+      }
+    },
+    {
+      "number": 115,
+      "title": "docs: reconcile canonical Pons launch authority v1",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T20:48:27Z",
+      "updated_at": "2026-10-03T20:48:27Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "6f512f0694134301586e6a6dd923d7a36e78d32e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/115",
+      "head": {
+        "ref": "integration/binrat-pons-launch-canonical-v1",
+        "sha": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+        "label": "CipherCuttle:integration/binrat-pons-launch-canonical-v1"
+      },
+      "base": {
+        "ref": "docs/binrat-staking-authority-rebind-v1",
+        "sha": "4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c",
+        "label": "CipherCuttle:docs/binrat-staking-authority-rebind-v1"
+      }
+    },
+    {
+      "number": 116,
+      "title": "feat: add read-only Pons preflight v1",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T21:01:43Z",
+      "updated_at": "2026-10-03T21:09:49Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "aabf90eb619b566a8e6020c3ac7fb7619c9b7f05",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/116",
+      "head": {
+        "ref": "feat/binrat-pons-preflight-v1",
+        "sha": "ccc677985ce07f438648a2499611e72c36729491",
+        "label": "CipherCuttle:feat/binrat-pons-preflight-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-pons-launch-canonical-v1",
+        "sha": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+        "label": "CipherCuttle:integration/binrat-pons-launch-canonical-v1"
+      }
+    },
+    {
+      "number": 117,
+      "title": "feat: add fail-closed Pons stake reader",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T21:27:19Z",
+      "updated_at": "2026-10-03T21:27:19Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "2aab9b67033f741d97c841630d1c62a5ed6cae1d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/117",
+      "head": {
+        "ref": "feat/binrat-working-rat-l2-v1",
+        "sha": "c23defaa9ed338e13ba2be72c482af51660aac56",
+        "label": "CipherCuttle:feat/binrat-working-rat-l2-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-preflight-v1",
+        "sha": "ccc677985ce07f438648a2499611e72c36729491",
+        "label": "CipherCuttle:feat/binrat-pons-preflight-v1"
+      }
+    },
+    {
+      "number": 118,
+      "title": "Exact Pons Launch Rehearsal V1",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T22:47:23Z",
+      "updated_at": "2026-10-03T22:47:23Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ed055be9dd767db9baa6986c633db5f64da02483",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/118",
+      "head": {
+        "ref": "feat/binrat-exact-pons-launch-rehearsal-v1",
+        "sha": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+        "label": "CipherCuttle:feat/binrat-exact-pons-launch-rehearsal-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-preflight-v1",
+        "sha": "ccc677985ce07f438648a2499611e72c36729491",
+        "label": "CipherCuttle:feat/binrat-pons-preflight-v1"
+      }
+    },
+    {
+      "number": 119,
+      "title": "feat: stabilize BINRAT public read plane",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T23:22:54Z",
+      "updated_at": "2026-10-03T23:22:54Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "75ee4abbb409da1544883f75da741008d30908c1",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/119",
+      "head": {
+        "ref": "feat/binrat-public-read-plane-stability-v1",
+        "sha": "5bd247bbef968ea8570532bbd6edc1d5ee543421",
+        "label": "CipherCuttle:feat/binrat-public-read-plane-stability-v1"
+      },
+      "base": {
+        "ref": "ops/binrat-case-version-url-preview-v1",
+        "sha": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+        "label": "CipherCuttle:ops/binrat-case-version-url-preview-v1"
+      }
+    },
+    {
+      "number": 120,
+      "title": "fix: retain verified public feed across refresh failures",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-03T23:27:17Z",
+      "updated_at": "2026-10-03T23:27:17Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d770e06e75423167b98d4eb3443aa7f2ee5ac100",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/120",
+      "head": {
+        "ref": "fix/binrat-read-plane-frontend-resilience-v1",
+        "sha": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+        "label": "CipherCuttle:fix/binrat-read-plane-frontend-resilience-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-degen-frontdoor-v1",
+        "sha": "64ec4702ca71330f41a2f8a8f575eeff44958f12",
+        "label": "CipherCuttle:feat/binrat-degen-frontdoor-v1"
+      }
+    },
+    {
+      "number": 121,
+      "title": "Canonical integration: public read plane stability v1 (base 1cfd4fa + 5bd247b + Scenario-11 fix)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-04T21:13:31Z",
+      "updated_at": "2026-10-04T22:45:18Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d5702941612bffc7c8e5028203a456126bd7b1bc",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/121",
+      "head": {
+        "ref": "integration/binrat-public-read-plane-stability-v1",
+        "sha": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+        "label": "CipherCuttle:integration/binrat-public-read-plane-stability-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-read-plane-frontend-resilience-v1",
+        "sha": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+        "label": "CipherCuttle:fix/binrat-read-plane-frontend-resilience-v1"
+      }
+    },
+    {
+      "number": 122,
+      "title": "feat: teach BINRAT frontdoor journey with honest crew availability",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T17:13:12Z",
+      "updated_at": "2026-10-05T17:13:12Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "7da85fb1e055a2707646fd6af50f0dfd92a23c43",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/122",
+      "head": {
+        "ref": "feat/binrat-frontdoor-journey-v1",
+        "sha": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+        "label": "CipherCuttle:feat/binrat-frontdoor-journey-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-public-read-plane-stability-v1",
+        "sha": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+        "label": "CipherCuttle:integration/binrat-public-read-plane-stability-v1"
+      }
+    },
+    {
+      "number": 123,
+      "title": "feat: prove Rat workforce contracts with bounded offline replay",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T17:55:13Z",
+      "updated_at": "2026-10-05T17:57:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "cb6b0372dbac597225339fc00c3ef2149878ff8a",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/123",
+      "head": {
+        "ref": "feat/binrat-rat-workforce-offline-v1",
+        "sha": "ed2807f6d49c853713770fba099159e20bfd173b",
+        "label": "CipherCuttle:feat/binrat-rat-workforce-offline-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontdoor-journey-v1",
+        "sha": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+        "label": "CipherCuttle:feat/binrat-frontdoor-journey-v1"
+      }
+    },
+    {
+      "number": 124,
+      "title": "feat: compare recorded Sniffer outputs with blinded paired cases",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T18:24:26Z",
+      "updated_at": "2026-10-05T18:28:17Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "5add82378ffa370a26d5a5e6ad8ea0e390ff6f34",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/124",
+      "head": {
+        "ref": "feat/binrat-sniffer-competence-eval-v1",
+        "sha": "d47e9c30f3d089c754b1da37b2016d2a57ec23dc",
+        "label": "CipherCuttle:feat/binrat-sniffer-competence-eval-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-rat-workforce-offline-v1",
+        "sha": "ed2807f6d49c853713770fba099159e20bfd173b",
+        "label": "CipherCuttle:feat/binrat-rat-workforce-offline-v1"
+      }
+    },
+    {
+      "number": 125,
+      "title": "feat: capture frozen Sniffer comparisons with bounded provider calls",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T18:49:09Z",
+      "updated_at": "2026-10-05T18:52:29Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "2e3c9cbd72b47733c82db22b4b1580ad5f66ef98",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/125",
+      "head": {
+        "ref": "feat/binrat-sniffer-capture-runner-v1",
+        "sha": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+        "label": "CipherCuttle:feat/binrat-sniffer-capture-runner-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-sniffer-competence-eval-v1",
+        "sha": "d47e9c30f3d089c754b1da37b2016d2a57ec23dc",
+        "label": "CipherCuttle:feat/binrat-sniffer-competence-eval-v1"
+      }
+    },
+    {
+      "number": 126,
+      "title": "ci: run one pinned Sniffer comparison through repository secret",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T19:34:38Z",
+      "updated_at": "2026-10-05T19:44:10Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "e3885bf9c1a315dcb7c8cd06fa7ad79d585b208e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/126",
+      "head": {
+        "ref": "experiment/binrat-sniffer-gpt41mini-20261005",
+        "sha": "9f63e3a6ffc3be1863cc44c5e7e475e4e6f7d2f1",
+        "label": "CipherCuttle:experiment/binrat-sniffer-gpt41mini-20261005"
+      },
+      "base": {
+        "ref": "feat/binrat-sniffer-capture-runner-v1",
+        "sha": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+        "label": "CipherCuttle:feat/binrat-sniffer-capture-runner-v1"
+      }
+    },
+    {
+      "number": 127,
+      "title": "fix: accept used capped capture keys and report rejected settings",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T22:01:19Z",
+      "updated_at": "2026-10-05T22:01:19Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "75f36aba70dcba60d8cf3285584a31b9027f9fa1",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/127",
+      "head": {
+        "ref": "fix/binrat-capture-used-capped-key-v1",
+        "sha": "665aee695cd904d10aa9848d4658de0aac84798f",
+        "label": "CipherCuttle:fix/binrat-capture-used-capped-key-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-sniffer-capture-runner-v1",
+        "sha": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+        "label": "CipherCuttle:feat/binrat-sniffer-capture-runner-v1"
+      }
+    },
+    {
+      "number": 128,
+      "title": "feat: validate offline workforce proposals against receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T22:54:26Z",
+      "updated_at": "2026-10-05T22:54:26Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4183cc9926d17d653ef5af1a7831236ad6875eae",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/128",
+      "head": {
+        "ref": "fix/binrat-offline-proposal-validation-v1",
+        "sha": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+        "label": "CipherCuttle:fix/binrat-offline-proposal-validation-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-capture-used-capped-key-v1",
+        "sha": "665aee695cd904d10aa9848d4658de0aac84798f",
+        "label": "CipherCuttle:fix/binrat-capture-used-capped-key-v1"
+      }
+    },
+    {
+      "number": 129,
+      "title": "test: freeze offline workforce benchmark and preserve chronology miss",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T23:23:46Z",
+      "updated_at": "2026-10-05T23:23:46Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "0bde6071b5d271f51bf56a0312933a4e1cabb19d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/129",
+      "head": {
+        "ref": "feat/binrat-offline-workforce-benchmark-v1",
+        "sha": "9759e02a44c9a6a60390d33db70f57166916e90c",
+        "label": "CipherCuttle:feat/binrat-offline-workforce-benchmark-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-offline-proposal-validation-v1",
+        "sha": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+        "label": "CipherCuttle:fix/binrat-offline-proposal-validation-v1"
+      }
+    },
+    {
+      "number": 130,
+      "title": "fix: reconcile verified history before delayed funding",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-05T23:44:25Z",
+      "updated_at": "2026-10-05T23:47:49Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "068372b3146080cfcc104f0d95259585feacca6d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/130",
+      "head": {
+        "ref": "fix/binrat-history-before-funding-v1",
+        "sha": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+        "label": "CipherCuttle:fix/binrat-history-before-funding-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-offline-workforce-benchmark-v1",
+        "sha": "9759e02a44c9a6a60390d33db70f57166916e90c",
+        "label": "CipherCuttle:feat/binrat-offline-workforce-benchmark-v1"
+      }
+    },
+    {
+      "number": 131,
+      "title": "test: add offline next-query scorer and expose dataset shortcut",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T00:07:54Z",
+      "updated_at": "2026-10-06T00:07:54Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "247b7302edcd735fafb30cbb1e2204e2abf107af",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/131",
+      "head": {
+        "ref": "feat/binrat-next-query-eval-v1",
+        "sha": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+        "label": "CipherCuttle:feat/binrat-next-query-eval-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-history-before-funding-v1",
+        "sha": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+        "label": "CipherCuttle:fix/binrat-history-before-funding-v1"
+      }
+    },
+    {
+      "number": 132,
+      "title": "feat: persist local Rat jobs across restart and prepare return artifacts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T00:32:52Z",
+      "updated_at": "2026-10-06T00:36:16Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "0be96a59ea27b0a71f5128841a65a8dca4aa4996",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/132",
+      "head": {
+        "ref": "feat/binrat-local-rat-job-v1",
+        "sha": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+        "label": "CipherCuttle:feat/binrat-local-rat-job-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-next-query-eval-v1",
+        "sha": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+        "label": "CipherCuttle:feat/binrat-next-query-eval-v1"
+      }
+    },
+    {
+      "number": 133,
+      "title": "feat: add a local Den for saved replay jobs and Case return",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T01:22:51Z",
+      "updated_at": "2026-10-06T01:27:18Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "444e765d646fdc9ac7d07b67f10ce5d39bc5fb66",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/133",
+      "head": {
+        "ref": "feat/binrat-local-den-v1",
+        "sha": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce",
+        "label": "CipherCuttle:feat/binrat-local-den-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-local-rat-job-v1",
+        "sha": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+        "label": "CipherCuttle:feat/binrat-local-rat-job-v1"
+      }
+    },
+    {
+      "number": 134,
+      "title": "feat: replay recorded funding evidence in the local Den",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T01:56:00Z",
+      "updated_at": "2026-10-06T01:59:09Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8e1e703ff1ee6f66e95494ea755d4da740c8d551",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/134",
+      "head": {
+        "ref": "feat/binrat-recorded-evidence-v1",
+        "sha": "c9abb46633418c0f5a0e1f48a278d7595e86b23e",
+        "label": "CipherCuttle:feat/binrat-recorded-evidence-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-local-den-v1",
+        "sha": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce",
+        "label": "CipherCuttle:feat/binrat-local-den-v1"
+      }
+    },
+    {
+      "number": 135,
+      "title": "feat: preserve bounded prospective funding observations",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T02:22:08Z",
+      "updated_at": "2026-10-06T10:55:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4ede62e94dbfd868c84fa3fe235a60e2ee13cf29",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/135",
+      "head": {
+        "ref": "feat/binrat-prospective-capture-v1",
+        "sha": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2",
+        "label": "CipherCuttle:feat/binrat-prospective-capture-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-recorded-evidence-v1",
+        "sha": "c9abb46633418c0f5a0e1f48a278d7595e86b23e",
+        "label": "CipherCuttle:feat/binrat-recorded-evidence-v1"
+      }
+    },
+    {
+      "number": 136,
+      "title": "feat: account for consecutive discovery blocks and saved cursors",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T11:12:09Z",
+      "updated_at": "2026-10-06T11:34:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4418a0e18703f1e157cef76857041b6e32da61ab",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/136",
+      "head": {
+        "ref": "feat/binrat-consecutive-discovery-v1",
+        "sha": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+        "label": "CipherCuttle:feat/binrat-consecutive-discovery-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-prospective-capture-v1",
+        "sha": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2",
+        "label": "CipherCuttle:feat/binrat-prospective-capture-v1"
+      }
+    },
+    {
+      "number": 137,
+      "title": "feat: add receipt-gated Comms Rat shadow mode",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T11:37:56Z",
+      "updated_at": "2026-10-06T13:00:18Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "bdea4abe3c4843adc6ead835b1c15dd91e831a22",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/137",
+      "head": {
+        "ref": "feat/binrat-comms-rat-shadow-v1",
+        "sha": "ac5ad85629c76ceecb512bb7d72eafa62d25833e",
+        "label": "CipherCuttle:feat/binrat-comms-rat-shadow-v1"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "67296a6ce8d999bc7b55f71ab0ed1d69e4722f85",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 138,
+      "title": "feat: journal bounded indexed funder discovery",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T11:56:06Z",
+      "updated_at": "2026-10-06T12:00:32Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "5b08eb0b15d3c39e4f919a141af28824ba85f3d2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/138",
+      "head": {
+        "ref": "feat/binrat-indexed-funder-discovery-v1",
+        "sha": "55380186538ccae65c43518742730fb507989730",
+        "label": "CipherCuttle:feat/binrat-indexed-funder-discovery-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-consecutive-discovery-v1",
+        "sha": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+        "label": "CipherCuttle:feat/binrat-consecutive-discovery-v1"
+      }
+    },
+    {
+      "number": 139,
+      "title": "feat: add bounded model-backed Comms Rat writer",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T12:02:03Z",
+      "updated_at": "2026-10-06T13:01:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "c9eecb5619e4d882240452cb29982ca19c749b91",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/139",
+      "head": {
+        "ref": "feat/binrat-comms-rat-writer-v1",
+        "sha": "1b54e042157d03c898ae03364e073195e2efd71c",
+        "label": "CipherCuttle:feat/binrat-comms-rat-writer-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-comms-rat-shadow-v1",
+        "sha": "7a9bf0f9561946c27172b9b7a4a745f9df37e66e",
+        "label": "CipherCuttle:feat/binrat-comms-rat-shadow-v1"
+      }
+    },
+    {
+      "number": 140,
+      "title": "feat: connect indexed discovery to a bounded archive probe",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T12:16:19Z",
+      "updated_at": "2026-10-06T12:28:03Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "5cee863ee8385a45d36575399b6220d215c61ca9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/140",
+      "head": {
+        "ref": "feat/binrat-indexed-archive-probe-v1",
+        "sha": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63",
+        "label": "CipherCuttle:feat/binrat-indexed-archive-probe-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-indexed-funder-discovery-v1",
+        "sha": "55380186538ccae65c43518742730fb507989730",
+        "label": "CipherCuttle:feat/binrat-indexed-funder-discovery-v1"
+      }
+    },
+    {
+      "number": 141,
+      "title": "test: add historical Comms Rat shadow evaluation pack",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T12:44:29Z",
+      "updated_at": "2026-10-06T13:03:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4c764e05a812ab8477ac63612476c5fb1a9601ea",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/141",
+      "head": {
+        "ref": "test/binrat-comms-shadow-eval-v1",
+        "sha": "ef2ef0b8955ab03908588dd94138ad0e3126704b",
+        "label": "CipherCuttle:test/binrat-comms-shadow-eval-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-comms-rat-writer-v1",
+        "sha": "6ad0159fd53477f4fbaef4fd221ab8aa664a0cf2",
+        "label": "CipherCuttle:feat/binrat-comms-rat-writer-v1"
+      }
+    },
+    {
+      "number": 142,
+      "title": "feat: observe bounded funding handoff and later Pons launch",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T12:57:03Z",
+      "updated_at": "2026-10-06T13:11:36Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "6abc864df1da89ae34d90b953be30d744627abef",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/142",
+      "head": {
+        "ref": "feat/binrat-indexed-observation-v1",
+        "sha": "96812356cc609925d1a5cfe6655f618eed4a8b7f",
+        "label": "CipherCuttle:feat/binrat-indexed-observation-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-indexed-archive-probe-v1",
+        "sha": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63",
+        "label": "CipherCuttle:feat/binrat-indexed-archive-probe-v1"
+      }
+    },
+    {
+      "number": 143,
+      "title": "feat: calibrate indexed funding retrieval and recent funder activity",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T14:26:24Z",
+      "updated_at": "2026-10-06T14:38:13Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "7998c0fb3052965c57f8468eb42c5d6c2a093d27",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/143",
+      "head": {
+        "ref": "feat/binrat-indexed-calibration-v1",
+        "sha": "68a61758db8912557fb6cd0eae2091877493e12d",
+        "label": "CipherCuttle:feat/binrat-indexed-calibration-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-indexed-observation-v1",
+        "sha": "96812356cc609925d1a5cfe6655f618eed4a8b7f",
+        "label": "CipherCuttle:feat/binrat-indexed-observation-v1"
+      }
+    },
+    {
+      "number": 144,
+      "title": "test: preregister future-only funding to later-launch confirmation",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T15:09:07Z",
+      "updated_at": "2026-10-06T15:31:16Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "7cf3eff05a1eed7328243d1c7ad1a91d689b26bb",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/144",
+      "head": {
+        "ref": "test/binrat-prospective-confirmation-v1",
+        "sha": "e8a722b456293e5ef092ed1f60db30f6d7f18831",
+        "label": "CipherCuttle:test/binrat-prospective-confirmation-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-indexed-calibration-v1",
+        "sha": "68a61758db8912557fb6cd0eae2091877493e12d",
+        "label": "CipherCuttle:feat/binrat-indexed-calibration-v1"
+      }
+    },
+    {
+      "number": 145,
+      "title": "feat: reserve bounded later-launch follow-up capacity",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T15:57:55Z",
+      "updated_at": "2026-10-06T16:18:30Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "66a87310bc80dc6cd6a05f08da2f547845c73130",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/145",
+      "head": {
+        "ref": "feat/binrat-reserved-followup-v1",
+        "sha": "b4eda1169d101e524d539fcc4a64cccc77c3c28c",
+        "label": "CipherCuttle:feat/binrat-reserved-followup-v1"
+      },
+      "base": {
+        "ref": "test/binrat-prospective-confirmation-v1",
+        "sha": "e8a722b456293e5ef092ed1f60db30f6d7f18831",
+        "label": "CipherCuttle:test/binrat-prospective-confirmation-v1"
+      }
+    },
+    {
+      "number": 146,
+      "title": "fix: preserve Comms eval configuration failure receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T16:33:27Z",
+      "updated_at": "2026-10-06T16:33:27Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "875ebf6f777047398f6fc19fe2cee4c92b64f5b6",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/146",
+      "head": {
+        "ref": "fix/binrat-comms-eval-failure-receipts-v1",
+        "sha": "66137462bb2a61b2ce6f3ba93cf820b896bef2d7",
+        "label": "CipherCuttle:fix/binrat-comms-eval-failure-receipts-v1"
+      },
+      "base": {
+        "ref": "test/binrat-comms-shadow-eval-v1",
+        "sha": "ef2ef0b8955ab03908588dd94138ad0e3126704b",
+        "label": "CipherCuttle:test/binrat-comms-shadow-eval-v1"
+      }
+    },
+    {
+      "number": 147,
+      "title": "feat: measure historical funder recipient launch yield",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T16:40:22Z",
+      "updated_at": "2026-10-06T16:52:56Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "9d055c2845986c7a9ffda24a74172f86137fd04b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/147",
+      "head": {
+        "ref": "feat/binrat-funder-cohort-v1",
+        "sha": "34527586e0f20df963513109794b1b770f81415f",
+        "label": "CipherCuttle:feat/binrat-funder-cohort-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-reserved-followup-v1",
+        "sha": "b4eda1169d101e524d539fcc4a64cccc77c3c28c",
+        "label": "CipherCuttle:feat/binrat-reserved-followup-v1"
+      }
+    },
+    {
+      "number": 148,
+      "title": "docs: converge BINRAT launch-night planning",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T17:09:21Z",
+      "updated_at": "2026-10-06T17:09:21Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "aa1d1ac8aed7bc29a31c3d3e434821b2b1c1fae5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/148",
+      "head": {
+        "ref": "docs/binrat-launch-night-canon-v1",
+        "sha": "0921ecbcb565ebb2fdb826fcb7a05056955f4666",
+        "label": "CipherCuttle:docs/binrat-launch-night-canon-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-pons-launch-canonical-v1",
+        "sha": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+        "label": "CipherCuttle:integration/binrat-pons-launch-canonical-v1"
+      }
+    },
+    {
+      "number": 149,
+      "title": "Exact Pons launch authority: frozen bounded sprint",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-06T23:48:05Z",
+      "updated_at": "2026-10-06T23:48:05Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "383c4d1f95d5122e27b31523993f147dad473988",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/149",
+      "head": {
+        "ref": "integration/binrat-pons-launch-authority-sprint-v1",
+        "sha": "4fbd2d71317ce99d0d96b42bc82b1b299afbe99f",
+        "label": "CipherCuttle:integration/binrat-pons-launch-authority-sprint-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-preflight-v1",
+        "sha": "ccc677985ce07f438648a2499611e72c36729491",
+        "label": "CipherCuttle:feat/binrat-pons-preflight-v1"
+      }
+    },
+    {
+      "number": 150,
+      "title": "C1: launch public truth and read-plane integrity \u2014 reviewed handoff",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T00:15:08Z",
+      "updated_at": "2026-10-07T00:45:31Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "3a961ae63a717bd0d063ea34a0c9cf52480d8faa",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/150",
+      "head": {
+        "ref": "integration/binrat-public-truth-launch-v1",
+        "sha": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+        "label": "CipherCuttle:integration/binrat-public-truth-launch-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-frontdoor-journey-v1",
+        "sha": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+        "label": "CipherCuttle:feat/binrat-frontdoor-journey-v1"
+      }
+    },
+    {
+      "number": 151,
+      "title": "Draft: BINRAT launch-night convergence \u2014 public truth + exact launch authority",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T01:15:41Z",
+      "updated_at": "2026-10-08T02:36:22Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b0cf94f9c4dd5dab0bcc16e5614dfc0401fd1f71",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/151",
+      "head": {
+        "ref": "integration/binrat-launch-night-v1",
+        "sha": "e34a94cf1702340582266852495e28423728add0",
+        "label": "CipherCuttle:integration/binrat-launch-night-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-public-truth-launch-v1",
+        "sha": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+        "label": "CipherCuttle:integration/binrat-public-truth-launch-v1"
+      }
+    },
+    {
+      "number": 152,
+      "title": "experiment: falsify prelaunch scout with typed institutional receipts",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T12:51:35Z",
+      "updated_at": "2026-10-07T12:57:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b352f0960f9d63a955d1fe24a338e9f0745eeb75",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/152",
+      "head": {
+        "ref": "experiment/binrat-prelaunch-scout-v0",
+        "sha": "c75e11654b6f7850068875bf0b89e23024113121",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-scout-v0"
+      },
+      "base": {
+        "ref": "integration/binrat-launch-night-v1",
+        "sha": "261a7207907816a770b2a51504186a021f0ffb8e",
+        "label": "CipherCuttle:integration/binrat-launch-night-v1"
+      }
+    },
+    {
+      "number": 153,
+      "title": "experiment: benchmark prelaunch scout across 20 paired historical projects",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T13:44:21Z",
+      "updated_at": "2026-10-07T13:51:20Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "82565ced4304ef6dab53a276248dd0a289393a9a",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/153",
+      "head": {
+        "ref": "experiment/binrat-prelaunch-benchmark-v1",
+        "sha": "a2e2608a39e42138e24b31865492812462744f1f",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-benchmark-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-prelaunch-scout-v0",
+        "sha": "c75e11654b6f7850068875bf0b89e23024113121",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-scout-v0"
+      }
+    },
+    {
+      "number": 154,
+      "title": "experiment: preregister launch-pressure state machine and real-evidence pilot",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T18:38:58Z",
+      "updated_at": "2026-10-07T18:41:37Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4bb1eb7952a43c7b71aba30d9947dd5b16e51fb2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/154",
+      "head": {
+        "ref": "experiment/binrat-launch-pressure-v0",
+        "sha": "ebaebce361671f17c0638453d690c5f8da64d560",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-v0"
+      },
+      "base": {
+        "ref": "experiment/binrat-prelaunch-benchmark-v1",
+        "sha": "a2e2608a39e42138e24b31865492812462744f1f",
+        "label": "CipherCuttle:experiment/binrat-prelaunch-benchmark-v1"
+      }
+    },
+    {
+      "number": 155,
+      "title": "experiment: pressure benchmark v1 with coverage-gated launchers and delayed controls",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T19:11:28Z",
+      "updated_at": "2026-10-07T19:17:19Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b705b3ccfa346aad33f9bde148a10349d91a0673",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/155",
+      "head": {
+        "ref": "experiment/binrat-launch-pressure-benchmark-v1",
+        "sha": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-benchmark-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-pressure-v0",
+        "sha": "ebaebce361671f17c0638453d690c5f8da64d560",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-v0"
+      }
+    },
+    {
+      "number": 156,
+      "title": "experiment: falsify pressure v0 with strict delayed controls",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-07T21:45:12Z",
+      "updated_at": "2026-10-08T00:18:36Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "06a8e37def55aec9c27eb8dcf43fe9fcc5336261",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/156",
+      "head": {
+        "ref": "experiment/binrat-hard-delayed-controls-v1",
+        "sha": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+        "label": "CipherCuttle:experiment/binrat-hard-delayed-controls-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-pressure-benchmark-v1",
+        "sha": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+        "label": "CipherCuttle:experiment/binrat-launch-pressure-benchmark-v1"
+      }
+    },
+    {
+      "number": 157,
+      "title": "ci: validate launch comprehension browser smoke",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T00:35:10Z",
+      "updated_at": "2026-10-08T00:48:39Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4dfdae93bdb20dbff16e14e434284c5694ae9db5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/157",
+      "head": {
+        "ref": "test/binrat-launch-comprehension-browser",
+        "sha": "118934655bfd443a6181793806a270412eb01339",
+        "label": "CipherCuttle:test/binrat-launch-comprehension-browser"
+      },
+      "base": {
+        "ref": "integration/binrat-launch-night-v1",
+        "sha": "e34a94cf1702340582266852495e28423728add0",
+        "label": "CipherCuttle:integration/binrat-launch-night-v1"
+      }
+    },
+    {
+      "number": 158,
+      "title": "experiment: preregister blocker-closure launch convergence test",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T00:38:59Z",
+      "updated_at": "2026-10-08T00:38:59Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "fa89ca012db6213af2b5f1688c74d4df82c30274",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/158",
+      "head": {
+        "ref": "experiment/binrat-launch-convergence-prereg-v1",
+        "sha": "5b14957836643b516ada1e706b7e05220530fe8f",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-prereg-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-hard-delayed-controls-v1",
+        "sha": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+        "label": "CipherCuttle:experiment/binrat-hard-delayed-controls-v1"
+      }
+    },
+    {
+      "number": 159,
+      "title": "experiment: freeze launch-label inventory and fail-closed convergence replay",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T00:52:05Z",
+      "updated_at": "2026-10-08T00:53:11Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "16dbfae91f29d42c95b6e97759bc1a3abd244e8b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/159",
+      "head": {
+        "ref": "experiment/binrat-launch-convergence-replay-v1",
+        "sha": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-replay-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-convergence-prereg-v1",
+        "sha": "5b14957836643b516ada1e706b7e05220530fe8f",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-prereg-v1"
+      }
+    },
+    {
+      "number": 160,
+      "title": "experiment: prospective shadow seed + explicit launch-date challenger",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T00:57:16Z",
+      "updated_at": "2026-10-08T00:57:16Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "568d061922ad7b722becd66d5bd876e1188c55b9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/160",
+      "head": {
+        "ref": "experiment/binrat-shadow-evidence-v1",
+        "sha": "832eb5c099d129129db702540a02a4a118226c52",
+        "label": "CipherCuttle:experiment/binrat-shadow-evidence-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-launch-convergence-replay-v1",
+        "sha": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+        "label": "CipherCuttle:experiment/binrat-launch-convergence-replay-v1"
+      }
+    },
+    {
+      "number": 161,
+      "title": "experiment: source-audit Base vs zkSync delayed control; Neon date trap",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T01:20:08Z",
+      "updated_at": "2026-10-08T01:20:08Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "3137caac6001941a7b0c2aec62d31fefdc38d0ee",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/161",
+      "head": {
+        "ref": "experiment/binrat-two-case-source-audit-v1",
+        "sha": "45bdf8258eeade825748eb6eaf6d55f015228662",
+        "label": "CipherCuttle:experiment/binrat-two-case-source-audit-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-shadow-evidence-v1",
+        "sha": "832eb5c099d129129db702540a02a4a118226c52",
+        "label": "CipherCuttle:experiment/binrat-shadow-evidence-v1"
+      }
+    },
+    {
+      "number": 162,
+      "title": "experiment: freeze Oct 8 prospective evidence capture for Logos, Miden, Rialo",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T01:53:18Z",
+      "updated_at": "2026-10-08T01:53:18Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4002b9a3cfde625d852d970ea07a8853486c7278",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/162",
+      "head": {
+        "ref": "experiment/binrat-prospective-capture-20261008-v1",
+        "sha": "335f8b0383366d2eb5031d52cbbc9f6c7b4d5bad",
+        "label": "CipherCuttle:experiment/binrat-prospective-capture-20261008-v1"
+      },
+      "base": {
+        "ref": "experiment/binrat-two-case-source-audit-v1",
+        "sha": "45bdf8258eeade825748eb6eaf6d55f015228662",
+        "label": "CipherCuttle:experiment/binrat-two-case-source-audit-v1"
+      }
+    },
+    {
+      "number": 163,
+      "title": "fix(ops): fail CI on production inspection errors without mutating prod",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T02:22:08Z",
+      "updated_at": "2026-10-08T02:23:24Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "13cb01b976d67fc3722c68d4db29683cb789a383",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/163",
+      "head": {
+        "ref": "fix/binrat-prod-readonly-inspection-verdict-v1",
+        "sha": "e03ae70db7a25229db773b2c1530178f42f10721",
+        "label": "CipherCuttle:fix/binrat-prod-readonly-inspection-verdict-v1"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "67296a6ce8d999bc7b55f71ab0ed1d69e4722f85",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 164,
+      "title": "feat: converge BINRAT Case journey from find to next action",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T02:22:22Z",
+      "updated_at": "2026-10-08T02:22:22Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "aa9508033240594cf530e26330f6e7ae6a5f1094",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/164",
+      "head": {
+        "ref": "feat/binrat-case-journey-convergence-v1",
+        "sha": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+        "label": "CipherCuttle:feat/binrat-case-journey-convergence-v1"
+      },
+      "base": {
+        "ref": "fix/binrat-launch-comprehension-v1",
+        "sha": "c5a4809b0eb763d50fae378b0c50dc9d278ed1cd",
+        "label": "CipherCuttle:fix/binrat-launch-comprehension-v1"
+      }
+    },
+    {
+      "number": 165,
+      "title": "ci: validate Case journey browser smoke",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T02:23:52Z",
+      "updated_at": "2026-10-08T02:23:52Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "44f1dc1f02647368a1958867b2f45e9077efa563",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/165",
+      "head": {
+        "ref": "test/binrat-case-journey-browser",
+        "sha": "0df3a4a41a4f386e70855fb05e2ea54f55a933b5",
+        "label": "CipherCuttle:test/binrat-case-journey-browser"
+      },
+      "base": {
+        "ref": "feat/binrat-case-journey-convergence-v1",
+        "sha": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+        "label": "CipherCuttle:feat/binrat-case-journey-convergence-v1"
+      }
+    },
+    {
+      "number": 166,
+      "title": "feat: add isolated React holographic visual lab",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T03:05:17Z",
+      "updated_at": "2026-10-08T18:24:09Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8903a378ff81616e392e4f5299406125519d1282",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/166",
+      "head": {
+        "ref": "feat/binrat-visual-lab-v1",
+        "sha": "bffc309e98e6ba6e07595564782844344dd443d7",
+        "label": "CipherCuttle:feat/binrat-visual-lab-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-case-journey-convergence-v1",
+        "sha": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+        "label": "CipherCuttle:feat/binrat-case-journey-convergence-v1"
+      }
+    },
+    {
+      "number": 167,
+      "title": "ci: validate holographic visual lab in V2 browser matrix",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T03:06:15Z",
+      "updated_at": "2026-10-08T03:06:15Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "6fcd082700ae630ed4d484a0c75f42b16f34318d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/167",
+      "head": {
+        "ref": "feat/binrat-frontend-visual-lab-ci",
+        "sha": "e1fafaf759da049c00f818ad1aa4bbcc09bf709e",
+        "label": "CipherCuttle:feat/binrat-frontend-visual-lab-ci"
+      },
+      "base": {
+        "ref": "feat/binrat-visual-lab-v1",
+        "sha": "34bce82d9c020af331788fc3bb031be53f878f40",
+        "label": "CipherCuttle:feat/binrat-visual-lab-v1"
+      }
+    },
+    {
+      "number": 168,
+      "title": "feat(web-v2): read-only Pons Case preview (4663, gated)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T18:34:19Z",
+      "updated_at": "2026-10-08T19:05:02Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "73ad27628389f38a8b7da2aa28b9a2a0ac0bd76b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/168",
+      "head": {
+        "ref": "feat/binrat-pons-case-preview-v1",
+        "sha": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+        "label": "CipherCuttle:feat/binrat-pons-case-preview-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-visual-lab-v1",
+        "sha": "bffc309e98e6ba6e07595564782844344dd443d7",
+        "label": "CipherCuttle:feat/binrat-visual-lab-v1"
+      }
+    },
+    {
+      "number": 169,
+      "title": "docs: bounded production Pons read-plane triage (no deploy)",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T19:23:43Z",
+      "updated_at": "2026-10-08T23:00:31Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "313ff6be1b26797437712e59b518643cbf39a56d",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/169",
+      "head": {
+        "ref": "docs/binrat-pons-production-runtime-triage-v1",
+        "sha": "cd889687c97f21b62fb166a7f72ded28df4243fb",
+        "label": "CipherCuttle:docs/binrat-pons-production-runtime-triage-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-case-preview-v1",
+        "sha": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+        "label": "CipherCuttle:feat/binrat-pons-case-preview-v1"
+      }
+    },
+    {
+      "number": 170,
+      "title": "feat(frontdoor): stage React V3 Pons homepage as isolated static candidate",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-08T20:20:22Z",
+      "updated_at": "2026-10-08T21:21:00Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "8b85080722af22d049f9427667d1241a7d83846b",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/170",
+      "head": {
+        "ref": "feat/binrat-v3-frontdoor-cutover-candidate-v1",
+        "sha": "07737938ef48bf886293ba34c5225ac9e1e5ed2b",
+        "label": "CipherCuttle:feat/binrat-v3-frontdoor-cutover-candidate-v1"
+      },
+      "base": {
+        "ref": "feat/binrat-pons-case-preview-v1",
+        "sha": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+        "label": "CipherCuttle:feat/binrat-pons-case-preview-v1"
+      }
+    },
+    {
+      "number": 172,
+      "title": "feat(frontdoor): integrate approved React V3 with verified read-only Pons backend",
+      "state": "open",
+      "draft": false,
+      "created_at": "2026-10-09T13:34:55Z",
+      "updated_at": "2026-10-09T13:39:31Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "cd4b22674d72e3b7ef97034c7a0af4027ac35051",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/172",
+      "head": {
+        "ref": "release/binrat-v3-production-20261009",
+        "sha": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+        "label": "CipherCuttle:release/binrat-v3-production-20261009"
+      },
+      "base": {
+        "ref": "release/binrat-backend-read-only-20261009",
+        "sha": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+        "label": "CipherCuttle:release/binrat-backend-read-only-20261009"
+      }
+    },
+    {
+      "number": 173,
+      "title": "fix(frontdoor): preserve historical Case identity and correct discovery UX",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-09T15:20:14Z",
+      "updated_at": "2026-10-09T16:14:00Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "916e5e0c718a415d89b18355650657442c5127b9",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/173",
+      "head": {
+        "ref": "feat/binrat-sprint-a1-frontdoor-discovery",
+        "sha": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+        "label": "CipherCuttle:feat/binrat-sprint-a1-frontdoor-discovery"
+      },
+      "base": {
+        "ref": "release/binrat-v3-production-20261009",
+        "sha": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+        "label": "CipherCuttle:release/binrat-v3-production-20261009"
+      }
+    },
+    {
+      "number": 174,
+      "title": "A1.2: Add bounded canonical historical Case evidence contract",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-09T17:06:37Z",
+      "updated_at": "2026-10-09T17:12:48Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ff89f204efd98a9cd24204eb75f479042f139fd2",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/174",
+      "head": {
+        "ref": "feat/binrat-a1-2-case-contract",
+        "sha": "695e813eacb8f70e169d45b814ecc180ec01d50e",
+        "label": "CipherCuttle:feat/binrat-a1-2-case-contract"
+      },
+      "base": {
+        "ref": "release/binrat-backend-read-only-20261009",
+        "sha": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+        "label": "CipherCuttle:release/binrat-backend-read-only-20261009"
+      }
+    },
+    {
+      "number": 175,
+      "title": "A1.2: Verify and render exact historical Case links",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-09T17:08:52Z",
+      "updated_at": "2026-10-09T17:12:51Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "ce1696987ce0dd3205b57c2d38737aa7a1d659a1",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/175",
+      "head": {
+        "ref": "feat/binrat-a1-2-case-ui",
+        "sha": "ac5e2b97d1ec1b8d870b1d2b02e1b55818ebac59",
+        "label": "CipherCuttle:feat/binrat-a1-2-case-ui"
+      },
+      "base": {
+        "ref": "feat/binrat-sprint-a1-frontdoor-discovery",
+        "sha": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+        "label": "CipherCuttle:feat/binrat-sprint-a1-frontdoor-discovery"
+      }
+    },
+    {
+      "number": 176,
+      "title": "A2: add bounded source-bound outcome intelligence to Cases",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-09T23:46:17Z",
+      "updated_at": "2026-10-09T23:46:35Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b499f306102222ba089207561cdf26fd1c4e9b57",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/176",
+      "head": {
+        "ref": "feat/binrat-a2-case-intelligence",
+        "sha": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+        "label": "CipherCuttle:feat/binrat-a2-case-intelligence"
+      },
+      "base": {
+        "ref": "integration/binrat-a1-3-visual-gate",
+        "sha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+        "label": "CipherCuttle:integration/binrat-a1-3-visual-gate"
+      }
+    },
+    {
+      "number": 177,
+      "title": "A2.2: isolate and bound disabled Pons outcome collection",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-10T15:27:17Z",
+      "updated_at": "2026-10-10T15:31:43Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "759d7a48e81e7977d1fb97149dbf427f35c0d9a5",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/177",
+      "head": {
+        "ref": "feat/binrat-a2-2-safe-outcome-collector",
+        "sha": "6ce3d8260011d9f0e6b00cef0f95d23f55976773",
+        "label": "CipherCuttle:feat/binrat-a2-2-safe-outcome-collector"
+      },
+      "base": {
+        "ref": "feat/binrat-a2-case-intelligence",
+        "sha": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+        "label": "CipherCuttle:feat/binrat-a2-case-intelligence"
+      }
+    },
+    {
+      "number": 178,
+      "title": "Pons Tripwire V1: authenticated owner Watch and exact Case return",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-10T17:21:04Z",
+      "updated_at": "2026-10-10T17:26:46Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "77eacd35205f51054eed4524654392bfad78758c",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/178",
+      "head": {
+        "ref": "feat/pons-tripwire-v1",
+        "sha": "216647d214a7df05d1eb48e99d8af27dc4262392",
+        "label": "CipherCuttle:feat/pons-tripwire-v1"
+      },
+      "base": {
+        "ref": "integration/binrat-a1-3-visual-gate",
+        "sha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+        "label": "CipherCuttle:integration/binrat-a1-3-visual-gate"
+      }
+    },
+    {
+      "number": 179,
+      "title": "docs: lock BINRAT employable-Rats vision and agent kill budgets",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-10-11T00:37:41Z",
+      "updated_at": "2026-10-11T02:12:08Z",
+      "closed_at": "2026-10-11T02:10:54Z",
+      "merged_at": "2026-10-11T02:10:54Z",
+      "merge_commit_sha": "72406deede635772e79a3e5f4e9f6b524605c04e",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/179",
+      "head": {
+        "ref": "docs/binrat-founder-vision-guardrails-20261011",
+        "sha": "11c009549f12e0b5e6eef2b368130afd611a0e44",
+        "label": "CipherCuttle:docs/binrat-founder-vision-guardrails-20261011"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "67296a6ce8d999bc7b55f71ab0ed1d69e4722f85",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 180,
+      "title": "docs: align active Rat workforce agents with founder north star",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-11T00:37:44Z",
+      "updated_at": "2026-10-11T00:37:44Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "e86a97b360dedf7d4a19efa8bfd6a421e8ee0c92",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/180",
+      "head": {
+        "ref": "docs/binrat-active-workforce-guardrails-20261011",
+        "sha": "2e90210f90ebe83374d192044342ac4e952f9b91",
+        "label": "CipherCuttle:docs/binrat-active-workforce-guardrails-20261011"
+      },
+      "base": {
+        "ref": "feat/pons-tripwire-v1",
+        "sha": "216647d214a7df05d1eb48e99d8af27dc4262392",
+        "label": "CipherCuttle:feat/pons-tripwire-v1"
+      }
+    },
+    {
+      "number": 181,
+      "title": "ops: emergency manual Cloudflare queue/cron cost containment",
+      "state": "open",
+      "draft": true,
+      "created_at": "2026-10-11T12:39:24Z",
+      "updated_at": "2026-10-11T12:39:24Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "27d2567bb69d3cca4ece8f6e9293ad99dea647e0",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/181",
+      "head": {
+        "ref": "ops/cloudflare-emergency-containment-20261011",
+        "sha": "aee9a91b0de87351ed219e4174836dce4ff9afad",
+        "label": "CipherCuttle:ops/cloudflare-emergency-containment-20261011"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "d617d6cb4f259e69a014189c159a4c458347b7db",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 182,
+      "title": "docs: single canonical authority router + lean engineering stack",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-10-11T21:12:08Z",
+      "updated_at": "2026-10-11T22:13:04Z",
+      "closed_at": "2026-10-11T22:12:22Z",
+      "merged_at": "2026-10-11T22:12:22Z",
+      "merge_commit_sha": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/182",
+      "head": {
+        "ref": "docs/engineering-stack-north-star-v1-20261011",
+        "sha": "4745768c54c3b86372fe67ba56bcbbf86bc6e235",
+        "label": "CipherCuttle:docs/engineering-stack-north-star-v1-20261011"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "d617d6cb4f259e69a014189c159a4c458347b7db",
+        "label": "CipherCuttle:main"
+      }
+    },
+    {
+      "number": 183,
+      "title": "docs: reconcile competing canonical authority on React/Pons integration",
+      "state": "closed",
+      "draft": false,
+      "created_at": "2026-10-11T21:31:22Z",
+      "updated_at": "2026-10-11T22:12:46Z",
+      "closed_at": "2026-10-11T22:11:59Z",
+      "merged_at": "2026-10-11T22:11:59Z",
+      "merge_commit_sha": "160ab9c4fbb2f9cebd4a45cc20f5e75d85f57302",
+      "html_url": "https://github.com/CipherCuttle/binrat/pull/183",
+      "head": {
+        "ref": "docs/authority-reconcile-react-pons-v1-20261011",
+        "sha": "4e79d91e1280072281f80dcb0982135cb45c8d23",
+        "label": "CipherCuttle:docs/authority-reconcile-react-pons-v1-20261011"
+      },
+      "base": {
+        "ref": "integration/binrat-a1-3-visual-gate",
+        "sha": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+        "label": "CipherCuttle:integration/binrat-a1-3-visual-gate"
+      }
+    }
+  ],
+  "branches": [
+    {
+      "name": "agent/arc-launch-ingest-v0",
+      "sha": "1d59ed3a39bf4f8cffef62e4dfa22f6c56d089b6",
+      "protected": false
+    },
+    {
+      "name": "agent/binrat-public-read-plane-v0",
+      "sha": "a76651e5c43abe7f3f8d1736996d063ea2592e42",
+      "protected": false
+    },
+    {
+      "name": "binrat-dumpster-os-d1-githack",
+      "sha": "e34501add2c1ac17526cf4b56826a90f84a68d08",
+      "protected": false
+    },
+    {
+      "name": "binrat-mobile-m1-githack",
+      "sha": "8487754822c4dfef1d634d1f8ca5981b51f9aadd",
+      "protected": false
+    },
+    {
+      "name": "binrat-v2-githack-pr23",
+      "sha": "6905d0cecd8ec24134ca5196f69f0a602daba305",
+      "protected": false
+    },
+    {
+      "name": "codex/binrat-prelaunch-release-a911c23",
+      "sha": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+      "protected": false
+    },
+    {
+      "name": "codex/prelaunch-hardening-v1",
+      "sha": "a911c23b70ea5e2286afaf0d9a3dfef5fc697a85",
+      "protected": false
+    },
+    {
+      "name": "codex/telegram-as-code-private-v2",
+      "sha": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-brand-assets-v0",
+      "sha": "1db118b285dcda3f0e5fb63a944afaa3822f95ef",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-brand-system-v1",
+      "sha": "770c7aa8741236ee5d8fc8ddd6411bc2addfdade",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-copy-library-v1",
+      "sha": "91cee9f12563f2d4286736155400910ad1ca1cb5",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-dumpster-web-v0",
+      "sha": "d8388b8dccfbaf64896e6617c0e78dddcb42ac95",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-export-pack-v1",
+      "sha": "de0fa94edbe4412054fc6bbd388f7c66165fc747",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-frontend-astra-v1",
+      "sha": "b70f21da98d32fa516a40eb9da9ea7a97c29685b",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-hero-image-fidelity-v0",
+      "sha": "445a034afbce8c99b02f84e82fae576b03c84a60",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-launch-presentation-v0",
+      "sha": "43c259e05f31a612083fbacb1d371a7913539627",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-motion-identity-v1",
+      "sha": "0b96eead965a788f4b14d9c714692f995b090545",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-north-star-v1",
+      "sha": "3946935b0db2179d17962349a1c98a65f3756474",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-public-identity-v0",
+      "sha": "9a294a13a17d9622bd4e5b0bf09fa8a34d2ef3b3",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-rive-machine-demo-v0",
+      "sha": "57d493f1511652b644363b7b5927cec5d40b7999",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-rive-signal-prototype-v0",
+      "sha": "64936b74981518f6d12d722f67165c3377436fa2",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-roadmap-brand-v1",
+      "sha": "95c7e78223cec4f2f8bbe62d83d4aa81bc9fc4ee",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-share-cards-v0",
+      "sha": "373c3e9d4271fdfe38c178bf5f46a3aac4fa04a6",
+      "protected": false
+    },
+    {
+      "name": "design/binrat-social-production-v1",
+      "sha": "568b0a3c7214e3252e3c7278ba35c2c382955814",
+      "protected": false
+    },
+    {
+      "name": "diag/binrat-observability-readonly-20260924",
+      "sha": "72d3369b1373ff31f285ea55e2ed980f65561697",
+      "protected": false
+    },
+    {
+      "name": "docs/authority-reconcile-react-pons-v1-20261011",
+      "sha": "4e79d91e1280072281f80dcb0982135cb45c8d23",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-active-workforce-guardrails-20261011",
+      "sha": "2e90210f90ebe83374d192044342ac4e952f9b91",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-founder-vision-guardrails-20261011",
+      "sha": "11c009549f12e0b5e6eef2b368130afd611a0e44",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-launch-genesis-funnel-v1",
+      "sha": "70501f0e8f30d3fa46a8a6dc04b63fd9284d17f7",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-launch-night-canon-v1",
+      "sha": "0921ecbcb565ebb2fdb826fcb7a05056955f4666",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-pons-launch-authority-v1",
+      "sha": "bb5d7a862021b3362d078c876a2a7243fe90c015",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-pons-production-runtime-triage-v1",
+      "sha": "cd889687c97f21b62fb166a7f72ded28df4243fb",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-ponsvault-forensic-pin-v1",
+      "sha": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-ponsvault-staking-forensic-pin-v1",
+      "sha": "8667d32182f3013a4ec255d340403f54d3db6c93",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-ponsvault-staking-forensic-v1",
+      "sha": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-production-reliability-freeze-v1",
+      "sha": "e62cfcc54269ea9fc5fec1344a8518041513315c",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-staking-authority-rebind-v1",
+      "sha": "4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-staking-authority-reconcile-v1",
+      "sha": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+      "protected": false
+    },
+    {
+      "name": "docs/binrat-staking-l1b-v1",
+      "sha": "e2cc2ecbeb05ddcbd5b9081cb683c9c04a930684",
+      "protected": false
+    },
+    {
+      "name": "docs/engineering-stack-north-star-v1-20261011",
+      "sha": "4745768c54c3b86372fe67ba56bcbbf86bc6e235",
+      "protected": false
+    },
+    {
+      "name": "docs/telegram-web-forensics-split-v1",
+      "sha": "fe48aad43506c4cca72d7abe0fe0e982dff27b29",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-comms-eval-20261006-v1",
+      "sha": "24549d2605696d99c06531485990ff5d7d0c5536",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-comms-eval-20261006-v2",
+      "sha": "594eadad301c226ba5a7243fa5768dc5620b0b62",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-comms-eval-20261006-v3",
+      "sha": "795588dc80df2a9ed7bf913c10469e11403ea93f",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-comms-shadow-20261006-v2",
+      "sha": "8ec70f8ca8cb562338ebd7268a281934f4249921",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-comms-shadow-20261006-v3",
+      "sha": "02183840b87dfa5fb64160e78ace47c810871ef3",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-comms-shadow-20261006",
+      "sha": "cfb9b7334694b6359356ebe9b7b4d445f0c54da3",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-design-review-gallery-20260928",
+      "sha": "368e0097e784098bab20572fcf13ec78f343df9e",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g3b-reviewed-20260926",
+      "sha": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g3c-mobile-20260926",
+      "sha": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4a-field-instrument-20260926",
+      "sha": "65e983a5ba7655f063be57a7ee12b23cfcc91e06",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4a-integration-20260926",
+      "sha": "cd7e7e986d0412c72ee00b45ffe98146a40e16ae",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4r2-grain-wave-20260927",
+      "sha": "521998d988fc1113dc7ef081250fe1b3147b48b0",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4r4-official-grain-wave-20260927",
+      "sha": "8d1378f2a1c834b49ef66cd8ebe1886738b80755",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4r5-demo-first-20260927",
+      "sha": "ba1b4e3a27f898cbbfa13406e9dcf9e2e86b4597",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4r-cinematic-20260926",
+      "sha": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+      "sha": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-hard-delayed-controls-v1",
+      "sha": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-launch-convergence-prereg-v1",
+      "sha": "5b14957836643b516ada1e706b7e05220530fe8f",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-launch-convergence-replay-v1",
+      "sha": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-launch-pressure-benchmark-v1",
+      "sha": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-launch-pressure-v0",
+      "sha": "ebaebce361671f17c0638453d690c5f8da64d560",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-prelaunch-benchmark-v1",
+      "sha": "a2e2608a39e42138e24b31865492812462744f1f",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-prelaunch-scout-v0",
+      "sha": "c75e11654b6f7850068875bf0b89e23024113121",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-prospective-capture-20261008-v1",
+      "sha": "335f8b0383366d2eb5031d52cbbc9f6c7b4d5bad",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-reactbits-license-probe-20260926",
+      "sha": "abe86822757029c5654394c57380f72fb87e945c",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-sentry-kill-fast-rpc-v1",
+      "sha": "90296437d8846df71311f9523a4e7a29d9968798",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-shadow-evidence-v1",
+      "sha": "832eb5c099d129129db702540a02a4a118226c52",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-sniffer-gpt41mini-20261005",
+      "sha": "9f63e3a6ffc3be1863cc44c5e7e475e4e6f7d2f1",
+      "protected": false
+    },
+    {
+      "name": "experiment/binrat-two-case-source-audit-v1",
+      "sha": "45bdf8258eeade825748eb6eaf6d55f015228662",
+      "protected": false
+    },
+    {
+      "name": "experiment/72h-hot-garbage-v0",
+      "sha": "5dbde0691da758a50cd41f802932f51d5a4020b4",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-a1-2-case-contract",
+      "sha": "695e813eacb8f70e169d45b814ecc180ec01d50e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-a1-2-case-ui",
+      "sha": "ac5e2b97d1ec1b8d870b1d2b02e1b55818ebac59",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-a2-2-safe-outcome-collector",
+      "sha": "6ce3d8260011d9f0e6b00cef0f95d23f55976773",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-a2-case-intelligence",
+      "sha": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-autonomous-rat-v1",
+      "sha": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-case-adapter-v1",
+      "sha": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-case-endpoint-v1",
+      "sha": "7a96a3c111af14b6d34585cd425904a59068b4be",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-case-journey-convergence-v1",
+      "sha": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-case-model-convergence-v1",
+      "sha": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-case-model-v1",
+      "sha": "9dbc44b923b9e86b57d81aa9b1b7c573f840fa07",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-case-surface-v1",
+      "sha": "c9bcb01c01433147ca6d774ed807efafffaa437e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-cloudflare-d1-v0",
+      "sha": "f1d093fc3d7b0dc865f3196ee41c486d2cc2d9e9",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-comms-rat-shadow-v1",
+      "sha": "ac5ad85629c76ceecb512bb7d72eafa62d25833e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-comms-rat-writer-v1",
+      "sha": "1b54e042157d03c898ae03364e073195e2efd71c",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-consecutive-discovery-v1",
+      "sha": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-degen-frontdoor-v1",
+      "sha": "64ec4702ca71330f41a2f8a8f575eeff44958f12",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-dumpster-os-d1",
+      "sha": "ee44442ce434f577dc628871931c4cd4c9dac8fe",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-exact-pons-launch-rehearsal-v1",
+      "sha": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-frontdoor-journey-v1",
+      "sha": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-frontend-live-integration-pr3",
+      "sha": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-frontend-mobile-m1",
+      "sha": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-frontend-routes-pr2",
+      "sha": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-frontend-visual-lab-ci",
+      "sha": "e1fafaf759da049c00f818ad1aa4bbcc09bf709e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-funder-cohort-v1",
+      "sha": "34527586e0f20df963513109794b1b770f81415f",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-g0-g1-capacity-foundation-v1",
+      "sha": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-g2a-a1-pons-receipt-proof-v1",
+      "sha": "55af899617fc38af71b746e3e90a9f2de3e6e53a",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-g2a-pons-source-candidate-v1",
+      "sha": "a6f03dd3191dbeb9309d1af5d49608dfcc965fc2",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-g2b-funding-ledger-v1",
+      "sha": "c8f55a221e88b3f7cab4cacf6302c5d171f75a48",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-g2b-prepaid-entitlements-candidate-v1",
+      "sha": "1e043cda038ed8b94ee7694416385ce807727964",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-indexed-archive-probe-v1",
+      "sha": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-indexed-calibration-v1",
+      "sha": "68a61758db8912557fb6cd0eae2091877493e12d",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-indexed-funder-discovery-v1",
+      "sha": "55380186538ccae65c43518742730fb507989730",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-indexed-observation-v1",
+      "sha": "96812356cc609925d1a5cfe6655f618eed4a8b7f",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-intelligence-v1",
+      "sha": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-live-candidate-v1",
+      "sha": "d3341052f95c0e3a1874a4b3cfcecf6e960846fb",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-live-read-v0",
+      "sha": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-local-den-v1",
+      "sha": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-local-rat-job-v1",
+      "sha": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-miniapp-hierarchy-v1",
+      "sha": "19fc3cdf42c3972dbf95dae4d9e407725d0d35bc",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-miniapp-hot-garbage-stability-v1",
+      "sha": "3eba47cc2ab6d72b057f13a4e561bda168447a29",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-miniapp-rat-trap-integration-v1",
+      "sha": "f9c16850b32405a25b1847c7aaabb787c29582c1",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-next-query-eval-v1",
+      "sha": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-north-star-slice-g0-g2",
+      "sha": "ad718032dc70da08bd38cb0b75b13e2ca43892a1",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-offline-workforce-benchmark-v1",
+      "sha": "9759e02a44c9a6a60390d33db70f57166916e90c",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-candidate-worker-routes-v1",
+      "sha": "eefda7326c283b54ec415c8abd948a274a9df674",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-candidate-worker-v1",
+      "sha": "b787a54744929cf0d8ccb3f8307a498004d8c6e3",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-case-preview-v1",
+      "sha": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-cutover-candidate-v1",
+      "sha": "462d70b8d00adafdd69adfd01ddf9f904ede01fa",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-discovery-consistency-v1",
+      "sha": "f1411ab83eddb25ed18c88584b6e26e75e86f163",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-funding-collector-v1",
+      "sha": "1175423a864ed6ac28c5473a55b850443f65076e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-funding-provenance-v1",
+      "sha": "95968749eac6691d2645344bf8cb7b2a0a227ade",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-funding-recurrence-read-v1",
+      "sha": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-funding-storage-v1",
+      "sha": "90296437d8846df71311f9523a4e7a29d9968798",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-holder-balance-probe-v1",
+      "sha": "5e7d8fa0e37b007d7d58d0acc9cc223b27c79095",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-launch-receipt-v0",
+      "sha": "5b38cdf00e7e170af7c1f1cc18f9d1a24160c928",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-outcome-capability-v1",
+      "sha": "04d559af941a1043847e8ea1c2909cd66d3f7bcf",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-outcome-o1-v1",
+      "sha": "9b50940e81b24727422deb64d16f94dba4736c98",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-outcome-receipts-v1",
+      "sha": "1cd72433af067eeaca3bd7d3ccf9a9f22051e319",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-outcome-v1",
+      "sha": "bd8d21dfa1353664057f772e5b7a7fcd223d48d5",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-preflight-v1",
+      "sha": "ccc677985ce07f438648a2499611e72c36729491",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-replay-lab-v1",
+      "sha": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-replay-receipt-v1",
+      "sha": "843f7e1866b2a96dd57fe9e47ab0574d407d48d3",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-siwe-bound-candidate-v1",
+      "sha": "1479adc08e3b171d47b171e51867d8d0c607a86e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-token-identity-livebase-v1",
+      "sha": "1eed71b8652c78762894bc685199bd33e5154116",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-token-identity-production-v1",
+      "sha": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-token-identity-runtime-v1",
+      "sha": "df71f614f00c8d7f595b9508d964dca276c15326",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-pons-token-identity-v1",
+      "sha": "d40ff86ddc708d23e2f7880d248267590b45809b",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-product-surface-v1-demo",
+      "sha": "17cce6b5a43089971a7a45fb6d02a00e30012a5f",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-prospective-capture-v1",
+      "sha": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-public-read-plane-stability-v1",
+      "sha": "5bd247bbef968ea8570532bbd6edc1d5ee543421",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-radar-calibration-v1",
+      "sha": "ed1cd81f3fce097f53b1b4c9337df16fdb696f0c",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-radar-case-file-v1",
+      "sha": "73c0b016cb265e892ea220b820f5ed7f2f45bfff",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-radar-final-v1",
+      "sha": "817fb44f8d082e25604591f1d158494fb224b82c",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-radar-workbench-v1",
+      "sha": "b27fdc48054b49bbe8fc80b8c5a637bab675d94f",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rat-conversation-free-ai-v1",
+      "sha": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rat-radar-v0",
+      "sha": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rat-trap-presentation-v1",
+      "sha": "206fb4d868a3fdeef2bb054edfb09837437306dd",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rat-trap-projection-v1",
+      "sha": "677f2046525fcb95c58a520054bd556c702ed404",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rat-watch-v0",
+      "sha": "b5755fef349a4badc153fee9e9811461cac1a919",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rat-workforce-offline-v1",
+      "sha": "ed2807f6d49c853713770fba099159e20bfd173b",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-rats-share-v1",
+      "sha": "083d4fe4bd662dfe9e7733cb37fbed40e06f3fc9",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-recorded-evidence-v1",
+      "sha": "c9abb46633418c0f5a0e1f48a278d7595e86b23e",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-remember-livebase-v1",
+      "sha": "7ef47cd2c2a7da8e005efbd40dc0c478b5370d0d",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-reserved-followup-v1",
+      "sha": "b4eda1169d101e524d539fcc4a64cccc77c3c28c",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-roadmap-living-scenes-v1",
+      "sha": "ab844e4814d553b4485b7d3351e176c8376712a6",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-robinhood-live-rat-v1",
+      "sha": "5fed3ed3c6f6405617348e150275378b23c24a59",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-shadow-economy-v0",
+      "sha": "b85d9c5f39072e32aec331d299e8f38ba6b6a499",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-sniffer-capture-runner-v1",
+      "sha": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-sniffer-competence-eval-v1",
+      "sha": "d47e9c30f3d089c754b1da37b2016d2a57ec23dc",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-sprint-a1-frontdoor-discovery",
+      "sha": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-telegram-messaging-v1",
+      "sha": "95da66edb428114ab7f7ff2aabdfdb7989134861",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-telegram-mood-art-v1",
+      "sha": "b5fc2f56846979ef7164a1db92a5b739da77901d",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-telegram-rat-v0",
+      "sha": "140d5434b4f83b7c6b2e04573d6ab199007841a1",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-telegram-scout-v0",
+      "sha": "d433f0d4c588325c280ac58d5acaca570ee248f1",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-telegram-ux-v2",
+      "sha": "7fece313958558a7bb9789e9592aafee894422b5",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-trash-trails-v1",
+      "sha": "0f9ec9f1127f132a279713c28cfe748ab150a2a9",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-v3-frontdoor-cutover-candidate-v1",
+      "sha": "07737938ef48bf886293ba34c5225ac9e1e5ed2b",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-visual-lab-v1",
+      "sha": "bffc309e98e6ba6e07595564782844344dd443d7",
+      "protected": false
+    },
+    {
+      "name": "feat/binrat-working-rat-l2-v1",
+      "sha": "c23defaa9ed338e13ba2be72c482af51660aac56",
+      "protected": false
+    },
+    {
+      "name": "feat/pons-tripwire-v1",
+      "sha": "216647d214a7df05d1eb48e99d8af27dc4262392",
+      "protected": false
+    },
+    {
+      "name": "feat/telegram-messaging-v1",
+      "sha": "2d2f27ed5cb1a5e575226b757df0b219d8eac43a",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-4663-surface-authority-v1",
+      "sha": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-capture-used-capped-key-v1",
+      "sha": "665aee695cd904d10aa9848d4658de0aac84798f",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-comms-eval-failure-receipts-v1",
+      "sha": "66137462bb2a61b2ce6f3ba93cf820b896bef2d7",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-history-before-funding-v1",
+      "sha": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-launch-comprehension-v1",
+      "sha": "c5a4809b0eb763d50fae378b0c50dc9d278ed1cd",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-offline-proposal-validation-v1",
+      "sha": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-pons-provider-head-regression-base-v1",
+      "sha": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-pons-provider-head-regression-v1",
+      "sha": "9d7d926f10db93802e76eab96b655ba449f23db1",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-prod-readonly-inspection-verdict-v1",
+      "sha": "e03ae70db7a25229db773b2c1530178f42f10721",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-provenance-incremental-repair-base-v1",
+      "sha": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-provenance-incremental-repair-v1",
+      "sha": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-read-plane-frontend-resilience-v1",
+      "sha": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+      "protected": false
+    },
+    {
+      "name": "fix/binrat-v2-evidence-integrity-pr1",
+      "sha": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+      "protected": false
+    },
+    {
+      "name": "fix/pons-rpc-limit-diagnostics-v1",
+      "sha": "c31ddf8ae70806a0a2abf444c9879c3e418bb2ae",
+      "protected": false
+    },
+    {
+      "name": "g3a-interactive-prototype-20260926",
+      "sha": "0eb819369602f6f153c58dae14212d5e9308059c",
+      "protected": false
+    },
+    {
+      "name": "gh-pages",
+      "sha": "7fd586cf62900acda541321485f1812046db9b9b",
+      "protected": false
+    },
+    {
+      "name": "hotfix/pons-catchup-throughput-v1",
+      "sha": "0f9878ca82ad9cc6002797738495c22bfb9d089a",
+      "protected": false
+    },
+    {
+      "name": "hotfix/pons-launch-identity-retry-v1",
+      "sha": "982b0ac761bf687a0281668acc693c163919c2c6",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-a1-3-visual-gate",
+      "sha": "160ab9c4fbb2f9cebd4a45cc20f5e75d85f57302",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-brand-v1-composed",
+      "sha": "0343d3815e509c45ef6b4991a7f8d438e2f4deb1",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-case-canonical-v1",
+      "sha": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-launch-night-v1",
+      "sha": "e34a94cf1702340582266852495e28423728add0",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-pons-launch-authority-sprint-v1",
+      "sha": "4fbd2d71317ce99d0d96b42bc82b1b299afbe99f",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-pons-launch-canonical-v1",
+      "sha": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-public-read-plane-stability-v1",
+      "sha": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-public-truth-launch-v1",
+      "sha": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+      "protected": false
+    },
+    {
+      "name": "integration/binrat-r5-approved-20260927",
+      "sha": "959da17b0573dff016808d597737b4cf186bed62",
+      "protected": false
+    },
+    {
+      "name": "main",
+      "sha": "d93defb8b59be5c5a9fd9f7f5733b766567c4b10",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-case-canonical-private-preview-v1",
+      "sha": "fae06e675bd68271a7f583a662b69e2451906236",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-case-surface-private-preview-v1",
+      "sha": "f5934950011455061569075fc6111d0022a11629",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-case-version-url-preview-v1",
+      "sha": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-domain-cutover-v1",
+      "sha": "dc72fe57b6f5927c8245cba6994c3811a6d0ef96",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-frontend-preview-gallery-v1",
+      "sha": "65ded06e1c7eb147a3e6c491f3ebda3ada2b8ee2",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-miniapp-preview-v1",
+      "sha": "128e2a47f322d3b6dc44ec8672871daae7cacc86",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-miniapp-preview-v2",
+      "sha": "b1e8f40aae9773828a11d3cd013e66b7e66ad127",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-o2-production-base-v1",
+      "sha": "525bab62a21061c576099215d247d96ae8541e01",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-o2-production-rollout-v1",
+      "sha": "7d223924f1dda8a50270c61443969c4a415bfd1c",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-pons-provider-regression-deploy-v1",
+      "sha": "7a03a7cc6ffb5c79843ed5c1df1c4b58d4483d8e",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-pons-replay-production-inspect-v1",
+      "sha": "1d55af75c55a98be696eb84a784383e0caa98939",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-provenance-repair-deploy-v1",
+      "sha": "e2e8934f1821502873211131c535dd58f1abcd75",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-rat-trap-production-inspect-v1",
+      "sha": "ab789594d12e334960eded3c571e08135f390516",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-repo-cleanup-manifest-v1",
+      "sha": "a3efccb9b8d449605cfe2a18d6deb5236463044d",
+      "protected": false
+    },
+    {
+      "name": "ops/binrat-token-identity-production-rollout-v1",
+      "sha": "65dd428f3916aee336cc460d5cb67ac37094d391",
+      "protected": false
+    },
+    {
+      "name": "ops/cloudflare-deploy-v0",
+      "sha": "5672736c09981287c5df1ea3e2c5e91254e57eb9",
+      "protected": false
+    },
+    {
+      "name": "ops/cloudflare-emergency-containment-20261011",
+      "sha": "aee9a91b0de87351ed219e4174836dce4ff9afad",
+      "protected": false
+    },
+    {
+      "name": "ops/cloudflare-readonly-inspect",
+      "sha": "e71938139dd3e901cebb9b8167cb5b1f3e24fda8",
+      "protected": false
+    },
+    {
+      "name": "ops/fix-controlled-rat-workflow-yaml-20260930",
+      "sha": "69aa1aad0c9f83d8a7d3b08fb2935683171e6252",
+      "protected": false
+    },
+    {
+      "name": "ops/register-controlled-rat-workflow-20260930",
+      "sha": "e12a01d3a1d41c231a2cf4bb9496e3520fa40afb",
+      "protected": false
+    },
+    {
+      "name": "plan/binrat-network-roadmap-v0",
+      "sha": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+      "protected": false
+    },
+    {
+      "name": "plan/binrat-pons-canonical-selection-v1",
+      "sha": "614363b77ce288384ac27f5a7dc1aa018076a8d3",
+      "protected": false
+    },
+    {
+      "name": "plan/binrat-token-prelaunch-control-v1",
+      "sha": "bd7fbe608e82d86c28ab23a01198013f550e1cd5",
+      "protected": false
+    },
+    {
+      "name": "plan/binrat-v0",
+      "sha": "9115033c8d407405927b710d86b233e5ea6847bb",
+      "protected": false
+    },
+    {
+      "name": "planning/binrat-g1a-prefigma-2026-09-26",
+      "sha": "582eaa66449c8ca4b2bbed3ab21353da64c0ec4f",
+      "protected": false
+    },
+    {
+      "name": "planning/binrat-pons-hybrid-blueprint-2026-09-26",
+      "sha": "d54933ceb1d6d4f0c63e9948dc96c7afcbd2f4a4",
+      "protected": false
+    },
+    {
+      "name": "preview-binrat-bento-pr31",
+      "sha": "f6165bd5a9b433f12fbbc6644b92aeaf22dc4027",
+      "protected": false
+    },
+    {
+      "name": "preview-binrat-bento-v1",
+      "sha": "c31b1d4726eade25ba257f48022879e538394394",
+      "protected": false
+    },
+    {
+      "name": "preview-binrat-g2",
+      "sha": "4d1df2121018d2c4291489d3e9dc91236a8c02ff",
+      "protected": false
+    },
+    {
+      "name": "release/binrat-autonomous-rat-v1-1",
+      "sha": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
+      "protected": false
+    },
+    {
+      "name": "release/binrat-backend-read-only-20261009",
+      "sha": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+      "protected": false
+    },
+    {
+      "name": "release/binrat-v3-production-20261009",
+      "sha": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+      "protected": false
+    },
+    {
+      "name": "research/binrat-pons-vault-pins-v1",
+      "sha": "21623f1c79850baee833317d08990d76760aaed9",
+      "protected": false
+    },
+    {
+      "name": "research/pons-gates-holder-econ-v1",
+      "sha": "54825038129d9bf4c9730664919cb7e83dd74211",
+      "protected": false
+    },
+    {
+      "name": "research/rat-radar-evidence-lab-v0",
+      "sha": "4c5695951998430f1fa57dcc341a157cb8c375cb",
+      "protected": false
+    },
+    {
+      "name": "reset/backend-only-main-20260925",
+      "sha": "a4e97f4a420f19d34bf3429cba50b7733666ab71",
+      "protected": false
+    },
+    {
+      "name": "reset/binrat-backend-only-20260925",
+      "sha": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+      "protected": false
+    },
+    {
+      "name": "review/binrat-brand-v1-integration",
+      "sha": "74527474fab29f6a05fab1affc751a3d187cda34",
+      "protected": false
+    },
+    {
+      "name": "test/binrat-case-journey-browser",
+      "sha": "0df3a4a41a4f386e70855fb05e2ea54f55a933b5",
+      "protected": false
+    },
+    {
+      "name": "test/binrat-comms-shadow-eval-v1",
+      "sha": "ef2ef0b8955ab03908588dd94138ad0e3126704b",
+      "protected": false
+    },
+    {
+      "name": "test/binrat-launch-comprehension-browser",
+      "sha": "118934655bfd443a6181793806a270412eb01339",
+      "protected": false
+    },
+    {
+      "name": "test/binrat-prospective-confirmation-v1",
+      "sha": "e8a722b456293e5ef092ed1f60db30f6d7f18831",
+      "protected": false
+    }
+  ]
+}

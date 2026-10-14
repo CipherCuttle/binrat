@@ -1,0 +1,2699 @@
+{
+  "inventory": {
+    "capturedAt": "2026-10-14T02:18:15.171763+00:00",
+    "repository": "CipherCuttle/binrat",
+    "allPRs": 182,
+    "openPRs": 151,
+    "remoteBranches": 242,
+    "pages": {
+      "prs": 2,
+      "branches": 3
+    },
+    "paginationCeilingEach": 5
+  },
+  "nodes": [
+    {
+      "prNumber": 3,
+      "headBranch": "experiment/72h-hot-garbage-v0",
+      "headSHA": "5dbde0691da758a50cd41f802932f51d5a4020b4",
+      "baseBranch": "main",
+      "baseSHA": "f35d5282cc7fe13567c47645633a07c1f0e3fa06",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 9,
+      "headBranch": "design/binrat-public-identity-v0",
+      "headSHA": "9a294a13a17d9622bd4e5b0bf09fa8a34d2ef3b3",
+      "baseBranch": "main",
+      "baseSHA": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 11,
+      "headBranch": "feat/binrat-live-read-v0",
+      "headSHA": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+      "baseBranch": "main",
+      "baseSHA": "dae4ad8df4b476e67a8834b986145e5989a6bf1d",
+      "directDependents": [
+        12
+      ],
+      "transitiveDependents": [
+        12,
+        14,
+        18,
+        19,
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 12,
+      "headBranch": "feat/binrat-intelligence-v1",
+      "headSHA": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+      "baseBranch": "feat/binrat-live-read-v0",
+      "baseSHA": "de06b9cb4cd5b0c4de1d007c00a4d8466af21f0e",
+      "directDependents": [
+        14
+      ],
+      "transitiveDependents": [
+        14,
+        18,
+        19,
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 14,
+      "headBranch": "plan/binrat-network-roadmap-v0",
+      "headSHA": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+      "baseBranch": "feat/binrat-intelligence-v1",
+      "baseSHA": "69793aef3ac6c152e0a91d8c914a6f71c5a4f0f3",
+      "directDependents": [
+        18
+      ],
+      "transitiveDependents": [
+        18,
+        19,
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 18,
+      "headBranch": "feat/binrat-rat-watch-v0",
+      "headSHA": "b5755fef349a4badc153fee9e9811461cac1a919",
+      "baseBranch": "plan/binrat-network-roadmap-v0",
+      "baseSHA": "4c956acaa062fc2196096dab3a73057f3fd042bf",
+      "directDependents": [
+        19
+      ],
+      "transitiveDependents": [
+        19,
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 19,
+      "headBranch": "feat/binrat-rat-radar-v0",
+      "headSHA": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "baseBranch": "feat/binrat-rat-watch-v0",
+      "baseSHA": "b5755fef349a4badc153fee9e9811461cac1a919",
+      "directDependents": [
+        20
+      ],
+      "transitiveDependents": [
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 20,
+      "headBranch": "feat/binrat-pons-launch-receipt-v0",
+      "headSHA": "5b38cdf00e7e170af7c1f1cc18f9d1a24160c928",
+      "baseBranch": "feat/binrat-rat-radar-v0",
+      "baseSHA": "b1b25e3bbd08189e7e913ef16768841ba7cb5296",
+      "directDependents": [
+        26
+      ],
+      "transitiveDependents": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 21,
+      "headBranch": "fix/binrat-v2-evidence-integrity-pr1",
+      "headSHA": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+      "baseBranch": "feat/binrat-product-surface-v1-demo",
+      "baseSHA": "17cce6b5a43089971a7a45fb6d02a00e30012a5f",
+      "directDependents": [
+        22
+      ],
+      "transitiveDependents": [
+        22,
+        23,
+        24,
+        34,
+        36
+      ]
+    },
+    {
+      "prNumber": 22,
+      "headBranch": "feat/binrat-frontend-routes-pr2",
+      "headSHA": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+      "baseBranch": "fix/binrat-v2-evidence-integrity-pr1",
+      "baseSHA": "0ef551df8874e141c9a0f7e871f24b1f2f23b437",
+      "directDependents": [
+        23
+      ],
+      "transitiveDependents": [
+        23,
+        24,
+        34,
+        36
+      ]
+    },
+    {
+      "prNumber": 23,
+      "headBranch": "feat/binrat-frontend-live-integration-pr3",
+      "headSHA": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+      "baseBranch": "feat/binrat-frontend-routes-pr2",
+      "baseSHA": "3ad8f8c89ce95afc24cfd060166be2976696740d",
+      "directDependents": [
+        24
+      ],
+      "transitiveDependents": [
+        24,
+        34,
+        36
+      ]
+    },
+    {
+      "prNumber": 24,
+      "headBranch": "feat/binrat-frontend-mobile-m1",
+      "headSHA": "3ca6cf59dde32f4e513acba3355b85571bfd1f2e",
+      "baseBranch": "feat/binrat-frontend-live-integration-pr3",
+      "baseSHA": "be53b6b2cf3247d773c4098d2f075f38c84acfd3",
+      "directDependents": [
+        34
+      ],
+      "transitiveDependents": [
+        34,
+        36
+      ]
+    },
+    {
+      "prNumber": 26,
+      "headBranch": "plan/binrat-pons-canonical-selection-v1",
+      "headSHA": "614363b77ce288384ac27f5a7dc1aa018076a8d3",
+      "baseBranch": "feat/binrat-pons-launch-receipt-v0",
+      "baseSHA": "5b38cdf00e7e170af7c1f1cc18f9d1a24160c928",
+      "directDependents": [
+        27
+      ],
+      "transitiveDependents": [
+        27,
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 27,
+      "headBranch": "feat/binrat-pons-holder-balance-probe-v1",
+      "headSHA": "5e7d8fa0e37b007d7d58d0acc9cc223b27c79095",
+      "baseBranch": "plan/binrat-pons-canonical-selection-v1",
+      "baseSHA": "614363b77ce288384ac27f5a7dc1aa018076a8d3",
+      "directDependents": [
+        28
+      ],
+      "transitiveDependents": [
+        28,
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 28,
+      "headBranch": "feat/binrat-pons-siwe-bound-candidate-v1",
+      "headSHA": "1479adc08e3b171d47b171e51867d8d0c607a86e",
+      "baseBranch": "feat/binrat-pons-holder-balance-probe-v1",
+      "baseSHA": "5e7d8fa0e37b007d7d58d0acc9cc223b27c79095",
+      "directDependents": [
+        29
+      ],
+      "transitiveDependents": [
+        29,
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 29,
+      "headBranch": "feat/binrat-pons-candidate-worker-routes-v1",
+      "headSHA": "eefda7326c283b54ec415c8abd948a274a9df674",
+      "baseBranch": "feat/binrat-pons-siwe-bound-candidate-v1",
+      "baseSHA": "1479adc08e3b171d47b171e51867d8d0c607a86e",
+      "directDependents": [
+        30
+      ],
+      "transitiveDependents": [
+        30,
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 30,
+      "headBranch": "feat/binrat-pons-cutover-candidate-v1",
+      "headSHA": "462d70b8d00adafdd69adfd01ddf9f904ede01fa",
+      "baseBranch": "feat/binrat-pons-candidate-worker-routes-v1",
+      "baseSHA": "eefda7326c283b54ec415c8abd948a274a9df674",
+      "directDependents": [
+        32
+      ],
+      "transitiveDependents": [
+        32,
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 32,
+      "headBranch": "feat/binrat-pons-discovery-consistency-v1",
+      "headSHA": "f1411ab83eddb25ed18c88584b6e26e75e86f163",
+      "baseBranch": "feat/binrat-pons-cutover-candidate-v1",
+      "baseSHA": "462d70b8d00adafdd69adfd01ddf9f904ede01fa",
+      "directDependents": [
+        35
+      ],
+      "transitiveDependents": [
+        35,
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 34,
+      "headBranch": "feat/binrat-rat-conversation-free-ai-v1",
+      "headSHA": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "baseBranch": "feat/binrat-frontend-mobile-m1",
+      "baseSHA": "5f1766a165a3755d620a952b3a1fec20e9206206",
+      "directDependents": [
+        36
+      ],
+      "transitiveDependents": [
+        36
+      ]
+    },
+    {
+      "prNumber": 35,
+      "headBranch": "research/pons-gates-holder-econ-v1",
+      "headSHA": "54825038129d9bf4c9730664919cb7e83dd74211",
+      "baseBranch": "feat/binrat-pons-discovery-consistency-v1",
+      "baseSHA": "f1411ab83eddb25ed18c88584b6e26e75e86f163",
+      "directDependents": [
+        37
+      ],
+      "transitiveDependents": [
+        37,
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 36,
+      "headBranch": "feat/binrat-telegram-scout-v0",
+      "headSHA": "d433f0d4c588325c280ac58d5acaca570ee248f1",
+      "baseBranch": "feat/binrat-rat-conversation-free-ai-v1",
+      "baseSHA": "2f54abb1486bef3c57e8c1a65b66f716ed0b088a",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 37,
+      "headBranch": "feat/binrat-g0-g1-capacity-foundation-v1",
+      "headSHA": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+      "baseBranch": "research/pons-gates-holder-econ-v1",
+      "baseSHA": "54825038129d9bf4c9730664919cb7e83dd74211",
+      "directDependents": [
+        38,
+        39
+      ],
+      "transitiveDependents": [
+        38,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "prNumber": 38,
+      "headBranch": "feat/binrat-g2a-pons-source-candidate-v1",
+      "headSHA": "a6f03dd3191dbeb9309d1af5d49608dfcc965fc2",
+      "baseBranch": "feat/binrat-g0-g1-capacity-foundation-v1",
+      "baseSHA": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+      "directDependents": [
+        40
+      ],
+      "transitiveDependents": [
+        40
+      ]
+    },
+    {
+      "prNumber": 39,
+      "headBranch": "feat/binrat-g2b-prepaid-entitlements-candidate-v1",
+      "headSHA": "1e043cda038ed8b94ee7694416385ce807727964",
+      "baseBranch": "feat/binrat-g0-g1-capacity-foundation-v1",
+      "baseSHA": "114b0572de3f3d153d24a155b8cfbbea07f38670",
+      "directDependents": [
+        42
+      ],
+      "transitiveDependents": [
+        42
+      ]
+    },
+    {
+      "prNumber": 40,
+      "headBranch": "feat/binrat-g2a-a1-pons-receipt-proof-v1",
+      "headSHA": "55af899617fc38af71b746e3e90a9f2de3e6e53a",
+      "baseBranch": "feat/binrat-g2a-pons-source-candidate-v1",
+      "baseSHA": "a6f03dd3191dbeb9309d1af5d49608dfcc965fc2",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 42,
+      "headBranch": "feat/binrat-g2b-funding-ledger-v1",
+      "headSHA": "c8f55a221e88b3f7cab4cacf6302c5d171f75a48",
+      "baseBranch": "feat/binrat-g2b-prepaid-entitlements-candidate-v1",
+      "baseSHA": "1e043cda038ed8b94ee7694416385ce807727964",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 43,
+      "headBranch": "planning/binrat-pons-hybrid-blueprint-2026-09-26",
+      "headSHA": "d54933ceb1d6d4f0c63e9948dc96c7afcbd2f4a4",
+      "baseBranch": "main",
+      "baseSHA": "28c4553d54164f086e19a87fbf25d410d2d647fb",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 48,
+      "headBranch": "experiment/binrat-g4r-cinematic-20260926",
+      "headSHA": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+      "baseBranch": "experiment/binrat-g3b-reviewed-20260926",
+      "baseSHA": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "directDependents": [
+        49
+      ],
+      "transitiveDependents": [
+        49,
+        50
+      ]
+    },
+    {
+      "prNumber": 49,
+      "headBranch": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+      "headSHA": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+      "baseBranch": "experiment/binrat-g4r-cinematic-20260926",
+      "baseSHA": "f9ec83f663fe5e0446b8a1dc61ccd507bc00027d",
+      "directDependents": [
+        50
+      ],
+      "transitiveDependents": [
+        50
+      ]
+    },
+    {
+      "prNumber": 50,
+      "headBranch": "experiment/binrat-g4r2-grain-wave-20260927",
+      "headSHA": "521998d988fc1113dc7ef081250fe1b3147b48b0",
+      "baseBranch": "experiment/binrat-g4r-header-cta5-inspired-20260926",
+      "baseSHA": "6faec5d1a6a1920c2aa311ef6b9864854650c842",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 53,
+      "headBranch": "integration/binrat-r5-approved-20260927",
+      "headSHA": "959da17b0573dff016808d597737b4cf186bed62",
+      "baseBranch": "experiment/binrat-g3b-reviewed-20260926",
+      "baseSHA": "b06d4f28515039f91c49ed1cd4c63adff37e63a9",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 56,
+      "headBranch": "feat/binrat-autonomous-rat-v1",
+      "headSHA": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+      "baseBranch": "codex/binrat-prelaunch-release-a911c23",
+      "baseSHA": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+      "directDependents": [
+        58
+      ],
+      "transitiveDependents": [
+        58
+      ]
+    },
+    {
+      "prNumber": 57,
+      "headBranch": "plan/binrat-token-prelaunch-control-v1",
+      "headSHA": "bd7fbe608e82d86c28ab23a01198013f550e1cd5",
+      "baseBranch": "codex/binrat-prelaunch-release-a911c23",
+      "baseSHA": "5cbedcc2704ca29bf66b749c1f46f4198ce8a6b0",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 58,
+      "headBranch": "feat/binrat-rats-share-v1",
+      "headSHA": "083d4fe4bd662dfe9e7733cb37fbed40e06f3fc9",
+      "baseBranch": "feat/binrat-autonomous-rat-v1",
+      "baseSHA": "9a6cd0de35cb0729e4889b06db0e2eae09b2e750",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 59,
+      "headBranch": "feat/binrat-robinhood-live-rat-v1",
+      "headSHA": "5fed3ed3c6f6405617348e150275378b23c24a59",
+      "baseBranch": "release/binrat-autonomous-rat-v1-1",
+      "baseSHA": "5f0eedbd26179fa1dee1f7f77db87db1c4507384",
+      "directDependents": [
+        60
+      ],
+      "transitiveDependents": [
+        60
+      ]
+    },
+    {
+      "prNumber": 60,
+      "headBranch": "feat/binrat-telegram-ux-v2",
+      "headSHA": "7fece313958558a7bb9789e9592aafee894422b5",
+      "baseBranch": "feat/binrat-robinhood-live-rat-v1",
+      "baseSHA": "5fed3ed3c6f6405617348e150275378b23c24a59",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 63,
+      "headBranch": "codex/telegram-as-code-private-v2",
+      "headSHA": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "baseBranch": "main",
+      "baseSHA": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+      "directDependents": [
+        66,
+        67,
+        68,
+        69
+      ],
+      "transitiveDependents": [
+        66,
+        67,
+        68,
+        69,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77
+      ]
+    },
+    {
+      "prNumber": 64,
+      "headBranch": "hotfix/pons-launch-identity-retry-v1",
+      "headSHA": "982b0ac761bf687a0281668acc693c163919c2c6",
+      "baseBranch": "main",
+      "baseSHA": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 65,
+      "headBranch": "hotfix/pons-catchup-throughput-v1",
+      "headSHA": "0f9878ca82ad9cc6002797738495c22bfb9d089a",
+      "baseBranch": "main",
+      "baseSHA": "9fea1c8f5afeb497f7db07428324eed3ef146056",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 66,
+      "headBranch": "docs/binrat-production-reliability-freeze-v1",
+      "headSHA": "e62cfcc54269ea9fc5fec1344a8518041513315c",
+      "baseBranch": "codex/telegram-as-code-private-v2",
+      "baseSHA": "5b712a7c24362cb8ac66c658d740ccc66be63b25",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 67,
+      "headBranch": "docs/telegram-web-forensics-split-v1",
+      "headSHA": "fe48aad43506c4cca72d7abe0fe0e982dff27b29",
+      "baseBranch": "codex/telegram-as-code-private-v2",
+      "baseSHA": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 68,
+      "headBranch": "feat/telegram-messaging-v1",
+      "headSHA": "2d2f27ed5cb1a5e575226b757df0b219d8eac43a",
+      "baseBranch": "codex/telegram-as-code-private-v2",
+      "baseSHA": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 69,
+      "headBranch": "feat/binrat-telegram-messaging-v1",
+      "headSHA": "95da66edb428114ab7f7ff2aabdfdb7989134861",
+      "baseBranch": "codex/telegram-as-code-private-v2",
+      "baseSHA": "ab6d0b09eacd2b3b7c0af7f5b3d2d4451a9fb316",
+      "directDependents": [
+        71
+      ],
+      "transitiveDependents": [
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77
+      ]
+    },
+    {
+      "prNumber": 71,
+      "headBranch": "fix/binrat-4663-surface-authority-v1",
+      "headSHA": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+      "baseBranch": "feat/binrat-telegram-messaging-v1",
+      "baseSHA": "95da66edb428114ab7f7ff2aabdfdb7989134861",
+      "directDependents": [
+        72,
+        77
+      ],
+      "transitiveDependents": [
+        72,
+        73,
+        74,
+        75,
+        76,
+        77
+      ]
+    },
+    {
+      "prNumber": 72,
+      "headBranch": "feat/binrat-pons-token-identity-v1",
+      "headSHA": "d40ff86ddc708d23e2f7880d248267590b45809b",
+      "baseBranch": "fix/binrat-4663-surface-authority-v1",
+      "baseSHA": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+      "directDependents": [
+        73,
+        74,
+        75
+      ],
+      "transitiveDependents": [
+        73,
+        74,
+        75,
+        76
+      ]
+    },
+    {
+      "prNumber": 73,
+      "headBranch": "feat/binrat-pons-outcome-o1-v1",
+      "headSHA": "9b50940e81b24727422deb64d16f94dba4736c98",
+      "baseBranch": "feat/binrat-pons-token-identity-v1",
+      "baseSHA": "d91add24fb2464d337a250cbd8c8e79100039b25",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 74,
+      "headBranch": "feat/binrat-pons-outcome-v1",
+      "headSHA": "bd8d21dfa1353664057f772e5b7a7fcd223d48d5",
+      "baseBranch": "feat/binrat-pons-token-identity-v1",
+      "baseSHA": "d91add24fb2464d337a250cbd8c8e79100039b25",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 75,
+      "headBranch": "feat/binrat-pons-outcome-capability-v1",
+      "headSHA": "04d559af941a1043847e8ea1c2909cd66d3f7bcf",
+      "baseBranch": "feat/binrat-pons-token-identity-v1",
+      "baseSHA": "d40ff86ddc708d23e2f7880d248267590b45809b",
+      "directDependents": [
+        76
+      ],
+      "transitiveDependents": [
+        76
+      ]
+    },
+    {
+      "prNumber": 76,
+      "headBranch": "feat/binrat-pons-outcome-receipts-v1",
+      "headSHA": "1cd72433af067eeaca3bd7d3ccf9a9f22051e319",
+      "baseBranch": "feat/binrat-pons-outcome-capability-v1",
+      "baseSHA": "04d559af941a1043847e8ea1c2909cd66d3f7bcf",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 77,
+      "headBranch": "feat/binrat-miniapp-hierarchy-v1",
+      "headSHA": "19fc3cdf42c3972dbf95dae4d9e407725d0d35bc",
+      "baseBranch": "fix/binrat-4663-surface-authority-v1",
+      "baseSHA": "6fdc508efa237ed137b91761567c10b8af5ad7b2",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 78,
+      "headBranch": "ops/binrat-o2-production-rollout-v1",
+      "headSHA": "7d223924f1dda8a50270c61443969c4a415bfd1c",
+      "baseBranch": "ops/binrat-o2-production-base-v1",
+      "baseSHA": "525bab62a21061c576099215d247d96ae8541e01",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 79,
+      "headBranch": "fix/binrat-pons-provider-head-regression-v1",
+      "headSHA": "9d7d926f10db93802e76eab96b655ba449f23db1",
+      "baseBranch": "fix/binrat-pons-provider-head-regression-base-v1",
+      "baseSHA": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 80,
+      "headBranch": "feat/binrat-rat-trap-projection-v1",
+      "headSHA": "677f2046525fcb95c58a520054bd556c702ed404",
+      "baseBranch": "fix/binrat-pons-provider-head-regression-base-v1",
+      "baseSHA": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "directDependents": [
+        82,
+        84
+      ],
+      "transitiveDependents": [
+        82,
+        84,
+        86,
+        89
+      ]
+    },
+    {
+      "prNumber": 81,
+      "headBranch": "fix/binrat-provenance-incremental-repair-v1",
+      "headSHA": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+      "baseBranch": "fix/binrat-provenance-incremental-repair-base-v1",
+      "baseSHA": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "directDependents": [
+        87,
+        88
+      ],
+      "transitiveDependents": [
+        87,
+        88,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 82,
+      "headBranch": "ops/binrat-rat-trap-production-inspect-v1",
+      "headSHA": "ab789594d12e334960eded3c571e08135f390516",
+      "baseBranch": "feat/binrat-rat-trap-projection-v1",
+      "baseSHA": "eeb2d105a1b4369e830a0539966302c12760bd66",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 83,
+      "headBranch": "feat/binrat-pons-token-identity-livebase-v1",
+      "headSHA": "1eed71b8652c78762894bc685199bd33e5154116",
+      "baseBranch": "fix/binrat-pons-provider-head-regression-base-v1",
+      "baseSHA": "cf85ee9cf33cdd3e7c04048e39e86b14ded775ae",
+      "directDependents": [
+        85
+      ],
+      "transitiveDependents": [
+        85
+      ]
+    },
+    {
+      "prNumber": 84,
+      "headBranch": "feat/binrat-rat-trap-presentation-v1",
+      "headSHA": "206fb4d868a3fdeef2bb054edfb09837437306dd",
+      "baseBranch": "feat/binrat-rat-trap-projection-v1",
+      "baseSHA": "677f2046525fcb95c58a520054bd556c702ed404",
+      "directDependents": [
+        86
+      ],
+      "transitiveDependents": [
+        86,
+        89
+      ]
+    },
+    {
+      "prNumber": 85,
+      "headBranch": "feat/binrat-pons-token-identity-runtime-v1",
+      "headSHA": "df71f614f00c8d7f595b9508d964dca276c15326",
+      "baseBranch": "feat/binrat-pons-token-identity-livebase-v1",
+      "baseSHA": "1eed71b8652c78762894bc685199bd33e5154116",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 86,
+      "headBranch": "feat/binrat-miniapp-rat-trap-integration-v1",
+      "headSHA": "f9c16850b32405a25b1847c7aaabb787c29582c1",
+      "baseBranch": "feat/binrat-rat-trap-presentation-v1",
+      "baseSHA": "206fb4d868a3fdeef2bb054edfb09837437306dd",
+      "directDependents": [
+        89
+      ],
+      "transitiveDependents": [
+        89
+      ]
+    },
+    {
+      "prNumber": 87,
+      "headBranch": "feat/binrat-remember-livebase-v1",
+      "headSHA": "7ef47cd2c2a7da8e005efbd40dc0c478b5370d0d",
+      "baseBranch": "fix/binrat-provenance-incremental-repair-v1",
+      "baseSHA": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 88,
+      "headBranch": "feat/binrat-pons-token-identity-production-v1",
+      "headSHA": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "baseBranch": "fix/binrat-provenance-incremental-repair-v1",
+      "baseSHA": "23afe944d1faf5ec4e681f66481ff88cbb4b7353",
+      "directDependents": [
+        90,
+        91,
+        92,
+        97
+      ],
+      "transitiveDependents": [
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 89,
+      "headBranch": "feat/binrat-miniapp-hot-garbage-stability-v1",
+      "headSHA": "3eba47cc2ab6d72b057f13a4e561bda168447a29",
+      "baseBranch": "feat/binrat-miniapp-rat-trap-integration-v1",
+      "baseSHA": "f9c16850b32405a25b1847c7aaabb787c29582c1",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 90,
+      "headBranch": "feat/binrat-trash-trails-v1",
+      "headSHA": "0f9ec9f1127f132a279713c28cfe748ab150a2a9",
+      "baseBranch": "feat/binrat-pons-token-identity-production-v1",
+      "baseSHA": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 91,
+      "headBranch": "feat/binrat-pons-funding-provenance-v1",
+      "headSHA": "95968749eac6691d2645344bf8cb7b2a0a227ade",
+      "baseBranch": "feat/binrat-pons-token-identity-production-v1",
+      "baseSHA": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "directDependents": [
+        93,
+        103
+      ],
+      "transitiveDependents": [
+        93,
+        94,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 92,
+      "headBranch": "feat/binrat-pons-replay-lab-v1",
+      "headSHA": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+      "baseBranch": "feat/binrat-pons-token-identity-production-v1",
+      "baseSHA": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "directDependents": [
+        95,
+        96
+      ],
+      "transitiveDependents": [
+        95,
+        96
+      ]
+    },
+    {
+      "prNumber": 93,
+      "headBranch": "feat/binrat-pons-funding-collector-v1",
+      "headSHA": "1175423a864ed6ac28c5473a55b850443f65076e",
+      "baseBranch": "feat/binrat-pons-funding-provenance-v1",
+      "baseSHA": "623a2448dd3109a3110d2a69e19e1a02ed6d984a",
+      "directDependents": [
+        94
+      ],
+      "transitiveDependents": [
+        94,
+        98,
+        99,
+        100,
+        101,
+        102
+      ]
+    },
+    {
+      "prNumber": 94,
+      "headBranch": "feat/binrat-pons-funding-recurrence-read-v1",
+      "headSHA": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
+      "baseBranch": "feat/binrat-pons-funding-collector-v1",
+      "baseSHA": "1175423a864ed6ac28c5473a55b850443f65076e",
+      "directDependents": [
+        98
+      ],
+      "transitiveDependents": [
+        98,
+        99,
+        100,
+        101,
+        102
+      ]
+    },
+    {
+      "prNumber": 95,
+      "headBranch": "ops/binrat-pons-replay-production-inspect-v1",
+      "headSHA": "1d55af75c55a98be696eb84a784383e0caa98939",
+      "baseBranch": "feat/binrat-pons-replay-lab-v1",
+      "baseSHA": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 96,
+      "headBranch": "feat/binrat-pons-replay-receipt-v1",
+      "headSHA": "843f7e1866b2a96dd57fe9e47ab0574d407d48d3",
+      "baseBranch": "feat/binrat-pons-replay-lab-v1",
+      "baseSHA": "592e52e5acb1f5b606f73d187a3f89163c4c34d2",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 97,
+      "headBranch": "feat/binrat-case-model-v1",
+      "headSHA": "9dbc44b923b9e86b57d81aa9b1b7c573f840fa07",
+      "baseBranch": "feat/binrat-pons-token-identity-production-v1",
+      "baseSHA": "75ea77d9384845c9c537248e5a757fff5efbd960",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 98,
+      "headBranch": "feat/binrat-case-model-convergence-v1",
+      "headSHA": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
+      "baseBranch": "feat/binrat-pons-funding-recurrence-read-v1",
+      "baseSHA": "a604f86913a38bcb08c1f86e7420eab1ff93baef",
+      "directDependents": [
+        99
+      ],
+      "transitiveDependents": [
+        99,
+        100,
+        101,
+        102
+      ]
+    },
+    {
+      "prNumber": 99,
+      "headBranch": "feat/binrat-case-adapter-v1",
+      "headSHA": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
+      "baseBranch": "feat/binrat-case-model-convergence-v1",
+      "baseSHA": "70bb71d0d0e1a596a929cb1f81146f0d50291d55",
+      "directDependents": [
+        100
+      ],
+      "transitiveDependents": [
+        100,
+        101,
+        102
+      ]
+    },
+    {
+      "prNumber": 100,
+      "headBranch": "feat/binrat-case-endpoint-v1",
+      "headSHA": "7a96a3c111af14b6d34585cd425904a59068b4be",
+      "baseBranch": "feat/binrat-case-adapter-v1",
+      "baseSHA": "192b1da15a1b0627a91260e7e9d5d880aaa1b0c5",
+      "directDependents": [
+        101
+      ],
+      "transitiveDependents": [
+        101,
+        102
+      ]
+    },
+    {
+      "prNumber": 101,
+      "headBranch": "feat/binrat-case-surface-v1",
+      "headSHA": "c9bcb01c01433147ca6d774ed807efafffaa437e",
+      "baseBranch": "feat/binrat-case-endpoint-v1",
+      "baseSHA": "7a96a3c111af14b6d34585cd425904a59068b4be",
+      "directDependents": [
+        102
+      ],
+      "transitiveDependents": [
+        102
+      ]
+    },
+    {
+      "prNumber": 102,
+      "headBranch": "ops/binrat-case-surface-private-preview-v1",
+      "headSHA": "f5934950011455061569075fc6111d0022a11629",
+      "baseBranch": "feat/binrat-case-surface-v1",
+      "baseSHA": "99fead7f0cc8266d8e6e3d1ce408d08d84af23de",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 103,
+      "headBranch": "feat/binrat-pons-funding-storage-v1",
+      "headSHA": "90296437d8846df71311f9523a4e7a29d9968798",
+      "baseBranch": "feat/binrat-pons-funding-provenance-v1",
+      "baseSHA": "623a2448dd3109a3110d2a69e19e1a02ed6d984a",
+      "directDependents": [
+        104
+      ],
+      "transitiveDependents": [
+        104,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 104,
+      "headBranch": "integration/binrat-case-canonical-v1",
+      "headSHA": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "baseBranch": "feat/binrat-pons-funding-storage-v1",
+      "baseSHA": "90296437d8846df71311f9523a4e7a29d9968798",
+      "directDependents": [
+        106,
+        107,
+        108
+      ],
+      "transitiveDependents": [
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 105,
+      "headBranch": "ops/binrat-case-version-url-preview-v1",
+      "headSHA": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+      "baseBranch": "ops/binrat-case-canonical-private-preview-v1",
+      "baseSHA": "fae06e675bd68271a7f583a662b69e2451906236",
+      "directDependents": [
+        119
+      ],
+      "transitiveDependents": [
+        119
+      ]
+    },
+    {
+      "prNumber": 106,
+      "headBranch": "feat/binrat-degen-frontdoor-v1",
+      "headSHA": "64ec4702ca71330f41a2f8a8f575eeff44958f12",
+      "baseBranch": "integration/binrat-case-canonical-v1",
+      "baseSHA": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "directDependents": [
+        120
+      ],
+      "transitiveDependents": [
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 107,
+      "headBranch": "feat/binrat-shadow-economy-v0",
+      "headSHA": "b85d9c5f39072e32aec331d299e8f38ba6b6a499",
+      "baseBranch": "integration/binrat-case-canonical-v1",
+      "baseSHA": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 108,
+      "headBranch": "docs/binrat-launch-genesis-funnel-v1",
+      "headSHA": "70501f0e8f30d3fa46a8a6dc04b63fd9284d17f7",
+      "baseBranch": "integration/binrat-case-canonical-v1",
+      "baseSHA": "9e8b37ec0a643aadf8aaf789e9ab6c4ae4b85cb3",
+      "directDependents": [
+        109
+      ],
+      "transitiveDependents": [
+        109,
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        148,
+        149
+      ]
+    },
+    {
+      "prNumber": 109,
+      "headBranch": "docs/binrat-pons-launch-authority-v1",
+      "headSHA": "bb5d7a862021b3362d078c876a2a7243fe90c015",
+      "baseBranch": "docs/binrat-launch-genesis-funnel-v1",
+      "baseSHA": "70501f0e8f30d3fa46a8a6dc04b63fd9284d17f7",
+      "directDependents": [
+        110
+      ],
+      "transitiveDependents": [
+        110,
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        148,
+        149
+      ]
+    },
+    {
+      "prNumber": 110,
+      "headBranch": "docs/binrat-ponsvault-forensic-pin-v1",
+      "headSHA": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+      "baseBranch": "docs/binrat-pons-launch-authority-v1",
+      "baseSHA": "bb5d7a862021b3362d078c876a2a7243fe90c015",
+      "directDependents": [
+        111,
+        114
+      ],
+      "transitiveDependents": [
+        111,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        148,
+        149
+      ]
+    },
+    {
+      "prNumber": 111,
+      "headBranch": "docs/binrat-ponsvault-staking-forensic-v1",
+      "headSHA": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+      "baseBranch": "docs/binrat-ponsvault-forensic-pin-v1",
+      "baseSHA": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+      "directDependents": [
+        113
+      ],
+      "transitiveDependents": [
+        113,
+        115,
+        116,
+        117,
+        118,
+        148,
+        149
+      ]
+    },
+    {
+      "prNumber": 113,
+      "headBranch": "docs/binrat-staking-authority-rebind-v1",
+      "headSHA": "4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c",
+      "baseBranch": "docs/binrat-ponsvault-staking-forensic-v1",
+      "baseSHA": "0f0632a78121dbe1dbd530ad86de4c66b95e8620",
+      "directDependents": [
+        115
+      ],
+      "transitiveDependents": [
+        115,
+        116,
+        117,
+        118,
+        148,
+        149
+      ]
+    },
+    {
+      "prNumber": 114,
+      "headBranch": "docs/binrat-ponsvault-staking-forensic-pin-v1",
+      "headSHA": "8667d32182f3013a4ec255d340403f54d3db6c93",
+      "baseBranch": "docs/binrat-ponsvault-forensic-pin-v1",
+      "baseSHA": "9da10d3df8a1f783927d6dd72b0c95a9b44dd438",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 115,
+      "headBranch": "integration/binrat-pons-launch-canonical-v1",
+      "headSHA": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+      "baseBranch": "docs/binrat-staking-authority-rebind-v1",
+      "baseSHA": "4f3e4622c0d089c0fa40cb06ca0fe01abbdc706c",
+      "directDependents": [
+        116,
+        148
+      ],
+      "transitiveDependents": [
+        116,
+        117,
+        118,
+        148,
+        149
+      ]
+    },
+    {
+      "prNumber": 116,
+      "headBranch": "feat/binrat-pons-preflight-v1",
+      "headSHA": "ccc677985ce07f438648a2499611e72c36729491",
+      "baseBranch": "integration/binrat-pons-launch-canonical-v1",
+      "baseSHA": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+      "directDependents": [
+        117,
+        118,
+        149
+      ],
+      "transitiveDependents": [
+        117,
+        118,
+        149
+      ]
+    },
+    {
+      "prNumber": 117,
+      "headBranch": "feat/binrat-working-rat-l2-v1",
+      "headSHA": "c23defaa9ed338e13ba2be72c482af51660aac56",
+      "baseBranch": "feat/binrat-pons-preflight-v1",
+      "baseSHA": "ccc677985ce07f438648a2499611e72c36729491",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 118,
+      "headBranch": "feat/binrat-exact-pons-launch-rehearsal-v1",
+      "headSHA": "ecfc5ba6dfde358dcb4140fefa2c8ec81f782ab0",
+      "baseBranch": "feat/binrat-pons-preflight-v1",
+      "baseSHA": "ccc677985ce07f438648a2499611e72c36729491",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 119,
+      "headBranch": "feat/binrat-public-read-plane-stability-v1",
+      "headSHA": "5bd247bbef968ea8570532bbd6edc1d5ee543421",
+      "baseBranch": "ops/binrat-case-version-url-preview-v1",
+      "baseSHA": "bb970868fdf0e6bf991195f78b8c7adcafe8c063",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 120,
+      "headBranch": "fix/binrat-read-plane-frontend-resilience-v1",
+      "headSHA": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+      "baseBranch": "feat/binrat-degen-frontdoor-v1",
+      "baseSHA": "64ec4702ca71330f41a2f8a8f575eeff44958f12",
+      "directDependents": [
+        121
+      ],
+      "transitiveDependents": [
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 121,
+      "headBranch": "integration/binrat-public-read-plane-stability-v1",
+      "headSHA": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "baseBranch": "fix/binrat-read-plane-frontend-resilience-v1",
+      "baseSHA": "1cfd4fa53347cccff49be62820f18ff584f1c1d1",
+      "directDependents": [
+        122
+      ],
+      "transitiveDependents": [
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 122,
+      "headBranch": "feat/binrat-frontdoor-journey-v1",
+      "headSHA": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+      "baseBranch": "integration/binrat-public-read-plane-stability-v1",
+      "baseSHA": "d31faee8e7e572cf1e1a540e3f97832674ca5dca",
+      "directDependents": [
+        123,
+        150
+      ],
+      "transitiveDependents": [
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 123,
+      "headBranch": "feat/binrat-rat-workforce-offline-v1",
+      "headSHA": "ed2807f6d49c853713770fba099159e20bfd173b",
+      "baseBranch": "feat/binrat-frontdoor-journey-v1",
+      "baseSHA": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+      "directDependents": [
+        124
+      ],
+      "transitiveDependents": [
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 124,
+      "headBranch": "feat/binrat-sniffer-competence-eval-v1",
+      "headSHA": "d47e9c30f3d089c754b1da37b2016d2a57ec23dc",
+      "baseBranch": "feat/binrat-rat-workforce-offline-v1",
+      "baseSHA": "ed2807f6d49c853713770fba099159e20bfd173b",
+      "directDependents": [
+        125
+      ],
+      "transitiveDependents": [
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 125,
+      "headBranch": "feat/binrat-sniffer-capture-runner-v1",
+      "headSHA": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+      "baseBranch": "feat/binrat-sniffer-competence-eval-v1",
+      "baseSHA": "d47e9c30f3d089c754b1da37b2016d2a57ec23dc",
+      "directDependents": [
+        126,
+        127
+      ],
+      "transitiveDependents": [
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 126,
+      "headBranch": "experiment/binrat-sniffer-gpt41mini-20261005",
+      "headSHA": "9f63e3a6ffc3be1863cc44c5e7e475e4e6f7d2f1",
+      "baseBranch": "feat/binrat-sniffer-capture-runner-v1",
+      "baseSHA": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 127,
+      "headBranch": "fix/binrat-capture-used-capped-key-v1",
+      "headSHA": "665aee695cd904d10aa9848d4658de0aac84798f",
+      "baseBranch": "feat/binrat-sniffer-capture-runner-v1",
+      "baseSHA": "46d3ccbcf5c0158ea601f830a89d84e5512ed68b",
+      "directDependents": [
+        128
+      ],
+      "transitiveDependents": [
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 128,
+      "headBranch": "fix/binrat-offline-proposal-validation-v1",
+      "headSHA": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+      "baseBranch": "fix/binrat-capture-used-capped-key-v1",
+      "baseSHA": "665aee695cd904d10aa9848d4658de0aac84798f",
+      "directDependents": [
+        129
+      ],
+      "transitiveDependents": [
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 129,
+      "headBranch": "feat/binrat-offline-workforce-benchmark-v1",
+      "headSHA": "9759e02a44c9a6a60390d33db70f57166916e90c",
+      "baseBranch": "fix/binrat-offline-proposal-validation-v1",
+      "baseSHA": "72d6141253c3e4e9f2dfcd4b07ab4d40f3efddf4",
+      "directDependents": [
+        130
+      ],
+      "transitiveDependents": [
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 130,
+      "headBranch": "fix/binrat-history-before-funding-v1",
+      "headSHA": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+      "baseBranch": "feat/binrat-offline-workforce-benchmark-v1",
+      "baseSHA": "9759e02a44c9a6a60390d33db70f57166916e90c",
+      "directDependents": [
+        131
+      ],
+      "transitiveDependents": [
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 131,
+      "headBranch": "feat/binrat-next-query-eval-v1",
+      "headSHA": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+      "baseBranch": "fix/binrat-history-before-funding-v1",
+      "baseSHA": "c06ea959d268955cd098210490e1f62f9cfd8a66",
+      "directDependents": [
+        132
+      ],
+      "transitiveDependents": [
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 132,
+      "headBranch": "feat/binrat-local-rat-job-v1",
+      "headSHA": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+      "baseBranch": "feat/binrat-next-query-eval-v1",
+      "baseSHA": "06abc9d592e7f0cf4edd5a389ced77e190ce95c2",
+      "directDependents": [
+        133
+      ],
+      "transitiveDependents": [
+        133,
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 133,
+      "headBranch": "feat/binrat-local-den-v1",
+      "headSHA": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce",
+      "baseBranch": "feat/binrat-local-rat-job-v1",
+      "baseSHA": "4b511a0f54338fff1062b92d2e2db56656b4abf2",
+      "directDependents": [
+        134
+      ],
+      "transitiveDependents": [
+        134,
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 134,
+      "headBranch": "feat/binrat-recorded-evidence-v1",
+      "headSHA": "c9abb46633418c0f5a0e1f48a278d7595e86b23e",
+      "baseBranch": "feat/binrat-local-den-v1",
+      "baseSHA": "2f715c4c501d8fcf9817fe51b63e5a9673f2e7ce",
+      "directDependents": [
+        135
+      ],
+      "transitiveDependents": [
+        135,
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 135,
+      "headBranch": "feat/binrat-prospective-capture-v1",
+      "headSHA": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2",
+      "baseBranch": "feat/binrat-recorded-evidence-v1",
+      "baseSHA": "c9abb46633418c0f5a0e1f48a278d7595e86b23e",
+      "directDependents": [
+        136
+      ],
+      "transitiveDependents": [
+        136,
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 136,
+      "headBranch": "feat/binrat-consecutive-discovery-v1",
+      "headSHA": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+      "baseBranch": "feat/binrat-prospective-capture-v1",
+      "baseSHA": "fe0773dbcc8a5ceacceb2c92021d77c1b9c637a2",
+      "directDependents": [
+        138
+      ],
+      "transitiveDependents": [
+        138,
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 137,
+      "headBranch": "feat/binrat-comms-rat-shadow-v1",
+      "headSHA": "ac5ad85629c76ceecb512bb7d72eafa62d25833e",
+      "baseBranch": "main",
+      "baseSHA": "67296a6ce8d999bc7b55f71ab0ed1d69e4722f85",
+      "directDependents": [
+        139
+      ],
+      "transitiveDependents": [
+        139,
+        141,
+        146
+      ]
+    },
+    {
+      "prNumber": 138,
+      "headBranch": "feat/binrat-indexed-funder-discovery-v1",
+      "headSHA": "55380186538ccae65c43518742730fb507989730",
+      "baseBranch": "feat/binrat-consecutive-discovery-v1",
+      "baseSHA": "2a8a9c29dd277c94ff5071d6dd9b72371ea23151",
+      "directDependents": [
+        140
+      ],
+      "transitiveDependents": [
+        140,
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 139,
+      "headBranch": "feat/binrat-comms-rat-writer-v1",
+      "headSHA": "1b54e042157d03c898ae03364e073195e2efd71c",
+      "baseBranch": "feat/binrat-comms-rat-shadow-v1",
+      "baseSHA": "7a9bf0f9561946c27172b9b7a4a745f9df37e66e",
+      "directDependents": [
+        141
+      ],
+      "transitiveDependents": [
+        141,
+        146
+      ]
+    },
+    {
+      "prNumber": 140,
+      "headBranch": "feat/binrat-indexed-archive-probe-v1",
+      "headSHA": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63",
+      "baseBranch": "feat/binrat-indexed-funder-discovery-v1",
+      "baseSHA": "55380186538ccae65c43518742730fb507989730",
+      "directDependents": [
+        142
+      ],
+      "transitiveDependents": [
+        142,
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 141,
+      "headBranch": "test/binrat-comms-shadow-eval-v1",
+      "headSHA": "ef2ef0b8955ab03908588dd94138ad0e3126704b",
+      "baseBranch": "feat/binrat-comms-rat-writer-v1",
+      "baseSHA": "6ad0159fd53477f4fbaef4fd221ab8aa664a0cf2",
+      "directDependents": [
+        146
+      ],
+      "transitiveDependents": [
+        146
+      ]
+    },
+    {
+      "prNumber": 142,
+      "headBranch": "feat/binrat-indexed-observation-v1",
+      "headSHA": "96812356cc609925d1a5cfe6655f618eed4a8b7f",
+      "baseBranch": "feat/binrat-indexed-archive-probe-v1",
+      "baseSHA": "7e23ee0dd1fcef883e9fe7c70abd3a25a5508c63",
+      "directDependents": [
+        143
+      ],
+      "transitiveDependents": [
+        143,
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 143,
+      "headBranch": "feat/binrat-indexed-calibration-v1",
+      "headSHA": "68a61758db8912557fb6cd0eae2091877493e12d",
+      "baseBranch": "feat/binrat-indexed-observation-v1",
+      "baseSHA": "96812356cc609925d1a5cfe6655f618eed4a8b7f",
+      "directDependents": [
+        144
+      ],
+      "transitiveDependents": [
+        144,
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 144,
+      "headBranch": "test/binrat-prospective-confirmation-v1",
+      "headSHA": "e8a722b456293e5ef092ed1f60db30f6d7f18831",
+      "baseBranch": "feat/binrat-indexed-calibration-v1",
+      "baseSHA": "68a61758db8912557fb6cd0eae2091877493e12d",
+      "directDependents": [
+        145
+      ],
+      "transitiveDependents": [
+        145,
+        147
+      ]
+    },
+    {
+      "prNumber": 145,
+      "headBranch": "feat/binrat-reserved-followup-v1",
+      "headSHA": "b4eda1169d101e524d539fcc4a64cccc77c3c28c",
+      "baseBranch": "test/binrat-prospective-confirmation-v1",
+      "baseSHA": "e8a722b456293e5ef092ed1f60db30f6d7f18831",
+      "directDependents": [
+        147
+      ],
+      "transitiveDependents": [
+        147
+      ]
+    },
+    {
+      "prNumber": 146,
+      "headBranch": "fix/binrat-comms-eval-failure-receipts-v1",
+      "headSHA": "66137462bb2a61b2ce6f3ba93cf820b896bef2d7",
+      "baseBranch": "test/binrat-comms-shadow-eval-v1",
+      "baseSHA": "ef2ef0b8955ab03908588dd94138ad0e3126704b",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 147,
+      "headBranch": "feat/binrat-funder-cohort-v1",
+      "headSHA": "34527586e0f20df963513109794b1b770f81415f",
+      "baseBranch": "feat/binrat-reserved-followup-v1",
+      "baseSHA": "b4eda1169d101e524d539fcc4a64cccc77c3c28c",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 148,
+      "headBranch": "docs/binrat-launch-night-canon-v1",
+      "headSHA": "0921ecbcb565ebb2fdb826fcb7a05056955f4666",
+      "baseBranch": "integration/binrat-pons-launch-canonical-v1",
+      "baseSHA": "d150776e353dfa13fd73125f2d10b3959dc5a5c6",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 149,
+      "headBranch": "integration/binrat-pons-launch-authority-sprint-v1",
+      "headSHA": "4fbd2d71317ce99d0d96b42bc82b1b299afbe99f",
+      "baseBranch": "feat/binrat-pons-preflight-v1",
+      "baseSHA": "ccc677985ce07f438648a2499611e72c36729491",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 150,
+      "headBranch": "integration/binrat-public-truth-launch-v1",
+      "headSHA": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+      "baseBranch": "feat/binrat-frontdoor-journey-v1",
+      "baseSHA": "fa23aa77b8c0cf15ca5f3e0f5d5f5638f1da9cd1",
+      "directDependents": [
+        151
+      ],
+      "transitiveDependents": [
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 151,
+      "headBranch": "integration/binrat-launch-night-v1",
+      "headSHA": "e34a94cf1702340582266852495e28423728add0",
+      "baseBranch": "integration/binrat-public-truth-launch-v1",
+      "baseSHA": "415b988605ef4aaae85a24db4bd88f2b9f263499",
+      "directDependents": [
+        152,
+        157
+      ],
+      "transitiveDependents": [
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 152,
+      "headBranch": "experiment/binrat-prelaunch-scout-v0",
+      "headSHA": "c75e11654b6f7850068875bf0b89e23024113121",
+      "baseBranch": "integration/binrat-launch-night-v1",
+      "baseSHA": "261a7207907816a770b2a51504186a021f0ffb8e",
+      "directDependents": [
+        153
+      ],
+      "transitiveDependents": [
+        153,
+        154,
+        155,
+        156,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 153,
+      "headBranch": "experiment/binrat-prelaunch-benchmark-v1",
+      "headSHA": "a2e2608a39e42138e24b31865492812462744f1f",
+      "baseBranch": "experiment/binrat-prelaunch-scout-v0",
+      "baseSHA": "c75e11654b6f7850068875bf0b89e23024113121",
+      "directDependents": [
+        154
+      ],
+      "transitiveDependents": [
+        154,
+        155,
+        156,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 154,
+      "headBranch": "experiment/binrat-launch-pressure-v0",
+      "headSHA": "ebaebce361671f17c0638453d690c5f8da64d560",
+      "baseBranch": "experiment/binrat-prelaunch-benchmark-v1",
+      "baseSHA": "a2e2608a39e42138e24b31865492812462744f1f",
+      "directDependents": [
+        155
+      ],
+      "transitiveDependents": [
+        155,
+        156,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 155,
+      "headBranch": "experiment/binrat-launch-pressure-benchmark-v1",
+      "headSHA": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+      "baseBranch": "experiment/binrat-launch-pressure-v0",
+      "baseSHA": "ebaebce361671f17c0638453d690c5f8da64d560",
+      "directDependents": [
+        156
+      ],
+      "transitiveDependents": [
+        156,
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 156,
+      "headBranch": "experiment/binrat-hard-delayed-controls-v1",
+      "headSHA": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+      "baseBranch": "experiment/binrat-launch-pressure-benchmark-v1",
+      "baseSHA": "6a8fcfe3040dda2a2b26327e9b088e02e295af17",
+      "directDependents": [
+        158
+      ],
+      "transitiveDependents": [
+        158,
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 157,
+      "headBranch": "test/binrat-launch-comprehension-browser",
+      "headSHA": "118934655bfd443a6181793806a270412eb01339",
+      "baseBranch": "integration/binrat-launch-night-v1",
+      "baseSHA": "e34a94cf1702340582266852495e28423728add0",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 158,
+      "headBranch": "experiment/binrat-launch-convergence-prereg-v1",
+      "headSHA": "5b14957836643b516ada1e706b7e05220530fe8f",
+      "baseBranch": "experiment/binrat-hard-delayed-controls-v1",
+      "baseSHA": "2d61522d340ec29b26d4e4ebc4b25b7bf91f62f3",
+      "directDependents": [
+        159
+      ],
+      "transitiveDependents": [
+        159,
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 159,
+      "headBranch": "experiment/binrat-launch-convergence-replay-v1",
+      "headSHA": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+      "baseBranch": "experiment/binrat-launch-convergence-prereg-v1",
+      "baseSHA": "5b14957836643b516ada1e706b7e05220530fe8f",
+      "directDependents": [
+        160
+      ],
+      "transitiveDependents": [
+        160,
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 160,
+      "headBranch": "experiment/binrat-shadow-evidence-v1",
+      "headSHA": "832eb5c099d129129db702540a02a4a118226c52",
+      "baseBranch": "experiment/binrat-launch-convergence-replay-v1",
+      "baseSHA": "c544384369d0e5f28d193f28f5a35e6f7eb403e4",
+      "directDependents": [
+        161
+      ],
+      "transitiveDependents": [
+        161,
+        162
+      ]
+    },
+    {
+      "prNumber": 161,
+      "headBranch": "experiment/binrat-two-case-source-audit-v1",
+      "headSHA": "45bdf8258eeade825748eb6eaf6d55f015228662",
+      "baseBranch": "experiment/binrat-shadow-evidence-v1",
+      "baseSHA": "832eb5c099d129129db702540a02a4a118226c52",
+      "directDependents": [
+        162
+      ],
+      "transitiveDependents": [
+        162
+      ]
+    },
+    {
+      "prNumber": 162,
+      "headBranch": "experiment/binrat-prospective-capture-20261008-v1",
+      "headSHA": "335f8b0383366d2eb5031d52cbbc9f6c7b4d5bad",
+      "baseBranch": "experiment/binrat-two-case-source-audit-v1",
+      "baseSHA": "45bdf8258eeade825748eb6eaf6d55f015228662",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 163,
+      "headBranch": "fix/binrat-prod-readonly-inspection-verdict-v1",
+      "headSHA": "e03ae70db7a25229db773b2c1530178f42f10721",
+      "baseBranch": "main",
+      "baseSHA": "67296a6ce8d999bc7b55f71ab0ed1d69e4722f85",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 164,
+      "headBranch": "feat/binrat-case-journey-convergence-v1",
+      "headSHA": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+      "baseBranch": "fix/binrat-launch-comprehension-v1",
+      "baseSHA": "c5a4809b0eb763d50fae378b0c50dc9d278ed1cd",
+      "directDependents": [
+        165,
+        166
+      ],
+      "transitiveDependents": [
+        165,
+        166,
+        167,
+        168,
+        169,
+        170
+      ]
+    },
+    {
+      "prNumber": 165,
+      "headBranch": "test/binrat-case-journey-browser",
+      "headSHA": "0df3a4a41a4f386e70855fb05e2ea54f55a933b5",
+      "baseBranch": "feat/binrat-case-journey-convergence-v1",
+      "baseSHA": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 166,
+      "headBranch": "feat/binrat-visual-lab-v1",
+      "headSHA": "bffc309e98e6ba6e07595564782844344dd443d7",
+      "baseBranch": "feat/binrat-case-journey-convergence-v1",
+      "baseSHA": "d83105d58c81eb1affb135d0a7d26085ae1f86f9",
+      "directDependents": [
+        167,
+        168
+      ],
+      "transitiveDependents": [
+        167,
+        168,
+        169,
+        170
+      ]
+    },
+    {
+      "prNumber": 167,
+      "headBranch": "feat/binrat-frontend-visual-lab-ci",
+      "headSHA": "e1fafaf759da049c00f818ad1aa4bbcc09bf709e",
+      "baseBranch": "feat/binrat-visual-lab-v1",
+      "baseSHA": "34bce82d9c020af331788fc3bb031be53f878f40",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 168,
+      "headBranch": "feat/binrat-pons-case-preview-v1",
+      "headSHA": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "baseBranch": "feat/binrat-visual-lab-v1",
+      "baseSHA": "bffc309e98e6ba6e07595564782844344dd443d7",
+      "directDependents": [
+        169,
+        170
+      ],
+      "transitiveDependents": [
+        169,
+        170
+      ]
+    },
+    {
+      "prNumber": 169,
+      "headBranch": "docs/binrat-pons-production-runtime-triage-v1",
+      "headSHA": "cd889687c97f21b62fb166a7f72ded28df4243fb",
+      "baseBranch": "feat/binrat-pons-case-preview-v1",
+      "baseSHA": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 170,
+      "headBranch": "feat/binrat-v3-frontdoor-cutover-candidate-v1",
+      "headSHA": "07737938ef48bf886293ba34c5225ac9e1e5ed2b",
+      "baseBranch": "feat/binrat-pons-case-preview-v1",
+      "baseSHA": "f0799f214a9134562ab0ae0340a2119f1b7c468f",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 172,
+      "headBranch": "release/binrat-v3-production-20261009",
+      "headSHA": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+      "baseBranch": "release/binrat-backend-read-only-20261009",
+      "baseSHA": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+      "directDependents": [
+        173
+      ],
+      "transitiveDependents": [
+        173,
+        175
+      ]
+    },
+    {
+      "prNumber": 173,
+      "headBranch": "feat/binrat-sprint-a1-frontdoor-discovery",
+      "headSHA": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+      "baseBranch": "release/binrat-v3-production-20261009",
+      "baseSHA": "8a2245176889e5e75aeb3695661e8dc834e2cac6",
+      "directDependents": [
+        175
+      ],
+      "transitiveDependents": [
+        175
+      ]
+    },
+    {
+      "prNumber": 174,
+      "headBranch": "feat/binrat-a1-2-case-contract",
+      "headSHA": "695e813eacb8f70e169d45b814ecc180ec01d50e",
+      "baseBranch": "release/binrat-backend-read-only-20261009",
+      "baseSHA": "16994bf1e331441f75d2ebba5f1d8d6226e7ebc6",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 175,
+      "headBranch": "feat/binrat-a1-2-case-ui",
+      "headSHA": "ac5e2b97d1ec1b8d870b1d2b02e1b55818ebac59",
+      "baseBranch": "feat/binrat-sprint-a1-frontdoor-discovery",
+      "baseSHA": "db13d4d8568bd99d72c6f318462664a8157e88eb",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 176,
+      "headBranch": "feat/binrat-a2-case-intelligence",
+      "headSHA": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+      "baseBranch": "integration/binrat-a1-3-visual-gate",
+      "baseSHA": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+      "directDependents": [
+        177
+      ],
+      "transitiveDependents": [
+        177
+      ]
+    },
+    {
+      "prNumber": 177,
+      "headBranch": "feat/binrat-a2-2-safe-outcome-collector",
+      "headSHA": "6ce3d8260011d9f0e6b00cef0f95d23f55976773",
+      "baseBranch": "feat/binrat-a2-case-intelligence",
+      "baseSHA": "7720773dc5a5c18168c54f0d8be8e9d10905a4f5",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 178,
+      "headBranch": "feat/pons-tripwire-v1",
+      "headSHA": "216647d214a7df05d1eb48e99d8af27dc4262392",
+      "baseBranch": "integration/binrat-a1-3-visual-gate",
+      "baseSHA": "30564864f5d406414f0c09c4d2ba2be5d1e79ab8",
+      "directDependents": [
+        180
+      ],
+      "transitiveDependents": [
+        180
+      ]
+    },
+    {
+      "prNumber": 180,
+      "headBranch": "docs/binrat-active-workforce-guardrails-20261011",
+      "headSHA": "2e90210f90ebe83374d192044342ac4e952f9b91",
+      "baseBranch": "feat/pons-tripwire-v1",
+      "baseSHA": "216647d214a7df05d1eb48e99d8af27dc4262392",
+      "directDependents": [],
+      "transitiveDependents": []
+    },
+    {
+      "prNumber": 181,
+      "headBranch": "ops/cloudflare-emergency-containment-20261011",
+      "headSHA": "aee9a91b0de87351ed219e4174836dce4ff9afad",
+      "baseBranch": "main",
+      "baseSHA": "d617d6cb4f259e69a014189c159a4c458347b7db",
+      "directDependents": [],
+      "transitiveDependents": []
+    }
+  ]
+}

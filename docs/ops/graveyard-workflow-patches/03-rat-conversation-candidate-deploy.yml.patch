@@ -1,0 +1,11 @@
+--- a/.github/workflows/rat-conversation-candidate-deploy.yml
++++ b/.github/workflows/rat-conversation-candidate-deploy.yml
+@@ -16,7 +16,7 @@
+ 
+ jobs:
+   isolated-candidate:
+-    if: ${{ contains(github.event.head_commit.message, '[deploy-rat-candidate]') || github.event_name == 'workflow_dispatch' }}
++    if: ${{ false }} # Graveyard: preserve implementation; disable all execution.
+     runs-on: ubuntu-latest
+     timeout-minutes: 25
+     env:

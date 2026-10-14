@@ -1,0 +1,11 @@
+--- a/.github/workflows/binrat-miniapp-preview-deploy.yml
++++ b/.github/workflows/binrat-miniapp-preview-deploy.yml
+@@ -14,7 +14,7 @@
+ 
+ jobs:
+   deploy-preview:
+-    if: ${{ contains(github.event.head_commit.message, '[deploy-miniapp-preview]') }}
++    if: ${{ false }} # Graveyard: preserve implementation; disable all execution.
+     runs-on: ubuntu-latest
+     timeout-minutes: 20
+     env:
