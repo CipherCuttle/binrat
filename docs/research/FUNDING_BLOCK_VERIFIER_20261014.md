@@ -27,7 +27,7 @@ From the BINRAT repository checkout at this branch head:
 node --test test/verifySelectedFundingBlock.test.mjs
 node --check scripts/verify-selected-funding-block.mjs
 # Only after offline tests pass; single real read-only proof:
-node scripts/verify-selected-funding-block.mjs --out /home/swirky/DevHub/artifacts/binrat-selected-funding-block-20261014
+node scripts/verify-selected-funding-block.mjs --out "$HOME/DevHub/artifacts/binrat-selected-funding-block-20261014"
 ```
 
 **No `pnpm`, Node addon, private key, Alchemy subscription or Docker required by this standalone script.** It uses Node 20+ built-ins only. The output directory must not already exist. A failed/PENDING output is terminal; do not rerun automatically under a new name.
