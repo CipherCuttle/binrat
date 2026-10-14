@@ -79,6 +79,18 @@ Stable capability IDs:
 - `bounty_boost`
 - `case_sponsor`
 
+### Sniffer graph intelligence — RESEARCH CANDIDATE / NOT LIVE
+
+**Hypothesis:** bounded, source-linked wallet/funding graphs can reveal *additional, useful* relations beyond the existing reported-deployer history and plain Case receipts. Graph edges are observations, not proof of common ownership or prediction. Graph analysis is subordinate to **Tripwire real-owner Watch** and the Founder's workforce MVP sequencing; it is not a token-launch gate.
+
+- **Trial A — Graph Sniffer (P1, NOT ADOPTED):** evaluate a small read-only derived graph of wallet -> funding recipient, wallet -> verified Pons launch, and time-ordered Case relationships against the existing deterministic Case-reader baseline. NetworkX is a **possible isolated offline library**, not installed/adopted runtime infrastructure; plain TypeScript/SQL may suffice. No graph DB, runtime Python service, broad framework, permanent scanner, or new RPC permission.
+- **Trial B — Historical cohort comparison (P2, CONDITIONAL):** benchmark existing indexed SQL against DuckDB on a private copy/snapshot for scoped Pons launch comparisons. Do not introduce a database or change ingestion unless a measured analysis gap exists.
+- **Trial C — Statistical anomaly / selective LLM reasoning (P3, DEFERRED):** only after verified cohort coverage and actual usefulness improvement. PyOD, River and a schema-bounded TS model SDK are research possibilities; no pretrained alpha, fraud prediction, model authority, autonomous tool discovery or uncapped spend.
+- **Promotion criteria:** source/identity/chronology/coverage validated; **zero unsupported claims**; at least one independently verified and user-actionable relation not already present in the baseline; measured overhead, freshness and cost; bounded real-Case comparison followed by one hostile review. If no novelty is proven, **PARK**, preserve findings, do not add dependencies.
+- **Safety:** retain original chain evidence and receipts; future data never informs historical findings; provider gaps and unknown ownership stay UNKNOWN; user interest gates any Watch or alert; per-job budgets and cancellation remain enforced outside the LLM.
+
+**First offline exploratory result (2026-10-14):** 40 captured Pons launch rows from two *selected, nonrepresentative* captures + one separate verified funding observation; 3 repeated reported addresses in those groups, **0 new verified funding-to-launch links**, and 10/10 synthetic adversarial chronology/receipt checks passed. This did **not** benchmark NetworkX or establish incremental user value. **VERDICT: GRAPH_SIGNAL_PROMOTION = NOT_YET.** See [the exact bounded trial receipt](research/GRAPH_SNIFFER_TRIAL_20261014.md). No deployed feature or new capability ID.
+
 **Degen decides attention. Receipts decide truth.**
 
 ## 05 — ORGANIZE · PLANNED / POST-LAUNCH
