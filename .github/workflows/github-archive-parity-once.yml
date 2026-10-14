@@ -1,0 +1,51 @@
+name: github-archive-parity-once
+on:
+  push:
+    branches: [verify/binrat-github-archive-parity-20261014]
+permissions:
+  contents: read
+concurrency:
+  group: binrat-github-archive-parity-20261014-single-use
+  cancel-in-progress: false
+jobs:
+  qualify:
+    if: >-
+      ${{ github.repository == 'CipherCuttle/binrat' &&
+          github.event_name == 'push' && github.event.created == true &&
+          github.event.before == '0000000000000000000000000000000000000000' &&
+          github.run_attempt == 1 &&
+          github.event.head_commit.message == '[binrat-github-archive-parity-20261014-one-code-read]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify exact request, hash, one-use gates and credential isolation offline
+        run: |
+          pnpm build
+          pnpm exec tsx --test test/githubArchiveParity.test.ts test/ratFunderCohortTransport.test.ts test/ratFunderCohort.test.ts
+          node --check scripts/verify-github-archive-parity.mjs
+      - name: One historical eth_getCode with existing secret injection
+        env:
+          BINRAT_ARCHIVE_PARITY_OFFLINE_SHA: ${{ github.sha }}
+          BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+        run: node scripts/verify-github-archive-parity.mjs
+      - name: Preserve sanitized terminal receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-github-archive-parity-20261014
+          path: ${{ runner.temp }}/binrat-github-archive-parity-20261014/receipt.json
+          retention-days: 30
+          if-no-files-found: warn

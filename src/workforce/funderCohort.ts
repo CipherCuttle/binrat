@@ -43,6 +43,12 @@ function receipt(v:unknown,hash:string,b:Obj){
 function sameHeader(a:Obj,b:Obj){return ['number','hash','parentHash','timestamp'].every(k=>a[k]===b[k]);}
 const candidateJson=(c:Candidate)=>({txHash:c.txHash,recipient:c.to,blockNumber:c.blockNumber.toString(),valueWei:c.valueWei.toString()});
 
+/** Shared by the cohort auditor and the separately gated, one-code-read qualification. */
+export function verifyFunderCohortFactoryCode(value:unknown){
+  const codeHash=typeof value==='string'?keccak256(value as Hex):null;
+  return {codeHash,matches:codeHash===PONS_V2_FACTORY_CODE_HASH};
+}
+
 /** Recompute every expected read and score from raw responses; never trust a summary or unverified locator. */
 export function auditFunderCohort(calls:CalibrationCall[],createdAtMs=calls[0]?.reservedAtMs??0){
   const p=FUNDER_COHORT_V1,from=BigInt(p.fromBlock),end=BigInt(p.toBlock),ceiling=BigInt(p.outcomeThroughBlock);
@@ -96,7 +102,7 @@ export function auditFunderCohort(calls:CalibrationCall[],createdAtMs=calls[0]?.
       const v=response.result;
       switch(stage){
         case 'CHAIN':if(v!=='0x1237')fail('COHORT_CHAIN_DRIFT');stage='CODE';break;
-        case 'CODE':if(typeof v!=='string'||keccak256(v as Hex)!==PONS_V2_FACTORY_CODE_HASH)fail('COHORT_FACTORY_DRIFT');stage='START';break;
+        case 'CODE':if(!verifyFunderCohortFactoryCode(v).matches)fail('COHORT_FACTORY_DRIFT');stage='START';break;
         case 'START':start=block(v,from);stage='END';break;
         case 'END':finish=block(v,end);if(qty(finish.timestamp)<qty(start!.timestamp))fail('COHORT_RANGE_TIME');stage='CEILING';break;
         case 'CEILING':outcomeEnd=block(v,ceiling);if(Number(qty(outcomeEnd.timestamp))*1000>row.completedAtMs!)fail('COHORT_FUTURE_CEILING');if(qty(outcomeEnd.timestamp)-qty(finish!.timestamp)<3600n)fail('COHORT_IMMATURE_WINDOW');stage='INDEX';break;
