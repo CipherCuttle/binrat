@@ -56,6 +56,30 @@ Never let a local branch, PR, roadmap or planning document silently promote BUIL
 
 Separate parallel **token launch compliance/mechanics track** remains gated independently; don't re-open token economics in workforce tasks.
 
+## 4A. Evidence-led degen signal roadmap — founder direction (2026-10-14)
+
+**STATUS: PRODUCT PRIORITY / NOT A LIVE CAPABILITY CLAIM. DOMAIN: PRODUCT. AUTHORIZATION_EFFECT: NONE.**
+**Purpose:** a degen should understand in ten seconds **WHO'S BACK → WHAT CHANGED → WHY LOOK NOW?**; deeper canonical receipts remain one click away. Generate attention from *relevant, verified developments*, not fake financial FOMO, trader rankings, inferred operators or return predictions.
+
+**Implementation order, conditioned on independently verified user value:**
+
+| Priority | User-facing hook | Grounded signal / Rat | Evidence and release gate |
+| --- | --- | --- | --- |
+| **P0 — BACK AGAIN** | **THE DEPLOYER IS BACK** | Tripwire: a specific consented, reported Pons deployer address has a **new** canonical launch after the Watch boundary | Versioned forward-only cursor/coverage, verified log/Case, saved owner job, accurate silence/unknown, one authorized delivered return. The local portable forward contract passed offline only on Oct 14; no live claim. |
+| **P1 — SERIAL LAUNCHER** | **SMELLS FAMILIAR** | Rat Zero + Case: same *reported address* appears on distinct earlier verified launches | Show exact count **in verified available coverage** and explicit unexamined gaps, not global history or human identity. 0/8 actionable recurrence Cases in earlier evaluation: repetition alone is **not alpha**. |
+| **P1 — LAUNCH SPREE** | **THIS ADDRESS IS ACTIVE AGAIN** | Tripwire: multiple distinct launches by the exact watched address within a declared **contiguously observed** interval | Separately prove cadence, dedup, chronology and net value versus one BACK AGAIN alert; avoid notification spam. |
+| **P2 — CURVE HEATING** | **ACTIVITY PICKING UP** | Focused Pons buy/sell and curve evidence for a token the user already follows | Typed source + trade window, buy *and* sell comparison, net vs gross, coverage, participants where supportable; no "smart money", manipulation or impending pump claims. Source integration and usefulness unproven. |
+| **P2 — GRADUATION WATCH** | **IT GRADUATED** | Verified Pons curve-to-pool lifecycle for a followed token | Exact lifecycle/receipt proof and independently resolved Case, not implied price performance or success. Historical state-query access previously blocked; no automatic promotion. |
+| **RESEARCH — FAMILIAR MONEY** | **SAME FUNDING TRAIL, DIFFERENT WALLET** | Sniffer: evidenced source-to-recipient funding edges between distinct deployers | Investigation-only until independently useful; **same funder ≠ same owner**, exchange/bridge service hubs create false positives. Oct 14 selected-funder cohort: **0/10** launches within 10/60 minutes; no predictive-lift proof and that particular prelaunch strategy is **DEFERRED**. |
+
+**Wallet rotation is expected as an adversarial case.** Exact-address Tripwire may miss a launcher who switches address. A second-layer Sniffer should preserve *directly observed* funding or flow relations and bounded time correlations without asserting who controls either wallet. Label displayed evidence as `EXACT_SAME_REPORTED_DEPLOYER`, `VERIFIED_DIRECT_FUNDING`, `SHARED_FUNDER_RELATION`, `BEHAVIORAL_CO_OCCURRENCE`, or `UNRESOLVED`; only the first is direct same-deployer matching. Exchange/bridge/platform source labels are shared infrastructure, not unique operator proof. Co-funding alone must **not** generate a "launcher returned" alert. Do not construct an unbounded wallet graph or buy new tooling to support this plan.
+
+**Measure before making prevalence claims:** perform one offline, read-only census on the recovered Pons launch records (deduplicate canonical launch/event identities; preserve source/interval/UNKNOWN gaps). Independently report **(1)** share of distinct reported deployer addresses with ≥2 launches, **(2)** share of all verified launches made by such repeat addresses, **(3)** exact-deployer alert yield under a frozen observation interval, and **(4)** among *actually inspected* funding transfers, the proportion showing verified shared funding (denominator and service-hub exclusions explicit). Funding trails are not necessarily stored for all launches. No claim that "most deployers reuse wallets" or that same funding predicts launches without verified data. A 10-recipient same-source outcome experiment is **not** a reuse-prevalence estimate.
+
+**Product surface for each signal:** `WHAT HAPPENED` (one human sentence) → `WHY YOU WERE ALERTED` (exact saved Watch or evidence reason) → `WHAT TO INSPECT` (verified Case) → optional `RECEIPTS`. Quiet means `NO_EVENT_YET` only under valid forward coverage; if the source is unavailable/gapped, show `UNKNOWN`, never "nothing happened." One owner-only persisted Watch and real Case return precede expanding signal types. Evaluate real notification open/return usefulness, verified-event latency, missed coverage, spurious links, and cost per useful finding before promoting P1/P2. Do not equate a passing offline demo with a customer-facing LIVE Rat.
+
+---
+
 ## 5. Kill criteria: stop work, not the vision
 
 | Workstream / trigger | Decision |
