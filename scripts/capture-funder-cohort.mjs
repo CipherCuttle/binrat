@@ -4,7 +4,7 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {canonicalJson} from '../dist/src/evidence/canonical.js';
 import {FUNDER_COHORT_V1,auditFunderCohort} from '../dist/src/workforce/funderCohort.js';
-import {createIndexedProbeTransport} from '../dist/src/workforce/prospectiveTransport.js';
+import {createFunderCohortTransport} from '../dist/src/workforce/prospectiveTransport.js';
 let out,registration,error=null;
 const calls=[];let selectionSaved=false;
 const sha=value=>createHash('sha256').update(value).digest('hex');
@@ -23,7 +23,7 @@ try{
   registration.digest=sha(canonicalJson(registration));
   save('registration.json',registration);save('raw-receipts.json',{registration,calls});
   const secret=process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL;delete process.env.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL;
-  const transport=createIndexedProbeTransport(secret);
+  const transport=createFunderCohortTransport(secret);
   while(true){
     const audit=auditFunderCohort(calls,registration.createdAtMs);save('audit.json',audit);
     if(audit.selection.digest&&!selectionSaved){save('selection-audit.json',audit);save('selection-raw-receipts.json',{registration,calls});selectionSaved=true;}
