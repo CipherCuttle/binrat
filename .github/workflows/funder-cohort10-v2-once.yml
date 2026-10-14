@@ -1,0 +1,44 @@
+name: binrat-funder-cohort10-v2-once
+on:
+  push:
+    branches: [research/binrat-funder-cohort-10-20261014]
+permissions:
+  contents: read
+concurrency:
+  group: binrat-funder-cohort10-v2-20261014
+  cancel-in-progress: false
+jobs:
+  observe:
+    # DO NOT RUN on a PR, ordinary push, or a re-run of this Actions run.
+    if: ${{ github.run_attempt == 1 && github.event.head_commit.message == '[binrat-funder-cohort10-v2-one-shot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: All offline checks before any archive secret
+        run: pnpm check
+      - name: One fresh ten-recipient historical cohort; no retry or restart
+        env:
+          BINRAT_ROBINHOOD_ARCHIVE_RPC_URL: ${{ secrets.BINRAT_ROBINHOOD_ARCHIVE_RPC_URL }}
+        run: |
+          node scripts/capture-funder-cohort-10-v2.mjs \
+            --out "$RUNNER_TEMP/binrat-funder-cohort10-v2-20261014" \
+            --capture-id funder-cohort10-v2-20261014 \
+            --source-sha "$GITHUB_SHA"
+      - name: Preserve durable raw selection, audit and terminal receipts even on halt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-funder-cohort10-v2-20261014
+          path: ${{ runner.temp }}/binrat-funder-cohort10-v2-20261014/
+          retention-days: 30
+          if-no-files-found: warn
