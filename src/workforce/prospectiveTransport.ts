@@ -1,6 +1,8 @@
 /** Offline-testable, one-attempt transports for the private indexed probe only. */
 import {PROSPECTIVE_RPC,captureTerminal,type ProspectiveState} from './prospective.js';
 import {indexedCaptureTransport,ProspectiveJournal,type PublicReadTransport} from './prospectiveJournal.js';
+import {FUNDER_COHORT_V1} from './funderCohort.js';
+import {PONS_V2_FACTORY} from '../pons/chain.js';
 
 const MAX_BYTES=1_000_000,TIMEOUT_MS=15_000;
 const PUBLIC_METHODS=['eth_chainId','eth_getCode','eth_getBlockByNumber','eth_getTransactionReceipt','eth_getLogs'];
@@ -67,6 +69,9 @@ export function createFunderCohortTransport(secret:unknown,fetchOnce:FetchOnce=f
   const archiveRead=readOnce(config.url,archiveMethods,fetchOnce,config.token);
   return request=>{
     const copy=structuredClone(request);
+    if(copy.method==='eth_getCode'&&(copy.params.length!==2||copy.params[0]!==PONS_V2_FACTORY||
+      copy.params[1]!==`0x${FUNDER_COHORT_V1.outcomeThroughBlock.toString(16)}`))
+      throw new Error('COHORT_HISTORICAL_CODE_SCOPE_INVALID');
     if(archiveMethods.includes(copy.method))return archiveRead(copy);
     if(!publicMethods.includes(copy.method))throw new Error('PROSPECTIVE_METHOD_NOT_ALLOWED');
     return publicRead(copy);
