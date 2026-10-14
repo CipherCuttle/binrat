@@ -63,6 +63,25 @@ Stable capability IDs:
 - `trash_dna_tripwires`
 - `webhook_alerts`
 
+### Deployed vs candidate signals — evidence-gated ladder (2026-10-14)
+
+**Owner-selected product direction; NOT deployed functionality or price/return prediction.** Priority is a genuinely employed Rat that comes back with one timely, source-backed story: **WHO'S BACK → WHAT CHANGED → WHY LOOK NOW?** Hide hash/transaction jargon behind an expandable Case receipt.
+
+| Order | Signal | What the user gets | Status / requirement |
+| --- | --- | --- | --- |
+| P0 | **THE DEPLOYER IS BACK** | One verified new Pons V2 token from the exact address they explicitly watched, with a Case return | Portable forward-only Watch/finding contract proven **offline**; requires approved real source coverage, owner job, independent HTTPS Case and authorized delivery |
+| P1 | **SMELLS FAMILIAR / SERIAL LAUNCHER** | Verified earlier launches from that **same reported deployer address**, only inside known available coverage | Historical relationship is evidential; missed history stays UNKNOWN; recurrence alone failed the previous user-value baseline (0/8 actionable Cases) |
+| P1 | **LAUNCH SPREE** | Multiple verified launches by the same watched address in a specified contiguous forward window, without duplicate spam | Proposed; require verified timing/coverage and incremental useful alerts |
+| P2 | **CURVE HEATING** | Supported buy-vs-sell activity and curve progress for a followed Case | Proposed; instrument typed trade receipts, include both sides and window completeness, no unsupported smart-money or pump claims |
+| P2 | **IT GRADUATED** | Verified Pons curve-to-pool transition and exact return Case | Proposed; source/lifecycle state must be verified without a paid historical-RPC chase |
+| Research | **FAMILIAR MONEY, NEW WALLET** | Sniffer shows a *verified* funding trail between distinct launch wallets | Investigation candidate, not imminent-launch alert or proof of common control; chosen single-funder 10/60min cohort scored 0/10 and is **DEFERRED** |
+
+**Rotation rule:** changing the deployer wallet defeats an *exact-address* Tripwire, not all possible onchain investigation. Sniffer may follow directly verified funding edges and compatible chronology, but a shared CEX/bridge/hot-wallet source can fund unrelated users. Show the evidence as `EXACT_SAME_REPORTED_DEPLOYER`, `VERIFIED_DIRECT_FUNDING`, `SHARED_FUNDER_RELATION`, `BEHAVIORAL_CO_OCCURRENCE` or `UNRESOLVED`. Never turn shared funding, correlated timing or common gas provider alone into "same person", "same team", "returning launcher", risk rating or trade recommendation. No general graph/ML platform in MVP.
+
+**First measurement gate:** before publishing any reuse rate, run an offline census on canonical deduplicated Pons launches, with the known historical gap labeled UNKNOWN. Publish separate denominators for (a) repeat reported-deployer addresses, (b) launches from repeat addresses, and (c) inspected funding trails with service-hub exceptions. The October 14 0/10 *funding-to-launch* cohort is **not** a reuse measurement. Do not invent a percentage or treat 49,420 local launch records as comprehensive recent coverage.
+
+**Activation order:** P0 real owner Watch → confirmed contiguous forward coverage and real Case return → one useful real alert or honest NO_EVENT_YET/UNKNOWN → evaluate delivery delay and user return → only then P1/P2 instrumentation. This roadmap grants **no** RPC, production, Telegram, wallet, token or paid-provider authority.
+
 ## 04 — HUNT · PROVING
 
 > **POINT THE RATS AT SOMETHING WORTH DIGGING.**
