@@ -81,6 +81,6 @@ Ten synthetic checks: valid funding before later launch; reject funding after la
 
 `WTP_EVIDENCE = NONE`
 
-**NEXT:** obtain a separately justified **representative, source-covered** real-Case cohort containing both verified funding edges and subsequent Pons launch receipts, then test whether a graph produces *at least one* supported and useful relationship absent from the deterministic Case baseline. Prefer existing indexed evidence at zero additional spend. If adequate coverage is unavailable, report `BLOCKED_SOURCE_COVERAGE`, not a synthesized positive. One bounded pass, no indefinite RPC/provider hunt.
+**CURRENT NEXT (after the second trial):** perform one bounded offline repair of #147's historical-state routing, using the already defined archive-capable transport in a mocked/tested read-only path. Do not dispatch RPC or reuse a stopped capture. Only a separately authorized future experiment with verified archive capability could attempt representative cohort collection; otherwise defer as `BLOCKED_SOURCE_COVERAGE`. Graph engine adoption stays blocked pending incremental evidence value.
 
 **STOP:** draft roadmap change only, with no merge/deploy/provider grants, token action, local worktree changes or production mutation.
