@@ -50,6 +50,29 @@ export function createIndexedProbeTransport(secret:unknown,fetchOnce:FetchOnce=f
     readOnce(config.url,['alchemy_getAssetTransfers'],fetchOnce,config.token));
 }
 
+/**
+ * Cohort-only transport. The frozen retrospective factory-code assertion needs
+ * archive state at its historical ceiling; the public Robinhood RPC cannot serve
+ * that read. Keep ordinary chain/header/log/receipt reads on the original public
+ * source and all indexed transfer lookups on the pinned archive provider.
+ *
+ * The cohort auditor, not this router, owns exact params, ordering and budgets.
+ * No generic probe is granted new archive authority by this function.
+ */
+export function createFunderCohortTransport(secret:unknown,fetchOnce:FetchOnce=fetch):PublicReadTransport {
+  const config=archiveConfig(secret);
+  const publicMethods=['eth_chainId','eth_getBlockByNumber','eth_getTransactionReceipt','eth_getLogs'];
+  const archiveMethods=['eth_getCode','alchemy_getAssetTransfers'];
+  const publicRead=readOnce(PROSPECTIVE_RPC,publicMethods,fetchOnce,config.token);
+  const archiveRead=readOnce(config.url,archiveMethods,fetchOnce,config.token);
+  return request=>{
+    const copy=structuredClone(request);
+    if(archiveMethods.includes(copy.method))return archiveRead(copy);
+    if(!publicMethods.includes(copy.method))throw new Error('PROSPECTIVE_METHOD_NOT_ALLOWED');
+    return publicRead(copy);
+  };
+}
+
 /** One fresh range, not an ongoing subscription. The original journal remains the only allowance. */
 export async function captureOneIndexedRange(store:ProspectiveJournal,transport:PublicReadTransport,
   pause:(ms:number)=>Promise<void>=ms=>new Promise(resolve=>setTimeout(resolve,ms)),now:()=>number=()=>Date.now()):Promise<ProspectiveState>{
