@@ -1,0 +1,13 @@
+# Operation Graveyard — dated public status (2026-10-14)
+
+STATUS: HISTORICAL_RECEIPT / NO REMOTE AUTHORITY. This is not a live inventory, current runtime report, or alternative policy canon. [CANONICAL_AUTHORITY.md](../CANONICAL_AUTHORITY.md) remains the source router.
+
+- Historical cleanup Waves 1–3 closed **25 PRs without merging**. Wave 3 closed 14 of the authorized 18; **#11, #28, #37 and #38** remained open because connector safety checks blocked closure. Do not retry blocked operations or infer a future grant.
+- At the read-only checkpoint preceding this lean preparation: **138 open PRs and 243 remote branches**, including quarantined draft **#184** at e2d870d1816d9dc48ee97ea7d001444c161cb379. These counts are dated observations, not assertions about later remote state.
+- PR #184 is **not merge-ready**: its generated JSON contains local topology, worktree and encrypted-backup custody metadata. That commit has already appeared in public Git history; later file deletion does not remove earlier public history. No private key or token was confirmed in the bounded pattern scan; this does not establish comprehensive secret safety.
+- Full historical inventories and WIP preservation evidence belong in controlled private custody. Preserve their original hashes/receipts without republishing private paths, secrets or snapshots in this repo.
+- All remote historical branches remain protected against deletion. Five historical workflow retirement patches were prepared but **not applied**; changing a workflow on main does not disable one on a historical ref.
+- main is the shared policy/older backend baseline, not the newest React/Pons deployable source. integration/binrat-a1-3-visual-gate retains the selected React V3/Pons/Case continuation; migration/binrat-survival-v1 has uncommitted portable work and must not be reset. Owner Tripwire #178 remains a pinned reference, not accepted live delivery.
+- A public PR metadata checker validates syntax and target alignment only. It never proves GitHub freshness, source ancestry, closure permission, deployed capacity or product readiness.
+
+**Next gates:** retain private evidence, reconcile any exposed credentials before further propagation, qualify independent backup custody before the recorded October 25 artifact expiry, and seek separate exact authority before merging, workflow retirement, production changes or ref deletion.
