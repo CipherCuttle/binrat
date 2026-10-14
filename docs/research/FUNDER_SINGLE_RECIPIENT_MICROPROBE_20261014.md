@@ -19,3 +19,23 @@ Time horizon: use the funding block's timestamp and independent header queries t
 This is N=1, selected, historically retrospective, and therefore **cannot estimate funder yield**, useful-wallet precision, predictive lift, profitability, or willingness to pay. It is a transport/evidence microprobe to determine whether a properly registered >=10-recipient study is feasible. Even one positive would be only a descriptive historical relationship; graph novelty must be judged against existing `SAME FUNDING SOURCE` baseline.
 
 Single final outcome: `ONE_SUBJECT_POSITIVE_VERIFIED`, `ONE_SUBJECT_PROVIDER_NEGATIVE_BOUNDED`, `NO_SUBJECT`, `BLOCKED_SOURCE_OR_PROVIDER`, or `INCOMPLETE_COVERAGE`. Record exact request count and bounded caveats; STOP after one pass.
+
+
+## Closed execution receipt — 2026-10-14
+
+**Verdict:** `BLOCKED_SOURCE_OR_PROVIDER` / `BLOCKED_EVIDENCE`. No cohort yield or launch inference.
+
+- Source read 1: one archive `alchemy_getAssetTransfers` page succeeded for frozen funder/window, five direct native transfer candidates in ascending order, **pageKey present** (non-exhaustive). Selected **first** non-self recipient, without outcome substitution:
+  - recipient `0xef8cbc4444d505b32198061884cf902e9307fd59`
+  - funding hash `0x952a185b94feec5649e5e9064186cf7aa763cc5b864db9c28b53879762189488`
+  - funding block `0x4dbab5a`
+  - locator raw value `0x874aa453554d8` wei; candidate only, not fully admitted as proven funding
+- Read 2: `eth_getBlockByNumber(0x4dbab5a,true)` through the connected Alchemy tool returned a large block response that was truncated by the tool output channel. The relevant transaction membership therefore **could not be parsed and verified**. In the first attempted summary the block and transaction fields were unavailable because of response truncation, **not because the transaction is absent**.
+- Read 3: `eth_getTransactionReceipt` for the selected transaction succeeded: `status=0x1`, `blockNumber=0x4dbab5a`, `blockHash=0x06e4b5633c8eade32195ffc657db00312f6ad3088474a26731ac35ecc2ec068a`, zero logs. This is a valid receipt but does not substitute for exact full-block membership.
+- Read 4: one attempted direct parse of the full block was again truncated; JSON parse failed. No further attempt was admitted.
+- **Provider requests: 4 total** (one transfer page, two full-block reads, one receipt), <=32 registered cap. No retry of the original frozen cohort. No Pons event-log queries, no confirmed launch, no validated funding path, and no user-visible autonomous Rat capability.
+- **Reason:** connected-app transport cannot expose a whole >8 KB full block for deterministic canonical membership verification within this chat. Response size/transport limitation, not proof of missing chain data or a failed on-chain predicate.
+- **Cost:** request-level USD unavailable; Alchemy usage summary just before the trial reported **$0.93 of the $10 monthly cap used**, with **$9.07 remaining** at its reported time. No exact incremental cost or restored usage check established.
+- **Safety:** no model calls, production writes, deployment, merge, token action, Telegram delivery or credential disclosure.
+
+**Next bounded action (newly scoped, not a continuation):** use the existing local Codex/Node historical cohort evidence checker with a verified full-body RPC transport and a hard 1 MB response ceiling, then verify the *same preselected transaction* (never substitute a later recipient) through exact block membership, receipt and hash consistency. Any later launch examination requires a separate fresh registration and cap. Do not pretend a transaction or receipt-only shortcut satisfies the frozen proof contract.
