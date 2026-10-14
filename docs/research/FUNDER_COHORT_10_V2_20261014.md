@@ -41,3 +41,10 @@ Report cohort: 10 selected and all verification outcomes (not only positives), 1
 - Preserve stopped original V1 and closed October 14 microprobe, no modification/renaming of their recorded receipts.
 
 **Stopping policy:** `PLAN → CHANGESET → VERIFY → VERDICT`, one hostile review, Critical/High repairs once, targeted rereview, STOP. If archive/index/raw evidence is still unavailable after this bounded implementation, `PARK` rather than pursuing endless transport fixes.
+
+
+## Single bounded execution grant — 2026-10-14
+
+The owner agreed in this conversation to proceed with the newly registered 10-recipient historical pilot. The exact-message Actions workflow was separately introduced at commit `adbaa5c9d10b51c34d0ad3b751e6ada9bb7371b5` and its ordinary push triggered an **observe: skipped** job (not a live run). The V2 implementation at commit `b15b76c91ccc2a2e87ac85bfd94f1acec4e67b2c` passed all offline CI tests, including nine new V2 test groups. The fresh run repeats offline checks on its own exact triggering checkout before any secret injection.
+
+This grant is exclusively for **one** first-attempt read-only GitHub Actions execution under the 144-attempt, 1MB/body, one-use-source/checkpoint and 20-minute runtime bounds frozen above, using the preexisting archive Actions credential. Owner's Alchemy monthly cap remains $10; authenticated usage last read: $0.93 used and $9.07 remaining (2026-10-14 UTC). No second workflow rerun, budget extension, second funder, source/window change, automatic publication, model calls, on-chain transaction, merge or deployment is authorized. The execution receipt determines actual outcome; this grant is not a finding.
