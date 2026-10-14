@@ -69,7 +69,7 @@ export function createFunderCohortTransport(secret:unknown,fetchOnce:FetchOnce=f
   const archiveRead=readOnce(config.url,archiveMethods,fetchOnce,config.token);
   return request=>{
     const copy=structuredClone(request);
-    if(copy.method==='eth_getCode'&&(copy.params.length!==2||copy.params[0]!==PONS_V2_FACTORY||
+    if(copy.method==='eth_getCode'&&(!Array.isArray(copy.params)||copy.params.length!==2||copy.params[0]!==PONS_V2_FACTORY||
       copy.params[1]!==`0x${FUNDER_COHORT_V1.outcomeThroughBlock.toString(16)}`))
       throw new Error('COHORT_HISTORICAL_CODE_SCOPE_INVALID');
     if(archiveMethods.includes(copy.method))return archiveRead(copy);
