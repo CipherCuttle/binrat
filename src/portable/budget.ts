@@ -171,9 +171,10 @@ export class BudgetLedger {
   /** Terminal status writes never issue or refund requests. */
   finishTripwireQualification(grantId:string,resultDigest:string|null):void{
     if(resultDigest!==null&&!/^[0-9a-f]{64}$/.test(resultDigest))throw Error('TRIPWIRE_QUALIFICATION_DIGEST_INVALID');
-    this.db.prepare(`UPDATE tripwire_source_qualifications_v1
+    const changed=this.db.prepare(`UPDATE tripwire_source_qualifications_v1
       SET status=?,result_digest=? WHERE grant_id=? AND status='RESERVED'`)
-      .run(resultDigest===null?'UNKNOWN':'QUALIFIED',resultDigest,grantId);
+      .run(resultDigest===null?'UNKNOWN':'QUALIFIED',resultDigest,grantId).changes;
+    if(Number(changed)!==1)throw Error('TRIPWIRE_QUALIFICATION_STATE_CONFLICT');
   }
 
   /** One-way 11-slot/3809.12-CU subscription-envelope admission.
