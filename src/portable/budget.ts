@@ -18,7 +18,8 @@ CREATE INDEX rpc_attempts_job ON rpc_attempts(job_id);
  * Milli-CU units avoid floating-point budget drift. WS accounting is NOT included. */
 export const TRIPWIRE_PROOF_BUDGET_SCHEMA = `
 CREATE TABLE IF NOT EXISTS tripwire_proof_grants_v1 (
-  grant_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, created_at_ms INTEGER NOT NULL,
+  grant_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL UNIQUE, generation TEXT NOT NULL UNIQUE,
+  deployer TEXT NOT NULL, created_at_ms INTEGER NOT NULL,
   stops_at_ms INTEGER NOT NULL, max_milli_cu INTEGER NOT NULL CHECK(max_milli_cu BETWEEN 1 AND 10000000),
   reserved_milli_cu INTEGER NOT NULL DEFAULT 0 CHECK(reserved_milli_cu BETWEEN 0 AND max_milli_cu)
 );
@@ -82,11 +83,13 @@ export class BudgetLedger {
   /** Precondition: the parent CLI holds its exclusive writer lock.
    * Explicit grant creation alone authorizes no RPC, WS or notifications. */
   createTripwireProofGrant(grant: {
-    grantId: string; ownerId: string; stopsAtMs: number; maxMilliCu: number; approved: boolean;
+    grantId: string; ownerId: string; generation: string; deployer: string;
+    stopsAtMs: number; maxMilliCu: number; approved: boolean;
   }): void {
     const now = this.now();
     if (!grant.approved || !/^[A-Za-z0-9_-]{1,80}$/.test(grant.grantId) ||
       !/^telegram:[1-9][0-9]*$/.test(grant.ownerId) ||
+      !/^[0-9a-f-]{36}$/.test(grant.generation) || !/^0x[0-9a-f]{40}$/.test(grant.deployer) ||
       !Number.isSafeInteger(now) || !Number.isSafeInteger(grant.stopsAtMs) ||
       grant.stopsAtMs <= now || grant.stopsAtMs - now > 86_400_000 ||
       !Number.isSafeInteger(grant.maxMilliCu) || grant.maxMilliCu < 1 || grant.maxMilliCu > 10_000_000) {
@@ -95,13 +98,14 @@ export class BudgetLedger {
     this.db.exec(TRIPWIRE_PROOF_BUDGET_SCHEMA);
     this.db.transaction(() => {
       this.db.prepare(`INSERT OR IGNORE INTO tripwire_proof_grants_v1
-        (grant_id,owner_id,created_at_ms,stops_at_ms,max_milli_cu)
-        VALUES (?,?,?,?,?)`).run(grant.grantId,grant.ownerId,now,grant.stopsAtMs,grant.maxMilliCu);
+        (grant_id,owner_id,generation,deployer,created_at_ms,stops_at_ms,max_milli_cu)
+        VALUES (?,?,?,?,?,?,?)`).run(grant.grantId,grant.ownerId,grant.generation,grant.deployer,now,grant.stopsAtMs,grant.maxMilliCu);
       const persisted = this.db.prepare('SELECT * FROM tripwire_proof_grants_v1 WHERE grant_id=?')
         .get(grant.grantId) as {
-          grant_id:string;owner_id:string;created_at_ms:number;stops_at_ms:number;max_milli_cu:number;
+          grant_id:string;owner_id:string;generation:string;deployer:string;created_at_ms:number;stops_at_ms:number;max_milli_cu:number;
         } | undefined;
-      if (!persisted || persisted.owner_id !== grant.ownerId || persisted.stops_at_ms !== grant.stopsAtMs ||
+      if (!persisted || persisted.owner_id !== grant.ownerId || persisted.generation !== grant.generation ||
+        persisted.deployer !== grant.deployer || persisted.stops_at_ms !== grant.stopsAtMs ||
         persisted.max_milli_cu !== grant.maxMilliCu) throw new Error('TRIPWIRE_PROOF_GRANT_CONFLICT');
     }).immediate();
   }
@@ -109,7 +113,8 @@ export class BudgetLedger {
   /** One proof is exactly six pre-reserved physical slots and 400 modeled CU.
    * A crash or rejected provider response never refunds the reservation.
    * WS setup/bytes must be charged separately before any real mounting. */
-  reserveTripwireProof(job: string, grantId: string, deadline: number): void {
+  reserveTripwireProof(job: string, grantId: string, deadline: number,
+    scope: {ownerId:string;generation:string;deployer:string}): void {
     const file = lstatSync(this.path), disk = statfsSync(dirname(this.path));
     if (file.isSymbolicLink() || file.ino !== this.inode || disk.bavail * disk.bsize < 64 * 1024 * 1024)
       throw new Error('BUDGET_STORAGE_UNAVAILABLE');
@@ -125,11 +130,13 @@ export class BudgetLedger {
       }
       const jobRow = this.db.prepare("SELECT started_at_ms FROM collector_jobs WHERE job_id=? AND state='RUNNING'")
         .get(job) as {started_at_ms:number}|undefined;
-      if (!jobRow || now < jobRow.started_at_ms || now-jobRow.started_at_ms >= this.ceiling.runtimeMs)
+      if (!jobRow || now < jobRow.started_at_ms || now-jobRow.started_at_ms >= this.ceiling.runtimeMs ||
+        deadline > jobRow.started_at_ms + this.ceiling.runtimeMs)
         throw new Error('JOB_BUDGET_INVALID');
-      const grant = this.db.prepare('SELECT stops_at_ms,max_milli_cu,reserved_milli_cu FROM tripwire_proof_grants_v1 WHERE grant_id=?')
-        .get(grantId) as {stops_at_ms:number;max_milli_cu:number;reserved_milli_cu:number}|undefined;
-      if (!grant || now >= grant.stops_at_ms || deadline > grant.stops_at_ms ||
+      const grant = this.db.prepare('SELECT owner_id,generation,deployer,stops_at_ms,max_milli_cu,reserved_milli_cu FROM tripwire_proof_grants_v1 WHERE grant_id=?')
+        .get(grantId) as {owner_id:string;generation:string;deployer:string;stops_at_ms:number;max_milli_cu:number;reserved_milli_cu:number}|undefined;
+      if (!grant || grant.owner_id !== scope.ownerId || grant.generation !== scope.generation ||
+        grant.deployer !== scope.deployer || now >= grant.stops_at_ms || deadline > grant.stops_at_ms ||
         grant.reserved_milli_cu + TRIPWIRE_PROOF_MILLI_CU > grant.max_milli_cu)
         throw new Error('TRIPWIRE_PROOF_BUDGET_EXHAUSTED');
       const day = new Date(now).toISOString().slice(0,10);
