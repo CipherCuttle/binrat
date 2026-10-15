@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS persistent_tripwire_hints_v1 (
  generation TEXT NOT NULL REFERENCES persistent_tripwire_sessions_v1(generation),
  event_key TEXT NOT NULL, block_number INTEGER NOT NULL, block_hash TEXT NOT NULL,
  tx_hash TEXT NOT NULL, log_index INTEGER NOT NULL, received_at_ms INTEGER NOT NULL,
- state TEXT NOT NULL CHECK(state IN ('PENDING','VERIFYING','UNKNOWN','CONFLICT')),
+ state TEXT NOT NULL CHECK(state IN ('PENDING','VERIFYING','PROVEN','UNKNOWN','CONFLICT')),
  PRIMARY KEY(generation,event_key)
 );
 CREATE INDEX IF NOT EXISTS persistent_tripwire_hint_queue_v1
