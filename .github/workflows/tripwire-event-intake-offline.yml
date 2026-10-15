@@ -1,0 +1,27 @@
+name: Tripwire event intake (offline)
+on:
+  push:
+    branches:
+      - 'feat/binrat-tripwire-event-intake-v1-20261015'
+    paths:
+      - 'src/portable/persistentTripwireWatch.ts'
+      - 'test/portablePersistentTripwire*.test.mjs'
+      - '.github/workflows/tripwire-event-intake-offline.yml'
+  pull_request:
+    paths:
+      - 'src/portable/persistentTripwireWatch.ts'
+      - 'test/portablePersistentTripwire*.test.mjs'
+      - '.github/workflows/tripwire-event-intake-offline.yml'
+permissions:
+  contents: read
+jobs:
+  offline-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Replay isolated SQLite event-intake tests (no RPC, no secrets)
+        run: node --experimental-transform-types --test test/portablePersistentTripwireWatch.test.mjs test/portablePersistentTripwireReplay.test.mjs
