@@ -1,0 +1,35 @@
+name: Tripwire source qualification (offline)
+on:
+  push:
+    branches:
+      - 'feat/binrat-tripwire-source-qualification-v1-20261015'
+    paths:
+      - 'src/portable/tripwireSourceQualification.ts'
+      - 'src/portable/budget.ts'
+      - 'test/portableTripwireSourceQualification.test.ts'
+      - '.github/workflows/tripwire-source-qualification-offline.yml'
+  pull_request:
+    paths:
+      - 'src/portable/tripwireSourceQualification.ts'
+      - 'src/portable/budget.ts'
+      - 'test/portableTripwireSourceQualification.test.ts'
+      - '.github/workflows/tripwire-source-qualification-offline.yml'
+permissions:
+  contents: read
+jobs:
+  synthetic-source-qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Offline bounded source qualification (no secrets, no RPC)
+        run: pnpm exec tsx --test test/portableTripwireSourceQualification.test.ts
