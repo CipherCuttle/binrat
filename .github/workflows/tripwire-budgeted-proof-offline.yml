@@ -1,0 +1,38 @@
+name: Tripwire canonical proof (offline)
+on:
+  push:
+    branches:
+      - 'feat/binrat-tripwire-budgeted-proof-v1-20261015'
+    paths:
+      - 'src/portable/budget.ts'
+      - 'src/portable/persistentTripwireProof.ts'
+      - 'src/portable/persistentTripwireWatch.ts'
+      - 'test/portablePersistentTripwireProof.test.ts'
+      - '.github/workflows/tripwire-budgeted-proof-offline.yml'
+  pull_request:
+    paths:
+      - 'src/portable/budget.ts'
+      - 'src/portable/persistentTripwireProof.ts'
+      - 'src/portable/persistentTripwireWatch.ts'
+      - 'test/portablePersistentTripwireProof.test.ts'
+      - '.github/workflows/tripwire-budgeted-proof-offline.yml'
+permissions:
+  contents: read
+jobs:
+  offline-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install pinned dependencies (no provider credentials)
+        run: pnpm install --frozen-lockfile
+      - name: Replay synthetic exact-event, budget and reorg proofs
+        run: pnpm exec tsx --test test/portablePersistentTripwireProof.test.ts
