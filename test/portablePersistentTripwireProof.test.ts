@@ -25,7 +25,7 @@ function fixture(){
  const initLedger=new Database(ledgerPath);initLedger.exec(BUDGET_SCHEMA);initLedger.close();
  const limits={attemptsPerDay:100,attemptsPerRun:50,blocksPerRun:1000,runtimeMs:60000,attemptsPerRequest:1};
  const ledger=new BudgetLedger(ledgerPath,limits,()=>MS);
- ledger.createTripwireProofGrant({grantId:'demo-grant',ownerId:'telegram:1234',
+ ledger.createTripwireProofGrant({grantId:'demo-grant',ownerId:'telegram:1234',generation:GEN,deployer:DEPLOYER,
    stopsAtMs:86_402_000,maxMilliCu:10_000_000,approved:true});
  const job=ledger.start(101n);
  const db=new DatabaseSync(':memory:');
