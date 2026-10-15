@@ -110,7 +110,7 @@ export async function proveQueuedTripwireHint(o:TripwireProofPort):Promise<Tripw
  requireFlag(topic===PONS_TOKEN_LAUNCHED_TOPIC,'TRIPWIRE_EVENT_SELECTOR_DRIFT');
  requireFlag(Number.isSafeInteger(begin)&&begin>=0,'TRIPWIRE_CLOCK_INVALID');
  o.db.exec(PERSISTENT_TRIPWIRE_PROOF_SCHEMA);
- let selected:{hint:StoredHint;deployer:string;stops:number;start:number}|null=null;
+ let selected:{hint:StoredHint;owner:string;deployer:string;stops:number;start:number}|null=null;
  transact(o.db,()=>{
    const session=o.db.prepare('SELECT * FROM persistent_tripwire_sessions_v1 WHERE generation=?')
      .get(o.generation) as {state:string;owner_id:string;deployer:string;stops_at_ms:number;start_block:number}|undefined;
@@ -127,15 +127,16 @@ export async function proveQueuedTripwireHint(o:TripwireProofPort):Promise<Tripw
    const changed=o.db.prepare("UPDATE persistent_tripwire_hints_v1 SET state='VERIFYING' WHERE generation=? AND event_key=? AND state='PENDING'")
      .run(o.generation,hint.event_key).changes;
    if(Number(changed)!==1)throw Error('TRIPWIRE_CLAIM_LOST');
-   selected={hint,deployer:session.deployer,stops:session.stops_at_ms,start:session.start_block};
+   selected={hint,owner:session.owner_id,deployer:session.deployer,stops:session.stops_at_ms,start:session.start_block};
  });
  if(!selected)return null;
- const scope=selected as {hint:StoredHint;deployer:string;stops:number;start:number};
+ const scope=selected as {hint:StoredHint;owner:string;deployer:string;stops:number;start:number};
  const hint=scope.hint;
  try {
    // The grant must fit the 60s parent job and session lifetime. All six
    // shared request slots and 400 modeled CU are permanently spent up front.
-   o.ledger.reserveTripwireProof(o.job,o.grantId,Math.min(o.deadline,scope.stops));
+   o.ledger.reserveTripwireProof(o.job,o.grantId,Math.min(o.deadline,scope.stops),
+     {ownerId:scope.owner,generation:o.generation,deployer:scope.deployer});
    let calls=0;
    async function read(method:string,params:unknown[]):Promise<unknown> {
      calls++;
@@ -211,7 +212,7 @@ export async function proveQueuedTripwireHint(o:TripwireProofPort):Promise<Tripw
        .get(o.generation,hint.event_key) as {state:string;block_hash:string;tx_hash:string;log_index:number}|undefined;
      if(!watch||!session||watch.state!=='ACTIVE'||session.state!=='CONNECTED'||
        watch.owner_id!==session.owner_id||watch.deployer!==session.deployer||
-       watch.start_block!==session.start_block||now()>=session.stops_at_ms||
+       watch.start_block!==session.start_block||now()>=session.stops_at_ms||now()>=o.deadline||
        current?.state!=='VERIFYING'||current.block_hash!==hint.block_hash||
        current.tx_hash!==hint.tx_hash||current.log_index!==hint.log_index)
        throw Error('TRIPWIRE_PROOF_ADMISSION_CHANGED');
