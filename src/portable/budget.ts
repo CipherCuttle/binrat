@@ -29,6 +29,21 @@ const TRIPWIRE_PROOF_METHODS = [
   'eth_getLogs','eth_getBlockReceipts','eth_getBlockByNumber'
 ] as const;
 const TRIPWIRE_PROOF_MILLI_CU = 400_000;
+/** Conservative 24h subscription reservation: 8 admission requests (800 CU),
+ * 3 connection/control operations (60 CU) and 72 KiB of frames (2949.12 CU).
+ * This is a model, NOT a provider invoice. No automatic network connection. */
+export const TRIPWIRE_STREAM_MILLI_CU = 3_809_120;
+export const TRIPWIRE_STREAM_MAX_BYTES = 72 * 1024;
+export const TRIPWIRE_STREAM_FRAME_MAX_BYTES = 8192;
+export const TRIPWIRE_STREAM_SCHEMA = `
+CREATE TABLE IF NOT EXISTS tripwire_stream_reservations_v1 (
+  grant_id TEXT PRIMARY KEY REFERENCES tripwire_proof_grants_v1(grant_id),
+  owner_id TEXT NOT NULL, generation TEXT NOT NULL UNIQUE, deployer TEXT NOT NULL,
+  reserved_at_ms INTEGER NOT NULL, received_bytes INTEGER NOT NULL DEFAULT 0,
+  state TEXT NOT NULL CHECK(state IN ('ADMITTED','UNKNOWN','STOPPED'))
+);
+`;
+
 
 export class BudgetLedger {
   private readonly db: Database.Database;
@@ -78,6 +93,87 @@ export class BudgetLedger {
       this.db.prepare('UPDATE budget_meta SET last_day=? WHERE singleton=1').run(day);
       this.db.prepare('INSERT INTO rpc_attempts(job_id,day,method,reserved_at_ms) VALUES(?,?,?,?)').run(job, day, method, time);
     }).immediate(); // Durable BEFORE fetch. Errors and interrupted attempts count.
+  }
+
+  /** One-way 11-slot/3809.12-CU subscription-envelope admission.
+   * Caller MUST hold the existing single-writer process lock. No I/O is made.
+   * Setup, reconnects, and all incoming data must fit this single envelope. */
+  reserveTripwireStream(job: string, grantId: string, deadline: number,
+    scope: { ownerId:string; generation:string; deployer:string }): void {
+    const file=lstatSync(this.path),disk=statfsSync(dirname(this.path));
+    if (file.isSymbolicLink() || file.ino!==this.inode ||
+      disk.bavail*disk.bsize<64*1024*1024) throw Error('BUDGET_STORAGE_UNAVAILABLE');
+    this.db.exec(TRIPWIRE_STREAM_SCHEMA);
+    this.db.transaction(()=>{
+      const time=this.now();
+      if(!Number.isSafeInteger(time)||time>=deadline) throw Error('TRIPWIRE_STREAM_DEADLINE');
+      if(this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='portable_budget_recovery'").get()){
+        const recovery=this.db.prepare('SELECT not_before_ms FROM portable_budget_recovery WHERE singleton=1')
+          .get() as {not_before_ms:number}|undefined;
+        if(!recovery||time<recovery.not_before_ms)throw Error('RESTORED_BUDGET_DAY_UNVERIFIED');
+      }
+      const jobRow=this.db.prepare("SELECT started_at_ms FROM collector_jobs WHERE job_id=? AND state='RUNNING'")
+        .get(job) as {started_at_ms:number}|undefined;
+      if(!jobRow||time<jobRow.started_at_ms||time-jobRow.started_at_ms>=this.ceiling.runtimeMs||
+        deadline>jobRow.started_at_ms+this.ceiling.runtimeMs)throw Error('JOB_BUDGET_INVALID');
+      const grant=this.db.prepare('SELECT * FROM tripwire_proof_grants_v1 WHERE grant_id=?')
+        .get(grantId) as {owner_id:string;generation:string;deployer:string;stops_at_ms:number;
+          max_milli_cu:number;reserved_milli_cu:number}|undefined;
+      if(!grant||grant.owner_id!==scope.ownerId||grant.generation!==scope.generation||
+        grant.deployer!==scope.deployer||time>=grant.stops_at_ms||
+        grant.reserved_milli_cu+TRIPWIRE_STREAM_MILLI_CU>grant.max_milli_cu)
+        throw Error('TRIPWIRE_STREAM_GRANT_INVALID');
+      const day=new Date(time).toISOString().slice(0,10);
+      const meta=this.db.prepare('SELECT last_day,version FROM budget_meta WHERE singleton=1')
+        .get() as {last_day:string;version:number}|undefined;
+      if(!meta||meta.version!==1||day<meta.last_day)throw Error('BUDGET_CLOCK_OR_META_INVALID');
+      const usedDay=(this.db.prepare('SELECT count(*) n FROM rpc_attempts WHERE day=?').get(day) as {n:number}).n;
+      const usedJob=(this.db.prepare('SELECT count(*) n FROM rpc_attempts WHERE job_id=?').get(job) as {n:number}).n;
+      if(usedDay+11>Math.min(100,this.ceiling.attemptsPerDay)||
+        usedJob+11>Math.min(50,this.ceiling.attemptsPerRun))throw Error('RPC_BUDGET_EXHAUSTED');
+      // UNIQUE grant/generation: never re-reserve a new 24h envelope on restart.
+      this.db.prepare(`INSERT INTO tripwire_stream_reservations_v1
+        (grant_id,owner_id,generation,deployer,reserved_at_ms,state)
+        VALUES (?,?,?,?,?,'ADMITTED')`).run(grantId,scope.ownerId,scope.generation,scope.deployer,time);
+      this.db.prepare('UPDATE tripwire_proof_grants_v1 SET reserved_milli_cu=reserved_milli_cu+? WHERE grant_id=?')
+        .run(TRIPWIRE_STREAM_MILLI_CU,grantId);
+      this.db.prepare('UPDATE budget_meta SET last_day=? WHERE singleton=1').run(day);
+      const statement=this.db.prepare('INSERT INTO rpc_attempts(job_id,day,method,reserved_at_ms) VALUES(?,?,?,?)');
+      for(let i=0;i<11;i++)statement.run(job,day,`tripwire_stream_reserved_${i+1}`,time);
+    }).immediate();
+  }
+
+  /** Durable byte charging happens before processing a frame; it never creates
+   * another allowance. Overflow fences the stream UNKNOWN, including duplicates. */
+  chargeTripwireStreamFrame(grantId:string, scope:{ownerId:string;generation:string;deployer:string},
+    bytes:number):void{
+    if(!Number.isSafeInteger(bytes)||bytes<0||bytes>1024*1024)throw Error('TRIPWIRE_FRAME_SIZE_INVALID');
+    this.db.transaction(()=>{
+      const row=this.db.prepare('SELECT * FROM tripwire_stream_reservations_v1 WHERE grant_id=?')
+        .get(grantId) as {owner_id:string;generation:string;deployer:string;
+          received_bytes:number;state:string}|undefined;
+      const grant=this.db.prepare('SELECT stops_at_ms FROM tripwire_proof_grants_v1 WHERE grant_id=?')
+        .get(grantId) as {stops_at_ms:number}|undefined;
+      if(!row||!grant||row.owner_id!==scope.ownerId||row.generation!==scope.generation||
+        row.deployer!==scope.deployer||row.state!=='ADMITTED'||this.now()>=grant.stops_at_ms)
+        throw Error('TRIPWIRE_STREAM_INACTIVE');
+      if(bytes>TRIPWIRE_STREAM_FRAME_MAX_BYTES||
+        row.received_bytes+bytes>TRIPWIRE_STREAM_MAX_BYTES){
+        this.db.prepare("UPDATE tripwire_stream_reservations_v1 SET state='UNKNOWN' WHERE grant_id=?")
+          .run(grantId);
+        return;
+      }
+      this.db.prepare('UPDATE tripwire_stream_reservations_v1 SET received_bytes=received_bytes+? WHERE grant_id=?')
+        .run(bytes,grantId);
+    }).immediate();
+    const state=this.db.prepare('SELECT state FROM tripwire_stream_reservations_v1 WHERE grant_id=?')
+      .get(grantId) as {state:string};
+    if(state.state!=='ADMITTED')throw Error('TRIPWIRE_STREAM_BYTES_EXHAUSTED');
+  }
+
+  stopTripwireStream(grantId:string):void {
+    this.db.prepare("UPDATE tripwire_stream_reservations_v1 SET state='STOPPED' WHERE grant_id=?")
+      .run(grantId);
   }
 
   /** Precondition: the parent CLI holds its exclusive writer lock.
