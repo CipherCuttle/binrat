@@ -159,3 +159,24 @@ test('overlong runtime deadline cannot bypass existing 60-second job',async()=>{
    assert.equal(f.debits(),0);assert.equal(f.calls.length,0);
  }finally{f.cleanup();}
 });
+
+test('malformed removed flag cannot be normalized to an authentic positive log',async()=>{
+ const f=fixture();try{
+   f.responses[5]=[{...f.log,removed:'false'}];
+   await assert.rejects(qualifyHistoricalPonsLaunch(f.args),/QUALIFICATION_UNVERIFIED/);
+   assert.equal(f.reservation().status,'UNKNOWN');
+ }finally{f.cleanup();}
+});
+test('a success cannot be claimed when terminal qualification state loses its reservation CAS',async()=>{
+ const f=fixture();try{
+   const original=f.args.wire.request;
+   f.args.wire.request=async(method,params,signal)=>{
+     if(f.calls.length===7)
+       f.db.prepare("UPDATE tripwire_source_qualifications_v1 SET status='UNKNOWN' WHERE status='RESERVED'").run();
+     return original(method,params,signal);
+   };
+   await assert.rejects(qualifyHistoricalPonsLaunch(f.args));
+   assert.equal(f.debits(),8);
+   assert.equal(f.reservation().status,'UNKNOWN');
+ }finally{f.cleanup();}
+});
