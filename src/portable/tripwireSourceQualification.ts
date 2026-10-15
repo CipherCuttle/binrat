@@ -108,7 +108,7 @@ function normalizedLog(v: unknown): Log {
     Array.isArray(r.topics) && r.topics.length <= 4 &&
     r.topics.every((t:unknown)=>typeof t==='string' && H32.test(t.toLowerCase())) &&
     typeof r.data === 'string' && /^0x(?:[0-9a-f]{2})*$/i.test(r.data) &&
-    r.removed !== true, 'TRIPWIRE_SOURCE_LOG_INVALID');
+    (r.removed===undefined || r.removed===false), 'TRIPWIRE_SOURCE_LOG_INVALID');
   return {
     address:r.address.toLowerCase(),blockNumber:quantity(r.blockNumber),
     blockHash:hash(r.blockHash),transactionHash:hash(r.transactionHash),
@@ -208,6 +208,10 @@ export async function qualifyHistoricalPonsLaunch(p: QualificationPort):Promise<
         demand(all.length<=MAX_LOGS,'TRIPWIRE_SOURCE_RECEIPT_LOG_LIMIT');
       }
     }
+    // Canonical launch logs must occur in a successful transaction receipt.
+    const matchTxIndex=first.transactions.indexOf(p.known.transactionHash);
+    demand(matchTxIndex>=0 && receipts[matchTxIndex]?.status==='0x1',
+      'TRIPWIRE_SOURCE_REVERTED_LAUNCH');
     const fromReceipts=all.filter(l=>matches(l,p.scope.deployer));
     const observedKeys=observed.map(logKey).sort(),receiptKeys=fromReceipts.map(logKey).sort();
     demand(fromReceipts.length<=MAX_MATCHES &&
