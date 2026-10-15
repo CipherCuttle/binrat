@@ -35,6 +35,7 @@ export interface KnownHistoricalPonsEvent {
 export interface ReadOnlyQualificationWire {
   /** Must issue ONE HTTP JSON-RPC attempt, NO retries/batches/fallbacks. */
   request(method: string, params: unknown[], signal: AbortSignal): Promise<unknown>;
+  readonly mode: 'OFFLINE_FIXTURE_ONLY' | 'EXPLICIT_READONLY_PROVIDER';
 }
 export interface HistoricalQualificationResult {
   schemaVersion: typeof TRIPWIRE_SOURCE_QUALIFICATION_V1;
@@ -56,6 +57,7 @@ export interface HistoricalQualificationResult {
   requestsReserved: 8;
   requestCostMilliCuReserved: 800000;
   coverage: 'HISTORICAL_POSITIVE_ONLY';
+  sourceAuthority: 'OFFLINE_SIMULATED' | 'FACTORY_CODE_HASH_PINNED';
 }
 export interface QualificationPort {
   ledger: Pick<BudgetLedger, 'reserveTripwireQualification' | 'finishTripwireQualification'>;
@@ -63,6 +65,8 @@ export interface QualificationPort {
   scope: {ownerId:string;generation:string;deployer:string};
   known: KnownHistoricalPonsEvent;
   wire: ReadOnlyQualificationWire;
+  /** Only for synthetic fixture tests. It can NEVER produce a live qualification. */
+  offlineExpectedCodeHash?: Hex;
   now?: () => number;
 }
 type Log = {
@@ -138,6 +142,9 @@ export async function qualifyHistoricalPonsLaunch(p: QualificationPort):Promise<
   demand(Number.isSafeInteger(p.deadlineMs) && p.deadlineMs > now() &&
     typeof p.wire?.request === 'function', 'TRIPWIRE_SOURCE_ADMISSION_INVALID');
   validateKnown(p.known,p.scope);
+  demand(!p.offlineExpectedCodeHash ||
+    (p.wire.mode==='OFFLINE_FIXTURE_ONLY' && H32.test(p.offlineExpectedCodeHash)),
+    'TRIPWIRE_SOURCE_TEST_OVERRIDE_DENIED');
   p.ledger.reserveTripwireQualification(p.job,p.grantId,p.deadlineMs,p.scope,{
     blockNumber:p.known.blockNumber,transactionHash:p.known.transactionHash,logIndex:p.known.logIndex
   });
@@ -160,7 +167,7 @@ export async function qualifyHistoricalPonsLaunch(p: QualificationPort):Promise<
     demand(quantity(await invoke('eth_chainId',[]))===BigInt(ROBINHOOD_CHAIN_ID),'TRIPWIRE_CHAIN_ID_DRIFT');
     const bytecode=await invoke('eth_getCode',[PONS_V2_FACTORY,'latest']);
     demand(typeof bytecode==='string' && /^0x(?:[0-9a-f]{2})+$/i.test(bytecode) &&
-      keccak256(bytecode as Hex).toLowerCase()===PONS_V2_FACTORY_CODE_HASH,
+      keccak256(bytecode as Hex).toLowerCase()===(p.offlineExpectedCodeHash ?? PONS_V2_FACTORY_CODE_HASH),
       'TRIPWIRE_FACTORY_CODE_HASH_DRIFT');
     const latest=header(await invoke('eth_getBlockByNumber',['latest',false]));
     const finalized=header(await invoke('eth_getBlockByNumber',['finalized',false]));
@@ -230,7 +237,8 @@ export async function qualifyHistoricalPonsLaunch(p: QualificationPort):Promise<
       receiptsRoot:first.receiptsRoot,transactionHash:p.known.transactionHash,
       logIndex:p.known.logIndex,deployer:p.scope.deployer,token,curve:getAddress(event.args.curve).toLowerCase(),
       launchId,eventId,verifiedAtMs:now(),requestsReserved:8,
-      requestCostMilliCuReserved:800000,coverage:'HISTORICAL_POSITIVE_ONLY'
+      requestCostMilliCuReserved:800000,coverage:'HISTORICAL_POSITIVE_ONLY',
+      sourceAuthority:p.offlineExpectedCodeHash?'OFFLINE_SIMULATED':'FACTORY_CODE_HASH_PINNED'
     };
     p.ledger.finishTripwireQualification(p.grantId,await sha256Hex(result));
     return result;
