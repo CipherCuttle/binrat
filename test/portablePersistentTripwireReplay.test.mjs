@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
 import { PersistentTripwireWatch as Watch, PERSISTENT_TRIPWIRE_SCHEMA as SCHEMA } from '../src/portable/persistentTripwireWatch.ts';
-const g='aaaabbbb-cccc-dddd-eeee-ffffffffffff',d='0x'+'ab'.repeat(20),t='0x'+'11'.repeat(32),o='0x'+'22'.repeat(32);
+const g='aaaabbbb-cccc-dddd-eeee-ffffffffffff',d='0x'+'ab'.repeat(20),t='0x8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607',o='0x'+'22'.repeat(32);
 function setup() {
  const db=new DatabaseSync(':memory:');
  db.exec("CREATE TABLE pons_tripwire_watches(generation TEXT PRIMARY KEY,owner_id TEXT,deployer TEXT,start_block INTEGER,created_at_ms INTEGER,state TEXT)");
