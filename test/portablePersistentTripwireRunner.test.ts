@@ -167,3 +167,26 @@ test('expiry stops frame acceptance; no periodic HTTP audit is scheduled',()=>{
    assert.equal(f.debits().n,11);
  }finally{f.finish();}
 });
+
+test('delivered bytes past 72 KiB are retained as explicit CU overrun before fail-close',()=>{
+ const f=setup();
+ try{
+   f.admit();
+   const scope={ownerId:OWNER,generation:GEN,deployer:DEPLOYER};
+   for(let i=0;i<9;i++)
+     f.ledger.chargeTripwireStreamFrame('grant-one',scope,8192);
+   f.ledger.chargeTripwireStreamFrame('grant-one',scope,100);
+   // At 73,828 delivered bytes, 100 bytes exceeded reserved frame envelope:
+   // the overrun is recorded as 4,000 milli-CU and no new credit is granted.
+ }catch(error){
+   assert.match(String(error),/TRIPWIRE_STREAM_BYTES_EXHAUSTED/);
+ }finally{
+   const row=f.ledger['db'].prepare('SELECT state,received_bytes,observed_overrun_milli_cu FROM tripwire_stream_reservations_v1')
+     .get() as {state:string;received_bytes:number;observed_overrun_milli_cu:number};
+   assert.equal(row.state,'UNKNOWN');
+   assert.equal(row.received_bytes,9*8192+100);
+   assert.equal(row.observed_overrun_milli_cu,4000);
+   assert.equal(f.spent().v,TRIPWIRE_STREAM_MILLI_CU);
+   f.finish();
+ }
+});
