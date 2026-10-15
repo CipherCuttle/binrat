@@ -4,12 +4,11 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createRequire } from 'node:module';
 import { encodeAbiParameters, toEventSelector, toHex } from 'viem';
 import Database from 'better-sqlite3';
 import { BUDGET_SCHEMA, BudgetLedger } from '../src/portable/budget.js';
 import { PERSISTENT_TRIPWIRE_SCHEMA, PersistentTripwireWatch } from '../src/portable/persistentTripwireWatch.js';
-import { PERSISTENT_TRIPWIRE_PROOF_SCHEMA, proveQueuedTripwireHint } from '../src/portable/persistentTripwireProof.js';
+import { proveQueuedTripwireHint } from '../src/portable/persistentTripwireProof.js';
 import { ponsTokenLaunchedEvent } from '../src/pons/ponsAbi.js';
 import { forwardReceiptRoot } from '../src/portable/forwardReceiptRoot.js';
 
@@ -145,5 +144,33 @@ test('owner cancellation during proof never admits durable evidence',async()=>{
    f.wire.request=async(m,p)=>{const result=await original(m,p); if(f.calls()===5) f.db.prepare("UPDATE pons_tripwire_watches SET state='CANCELLED'").run();return result;};
    await assert.rejects(proveQueuedTripwireHint(f.options),/TRIPWIRE_PROOF_UNVERIFIED/);
    assert.equal(f.db.prepare('SELECT count(*) n FROM persistent_tripwire_proofs_v1').get().n,0);
+ }finally{f.cleanup();}
+});
+
+test('a CU grant bound to another deployer cannot authorize this Watch',async()=>{
+ const f=fixture();
+ try{
+   f.ledger['db'].prepare('UPDATE tripwire_proof_grants_v1 SET deployer=?').run('0x'+'ff'.repeat(20));
+   await assert.rejects(proveQueuedTripwireHint(f.options),/TRIPWIRE_PROOF_UNVERIFIED/);
+   assert.equal(f.calls(),0);
+   assert.equal(f.ledger['db'].prepare('SELECT count(*) n FROM rpc_attempts').get().n,0);
+ }finally{f.cleanup();}
+});
+test('job deadline cannot silently expand beyond the approved 60-second parent job',async()=>{
+ const f=fixture();
+ try{
+   await assert.rejects(proveQueuedTripwireHint({...f.options,deadline:999999}),/TRIPWIRE_PROOF_UNVERIFIED/);
+   assert.equal(f.calls(),0);
+   assert.equal(f.ledger['db'].prepare('SELECT count(*) n FROM rpc_attempts').get().n,0);
+ }finally{f.cleanup();}
+});
+test('re-admitting a different grant for the same owner never resets modeled CU',()=>{
+ const f=fixture();
+ try {
+   assert.throws(()=>f.ledger.createTripwireProofGrant({
+     grantId:'fresh-id',ownerId:'telegram:1234',generation:GEN,deployer:DEPLOYER,
+     stopsAtMs:86_402_000,maxMilliCu:10_000_000,approved:true
+   }));
+   assert.equal(f.ledger['db'].prepare('SELECT count(*) n FROM tripwire_proof_grants_v1').get().n,1);
  }finally{f.cleanup();}
 });
