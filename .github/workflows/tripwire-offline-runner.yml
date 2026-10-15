@@ -1,0 +1,36 @@
+name: Tripwire offline runner (bounded)
+on:
+  push:
+    branches:
+      - 'feat/binrat-tripwire-offline-runner-v1-20261015'
+    paths:
+      - 'src/portable/offlinePersistentTripwireRunner.ts'
+      - 'src/portable/budget.ts'
+      - 'test/portablePersistentTripwireRunner.test.ts'
+      - '.github/workflows/tripwire-offline-runner.yml'
+  pull_request:
+    paths:
+      - 'src/portable/offlinePersistentTripwireRunner.ts'
+      - 'src/portable/budget.ts'
+      - 'test/portablePersistentTripwireRunner.test.ts'
+      - '.github/workflows/tripwire-offline-runner.yml'
+permissions:
+  contents: read
+jobs:
+  network-denied-offline-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install pinned packages
+        run: pnpm install --frozen-lockfile
+      - name: Exercise bounded fake provider; no credentials or production writes
+        run: pnpm exec tsx --test test/portablePersistentTripwireRunner.test.ts
