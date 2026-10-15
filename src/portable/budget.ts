@@ -46,6 +46,25 @@ CREATE TABLE IF NOT EXISTS tripwire_stream_reservations_v1 (
 `;
 
 
+/** Exactly eight read-only source qualification requests; priced at a
+ * conservative 100 CU each. This is modeled, not guaranteed provider billing. */
+export const TRIPWIRE_QUALIFICATION_MILLI_CU = 800_000;
+export const TRIPWIRE_QUALIFICATION_SCHEMA = `
+CREATE TABLE IF NOT EXISTS tripwire_source_qualifications_v1 (
+  grant_id TEXT PRIMARY KEY REFERENCES tripwire_proof_grants_v1(grant_id),
+  block_number INTEGER NOT NULL,
+  transaction_hash TEXT NOT NULL,
+  log_index INTEGER NOT NULL,
+  reserved_at_ms INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK(status IN ('RESERVED','QUALIFIED','UNKNOWN')),
+  result_digest TEXT
+);
+`;
+const QUALIFICATION_METHODS = [
+ 'eth_chainId','eth_getCode','eth_getBlockByNumber','eth_getBlockByNumber',
+ 'eth_getBlockByNumber','eth_getLogs','eth_getBlockReceipts','eth_getBlockByNumber'
+] as const;
+
 export class BudgetLedger {
   private readonly db: Database.Database;
   private readonly inode: number;
@@ -94,6 +113,67 @@ export class BudgetLedger {
       this.db.prepare('UPDATE budget_meta SET last_day=? WHERE singleton=1').run(day);
       this.db.prepare('INSERT INTO rpc_attempts(job_id,day,method,reserved_at_ms) VALUES(?,?,?,?)').run(job, day, method, time);
     }).immediate(); // Durable BEFORE fetch. Errors and interrupted attempts count.
+  }
+
+  /** Authoritatively reserves all eight physical reads BEFORE the injected
+   * provider callback. Caller must hold the existing exclusive writer lock.
+   * No implicit retries; interrupted or failed reservations are never refunded. */
+  reserveTripwireQualification(job:string,grantId:string,deadline:number,
+    scope:{ownerId:string;generation:string;deployer:string},
+    known:{blockNumber:number;transactionHash:string;logIndex:number}):void{
+    const file=lstatSync(this.path),disk=statfsSync(dirname(this.path));
+    if(file.isSymbolicLink()||file.ino!==this.inode||
+      disk.bavail*disk.bsize<64*1024*1024)throw Error('BUDGET_STORAGE_UNAVAILABLE');
+    if(!Number.isSafeInteger(known.blockNumber)||known.blockNumber<0||
+      !/^0x[0-9a-f]{64}$/.test(known.transactionHash)||
+      !Number.isSafeInteger(known.logIndex)||known.logIndex<0)
+      throw Error('TRIPWIRE_KNOWN_EVENT_INVALID');
+    this.db.exec(TRIPWIRE_QUALIFICATION_SCHEMA);
+    this.db.transaction(()=>{
+      const time=this.now();
+      if(!Number.isSafeInteger(time)||time>=deadline)throw Error('TRIPWIRE_QUALIFICATION_DEADLINE');
+      if(this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='portable_budget_recovery'").get()){
+        const recovery=this.db.prepare('SELECT not_before_ms FROM portable_budget_recovery WHERE singleton=1')
+          .get() as {not_before_ms:number}|undefined;
+        if(!recovery||time<recovery.not_before_ms)throw Error('RESTORED_BUDGET_DAY_UNVERIFIED');
+      }
+      const jobRow=this.db.prepare("SELECT started_at_ms FROM collector_jobs WHERE job_id=? AND state='RUNNING'")
+        .get(job) as {started_at_ms:number}|undefined;
+      if(!jobRow||time<jobRow.started_at_ms||time-jobRow.started_at_ms>=this.ceiling.runtimeMs||
+        deadline>jobRow.started_at_ms+this.ceiling.runtimeMs)
+        throw Error('JOB_BUDGET_INVALID');
+      const grant=this.db.prepare('SELECT owner_id,generation,deployer,stops_at_ms,max_milli_cu,reserved_milli_cu FROM tripwire_proof_grants_v1 WHERE grant_id=?')
+        .get(grantId) as {owner_id:string;generation:string;deployer:string;stops_at_ms:number;
+          max_milli_cu:number;reserved_milli_cu:number}|undefined;
+      if(!grant||grant.owner_id!==scope.ownerId||grant.generation!==scope.generation||
+        grant.deployer!==scope.deployer||time>=grant.stops_at_ms||deadline>grant.stops_at_ms||
+        grant.reserved_milli_cu+TRIPWIRE_QUALIFICATION_MILLI_CU>grant.max_milli_cu)
+        throw Error('TRIPWIRE_QUALIFICATION_GRANT_INVALID');
+      const day=new Date(time).toISOString().slice(0,10);
+      const meta=this.db.prepare('SELECT last_day,version FROM budget_meta WHERE singleton=1')
+        .get() as {last_day:string;version:number}|undefined;
+      if(!meta||meta.version!==1||day<meta.last_day)throw Error('BUDGET_CLOCK_OR_META_INVALID');
+      const dayUsed=(this.db.prepare('SELECT count(*) n FROM rpc_attempts WHERE day=?').get(day) as {n:number}).n;
+      const jobUsed=(this.db.prepare('SELECT count(*) n FROM rpc_attempts WHERE job_id=?').get(job) as {n:number}).n;
+      if(dayUsed+QUALIFICATION_METHODS.length>Math.min(100,this.ceiling.attemptsPerDay)||
+        jobUsed+QUALIFICATION_METHODS.length>Math.min(50,this.ceiling.attemptsPerRun))
+        throw Error('RPC_BUDGET_EXHAUSTED');
+      this.db.prepare(`INSERT INTO tripwire_source_qualifications_v1
+        (grant_id,block_number,transaction_hash,log_index,reserved_at_ms,status)
+        VALUES (?,?,?,?,?,'RESERVED')`).run(grantId,known.blockNumber,known.transactionHash,known.logIndex,time);
+      this.db.prepare('UPDATE tripwire_proof_grants_v1 SET reserved_milli_cu=reserved_milli_cu+? WHERE grant_id=?')
+        .run(TRIPWIRE_QUALIFICATION_MILLI_CU,grantId);
+      this.db.prepare('UPDATE budget_meta SET last_day=? WHERE singleton=1').run(day);
+      const statement=this.db.prepare('INSERT INTO rpc_attempts(job_id,day,method,reserved_at_ms) VALUES(?,?,?,?)');
+      for(const method of QUALIFICATION_METHODS)statement.run(job,day,method,time);
+    }).immediate();
+  }
+  /** Terminal status writes never issue or refund requests. */
+  finishTripwireQualification(grantId:string,resultDigest:string|null):void{
+    if(resultDigest!==null&&!/^[0-9a-f]{64}$/.test(resultDigest))throw Error('TRIPWIRE_QUALIFICATION_DIGEST_INVALID');
+    this.db.prepare(`UPDATE tripwire_source_qualifications_v1
+      SET status=?,result_digest=? WHERE grant_id=? AND status='RESERVED'`)
+      .run(resultDigest===null?'UNKNOWN':'QUALIFIED',resultDigest,grantId);
   }
 
   /** One-way 11-slot/3809.12-CU subscription-envelope admission.
