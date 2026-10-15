@@ -42,9 +42,6 @@ const H32=/^0x[0-9a-f]{64}$/;
 const Q=/^0x(?:0|[1-9a-f][0-9a-f]*)$/;
 const MAX_TX=128, MAX_LOGS=1024, MAX_MATCHES=20;
 const topic=toEventSelector(ponsTokenLaunchedEvent).toLowerCase();
-const fail=(value:unknown,code='TRIPWIRE_CANONICAL_PROOF_INVALID'):asserts value => {
- if(!value)throw Error(code);
-};
 function qty(v:unknown):bigint {
  if(typeof v!=='string'||!Q.test(v))throw Error('TRIPWIRE_QUANTITY_INVALID');
  return BigInt(v);
