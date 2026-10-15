@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS tripwire_stream_reservations_v1 (
   grant_id TEXT PRIMARY KEY REFERENCES tripwire_proof_grants_v1(grant_id),
   owner_id TEXT NOT NULL, generation TEXT NOT NULL UNIQUE, deployer TEXT NOT NULL,
   reserved_at_ms INTEGER NOT NULL, received_bytes INTEGER NOT NULL DEFAULT 0,
+  observed_overrun_milli_cu INTEGER NOT NULL DEFAULT 0,
   state TEXT NOT NULL CHECK(state IN ('ADMITTED','UNKNOWN','STOPPED'))
 );
 `;
@@ -157,10 +158,16 @@ export class BudgetLedger {
       if(!row||!grant||row.owner_id!==scope.ownerId||row.generation!==scope.generation||
         row.deployer!==scope.deployer||row.state!=='ADMITTED'||this.now()>=grant.stops_at_ms)
         throw Error('TRIPWIRE_STREAM_INACTIVE');
-      if(bytes>TRIPWIRE_STREAM_FRAME_MAX_BYTES||
-        row.received_bytes+bytes>TRIPWIRE_STREAM_MAX_BYTES){
-        this.db.prepare("UPDATE tripwire_stream_reservations_v1 SET state='UNKNOWN' WHERE grant_id=?")
-          .run(grantId);
+      const delivered=row.received_bytes+bytes;
+      if(bytes>TRIPWIRE_STREAM_FRAME_MAX_BYTES||delivered>TRIPWIRE_STREAM_MAX_BYTES){
+        // Frames are received before their size is known; record the full
+        // unavoidable delivery, including bytes above the pre-reserved 72 KiB.
+        // 40 milli-CU per byte (modeled); overruns are a liability, not
+        // permission to increase the user's authorized CU allowance.
+        const overrun=Math.max(0,delivered-TRIPWIRE_STREAM_MAX_BYTES);
+        this.db.prepare(`UPDATE tripwire_stream_reservations_v1
+          SET received_bytes=?,observed_overrun_milli_cu=?,state='UNKNOWN'
+          WHERE grant_id=?`).run(delivered,overrun*40,grantId);
         return;
       }
       this.db.prepare('UPDATE tripwire_stream_reservations_v1 SET received_bytes=received_bytes+? WHERE grant_id=?')
