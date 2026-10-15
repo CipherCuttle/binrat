@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://binrat.tech/schemas/comms-shadow-post-bundle-v1.json",
+  "title": "BINRAT Shadow Post Bundle V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "eventId",
+    "createdAt",
+    "lifecycle",
+    "triageDecision",
+    "decision",
+    "score",
+    "reasons",
+    "evidence",
+    "drafts",
+    "violations",
+    "requiresHumanApproval",
+    "publishAllowed"
+  ],
+  "properties": {
+    "version": { "const": "binrat.comms.shadow/1" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "lifecycle": {
+      "enum": [
+        "EXPERIMENTAL",
+        "PLANNED",
+        "BUILDING",
+        "ENGINEERING_PASS",
+        "DEPLOYED",
+        "PUBLIC_LIVE",
+        "BLOCKED",
+        "DEPRECATED",
+        "REJECTED"
+      ]
+    },
+    "triageDecision": { "enum": ["POST", "QUEUE", "IGNORE"] },
+    "decision": { "enum": ["POST", "QUEUE", "IGNORE"] },
+    "score": { "type": "number", "minimum": 0 },
+    "reasons": { "type": "array", "items": { "type": "string" } },
+    "evidence": { "type": "array" },
+    "drafts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "telegram"],
+      "properties": {
+        "x": { "type": "string" },
+        "telegram": { "type": "string" }
+      }
+    },
+    "violations": { "type": "array" },
+    "requiresHumanApproval": { "const": true },
+    "publishAllowed": { "const": false }
+  }
+}
