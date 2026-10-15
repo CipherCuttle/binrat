@@ -5,8 +5,10 @@ on:
       - 'feat/binrat-tripwire-source-qualification-v1-20261015'
     paths:
       - 'src/portable/tripwireSourceQualification.ts'
+      - 'src/portable/oneShotAlchemyQualificationWire.ts'
       - 'src/portable/budget.ts'
       - 'test/portableTripwireSourceQualification.test.ts'
+      - 'test/oneShotAlchemyQualificationWire.test.ts'
       - '.github/workflows/tripwire-source-qualification-offline.yml'
   pull_request:
     paths:
@@ -32,4 +34,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Offline bounded source qualification (no secrets, no RPC)
-        run: pnpm exec tsx --test test/portableTripwireSourceQualification.test.ts
+        run: pnpm exec tsx --test test/portableTripwireSourceQualification.test.ts test/oneShotAlchemyQualificationWire.test.ts
