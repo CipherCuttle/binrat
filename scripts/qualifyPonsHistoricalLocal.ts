@@ -117,6 +117,8 @@ export async function runOnce(args:string[]){
    return;
  }
  const url=secretUrl();
+ // Reject wrong endpoint and malformed credentials BEFORE creating a ledger job/grant.
+ const wire=oneShotAlchemyQualificationWire({httpsUrl:url,approved:true,stopsAtMs:Date.now()+55_000});
  const ledger=new BudgetLedger(LEDGER,LIMITS);
  let job:string|undefined;
  try{
@@ -125,7 +127,6 @@ export async function runOnce(args:string[]){
    const generation=randomUUID();
    ledger.createTripwireProofGrant({grantId:GRANT_ID,ownerId,generation,
      deployer:HISTORICAL_DEPLOYER,stopsAtMs:grantExpires,maxMilliCu:800_000,approved:true});
-   const wire=oneShotAlchemyQualificationWire({httpsUrl:url,approved:true,stopsAtMs:deadline});
    const result=await qualifyHistoricalPonsLaunch({ledger,job,grantId:GRANT_ID,deadlineMs:deadline,
      known,scope:{ownerId,generation,deployer:HISTORICAL_DEPLOYER},wire});
    ledger.finish(job,true);
