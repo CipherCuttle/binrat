@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { PersistentTripwireWatch, PERSISTENT_TRIPWIRE_SCHEMA } from '../src/portable/persistentTripwireWatch.ts';
 const GEN='aaaabbbb-cccc-dddd-eeee-ffffffffffff';
 const ADDRESS='0x'+'ab'.repeat(20);
-const TOPIC='0x'+'11'.repeat(32);
+const TOPIC='0x8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607';
 function createFixture() {
  const db=new DatabaseSync(':memory:');
  db.exec("CREATE TABLE pons_tripwire_watches(generation TEXT PRIMARY KEY,owner_id TEXT,deployer TEXT,start_block INTEGER,created_at_ms INTEGER,state TEXT)");
