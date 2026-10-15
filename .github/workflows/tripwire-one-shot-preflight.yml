@@ -6,12 +6,14 @@ on:
     paths:
       - scripts/qualifyPonsHistoricalLocal.ts
       - scripts/runPonsQualificationOnce.sh
+      - test/runPonsQualificationLock.test.sh
       - test/qualifyPonsHistoricalLocal.test.ts
       - .github/workflows/tripwire-one-shot-preflight.yml
   pull_request:
     paths:
       - scripts/qualifyPonsHistoricalLocal.ts
       - scripts/runPonsQualificationOnce.sh
+      - test/runPonsQualificationLock.test.sh
       - test/qualifyPonsHistoricalLocal.test.ts
       - .github/workflows/tripwire-one-shot-preflight.yml
 permissions:
@@ -33,5 +35,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Validate local-only wrapper
         run: bash -n scripts/runPonsQualificationOnce.sh
+      - name: Confirm original collector flock is inherited and exclusive
+        run: bash test/runPonsQualificationLock.test.sh
       - name: Test historical evidence and ledger preflight (no secrets or provider calls)
         run: pnpm exec tsx --test test/qualifyPonsHistoricalLocal.test.ts
