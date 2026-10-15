@@ -1,0 +1,37 @@
+name: Tripwire local one-shot preflight (offline)
+on:
+  push:
+    branches:
+      - feat/binrat-tripwire-one-shot-local-20261015
+    paths:
+      - scripts/qualifyPonsHistoricalLocal.ts
+      - scripts/runPonsQualificationOnce.sh
+      - test/qualifyPonsHistoricalLocal.test.ts
+      - .github/workflows/tripwire-one-shot-preflight.yml
+  pull_request:
+    paths:
+      - scripts/qualifyPonsHistoricalLocal.ts
+      - scripts/runPonsQualificationOnce.sh
+      - test/qualifyPonsHistoricalLocal.test.ts
+      - .github/workflows/tripwire-one-shot-preflight.yml
+permissions:
+  contents: read
+jobs:
+  offline-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Validate local-only wrapper
+        run: bash -n scripts/runPonsQualificationOnce.sh
+      - name: Test historical evidence and ledger preflight (no secrets or provider calls)
+        run: pnpm exec tsx --test test/qualifyPonsHistoricalLocal.test.ts
