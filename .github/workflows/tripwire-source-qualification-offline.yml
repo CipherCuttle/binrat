@@ -13,8 +13,10 @@ on:
   pull_request:
     paths:
       - 'src/portable/tripwireSourceQualification.ts'
+      - 'src/portable/oneShotAlchemyQualificationWire.ts'
       - 'src/portable/budget.ts'
       - 'test/portableTripwireSourceQualification.test.ts'
+      - 'test/oneShotAlchemyQualificationWire.test.ts'
       - '.github/workflows/tripwire-source-qualification-offline.yml'
 permissions:
   contents: read
