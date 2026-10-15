@@ -39,6 +39,8 @@ const HEX32 = /^0x[0-9a-f]{64}$/;
 const ADDRESS = /^0x[0-9a-f]{40}$/;
 const QTY = /^0x(?:0|[1-9a-f][0-9a-f]*)$/;
 const PONS_FACTORY = '0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e';
+// TokenLaunched(address,address,address,address,uint256,uint256) from src/pons/ponsAbi.ts.
+export const PONS_TOKEN_LAUNCHED_TOPIC = '0x8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607';
 const MAX_FRAME_BYTES = 8192;
 const MAX_PERSISTED_HINTS = 128;
 const ONE_DAY_MS = 86_400_000;
@@ -78,7 +80,7 @@ export class PersistentTripwireWatch {
      !/^[0-9a-f-]{36}$/.test(input.generation) || !/^telegram:[1-9][0-9]*$/.test(input.ownerId) ||
      !ADDRESS.test(input.deployer) || !Number.isSafeInteger(input.startBlock) || input.startBlock < 0 ||
      typeof input.subscriptionId !== 'string' || !/^[a-zA-Z0-9_-]{1,128}$/.test(input.subscriptionId) ||
-     !HEX32.test(input.eventTopic)) throw new Error('TRIPWIRE_GRANT_INVALID');
+     input.eventTopic !== PONS_TOKEN_LAUNCHED_TOPIC) throw new Error('TRIPWIRE_GRANT_INVALID');
    transaction(this.db, () => {
      const watch = this.db.prepare(`SELECT owner_id,deployer,start_block,state,created_at_ms FROM pons_tripwire_watches
        WHERE generation=?`).get(input.generation) as {
@@ -144,7 +146,7 @@ export class PersistentTripwireWatch {
        (log.topics[3] as string).toLowerCase() !== `0x${session.deployer.slice(2).padStart(64,'0')}`) {
        throw new Error('TRIPWIRE_HINT_SCOPE_INVALID');
      }
-     if (block <= session.start_block) return 'HISTORICAL_IGNORED';
+     if (block <= session.start_block && log.removed !== true) return 'HISTORICAL_IGNORED';
      const tx = (log.transactionHash as string).toLowerCase(), hash = (log.blockHash as string).toLowerCase();
      const key = `${tx}:${index}`;
      const old = this.db.prepare('SELECT block_number,block_hash,tx_hash,log_index FROM persistent_tripwire_hints_v1 WHERE generation=? AND event_key=?')
