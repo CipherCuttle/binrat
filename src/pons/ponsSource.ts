@@ -99,6 +99,9 @@ export class PonsLaunchSource {
     const launches: LaunchObserved[] = [];
     for (const log of logs) {
       if (log.blockNumber === null || log.blockHash === null || log.transactionHash === null || log.logIndex === null) throw new Error('PONS_INCOMPLETE_TOKEN_LAUNCHED_LOG');
+      if (log.address.toLowerCase() !== this.factory.toLowerCase()) throw new Error('PONS_LOG_SOURCE_IDENTITY_DRIFT');
+      if (log.removed) throw new Error('PONS_REMOVED_TOKEN_LAUNCHED_LOG');
+      if (log.blockNumber < fromBlock || log.blockNumber > toBlock) throw new Error('PONS_LOG_OUTSIDE_REQUESTED_RANGE');
       const token = log.args.token, curve = log.args.curve, deployer = log.args.deployer;
       if (!token || !curve || !deployer) throw new Error('PONS_MALFORMED_TOKEN_LAUNCHED_LOG');
       // Name and symbol are non-authoritative enrichment. Keep the critical
