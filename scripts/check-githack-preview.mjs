@@ -8,7 +8,7 @@ const root=resolve('.');
 const site=join(root,'.artifacts/githack/site');
 const preview=JSON.parse(readFileSync(join(site,'GITHACK_PREVIEW.json')));
 const prefix=preview.basePath;
-assert.ok(prefix.startsWith('/CipherCuttle/binrat/binrat-v3-githack-20261016/preview/githack/'));
+assert.match(prefix, /^\/CipherCuttle\/binrat\/binrat-v3-githack(?:-v2(?:-r[12])?)?-20261016\/preview\/githack\/$/);
 const html=readFileSync(join(site,'index.html'),'utf8');
 assert.ok(html.includes('RECORDED PONS DATA · NOT LIVE'));
 assert.ok(html.includes(prefix+'githack-fixture.js'));
@@ -52,7 +52,7 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    await p.locator('[data-case-id]').first().click();
    assert.equal(new URL(p.url()).searchParams.get('case'),id);
    await p.getByRole('button',{name:'SAVE CASE',exact:true}).click();
-   await nav.locator('a[href="/saved"]').click();
+   await nav.locator('a[data-route="/saved"]').click();
    assert.equal(new URL(p.url()).searchParams.get('view'),'saved');
    await p.reload({waitUntil:'networkidle'});
    assert.equal(await p.locator('.inv-saved-list li').count(),1);

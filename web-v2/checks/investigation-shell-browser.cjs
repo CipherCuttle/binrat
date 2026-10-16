@@ -1,99 +1,233 @@
-/* Offline compiled-browser acceptance. Recorded public Pons data, never a live Watch. */
+/* Pinned, bounded compiled-browser acceptance. All API responses are recorded
+   public Pons data or explicitly simulated controls; never live provider proof. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
-const {createRequire} = require('node:module');
-const browserRequire = createRequire(path.join(process.env.BINRAT_FRONTDOOR_TOOLS, 'runner.cjs'));
-assert.equal(browserRequire('playwright/package.json').version, '1.56.1');
-const {chromium} = browserRequire('playwright');
+const { createRequire } = require('node:module');
+const runner = createRequire(path.join(process.env.BINRAT_FRONTDOOR_TOOLS, 'runner.cjs'));
+assert.equal(runner('playwright/package.json').version, '1.56.1');
+const { chromium } = runner('playwright');
 const root = path.resolve(__dirname, '../..');
 const site = path.join(root, '.artifacts/v3-frontdoor/site');
 const out = path.join(root, '.artifacts/investigation-shell/browser');
 const feed = JSON.parse(fs.readFileSync(path.join(root,'docs/receipts/sprint-a1/public-feed.json')));
 const status = JSON.parse(fs.readFileSync(path.join(root,'docs/receipts/sprint-a1/public-status.json')));
-const report = {provenance:'RECORDED_PUBLIC_PONS_REPLAY', liveProvider:false, send:false,
-  tests:[], requests:[], errors:[], screenshots:[], verdict:'FAIL'};
+const envelope = JSON.parse(fs.readFileSync(path.join(root,'docs/receipts/sprint-a1-2-contract/old-case-envelope.json')));
+const capture = JSON.parse(fs.readFileSync(path.join(root,'docs/receipts/sprint-a1-2-contract/production-records.json')));
+const manifest = JSON.parse(fs.readFileSync(path.join(root,'.artifacts/v3-frontdoor/manifest.json')));
+const report = {source:manifest.sourceSha, sourceDirty:manifest.sourceDirty, provenance:'RECORDED_PUBLIC_PONS_REPLAY',
+  controls:'EXPLICIT_SIMULATED_ADVERSE_STATES', liveProvider:false, send:false, ownerVisualApproval:'PENDING',
+  tests:[], requests:[], errors:[], metrics:[], screenshots:[], apiRequestCeiling:160, verdict:'FAIL'};
 fs.mkdirSync(out,{recursive:true});
-const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2','.svg':'image/svg+xml'};
-const server = http.createServer((req,res)=>{
+const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2','.svg':'image/svg+xml','.json':'application/json'};
+const server=http.createServer((req,res)=>{
   const pathname=new URL(req.url,'http://127.0.0.1').pathname;
-  const rel=pathname.replace(/^\/+/, '');
-  const candidate=path.resolve(site,rel);
-  const f=candidate.startsWith(site+path.sep)&&fs.existsSync(candidate)&&fs.statSync(candidate).isFile()
-    ? candidate : path.join(site,'index.html');
-  res.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});
-  fs.createReadStream(f).pipe(res);
+  const file=path.resolve(site,'.'+pathname);
+  const valid=file.startsWith(site+path.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile();
+  const target=valid?file:!path.extname(pathname)?path.join(site,'index.html'):null;
+  if(!target){res.writeHead(404);res.end();return;}
+  res.writeHead(200,{'content-type':mime[path.extname(target)]||'application/octet-stream'});
+  fs.createReadStream(target).pipe(res);
 });
-async function check(label, fn) {await fn();report.tests.push(label);console.log('PASS '+label);}
+let base;
+async function check(name,fn){await fn();report.tests.push(name);console.log('PASS '+name);}
+async function shot(page,name){await page.screenshot({path:path.join(out,name+'.png')});report.screenshots.push(name+'.png');}
+async function ready(page){await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].map(i=>i.decode()));});}
+async function noOverflow(page,width){assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth)<=width+1,'overflow '+width);}
+async function context(browser,width=390,height=844,state={feed,status}) {
+  const ctx=await browser.newContext({viewport:{width,height},reducedMotion:'reduce',hasTouch:width<700});
+  ctx.on('page',page=>{
+    page.on('pageerror',e=>report.errors.push(e.message));
+    page.on('request',r=>{assert.equal(new URL(r.url()).origin,base,'external network');assert.equal(r.method(),'GET');});
+    page.on('response',r=>{if(r.status()>=400&&!new URL(r.url()).pathname.startsWith('/api/'))report.errors.push('STATIC_'+r.status()+':'+r.url());});
+  });
+  await ctx.route('**/api/**',async route=>{
+    const p=new URL(route.request().url()).pathname;
+    assert.equal(route.request().method(),'GET');
+    assert.ok(['/api/status','/api/launches/latest'].includes(p)||/^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(p)||/^\/api\/bag\/[0-9a-f]{64}(\/evidence)?$/.test(p),p);
+    report.requests.push({path:p,method:route.request().method()});
+    assert.ok(report.requests.length<=report.apiRequestCeiling,'request ceiling');
+    let code=404,body={error:'RECORDED_SOURCE_NOT_INCLUDED'};
+    if(p==='/api/status'){code=state.unavailable?503:200;body=state.status;}
+    else if(p==='/api/launches/latest'){code=state.unavailable?503:200;body=state.feed;}
+    else if(state.envelope&&p==='/api/bag/'+state.envelope.material.caseId+'/evidence'){code=200;body=state.envelope;}
+    await route.fulfill({status:code,contentType:'application/json',body:JSON.stringify(body)});
+  });
+  return ctx;
+}
+async function visit(ctx,route='/'){const p=await ctx.newPage();await p.goto(base+route,{waitUntil:'networkidle'});await ready(p);return p;}
+const nav=(p,w)=>p.locator(w>1040?'.inv-sidebar nav':'.inv-mobile-nav');
+const routeLink=(p,w,route)=>nav(p,w).locator('a[data-route="'+route+'"]');
+const clone=x=>JSON.parse(JSON.stringify(x));
+const compareCase=feed.launches.find(l=>feed.launches.some(other=>other.launchId!==l.launchId&&other.deployer===l.deployer&&BigInt(other.blockNumber)<BigInt(l.blockNumber)));
+assert.ok(compareCase,'frozen replay contains no comparable pair');
 (async()=>{
-  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-  const base='http://127.0.0.1:'+server.address().port;
-  const browser=await chromium.launch({headless:true});
-  try{
-    for(const [width,height] of [[1440,900],[390,844],[320,800]]){
-      const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'});
-      context.on('page',page=>page.on('pageerror',err=>report.errors.push(err.message)));
-      await context.route('**/api/**',async route=>{
-        const p=new URL(route.request().url()).pathname;
-        report.requests.push({path:p,method:route.request().method()});
-        assert.equal(route.request().method(),'GET');
-        assert.ok(['/api/status','/api/launches/latest'].includes(p)||/^\/api\/creator\/0x[0-9a-f]{40}\/summary$/.test(p)||/^\/api\/bag\/[0-9a-f]{64}(\/evidence)?$/.test(p),p);
-        const reply=p==='/api/status' ? {code:200,body:status} : p==='/api/launches/latest' ? {code:200,body:feed} : {code:404,body:{error:'OFFLINE_SOURCE_UNAVAILABLE'}};
-        await route.fulfill({status:reply.code,contentType:'application/json',body:JSON.stringify(reply.body)});
-      });
-      const page=await context.newPage();
-      const nav=page.locator(width>1040?'.inv-sidebar':'.inv-mobile-nav');
-      await page.goto(base+'/',{waitUntil:'networkidle'});
-      await check(width+' homepage, V3 art, old slogan and no overflow',async()=>{
+  await new Promise(ok=>server.listen(0,'127.0.0.1',ok));base='http://127.0.0.1:'+server.address().port;
+  const browser=await chromium.launch({headless:true});report.browser=browser.version();
+  try {
+    for(const [width,height] of [[1440,900],[768,1024],[390,844],[320,800]]) {
+      const ctx=await context(browser,width,height),page=await visit(ctx);
+      const id=feed.launches[0].launchId;
+      await check(width+' first-screen finds, loaded art, readable body and touch targets',async()=>{
         assert.match(await page.locator('#a1-title').innerText(),/THE RAT\s+REMEMBERS/);
-        assert.ok(await nav.isVisible());
-        assert.ok(await page.locator('.vl-rat-scene img').count());
-        assert.ok(await page.locator('.vl-find').count()>0);
-        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth)<=width+1,'horizontal overflow');
+        assert.ok(await nav(page,width).isVisible());
+        assert.equal(await page.locator('[data-case-id]').count(),6);
+        assert.equal(await page.locator('.vl-rat-scene img').evaluate(e=>e.complete&&e.naturalWidth>0),true);
+        const first=await page.locator('[data-case-id]').first().boundingBox();
+        const available=width>1040?height:await nav(page,width).evaluate(e=>e.getBoundingClientRect().top);
+        assert.ok(first&&first.y+first.height<=available,'first whole Case below viewport');
+        const sizes=await nav(page,width).locator('a[data-route]').evaluateAll(es=>es.map(e=>({h:e.getBoundingClientRect().height,w:e.getBoundingClientRect().width})));
+        assert.ok(sizes.every(s=>s.h>=44&&s.w>=44),'nav touch targets');
+        report.metrics.push({width,height,firstFindTop:first.y,firstFindBottom:first.y+first.height,available});
+        await noOverflow(page,width);
       });
-      const shot='find-'+width+'.png';
-      await page.screenshot({path:path.join(out,shot),fullPage:true});
-      report.screenshots.push(shot);
-      await check(width+' saved Case persists after navigation and reload',async()=>{
-        const id=await page.locator('[data-case-id]').first().getAttribute('data-case-id');
-        await page.locator('[data-case-id]').first().click();
-        assert.equal(new URL(page.url()).pathname,'/bag/'+id);
-        await page.getByRole('button',{name:'SAVE CASE',exact:true}).click();
-        assert.equal(await page.getByRole('button',{name:'SAVED ON THIS DEVICE'}).count(),1);
-        await nav.locator('a[href="/saved"]').click();
-        assert.equal(new URL(page.url()).pathname,'/saved');
-        await page.reload({waitUntil:'networkidle'});
-        assert.ok((await page.locator('.inv-saved-list li').count())>0);
-        await page.locator('.inv-saved-list li button').first().click();
-        assert.equal(new URL(page.url()).pathname,'/bag/'+id);
-      });
-      await check(width+' searchable Pons finds and truthful trails/crew/status',async()=>{
-        await nav.locator('a[href="/"]').last().click();
-        const input=page.getByRole('searchbox');
-        await input.fill('ZZZ_NOT_A_REAL_LAUNCH_98765');
+      await shot(page,'find-'+width);
+      await check(width+' bounded search, empty recovery and zero search requests',async()=>{
+        const before=report.requests.length;
+        await page.getByRole('searchbox').fill('ZZZ_NOT_A_REAL_LAUNCH_98765');
         assert.equal(await page.locator('[data-case-id]').count(),0);
-        await input.fill('');
-        await nav.locator('a[href="/trails"]').click();
-        assert.match(await page.locator('#a1-finds-title').innerText(),/SMELLS FAMILIAR/);
-        await nav.locator('a[href="/crew"]').click();
-        assert.match(await page.locator('#inv-crew-heading').innerText(),/ONE RAT DIGGING/);
-        await nav.locator('a[href="/status"]').click();
-        assert.match(await page.locator('#inv-status-heading').innerText(),/CHECK THE SOURCE/);
-        assert.equal(await page.getByText(/TRIPWIRE · BUILDING/).count()>0,true);
-        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth)<=width+1,'route overflow');
+        assert.match(await page.getByRole('status').innerText(),/Only these published launches/);
+        await page.getByRole('button',{name:'CLEAR SEARCH',exact:true}).click();
+        assert.equal(await page.locator('[data-case-id]').count(),6);
+        assert.equal(report.requests.length,before);
       });
-      if(width===390){
-        await page.goto(base+'/saved',{waitUntil:'networkidle'});
-        const saved='casebook-'+width+'.png';await page.screenshot({path:path.join(out,saved),fullPage:true});report.screenshots.push(saved);
-      }
-      await context.close();
+      await page.locator('[data-case-id="'+id+'"]').click();
+      await ready(page);
+      await check(width+' exact Case, summary, save and keyboard tabs',async()=>{
+        assert.equal(new URL(page.url()).pathname,'/bag/'+id);
+        assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        assert.match(await page.locator('.vl-case-intro').innerText(),/38 earlier indexed launches/);
+        assert.equal(await page.getByRole('tab').count(),3);
+        const save=await page.getByRole('button',{name:'SAVE CASE',exact:true}).boundingBox();
+        assert.ok(save&&save.y+save.height<height,'save below first viewport');
+        await page.getByRole('button',{name:'SAVE CASE',exact:true}).click();
+        assert.ok(await page.getByRole('button',{name:'SAVED ON THIS DEVICE',exact:true}).isVisible());
+        await noOverflow(page,width);
+      });
+      await shot(page,'case-'+width);
+      await check(width+' verified related Case opens, browser history and receipt fields',async()=>{
+        await page.locator('#vl-tab-WHAT').focus();
+        await page.locator('#vl-tab-WHAT').press('ArrowRight');
+        assert.equal(await page.locator('#vl-tab-TRAIL').getAttribute('aria-selected'),'true');
+        assert.equal(await page.locator('.inv-related-cases [data-case-id]').count(),0,'first Case has no older in-window record');
+        await page.getByRole('button',{name:'BACK TO FINDS'}).click();
+        await page.locator('[data-case-id="'+compareCase.launchId+'"]').click();
+        await page.locator('#vl-tab-TRAIL').click();
+        const related=page.locator('.inv-related-cases [data-case-id]');
+        assert.ok(await related.count()>0,'no in-window trail');
+        const relatedId=await related.first().getAttribute('data-case-id');
+        const a=compareCase,other=feed.launches.find(l=>l.launchId===relatedId);
+        assert.equal(other.deployer,a.deployer);assert.ok(BigInt(other.blockNumber)<BigInt(a.blockNumber));
+        await shot(page,'trail-'+width);
+        await related.first().click();assert.equal(await page.locator('#vl-case').getAttribute('data-case'),relatedId);
+        await page.goBack();assert.equal(await page.locator('#vl-case').getAttribute('data-case'),compareCase.launchId);
+        await page.locator('#vl-tab-RECEIPTS').click();
+        await page.locator('.vl-receipt summary').click();
+        assert.ok((await page.locator('.vl-receipt-body').innerText()).includes(a.txHash));
+        await noOverflow(page,width);
+        await page.locator('#vl-tab-RECEIPTS').press('Home');
+        assert.equal(await page.locator('#vl-tab-WHAT').getAttribute('aria-selected'),'true');
+      });
+      await check(width+' Casebook persists and reopens exact ID with useful identity',async()=>{
+        await routeLink(page,width,'/saved').click();
+        await page.reload({waitUntil:'networkidle'});await ready(page);
+        assert.equal(await page.locator('.inv-saved-list li').count(),1);
+        assert.match(await page.locator('.inv-saved-open').innerText(),/0xea90…daf3/);
+        await shot(page,'casebook-'+width);
+        await page.locator('.inv-saved-open').click();
+        assert.equal(new URL(page.url()).pathname,'/bag/'+id);
+        await page.reload({waitUntil:'networkidle'});
+        assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        await page.getByRole('button',{name:'BACK TO CASEBOOK'}).click();
+        assert.equal(new URL(page.url()).pathname,'/saved');
+      });
+      await check(width+' distinct deployer groups, return context and truthful crew/status',async()=>{
+        await routeLink(page,width,'/trails').click();
+        assert.match(await page.locator('#a1-finds-title').innerText(),/SMELLS FAMILIAR/);
+        assert.ok(await page.locator('.inv-deployer-group').count()>0);
+        await shot(page,'deployer-groups-'+width);
+        await page.locator('[data-case-id]').first().click();
+        await page.getByRole('button',{name:'BACK TO TRAILS'}).click();
+        assert.equal(new URL(page.url()).pathname,'/trails');
+        await routeLink(page,width,'/crew').click();
+        assert.match(await page.locator('#inv-crew-heading').innerText(),/ONE RAT DIGGING/);
+        assert.match(await page.locator('.inv-crew-list').innerText(),/TRIPWIRE · BUILDING/);
+        assert.equal(await page.getByRole('button',{name:/EMPLOY|CONNECT WALLET|START WATCH/}).count(),0);
+        await ready(page);await shot(page,'crew-'+width);await noOverflow(page,width);
+        await routeLink(page,width,'/status').click();
+        assert.match(await page.locator('#inv-status-heading').innerText(),/CHECK THE SOURCE/);
+        assert.match(await page.locator('.inv-status-list').innerText(),/STALE_VERIFIED/);
+        await noOverflow(page,width);
+      });
+      await ctx.close();
     }
-    assert.deepEqual(report.errors,[]);
-    assert.ok(report.requests.every(r=>r.method==='GET'));
-    report.verdict='PASS';console.log('INVESTIGATION_SHELL_BROWSER_PASS '+report.tests.length);
-  }finally{await browser.close();}
-})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{
-  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(report,null,2)+'\n');
-  server.close();
-});
+    for(const name of ['unavailable','wrong-chain','corrupt-digest','binding-mismatch']) {
+      const state={feed:clone(feed),status:clone(status)};
+      if(name==='unavailable')state.unavailable=true;
+      if(name==='wrong-chain')state.feed.chainId=5042;
+      if(name==='corrupt-digest')state.feed.feedDigest='0'.repeat(64);
+      if(name==='binding-mismatch')state.status.checkpointBlock=String(BigInt(state.status.checkpointBlock)+1n);
+      const ctx=await context(browser,390,844,state),page=await visit(ctx,'/bag/'+feed.launches[0].launchId);
+      await check(name+' fails closed and preserves requested Case',async()=>{
+        assert.equal(await page.locator('[data-case-id]').count(),0);
+        assert.equal(await page.locator('#vl-case').getAttribute('data-case'),null);
+        assert.equal(new URL(page.url()).pathname,'/bag/'+feed.launches[0].launchId);
+        assert.equal(await page.locator('[data-read-state]').first().getAttribute('data-read-state'),'UNAVAILABLE');
+        assert.match(await page.locator('#vl-case').innerText(),/CASE UNAVAILABLE/);
+      });
+      if(name==='unavailable')await shot(page,'unavailable-390');
+      await ctx.close();
+    }
+    const retained={feed:clone(feed),status:clone(status)};
+    const retainedCtx=await context(browser,390,844,retained),retainedPage=await visit(retainedCtx);
+    await check('failed recheck retains exact stale verified window without fallback',async()=>{
+      retained.unavailable=true;
+      await retainedPage.getByRole('button',{name:'RECHECK',exact:true}).click();
+      await retainedPage.getByRole('alert').waitFor();
+      assert.equal(await retainedPage.locator('[data-case-id]').count(),6);
+      assert.equal(await retainedPage.locator('[data-read-state]').first().getAttribute('data-read-state'),'STALE_VERIFIED');
+    });await retainedCtx.close();
+    const fresh={feed:clone(feed),status:{...status,state:'FRESH_VERIFIED',verifiedAtMs:Date.now()-1000,runtimeUpdatedAtMs:Date.now()-1000,freshnessValidUntilMs:Date.now()+2500,lastSyncError:null}};
+    const freshCtx=await context(browser,390,844,fresh),freshPage=await visit(freshCtx);
+    await check('fresh publication expires visibly without polling or stale promotion',async()=>{
+      assert.equal(await freshPage.locator('[data-read-state]').first().getAttribute('data-read-state'),'FRESH_VERIFIED');
+      const before=report.requests.length;
+      await freshPage.locator('.vl-lab-stamp b[data-read-state="STALE_VERIFIED"]').waitFor({timeout:5000});
+      assert.equal(report.requests.length,before);
+    });await freshCtx.close();
+    const snap=capture.snapshot;
+    const historyState={feed:JSON.parse(snap.snapshot_json),status:{...status,state:'STALE_VERIFIED',checkpointBlock:snap.checkpoint_block,checkpointBlockHash:snap.checkpoint_block_hash,feedDigest:snap.feed_digest,verifiedAtMs:snap.verified_at_ms,publicationVersion:snap.publication_version,freshnessValidUntilMs:null,runtimeUpdatedAtMs:null},envelope:clone(envelope)};
+    const historyCtx=await context(browser,390,844,historyState),historyPage=await visit(historyCtx,'/bag/'+envelope.material.caseId);
+    await check('recorded historical envelope keeps its own 19-count and partial reconstruction',async()=>{
+      await historyPage.locator('#vl-case[data-projection="HISTORICAL"]').waitFor();
+      assert.match(await historyPage.locator('.vl-case-intro').innerText(),/19 earlier indexed launches in this returned window/);
+      assert.match(await historyPage.locator('.a12-history-notice').innerText(),/not an immutable archived publication/);
+      await historyPage.locator('#vl-tab-TRAIL').click();
+      assert.equal(await historyPage.locator('.vl-source-trail li').count(),20);
+      const href=await historyPage.locator('.vl-source-trail a').first().getAttribute('href');
+      assert.match(href,/^\/bag\/[0-9a-f]{64}$/);
+      await noOverflow(historyPage,390);
+    });await historyCtx.close();
+    historyState.envelope.digest='0'.repeat(64);
+    const corruptCtx=await context(browser,390,844,historyState),corruptPage=await visit(corruptCtx,'/bag/'+envelope.material.caseId);
+    await check('corrupt historical envelope cannot borrow latest-feed evidence',async()=>{
+      await corruptPage.locator('#vl-case[data-historical-state="UNAVAILABLE"]').waitFor();
+      assert.equal(await corruptPage.locator('#vl-case').getAttribute('data-case'),null);
+      assert.equal(await corruptPage.locator('.vl-case-steps').count(),0);
+    });await corruptCtx.close();
+    const storageCtx=await context(browser);
+    await storageCtx.addInitScript(()=>{Storage.prototype.setItem=()=>{throw Error('CONTROL_STORAGE_UNAVAILABLE');};});
+    const storagePage=await visit(storageCtx);
+    await check('storage failure says session-only and still allows a reversible save',async()=>{
+      await storagePage.locator('[data-case-id]').first().click();
+      await storagePage.getByRole('button',{name:'SAVE CASE',exact:true}).click();
+      assert.equal(await storagePage.getByRole('button',{name:'SAVED FOR THIS SESSION',exact:true}).count(),1);
+      await routeLink(storagePage,390,'/saved').click();
+      assert.match(await storagePage.getByRole('status').innerText(),/lasts only for this session/);
+      await storagePage.getByRole('button',{name:/Remove saved Case/}).click();
+      assert.equal(await storagePage.locator('.inv-saved-list li').count(),0);
+    });await storageCtx.close();
+    assert.deepEqual(report.errors,[]);report.verdict='PASS';console.log('INVESTIGATION_V2_BROWSER_PASS '+report.tests.length);
+  } finally {await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(report,null,2)+'\n');server.close();});

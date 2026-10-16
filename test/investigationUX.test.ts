@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { filterDiscoverableCases, readCasebook, sectionForPath, toggleSavedCase } from '../web-v2/src/investigationUX.js';
+import { filterDiscoverableCases, groupDeployerCases, investigationHref, readCasebook, sectionForPath, toggleSavedCase } from '../web-v2/src/investigationUX.js';
 
 const a = 'a'.repeat(64), b = 'b'.repeat(64), c = 'c'.repeat(64);
 const cases = [
@@ -15,6 +15,24 @@ test('route selection preserves the real V3 /bag Case path',()=>{
  assert.equal(sectionForPath('/status'), 'status');
  assert.equal(sectionForPath('/bag/'+a), 'find');
  assert.equal(sectionForPath('/unimplemented-arc-radar'), 'find');
+});
+test('deployer groups retain exact verified Cases and order without borrowing historical counts',()=>{
+ const input=[cases[0],cases[1],{...cases[0],token:'0x3',priorLaunches:8}];
+ const groups=groupDeployerCases(input);
+ assert.equal(groups.length,2);
+ assert.deepEqual(groups[0].cases,[input[0],input[2]]);
+ assert.equal(groups[0].cases.length,2); // not 8 from the separate recurrence field
+ assert.deepEqual(input,[cases[0],cases[1],{...cases[0],token:'0x3',priorLaunches:8}]);
+});
+test('preview hrefs preserve nested entry for reload, modified clicks and exact Case IDs',()=>{
+ const location='https://raw.githack.com/CipherCuttle/binrat/binrat-v3-githack-v2-20261016/preview/githack/index.html?view=saved#old';
+ for(const path of ['/', '/trails', '/saved', '/crew', '/status', '/bag/'+a, '/#vl-finds']) {
+  const preview=new URL(investigationHref(path,location,true),'https://raw.githack.com');
+  assert.equal(preview.pathname,new URL(location).pathname);
+  assert.equal(preview.searchParams.get('case'),path.startsWith('/bag/')?a:null);
+  assert.equal(preview.searchParams.get('view'),['/trails','/saved','/crew','/status'].includes(path)?path.slice(1):null);
+  assert.equal(investigationHref(path,location,false),path);
+ }
 });
 test('Casebook accepts only exact 64-character digest IDs, deduplicates and caps',()=>{
  assert.deepEqual(readCasebook(JSON.stringify([a,a,'../data',b.toUpperCase(),b,c])),[a,b,c]);
