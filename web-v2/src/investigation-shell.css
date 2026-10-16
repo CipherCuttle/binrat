@@ -363,3 +363,32 @@
 @media (prefers-reduced-motion: reduce) {
   .inv-layout *, .inv-layout *::before, .inv-layout *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* CASE VALUE V1: user notes are distinct from verified on-chain evidence. */
+.inv-layout .inv-saved-list li { flex-wrap: wrap; }
+.inv-layout .inv-find-history { align-content: center; }
+.inv-layout .inv-find-history small:nth-child(2) { color: #e1d5f4; font-weight: 550; }
+.inv-layout .inv-saved-evidence {
+  flex: 0 0 100%; margin: 0 !important; padding: 8px 12px;
+  border-top: 1px solid #9a8bb33d; color: #d1c5e0;
+  font: 400 13px/1.5 'VL Sans', sans-serif;
+}
+.inv-layout .inv-saved-evidence strong { color: #d4ecf1; }
+.inv-layout .inv-note-editor {
+  flex: 0 0 100%; min-width: 0; display: grid; gap: 7px;
+  padding: 9px 12px 12px; color: #d6c8e5;
+  font: 600 11px/1.5 'VL Mono', monospace; letter-spacing: .03em;
+}
+.inv-layout .inv-note-editor textarea {
+  display: block; box-sizing: border-box; width: 100%; resize: vertical;
+  min-height: 68px; max-height: 180px; border: 1px solid #a89fc861;
+  border-radius: 7px; background: #121429a3; color: #f4e9ff;
+  padding: 10px 12px; font: 400 15px/1.45 'VL Sans', sans-serif;
+}
+.inv-layout .inv-note-editor textarea::placeholder { color: #a6a1ba; }
+.inv-layout .inv-note-editor textarea:focus-visible { outline: 2px solid #a3ebed; outline-offset: 2px; }
+.inv-layout .inv-note-editor > span { text-align: right; color: #a9a3c1; letter-spacing: 0; }
+@media (max-width: 700px) {
+  .inv-layout .inv-saved-evidence { padding-inline: 4px; font-size: 12px; }
+  .inv-layout .inv-note-editor { padding-inline: 4px; }
+}
