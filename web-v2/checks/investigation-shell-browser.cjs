@@ -83,6 +83,31 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         await noOverflow(page,width);
       });
       await shot(page,'find-'+width);
+      await check(width+' React Bits starter elements honor reduced motion and button semantics',async()=>{
+        assert.equal(await page.locator('.rb-spotlight.inv-evidence-lead').count(),1);
+        assert.equal(await page.locator('.rb-shiny-text.inv-evidence-lead-tag').count(),1);
+        const button=page.locator('.rb-star-border.inv-evidence-lead-action');
+        assert.equal(await button.count(),1);
+        assert.equal(await button.getAttribute('type'),'button');
+        assert.equal(await page.locator('.rb-shiny-text').evaluate(el => getComputedStyle(el).animationName),'none');
+        assert.equal(await page.locator('.rb-spotlight').evaluate(el => getComputedStyle(el, '::before').display),'none');
+        assert.equal(await page.locator('.rb-star-border').evaluate(el => getComputedStyle(el, '::after').display),'none');
+        await noOverflow(page,width);
+      });
+      if(width===1440) {
+        await page.emulateMedia({reducedMotion:'no-preference'});
+        await check('React Bits desktop hover has real pointer spotlight and no DOM/source mutations',async()=>{
+          const before=report.requests.length;
+          const surface=page.locator('.rb-spotlight');
+          await surface.hover();
+          const pos=await surface.evaluate(el=>el.style.getPropertyValue('--rb-spot-x'));
+          assert.match(pos,/^[0-9.]+px$/,'pointer spotlight did not move');
+          assert.notEqual(await page.locator('.rb-shiny-text').evaluate(el=>getComputedStyle(el).animationName),'none');
+          assert.equal(report.requests.length,before,'hover must not poll');
+        });
+        await shot(page,'react-bits-desktop');
+        await page.emulateMedia({reducedMotion:'reduce'});
+      }
       await check(width+' evidence-based link leads to two real Cases in this window',async()=>{
         const match=page.locator('.inv-evidence-lead');
         assert.match(await match.innerText(),/2 launches share one reported deployer in this window/);

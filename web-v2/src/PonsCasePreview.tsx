@@ -10,6 +10,8 @@ import { InvestigationNav } from "./InvestigationNav";
 import { DeployerGroups, FindRow, SavedCases, shortAddress, tokenLabel } from "./InvestigationPanels";
 import { filterDiscoverableCases, investigationHref, readCasebook, readCaseNotes, sectionForPath, sharedDeployerLeads, toggleSavedCase, updateCaseNote, type InvestigationSection } from "./investigationUX";
 import "./investigation-shell.css";
+import { ShinyText, SpotlightCard, StarBorder } from "./ReactBitsStarter";
+import "./ReactBitsStarter.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS"];
@@ -292,17 +294,17 @@ export function PonsCasePreview() {
         {!data && <p role="status">{loading ? "Rat Zero is checking the source. Launches appear here once verified." : "Pons launches are unavailable. Recheck to try again. Nothing was substituted."}</p>}
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
         {data && cases.length > 0 && filtered.length === 0 && <div className="inv-empty-state" role="status"><h3>{search.trim() ? "Nothing in this window." : "No earlier matches here."}</h3><p>{search.trim() ? "Try another token or address. Only these published launches were searched." : "No earlier match in our partial index. Older history remains unknown."}</p>{search.trim() && <button className="vl-utility" onClick={() => setSearch("")}>CLEAR SEARCH</button>}</div>}
-        {data && section === "find" && !search.trim() && (firstSharedLead || historyMatchCount > 0) && <aside className="inv-evidence-lead" aria-label="Relationships in this recorded launch window">
-          <span className="inv-evidence-lead-tag">RAT ZERO / VERIFIED CONNECTION</span>
+        {data && section === "find" && !search.trim() && (firstSharedLead || historyMatchCount > 0) && <SpotlightCard className="inv-evidence-lead" aria-label="Relationships in this recorded launch window">
+          <ShinyText className="inv-evidence-lead-tag">RAT ZERO / VERIFIED CONNECTION</ShinyText>
           <span className="inv-evidence-lead-fact">{firstSharedLead
             ? firstSharedLead.caseIds.length + " launches share one reported deployer in this window"
             : historyMatchCount + " launches have earlier indexed deployer activity"}</span>
-          <button type="button" className="inv-evidence-lead-action" onClick={() => firstSharedLead
+          <StarBorder className="inv-evidence-lead-action" onClick={() => firstSharedLead
             ? openSharedDeployer(firstSharedLead.address) : navigateSection("/trails")}>
             {firstSharedLead ? "COMPARE THOSE CASES ↗" : "INSPECT MATCHES ↗"}
-          </button>
+          </StarBorder>
           <small>Address match only. No ownership, risk or profit claim.</small>
-        </aside>}
+        </SpotlightCard>}
         {data && filtered.length > 0 && (section === "trails" ? <DeployerGroups cases={filtered} onOpen={selectCase} /> : <div className="vl-find-rail a1-find-grid">{visibleCases.map(item => <FindRow key={item.id} item={item} onOpen={selectCase} />)}</div>)}
         {section === "find" && !expanded && filtered.length > 6 && <button className="vl-utility a1-more" onClick={() => setExpanded(true)}>SHOW ALL {filtered.length} LAUNCHES <span aria-hidden="true">↓</span></button>}
         <details className="inv-source-limits"><summary>What these finds tell you</summary><p>Launch order comes from indexed blocks. Earlier-launch counts refer to the Pons-reported deployer in partial history. They do not identify a human, predict returns or show safety. Source freshness describes the publication check, not launch age.</p></details>
