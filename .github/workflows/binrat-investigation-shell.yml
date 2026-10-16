@@ -5,6 +5,7 @@ on:
       - feat/binrat-v3-investigation-shell-v1-20261016
     paths:
       - 'web-v2/src/**'
+      - 'web-v2/checks/investigation-shell-browser.cjs'
       - 'test/investigationUX.test.ts'
       - '.github/workflows/binrat-investigation-shell.yml'
   pull_request:
@@ -35,3 +36,16 @@ jobs:
         run: pnpm --dir web-v2 check
       - name: Compile production-shaped local candidate without deployment
         run: pnpm --dir web-v2 build:frontdoor-candidate
+      - name: Pinned Chromium browser journey (recorded real Pons feed, offline)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-v3-browser" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-v3-browser/node_modules/playwright/cli.js" install --with-deps chromium
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-v3-browser/node_modules" node web-v2/checks/investigation-shell-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: binrat-v3-investigation-shell-${{ github.sha }}
+          path: .artifacts/investigation-shell/browser/
+          retention-days: 14
