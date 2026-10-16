@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { filterDiscoverableCases, groupDeployerCases, investigationHref, readCasebook, sectionForPath, toggleSavedCase } from '../web-v2/src/investigationUX.js';
+import { filterDiscoverableCases, groupDeployerCases, investigationHref, observationForFind, readCasebook, readCaseNotes, sectionForPath, toggleSavedCase, updateCaseNote } from '../web-v2/src/investigationUX.js';
 
 const a = 'a'.repeat(64), b = 'b'.repeat(64), c = 'c'.repeat(64);
 const cases = [
@@ -53,4 +53,29 @@ test('Pons search uses verified visible data only, not network or synthetic rank
  assert.deepEqual(filterDiscoverableCases(cases,'222222',false).map(x=>x.symbol),['DUCK']);
  assert.deepEqual(filterDiscoverableCases(cases,'Not indexed',false),[]);
  assert.equal(filterDiscoverableCases(cases,'',true).length,1);
+});
+
+test('find explanations never imply safety, opportunity, fresh chain state or verified human identity',()=>{
+ const recurrent=observationForFind({priorLaunches:3});
+ assert.match(recurrent.label,/3 earlier indexed launches/);
+ assert.match(recurrent.action,/Compare/);
+ assert.match(recurrent.explanation,/significance unknown/);
+ const unmatched=observationForFind({priorLaunches:0});
+ assert.match(unmatched.label,/No earlier indexed match/);
+ assert.match(unmatched.explanation,/partial records/);
+ assert.doesNotMatch([recurrent,unmatched].map(x=>Object.values(x).join(' ')).join(' '),/profitable|alpha|safe to buy|guaranteed/i);
+});
+test('device-only notes reject invalid IDs, bad types, pollution and excess text',()=>{
+ const dirty=JSON.stringify({[a]:'Look at contract.',[b]:'', ['../']: 'unsafe', ['__proto__']:'pollution',[c]:'x'.repeat(281)});
+ const parsed=readCaseNotes(dirty);
+ assert.equal(parsed[a],'Look at contract.');
+ assert.equal(parsed[b],undefined);
+ assert.equal(parsed[c],undefined);
+ assert.equal(Object.getPrototypeOf(parsed),null);
+ assert.deepEqual(Object.keys(readCaseNotes('not-json')),[]);
+ assert.deepEqual(Object.keys(readCaseNotes('x'.repeat(20001))),[]);
+ assert.equal(updateCaseNote(parsed,'bad', 'hi'),parsed);
+ assert.equal(updateCaseNote(parsed,b,'x'.repeat(300))[b].length,280);
+ assert.equal(updateCaseNote(parsed,a,' ')[a],undefined);
+ assert.equal(Object.keys(updateCaseNote(readCaseNotes(null),a,'Remember')).length,1);
 });
