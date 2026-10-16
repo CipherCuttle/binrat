@@ -1,0 +1,356 @@
+{
+  "source": "ed7f537d6ea30172df8edf12e7e9cc51ecc7b3aa",
+  "sourceDirty": false,
+  "provenance": "RECORDED_PUBLIC_PONS_REPLAY",
+  "controls": "EXPLICIT_SIMULATED_ADVERSE_STATES",
+  "liveProvider": false,
+  "send": false,
+  "ownerVisualApproval": "PENDING",
+  "tests": [
+    "1440 first-screen finds, loaded art, readable body and touch targets",
+    "1440 evidence-based link leads to two real Cases in this window",
+    "1440 bounded search, empty recovery and zero search requests",
+    "1440 exact Case, summary, save and keyboard tabs",
+    "1440 verified related Case opens, browser history and receipt fields",
+    "1440 Casebook persists and reopens exact ID with useful identity",
+    "1440 distinct deployer groups, return context and truthful crew/status",
+    "768 first-screen finds, loaded art, readable body and touch targets",
+    "768 evidence-based link leads to two real Cases in this window",
+    "768 bounded search, empty recovery and zero search requests",
+    "768 exact Case, summary, save and keyboard tabs",
+    "768 verified related Case opens, browser history and receipt fields",
+    "768 Casebook persists and reopens exact ID with useful identity",
+    "768 distinct deployer groups, return context and truthful crew/status",
+    "390 first-screen finds, loaded art, readable body and touch targets",
+    "390 evidence-based link leads to two real Cases in this window",
+    "390 bounded search, empty recovery and zero search requests",
+    "390 exact Case, summary, save and keyboard tabs",
+    "390 verified related Case opens, browser history and receipt fields",
+    "390 Casebook persists and reopens exact ID with useful identity",
+    "390 distinct deployer groups, return context and truthful crew/status",
+    "320 first-screen finds, loaded art, readable body and touch targets",
+    "320 evidence-based link leads to two real Cases in this window",
+    "320 bounded search, empty recovery and zero search requests",
+    "320 exact Case, summary, save and keyboard tabs",
+    "320 verified related Case opens, browser history and receipt fields",
+    "320 Casebook persists and reopens exact ID with useful identity",
+    "320 distinct deployer groups, return context and truthful crew/status",
+    "unavailable fails closed and preserves requested Case",
+    "wrong-chain fails closed and preserves requested Case",
+    "corrupt-digest fails closed and preserves requested Case",
+    "binding-mismatch fails closed and preserves requested Case",
+    "failed recheck retains exact stale verified window without fallback",
+    "verified empty feed stays distinct from source failure",
+    "fresh publication expires visibly without polling or stale promotion",
+    "recorded historical envelope keeps its own 19-count and partial reconstruction",
+    "corrupt historical envelope cannot borrow latest-feed evidence",
+    "storage failure says session-only and still allows a reversible save"
+  ],
+  "requests": [
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0xca11bde05977b3631167028862be2a173976ca11/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0xca11bde05977b3631167028862be2a173976ca11/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0xca11bde05977b3631167028862be2a173976ca11/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0xca11bde05977b3631167028862be2a173976ca11/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/creator/0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf/summary",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    },
+    {
+      "path": "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01/evidence",
+      "method": "GET"
+    },
+    {
+      "path": "/api/bag/742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01",
+      "method": "GET"
+    },
+    {
+      "path": "/api/launches/latest",
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "method": "GET"
+    }
+  ],
+  "errors": [],
+  "metrics": [
+    {
+      "width": 1440,
+      "height": 900,
+      "firstFindTop": 736.03125,
+      "firstFindBottom": 850.8125,
+      "available": 900
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "firstFindTop": 700.03125,
+      "firstFindBottom": 814.8125,
+      "available": 956.5
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "firstFindTop": 669.859375,
+      "firstFindBottom": 773.859375,
+      "available": 776.5
+    },
+    {
+      "width": 320,
+      "height": 800,
+      "firstFindTop": 597.078125,
+      "firstFindBottom": 701.078125,
+      "available": 732.5
+    }
+  ],
+  "screenshots": [
+    "find-1440.png",
+    "case-1440.png",
+    "trail-1440.png",
+    "casebook-1440.png",
+    "deployer-groups-1440.png",
+    "crew-1440.png",
+    "find-768.png",
+    "case-768.png",
+    "trail-768.png",
+    "casebook-768.png",
+    "deployer-groups-768.png",
+    "crew-768.png",
+    "find-390.png",
+    "case-390.png",
+    "trail-390.png",
+    "casebook-390.png",
+    "deployer-groups-390.png",
+    "crew-390.png",
+    "find-320.png",
+    "case-320.png",
+    "trail-320.png",
+    "casebook-320.png",
+    "deployer-groups-320.png",
+    "crew-320.png",
+    "unavailable-390.png"
+  ],
+  "apiRequestCeiling": 160,
+  "verdict": "PASS",
+  "browser": "141.0.7390.37"
+}
