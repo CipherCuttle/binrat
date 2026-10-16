@@ -1,0 +1,79 @@
+name: BINRAT BINRAT micrographics offline preview
+on:
+  push:
+    branches: [feat/binrat-micrographics-v1-20261017]
+    paths:
+      - 'web-v2/src/**'
+      - 'docs/licenses/REACT_BITS_LICENSE.md'
+      - 'docs/licenses/REACT_BITS_LICENSE.md'
+      - 'web-v2/checks/investigation-shell-browser.cjs'
+      - 'test/investigationUX.test.ts'
+      - 'scripts/build-githack-preview.mjs'
+      - 'scripts/check-githack-preview.mjs'
+      - '.github/workflows/binrat-micrographics-preview.yml'
+permissions:
+  contents: read
+jobs:
+  candidate:
+    if: github.repository == 'CipherCuttle/binrat' && github.ref == 'refs/heads/feat/binrat-micrographics-v1-20261017'
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: write
+    env:
+      BINRAT_GITHACK_BRANCH: binrat-v3-githack-micrographics-20261017
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: pnpm/action-setup@v4
+        with: {version: 10.15.0, run_install: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install frozen dependencies without application/native side effects
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Route, Casebook and historical-source contracts
+        run: node --import tsx --test test/investigationUX.test.ts web-v2/checks/check-historical-case.ts web-v2/checks/check-pons-historical-source.mjs
+      - name: V3 source, evidence, visual invariants and TypeScript
+        run: pnpm --dir web-v2 check
+      - name: Build normal same-origin candidate without deployment
+        run: pnpm --dir web-v2 build:frontdoor-candidate
+      - name: Pinned Chromium at desktop, tablet and two mobile widths
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-browser" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-browser/node_modules/playwright/cli.js" install --with-deps chromium
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-browser/node_modules" node web-v2/checks/investigation-shell-browser.cjs
+      - name: Build and check static recorded-data preview
+        run: |
+          node scripts/build-githack-preview.mjs
+          node scripts/check-githack-preview.mjs --static
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-browser/node_modules" node scripts/check-githack-preview.mjs
+      - name: Publish one distinct preview branch after all acceptance passes
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/$BINRAT_GITHACK_BRANCH" >/dev/null 2>&1; then
+            echo 'STOP: this preview already exists; never overwrite'
+            exit 1
+          fi
+          git diff --quiet
+          git diff --cached --quiet
+          git switch -c "$BINRAT_GITHACK_BRANCH"
+          mkdir -p preview/githack/review
+          cp -R .artifacts/githack/site/. preview/githack/
+          cp -R .artifacts/investigation-shell/browser/. preview/githack/review/
+          cp .artifacts/githack/check.json preview/githack/review/githack-check.json
+          git add -f preview/githack
+          git config user.name "binrat-preview"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "preview: BINRAT BINRAT micrographics from $GITHUB_SHA (recorded Pons data only)"
+          git push origin HEAD:refs/heads/"$BINRAT_GITHACK_BRANCH"
+      - name: Preserve results even if publication is blocked
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binrat-micrographics-v1-${{ github.sha }}
+          path: |
+            .artifacts/investigation-shell/browser/
+            .artifacts/githack/check.json
+            .artifacts/githack/site/GITHACK_PREVIEW.json
+          retention-days: 14
