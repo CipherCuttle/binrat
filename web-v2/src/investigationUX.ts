@@ -38,3 +38,32 @@ export function filterDiscoverableCases<T extends DiscoverableCase>(
     (!needle || [item.name, item.symbol, item.token, item.reportedCreatorAddress]
       .some((field) => field.toLowerCase().includes(needle))));
 }
+
+/** Groups the displayed, already-verified launch window. Never searches more history. */
+export function groupDeployerCases<T extends DiscoverableCase>(cases: readonly T[]): {
+  address: string; cases: T[];
+}[] {
+  const groups = new Map<string, T[]>();
+  for (const item of cases) {
+    const key = item.reportedCreatorAddress;
+    const group = groups.get(key) ?? [];
+    group.push(item);
+    groups.set(key, group);
+  }
+  return [...groups].map(([address, items]) => ({ address, cases: items }));
+}
+
+/** Keep modifier-click/new-tab destinations inside the same static preview. */
+export function investigationHref(route: string, location: string, staticPreview: boolean): string {
+  if (!staticPreview) return route;
+  const url = new URL(location);
+  url.searchParams.delete('view');
+  url.searchParams.delete('case');
+  const id = /^\/bag\/([0-9a-f]{64})$/.exec(route)?.[1];
+  if (id) url.searchParams.set('case', id);
+  else if (['/saved', '/trails', '/crew', '/status'].includes(route)) {
+    url.searchParams.set('view', route.slice(1));
+  }
+  url.hash = route.includes('#') ? route.slice(route.indexOf('#')) : '';
+  return url.pathname + url.search + url.hash;
+}
