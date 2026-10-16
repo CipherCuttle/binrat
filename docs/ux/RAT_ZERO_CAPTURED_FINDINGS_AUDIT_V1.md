@@ -8,7 +8,7 @@
 - **20 exact launch IDs**, **19 distinct reported deployer addresses**.
 - **0 nonempty token names; 0 nonempty symbols.** Do not manufacture labels, trends or popularity.
 - **4 launches** have `priorLaunchCount > 0` (counts 38, 2, 1, 43). These are historical index counts with partial coverage, **not** observed in-window overlaps and **not** ratings.
-- **Exactly one deployer address appears on two distinct launch IDs in the captured 20-record window**: `0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf`. The two launch IDs are `ea2e848582...` (block 84242495) and `37bbe331d...` (block 84240922), and must be verified by exact ID through the read adapter.
+- **Exactly one deployer address appears on two distinct launch IDs in the captured 20-record window**: `0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf`. The two launch IDs are `ea2e84858696...` (block 84242495) and `37bbe331d9b7...` (block 84240922), and must be verified by exact ID through the read adapter.
 - The overlap is the most directly inspectable relationship available **within this preview**. It is not necessarily unusual or economically interesting. Do not imply shared humans, wallets, funding provenance, rug risk or trading profitability.
 
 ## UI choice
