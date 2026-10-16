@@ -8,7 +8,7 @@ on:
       - 'test/investigationUX.test.ts'
       - 'scripts/build-githack-preview.mjs'
       - 'scripts/check-githack-preview.mjs'
-      - '.github/workflows/binrat-case-value-v1-preview.yml'
+      - '.github/workflows/binrat-case-value-preview.yml'
 permissions:
   contents: read
 jobs:
@@ -63,7 +63,7 @@ jobs:
           git add -f preview/githack
           git config user.name "binrat-preview"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "preview: Investigation V2 from $GITHUB_SHA (recorded Pons data only)"
+          git commit -m "preview: Case Value V1 from $GITHUB_SHA (recorded Pons data only)"
           git push origin HEAD:refs/heads/"$BINRAT_GITHACK_BRANCH"
       - name: Preserve results even if publication is blocked
         if: always()
