@@ -1,0 +1,71 @@
+name: BINRAT GitHack offline V3 preview
+on:
+  push:
+    branches:
+      - feat/binrat-v3-investigation-shell-v1-20261016
+    paths:
+      - 'scripts/build-githack-preview.mjs'
+      - 'scripts/check-githack-preview.mjs'
+      - 'web-v2/src/PonsCasePreview.tsx'
+      - 'web-v2/src/FrontdoorCandidateApp.tsx'
+      - '.github/workflows/binrat-githack-preview.yml'
+permissions:
+  contents: write
+jobs:
+  static-preview-only:
+    if: github.repository == 'CipherCuttle/binrat' && github.ref == 'refs/heads/feat/binrat-v3-investigation-shell-v1-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install frozen dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build isolated static V3 preview using captured public Pons data only
+        run: node scripts/build-githack-preview.mjs
+      - name: Verify source, fixture and static links before browser
+        run: node scripts/check-githack-preview.mjs --static
+      - name: Verify GitHack URL routing in Chromium (no provider access)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/binrat-githack-browser" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-githack-browser/node_modules/playwright/cli.js" install --with-deps chromium
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-githack-browser/node_modules" node scripts/check-githack-preview.mjs
+      - name: Publish to distinct one-shot GitHack branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH=binrat-v3-githack-20261016
+          if git ls-remote --exit-code --heads origin "refs/heads/$BRANCH" >/dev/null 2>&1; then
+            echo 'STOP: GitHack branch already exists; no overwrite or automatic republish'
+            exit 1
+          fi
+          git diff --quiet
+          git diff --cached --quiet
+          git switch -c "$BRANCH"
+          mkdir -p preview/githack
+          cp -R .artifacts/githack/site/. preview/githack/
+          git add -f preview/githack
+          git config user.name "binrat-githack-preview"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "preview: V3 investigation shell built from $GITHUB_SHA (offline Pons fixture)"
+          git push origin HEAD:refs/heads/"$BRANCH"
+          echo "GITHACK_PUBLISHED https://raw.githack.com/CipherCuttle/binrat/$BRANCH/preview/githack/index.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: binrat-githack-offline-static-${{ github.sha }}
+          path: |
+            .artifacts/githack/check.json
+            .artifacts/githack/site/GITHACK_PREVIEW.json
+          retention-days: 14
