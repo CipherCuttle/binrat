@@ -69,7 +69,7 @@ async function check(label, fn) {await fn();report.tests.push(label);console.log
         assert.equal(new URL(page.url()).pathname,'/bag/'+id);
       });
       await check(width+' searchable Pons finds and truthful trails/crew/status',async()=>{
-        await nav.locator('a[href="/"]').click();
+        await nav.locator('a[href="/"]').last().click();
         const input=page.getByRole('searchbox');
         await input.fill('ZZZ_NOT_A_REAL_LAUNCH_98765');
         assert.equal(await page.locator('[data-case-id]').count(),0);
