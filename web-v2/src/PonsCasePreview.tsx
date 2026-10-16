@@ -229,22 +229,27 @@ export function PonsCasePreview() {
     </header>
     <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>PONS LAUNCH SCOUT</b></span><p>The Rat remembers.<br /><strong>You check the receipts.</strong></p></aside>
     <main className="vl-workspace">
-      {!selectedId && <>
-      <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
+      {!selectedId && (section === "find" || section === "trails") && <>
+      {section === "find" && <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
         <span className="vl-eyebrow">RAT ZERO / PONS LAUNCH SCOUT</span>
-        <h1 id="a1-title">YOU CAN'T WATCH<br />ALL THIS SHIT.<br /><span>RAT ZERO IS DIGGING.</span></h1>
+        <h1 id="a1-title">THE RAT<br /><span>REMEMBERS.</span></h1>
+        <p className="inv-feral-promise">YOU CAN'T WATCH ALL THIS SHIT. RAT ZERO IS DIGGING.</p>
         <p className="a1-support">Indexed Pons launches. Familiar deployer addresses. Receipts you can check.</p>
         <p className="a1-explainer">Rat Zero automatically finds Pons launches and links earlier indexed evidence. Follow reported addresses and inspect receipts. More Rats are in the works.</p>
         <div className="a1-actions"><button className="vl-primary" onClick={startDigging}>START DIGGING <span aria-hidden="true">→</span></button><DiscoveryCrew live={isFresh} checking={loading} /></div>
-      </section>
+      </section>}
       <section ref={findsRef} tabIndex={-1} className="vl-discovery a1-discovery" id="vl-finds" aria-labelledby="a1-finds-title">
-        <header><div><span className="vl-eyebrow">{isFresh ? "SOURCE CHECKED / PONS LAUNCHES" : data ? "EARLIER FINDS / UPDATES PAUSED" : "PONS LAUNCH DISCOVERY"}</span><h2 id="a1-finds-title">{isFresh ? "LATEST IN THE INDEX." : data ? "FROM THE LAST SOURCE CHECK." : "WHAT DID THE RAT FIND?"}</h2></div></header>
-        <div className="a1-filters" role="group" aria-label="Launch views"><button className="vl-utility" aria-pressed={filter === "latest"} onClick={() => { setFilter("latest"); setExpanded(false); }}>Latest launches</button><button className="vl-utility" aria-pressed={filter === "familiar"} onClick={() => { setFilter("familiar"); setExpanded(false); }}>Familiar deployers</button></div>
+        <header><div><span className="vl-eyebrow">{isFresh ? "SOURCE CHECKED / PONS LAUNCHES" : data ? "EARLIER FINDS / UPDATES PAUSED" : "PONS LAUNCH DISCOVERY"}</span><h2 id="a1-finds-title">{section === "trails" ? "SMELLS FAMILIAR." : isFresh ? "RIGHT NOW IN THE BIN." : data ? "FROM THE LAST SOURCE CHECK." : "WHAT DID THE RAT FIND?"}</h2></div></header>
+        {section === "trails" && <p className="inv-tool-note">Matching Pons-reported deployers in this partial index. A repeat is neither an identity claim nor a trading signal.</p>}
+        <label className="inv-search">SEARCH THIS INDEX
+          <input type="search" maxLength={128} value={search} onChange={(e) => { setSearch(e.target.value); setExpanded(false); }} placeholder="Token, symbol, contract or deployer" />
+        </label>
+        {section === "find" && <div className="a1-filters" role="group" aria-label="Launch views"><button className="vl-utility" aria-pressed={filter === "latest"} onClick={() => { setFilter("latest"); setExpanded(false); }}>Latest launches</button><button className="vl-utility" aria-pressed={filter === "familiar"} onClick={() => { setFilter("familiar"); setExpanded(false); }}>Familiar deployers</button></div>}
         <p className="a1-coverage">{data ? <>{isFresh ? "Source checked" : "Updates paused · last source check"} <time dateTime={new Date(data.status.verifiedAtMs).toISOString()}>{new Date(data.status.verifiedAtMs).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</time>. Latest {cases.length} indexed launches · partial history.</> : "Pons / Robinhood Chain · partial launch history."} Publication freshness describes the source check, not launch age. Blocks show launch order. Recurrence counts earlier indexed launches from the same reported address; they establish neither human identity nor profitability.</p>
         {error && <p role="alert">{data ? "Updates paused. Last verified snapshot retained, now stale. Recheck to try again." : "We could not verify the Pons source. Recheck to try again."}</p>}
         {!data && <p role="status">{loading ? "Rat Zero is checking the source. Launches appear here once verified." : "Pons launches are unavailable. Recheck to try again. Nothing was substituted."}</p>}
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
-        {data && cases.length > 0 && filtered.length === 0 && <p role="status">No familiar deployers in these launches. No earlier launch matches in our partial index; this does not prove a clean history.</p>}
+        {data && cases.length > 0 && filtered.length === 0 && <p role="status">{search.trim() ? "No match in this published window. No other history was searched." : "No familiar deployers in these launches. No earlier launch matches in our partial index; this does not prove a clean history."}</p>}
         {data && filtered.length > 0 && <div className="vl-find-rail a1-find-grid">
           {visibleCases.map((item) => <button type="button" id={"find-" + item.id} key={item.id} aria-label={"Open Case " + tokenLabel(item) + " " + shortAddress(item.token)} data-case-id={item.id} className="vl-find"
             onClick={() => selectCase(item.id)}>
