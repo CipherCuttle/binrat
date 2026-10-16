@@ -54,7 +54,7 @@ export function SavedCases({ ids, cases, notes, persistent, onOpen, onRemove, on
           <textarea aria-label={'Research note for Case ' + id} maxLength={280} rows={2}
             value={notes[id] ?? ''} placeholder="What do you want to check when you return?"
             onChange={(e) => onNoteChange(id, e.target.value)} />
-          <span>{(notes[id] ?? '').length}/280 · saved on this device only</span>
+          <span>{(notes[id] ?? '').length}/280 · {persistent ? 'stored on this device' : 'session only, storage unavailable'}</span>
         </label></li>;
       })}</ul>}
     {ids.length > 0 && <button className="vl-utility" onClick={onFind}>BACK TO FINDS <span aria-hidden="true">→</span></button>}
