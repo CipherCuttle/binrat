@@ -19,8 +19,12 @@ export default function FrontdoorCandidateApp() {
     window.addEventListener('popstate', changed);
     return () => window.removeEventListener('popstate', changed);
   }, []);
+  // GitHack serves the compiled entry in a nested static folder. This branch-only
+  // build variant has fixture data and no backend, Watch, or deployment authority.
+  if (import.meta.env.VITE_BINRAT_GITHACK_PREVIEW === '1' &&
+      loc.path.endsWith('/preview/githack/index.html')) return <PonsCasePreview />;
   if (loc.synthetic && !loc.ponsPreview) return <VisualLab />;
-  if (loc.synthetic || loc.path === '/' || loc.path === '/index.html' || /^\/bag\/[0-9a-f]{64}$/.test(loc.path)) {
+  if (loc.synthetic || loc.path === '/' || loc.path === '/index.html' || ['/saved','/trails','/crew','/status'].includes(loc.path) || /^\/bag\/[0-9a-f]{64}$/.test(loc.path)) {
     return <PonsCasePreview />;
   }
   // Do not silently expose historic ARC V2 routes as live current Pons features.

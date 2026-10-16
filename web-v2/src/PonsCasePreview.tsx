@@ -7,10 +7,36 @@ import type { CaseEnvelope } from "../../src/public/caseEvidence.js";
 import "./visual-lab.css";
 import "./frontdoor-discovery.css";
 import { DiscoveryCrew } from "./DiscoveryCrew";
+import { InvestigationNav } from "./InvestigationNav";
+import { filterDiscoverableCases, readCasebook, sectionForPath, toggleSavedCase, type InvestigationSection } from "./investigationUX";
+import "./investigation-shell.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS" | "NEXT";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS", "NEXT"];
 const sourceRoute = "/api/launches/latest";
+const CASEBOOK_KEY = "binrat-v3-casebook-v1";
+const gitHackPreview = import.meta.env.VITE_BINRAT_GITHACK_PREVIEW === "1";
+function currentSection(): InvestigationSection {
+  if (gitHackPreview) {
+    const view = new URLSearchParams(window.location.search).get("view");
+    return sectionForPath(view ? "/" + view : "/");
+  }
+  return sectionForPath(window.location.pathname);
+}
+/** Static GitHack has no SPA rewrite. Keep the exact Case in query, without changing production routes. */
+function navigationUrl(route: string) {
+  if (!gitHackPreview) return route;
+  const url = new URL(window.location.href);
+  url.searchParams.delete("view");
+  url.searchParams.delete("case");
+  const match = /^\/bag\/([0-9a-f]{64})$/.exec(route);
+  if (match) url.searchParams.set("case", match[1]);
+  else if (["/saved", "/trails", "/crew", "/status"].includes(route))
+    url.searchParams.set("view", route.slice(1));
+  url.hash = route.includes("#") ? route.slice(route.indexOf("#")) : "";
+  return url.pathname + url.search + url.hash;
+}
+
 const candidateSite = import.meta.env.VITE_BINRAT_V3_CANDIDATE === "1";
 const productionSite = import.meta.env.VITE_BINRAT_V3_PRODUCTION === "1";
 const shortAddress = (address: string) => address.slice(0, 6) + "…" + address.slice(-4);
@@ -30,6 +56,12 @@ export function PonsCasePreview() {
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(requestedCase);
+  const [section, setSection] = useState<InvestigationSection>(() => currentSection());
+  const [search, setSearch] = useState("");
+  const [savedIds, setSavedIds] = useState<string[]>(() => {
+    try { return readCasebook(window.localStorage.getItem(CASEBOOK_KEY)); } catch { return []; }
+  });
+  const [casebookPersistent, setCasebookPersistent] = useState(true);
   const [historical, setHistorical] = useState<{ id: string; snapshot: PonsPreview; state: "VERIFIED_HISTORICAL" | "HISTORICAL_SOURCE_ONLY" | "UNAVAILABLE"; error: string; envelope?: CaseEnvelope; item?: HistoricalCaseItem } | null>(null);
   const [stage, setStage] = useState<Stage>("WHAT");
   const [trail, setTrail] = useState<PonsCreatorTrail | null>(null);
@@ -46,7 +78,10 @@ export function PonsCasePreview() {
   const lastVerified = useRef<PonsPreview | null>(null);
 
   useEffect(() => {
-    const navigate = () => { setSelectedId(requestedCase()); setStage("WHAT"); setShareNotice(""); };
+    const navigate = () => {
+      setSelectedId(requestedCase()); setSection(currentSection());
+      setStage("WHAT"); setShareNotice("");
+    };
     window.addEventListener("popstate", navigate);
     return () => window.removeEventListener("popstate", navigate);
   }, []);
@@ -111,7 +146,7 @@ export function PonsCasePreview() {
       });
     return () => { mounted = false; controller.abort(); };
   }, [selectedId, data, currentCase, loading]);
-  const filtered = filter === "familiar" ? cases.filter((item) => item.priorLaunches > 0) : cases;
+  const filtered = filterDiscoverableCases(cases, search, section === "trails" || filter === "familiar");
   const visibleCases = expanded ? filtered : filtered.slice(0, 4);
   const isFresh = !error && data?.freshness === "FRESH_VERIFIED" &&
     data.status.freshnessValidUntilMs !== null && data.status.freshnessValidUntilMs > clock;
@@ -164,57 +199,79 @@ export function PonsCasePreview() {
     advance(stages[n], true);
   }
   const refresh = () => setRetry((n) => n + 1);
+  function navigateSection(path: string) {
+    window.history.pushState(null, "", navigationUrl(path));
+    setSection(sectionForPath(path)); setSelectedId(null); setStage("WHAT");
+    setShareNotice(""); setExpanded(false); setSearch("");
+    setFilter(path === "/trails" ? "familiar" : "latest");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  function toggleCasebook(id: string) {
+    const next = toggleSavedCase(savedIds, id);
+    try { window.localStorage.setItem(CASEBOOK_KEY, JSON.stringify(next)); setCasebookPersistent(true); }
+    catch { setCasebookPersistent(false); }
+    setSavedIds(next);
+  }
   function selectCase(id: string) {
     returningCase.current = id;
     setSelectedId(id);
+    setSection("find");
     setStage("WHAT");
     setShareNotice("");
-    window.history.pushState(null, "", "/bag/" + id);
+    window.history.pushState(null, "", navigationUrl("/bag/" + id));
   }
   function returnToFinds() {
-    window.history.pushState(null, "", "/#vl-finds");
+    setSection("find");
+    window.history.pushState(null, "", navigationUrl("/#vl-finds"));
     setSelectedId(null); setStage("WHAT"); setShareNotice("");
   }
   function startDigging() {
-    window.history.replaceState(window.history.state, "", "/#vl-finds");
+    window.history.replaceState(window.history.state, "", navigationUrl("/#vl-finds"));
     findsRef.current?.focus({ preventScroll: true });
     findsRef.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   }
   async function copyCaseLink() {
     if (!active) return;
-    const url = new URL("/bag/" + active.id, window.location.origin).href;
+    const url = new URL(navigationUrl("/bag/" + active.id), window.location.origin).href;
     try { await navigator.clipboard.writeText(url); setShareNotice("Case link copied."); }
     catch { setShareNotice("Copy the exact Case link from your browser’s address bar."); }
   }
 
-  return <div className="visual-lab vl-pons-preview a1-frontdoor" data-material="pearl" data-view={selectedId ? "case" : "discovery"}>
+  return <div className="inv-layout">
+    <InvestigationNav section={section} hasCase={Boolean(selectedId)} savedCount={savedIds.length} isFresh={Boolean(isFresh)} onNavigate={navigateSection} />
+    <div className="visual-lab vl-pons-preview a1-frontdoor" data-material="pearl" data-view={selectedId ? "case" : section}>
     <AlleyWorld />
-    <a className="vl-skip" href={selectedId ? "#vl-case" : "#vl-finds"}>Skip to {selectedId ? "Case" : "discovery"}</a>
+    <a className="vl-skip" href={selectedId ? "#vl-case" : (section === "find" || section === "trails") ? "#vl-finds" : "#inv-main"}>Skip to {selectedId ? "Case" : "investigation"}</a>
     <header className="vl-topbar">
-      <a className="vl-brand" href="/"><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
+      <a className="vl-brand" href={navigationUrl("/")}><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
       <div className="vl-command">
         <div className="vl-lab-stamp"><span>{productionSite ? "PONS / ROBINHOOD CHAIN" : candidateSite ? "ISOLATED CANDIDATE PREVIEW" : "PONS READ PREVIEW"}</span><b data-read-state={readState}>{loading ? "Checking launches…" : isFresh ? "Publication checked" : data ? "Updates paused · earlier receipts" : "Launches unavailable"}</b></div>
         <button type="button" className="vl-utility" onClick={refresh} disabled={loading}>{loading ? "CHECKING…" : "RECHECK"}</button>
       </div>
     </header>
     <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>PONS LAUNCH SCOUT</b></span><p>The Rat remembers.<br /><strong>You check the receipts.</strong></p></aside>
-    <main className="vl-workspace">
-      {!selectedId && <>
-      <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
+    <main className="vl-workspace" id="inv-main">
+      {!selectedId && (section === "find" || section === "trails") && <>
+      {section === "find" && <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
         <span className="vl-eyebrow">RAT ZERO / PONS LAUNCH SCOUT</span>
-        <h1 id="a1-title">YOU CAN'T WATCH<br />ALL THIS SHIT.<br /><span>RAT ZERO IS DIGGING.</span></h1>
+        <h1 id="a1-title">THE RAT<br /><span>REMEMBERS.</span></h1>
+        <p className="inv-feral-promise">YOU CAN'T WATCH ALL THIS SHIT. RAT ZERO IS DIGGING.</p>
         <p className="a1-support">Indexed Pons launches. Familiar deployer addresses. Receipts you can check.</p>
         <p className="a1-explainer">Rat Zero automatically finds Pons launches and links earlier indexed evidence. Follow reported addresses and inspect receipts. More Rats are in the works.</p>
         <div className="a1-actions"><button className="vl-primary" onClick={startDigging}>START DIGGING <span aria-hidden="true">→</span></button><DiscoveryCrew live={isFresh} checking={loading} /></div>
-      </section>
+      </section>}
       <section ref={findsRef} tabIndex={-1} className="vl-discovery a1-discovery" id="vl-finds" aria-labelledby="a1-finds-title">
-        <header><div><span className="vl-eyebrow">{isFresh ? "SOURCE CHECKED / PONS LAUNCHES" : data ? "EARLIER FINDS / UPDATES PAUSED" : "PONS LAUNCH DISCOVERY"}</span><h2 id="a1-finds-title">{isFresh ? "LATEST IN THE INDEX." : data ? "FROM THE LAST SOURCE CHECK." : "WHAT DID THE RAT FIND?"}</h2></div></header>
-        <div className="a1-filters" role="group" aria-label="Launch views"><button className="vl-utility" aria-pressed={filter === "latest"} onClick={() => { setFilter("latest"); setExpanded(false); }}>Latest launches</button><button className="vl-utility" aria-pressed={filter === "familiar"} onClick={() => { setFilter("familiar"); setExpanded(false); }}>Familiar deployers</button></div>
+        <header><div><span className="vl-eyebrow">{isFresh ? "SOURCE CHECKED / PONS LAUNCHES" : data ? "EARLIER FINDS / UPDATES PAUSED" : "PONS LAUNCH DISCOVERY"}</span><h2 id="a1-finds-title">{section === "trails" ? "SMELLS FAMILIAR." : isFresh ? "RIGHT NOW IN THE BIN." : data ? "FROM THE LAST SOURCE CHECK." : "WHAT DID THE RAT FIND?"}</h2></div></header>
+        {section === "trails" && <p className="inv-tool-note">Matching Pons-reported deployers in this partial index. A repeat is neither an identity claim nor a trading signal.</p>}
+        <label className="inv-search">SEARCH THIS INDEX
+          <input type="search" maxLength={128} value={search} onChange={(e) => { setSearch(e.target.value); setExpanded(false); }} placeholder="Token, symbol, contract or deployer" />
+        </label>
+        {section === "find" && <div className="a1-filters" role="group" aria-label="Launch views"><button className="vl-utility" aria-pressed={filter === "latest"} onClick={() => { setFilter("latest"); setExpanded(false); }}>Latest launches</button><button className="vl-utility" aria-pressed={filter === "familiar"} onClick={() => { setFilter("familiar"); setExpanded(false); }}>Familiar deployers</button></div>}
         <p className="a1-coverage">{data ? <>{isFresh ? "Source checked" : "Updates paused · last source check"} <time dateTime={new Date(data.status.verifiedAtMs).toISOString()}>{new Date(data.status.verifiedAtMs).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</time>. Latest {cases.length} indexed launches · partial history.</> : "Pons / Robinhood Chain · partial launch history."} Publication freshness describes the source check, not launch age. Blocks show launch order. Recurrence counts earlier indexed launches from the same reported address; they establish neither human identity nor profitability.</p>
         {error && <p role="alert">{data ? "Updates paused. Last verified snapshot retained, now stale. Recheck to try again." : "We could not verify the Pons source. Recheck to try again."}</p>}
         {!data && <p role="status">{loading ? "Rat Zero is checking the source. Launches appear here once verified." : "Pons launches are unavailable. Recheck to try again. Nothing was substituted."}</p>}
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
-        {data && cases.length > 0 && filtered.length === 0 && <p role="status">No familiar deployers in these launches. No earlier launch matches in our partial index; this does not prove a clean history.</p>}
+        {data && cases.length > 0 && filtered.length === 0 && <p role="status">{search.trim() ? "No match in this published window. No other history was searched." : "No familiar deployers in these launches. No earlier launch matches in our partial index; this does not prove a clean history."}</p>}
         {data && filtered.length > 0 && <div className="vl-find-rail a1-find-grid">
           {visibleCases.map((item) => <button type="button" id={"find-" + item.id} key={item.id} aria-label={"Open Case " + tokenLabel(item) + " " + shortAddress(item.token)} data-case-id={item.id} className="vl-find"
             onClick={() => selectCase(item.id)}>
@@ -224,7 +281,38 @@ export function PonsCasePreview() {
         {!expanded && filtered.length > 4 && <button className="vl-utility a1-more" onClick={() => setExpanded(true)}>SHOW ALL {filtered.length} LAUNCHES <span aria-hidden="true">↓</span></button>}
       </section>
       </>}
-      {selectedId && <div className="a1-case-navigation"><button className="vl-utility" onClick={returnToFinds}>← BACK TO DISCOVERY</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}<span role="status">{shareNotice}</span></div>}
+      {!selectedId && section === "saved" && <section className="inv-workbench" aria-labelledby="inv-saved-heading">
+        <span className="vl-eyebrow">LOCAL CASEBOOK · DEVICE ONLY</span>
+        <h1 id="inv-saved-heading">THE RAT REMEMBERS. SO CAN YOU.</h1>
+        <p>Keep exact Case links on this device. Saved is not a Watch; no alerts are created or sent.</p>
+        {!casebookPersistent && <p role="status">Device storage unavailable. This list lasts only for this session.</p>}
+        {savedIds.length === 0 ? <p>No Cases saved. Open a Case and select SAVE CASE.</p> :
+          <ul className="inv-saved-list">{savedIds.map((id) => <li key={id}>
+            <button className="vl-utility" onClick={() => selectCase(id)}>OPEN CASE · {id.slice(0, 10)}…</button>
+            <button className="vl-utility" onClick={() => toggleCasebook(id)} aria-label={"Remove saved Case " + id}>REMOVE</button>
+          </li>)}</ul>}
+        <button className="vl-utility" onClick={() => navigateSection("/")}>BACK TO FINDS →</button>
+      </section>}
+      {!selectedId && section === "crew" && <section className="inv-workbench" aria-labelledby="inv-crew-heading">
+        <span className="vl-eyebrow">MEET THE CREW</span><h1 id="inv-crew-heading">ONE RAT DIGGING. MORE IN THE WORKS.</h1>
+        <div className="inv-crew-list">
+          <article><img src="/crew/rat-avatar-48.png" alt="" /><div><h2>RAT ZERO · {isFresh ? "SOURCE CHECKED" : loading ? "CHECKING" : "UPDATES UNAVAILABLE"}</h2><p>Finds Pons launches and brings retained source records you can inspect.</p></div></article>
+          <article><img src="/crew/tripwire.png" alt="" /><div><h2>TRIPWIRE · BUILDING</h2><p>Future owner-bounded watches and Case alerts. Not active on this site.</p></div></article>
+          <article><img src="/crew/sniffer.png" alt="" /><div><h2>SNIFFER · PROVING</h2><p>Funding-trail investigations are being tested. No public autonomous worker or prediction.</p></div></article>
+        </div>
+        <button className="vl-utility" onClick={() => navigateSection("/")}>FIND A CASE →</button>
+      </section>}
+      {!selectedId && section === "status" && <section className="inv-workbench" aria-labelledby="inv-status-heading">
+        <span className="vl-eyebrow">SOURCE & CAPABILITY STATUS</span><h1 id="inv-status-heading">CHECK THE SOURCE.</h1>
+        <dl className="inv-status-list"><div><dt>Current read</dt><dd>{readState}</dd></div>
+          <div><dt>Last verified at</dt><dd>{data ? new Date(data.status.verifiedAtMs).toLocaleString() : "Unavailable"}</dd></div>
+          <div><dt>Visible indexed launches</dt><dd>{data ? cases.length : "Unavailable"}</dd></div>
+          <div><dt>Historical coverage</dt><dd>PARTIAL / do not infer absence</dd></div>
+          <div><dt>Tripwire / Sniffer</dt><dd>BUILDING / PROVING · NOT PUBLIC LIVE</dd></div></dl>
+        <p>Source freshness is not launch age. Saved Cases are not Watches or notifications.</p>
+        <button className="vl-utility" onClick={refresh}>RECHECK SOURCE →</button>
+      </section>}
+      {selectedId && <div className="a1-case-navigation"><button className="vl-utility" onClick={returnToFinds}>← BACK TO DISCOVERY</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}{active && <button className="vl-utility" aria-pressed={savedIds.includes(active.id)} onClick={() => toggleCasebook(active.id)}>{savedIds.includes(active.id) ? "SAVED ON THIS DEVICE" : "SAVE CASE"}</button>}<span role="status">{shareNotice}</span></div>}
       {selectedId && !data && loading && <article ref={caseRef} tabIndex={-1} id="vl-case" className="vl-hero-surface vl-loading-case" aria-busy="true" aria-label="Checking Pons Cases">
         <div className="vl-case-topline">RAT ZERO / CHECKING THE RECEIPTS</div>
         <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>
@@ -296,5 +384,6 @@ export function PonsCasePreview() {
         {data && <span>{readState} · Verified {new Date(data.status.verifiedAtMs).toISOString()} · Freshness expires {data.status.freshnessValidUntilMs === null ? "UNKNOWN" : new Date(data.status.freshnessValidUntilMs).toISOString()} · {data.status.lastSyncError ?? "No reported sync error"}</span>}
       </footer>
     </main>
+    </div>
   </div>;
 }
