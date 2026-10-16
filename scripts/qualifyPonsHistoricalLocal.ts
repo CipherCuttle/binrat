@@ -8,7 +8,7 @@ import {readFileSync,lstatSync,fstatSync,statfsSync,writeFileSync} from 'node:fs
 import {homedir} from 'node:os';
 import {join,dirname} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {BudgetLedger} from '../src/portable/budget.js';
+import {BudgetLedger,HISTORICAL_SOURCE_PRINCIPAL,HISTORICAL_SOURCE_GRANT_ID} from '../src/portable/budget.js';
 import {oneShotAlchemyQualificationWire} from '../src/portable/oneShotAlchemyQualificationWire.js';
 import {qualifyHistoricalPonsLaunch,type KnownHistoricalPonsEvent} from '../src/portable/tripwireSourceQualification.js';
 import {PONS_V2_FACTORY} from '../src/pons/chain.js';
@@ -19,7 +19,7 @@ const BASE=join(homedir(),'.local/share/binrat-rescue/20261011/replacement-proof
 const DATA=join(BASE,'binrat.sqlite'),LEDGER=join(BASE,'budget.sqlite');
 const LOCK=join(BASE,'binrat.sqlite.collector.lock');
 const CREDS=join(homedir(),'.config/binrat/robinhood-alchemy-rpc.url');
-const GRANT_ID='historical-pons-orbbook-20261015-v1',H32=/^0x[0-9a-f]{64}$/;
+const GRANT_ID=HISTORICAL_SOURCE_GRANT_ID,H32=/^0x[0-9a-f]{64}$/;
 const LIMITS={attemptsPerDay:100,attemptsPerRun:50,blocksPerRun:1000,runtimeMs:60000,attemptsPerRequest:1};
 
 function regular(path:string){
@@ -48,23 +48,11 @@ export function selectHistoricalLaunch(db:Database.Database):KnownHistoricalPons
  return {blockNumber:HISTORICAL_BLOCK,blockHash:r.block_hash,transactionHash:r.tx_hash,
    logIndex:r.log_index,deployer:HISTORICAL_DEPLOYER};
 }
-export function ownerForQualification(db:Database.Database,configured?:string):string{
- const valid=/^telegram:[1-9][0-9]*$/;
- if(configured!==undefined){
-   if(!valid.test(configured))throw Error('OWNER_SCOPE_INVALID');
-   return configured;
- }
- const owners=new Set<string>();
- for(const name of ['pons_forward_watches_v1','pons_tripwire_watches']){
-   if(!table(db,name))continue;
-   const cols=(db.pragma(`table_info(${name})`) as Array<{name:string}>).map(c=>c.name);
-   if(!cols.includes('deployer')||!cols.includes('owner_id'))continue;
-   const matches=db.prepare(`SELECT DISTINCT owner_id FROM ${name} WHERE deployer=?`)
-     .all(HISTORICAL_DEPLOYER) as Array<{owner_id:string}>;
-   for(const row of matches)if(valid.test(row.owner_id))owners.add(row.owner_id);
- }
- if(owners.size!==1)throw Error('TRIPWIRE_OWNER_NOT_PROVEN');
- return [...owners][0];
+/** Historical source qualification has no Telegram owner and confers zero
+ * consent to create a Watch or send a message. Do not infer one from a launch. */
+export function historicalQualificationPrincipal(configured?:string):string {
+ if(configured!==undefined)throw Error('HISTORICAL_WATCH_OWNER_OVERRIDE_DENIED');
+ return HISTORICAL_SOURCE_PRINCIPAL;
 }
 export function readHistoricalBudget(db:Database.Database,time:number){
  if(!table(db,'rpc_attempts')||!table(db,'budget_meta'))throw Error('ORIGINAL_LEDGER_SCHEMA_MISSING');
@@ -102,7 +90,7 @@ export async function runOnce(args:string[]){
  let known:KnownHistoricalPonsEvent,ownerId:string;
  try{
    known=selectHistoricalLaunch(cases);
-   ownerId=ownerForQualification(cases,process.env.BINRAT_TRIPWIRE_OWNER_ID);
+   ownerId=historicalQualificationPrincipal(process.env.BINRAT_TRIPWIRE_OWNER_ID);
  }finally{cases.close()}
  const previous=new Database(LEDGER,{readonly:true,fileMustExist:true,timeout:0});
  let budget:{day:string;used:number;after:number};
@@ -110,7 +98,8 @@ export async function runOnce(args:string[]){
  const disk=statfsSync(dirname(LEDGER));
  if(disk.bavail*disk.bsize<64*1024*1024)throw Error('LEDGER_DISK_GATE_BLOCKED');
  if(!execute){
-   console.log(JSON.stringify({verdict:'PREFLIGHT_ONLY',networkRequests:0,ownerId,
+   console.log(JSON.stringify({verdict:'PREFLIGHT_ONLY',networkRequests:0,
+     principal:ownerId,telegramWatchAuthorized:false,
      historicalBlock:known.blockNumber,transactionHash:known.transactionHash,
      logIndex:known.logIndex,deployer:known.deployer,sharedDailyRequests:budget,
      proposedReservations:8,modeledCu:800,ponsPaperUntouched:true},null,2));
@@ -125,7 +114,7 @@ export async function runOnce(args:string[]){
    const started=Date.now(),deadline=started+55_000,grantExpires=started+60_000;
    job=ledger.start(BigInt(HISTORICAL_BLOCK));
    const generation=randomUUID();
-   ledger.createTripwireProofGrant({grantId:GRANT_ID,ownerId,generation,
+   ledger.createHistoricalQualificationGrant({grantId:GRANT_ID,generation,
      deployer:HISTORICAL_DEPLOYER,stopsAtMs:grantExpires,maxMilliCu:800_000,approved:true});
    const result=await qualifyHistoricalPonsLaunch({ledger,job,grantId:GRANT_ID,deadlineMs:deadline,
      known,scope:{ownerId,generation,deployer:HISTORICAL_DEPLOYER},wire});
