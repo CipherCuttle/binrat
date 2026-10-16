@@ -1,0 +1,41 @@
+name: BINRAT V2 frozen baseline capture
+on:
+  push:
+    branches: [preview/binrat-v2-baseline-capture-20261016]
+permissions:
+  contents: write
+jobs:
+  capture:
+    if: github.repository == 'CipherCuttle/binrat' && github.ref == 'refs/heads/preview/binrat-v2-baseline-capture-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: pnpm/action-setup@v4
+        with: {version: 10.15.0, run_install: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm --dir web-v2 build:frontdoor-candidate
+      - name: Four viewport captures of frozen V1 with recorded public data
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binrat-browser" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-browser/node_modules/playwright/cli.js" install --with-deps chromium
+          BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-browser/node_modules" node scripts/capture-investigation-baseline.cjs
+      - name: Publish requested review screenshots to isolated one-shot branch
+        run: |
+          set -euo pipefail
+          BRANCH=binrat-v2-baseline-proof-20261016
+          if git ls-remote --exit-code --heads origin "refs/heads/$BRANCH" >/dev/null 2>&1; then
+            echo 'STOP: baseline proof already exists'
+            exit 1
+          fi
+          git switch -c "$BRANCH"
+          mkdir -p preview/v2-baseline
+          cp -R .artifacts/v2-baseline/. preview/v2-baseline/
+          git add -f preview/v2-baseline
+          git config user.name "binrat-preview"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "preview: frozen V1 desktop and mobile review captures"
+          git push origin HEAD:refs/heads/"$BRANCH"
