@@ -94,6 +94,20 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.equal(await page.locator('.rb-star-border').evaluate(el => getComputedStyle(el, '::after').display),'none');
         await noOverflow(page,width);
       });
+      if(width===1440) {
+        await page.emulateMedia({reducedMotion:'no-preference'});
+        await check('React Bits desktop hover has real pointer spotlight and no DOM/source mutations',async()=>{
+          const before=report.requests.length;
+          const surface=page.locator('.rb-spotlight');
+          await surface.hover();
+          const pos=await surface.evaluate(el=>el.style.getPropertyValue('--rb-spot-x'));
+          assert.match(pos,/^[0-9.]+px$/,'pointer spotlight did not move');
+          assert.notEqual(await page.locator('.rb-shiny-text').evaluate(el=>getComputedStyle(el).animationName),'none');
+          assert.equal(report.requests.length,before,'hover must not poll');
+        });
+        await shot(page,'react-bits-desktop');
+        await page.emulateMedia({reducedMotion:'reduce'});
+      }
       await check(width+' evidence-based link leads to two real Cases in this window',async()=>{
         const match=page.locator('.inv-evidence-lead');
         assert.match(await match.innerText(),/2 launches share one reported deployer in this window/);
