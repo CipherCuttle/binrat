@@ -7,10 +7,14 @@ import type { CaseEnvelope } from "../../src/public/caseEvidence.js";
 import "./visual-lab.css";
 import "./frontdoor-discovery.css";
 import { DiscoveryCrew } from "./DiscoveryCrew";
+import { InvestigationNav } from "./InvestigationNav";
+import { filterDiscoverableCases, readCasebook, sectionForPath, toggleSavedCase, type InvestigationSection } from "./investigationUX";
+import "./investigation-shell.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS" | "NEXT";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS", "NEXT"];
 const sourceRoute = "/api/launches/latest";
+const CASEBOOK_KEY = "binrat-v3-casebook-v1";
 const candidateSite = import.meta.env.VITE_BINRAT_V3_CANDIDATE === "1";
 const productionSite = import.meta.env.VITE_BINRAT_V3_PRODUCTION === "1";
 const shortAddress = (address: string) => address.slice(0, 6) + "…" + address.slice(-4);
@@ -30,6 +34,12 @@ export function PonsCasePreview() {
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(requestedCase);
+  const [section, setSection] = useState<InvestigationSection>(() => sectionForPath(window.location.pathname));
+  const [search, setSearch] = useState("");
+  const [savedIds, setSavedIds] = useState<string[]>(() => {
+    try { return readCasebook(window.localStorage.getItem(CASEBOOK_KEY)); } catch { return []; }
+  });
+  const [casebookPersistent, setCasebookPersistent] = useState(true);
   const [historical, setHistorical] = useState<{ id: string; snapshot: PonsPreview; state: "VERIFIED_HISTORICAL" | "HISTORICAL_SOURCE_ONLY" | "UNAVAILABLE"; error: string; envelope?: CaseEnvelope; item?: HistoricalCaseItem } | null>(null);
   const [stage, setStage] = useState<Stage>("WHAT");
   const [trail, setTrail] = useState<PonsCreatorTrail | null>(null);
@@ -46,7 +56,10 @@ export function PonsCasePreview() {
   const lastVerified = useRef<PonsPreview | null>(null);
 
   useEffect(() => {
-    const navigate = () => { setSelectedId(requestedCase()); setStage("WHAT"); setShareNotice(""); };
+    const navigate = () => {
+      setSelectedId(requestedCase()); setSection(sectionForPath(window.location.pathname));
+      setStage("WHAT"); setShareNotice("");
+    };
     window.addEventListener("popstate", navigate);
     return () => window.removeEventListener("popstate", navigate);
   }, []);
@@ -111,7 +124,7 @@ export function PonsCasePreview() {
       });
     return () => { mounted = false; controller.abort(); };
   }, [selectedId, data, currentCase, loading]);
-  const filtered = filter === "familiar" ? cases.filter((item) => item.priorLaunches > 0) : cases;
+  const filtered = filterDiscoverableCases(cases, search, section === "trails" || filter === "familiar");
   const visibleCases = expanded ? filtered : filtered.slice(0, 4);
   const isFresh = !error && data?.freshness === "FRESH_VERIFIED" &&
     data.status.freshnessValidUntilMs !== null && data.status.freshnessValidUntilMs > clock;
@@ -164,14 +177,29 @@ export function PonsCasePreview() {
     advance(stages[n], true);
   }
   const refresh = () => setRetry((n) => n + 1);
+  function navigateSection(path: string) {
+    window.history.pushState(null, "", path);
+    setSection(sectionForPath(path)); setSelectedId(null); setStage("WHAT");
+    setShareNotice(""); setExpanded(false); setSearch("");
+    setFilter(path === "/trails" ? "familiar" : "latest");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  function toggleCasebook(id: string) {
+    const next = toggleSavedCase(savedIds, id);
+    try { window.localStorage.setItem(CASEBOOK_KEY, JSON.stringify(next)); setCasebookPersistent(true); }
+    catch { setCasebookPersistent(false); }
+    setSavedIds(next);
+  }
   function selectCase(id: string) {
     returningCase.current = id;
     setSelectedId(id);
+    setSection("find");
     setStage("WHAT");
     setShareNotice("");
     window.history.pushState(null, "", "/bag/" + id);
   }
   function returnToFinds() {
+    setSection("find");
     window.history.pushState(null, "", "/#vl-finds");
     setSelectedId(null); setStage("WHAT"); setShareNotice("");
   }
@@ -187,7 +215,9 @@ export function PonsCasePreview() {
     catch { setShareNotice("Copy the exact Case link from your browser’s address bar."); }
   }
 
-  return <div className="visual-lab vl-pons-preview a1-frontdoor" data-material="pearl" data-view={selectedId ? "case" : "discovery"}>
+  return <div className="inv-layout">
+    <InvestigationNav section={section} hasCase={Boolean(selectedId)} savedCount={savedIds.length} isFresh={Boolean(isFresh)} onNavigate={navigateSection} />
+    <div className="visual-lab vl-pons-preview a1-frontdoor" data-material="pearl" data-view={selectedId ? "case" : section}>
     <AlleyWorld />
     <a className="vl-skip" href={selectedId ? "#vl-case" : "#vl-finds"}>Skip to {selectedId ? "Case" : "discovery"}</a>
     <header className="vl-topbar">
@@ -296,5 +326,6 @@ export function PonsCasePreview() {
         {data && <span>{readState} · Verified {new Date(data.status.verifiedAtMs).toISOString()} · Freshness expires {data.status.freshnessValidUntilMs === null ? "UNKNOWN" : new Date(data.status.freshnessValidUntilMs).toISOString()} · {data.status.lastSyncError ?? "No reported sync error"}</span>}
       </footer>
     </main>
+    </div>
   </div>;
 }
