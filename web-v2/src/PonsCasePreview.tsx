@@ -219,7 +219,7 @@ export function PonsCasePreview() {
     <InvestigationNav section={section} hasCase={Boolean(selectedId)} savedCount={savedIds.length} isFresh={Boolean(isFresh)} onNavigate={navigateSection} />
     <div className="visual-lab vl-pons-preview a1-frontdoor" data-material="pearl" data-view={selectedId ? "case" : section}>
     <AlleyWorld />
-    <a className="vl-skip" href={selectedId ? "#vl-case" : "#vl-finds"}>Skip to {selectedId ? "Case" : "discovery"}</a>
+    <a className="vl-skip" href={selectedId ? "#vl-case" : (section === "find" || section === "trails") ? "#vl-finds" : "#inv-main"}>Skip to {selectedId ? "Case" : "investigation"}</a>
     <header className="vl-topbar">
       <a className="vl-brand" href="/"><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
       <div className="vl-command">
@@ -228,7 +228,7 @@ export function PonsCasePreview() {
       </div>
     </header>
     <aside className="vl-scout-label"><span className="vl-live">RAT ZERO <b>PONS LAUNCH SCOUT</b></span><p>The Rat remembers.<br /><strong>You check the receipts.</strong></p></aside>
-    <main className="vl-workspace">
+    <main className="vl-workspace" id="inv-main">
       {!selectedId && (section === "find" || section === "trails") && <>
       {section === "find" && <section className="a1-hero vl-hero-surface" aria-labelledby="a1-title">
         <span className="vl-eyebrow">RAT ZERO / PONS LAUNCH SCOUT</span>
