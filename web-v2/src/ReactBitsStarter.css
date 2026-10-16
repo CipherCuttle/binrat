@@ -1,0 +1,64 @@
+/* BINRAT React Bits Starter V1 — source-inspired, project-scoped adaptations.
+   CSS adds no geometry: the 320/390px first-find viewport gate remains intact. */
+.rb-spotlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.rb-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(180px circle at var(--rb-spot-x, 50%) var(--rb-spot-y, 50%),
+    rgba(148, 239, 225, 0.14) 0%, rgba(148, 239, 225, 0.045) 32%, transparent 72%);
+  transition: opacity 210ms ease;
+}
+.rb-spotlight > * { position: relative; z-index: 1; }
+.rb-shiny-text {
+  display: inline;
+  color: #b6e8df;
+}
+.rb-star-border {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.rb-star-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 25%, rgba(178, 255, 242, 0.18) 49%, transparent 70%);
+  transform: translateX(-125%);
+}
+/* Never put ornamental hover animation on touch screens or in reduced motion. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .rb-spotlight:hover::before, .rb-spotlight:focus-within::before { opacity: 1; }
+  .rb-shiny-text {
+    background-image: linear-gradient(100deg, #b6e8df 10%, #f4fff9 30%, #b6e8df 55%);
+    background-size: 250% 100%;
+    background-position: 100% 0;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rb-shiny-once 2.5s ease-out both 1;
+  }
+  .rb-star-border:hover::after, .rb-star-border:focus-visible::after {
+    animation: rb-star-sweep 620ms ease-out 1 both;
+  }
+}
+@keyframes rb-shiny-once { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@keyframes rb-star-sweep { from { transform: translateX(-125%); } to { transform: translateX(125%); } }
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .rb-spotlight::before, .rb-star-border::after { display: none; }
+  .rb-shiny-text {
+    background: none !important;
+    animation: none !important;
+    -webkit-text-fill-color: currentColor;
+  }
+}
