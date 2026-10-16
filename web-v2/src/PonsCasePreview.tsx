@@ -8,13 +8,14 @@ import "./visual-lab.css";
 import "./frontdoor-discovery.css";
 import { InvestigationNav } from "./InvestigationNav";
 import { DeployerGroups, FindRow, SavedCases, shortAddress, tokenLabel } from "./InvestigationPanels";
-import { filterDiscoverableCases, investigationHref, readCasebook, sectionForPath, toggleSavedCase, type InvestigationSection } from "./investigationUX";
+import { filterDiscoverableCases, investigationHref, readCasebook, readCaseNotes, sectionForPath, toggleSavedCase, updateCaseNote, type InvestigationSection } from "./investigationUX";
 import "./investigation-shell.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS"];
 const sourceRoute = "/api/launches/latest";
 const CASEBOOK_KEY = "binrat-v3-casebook-v1";
+const CASE_NOTES_KEY = "binrat-v3-case-notes-v1";
 const gitHackPreview = import.meta.env.VITE_BINRAT_GITHACK_PREVIEW === "1";
 function currentSection(): InvestigationSection {
   if (requestedCase() && typeof window.history.state?.invOrigin === "string") return sectionForPath(window.history.state.invOrigin);
@@ -52,6 +53,11 @@ export function PonsCasePreview() {
     try { return readCasebook(window.localStorage.getItem(CASEBOOK_KEY)); } catch { return []; }
   });
   const [casebookPersistent, setCasebookPersistent] = useState(true);
+  const [caseNotes, setCaseNotes] = useState(() => {
+    try { return readCaseNotes(window.localStorage.getItem(CASE_NOTES_KEY)); }
+    catch { return readCaseNotes(null); }
+  });
+  const [notesPersistent, setNotesPersistent] = useState(true);
   const [historical, setHistorical] = useState<{ id: string; snapshot: PonsPreview; state: "VERIFIED_HISTORICAL" | "HISTORICAL_SOURCE_ONLY" | "UNAVAILABLE"; error: string; envelope?: CaseEnvelope; item?: HistoricalCaseItem } | null>(null);
   const [stage, setStage] = useState<Stage>("WHAT");
   const [trail, setTrail] = useState<PonsCreatorTrail | null>(null);
@@ -199,11 +205,24 @@ export function PonsCasePreview() {
     setShareNotice(""); setExpanded(false); setSearch("");
     window.scrollTo({ top: 0, behavior: "instant" });
   }
+  function editCaseNote(id: string, value: string) {
+    if (!savedIds.includes(id)) return;
+    const next = updateCaseNote(caseNotes, id, value);
+    try { window.localStorage.setItem(CASE_NOTES_KEY, JSON.stringify(next)); setNotesPersistent(true); }
+    catch { setNotesPersistent(false); }
+    setCaseNotes(next);
+  }
   function toggleCasebook(id: string) {
     const next = toggleSavedCase(savedIds, id);
     try { window.localStorage.setItem(CASEBOOK_KEY, JSON.stringify(next)); setCasebookPersistent(true); }
     catch { setCasebookPersistent(false); }
     setSavedIds(next);
+    if (!next.includes(id) && Object.hasOwn(caseNotes, id)) {
+      const cleaned = updateCaseNote(caseNotes, id, "");
+      try { window.localStorage.setItem(CASE_NOTES_KEY, JSON.stringify(cleaned)); setNotesPersistent(true); }
+      catch { setNotesPersistent(false); }
+      setCaseNotes(cleaned);
+    }
   }
   function selectCase(id: string) {
     returningCase.current = id;
@@ -270,7 +289,7 @@ export function PonsCasePreview() {
         <details className="inv-source-limits"><summary>What these finds tell you</summary><p>Launch order comes from indexed blocks. Earlier-launch counts refer to the Pons-reported deployer in partial history. They do not identify a human, predict returns or show safety. Source freshness describes the publication check, not launch age.</p></details>
       </section>
       </>}
-      {!selectedId && section === "saved" && <SavedCases ids={savedIds} cases={cases} persistent={casebookPersistent} onOpen={selectCase} onRemove={toggleCasebook} onFind={() => navigateSection("/")} />}
+      {!selectedId && section === "saved" && <SavedCases ids={savedIds} cases={cases} notes={caseNotes} persistent={casebookPersistent && notesPersistent} onOpen={selectCase} onRemove={toggleCasebook} onFind={() => navigateSection("/")} onNoteChange={editCaseNote} />}
       {!selectedId && section === "crew" && <section className="inv-workbench" aria-labelledby="inv-crew-heading">
         <span className="vl-eyebrow">THE WORKFORCE</span><h1 id="inv-crew-heading">ONE RAT DIGGING. MORE IN THE WORKS.</h1><p>The Scout brings the Case. The rest of the crew is being built and tested.</p>
         <div className="inv-crew-list">
