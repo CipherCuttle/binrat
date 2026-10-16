@@ -100,3 +100,13 @@
 @media (hover:none),(prefers-reduced-motion:reduce) {
   .rb-glare-hover::after,.rb-spark-burst { display:none !important; animation:none !important; transition:none !important; }
 }
+
+/* The trace is decorative; keep a complete first Case above 390px bottom navigation. */
+@media (min-width: 381px) and (max-width: 700px) {
+  .inv-layout .inv-evidence-lead {
+    margin: 2px 0 3px;
+    padding: 3px 7px;
+    gap: 2px 6px;
+  }
+  .inv-proof-thread { display: none; }
+}
