@@ -16,4 +16,6 @@ exec 9<>"$LOCK"
   printf '%s\n' 'BLOCKED: another BINRAT collector owns the original lock'; exit 1;
 }
 export BINRAT_SOURCE_LOCK_FD=9
-exec pnpm exec tsx scripts/qualifyPonsHistoricalLocal.ts "$@"
+# pnpm exec spawns a child process and closes fd9 by default. Execute the
+# TypeScript loader in this process so the locked fd remains inherited by Node.
+exec node --import tsx scripts/qualifyPonsHistoricalLocal.ts "$@"
