@@ -8,7 +8,7 @@ const root=resolve('.');
 const site=join(root,'.artifacts/githack/site');
 const preview=JSON.parse(readFileSync(join(site,'GITHACK_PREVIEW.json')));
 const prefix=preview.basePath;
-assert.match(prefix, /^\/CipherCuttle\/binrat\/binrat-v3-githack(?:-v2(?:-r[12])?)?-20261016\/preview\/githack\/$/);
+assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-casevalue-20261017/preview/githack/');
 const html=readFileSync(join(site,'index.html'),'utf8');
 assert.ok(html.includes('RECORDED PONS DATA · NOT LIVE'));
 assert.ok(html.includes(prefix+'githack-fixture.js'));
