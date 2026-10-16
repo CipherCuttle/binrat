@@ -15,6 +15,28 @@ type Stage = "WHAT" | "TRAIL" | "RECEIPTS" | "NEXT";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS", "NEXT"];
 const sourceRoute = "/api/launches/latest";
 const CASEBOOK_KEY = "binrat-v3-casebook-v1";
+const gitHackPreview = import.meta.env.VITE_BINRAT_GITHACK_PREVIEW === "1";
+function currentSection(): InvestigationSection {
+  if (gitHackPreview) {
+    const view = new URLSearchParams(window.location.search).get("view");
+    return sectionForPath(view ? "/" + view : "/");
+  }
+  return sectionForPath(window.location.pathname);
+}
+/** Static GitHack has no SPA rewrite. Keep the exact Case in query, without changing production routes. */
+function navigationUrl(route: string) {
+  if (!gitHackPreview) return route;
+  const url = new URL(window.location.href);
+  url.searchParams.delete("view");
+  url.searchParams.delete("case");
+  const match = /^\/bag\/([0-9a-f]{64})$/.exec(route);
+  if (match) url.searchParams.set("case", match[1]);
+  else if (["/saved", "/trails", "/crew", "/status"].includes(route))
+    url.searchParams.set("view", route.slice(1));
+  url.hash = route.includes("#") ? route.slice(route.indexOf("#")) : "";
+  return url.pathname + url.search + url.hash;
+}
+
 const candidateSite = import.meta.env.VITE_BINRAT_V3_CANDIDATE === "1";
 const productionSite = import.meta.env.VITE_BINRAT_V3_PRODUCTION === "1";
 const shortAddress = (address: string) => address.slice(0, 6) + "…" + address.slice(-4);
@@ -34,7 +56,7 @@ export function PonsCasePreview() {
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(requestedCase);
-  const [section, setSection] = useState<InvestigationSection>(() => sectionForPath(window.location.pathname));
+  const [section, setSection] = useState<InvestigationSection>(() => currentSection());
   const [search, setSearch] = useState("");
   const [savedIds, setSavedIds] = useState<string[]>(() => {
     try { return readCasebook(window.localStorage.getItem(CASEBOOK_KEY)); } catch { return []; }
@@ -57,7 +79,7 @@ export function PonsCasePreview() {
 
   useEffect(() => {
     const navigate = () => {
-      setSelectedId(requestedCase()); setSection(sectionForPath(window.location.pathname));
+      setSelectedId(requestedCase()); setSection(currentSection());
       setStage("WHAT"); setShareNotice("");
     };
     window.addEventListener("popstate", navigate);
@@ -178,7 +200,7 @@ export function PonsCasePreview() {
   }
   const refresh = () => setRetry((n) => n + 1);
   function navigateSection(path: string) {
-    window.history.pushState(null, "", path);
+    window.history.pushState(null, "", navigationUrl(path));
     setSection(sectionForPath(path)); setSelectedId(null); setStage("WHAT");
     setShareNotice(""); setExpanded(false); setSearch("");
     setFilter(path === "/trails" ? "familiar" : "latest");
@@ -196,21 +218,21 @@ export function PonsCasePreview() {
     setSection("find");
     setStage("WHAT");
     setShareNotice("");
-    window.history.pushState(null, "", "/bag/" + id);
+    window.history.pushState(null, "", navigationUrl("/bag/" + id));
   }
   function returnToFinds() {
     setSection("find");
-    window.history.pushState(null, "", "/#vl-finds");
+    window.history.pushState(null, "", navigationUrl("/#vl-finds"));
     setSelectedId(null); setStage("WHAT"); setShareNotice("");
   }
   function startDigging() {
-    window.history.replaceState(window.history.state, "", "/#vl-finds");
+    window.history.replaceState(window.history.state, "", navigationUrl("/#vl-finds"));
     findsRef.current?.focus({ preventScroll: true });
     findsRef.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   }
   async function copyCaseLink() {
     if (!active) return;
-    const url = new URL("/bag/" + active.id, window.location.origin).href;
+    const url = new URL(navigationUrl("/bag/" + active.id), window.location.origin).href;
     try { await navigator.clipboard.writeText(url); setShareNotice("Case link copied."); }
     catch { setShareNotice("Copy the exact Case link from your browser’s address bar."); }
   }
@@ -221,7 +243,7 @@ export function PonsCasePreview() {
     <AlleyWorld />
     <a className="vl-skip" href={selectedId ? "#vl-case" : (section === "find" || section === "trails") ? "#vl-finds" : "#inv-main"}>Skip to {selectedId ? "Case" : "investigation"}</a>
     <header className="vl-topbar">
-      <a className="vl-brand" href="/"><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
+      <a className="vl-brand" href={navigationUrl("/")}><strong>BINRAT</strong><span>HE GETS THE SCRAPS.<br />YOU GET THE RECEIPTS.</span></a>
       <div className="vl-command">
         <div className="vl-lab-stamp"><span>{productionSite ? "PONS / ROBINHOOD CHAIN" : candidateSite ? "ISOLATED CANDIDATE PREVIEW" : "PONS READ PREVIEW"}</span><b data-read-state={readState}>{loading ? "Checking launches…" : isFresh ? "Publication checked" : data ? "Updates paused · earlier receipts" : "Launches unavailable"}</b></div>
         <button type="button" className="vl-utility" onClick={refresh} disabled={loading}>{loading ? "CHECKING…" : "RECHECK"}</button>
