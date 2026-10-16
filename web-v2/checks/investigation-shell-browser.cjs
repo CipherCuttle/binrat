@@ -83,6 +83,19 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         await noOverflow(page,width);
       });
       await shot(page,'find-'+width);
+      await check(width+' evidence-based link leads to two real Cases in this window',async()=>{
+        const match=page.locator('.inv-evidence-lead');
+        assert.match(await match.innerText(),/2 launches share one reported deployer in this window/);
+        assert.match(await match.innerText(),/No ownership, risk or profit claim/);
+        const before=report.requests.length;
+        await page.locator('.inv-evidence-lead-action').click();
+        assert.equal(new URL(page.url()).pathname,'/trails');
+        assert.equal(await page.getByRole('searchbox').inputValue(),'0x4e0561054f4fabbaa183a8c16ef1f4e125881eaf');
+        assert.equal(await page.locator('.inv-deployer-group').count(),1);
+        assert.equal(await page.locator('.inv-deployer-group [data-case-id]').count(),2);
+        assert.equal(report.requests.length,before,'finding must not spend an additional RPC request');
+        await routeLink(page,width,'/').click();
+      });
       await check(width+' bounded search, empty recovery and zero search requests',async()=>{
         const before=report.requests.length;
         await page.getByRole('searchbox').fill('ZZZ_NOT_A_REAL_LAUNCH_98765');
