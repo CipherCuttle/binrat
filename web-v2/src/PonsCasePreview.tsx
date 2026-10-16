@@ -259,7 +259,38 @@ export function PonsCasePreview() {
         {!expanded && filtered.length > 4 && <button className="vl-utility a1-more" onClick={() => setExpanded(true)}>SHOW ALL {filtered.length} LAUNCHES <span aria-hidden="true">↓</span></button>}
       </section>
       </>}
-      {selectedId && <div className="a1-case-navigation"><button className="vl-utility" onClick={returnToFinds}>← BACK TO DISCOVERY</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}<span role="status">{shareNotice}</span></div>}
+      {!selectedId && section === "saved" && <section className="inv-workbench" aria-labelledby="inv-saved-heading">
+        <span className="vl-eyebrow">LOCAL CASEBOOK · DEVICE ONLY</span>
+        <h1 id="inv-saved-heading">THE RAT REMEMBERS. SO CAN YOU.</h1>
+        <p>Keep exact Case links on this device. Saved is not a Watch; no alerts are created or sent.</p>
+        {!casebookPersistent && <p role="status">Device storage unavailable. This list lasts only for this session.</p>}
+        {savedIds.length === 0 ? <p>No Cases saved. Open a Case and select SAVE CASE.</p> :
+          <ul className="inv-saved-list">{savedIds.map((id) => <li key={id}>
+            <button className="vl-utility" onClick={() => selectCase(id)}>OPEN CASE · {id.slice(0, 10)}…</button>
+            <button className="vl-utility" onClick={() => toggleCasebook(id)} aria-label={"Remove saved Case " + id}>REMOVE</button>
+          </li>)}</ul>}
+        <button className="vl-utility" onClick={() => navigateSection("/")}>BACK TO FINDS →</button>
+      </section>}
+      {!selectedId && section === "crew" && <section className="inv-workbench" aria-labelledby="inv-crew-heading">
+        <span className="vl-eyebrow">MEET THE CREW</span><h1 id="inv-crew-heading">ONE RAT DIGGING. MORE IN THE WORKS.</h1>
+        <div className="inv-crew-list">
+          <article><img src="/crew/rat-avatar-48.png" alt="" /><div><h2>RAT ZERO · {isFresh ? "SOURCE CHECKED" : loading ? "CHECKING" : "UPDATES UNAVAILABLE"}</h2><p>Finds Pons launches and brings retained source records you can inspect.</p></div></article>
+          <article><img src="/crew/tripwire.png" alt="" /><div><h2>TRIPWIRE · BUILDING</h2><p>Future owner-bounded watches and Case alerts. Not active on this site.</p></div></article>
+          <article><img src="/crew/sniffer.png" alt="" /><div><h2>SNIFFER · PROVING</h2><p>Funding-trail investigations are being tested. No public autonomous worker or prediction.</p></div></article>
+        </div>
+        <button className="vl-utility" onClick={() => navigateSection("/")}>FIND A CASE →</button>
+      </section>}
+      {!selectedId && section === "status" && <section className="inv-workbench" aria-labelledby="inv-status-heading">
+        <span className="vl-eyebrow">SOURCE & CAPABILITY STATUS</span><h1 id="inv-status-heading">CHECK THE SOURCE.</h1>
+        <dl className="inv-status-list"><div><dt>Current read</dt><dd>{readState}</dd></div>
+          <div><dt>Last verified at</dt><dd>{data ? new Date(data.status.verifiedAtMs).toLocaleString() : "Unavailable"}</dd></div>
+          <div><dt>Visible indexed launches</dt><dd>{data ? cases.length : "Unavailable"}</dd></div>
+          <div><dt>Historical coverage</dt><dd>PARTIAL / do not infer absence</dd></div>
+          <div><dt>Tripwire / Sniffer</dt><dd>BUILDING / PROVING · NOT PUBLIC LIVE</dd></div></dl>
+        <p>Source freshness is not launch age. Saved Cases are not Watches or notifications.</p>
+        <button className="vl-utility" onClick={refresh}>RECHECK SOURCE →</button>
+      </section>}
+      {selectedId && <div className="a1-case-navigation"><button className="vl-utility" onClick={returnToFinds}>← BACK TO DISCOVERY</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}{active && <button className="vl-utility" aria-pressed={savedIds.includes(active.id)} onClick={() => toggleCasebook(active.id)}>{savedIds.includes(active.id) ? "SAVED ON THIS DEVICE" : "SAVE CASE"}</button>}<span role="status">{shareNotice}</span></div>}
       {selectedId && !data && loading && <article ref={caseRef} tabIndex={-1} id="vl-case" className="vl-hero-surface vl-loading-case" aria-busy="true" aria-label="Checking Pons Cases">
         <div className="vl-case-topline">RAT ZERO / CHECKING THE RECEIPTS</div>
         <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>
