@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { filterDiscoverableCases, groupDeployerCases, investigationHref, observationForFind, readCasebook, readCaseNotes, sectionForPath, toggleSavedCase, updateCaseNote } from '../web-v2/src/investigationUX.js';
+import { filterDiscoverableCases, groupDeployerCases, investigationHref, observationForFind, readCasebook, readCaseNotes, sectionForPath, sharedDeployerLeads, toggleSavedCase, updateCaseNote } from '../web-v2/src/investigationUX.js';
 
 const a = 'a'.repeat(64), b = 'b'.repeat(64), c = 'c'.repeat(64);
 const cases = [
@@ -78,4 +78,17 @@ test('device-only notes reject invalid IDs, bad types, pollution and excess text
  assert.equal(updateCaseNote(parsed,b,'x'.repeat(300))[b].length,280);
  assert.equal(updateCaseNote(parsed,a,' ')[a],undefined);
  assert.equal(Object.keys(updateCaseNote(readCaseNotes(null),a,'Remember')).length,1);
+});
+
+test('window relationship is based on distinct exact Cases, not history counts or arbitrary ranking',()=>{
+ const address='0x1111111111111111111111111111111111111111';
+ const two = [
+   { ...cases[0], id:a, priorLaunches:38 },
+   { ...cases[0], id:b, priorLaunches:0 },
+   { ...cases[0], id:a, priorLaunches:43 }, // repeated projection cannot invent a new Case
+   { ...cases[1], id:c, priorLaunches:100 },
+ ];
+ assert.deepEqual(sharedDeployerLeads(two),[{address,caseIds:[a,b]}]);
+ assert.deepEqual(sharedDeployerLeads(two.filter(x=>x.id!==b)),[]);
+ assert.deepEqual(sharedDeployerLeads([]),[]);
 });
