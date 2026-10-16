@@ -20,7 +20,7 @@ export default function FrontdoorCandidateApp() {
     return () => window.removeEventListener('popstate', changed);
   }, []);
   if (loc.synthetic && !loc.ponsPreview) return <VisualLab />;
-  if (loc.synthetic || loc.path === '/' || loc.path === '/index.html' || /^\/bag\/[0-9a-f]{64}$/.test(loc.path)) {
+  if (loc.synthetic || loc.path === '/' || loc.path === '/index.html' || ['/saved','/trails','/crew','/status'].includes(loc.path) || /^\/bag\/[0-9a-f]{64}$/.test(loc.path)) {
     return <PonsCasePreview />;
   }
   // Do not silently expose historic ARC V2 routes as live current Pons features.
