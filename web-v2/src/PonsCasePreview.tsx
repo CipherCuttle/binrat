@@ -250,7 +250,7 @@ export function PonsCasePreview() {
         <div className="inv-arrival-scene"><AlleyWorld /></div>
         <div className="inv-arrival-copy"><span className="vl-eyebrow">RAT ZERO / PONS SCOUT</span>
         <h1 id="a1-title">THE RAT<br /><span>REMEMBERS.</span></h1>
-        <p>New launch. Familiar address? Open a Case, follow the history, keep the receipts.</p>
+        <p>Pons launches. Earlier history. Open a Case and check the receipts.</p>
         <button className="inv-arrival-action" onClick={startDigging}>START DIGGING <span aria-hidden="true">↓</span></button></div>
         <span className="inv-scene-caption">RAT ZERO · SCOUT</span>
       </section>}

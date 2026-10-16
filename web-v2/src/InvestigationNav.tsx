@@ -47,7 +47,7 @@ export function InvestigationNav({ section, hasCase, savedCount, isFresh, onNavi
   );
   return <>
     <aside className="inv-sidebar" aria-label="Investigation navigation">
-      <a className="inv-wordmark" href={hrefForPath('/')} onClick={(e) => activate(e, '/')}><img src="/crew/rat-avatar-48.png" width={32} height={32} alt="" />BINRAT<span>®</span></a>
+      <a className="inv-wordmark" href={hrefForPath('/')} onClick={(e) => activate(e, '/')}><img src="/crew/rat-avatar-48.png" width={32} height={32} alt="" />BINRAT</a>
       <span className="inv-sidebar-kicker">CRYPTO INVESTIGATION</span>
       <span className="inv-nav-heading">YOUR WORKSPACE</span>
       <nav aria-label="Investigation">{links}</nav>

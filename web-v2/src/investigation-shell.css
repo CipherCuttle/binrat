@@ -9,6 +9,8 @@
 }
 .inv-layout *, .inv-layout *::before, .inv-layout *::after { box-sizing: border-box; }
 .inv-layout :focus-visible { outline: 2px solid #79f5ff; outline-offset: 4px; }
+/* Route landmarks receive programmatic focus; controls retain visible rings. */
+.inv-layout #inv-main:focus { outline: none; }
 .inv-layout svg { width: 20px; height: 20px; flex-shrink: 0; }
 .inv-sidebar {
   position: sticky; top: 0; height: 100svh; align-self: start;
@@ -178,7 +180,7 @@
 .inv-layout .a1-case-navigation .inv-save-case { background: #c5bded15; border-color: #c5bded85; color: #eee6ff; }
 .inv-layout .a1-case-navigation [aria-pressed='true'] { color: #b6f6ee; border-color: #b6f6ee66; }
 .inv-layout .a1-case-navigation > span { flex-basis: 100%; }
-.inv-layout .a1-active-case { margin-top: 0; padding: 20px 26px; border-radius: 14px; box-shadow: inset 0 1px #f5dcff60, inset -1px -1px #90cfe855, 0 10px 30px #09061f33; background: linear-gradient(120deg, #67446f22, #18244318 50%, #51365920), #1b192ddd; backdrop-filter: none; }
+.inv-layout .a1-active-case { display: block; margin-top: 0; padding: 20px 26px; border-radius: 14px; box-shadow: inset 0 1px #f5dcff60, inset -1px -1px #90cfe855, 0 10px 30px #09061f33; background: linear-gradient(120deg, #67446f22, #18244318 50%, #51365920), #1b192ddd; backdrop-filter: none; }
 .inv-layout .a1-active-case::before { opacity: .45; }
 .inv-layout .a1-active-case::after { opacity: .45; border-width: 1px; }
 .inv-layout .vl-case-topline { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; font-size: 11px; padding: 0 0 16px; color: #bdb2d1; }
@@ -281,7 +283,7 @@
   .inv-layout .a1-find-grid strong { font-size: 16px; }
   .inv-layout .a1-find-grid .a1-token { font-size: 12px !important; margin-top: 3px; }
   .inv-find-history { grid-column: 2; grid-row: 2; font-size: 12px; line-height: 1.4; gap: 0; }
-  .inv-find-history small { display: none; }
+  .inv-layout .a1-find-grid .inv-find-history small { display: none; }
   .inv-layout .a1-find-grid .a1-open { grid-column: 3; grid-row: 1/3; font-size: 0; }
   .inv-layout .a1-find-grid .a1-open > span { font-size: 21px; }
   .inv-layout .a1-find-grid .inv-find-compact { min-height: 76px; grid-template-columns: 28px minmax(0,1fr) auto; padding: 12px; }
@@ -347,6 +349,7 @@
   .inv-layout .vl-lab-stamp b { font-size: 12px; max-width: 95px; }
   .inv-layout .vl-command { gap: 7px; }
   .inv-layout .inv-arrival { min-height: 220px; padding: 20px 15px; }
+  .inv-layout .inv-arrival .vl-eyebrow { display: none; }
   .inv-layout .inv-arrival h1 { font-size: 27px; }
   .inv-layout .inv-arrival .vl-rat-scene { width: 139px; bottom: -12px; right: -25px; }
   .inv-arrival-copy { max-width: 68%; }
