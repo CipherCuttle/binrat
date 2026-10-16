@@ -108,3 +108,17 @@ export function updateCaseNote(current: CaseNotes, id: string, value: string): C
   else if (Object.hasOwn(next, id) || Object.keys(next).length < 50) next[id] = note;
   return next;
 }
+
+/** A verifiable, snapshot-scoped relationship between DISTINCT Cases, not a risk score.
+ * The same reported deployer address on >=2 exact launch IDs is the only fact claimed.
+ */
+export function sharedDeployerLeads<T extends DiscoverableCase & { id: string }>(
+  cases: readonly T[]
+): { address: string; caseIds: string[] }[] {
+  return groupDeployerCases(cases)
+    .map(group => ({
+      address: group.address,
+      caseIds: [...new Set(group.cases.map(item => item.id))],
+    }))
+    .filter(group => group.caseIds.length >= 2);
+}
