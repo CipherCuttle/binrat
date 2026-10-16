@@ -143,7 +143,7 @@ async function visit(c, route) {
           );
           if (w <= 430) {
             const cta = await p
-              .locator(".vl-case-intro .vl-primary")
+              .getByRole("button", { name: "SAVE CASE", exact: true })
               .boundingBox();
             assert.ok(
               cta.y + cta.height <= h,
@@ -187,7 +187,7 @@ async function visit(c, route) {
             await p.locator("#vl-case").getAttribute("data-case"),
             id,
           );
-          await p.getByRole("button", { name: "BACK TO DISCOVERY" }).click();
+          await p.getByRole("button", { name: "BACK TO FINDS" }).click();
           await p.locator("[data-case-id]").first().click();
           assert.equal(
             await p.locator("#vl-case").getAttribute("data-case"),
@@ -289,6 +289,7 @@ async function visit(c, route) {
         async () => {
           assert.equal(await p.locator("[data-case]").count(), 0);
           assert.equal(new URL(p.url()).pathname, "/bag/" + id);
+          await p.locator(".inv-source-limits summary").click();
           assert.match(await p.locator("#vl-case").innerText(), new RegExp(id));
           assert.equal(
             await p
@@ -319,7 +320,7 @@ async function visit(c, route) {
         const p = await c.newPage();
         await p.goto(base + "/bag/" + id, { waitUntil: "domcontentloaded" });
         await p.locator("[data-historical-state=CHECKING]").waitFor();
-        await p.getByRole("button", { name: "BACK TO DISCOVERY" }).click();
+        await p.getByRole("button", { name: "BACK TO FINDS" }).click();
         await p.locator("[data-case-id]").first().click();
         release();
         await p.waitForLoadState("networkidle");

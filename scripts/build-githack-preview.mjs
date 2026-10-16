@@ -66,11 +66,14 @@ for(const file of readdirSync(assetDir)){
  let code=readFileSync(filePath,'utf8');
  code=code.replaceAll('"/crew/','"'+prefix+'crew/')
           .replaceAll("'/crew/","'"+prefix+'crew/')
+          .replaceAll('`/crew/','`'+prefix+'crew/')
           .replaceAll('"/fonts/','"'+prefix+'fonts/')
           .replaceAll("'/fonts/","'"+prefix+'fonts/')
+          .replaceAll('`/fonts/','`'+prefix+'fonts/')
           .replaceAll('url(/fonts/','url('+prefix+'fonts/')
           .replaceAll('url("/fonts/','url("'+prefix+'fonts/')
           .replaceAll("url('/fonts/","url('"+prefix+'fonts/');
+ if (/["'`]\/(?:crew|fonts)\//.test(code)) throw Error('GITHACK_ROOT_ASSET_REMAINS:' + file);
  writeFileSync(filePath,code);
 }
 const source=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
