@@ -86,7 +86,7 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
       await check(width+' evidence-based link leads to two real Cases in this window',async()=>{
         const match=page.locator('.inv-evidence-lead');
         assert.match(await match.innerText(),/2 launches share one reported deployer in this window/);
-        assert.match(await match.innerText(),/No ownership, risk or profit claim/);
+        assert.match(await match.textContent(),/No ownership, risk or profit claim/);
         const before=report.requests.length;
         await page.locator('.inv-evidence-lead-action').click();
         assert.equal(new URL(page.url()).pathname,'/trails');
