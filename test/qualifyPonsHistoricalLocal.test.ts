@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import Database from 'better-sqlite3';
-import {BUDGET_SCHEMA,TRIPWIRE_PROOF_BUDGET_SCHEMA} from '../src/portable/budget.js';
-import {selectHistoricalLaunch,ownerForQualification,readHistoricalBudget,
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {BUDGET_SCHEMA,TRIPWIRE_PROOF_BUDGET_SCHEMA,BudgetLedger,
+  HISTORICAL_SOURCE_PRINCIPAL,HISTORICAL_SOURCE_GRANT_ID} from '../src/portable/budget.js';
+import {selectHistoricalLaunch,historicalQualificationPrincipal,readHistoricalBudget,
   HISTORICAL_BLOCK,HISTORICAL_DEPLOYER} from '../scripts/qualifyPonsHistoricalLocal.js';
 import {PONS_V2_FACTORY} from '../src/pons/chain.js';
 
@@ -20,7 +24,6 @@ function cases(){
   'PONS_V2',PONS_V2_FACTORY,HISTORICAL_DEPLOYER,String(HISTORICAL_BLOCK),hash,tx,0,event);
  db.prepare('INSERT INTO provenance_facts VALUES(?,?,?,?,?,?,?)').run(4663,'launch',event,
   String(HISTORICAL_BLOCK),hash,0,HISTORICAL_DEPLOYER);
- db.prepare('INSERT INTO pons_forward_watches_v1 VALUES(?,?)').run('telegram:321',HISTORICAL_DEPLOYER);
  return db;
 }
 test('historical source identity comes from stored launch and matching provenance',()=>{
@@ -29,7 +32,7 @@ test('historical source identity comes from stored launch and matching provenanc
   assert.equal(known.blockNumber,HISTORICAL_BLOCK);
   assert.equal(known.transactionHash,'0x'+'22'.repeat(32));
   assert.equal(known.deployer,HISTORICAL_DEPLOYER);
-  assert.equal(ownerForQualification(db),'telegram:321');
+  assert.equal(historicalQualificationPrincipal(),HISTORICAL_SOURCE_PRINCIPAL);
  }finally{db.close()}
 });
 test('tampered provenance, duplicate or absent canary fail before network',()=>{
@@ -40,12 +43,13 @@ test('tampered provenance, duplicate or absent canary fail before network',()=>{
   assert.throws(()=>selectHistoricalLaunch(db),/ABSENT/);
  }finally{db.close()}
 });
-test('a missing or ambiguous owner never receives automatic grant authority',()=>{
+test('historical evidence needs no existing Watch and cannot impersonate Telegram owner',()=>{
  const db=cases();try{
-  assert.equal(ownerForQualification(db,'telegram:123'),'telegram:123');
-  assert.throws(()=>ownerForQualification(db,'local-owner'),/OWNER_SCOPE_INVALID/);
+  assert.equal(selectHistoricalLaunch(db).deployer,HISTORICAL_DEPLOYER);
+  assert.equal(historicalQualificationPrincipal(),HISTORICAL_SOURCE_PRINCIPAL);
+  assert.throws(()=>historicalQualificationPrincipal('telegram:123'),/OWNER_OVERRIDE_DENIED/);
   db.prepare('INSERT INTO pons_forward_watches_v1 VALUES(?,?)').run('telegram:222',HISTORICAL_DEPLOYER);
-  assert.throws(()=>ownerForQualification(db),/OWNER_NOT_PROVEN/);
+  assert.equal(historicalQualificationPrincipal(),HISTORICAL_SOURCE_PRINCIPAL);
  }finally{db.close()}
 });
 test('read-only daily ledger reconciliation includes prior diagnostics without resets',()=>{
@@ -71,4 +75,35 @@ test('an existing grant fences replay without changing the original ledger',()=>
       HISTORICAL_DEPLOYER,0,60000,800000);
   assert.throws(()=>readHistoricalBudget(db,2_000),/GRANT_ALREADY_CREATED/);
  }finally{db.close()}
+});
+
+test('historical-only grant reserves eight shared slots but cannot authorize Watch or proof',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'historical-source-budget-'));
+ const path=join(dir,'budget.sqlite');
+ const init=new Database(path);
+ init.exec(BUDGET_SCHEMA);
+ init.close();
+ const ledger=new BudgetLedger(path,{attemptsPerDay:100,attemptsPerRun:50,
+   blocksPerRun:1000,runtimeMs:60000,attemptsPerRequest:1},()=>2000);
+ const generation='aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+ const scope={ownerId:HISTORICAL_SOURCE_PRINCIPAL,generation,deployer:HISTORICAL_DEPLOYER};
+ try{
+   const job=ledger.start(BigInt(HISTORICAL_BLOCK));
+   ledger.createHistoricalQualificationGrant({grantId:HISTORICAL_SOURCE_GRANT_ID,
+     generation,deployer:HISTORICAL_DEPLOYER,stopsAtMs:60_000,
+     maxMilliCu:800_000,approved:true});
+   assert.throws(()=>ledger.createHistoricalQualificationGrant({
+     grantId:HISTORICAL_SOURCE_GRANT_ID,generation,deployer:HISTORICAL_DEPLOYER,
+     stopsAtMs:60_000,maxMilliCu:800_000,approved:true
+   }),/UNIQUE/);
+   assert.throws(()=>ledger.reserveTripwireStream(job,HISTORICAL_SOURCE_GRANT_ID,50_000,scope),
+     /WATCH_OWNER_REQUIRED/);
+   assert.throws(()=>ledger.reserveTripwireProof(job,HISTORICAL_SOURCE_GRANT_ID,50_000,scope),
+     /WATCH_OWNER_REQUIRED/);
+   ledger.reserveTripwireQualification(job,HISTORICAL_SOURCE_GRANT_ID,50_000,scope,
+     {blockNumber:HISTORICAL_BLOCK,transactionHash:'0x'+'22'.repeat(32),logIndex:0});
+   assert.equal(ledger['db'].prepare('SELECT count(*) n FROM rpc_attempts').get().n,8);
+   assert.equal(ledger['db'].prepare('SELECT reserved_milli_cu n FROM tripwire_proof_grants_v1').get().n,800_000);
+   assert.equal(ledger['db'].prepare('SELECT status FROM tripwire_source_qualifications_v1').get().status,'RESERVED');
+ }finally{ledger.close();rmSync(dir,{recursive:true,force:true})}
 });
