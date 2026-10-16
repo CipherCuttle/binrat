@@ -49,6 +49,9 @@ CREATE TABLE IF NOT EXISTS tripwire_stream_reservations_v1 (
 /** Exactly eight read-only source qualification requests; priced at a
  * conservative 100 CU each. This is modeled, not guaranteed provider billing. */
 export const TRIPWIRE_QUALIFICATION_MILLI_CU = 800_000;
+/** Distinct forensic-only principal: NEVER a user Watch or Telegram authorization. */
+export const HISTORICAL_SOURCE_PRINCIPAL = 'local:historical-pons-qualification';
+export const HISTORICAL_SOURCE_GRANT_ID = 'historical-pons-orbbook-20261015-v1';
 export const TRIPWIRE_QUALIFICATION_SCHEMA = `
 CREATE TABLE IF NOT EXISTS tripwire_source_qualifications_v1 (
   grant_id TEXT PRIMARY KEY REFERENCES tripwire_proof_grants_v1(grant_id),
@@ -182,6 +185,7 @@ export class BudgetLedger {
    * Setup, reconnects, and all incoming data must fit this single envelope. */
   reserveTripwireStream(job: string, grantId: string, deadline: number,
     scope: { ownerId:string; generation:string; deployer:string }): void {
+    if(scope.ownerId===HISTORICAL_SOURCE_PRINCIPAL) throw Error('TRIPWIRE_WATCH_OWNER_REQUIRED');
     const file=lstatSync(this.path),disk=statfsSync(dirname(this.path));
     if (file.isSymbolicLink() || file.ino!==this.inode ||
       disk.bavail*disk.bsize<64*1024*1024) throw Error('BUDGET_STORAGE_UNAVAILABLE');
@@ -266,6 +270,36 @@ export class BudgetLedger {
 
   /** Precondition: the parent CLI holds its exclusive writer lock.
    * Explicit grant creation alone authorizes no RPC, WS or notifications. */
+  /** Single historical SOURCE test, not a Watch/Telegram grant. This local
+   * principal cannot pass the owner-consent gate in persistentTripwireWatch.
+   * The original shared ledger and daily 100-slot cap remain authoritative. */
+  createHistoricalQualificationGrant(grant: {
+    grantId:string;generation:string;deployer:string;stopsAtMs:number;
+    maxMilliCu:number;approved:boolean;
+  }):void {
+    const now=this.now();
+    if(grant.approved!==true || grant.grantId!==HISTORICAL_SOURCE_GRANT_ID ||
+       !/^[0-9a-f-]{36}$/.test(grant.generation) ||
+       !/^0x[0-9a-f]{40}$/.test(grant.deployer) ||
+       !Number.isSafeInteger(now) || !Number.isSafeInteger(grant.stopsAtMs) ||
+       grant.stopsAtMs<=now || grant.stopsAtMs-now>60_000 ||
+       grant.maxMilliCu!==TRIPWIRE_QUALIFICATION_MILLI_CU)
+      throw Error('HISTORICAL_QUALIFICATION_GRANT_INVALID');
+    const file=lstatSync(this.path),disk=statfsSync(dirname(this.path));
+    if(file.isSymbolicLink()||file.ino!==this.inode||
+       disk.bavail*disk.bsize<64*1024*1024)
+      throw Error('BUDGET_STORAGE_UNAVAILABLE');
+    this.db.exec(TRIPWIRE_PROOF_BUDGET_SCHEMA);
+    this.db.transaction(()=>{
+      // INSERT (never upsert/ignore): a second grant must fail closed.
+      this.db.prepare(`INSERT INTO tripwire_proof_grants_v1
+        (grant_id,owner_id,generation,deployer,created_at_ms,stops_at_ms,max_milli_cu)
+        VALUES (?,?,?,?,?,?,?)`)
+        .run(grant.grantId,HISTORICAL_SOURCE_PRINCIPAL,grant.generation,
+             grant.deployer,now,grant.stopsAtMs,grant.maxMilliCu);
+    }).immediate();
+  }
+
   createTripwireProofGrant(grant: {
     grantId: string; ownerId: string; generation: string; deployer: string;
     stopsAtMs: number; maxMilliCu: number; approved: boolean;
@@ -299,6 +333,7 @@ export class BudgetLedger {
    * WS setup/bytes must be charged separately before any real mounting. */
   reserveTripwireProof(job: string, grantId: string, deadline: number,
     scope: {ownerId:string;generation:string;deployer:string}): void {
+    if(scope.ownerId===HISTORICAL_SOURCE_PRINCIPAL) throw Error('TRIPWIRE_WATCH_OWNER_REQUIRED');
     const file = lstatSync(this.path), disk = statfsSync(dirname(this.path));
     if (file.isSymbolicLink() || file.ino !== this.inode || disk.bavail * disk.bsize < 64 * 1024 * 1024)
       throw new Error('BUDGET_STORAGE_UNAVAILABLE');
