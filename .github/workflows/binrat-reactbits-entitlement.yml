@@ -1,0 +1,46 @@
+name: BINRAT React Bits Pro entitlement (no source export)
+on:
+  push:
+    branches: [feat/binrat-micrographics-v1-20261017]
+    paths:
+      - '.github/workflows/binrat-reactbits-entitlement.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  license-status-only:
+    if: github.repository == 'CipherCuttle/binrat'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      REACTBITS_LICENSE_KEY: ${{ secrets.REACTBITS_LICENSE_KEY }}
+    steps:
+      - name: Test registry access without exposing key or licensed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${REACTBITS_LICENSE_KEY:-}" ]]; then
+            echo "REACTBITS_ENTITLEMENT=SECRET_NOT_AVAILABLE"
+            exit 0
+          fi
+          echo "::add-mask::${REACTBITS_LICENSE_KEY}"
+          for item in "starter/glitch-text-css" "pro/hero-1"; do
+            path="${RUNNER_TEMP}/rb-entitlement-response"
+            code=$(curl --fail-with-body --silent --show-error --max-time 35 \
+              --output "$path" --write-out '%{http_code}' \
+              -H "Authorization: Bearer ${REACTBITS_LICENSE_KEY}" \
+              "https://pro.reactbits.dev/api/r/${item}.json") || :
+            if [[ "$code" == "200" ]]; then
+              if node -e "const fs=require('node:fs');const x=JSON.parse(fs.readFileSync(process.argv[1]));if(!x||!Array.isArray(x.files))process.exit(1)" "$path" >/dev/null 2>&1; then
+                echo "REGISTRY_${item%%/*}=AUTHORIZED_JSON_ITEM"
+              else
+                echo "REGISTRY_${item%%/*}=UNEXPECTED_RESPONSE"
+              fi
+            elif [[ "$code" == "401" || "$code" == "403" ]]; then
+              echo "REGISTRY_${item%%/*}=DENIED_HTTP_${code}"
+            else
+              echo "REGISTRY_${item%%/*}=UNRESOLVED_HTTP_${code:-000}"
+            fi
+            rm -f "$path"
+          done
+          echo "REACTBITS_PROBE=FINISHED_NO_LICENSE_OR_SOURCE_EXPORTED"

@@ -10,7 +10,8 @@ import { InvestigationNav } from "./InvestigationNav";
 import { DeployerGroups, FindRow, SavedCases, shortAddress, tokenLabel } from "./InvestigationPanels";
 import { filterDiscoverableCases, investigationHref, readCasebook, readCaseNotes, sectionForPath, sharedDeployerLeads, toggleSavedCase, updateCaseNote, type InvestigationSection } from "./investigationUX";
 import "./investigation-shell.css";
-import { ShinyText, SpotlightCard, StarBorder } from "./ReactBitsStarter";
+import { ClickSparkButton, ShinyText, SpotlightCard, StarBorder } from "./ReactBitsStarter";
+import { ProofThread } from "./CaseMicrographics";
 import "./ReactBitsStarter.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS";
@@ -295,7 +296,7 @@ export function PonsCasePreview() {
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
         {data && cases.length > 0 && filtered.length === 0 && <div className="inv-empty-state" role="status"><h3>{search.trim() ? "Nothing in this window." : "No earlier matches here."}</h3><p>{search.trim() ? "Try another token or address. Only these published launches were searched." : "No earlier match in our partial index. Older history remains unknown."}</p>{search.trim() && <button className="vl-utility" onClick={() => setSearch("")}>CLEAR SEARCH</button>}</div>}
         {data && section === "find" && !search.trim() && (firstSharedLead || historyMatchCount > 0) && <SpotlightCard className="inv-evidence-lead" aria-label="Relationships in this recorded launch window">
-          <ShinyText className="inv-evidence-lead-tag">RAT ZERO / VERIFIED CONNECTION</ShinyText>
+          <span className="inv-evidence-lead-tag inv-lead-graphic"><ShinyText>RAT ZERO / VERIFIED CONNECTION</ShinyText>{firstSharedLead && <ProofThread ids={firstSharedLead.caseIds} />}</span>
           <span className="inv-evidence-lead-fact">{firstSharedLead
             ? firstSharedLead.caseIds.length + " launches share one reported deployer in this window"
             : historyMatchCount + " launches have earlier indexed deployer activity"}</span>
@@ -330,7 +331,7 @@ export function PonsCasePreview() {
         <p>Source freshness is not launch age. Saved Cases are not Watches or notifications.</p>
         <button className="vl-utility" onClick={refresh}>RECHECK SOURCE →</button>
       </section>}
-      {selectedId && <div className="a1-case-navigation"><button className="vl-utility inv-case-back" onClick={returnToFinds}>← {section === "saved" ? "BACK TO CASEBOOK" : section === "trails" ? "BACK TO TRAILS" : "BACK TO FINDS"}</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}{active && <button className="vl-utility inv-save-case" aria-pressed={savedIds.includes(active.id)} onClick={() => toggleCasebook(active.id)}>{savedIds.includes(active.id) ? (casebookPersistent ? "SAVED ON THIS DEVICE" : "SAVED FOR THIS SESSION") : "SAVE CASE"}</button>}<span role="status">{shareNotice}</span></div>}
+      {selectedId && <div className="a1-case-navigation"><button className="vl-utility inv-case-back" onClick={returnToFinds}>← {section === "saved" ? "BACK TO CASEBOOK" : section === "trails" ? "BACK TO TRAILS" : "BACK TO FINDS"}</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}{active && <ClickSparkButton className="vl-utility inv-save-case" aria-pressed={savedIds.includes(active.id)} onClick={() => toggleCasebook(active.id)}>{savedIds.includes(active.id) ? (casebookPersistent ? "SAVED ON THIS DEVICE" : "SAVED FOR THIS SESSION") : "SAVE CASE"}</ClickSparkButton>}<span role="status">{shareNotice}</span></div>}
       {selectedId && !data && loading && <article ref={caseRef} tabIndex={-1} id="vl-case" className="vl-hero-surface vl-loading-case" aria-busy="true" aria-label="Checking Pons Cases">
         <div className="vl-case-topline">RAT ZERO / CHECKING THE RECEIPTS</div>
         <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>

@@ -62,3 +62,51 @@
     -webkit-text-fill-color: currentColor;
   }
 }
+
+/* Two additional source-inspired React Bits interactions: GlareHover + ClickSpark.
+   Deliberately small adaptations, not authenticated React Bits Pro components. */
+.rb-glare-hover { position: relative; isolation: isolate; overflow: hidden; }
+.rb-glare-hover::after {
+  content: ""; z-index: 2; position: absolute; pointer-events: none;
+  inset: 0; border-radius: inherit; opacity: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(115deg, transparent 31%, rgba(192,255,248,.115) 48%, transparent 68%);
+}
+.rb-click-spark { position: relative; isolation: isolate; }
+.rb-spark-burst {
+  position: absolute; pointer-events: none; z-index: 3;
+  width: 30px; height: 30px; top: 50%; left: 50%;
+  margin: -15px; opacity: 0;
+  background:
+    linear-gradient(#b6f6ed,#b6f6ed) center 0 / 1px 7px no-repeat,
+    linear-gradient(#b6f6ed,#b6f6ed) center bottom / 1px 7px no-repeat,
+    linear-gradient(90deg,#b6f6ed,#b6f6ed) left center / 7px 1px no-repeat,
+    linear-gradient(90deg,#b6f6ed,#b6f6ed) right center / 7px 1px no-repeat;
+}
+.inv-proof-thread { display:inline-block; flex-shrink:0; opacity:.9; vertical-align:middle; }
+.inv-lead-graphic { display:flex; align-items:center; column-gap:7px; min-width:0; }
+.inv-case-sigil { flex-shrink:0; display:block; margin:auto; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .rb-glare-hover:hover::after,.rb-glare-hover:focus-visible::after {
+    opacity: 1; transform:translateX(120%); transition:transform 630ms ease-out,opacity 210ms ease;
+  }
+  .rb-spark-burst { animation: rb-spark 370ms ease-out 1 both; }
+}
+@keyframes rb-spark {
+  0% { opacity:.8; transform:scale(.25) rotate(0deg); }
+  75% { opacity:.6; }
+  100% { opacity:0; transform:scale(1.1) rotate(25deg); }
+}
+@media (hover:none),(prefers-reduced-motion:reduce) {
+  .rb-glare-hover::after,.rb-spark-burst { display:none !important; animation:none !important; transition:none !important; }
+}
+
+/* The trace is decorative; keep a complete first Case above 390px bottom navigation. */
+@media (min-width: 381px) and (max-width: 700px) {
+  .inv-layout .inv-evidence-lead {
+    margin: 2px 0 3px;
+    padding: 3px 7px;
+    gap: 2px 6px;
+  }
+  .inv-proof-thread { display: none; }
+}

@@ -1,6 +1,8 @@
 import type { PonsCase } from './pons-readonly-preview.mjs';
 import { groupDeployerCases, observationForFind, type CaseNotes } from './investigationUX';
 import { NavIcon } from './InvestigationNav';
+import { GlareHoverButton } from './ReactBitsStarter';
+import { CaseSigil } from './CaseMicrographics';
 
 export const shortAddress = (value: string) => value.slice(0, 6) + '…' + value.slice(-4);
 export const tokenLabel = (item: Pick<PonsCase, 'name' | 'symbol'>) => item.name.trim() || item.symbol.trim() || 'Unnamed launch';
@@ -9,16 +11,16 @@ export function FindRow({ item, onOpen, compact = false }: {
   item: PonsCase; onOpen: (id: string) => void; compact?: boolean;
 }) {
   const hasName = Boolean(item.name.trim() || item.symbol.trim());
-  return <button type="button" id={'find-' + item.id} data-case-id={item.id}
+  return <GlareHoverButton id={'find-' + item.id} data-case-id={item.id}
     aria-label={'Open Case ' + tokenLabel(item) + ' ' + shortAddress(item.token)}
     className={'vl-find inv-find-row' + (compact ? ' inv-find-compact' : '')} onClick={() => onOpen(item.id)}>
-    <span className="vl-find-mark" aria-hidden="true">{item.symbol.trim().slice(0, 2) || '↗'}</span>
+    <span className="vl-find-mark" aria-hidden="true">{item.symbol.trim() ? item.symbol.trim().slice(0, 2) : <CaseSigil id={item.id} />}</span>
     <span className="a1-find-copy"><strong>{hasName ? tokenLabel(item) : shortAddress(item.token)}</strong>
       <small className="a1-token">{hasName ? (item.symbol && item.name ? item.symbol + ' · ' : '') + shortAddress(item.token) : 'Unnamed Pons launch'}</small>
     </span>
     {!compact && <span className="inv-find-history"><span className={item.priorLaunches > 0 ? 'a1-recurrence' : ''}>{observationForFind(item).label}</span><small>{observationForFind(item).action}</small><small>Deployer {shortAddress(item.reportedCreatorAddress)}</small></span>}
     <span className="a1-open">OPEN CASE <span aria-hidden="true">↗</span></span>
-  </button>;
+  </GlareHoverButton>;
 }
 
 export function DeployerGroups({ cases, onOpen }: { cases: PonsCase[]; onOpen: (id: string) => void }) {

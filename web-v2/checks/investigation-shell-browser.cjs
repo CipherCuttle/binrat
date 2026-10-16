@@ -85,13 +85,17 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
       await shot(page,'find-'+width);
       await check(width+' React Bits starter elements honor reduced motion and button semantics',async()=>{
         assert.equal(await page.locator('.rb-spotlight.inv-evidence-lead').count(),1);
-        assert.equal(await page.locator('.rb-shiny-text.inv-evidence-lead-tag').count(),1);
+        assert.equal(await page.locator('.inv-evidence-lead-tag .rb-shiny-text').count(),1);
         const button=page.locator('.rb-star-border.inv-evidence-lead-action');
         assert.equal(await button.count(),1);
         assert.equal(await button.getAttribute('type'),'button');
         assert.equal(await page.locator('.rb-shiny-text').evaluate(el => getComputedStyle(el).animationName),'none');
         assert.equal(await page.locator('.rb-spotlight').evaluate(el => getComputedStyle(el, '::before').display),'none');
         assert.equal(await page.locator('.rb-star-border').evaluate(el => getComputedStyle(el, '::after').display),'none');
+        assert.equal(await page.locator('.inv-proof-thread circle').count(),2);
+        assert.equal(await page.locator('.rb-glare-hover[data-case-id]').count(),6);
+        assert.equal(await page.locator('.inv-case-sigil').count(),6);
+        assert.equal(await page.locator('.rb-glare-hover').first().evaluate(el => getComputedStyle(el, '::after').display),'none');
         await noOverflow(page,width);
       });
       if(width===1440) {
@@ -143,6 +147,9 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.ok(save&&save.y+save.height<height,'save below first viewport');
         await page.getByRole('button',{name:'SAVE CASE',exact:true}).click();
         assert.ok(await page.getByRole('button',{name:'SAVED ON THIS DEVICE',exact:true}).isVisible());
+        assert.equal(await page.locator('.rb-click-spark.inv-save-case').count(),1);
+        assert.equal(await page.locator('.rb-spark-burst[aria-hidden="true"]').count(),1);
+        assert.equal(await page.locator('.rb-spark-burst').evaluate(el=>getComputedStyle(el).display),'none');
         await noOverflow(page,width);
       });
       await shot(page,'case-'+width);

@@ -5,8 +5,12 @@ BINRAT's `web-v2/src/ReactBitsStarter.tsx` and `ReactBitsStarter.css` are lightw
 - SpotlightCard: https://github.com/DavidHDev/react-bits/tree/main/src/content/Components/SpotlightCard
 - ShinyText: https://github.com/DavidHDev/react-bits/tree/main/src/content/TextAnimations/ShinyText
 - StarBorder: https://github.com/DavidHDev/react-bits/tree/main/src/content/Animations/StarBorder
+- GlareHover: https://github.com/DavidHDev/react-bits/tree/main/src/content/Animations/GlareHover
+- ClickSpark: https://github.com/DavidHDev/react-bits/tree/main/src/content/Animations/ClickSpark
 
 Source: David Haz / https://github.com/DavidHDev/react-bits, accessed 2026-10-17. The components are not an independent for-sale component pack or a substitute for the original complete API.
+
+The CaseSigil and ProofThread graphics are original BINRAT code. React Bits Pro is a separately licensed registry; **no restricted Pro registry source is committed in this frontend PR**. Entitlement checks, if run, must never print the license or response payload.
 
 The upstream license notice is retained below.
 
