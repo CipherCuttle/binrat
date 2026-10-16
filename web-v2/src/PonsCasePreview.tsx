@@ -8,7 +8,7 @@ import "./visual-lab.css";
 import "./frontdoor-discovery.css";
 import { InvestigationNav } from "./InvestigationNav";
 import { DeployerGroups, FindRow, SavedCases, shortAddress, tokenLabel } from "./InvestigationPanels";
-import { filterDiscoverableCases, investigationHref, readCasebook, readCaseNotes, sectionForPath, toggleSavedCase, updateCaseNote, type InvestigationSection } from "./investigationUX";
+import { filterDiscoverableCases, investigationHref, readCasebook, readCaseNotes, sectionForPath, sharedDeployerLeads, toggleSavedCase, updateCaseNote, type InvestigationSection } from "./investigationUX";
 import "./investigation-shell.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS";
@@ -146,6 +146,9 @@ export function PonsCasePreview() {
   const familiarAddresses = new Set(cases.filter(item => item.priorLaunches > 0).map(item => item.reportedCreatorAddress));
   const trailCases = cases.filter(item => familiarAddresses.has(item.reportedCreatorAddress));
   const filtered = filterDiscoverableCases(section === "trails" ? trailCases : cases, search, false);
+  const sharedLeads = sharedDeployerLeads(cases);
+  const firstSharedLead = sharedLeads[0];
+  const historyMatchCount = cases.filter(item => item.priorLaunches > 0).length;
   const visibleCases = expanded ? filtered : filtered.slice(0, 6);
   const earlierVisibleCases = active && !isHistorical ? cases.filter(item => item.id !== active.id && item.reportedCreatorAddress === active.reportedCreatorAddress && BigInt(item.block) < BigInt(active.block)) : [];
   const isFresh = !error && data?.freshness === "FRESH_VERIFIED" &&
@@ -199,6 +202,11 @@ export function PonsCasePreview() {
     advance(stages[n], true);
   }
   const refresh = () => setRetry((n) => n + 1);
+  function openSharedDeployer(address: string) {
+    navigateSection("/trails");
+    // Search is limited to current already-verified Case records; no RPC or new history.
+    setSearch(address);
+  }
   function navigateSection(path: string) {
     window.history.pushState(null, "", navigationUrl(path));
     setSection(sectionForPath(path)); setSelectedId(null); setStage("WHAT");
@@ -284,6 +292,17 @@ export function PonsCasePreview() {
         {!data && <p role="status">{loading ? "Rat Zero is checking the source. Launches appear here once verified." : "Pons launches are unavailable. Recheck to try again. Nothing was substituted."}</p>}
         {data && cases.length === 0 && <p role="status">Verified empty feed at this checkpoint. No launches to open yet. Recheck for new finds.</p>}
         {data && cases.length > 0 && filtered.length === 0 && <div className="inv-empty-state" role="status"><h3>{search.trim() ? "Nothing in this window." : "No earlier matches here."}</h3><p>{search.trim() ? "Try another token or address. Only these published launches were searched." : "No earlier match in our partial index. Older history remains unknown."}</p>{search.trim() && <button className="vl-utility" onClick={() => setSearch("")}>CLEAR SEARCH</button>}</div>}
+        {data && section === "find" && !search.trim() && (firstSharedLead || historyMatchCount > 0) && <aside className="inv-evidence-lead" aria-label="Relationships in this recorded launch window">
+          <span className="inv-evidence-lead-tag">RAT ZERO / VERIFIED CONNECTION</span>
+          <span className="inv-evidence-lead-fact">{firstSharedLead
+            ? firstSharedLead.caseIds.length + " launches share one reported deployer in this window"
+            : historyMatchCount + " launches have earlier indexed deployer activity"}</span>
+          <button type="button" className="inv-evidence-lead-action" onClick={() => firstSharedLead
+            ? openSharedDeployer(firstSharedLead.address) : navigateSection("/trails")}>
+            {firstSharedLead ? "COMPARE THOSE CASES ↗" : "INSPECT MATCHES ↗"}
+          </button>
+          <small>Address match only. No ownership, risk or profit claim.</small>
+        </aside>}
         {data && filtered.length > 0 && (section === "trails" ? <DeployerGroups cases={filtered} onOpen={selectCase} /> : <div className="vl-find-rail a1-find-grid">{visibleCases.map(item => <FindRow key={item.id} item={item} onOpen={selectCase} />)}</div>)}
         {section === "find" && !expanded && filtered.length > 6 && <button className="vl-utility a1-more" onClick={() => setExpanded(true)}>SHOW ALL {filtered.length} LAUNCHES <span aria-hidden="true">↓</span></button>}
         <details className="inv-source-limits"><summary>What these finds tell you</summary><p>Launch order comes from indexed blocks. Earlier-launch counts refer to the Pons-reported deployer in partial history. They do not identify a human, predict returns or show safety. Source freshness describes the publication check, not launch age.</p></details>
