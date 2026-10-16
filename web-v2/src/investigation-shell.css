@@ -429,3 +429,21 @@
   .inv-layout .inv-evidence-lead-action { max-width: 118px; padding: 6px; font-size: 10px; }
   .inv-layout .inv-evidence-lead small { font-size: 10px; }
 }
+
+/* On compact 320px phones keep the lead actionable AND a full Case above the bottom rail.
+ * Source limitations remain available in the Trails page and expandable evidence note. */
+@media (max-width: 380px) {
+  .inv-layout .inv-evidence-lead {
+    grid-template-columns: minmax(0,1fr) 101px; gap: 5px;
+    padding: 3px 7px; margin: 3px 0 5px;
+  }
+  .inv-layout .inv-evidence-lead-tag,
+  .inv-layout .inv-evidence-lead small { display: none; }
+  .inv-layout .inv-evidence-lead-fact {
+    grid-column: 1; grid-row: 1; font-size: 11px; line-height: 1.3;
+  }
+  .inv-layout .inv-evidence-lead-action {
+    grid-column: 2; grid-row: 1; min-height: 42px; font-size: 9.5px;
+    max-width: none; padding: 5px;
+  }
+}
