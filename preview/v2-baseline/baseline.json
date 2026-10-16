@@ -1,0 +1,30 @@
+{
+  "source": "4d748247474e1e506e6a54a44aacab4b81e096ed",
+  "mode": "RECORDED_PONS_REPLAY",
+  "metrics": [
+    {
+      "width": 1440,
+      "height": 900,
+      "firstFindTop": 994.734375,
+      "firstFindVisible": false
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "firstFindTop": 985.328125,
+      "firstFindVisible": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "firstFindTop": 1195.625,
+      "firstFindVisible": false
+    },
+    {
+      "width": 320,
+      "height": 800,
+      "firstFindTop": 1276.34375,
+      "firstFindVisible": false
+    }
+  ]
+}
