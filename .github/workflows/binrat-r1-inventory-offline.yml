@@ -2,6 +2,12 @@ name: BINRAT R1 inventory offline proof (no provider access)
 # Inert until a human dispatches it on the reviewed branch.
 # No secrets, no network diagnostics, no Cloudflare GETs, no production writes.
 on:
+  push:
+    branches: [experiment/binrat-r1-preservation-inventory-20261017]
+    paths:
+      - 'scripts/binrat-recovery-readonly-inventory.mjs'
+      - 'test/binratRecoveryInventory.test.mjs'
+      - '.github/workflows/binrat-r1-inventory-offline.yml'
   workflow_dispatch:
 permissions:
   contents: read
