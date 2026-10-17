@@ -184,7 +184,16 @@ export function handleMcp(snapshot,message){
     const p=message.params;
     if(!OBJECT(p)||typeof p.name!=='string'||!TOOL_DEFS.some(t=>t.name===p.name))return rpcError(id,-32602,'Unknown or invalid tool');
     const out=evaluateTool(snapshot,p.name,p.arguments??{});
-    const result={content:[{type:'text',text:JSON.stringify(out)}],structuredContent:out,isError:out.status==='ERROR'};
+    // MCP exposes both text and structured content. For a 20-record Case,
+    // a second full JSON copy would exceed the bounded JSON-RPC frame.
+    const textContent=out.status==='OK'&&p.name==='get_case'
+      ? JSON.stringify({status:out.status,reason:out.reason,
+          caseId:out.data.caseId,reportedDeployer:out.data.reportedDeployer,
+          recordedPriorLaunchCount:out.data.priorLaunchCount,
+          caseDigest:out.data.caseDigest,fullRecords:'structuredContent',
+          note:'Recorded Pons Case; partial history; current live state UNKNOWN'})
+      : JSON.stringify(out);
+    const result={content:[{type:'text',text:textContent}],structuredContent:out,isError:out.status==='ERROR'};
     return rpcResult(id,result);
   }
   return rpcError(id,-32601,'Method not found');
