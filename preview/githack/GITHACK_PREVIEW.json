@@ -1,0 +1,12 @@
+{
+  "schema": "binrat.githack-offline-preview/1",
+  "sourceCommit": "c10151d38f1a1e7bda676ac631b2386b61c3e519",
+  "liveSource": false,
+  "fixtureVerifiedAtMs": 1791557862768,
+  "fixtureCount": 20,
+  "display": "RECORDED_PRODUCTION_PUBLIC_GET_REPLAY",
+  "noWatch": true,
+  "noRPC": true,
+  "previewBranch": "binrat-v3-githack-splash-20261017",
+  "basePath": "/CipherCuttle/binrat/binrat-v3-githack-splash-20261017/preview/githack/"
+}
