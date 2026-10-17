@@ -1,0 +1,33 @@
+name: BINRAT positive-event Tripwire offline gate
+on:
+  push:
+    branches:
+      - experiment/binrat-positive-event-tripwire-offline-20261017
+    paths:
+      - 'src/portable/persistentTripwireBudget.ts'
+      - 'src/portable/persistentTripwireWatch.ts'
+      - 'test/portablePersistentTripwireWatch.test.ts'
+      - '.github/workflows/binrat-positive-event-offline.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  no-provider-source-proof:
+    if: >-
+      github.repository == 'CipherCuttle/binrat' &&
+      github.ref == 'refs/heads/experiment/binrat-positive-event-tripwire-offline-20261017'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NODE_OPTIONS: --experimental-sqlite
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v4
+        with: { version: '10.15.0' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install existing pinned dependencies (no lifecycle scripts)
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Run only the 13 event-driven SQLite offline tests
+        run: pnpm exec tsx --test test/portablePersistentTripwireWatch.test.ts
