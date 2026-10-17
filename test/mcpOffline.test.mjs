@@ -68,7 +68,7 @@ test('malformed input, injected fields and unbounded output rejected',()=>{
   }
   assert.equal(evaluateTool(s,'get_case',{case_id:'ab'}).status,'ERROR');
   assert.equal(evaluateTool(s,'source_status',{url:'https://example.com'}).status,'ERROR');
-  assert.equal(evaluateTool(s,'compare_cases',{}).status,'ERROR');
+  assert.throws(()=>evaluateTool(s,'compare_cases',{}),/TOOL_UNKNOWN/);
 });
 
 test('pinning prevents swapped, mixed or modified snapshots',()=>{
