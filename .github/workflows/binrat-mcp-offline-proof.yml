@@ -5,11 +5,13 @@ on:
     paths:
       - 'scripts/binrat-mcp-offline.mjs'
       - 'scripts/binrat-bitquery-ab-probe.mjs'
+      - 'scripts/binrat-bitquery-recent-overlap.ts'
       - 'scripts/binrat-mcp-case-offline.ts'
       - 'src/public/caseEvidence.ts'
       - 'docs/receipts/sprint-a1-2-contract/old-case-envelope.json'
       - 'test/mcpOffline.test.mjs'
       - 'test/bitqueryAbOffline.test.mjs'
+      - 'test/bitqueryRecentOverlap.test.ts'
       - 'test/mcpCaseOffline.test.ts'
       - 'docs/MCP_LOCAL_PROOF_V01.md'
       - '.github/workflows/binrat-mcp-offline-proof.yml'
@@ -40,7 +42,10 @@ jobs:
       - name: Install exact pinned existing deps (offline-only tests; no provider credentials)
         run: pnpm install --frozen-lockfile
       - name: Verify captured full Case using production canonical verifier
-        run: pnpm exec tsx --test test/mcpCaseOffline.test.ts
+        run: |
+          pnpm exec tsx --test test/mcpCaseOffline.test.ts
+          pnpm exec tsx --test test/bitqueryRecentOverlap.test.ts
+          pnpm exec tsx scripts/binrat-bitquery-recent-overlap.ts --dry-run
       - name: Assert no deployment, arbitrary fetch or paid model API
         run: |
           ! grep -nE 'https://api[.]telegram[.]org|api[.]openrouter[.]ai|private_key|eth_sendRawTransaction|fetch[(]' scripts/binrat-mcp-offline.mjs scripts/binrat-mcp-case-offline.ts
