@@ -8,6 +8,7 @@ on:
       - 'src/portable/persistentTripwireBudget.ts'
       - 'src/portable/persistentTripwireWatch.ts'
       - 'test/portablePersistentTripwireWatch.test.ts'
+      - 'docs/migration/POSITIVE_EVENT_TRIPWIRE_OFFLINE_V1.md'
       - '.github/workflows/binrat-positive-event-offline.yml'
   workflow_dispatch:
 permissions:
