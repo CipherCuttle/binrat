@@ -55,3 +55,26 @@ Then decide **PAUSED_BY_POLICY / DISABLED_SERVICE / MISBOUND_DEPLOYMENT / NO_QUE
 **STOP before** enabling Cron/Queues, unpausing delivery, upgrading a billing plan, replaying historical sync, changing DNS, deploying Workers, modifying D1, spending Alchemy/Bitquery credits, merging PRs or launching tokens. Those require a new narrowly scoped owner grant and verified cost/data preservation gates.
 
 **Verdict:** Freshness monitor is correct; **no code adjustment to the 180-second bound is justified**. The next repair is operational only after current control-plane evidence establishes the specific outage mechanism.
+
+## Follow-up: authenticated control-plane evidence (same date)
+
+**Proof:** [one-shot GitHub Actions #39039308302](https://github.com/CipherCuttle/binrat/actions/runs/39039308302). Source `scripts/binrat-cloudflare-control-inspect.mjs` and five mocked no-mutation tests (all passed). The source ran only Cloudflare GET requests with existing Actions secrets; raw credentials and full Cloudflare results were not logged. Exact authorization/grant commit `a077895f15becf00f2d5c08690e10be95ad0a14d`.
+
+Cloudflare returned HTTP 200 for **four read-only control-plane requests**:
+
+| Named resource / check | Provider observation |
+| --- | --- |
+| Worker `binrat-edge-v0` settings | `SYNC_QUEUE` producer binding points to `binrat-sync-v0` |
+| Worker Cron schedules | **Empty list — no configured Cron triggers** |
+| Exact queue `binrat-sync-v0` | **`settings.delivery_paused=true`** |
+| Queue producers | 1, named Worker producer verified |
+| Queue consumers | 1 Worker-type consumer; the returned fields did **not** independently identify its script name (do not claim the exact consumer identity) |
+| Account identity | Matched the historical pinned BINRAT account ID; no cross-account fallback |
+
+**Revised, narrower diagnosis:** `CLOUDFLARE_CRON_ABSENT_AND_QUEUE_PAUSED_CONFIRMED`. This is sufficient to explain why the configured Cloudflare ingestion is not advancing: the scheduled producer has no trigger and pending queue delivery is paused. It does **not** establish who/what paused either control, whether the pause was deliberate, the status of all other hosting/collectors, or whether paid platform operations are available. No producer/consumer or database state was changed.
+
+**Decision: KEEP PAUSED pending cost-safe owner authorization.** Cloudflare had been under explicit emergency cost containment. Restoring Cron, unpausing Queue, or inducing catch-up could reintroduce provider/RPC billing, a large backlog, or state drift. Don't reactivate these controls merely to get a green comparison.
+
+**Next candidate recovery phase (not yet authorized):** determine which low-cost collector and read-plane are to be authoritative; check durable D1 evidence export/backup viability, queue retention/backlog and current Cloudflare plan costs; freeze maximum API/RPC spend, a gradual catch-up envelope, release/rollback contract, and public freshness acceptance. Then seek separate owner approval for **one** narrow operations changeset. No merge, deployment, Cron creation, queue unpause, paid upgrade or chain broadcast from this diagnosis.
+
+**Stopping condition:** Existing offline MCP/Case acceptance remains valid. Live forensic MCP and a paying SaaS remain BLOCKED by stale current-source publication; resume A/B only after independent fresh public read-plane acceptance. Do not loosen the 180s freshness contract.
