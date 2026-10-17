@@ -91,7 +91,7 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         const shellColor=await page.locator('.inv-layout').evaluate(el=>getComputedStyle(el).backgroundColor);
         assert.equal(shellColor,'rgb(238, 232, 222)','workspace must be light');
         const firstTicket=page.locator('[data-case-id]').first();
-        assert.equal(await firstTicket.evaluate(el=>getComputedStyle(el).borderLeftWidth),'4px');
+        assert.equal(await firstTicket.evaluate(el=>getComputedStyle(el).borderLeftWidth),'3px');
         const ticketGradient=await firstTicket.evaluate(el=>getComputedStyle(el).backgroundImage);
         assert.match(ticketGradient,/linear-gradient/);
         const heroColor=await page.locator('.inv-arrival').evaluate(el=>getComputedStyle(el).backgroundColor);
