@@ -18,18 +18,35 @@ export function FindRow({ item, onOpen, compact = false }: {
     <span className="a1-find-copy"><strong>{hasName ? tokenLabel(item) : shortAddress(item.token)}</strong>
       <small className="a1-token">{hasName ? (item.symbol && item.name ? item.symbol + ' · ' : '') + shortAddress(item.token) : 'Unnamed Pons launch'}</small>
     </span>
-    {!compact && <span className="inv-find-history"><span className={item.priorLaunches > 0 ? 'a1-recurrence' : ''}>{observationForFind(item).label}</span><small>{observationForFind(item).action}</small><small>Deployer {shortAddress(item.reportedCreatorAddress)}</small></span>}
+    {!compact && <span className="inv-find-history">
+      <span className={'inv-find-observation' + (item.priorLaunches > 0 ? ' a1-recurrence' : '')}>{observationForFind(item).label}</span>
+      <small className="inv-find-next">{observationForFind(item).action}</small>
+      <small className="inv-find-deployer">DEPLOYER {shortAddress(item.reportedCreatorAddress)}</small>
+    </span>}
     <span className="a1-open">OPEN CASE <span aria-hidden="true">↗</span></span>
   </GlareHoverButton>;
 }
 
 export function DeployerGroups({ cases, onOpen }: { cases: PonsCase[]; onOpen: (id: string) => void }) {
-  return <div className="inv-deployer-grid">{groupDeployerCases(cases).map(group => <article className="inv-deployer-group" data-deployer={group.address} key={group.address}>
-    <header><div><span className="vl-eyebrow">REPORTED DEPLOYER</span><h3>{shortAddress(group.address)}</h3></div><span className="inv-group-count">{group.cases.length} in this window</span></header>
-    <p>Compare the launches below. Shared address; human ownership unknown.</p>
-    <div className="a1-find-grid">{group.cases.slice(0, 3).map(item => <FindRow key={item.id} item={item} onOpen={onOpen} compact />)}</div>
-    {group.cases.length > 3 && <details className="inv-more-cases"><summary>{group.cases.length - 3} more Cases from this address</summary><div className="a1-find-grid">{group.cases.slice(3).map(item => <FindRow key={item.id} item={item} onOpen={onOpen} compact />)}</div></details>}
-  </article>)}</div>;
+  const groups = groupDeployerCases(cases);
+  const linked = groups.filter(group => new Set(group.cases.map(item => item.id)).size > 1);
+  const single = groups.filter(group => new Set(group.cases.map(item => item.id)).size === 1);
+  function renderGroup(group: typeof groups[number], linkedGroup: boolean) {
+    return <article className={'inv-deployer-group' + (linkedGroup ? ' inv-deployer-linked' : ' inv-deployer-single')} data-deployer={group.address} key={group.address}>
+      <header><div><span className="vl-eyebrow">{linkedGroup ? 'SHARED REPORTED ADDRESS' : 'ONE VISIBLE LAUNCH'}</span><h3>{shortAddress(group.address)}</h3></div><span className="inv-group-count">{group.cases.length} in this window</span></header>
+      <p>{linkedGroup ? 'These distinct Cases report the same deployer address. Shared address does not identify a human or indicate returns.' : 'Only one Case for this address is visible here. Other activity outside this window is unknown.'}</p>
+      <div className="a1-find-grid">{group.cases.slice(0,3).map(item => <FindRow key={item.id} item={item} onOpen={onOpen} compact />)}</div>
+      {group.cases.length > 3 && <details className="inv-more-cases"><summary>{group.cases.length - 3} more Cases from this address</summary><div className="a1-find-grid">{group.cases.slice(3).map(item => <FindRow key={item.id} item={item} onOpen={onOpen} compact />)}</div></details>}
+    </article>;
+  }
+  return <div className="inv-trails-layout">
+    {linked.length > 0 && <section className="inv-trails-linked" aria-label="Directly comparable Cases"><div className="inv-trails-label"><span>CONNECTED CASES · CURRENT WINDOW</span><strong>{linked.length} shared-address {linked.length === 1 ? 'connection' : 'connections'}</strong></div><div className="inv-deployer-grid">{linked.map(group => renderGroup(group,true))}</div></section>}
+    {single.length > 0 && <details className="inv-trails-single" open={linked.length === 0 ? true : undefined}>
+      <summary>{single.length} single-address {single.length === 1 ? 'record' : 'records'} · no in-window comparison <span aria-hidden="true">↗</span></summary>
+      <p className="inv-trails-scope">These launches have no second visible Case from the same reported address in this window. Earlier indexed counts may still exist outside this captured sample.</p>
+      <div className="inv-deployer-grid">{single.map(group => renderGroup(group,false))}</div>
+    </details>}
+  </div>;
 }
 
 export function SavedCases({ ids, cases, notes, persistent, onOpen, onRemove, onFind, onNoteChange }: {
@@ -48,7 +65,7 @@ export function SavedCases({ ids, cases, notes, persistent, onOpen, onRemove, on
         return <li key={id}><button className="inv-saved-open" onClick={() => onOpen(id)}>
           <span className="inv-saved-icon"><NavIcon name="saved" /></span>
           <span><strong>{item ? (item.name.trim() || item.symbol.trim() ? tokenLabel(item) : shortAddress(item.token)) : 'Saved Case · ' + id.slice(0, 10) + '…'}</strong><small>{item ? 'Pons launch · ' + shortAddress(item.reportedCreatorAddress) + ' reported deployer' : 'Outside this launch window · source checked on open'}</small><code>CASE {id.slice(0, 10)}…</code></span>
-          <span className="inv-saved-arrow" aria-hidden="true">↗</span>
+          <span className="inv-saved-arrow" aria-hidden="true">OPEN ↗</span>
         </button><button className="vl-utility inv-remove" onClick={() => onRemove(id)} aria-label={'Remove saved Case ' + id}>REMOVE</button>
         {item && <p className="inv-saved-evidence"><strong>Evidence:</strong> {observationForFind(item).label} · {observationForFind(item).action}. This snapshot may be stale; reopen to recheck.</p>}
         {!item && <p className="inv-saved-evidence">Outside this published window. No current evidence is shown; reopen to verify.</p>}
