@@ -420,7 +420,7 @@
   box-shadow: 0 2px 0 #d8c5b5;
 }
 .inv-layout .inv-crew-art {
-  background: radial-gradient(ellipse at center, #d7c6e2, #eee2d2);
+  background: radial-gradient(ellipse at 50% 100%, #1c1420, #09090e 75%);
 }
 .inv-layout .inv-crew-list h2 { color: #352d37; }
 .inv-layout .inv-crew-list p { color: #665b66; }
