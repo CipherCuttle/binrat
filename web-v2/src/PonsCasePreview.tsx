@@ -281,7 +281,7 @@ export function PonsCasePreview() {
         <div className="inv-arrival-scene"><AlleyWorld /></div>
         <div className="inv-arrival-copy"><span className="vl-eyebrow">RAT ZERO / PONS SCOUT</span>
         <h1 id="a1-title">THE RAT<br /><span>REMEMBERS.</span></h1>
-        <p>Pons launches. Earlier history. Open a Case and check the receipts.</p>
+        <p><span className="inv-desktop-pitch">Pons launches. Earlier history. Open a Case and check the receipts.</span><span className="inv-mobile-pitch">Pons launches. Follow the trail. Check the receipts.</span></p>
         <button className="inv-arrival-action" onClick={startDigging}>START DIGGING <span aria-hidden="true">↓</span></button></div>
         <span className="inv-scene-caption">RAT ZERO · SCOUT</span>
       </section>}
@@ -335,7 +335,7 @@ export function PonsCasePreview() {
       {selectedId && <div className="a1-case-navigation"><button className="vl-utility inv-case-back" onClick={returnToFinds}>← {section === "saved" ? "BACK TO CASEBOOK" : section === "trails" ? "BACK TO TRAILS" : "BACK TO FINDS"}</button>{active && <button className="vl-utility" onClick={copyCaseLink}>COPY CASE LINK</button>}{active && <ClickSparkButton className="vl-utility inv-save-case" aria-pressed={savedIds.includes(active.id)} onClick={() => toggleCasebook(active.id)}>{savedIds.includes(active.id) ? (casebookPersistent ? "SAVED ON THIS DEVICE" : "SAVED FOR THIS SESSION") : "SAVE CASE"}</ClickSparkButton>}<span role="status">{shareNotice}</span></div>}
       {selectedId && !data && loading && <article ref={caseRef} tabIndex={-1} id="vl-case" className="vl-hero-surface vl-loading-case" aria-busy="true" aria-label="Checking Pons Cases">
         <div className="vl-case-topline">RAT ZERO / CHECKING THE RECEIPTS</div>
-        <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>
+        <div className="vl-case-hero"><div className="vl-case-art vl-skeleton" /><div className="vl-case-intro"><span className="inv-dossier-kicker">RAT ZERO / INVESTIGATION DOSSIER</span><h1>THE RAT'S ON IT.</h1><p>Checking real Pons launches and their source receipts.</p></div></div>
         <div className="vl-case-steps vl-skeleton" /><div className="vl-stage"><p>Verified Cases appear here. A missing source stays unavailable.</p></div>
       </article>}
       {selectedId && !loading && !active && <article ref={caseRef} tabIndex={-1} id="vl-case" aria-label="Requested Case unavailable" className="vl-hero-surface vl-missing-case" data-historical-state={checkingHistorical ? "CHECKING" : historicalResult?.state ?? "UNAVAILABLE"}>
@@ -360,7 +360,7 @@ export function PonsCasePreview() {
           </div>
         </div>
         {isHistorical && <p className="a12-history-notice">Historical launch observation at block {active.block}, reconstructed from the indexed source at published checkpoint {active.asOfBlock}. {isFresh ? "Publication source checked." : "Publication updates paused; evidence is stale."} This is not an immutable archived publication or a historical point-in-time replay. The same-origin index supplies source authority; the browser checks digest, identity and provenance derivation without independently querying the chain.</p>}
-        <div className="vl-case-steps" role="tablist" aria-label="Pons Case journey">
+        <div className="inv-dossier-index"><span>CASE FILE / INDEX</span><span>THREE SOURCE-BOUND VIEWS</span></div><div className="vl-case-steps" role="tablist" aria-label="Pons Case journey">
           {stages.map((name, index) => <button key={name} ref={(node) => { stageTabs.current[index] = node; }}
             id={"vl-tab-" + name} role="tab" aria-selected={name === stage}
             aria-controls={"vl-panel-" + name} tabIndex={name === stage ? 0 : -1}
