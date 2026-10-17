@@ -13,6 +13,7 @@ import "./investigation-shell.css";
 import { ClickSparkButton, ShinyText, SpotlightCard, StarBorder } from "./ReactBitsStarter";
 import { ProofThread } from "./CaseMicrographics";
 import "./ReactBitsStarter.css";
+import "./investigation-paper.css";
 
 type Stage = "WHAT" | "TRAIL" | "RECEIPTS";
 const stages: Stage[] = ["WHAT", "TRAIL", "RECEIPTS"];

@@ -82,6 +82,17 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         report.metrics.push({width,height,firstFindTop:first.y,firstFindBottom:first.y+first.height,available});
         await noOverflow(page,width);
       });
+      await check(width+' warm paper hierarchy and individual dossier tickets',async()=>{
+        const shellColor=await page.locator('.inv-layout').evaluate(el=>getComputedStyle(el).backgroundColor);
+        assert.equal(shellColor,'rgb(238, 232, 222)','workspace must be light');
+        const firstTicket=page.locator('[data-case-id]').first();
+        assert.equal(await firstTicket.evaluate(el=>getComputedStyle(el).borderLeftWidth),'4px');
+        const ticketGradient=await firstTicket.evaluate(el=>getComputedStyle(el).backgroundImage);
+        assert.match(ticketGradient,/linear-gradient/);
+        const heroColor=await page.locator('.inv-arrival').evaluate(el=>getComputedStyle(el).backgroundColor);
+        assert.equal(heroColor,'rgb(33, 27, 43)','canonical alley hero must retain dark art');
+        await noOverflow(page,width);
+      });
       await shot(page,'find-'+width);
       await check(width+' React Bits starter elements honor reduced motion and button semantics',async()=>{
         assert.equal(await page.locator('.rb-spotlight.inv-evidence-lead').count(),1);
@@ -139,6 +150,8 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
       await check(width+' exact Case, summary, save and keyboard tabs',async()=>{
         assert.equal(new URL(page.url()).pathname,'/bag/'+id);
         assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        assert.equal(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).borderTopWidth),'4px');
+        assert.match(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/);
         assert.match(await page.locator('.vl-case-intro').innerText(),/38 earlier indexed launches/);
         assert.equal(await page.getByRole('tab').count(),3);
         const finding=await page.locator('.vl-case-intro').boundingBox(),returnAction=await page.locator('.inv-case-return').boundingBox();
