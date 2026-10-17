@@ -1,0 +1,44 @@
+name: BINRAT Crew and Case splash presentation proof
+on:
+  push:
+    branches: [fix/binrat-crew-case-splash-sync-20261017]
+    paths:
+      - 'web-v2/src/**'
+      - 'web-v2/checks/investigation-shell-browser.cjs'
+      - '.github/workflows/binrat-crew-case-splash-review-20261017.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-browser-proof:
+    if: github.repository == 'CipherCuttle/binrat'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Frozen dependencies without install hooks
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Read-only frontend and evidence checks
+        run: |
+          node --import tsx --test test/investigationUX.test.ts
+          pnpm --dir web-v2 check
+          pnpm --dir web-v2 build:frontdoor-candidate
+      - name: Pinned Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binrat-browser" --no-save --no-package-lock playwright@1.56.1
+          node "$RUNNER_TEMP/binrat-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Four-viewport offline Case and Crew proof
+        run: BINRAT_FRONTDOOR_TOOLS="$RUNNER_TEMP/binrat-browser/node_modules" node web-v2/checks/investigation-shell-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: crew-case-splash-review-${{ github.sha }}
+          path: .artifacts/investigation-shell/browser/
+          retention-days: 14
