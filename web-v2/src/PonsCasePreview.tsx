@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { AlleyWorld } from "./VisualLab";
-import caseScene from "../public/visual-lab/case-scenes/case-neon-alley.webp";
 import { loadPonsPreview, loadPonsCreatorTrail, inspectPonsHistoricalSource, type PonsCase, type PonsPreview, type PonsCreatorTrail } from "./pons-readonly-preview.mjs";
 import { loadHistoricalCase, type HistoricalCaseItem } from "./historicalCase";
 import type { CaseEnvelope } from "../../src/public/caseEvidence.js";
@@ -11,7 +10,7 @@ import { DeployerGroups, FindRow, SavedCases, shortAddress, tokenLabel } from ".
 import { filterDiscoverableCases, investigationHref, readCasebook, readCaseNotes, sectionForPath, sharedDeployerLeads, toggleSavedCase, updateCaseNote, type InvestigationSection } from "./investigationUX";
 import "./investigation-shell.css";
 import { ClickSparkButton, ShinyText, SpotlightCard, StarBorder } from "./ReactBitsStarter";
-import { ProofThread } from "./CaseMicrographics";
+import { ProofThread, CaseSigil } from "./CaseMicrographics";
 import "./ReactBitsStarter.css";
 import "./investigation-paper.css";
 
@@ -316,7 +315,7 @@ export function PonsCasePreview() {
       {!selectedId && section === "crew" && <section className="inv-workbench" aria-labelledby="inv-crew-heading">
         <span className="vl-eyebrow">THE WORKFORCE</span><h1 id="inv-crew-heading">ONE RAT DIGGING. MORE IN THE WORKS.</h1><p>The Scout brings the Case. The rest of the crew is being built and tested.</p>
         <div className="inv-crew-list">
-          <article><div className="inv-crew-art inv-crew-scout"><img src="/crew/rat-avatar-48.png" alt="Rat Zero" /></div><div><span className="vl-eyebrow">SCOUT</span><h2>RAT ZERO</h2><span className="inv-crew-state">{isFresh ? "SOURCE CHECKED" : loading ? "CHECKING" : data ? "EARLIER FINDS / UPDATES PAUSED" : "SOURCE UNAVAILABLE"}</span><p>Finds Pons launches. Brings the reported addresses, indexed history and source receipts into a Case.</p><button className="vl-utility" onClick={() => navigateSection("/")}>SEE HIS FINDS →</button></div></article>
+          <article><div className="inv-crew-art inv-crew-scout"><img src="/crew/rat-zero.jpg" alt="Rat Zero" /></div><div><span className="vl-eyebrow">SCOUT</span><h2>RAT ZERO</h2><span className="inv-crew-state">{isFresh ? "SOURCE CHECKED" : loading ? "CHECKING" : data ? "EARLIER FINDS / UPDATES PAUSED" : "SOURCE UNAVAILABLE"}</span><p>Finds Pons launches. Brings the reported addresses, indexed history and source receipts into a Case.</p><button className="vl-utility" onClick={() => navigateSection("/")}>SEE HIS FINDS →</button></div></article>
           <article><div className="inv-crew-art"><img src="/crew/tripwire.png" alt="Tripwire" /></div><div><span className="vl-eyebrow">WATCHER</span><h2>TRIPWIRE · BUILDING</h2><p>Planned job: stay behind and alert you when a declared event happens. No active Watch or alert delivery on this site.</p></div></article>
           <article><div className="inv-crew-art"><img src="/crew/sniffer.png" alt="Sniffer" /></div><div><span className="vl-eyebrow">TRAIL HUNTER</span><h2>SNIFFER · PROVING</h2><p>Funding-trail investigations are being tested. Public autonomous work and prediction are not established.</p></div></article>
         </div>
@@ -349,7 +348,7 @@ export function PonsCasePreview() {
         <div className="vl-case-topline"><span>CASE FILE / PONS <b>{active.id.slice(0, 10)}…</b></span><span className="vl-case-status" data-read-state={readState}>{isHistorical ? "HISTORICAL · DIGEST CHECKED" : isFresh ? "SOURCE CHECKED" : "UPDATES PAUSED"}</span></div>
         {error && <p role="alert">Last verified snapshot retained, now stale. Recheck to try again.</p>}
         <div className="vl-case-hero">
-          <figure className="vl-case-art"><img src={caseScene} alt="Decorative neon BINRAT alley illustration" /><figcaption>ILLUSTRATION ONLY · NOT EVIDENCE</figcaption></figure>
+          <figure className="vl-case-art inv-case-splash-art" aria-label="Decorative BINRAT trash-art assignment for this address"><CaseSigil id={active.token} /><figcaption>CASE ART · NOT EVIDENCE</figcaption></figure>
           <div className="vl-case-intro">
             <span className="vl-alert">{active.priorLaunches > 0 ? "SMELLS FAMILIAR." : "FOUND SOMETHING."}</span>
             <h1>{active.name.trim() || active.symbol.trim() ? tokenLabel(active) : shortAddress(active.token)}</h1>
