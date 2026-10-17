@@ -1,6 +1,6 @@
 # BINRAT × Bitquery — free-tier A/B probe V1
 
-**Execution status:** LIVE PROBE **NOT RUN**. Source, transport and comparator were only tested offline.
+**Execution status:** The first authorized GitHub workflow ([run #39036392483](https://github.com/CipherCuttle/binrat/actions/runs/39036392483)) **FAILED PREFLIGHT BEFORE ANY BITQUERY REQUEST** because the default checkout depth was one commit; its `git diff HEAD^ HEAD` check had no parent. Secret-using step skipped. Thus actual Bitquery A/B remains **NOT RUN (0 requests)**. Fix is staged, but a new owner grant is required before another attempt.
 **Scope:** one historical Pons v2 launch already validated in the BINRAT MCP Case V0.2. No archive requests, no model inference, no wallet actions, no publication or paid plan.
 
 ## Credential custody
@@ -23,7 +23,7 @@ At most 2 sequential Bitquery requests; no concurrent fanout; no retries; one fi
 
 ## Release gate: opt-in one-shot run (owner-required GitHub secret)
 
-The file \`.github/workflows/binrat-bitquery-ab-once.yml\` is wired only to the **first CREATE** of \`bench/bitquery-ab-grant-20261017.txt\` on branch \`experiment/binrat-mcp-local-forensics-v01-20261017\`. That commit must contain exactly the new grant file and the exact message \`test(benchmark): owner grant single free Bitquery A-B probe\`; its content must be \`BINRAT_AB_20261017_ONE_SHOT\`. The workflow refuses reruns at run_attempt > 1 and re-edits of the grant file. It is intentionally not yet triggered. Once the owner has securely installed the token secret, this single file can be created via the existing connected GitHub tools to trigger the bounded attempt. On first terminal result: STOP. No second live attempt without a new owner grant.
+Original grant \`bench/bitquery-ab-grant-20261017.txt\` was consumed in a **preflight-only** run that did not touch the Bitquery API. The shallow checkout has been fixed using \`fetch-depth: 2\`. The workflow is now gated on a **separate new owner-authorized CREATE** of \`bench/bitquery-ab-grant-retry-20261017.txt\` on branch \`experiment/binrat-mcp-local-forensics-v01-20261017\`. That commit must change only the marker, use exact message \`test(benchmark): owner regrant after zero-request preflight failure\`, and marker text \`BINRAT_AB_20261017_PREFLIGHT_RETRY_ONLY\`. The workflow refuses reruns at run_attempt > 1. **Do not create the retry marker without a new explicit user approval.** No token should be placed in the marker, code or issue.
 
 ## Acceptance and truthful verdicts
 
