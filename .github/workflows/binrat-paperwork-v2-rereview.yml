@@ -1,7 +1,7 @@
 name: BINRAT Paperwork V2 rereview acceptance
 on:
   push:
-    branches: [feat/binrat-paperwork-v2r1-polish-20261017]
+    branches: [feat/binrat-paperwork-v2-polish-20261017]
     paths:
       - 'web-v2/src/**'
       - 'docs/licenses/REACT_BITS_LICENSE.md'
@@ -9,12 +9,12 @@ on:
       - 'test/investigationUX.test.ts'
       - 'scripts/build-githack-preview.mjs'
       - 'scripts/check-githack-preview.mjs'
-      - '.github/workflows/binrat-paperwork-v2r1-rereview.yml'
+      - '.github/workflows/binrat-paperwork-v2-rereview.yml'
 permissions:
   contents: read
 jobs:
   candidate:
-    if: github.repository == 'CipherCuttle/binrat' && github.ref == 'refs/heads/feat/binrat-paperwork-v2r1-polish-20261017'
+    if: github.repository == 'CipherCuttle/binrat' && github.ref == 'refs/heads/feat/binrat-paperwork-v2-polish-20261017'
     runs-on: ubuntu-latest
     timeout-minutes: 14
     permissions:
