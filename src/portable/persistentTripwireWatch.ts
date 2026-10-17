@@ -5,8 +5,15 @@
  * Real source validation remains a separate, explicit integration gate.
  */
 import {POSITIVE_EVENT_BUDGET, PROOF_METHOD_RESERVATIONS} from './persistentTripwireBudget.js';
+import {toEventSelector} from 'viem';
+import {ponsTokenLaunchedEvent} from '../pons/ponsAbi.js';
+import {PONS_V2_FACTORY, PONS_V2_FACTORY_CODE_HASH} from '../pons/chain.js';
 
-const PONS_FACTORY='0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e';
+const PONS_FACTORY=PONS_V2_FACTORY;
+export const POSITIVE_EVENT_SOURCE_PINS=Object.freeze({
+  chainId:4663, factory:PONS_FACTORY, factoryCodeHash:PONS_V2_FACTORY_CODE_HASH,
+  tokenLaunchedTopic0:toEventSelector(ponsTokenLaunchedEvent)
+});
 const addr=(v:unknown):v is string=>typeof v==='string' && /^0x[0-9a-f]{40}$/.test(v);
 const hash=(v:unknown):v is string=>typeof v==='string' && /^0x[0-9a-f]{64}$/.test(v);
 export type PositiveGrant = Readonly<{
@@ -56,7 +63,7 @@ export class PersistentPositiveEventWatch {
     if (!grant || grant.mode!=='POSITIVE_EVENT_ONLY_V1' || grant.chainId!==4663 ||
       !/^[a-zA-Z0-9_-]{1,80}$/.test(grant.id) || !/^[a-zA-Z0-9:_-]{1,100}$/.test(grant.ownerId) ||
       !addr(grant.deployer) || grant.deployer!==grant.deployer.toLowerCase() ||
-      !hash(grant.tokenLaunchedTopic0) ||
+      !hash(grant.tokenLaunchedTopic0) || grant.tokenLaunchedTopic0!==POSITIVE_EVENT_SOURCE_PINS.tokenLaunchedTopic0 ||
       !Number.isSafeInteger(grant.startsAtMs) || !Number.isSafeInteger(grant.expiresAtMs) ||
       grant.startsAtMs>=grant.expiresAtMs ||
       grant.expiresAtMs-grant.startsAtMs>POSITIVE_EVENT_BUDGET.lifetimeMs ||

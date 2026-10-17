@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 // @ts-ignore Repo pins @types/node 20, which omits Node 22's built-in node:sqlite.
 import {DatabaseSync} from 'node:sqlite';
-import {PersistentPositiveEventWatch, type PositiveGrant, type ChainHint} from '../src/portable/persistentTripwireWatch.js';
+import {PersistentPositiveEventWatch, POSITIVE_EVENT_SOURCE_PINS, type PositiveGrant, type ChainHint} from '../src/portable/persistentTripwireWatch.js';
 import {POSITIVE_EVENT_BUDGET,quotePositiveEventBudget,PROOF_METHOD_RESERVATIONS} from '../src/portable/persistentTripwireBudget.js';
 const DEPLOYER='0x'+'a'.repeat(40);
 const CONTRACT='0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e';
-const TOPIC='0x'+'1'.repeat(64);
+const TOPIC=POSITIVE_EVENT_SOURCE_PINS.tokenLaunchedTopic0;
 const HASH='0x'+'f'.repeat(64);
 const TX='0x'+'e'.repeat(64);
 const JOB='00000000-0000-0000-0000-000000000001';
@@ -110,4 +110,15 @@ test('candidate cap and hint cap fail closed; no provider I/O',()=>{
  }
  assert.equal(a.w.journal({...hint,transactionHash:'0x'+'b'.repeat(64)}).reason,'PENDING_HINT_CAP');
  assert.equal(a.debits.length,0);
+});
+
+test('canonical event ABI selector and Pons source are pinned; fake selector grant is rejected',()=>{
+ const a=rig();
+ assert.equal(POSITIVE_EVENT_SOURCE_PINS.factory, CONTRACT);
+ assert.equal(POSITIVE_EVENT_SOURCE_PINS.factoryCodeHash, '0x89a27da6f703e0a7cdd4f233e7cb57604ff75b164530962d3ff7cf8483a67d84');
+ assert.equal(POSITIVE_EVENT_SOURCE_PINS.tokenLaunchedTopic0, TOPIC);
+ const forged={...grant,tokenLaunchedTopic0:'0x'+'1'.repeat(64)} as PositiveGrant;
+ assert.notEqual(forged.tokenLaunchedTopic0,TOPIC);
+ assert.throws(()=>a.newWatch(forged),/POSITIVE_EVENT_SCOPE_INVALID/);
+ assert.equal(a.w.journal({...hint,topics:['0x'+'1'.repeat(64),...hint.topics.slice(1)]}).state,'IGNORED');
 });
