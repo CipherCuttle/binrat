@@ -1,0 +1,54 @@
+name: BINRAT vs Bitquery recent Pons one-shot comparison
+on:
+  push:
+    branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
+    paths: ['bench/bitquery-recent-overlap-grant-20261017.txt']
+permissions:
+  contents: read
+concurrency:
+  group: binrat-bitquery-recent-20261017
+  cancel-in-progress: false
+jobs:
+  recent-case-ab:
+    if: >-
+      github.repository == 'CipherCuttle/binrat' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 &&
+      github.event.head_commit.message == 'test(benchmark): owner one-shot recent Pons overlap'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact single-file one-shot grant
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-status HEAD^ HEAD)" = $'A\tbench/bitquery-recent-overlap-grant-20261017.txt'
+          test "$(cat bench/bitquery-recent-overlap-grant-20261017.txt)" = 'BINRAT_RECENT_PONS_AB_ONE_SHOT'
+          node --check scripts/binrat-bitquery-ab-probe.mjs
+      - uses: pnpm/action-setup@v4
+        with: {version: '10.15.0'}
+      - name: Install existing pinned dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Re-run mock-gated test and inspect planned query hashes (zero external calls)
+        run: |
+          pnpm exec tsx --test test/bitqueryRecentOverlap.test.ts
+          pnpm exec tsx scripts/binrat-bitquery-recent-overlap.ts --dry-run
+      - name: One bounded read-only overlapping recent Case comparison
+        shell: bash
+        env:
+          BITQUERY_ACCESS_TOKEN: ${{ secrets.BITQUERY_AB_FREE_TOKEN }}
+          BINRAT_RECENT_AB_GRANT: ONE_SHOT_20261017
+        run: |
+          set -euo pipefail
+          if test -z "${BITQUERY_ACCESS_TOKEN:-}"; then
+            echo "NOT_RUN: secret is absent; no external request"
+            exit 2
+          fi
+          pnpm exec tsx scripts/binrat-bitquery-recent-overlap.ts --live-readonly
