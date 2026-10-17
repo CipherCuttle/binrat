@@ -12,19 +12,26 @@ export function ProofThread({ ids }: { ids: readonly string[] }) {
   </svg>;
 }
 
-/** Deterministic per-Case graphic. Hash bits give a visual ID, not a risk score. */
+/** Eight approved trash-art crops; decorative only, not a risk or identity signal.
+ * Stable address-hash assignment avoids flicker and per-render randomness.
+ * The sprite is copied by Vite from web/assets, never fetched from an API. */
 export function CaseSigil({ id }: { id: string }) {
-  if (!/^[0-9a-f]{64}$/.test(id)) return null;
-  const cells: {x:number;y:number}[]=[];
-  for(let y=0;y<4;y++) for(let x=0;x<2;x++) {
-    const bit=parseInt(id[y*2+x],16)%2;
-    if(bit) {
-      cells.push({x:x+0.5,y:y+0.5},{x:3-x+0.5,y:y+0.5});
-    }
-  }
-  return <svg className="inv-case-sigil" viewBox="0 0 26 26" width="26" height="26"
-      aria-hidden="true" focusable="false">
-      <rect x="1" y="1" width="24" height="24" rx="4" fill="#26283c" stroke="#697d84" strokeWidth="0.7"/>
-      {cells.map((p,i)=><rect key={i} x={5+p.x*3.7} y={5+p.y*3.7} width="2.75" height="2.75" rx=".35" fill="#b7e8de"/>)}
-    </svg>;
+  const address = id.toLowerCase();
+  if (!/^0x[0-9a-f]{40}$/.test(address) && !/^[0-9a-f]{64}$/.test(address)) return null;
+  let hash = 0x811c9dc5;
+  for (const ch of address) hash = Math.imul(hash ^ ch.charCodeAt(0), 0x01000193) >>> 0;
+  const variant = hash % 8;
+  const column = variant % 4;
+  const row = Math.floor(variant / 4);
+  return <span className="inv-case-sigil inv-case-splash" data-splash-variant={variant}
+    aria-hidden="true" style={{
+      display: 'block',
+      flexShrink: 0,
+      backgroundColor: '#050505',
+      backgroundImage: `url('${import.meta.env.BASE_URL}case-splash-sprite.webp')`,
+      backgroundSize: '400% 200%',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: `${column * 100 / 3}% ${row * 100}%`,
+      borderRadius: '4px',
+    }} />;
 }
