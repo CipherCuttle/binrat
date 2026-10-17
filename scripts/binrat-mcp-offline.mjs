@@ -76,7 +76,7 @@ export function loadCapturedPons(root=process.cwd()){
 
 const TOOL_DEFS=Object.freeze([
  {name:'source_status',description:'Report pinned historical Pons source capture and explicitly UNKNOWN present-time freshness. No network.',inputSchema:{type:'object',properties:{},additionalProperties:false}},
- {name:'get_case',description:'Return a captured Pons launch card by exact 64-character Case ID. No full Case evidence envelope exists in this fixture; marked UNKNOWN.',inputSchema:{type:'object',properties:{case_id:{type:'string',pattern:'^[0-9a-f]{64}$'}},required:['case_id'],additionalProperties:false}},
+ {name:'get_case',description:'Return a canonical verified historical Pons Case when the evidence-capture entrypoint is used; default discovery-only entrypoint stays UNKNOWN.',inputSchema:{type:'object',properties:{case_id:{type:'string',pattern:'^[0-9a-f]{64}$'}},required:['case_id'],additionalProperties:false}},
  {name:'investigate_deployer',description:'Find exact reported deployer matches within one pinned historical 20-launch snapshot only; never claim whole-chain coverage.',inputSchema:{type:'object',properties:{address:{type:'string',pattern:'^0x[0-9a-f]{40}$'},limit:{type:'integer',minimum:1,maximum:4}},required:['address'],additionalProperties:false}}
 ].map(x=>Object.freeze({...x,annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true,openWorldHint:false}})));
 
@@ -106,6 +106,41 @@ export function evaluateTool(snapshot,name,args){
       const a=argumentsFor(args,['case_id'],['case_id']);
       if(typeof a.case_id!=='string'||!CASE.test(a.case_id))error('INVALID_CASE_ID');
       const match=snapshot.feed.launches.find(x=>x.launchId===a.case_id);
+      const verified=snapshot.verifiedCase;
+      if(verified?.caseId===a.case_id){
+        // verifyCaseEnvelope() has independently rederived all 20 identities,
+        // authority digests and provenance before this immutable projection exists.
+        const response=envelope(snapshot,'OK',{
+          caseId:verified.caseId,
+          reportedDeployer:verified.reportedDeployer,
+          token:verified.token,
+          caseDigest:verified.caseDigest,
+          priorLaunchCount:verified.priorLaunchCount,
+          records:verified.records,
+          evidenceValidated:true,
+          evidenceSource:'PINNED_HISTORICAL_CASE_ENVELOPE',
+          recordedCasePublication:verified.publication,
+          currentLiveStatus:'UNKNOWN'
+        },'VALIDATED_RECORDED_CASE_PARTIAL_HISTORY');
+        response.provenance={
+          ...response.provenance,
+          caseEnvelopeSource:verified.source,
+          caseEnvelopeDigest:verified.caseDigest,
+          casePublicationFeedDigest:verified.publication.feedDigest,
+          casePublicationCheckpoint:verified.publication.checkpointBlock
+        };
+        // Never borrow earlier feed freshness for the later Case publication.
+        response.freshness={
+          kind:'RECORDED_ONLY',liveNow:'UNKNOWN',
+          recordedCaseVerifiedAtMs:verified.publication.verifiedAtMs,
+          recordedCasePublicationVersion:verified.publication.publicationVersion
+        };
+        response.coverage={
+          history:'PARTIAL',scope:'LATEST_20_DEPLOYER_LAUNCHES_THROUGH_CASE',
+          resultLimit:20,olderHistory:'NOT_ENUMERATED',wholeChain:false
+        };
+        return response;
+      }
       return envelope(snapshot,'UNKNOWN',match ? {recordedLaunchCard:match,fullCaseEvidence:null} :
         {recordedLaunchCard:null,fullCaseEvidence:null},
         match?'FULL_CASE_EVIDENCE_NOT_CAPTURED':'CASE_NOT_IN_RECORDED_WINDOW');
