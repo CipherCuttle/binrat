@@ -1,0 +1,46 @@
+name: BINRAT Cloudflare control-plane one-shot read-only diagnosis
+on:
+  push:
+    branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
+    paths: ['bench/binrat-cf-control-inspect-grant-20261017.txt']
+permissions:
+  contents: read
+concurrency:
+  group: binrat-cf-inspect-20261017
+  cancel-in-progress: false
+jobs:
+  readonly:
+    if: >-
+      github.repository == 'CipherCuttle/binrat' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 &&
+      github.event.head_commit.message == 'test(ops): owner Cloudflare control-plane read-only inspection'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 2}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Exact sole grant, static no-write command, mock tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-status HEAD^ HEAD)" = $'A\tbench/binrat-cf-control-inspect-grant-20261017.txt'
+          test "$(cat bench/binrat-cf-control-inspect-grant-20261017.txt)" = 'BINRAT_CF_CONTROL_READ_ONLY_20261017'
+          node --check scripts/binrat-cloudflare-control-inspect.mjs
+          node --test test/binratCloudflareControlInspect.test.mjs
+          node scripts/binrat-cloudflare-control-inspect.mjs --dry-run
+      - name: Cloudflare control-plane GET-only inspection, no mutations
+        shell: bash
+        env:
+          BINRAT_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.BINRAT_CLOUDFLARE_ACCOUNT_ID }}
+          BINRAT_CLOUDFLARE_ADMIN_API_TOKEN: ${{ secrets.BINRAT_CLOUDFLARE_ADMIN_API_TOKEN }}
+          BINRAT_CF_INSPECT_GRANT: ONE_SHOT_20261017
+        run: |
+          set -euo pipefail
+          if test -z "${BINRAT_CLOUDFLARE_ACCOUNT_ID:-}" || test -z "${BINRAT_CLOUDFLARE_ADMIN_API_TOKEN:-}"; then
+            echo "CONTROL_PLANE_NOT_RUN: missing GitHub Actions secret; no API requests"
+            exit 2
+          fi
+          node scripts/binrat-cloudflare-control-inspect.mjs --read-only

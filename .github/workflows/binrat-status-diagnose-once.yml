@@ -1,0 +1,36 @@
+name: BINRAT source freshness one-shot diagnosis
+on:
+  push:
+    branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
+    paths: ['bench/binrat-public-status-diagnose-grant-20261017.txt']
+permissions:
+  contents: read
+concurrency:
+  group: binrat-public-freshness-diag-20261017
+  cancel-in-progress: false
+jobs:
+  readonly:
+    if: >-
+      github.repository == 'CipherCuttle/binrat' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 &&
+      github.event.head_commit.message == 'test(diagnostic): owner bounded public freshness inspection'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 2}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Admit only exact one-file grant, no unrelated mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-status HEAD^ HEAD)" = $'A\tbench/binrat-public-status-diagnose-grant-20261017.txt'
+          test "$(cat bench/binrat-public-status-diagnose-grant-20261017.txt)" = 'BINRAT_PUBLIC_DIAG_ONE_SHOT_20261017'
+          node --check scripts/binrat-public-status-diagnose.mjs
+          node --test test/binratPublicStatusDiagnose.test.mjs
+          node scripts/binrat-public-status-diagnose.mjs --dry-run
+      - name: Exactly three bounded public GETs; no secrets, model, RPC or Bitquery
+        env: {BINRAT_PUBLIC_DIAG_GRANT: ONE_SHOT_20261017}
+        run: node scripts/binrat-public-status-diagnose.mjs --live-readonly

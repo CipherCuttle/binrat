@@ -1,0 +1,62 @@
+name: BINRAT MCP offline forensic proof
+on:
+  push:
+    branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
+    paths:
+      - 'scripts/binrat-mcp-offline.mjs'
+      - 'scripts/binrat-bitquery-ab-probe.mjs'
+      - 'scripts/binrat-bitquery-recent-overlap.ts'
+      - 'scripts/binrat-public-status-diagnose.mjs'
+      - 'scripts/binrat-cloudflare-control-inspect.mjs'
+      - 'scripts/binrat-mcp-case-offline.ts'
+      - 'src/public/caseEvidence.ts'
+      - 'docs/receipts/sprint-a1-2-contract/old-case-envelope.json'
+      - 'test/mcpOffline.test.mjs'
+      - 'test/bitqueryAbOffline.test.mjs'
+      - 'test/bitqueryRecentOverlap.test.ts'
+      - 'test/binratPublicStatusDiagnose.test.mjs'
+      - 'test/binratCloudflareControlInspect.test.mjs'
+      - 'test/mcpCaseOffline.test.ts'
+      - 'docs/MCP_LOCAL_PROOF_V01.md'
+      - '.github/workflows/binrat-mcp-offline-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-mcp-proof:
+    if: github.repository == 'CipherCuttle/binrat'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax and pinned recorded source acceptance (no installation, external calls or secrets)
+        run: |
+          node --check scripts/binrat-mcp-offline.mjs
+          node --check test/mcpOffline.test.mjs
+          node --check scripts/binrat-bitquery-ab-probe.mjs
+          node --check test/bitqueryAbOffline.test.mjs
+          node --check scripts/binrat-public-status-diagnose.mjs
+          node --check test/binratPublicStatusDiagnose.test.mjs
+          node --test test/binratPublicStatusDiagnose.test.mjs
+          node scripts/binrat-public-status-diagnose.mjs --dry-run
+          node --check scripts/binrat-cloudflare-control-inspect.mjs
+          node --test test/binratCloudflareControlInspect.test.mjs
+          node scripts/binrat-cloudflare-control-inspect.mjs --dry-run
+          node --test test/bitqueryAbOffline.test.mjs
+          node scripts/binrat-bitquery-ab-probe.mjs --dry-run
+          node --test test/mcpOffline.test.mjs
+      - uses: pnpm/action-setup@v4
+        with: {version: '10.15.0'}
+      - name: Install exact pinned existing deps (offline-only tests; no provider credentials)
+        run: pnpm install --frozen-lockfile
+      - name: Verify captured full Case using production canonical verifier
+        run: |
+          pnpm exec tsx --test test/mcpCaseOffline.test.ts
+          pnpm exec tsx --test test/bitqueryRecentOverlap.test.ts
+          pnpm exec tsx scripts/binrat-bitquery-recent-overlap.ts --dry-run
+      - name: Assert no deployment, arbitrary fetch or paid model API
+        run: |
+          ! grep -nE 'https://api[.]telegram[.]org|api[.]openrouter[.]ai|private_key|eth_sendRawTransaction|fetch[(]' scripts/binrat-mcp-offline.mjs scripts/binrat-mcp-case-offline.ts
