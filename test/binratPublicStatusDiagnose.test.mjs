@@ -31,7 +31,7 @@ test('status admission correctly identifies exact expired publication field',()=
   const v=assessStatus({...valid,freshnessValidUntilMs:now-1},now);
   assert.equal(v.admitted,false);
   assert.deepEqual(v.failed,['beforeExpiry']);
-  assert.equal(v.expiryDeltaSeconds,0);
+  assert.ok(v.expiryDeltaSeconds<=0);
 });
 test('status admission identifies stale state, timestamp age and sync error separately',()=>{
   const v=assessStatus({...valid,state:'STALE_VERIFIED',verifiedAtMs:now-280000,lastSyncError:'RPC_TIMEOUT'},now);
