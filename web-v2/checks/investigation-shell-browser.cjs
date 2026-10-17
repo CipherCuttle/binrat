@@ -116,7 +116,7 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         const splashes=await page.locator('.inv-case-sigil').evaluateAll(els=>els.map(el=>({tag:el.tagName.toLowerCase(), variant:el.getAttribute('data-splash-variant'), bg:getComputedStyle(el).backgroundImage})));
         assert.ok(splashes.length>=1 && splashes.every(x=>x.tag==='span' && /^[0-7]$/.test(x.variant) && x.bg.includes('case-splash-sprite.webp')), 'address splash assignment missing');
         const art=await page.evaluate(async()=>{const im=new Image();im.src='/case-splash-sprite.webp';await im.decode();return {width:im.naturalWidth,height:im.naturalHeight};});
-        assert.ok((art.width===160&&art.height===80)||(art.width===768&&art.height===384),'approved eight-splash sprite dimensions unexpected: '+JSON.stringify(art));
+        assert.deepEqual(art,{width:768,height:384},'approved eight-splash hero asset must provide 192px per variant');
         if(width>700)assert.equal(await page.locator('.inv-proof-thread').evaluate(el=>Math.round(el.getBoundingClientRect().width)),54);
       });
       await shot(page,'find-'+width);
