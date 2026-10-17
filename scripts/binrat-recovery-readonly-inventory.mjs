@@ -20,7 +20,10 @@ const guid = x => typeof x === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(x);
 const obj = x => x && typeof x === 'object' && !Array.isArray(x);
 const bool = x => typeof x === 'boolean' ? x : null;
 const count = x => Number.isSafeInteger(x) && x >= 0 ? x : null;
-const iso = x => typeof x === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d/.test(x) ? x.slice(0, 24) : null;
+const completeFirstPage = ({ value, info }) => Array.isArray(value) && obj(info) &&
+  count(info.page) === 1 && count(info.count) === value.length &&
+  count(info.total_count) === value.length &&
+  (info.total_pages === undefined || count(info.total_pages) === 1);
 const pathAllowed = (path, ids) => Object.values(STATIC).includes(path) ||
   (ids.queue && [ `/queues/${ids.queue}`, `/queues/${ids.queue}/metrics` ].includes(path)) ||
   (ids.d1 && path === `/d1/database/${ids.d1}/time_travel/bookmark`);
@@ -117,8 +120,8 @@ export async function inspectRecovery({ account, token, request, now = Date.now 
     out.cronCount = Array.isArray(scheduled?.schedules) ? count(scheduled.schedules.length) : null;
     const listing = await get('queue-list', STATIC.queues);
     if (!Array.isArray(listing.value)) throw new Stop('QUEUES_UNVERIFIED');
-    const partialQueue = obj(listing.info) && count(listing.info.total_count) !== null && listing.info.total_count > listing.value.length;
-    if (partialQueue) throw new Stop('QUEUES_PAGE_INCOMPLETE');
+    // Missing pagination receipts cannot establish that a name is unique.
+    if (!completeFirstPage(listing)) throw new Stop('QUEUES_PAGE_INCOMPLETE');
     const matches = listing.value.filter(q => q?.queue_name === QUEUE);
     if (matches.length !== 1 || !guid(matches[0].queue_id)) throw new Stop('QUEUE_IDENTITY_UNKNOWN');
     ids.queue = matches[0].queue_id;
@@ -140,8 +143,7 @@ export async function inspectRecovery({ account, token, request, now = Date.now 
     out.queue.oldestMessageAtMs = count(metrics?.oldest_message_timestamp_ms) || null;
     const d1listing = await get('d1-list', STATIC.d1);
     if (!Array.isArray(d1listing.value)) throw new Stop('D1_LIST_UNVERIFIED');
-    const partialD1 = obj(d1listing.info) && count(d1listing.info.total_count) !== null && d1listing.info.total_count > d1listing.value.length;
-    if (partialD1) throw new Stop('D1_PAGE_INCOMPLETE');
+    if (!completeFirstPage(d1listing)) throw new Stop('D1_PAGE_INCOMPLETE');
     const dbMatches = ids.d1 ? d1listing.value.filter(d => d?.uuid === ids.d1) : [];
     out.d1.identityMatched = ids.d1 ? dbMatches.length === 1 : null;
     if (out.d1.identityMatched) {
