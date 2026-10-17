@@ -4,7 +4,7 @@
  * This consumes only externally presented hints, never infers absent launches.
  * Real source validation remains a separate, explicit integration gate.
  */
-import {POSITIVE_EVENT_BUDGET, PROOF_METHOD_RESERVATIONS} from './persistentTripwireBudget.ts';
+import {POSITIVE_EVENT_BUDGET, PROOF_METHOD_RESERVATIONS} from './persistentTripwireBudget.js';
 
 const PONS_FACTORY='0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e';
 const addr=(v:unknown):v is string=>typeof v==='string' && /^0x[0-9a-f]{40}$/.test(v);
@@ -22,7 +22,7 @@ export type ChainHint = Readonly<{
 }>;
 export interface SqlStatement {
   get(...v:unknown[]):any;
-  run(...v:unknown[]):{changes:number};
+  run(...v:unknown[]):{changes:number|bigint};
 }
 export interface SqlPort {
   exec(sql:string):void;
