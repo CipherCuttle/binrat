@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+// @ts-ignore Repo pins @types/node 20, which omits Node 22's built-in node:sqlite.
 import {DatabaseSync} from 'node:sqlite';
 import {PersistentPositiveEventWatch, type PositiveGrant, type ChainHint} from '../src/portable/persistentTripwireWatch.js';
 import {POSITIVE_EVENT_BUDGET,quotePositiveEventBudget,PROOF_METHOD_RESERVATIONS} from '../src/portable/persistentTripwireBudget.js';
