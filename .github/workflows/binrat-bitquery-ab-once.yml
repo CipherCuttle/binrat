@@ -3,7 +3,7 @@ on:
   push:
     branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
     paths:
-      - 'bench/bitquery-ab-grant-20261017.txt'
+      - 'bench/bitquery-ab-grant-retry-20261017.txt'
 permissions:
   contents: read
 concurrency:
@@ -15,13 +15,14 @@ jobs:
       github.repository == 'CipherCuttle/binrat' &&
       github.event_name == 'push' &&
       github.run_attempt == 1 &&
-      github.event.head_commit.message == 'test(benchmark): owner grant single free Bitquery A-B probe'
+      github.event.head_commit.message == 'test(benchmark): owner regrant after zero-request preflight failure'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -29,8 +30,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git diff --name-status HEAD^ HEAD)" = $'A\tbench/bitquery-ab-grant-20261017.txt'
-          test "$(cat bench/bitquery-ab-grant-20261017.txt)" = 'BINRAT_AB_20261017_ONE_SHOT'
+          test "$(git diff --name-status HEAD^ HEAD)" = $'A\tbench/bitquery-ab-grant-retry-20261017.txt'
+          test "$(cat bench/bitquery-ab-grant-retry-20261017.txt)" = 'BINRAT_AB_20261017_PREFLIGHT_RETRY_ONLY'
           node --check scripts/binrat-bitquery-ab-probe.mjs
           node scripts/binrat-bitquery-ab-probe.mjs --dry-run
       - name: Execute max-two Bitquery readonly queries
