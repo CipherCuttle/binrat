@@ -6,7 +6,7 @@ import {resolve} from 'node:path';
 
 const FACTORY='0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e';
 const TOPIC='8d4aad4953d0ca700d468f3753aa14432d1b35b43ec6409f051fb6aa43a89607';
-const URL='https://streaming.bitquery.io/graphql';
+const API_ENDPOINT='https://streaming.bitquery.io/graphql';
 const CASE_ID='742ed5c2d361c11d5a4da715e35e6c189a9b61ae4a433a937a96111360d7ab01';
 const BLOB='ac4258f22bb32643b4829a699f7c5bf4720690ba';
 const FIELD='docs/receipts/sprint-a1-2-contract/old-case-envelope.json';
@@ -75,7 +75,7 @@ export async function probe({token,request=globalThis.fetch,root=process.cwd()})
     count++;
     const payload=JSON.stringify({query:query(kind,c.txHash)});
     const abort=AbortSignal.timeout(12000),t=Date.now();
-    const res=await request(URL,{method:'POST',redirect:'error',signal:abort,
+    const res=await request(API_ENDPOINT,{method:'POST',redirect:'error',signal:abort,
       headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:payload});
     const ab=await res.arrayBuffer();
     if(ab.byteLength>32768)throw Error('RESPONSE_BUDGET_EXCEEDED');
