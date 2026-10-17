@@ -11,7 +11,7 @@ Identify whether the existing Pons 4663 collector's pause, queue backlog, and D1
 
 - `scripts/binrat-recovery-readonly-inventory.mjs` exports `inspectRecovery`, a strict, injected-request async inspector. Import and synthetic fixtures can test it. **There is no production runner:** CLI allows only `--dry-run`. `--read-only`, environment tokens, or other commands refuse. No `fetch` call is made by the CLI.
 - `test/binratRecoveryInventory.test.mjs` validates the allowlist, zero-network admission, hard request/response/time budgets, unknown-consumer semantics, pagination, sanitizer, tamper and fail-closed behavior with mocked `Response`s.
-- `.github/workflows/binrat-r1-inventory-offline.yml` is **manual, tests only**. No secrets/Cloudflare request. It has not been dispatched. A future credentialed one-shot runner needs a *different, separately approved changeset and owner grant*.
+- `.github/workflows/binrat-r1-inventory-offline.yml` runs on isolated-branch changes or manual dispatch, **tests only**. No secrets/Cloudflare request. It has not been dispatched. A future credentialed one-shot runner needs a *different, separately approved changeset and owner grant*.
 - No worker, D1, RPC, Queue, DNS, provider plan or production file is mutated; existing WIP and PR #209 remain untouched.
 
 ## Exact read-only Cloudflare path allowlist (maximum eight requests)
@@ -27,7 +27,7 @@ All paths use **only** `GET https://api.cloudflare.com/client/v4/accounts/{PINNE
 7. `/d1/database/{VERIFIED_ID}/time_travel/bookmark` — bookmark available boolean; **never expose the bookmark**
 8. `/subscriptions` — subscription count only; **cannot establish zero charges or account standing**
 
-If D1 identity cannot be pinned, skip #7 (maximum seven requests). If the queue cannot be uniquely pinned or pagination is incomplete, stop. Auth failure, invalid responses, any unexpected path or over-budget result stops without fallback. Routes/DNS, D1 restore ability, off-platform backup, historical checkpoint and executable cost ceiling remain UNKNOWN.
+If D1 identity cannot be pinned, skip #7 (maximum seven requests). Queue/D1 list pages must include explicit consistent first-page pagination metadata (`page`, `count`, `total_count`); if absent, contradictory or incomplete, STOP rather than assume unique resource identity. If the queue cannot be uniquely pinned, stop. Auth failure, invalid responses, any unexpected path or over-budget result stops without fallback. Routes/DNS, D1 restore ability, off-platform backup, historical checkpoint and executable cost ceiling remain UNKNOWN.
 
 **Budgets:** ≤8 GETs, one at a time, ≤5 seconds/request, ≤45 seconds overall, ≤64 KiB/request, ≤512 KiB total. No retry, fan-out, recursive discovery, storage of raw provider data or provider error bodies. Empty/malformed/missing data is never silently promoted to proof; `METADATA_ONLY` means the *metadata checks* ran, **not** that restore/restart is safe.
 
