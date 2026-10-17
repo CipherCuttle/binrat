@@ -7,6 +7,7 @@ on:
       - 'scripts/binrat-bitquery-ab-probe.mjs'
       - 'scripts/binrat-bitquery-recent-overlap.ts'
       - 'scripts/binrat-public-status-diagnose.mjs'
+      - 'scripts/binrat-cloudflare-control-inspect.mjs'
       - 'scripts/binrat-mcp-case-offline.ts'
       - 'src/public/caseEvidence.ts'
       - 'docs/receipts/sprint-a1-2-contract/old-case-envelope.json'
@@ -14,6 +15,7 @@ on:
       - 'test/bitqueryAbOffline.test.mjs'
       - 'test/bitqueryRecentOverlap.test.ts'
       - 'test/binratPublicStatusDiagnose.test.mjs'
+      - 'test/binratCloudflareControlInspect.test.mjs'
       - 'test/mcpCaseOffline.test.ts'
       - 'docs/MCP_LOCAL_PROOF_V01.md'
       - '.github/workflows/binrat-mcp-offline-proof.yml'
@@ -40,6 +42,9 @@ jobs:
           node --check test/binratPublicStatusDiagnose.test.mjs
           node --test test/binratPublicStatusDiagnose.test.mjs
           node scripts/binrat-public-status-diagnose.mjs --dry-run
+          node --check scripts/binrat-cloudflare-control-inspect.mjs
+          node --test test/binratCloudflareControlInspect.test.mjs
+          node scripts/binrat-cloudflare-control-inspect.mjs --dry-run
           node --test test/bitqueryAbOffline.test.mjs
           node scripts/binrat-bitquery-ab-probe.mjs --dry-run
           node --test test/mcpOffline.test.mjs
