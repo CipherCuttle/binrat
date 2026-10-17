@@ -51,7 +51,7 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    assert.ok(artUrl.includes(prefix+'case-splash-sprite.webp'), 'preview artwork URL must use GitHack base path');
    const resource = await p.request.get(artUrl);
    assert.equal(resource.status(),200, 'splash art asset HTTP ' + resource.status() + ' at ' + artUrl);
-   assert.match(resource.headers()['content-type'] || '', /image\\/webp/, 'splash image MIME');
+   assert.ok((resource.headers()['content-type'] || '').includes('image/webp'), 'splash image MIME');
    const data = await resource.body();
    assert.ok(data.length > 1000 && data.subarray(0,4).toString() === 'RIFF' && data.subarray(8,12).toString() === 'WEBP', 'splash bytes invalid');
    const artwork = await p.evaluate(async url => {const img=new Image();img.src=url;await img.decode();return [img.naturalWidth,img.naturalHeight];},artUrl);
