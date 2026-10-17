@@ -1,0 +1,9 @@
+{
+  "source": "9de62e15a3186d58c628bc49a5c314359140ddb8",
+  "mode": "OFFLINE_PONS_GITHACK_FIXTURE",
+  "checks": [
+    "1440 static preview, saved Case, URL/reload and assets",
+    "390 static preview, saved Case, URL/reload and assets"
+  ],
+  "errors": []
+}
