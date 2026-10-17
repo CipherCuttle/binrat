@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {PersistentPositiveEventWatch, type PositiveGrant, type ChainHint} from '../src/portable/persistentTripwireWatch.ts';
-import {POSITIVE_EVENT_BUDGET,quotePositiveEventBudget,PROOF_METHOD_RESERVATIONS} from '../src/portable/persistentTripwireBudget.ts';
+import {PersistentPositiveEventWatch, type PositiveGrant, type ChainHint} from '../src/portable/persistentTripwireWatch.js';
+import {POSITIVE_EVENT_BUDGET,quotePositiveEventBudget,PROOF_METHOD_RESERVATIONS} from '../src/portable/persistentTripwireBudget.js';
 const DEPLOYER='0x'+'a'.repeat(40);
 const CONTRACT='0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e';
 const TOPIC='0x'+'1'.repeat(64);
