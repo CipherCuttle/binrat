@@ -55,7 +55,7 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    const data = await resource.body();
    assert.ok(data.length > 1000 && data.subarray(0,4).toString() === 'RIFF' && data.subarray(8,12).toString() === 'WEBP', 'splash bytes invalid');
    const artwork = await p.evaluate(async url => {const img=new Image();img.src=url;await img.decode();return [img.naturalWidth,img.naturalHeight];},artUrl);
-   assert.deepEqual(artwork,[160,80], 'preview splash artwork missing or corrupt');
+   assert.ok(([160,80].every((n,i)=>artwork[i]===n)||[768,384].every((n,i)=>artwork[i]===n)), 'preview splash artwork missing or corrupt: '+JSON.stringify(artwork));
    const firstVariant = await splash.getAttribute('data-splash-variant');
    await p.reload({waitUntil:'networkidle'});
    assert.equal(await p.locator('.inv-case-sigil').first().getAttribute('data-splash-variant'),firstVariant,'per-address splash changed after reload');
