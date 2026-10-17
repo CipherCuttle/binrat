@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - experiment/binrat-positive-event-tripwire-offline-20261017
+      - experiment/binrat-tripwire-source-pinning-20261017
     paths:
       - 'src/portable/persistentTripwireBudget.ts'
       - 'src/portable/persistentTripwireWatch.ts'
@@ -15,7 +16,8 @@ jobs:
   no-provider-source-proof:
     if: >-
       github.repository == 'CipherCuttle/binrat' &&
-      github.ref == 'refs/heads/experiment/binrat-positive-event-tripwire-offline-20261017'
+      (github.ref == 'refs/heads/experiment/binrat-positive-event-tripwire-offline-20261017' ||
+       github.ref == 'refs/heads/experiment/binrat-tripwire-source-pinning-20261017')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
