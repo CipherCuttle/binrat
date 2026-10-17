@@ -12,26 +12,39 @@ export function ProofThread({ ids }: { ids: readonly string[] }) {
   </svg>;
 }
 
-/** Eight approved trash-art crops; decorative only, not a risk or identity signal.
- * Stable address-hash assignment avoids flicker and per-render randomness.
- * The sprite is copied by Vite from web/assets, never fetched from an API. */
-export function CaseSigil({ id }: { id: string }) {
-  const address = id.toLowerCase();
-  if (!/^0x[0-9a-f]{40}$/.test(address) && !/^[0-9a-f]{64}$/.test(address)) return null;
+/** Pure, stable decorative identity for the approved eight V2 archetypes.
+ * Hash the Pons token address, never the Case ID or reported deployer. */
+export function getCaseSplashVariant(address: string): number | null {
+  const normalized = address.toLowerCase();
+  if (!/^0x[0-9a-f]{40}$/.test(normalized) && !/^[0-9a-f]{64}$/.test(normalized)) return null;
   let hash = 0x811c9dc5;
-  for (const ch of address) hash = Math.imul(hash ^ ch.charCodeAt(0), 0x01000193) >>> 0;
-  const variant = hash % 8;
+  for (const ch of normalized) hash = Math.imul(hash ^ ch.charCodeAt(0), 0x01000193) >>> 0;
+  return hash % 8;
+}
+
+/** One address-to-art presentation path for FIND, TRAILS, and the Case header.
+ * The artwork is cosmetic only; it is not an identity/risk/source signal. */
+export function CaseSplashArt({ address, presentation = "thumbnail" }: {
+  address: string; presentation?: "thumbnail" | "hero";
+}) {
+  const variant = getCaseSplashVariant(address);
+  if (variant === null) return null;
   const column = variant % 4;
   const row = Math.floor(variant / 4);
-  return <span className="inv-case-sigil inv-case-splash" data-splash-variant={variant}
-    aria-hidden="true" style={{
-      display: 'block',
+  return <span className={presentation === "hero" ? "inv-case-splash inv-case-splash-hero" : "inv-case-sigil inv-case-splash"}
+    data-splash-variant={variant} aria-hidden="true" style={{
+      display: "block",
       flexShrink: 0,
-      backgroundColor: '#050505',
+      backgroundColor: "#050505",
       backgroundImage: `url('${import.meta.env.BASE_URL}case-splash-sprite.webp')`,
-      backgroundSize: '400% 200%',
-      backgroundRepeat: 'no-repeat',
+      backgroundSize: "400% 200%",
+      backgroundRepeat: "no-repeat",
       backgroundPosition: `${column * 100 / 3}% ${row * 100}%`,
-      borderRadius: '4px',
+      borderRadius: presentation === "hero" ? "inherit" : "4px",
     }} />;
+}
+
+/** Legacy public name retained for the FIND / TRAILS thumbnail. */
+export function CaseSigil({ id }: { id: string }) {
+  return <CaseSplashArt address={id} />;
 }
