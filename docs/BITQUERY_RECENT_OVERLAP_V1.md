@@ -27,3 +27,15 @@ This attempt is **one new explicitly user-authorized bounded experiment**. It us
 `.github/workflows/binrat-bitquery-recent-ab-once.yml` runs **only** when an exact new file `bench/bitquery-recent-overlap-grant-20261017.txt` is created as the sole addition in an exact new commit with message `test(benchmark): owner one-shot recent Pons overlap` and content `BINRAT_RECENT_PONS_AB_ONE_SHOT`. The workflow checks run attempt one and reads the existing GitHub Actions secret `BITQUERY_AB_FREE_TOKEN` in the isolated query step.
 
 **Stopping rule:** After one terminal receipt, stop. Any further request or changed test target needs separate explicit authorization. Do not merge PR #209, deploy, or spend money.
+
+## Terminal execution receipt — 2026-10-17
+
+- User authorized exactly one live overlapping-recent-Pons A/B attempt, triggered by marker commit `19246051515e94282e15d6ffcb38cc8776db37d9`.
+- [GitHub Actions run #39037759116](https://github.com/CipherCuttle/binrat/actions/runs/39037759116) reached the bounded live step. Preflight/mock suite **8/8 PASS**. The workflow run itself ended **failure** because fail-closed admission set exit 2, not because those tests failed.
+- First bounded GET `https://binrat.tech/api/status` returned **HTTP 200**, 433 response bytes, ~3,856 ms; SHA-256 `dfaeb7eb09cdaf08fae839ccda3d2ff5a3afe8f86f5d1edae33d1f5d7f2924e7`.
+- Parsed status did **not** pass `validateStatus`: terminal code `BINRAT_STATUS_NOT_CURRENT_VERIFIED`. That gate combines chain/schema, published source state, verifiedAtMs age, freshness expiry and lastSyncError. **Which individual condition failed is unmeasured**; avoid ungrounded claims about the exact reason.
+- External calls: **BINRAT 1**, **Bitquery 0**, no archive or paid endpoints, no repeated requests and no merge/deploy. No Bitquery model comparison performed.
+- **Decision:** `A_B_BLOCKED_BY_BINRAT_SOURCE_ADMISSION`; outcome is NOT_RUN, not a Bitquery or BINRAT forensic-quality result.
+- **Next smallest information-gaining action requires a separate owner grant:** readonly inspection of exact status fields and deployed identity, and repair only the proven source freshness/contract issue. Then re-evaluate whether same-source recent coverage exists. Do not consume additional Bitquery calls until that gate passes.
+
+**STOP. The one-shot authorization is consumed.**
