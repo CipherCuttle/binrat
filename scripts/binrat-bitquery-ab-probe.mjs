@@ -77,9 +77,23 @@ export async function probe({token,request=globalThis.fetch,root=process.cwd()})
     const abort=AbortSignal.timeout(12000),t=Date.now();
     const res=await request(API_ENDPOINT,{method:'POST',redirect:'error',signal:abort,
       headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:payload});
-    const ab=await res.arrayBuffer();
-    if(ab.byteLength>32768)throw Error('RESPONSE_BUDGET_EXCEEDED');
-    const body=Buffer.from(ab).toString('utf8');
+    const reader=res.body?.getReader();
+    if(!reader)throw Error('RESPONSE_STREAM_UNAVAILABLE');
+    const chunks=[];let byteCount=0;
+    try{
+      while(true){
+        const {done,value}=await reader.read();
+        if(done)break;
+        byteCount+=value.byteLength;
+        if(byteCount>32768){
+          await reader.cancel().catch(()=>{});
+          throw Error('RESPONSE_BUDGET_EXCEEDED');
+        }
+        chunks.push(Buffer.from(value));
+      }
+    }finally{reader.releaseLock();}
+    const ab=Buffer.concat(chunks);
+    const body=ab.toString('utf8');
     receipts.push({kind,status:res.status,requestSha256:sha(payload),responseSha256:sha(body),
       bytes:ab.byteLength,durationMs:Date.now()-t});
     let result;try{result=JSON.parse(body)}catch{result=null}
