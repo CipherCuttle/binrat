@@ -45,13 +45,22 @@ test('get_case identifies exactly one recorded launch but refuses to manufacture
 test('deployer lookup stays exact-address, snapshot-scoped, limited and explicit on missing',()=>{
   const s=loadCapturedPons();
   const r=evaluateTool(s,'investigate_deployer',{address:addr(s),limit:1});
-  assert.equal(r.status,'OK');
+  assert.equal(r.status,'UNKNOWN');
+  assert.equal(r.reason,'HISTORY_PARTIAL_RECORDED_WINDOW_ONLY');
   assert.equal(r.data.launches[0].deployer,addr(s));
   assert.equal(r.data.returned,1);
   assert.equal(r.coverage.wholeChain,false);
   assert.equal(r.coverage.history,'PARTIAL');
   assert.equal(evaluateTool(s,'investigate_deployer',{address:'0x'+'0'.repeat(40)}).status,'UNKNOWN');
   assert.equal(evaluateTool(s,'investigate_deployer',{address:'0x'+'0'.repeat(40)}).reason,'NO_MATCH_IN_RECORDED_WINDOW');
+  const syntheticMatches=Array.from({length:5},(_,index)=>({
+    ...s.feed.launches[0],launchId:String(index+1).padStart(64,'0')
+  }));
+  const synthetic={...s,feed:{...s.feed,historyCoverage:'COMPLETE',launches:syntheticMatches}};
+  const cut=evaluateTool(synthetic,'investigate_deployer',{address:addr(s),limit:1});
+  assert.equal(cut.status,'UNKNOWN');
+  assert.equal(cut.data.truncated,true);
+  assert.equal(cut.reason,'MATCHES_TRUNCATED_AT_RESULT_LIMIT');
 });
 
 test('malformed input, injected fields and unbounded output rejected',()=>{
