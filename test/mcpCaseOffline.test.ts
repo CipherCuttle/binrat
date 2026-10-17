@@ -97,4 +97,6 @@ test('MCP stdio emits one real validated Case and no non-protocol stdout',()=>{
   assert.deepEqual(frames.map(x=>x.id),[1,2]);
   assert.equal(frames[1].result.structuredContent.status,'OK');
   assert.equal(frames[1].result.structuredContent.data.records.length,20);
+  assert.ok(Buffer.byteLength(JSON.stringify(frames[1]),'utf8')<=32768,
+    'the complete JSON-RPC frame including duplicated text+structured payload stays within 32 KiB');
 });
