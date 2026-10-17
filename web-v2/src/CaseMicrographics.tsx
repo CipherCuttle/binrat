@@ -28,7 +28,7 @@ export function CaseSigil({ id }: { id: string }) {
       display: 'block',
       flexShrink: 0,
       backgroundColor: '#050505',
-      backgroundImage: "url('/case-splash-sprite.webp')",
+      backgroundImage: `url('${import.meta.env.BASE_URL}case-splash-sprite.webp')`,
       backgroundSize: '400% 200%',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: `${column * 100 / 3}% ${row * 100}%`,

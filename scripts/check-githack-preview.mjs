@@ -8,7 +8,7 @@ const root=resolve('.');
 const site=join(root,'.artifacts/githack/site');
 const preview=JSON.parse(readFileSync(join(site,'GITHACK_PREVIEW.json')));
 const prefix=preview.basePath;
-assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-paper-v2r1-20261017/preview/githack/');
+assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-splash-20261017/preview/githack/');
 const html=readFileSync(join(site,'index.html'),'utf8');
 assert.ok(html.includes('RECORDED PONS DATA · NOT LIVE'));
 assert.ok(html.includes(prefix+'githack-fixture.js'));
@@ -45,6 +45,16 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    await p.locator('#a1-title').waitFor();
    assert.match(await p.locator('#a1-title').innerText(),/THE RAT\s+REMEMBERS/);
    assert.ok(await p.locator('[data-case-id]').count()>0,'fixture Cases missing');
+   const splash = p.locator('.inv-case-sigil').first();
+   await splash.waitFor();
+   const artUrl = await splash.evaluate(el => new URL(getComputedStyle(el).backgroundImage.replace(/^url\\([\"']?|[\"']?\\)$/g,''),location.href).href);
+   assert.ok(artUrl.includes(prefix+'case-splash-sprite.webp'), 'preview artwork URL must use GitHack base path');
+   const artwork = await p.evaluate(async url => {const img=new Image();img.src=url;await img.decode();return [img.naturalWidth,img.naturalHeight];},artUrl);
+   assert.deepEqual(artwork,[160,80], 'preview splash artwork missing or corrupt');
+   const firstVariant = await splash.getAttribute('data-splash-variant');
+   await p.reload({waitUntil:'networkidle'});
+   assert.equal(await p.locator('.inv-case-sigil').first().getAttribute('data-splash-variant'),firstVariant,'per-address splash changed after reload');
+
    assert.ok(await p.locator('#binrat-preview-label').isVisible());
    assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth)<=width+1);
    const nav=p.locator(width>1040?'.inv-sidebar nav':'.inv-mobile-nav');
