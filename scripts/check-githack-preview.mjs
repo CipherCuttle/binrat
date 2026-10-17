@@ -8,7 +8,7 @@ const root=resolve('.');
 const site=join(root,'.artifacts/githack/site');
 const preview=JSON.parse(readFileSync(join(site,'GITHACK_PREVIEW.json')));
 const prefix=preview.basePath;
-assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-splash-20261017/preview/githack/');
+assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-crew-splash-20261017/preview/githack/');
 const html=readFileSync(join(site,'index.html'),'utf8');
 assert.ok(html.includes('RECORDED PONS DATA · NOT LIVE'));
 assert.ok(html.includes(prefix+'githack-fixture.js'));
@@ -55,7 +55,7 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    const data = await resource.body();
    assert.ok(data.length > 1000 && data.subarray(0,4).toString() === 'RIFF' && data.subarray(8,12).toString() === 'WEBP', 'splash bytes invalid');
    const artwork = await p.evaluate(async url => {const img=new Image();img.src=url;await img.decode();return [img.naturalWidth,img.naturalHeight];},artUrl);
-   assert.ok(([160,80].every((n,i)=>artwork[i]===n)||[768,384].every((n,i)=>artwork[i]===n)), 'preview splash artwork missing or corrupt: '+JSON.stringify(artwork));
+   assert.deepEqual(artwork,[768,384],'preview must contain approved 192px-per-variant atlas');
    const firstVariant = await splash.getAttribute('data-splash-variant');
    await p.reload({waitUntil:'networkidle'});
    assert.equal(await p.locator('.inv-case-sigil').first().getAttribute('data-splash-variant'),firstVariant,'per-address splash changed after reload');
@@ -66,6 +66,8 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    const id=await p.locator('[data-case-id]').first().getAttribute('data-case-id');
    await p.locator('[data-case-id]').first().click();
    assert.equal(new URL(p.url()).searchParams.get('case'),id);
+   assert.equal(await p.locator('.inv-case-splash-hero').getAttribute('data-splash-variant'),firstVariant,'FIND and Case splash differ');
+   assert.match(await p.locator('.inv-case-splash-figure figcaption').innerText(),/ILLUSTRATION ONLY · NOT EVIDENCE/);
    await p.getByRole('button',{name:'SAVE CASE',exact:true}).click();
    await nav.locator('a[data-route="/saved"]').click();
    assert.equal(new URL(p.url()).searchParams.get('view'),'saved');
@@ -75,6 +77,11 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    assert.equal(new URL(p.url()).searchParams.get('case'),id);
    await p.reload({waitUntil:'networkidle'});
    assert.ok(await p.locator('#vl-case').count(),'refresh loses Case');
+   assert.equal(await p.locator('.inv-case-splash-hero').getAttribute('data-splash-variant'),firstVariant,'Case splash changes after reload');
+   await nav.locator('a[data-route="/crew"]').click();
+   const ratArt=await p.locator('.inv-crew-art img').evaluateAll(els=>els.map(el=>({ok:el.complete&&el.naturalWidth>100,src:el.src})));
+   assert.equal(ratArt.length,3,'full Crew not rendered');
+   assert.ok(ratArt.every(x=>x.ok&&x.src.includes(prefix+'crew/')),'Crew artwork should load from exact hosted prefix');
    await ctx.close();
    report.checks.push(width+' static preview, saved Case, URL/reload and assets');
    console.log('PASS '+report.checks.at(-1));
