@@ -1,0 +1,47 @@
+name: BINRAT Bitquery capped A-B live probe
+on:
+  push:
+    branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
+    paths:
+      - 'bench/bitquery-ab-grant-20261017.txt'
+permissions:
+  contents: read
+concurrency:
+  group: binrat-bitquery-ab-20261017
+  cancel-in-progress: false
+jobs:
+  exactly-once-authorization:
+    if: >-
+      github.repository == 'CipherCuttle/binrat' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 &&
+      github.event.head_commit.message == 'test(benchmark): owner grant single free Bitquery A-B probe'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require one newly added immutable grant file and no other diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-status HEAD^ HEAD)" = $'A\tbench/bitquery-ab-grant-20261017.txt'
+          test "$(cat bench/bitquery-ab-grant-20261017.txt)" = 'BINRAT_AB_20261017_ONE_SHOT'
+          node --check scripts/binrat-bitquery-ab-probe.mjs
+          node scripts/binrat-bitquery-ab-probe.mjs --dry-run
+      - name: Execute max-two Bitquery readonly queries
+        shell: bash
+        env:
+          BITQUERY_ACCESS_TOKEN: ${{ secrets.BITQUERY_AB_FREE_TOKEN }}
+          BITQUERY_AB_GRANT: BINRAT_AB_ONE_SHOT
+        run: |
+          set -euo pipefail
+          if test -z "${BITQUERY_ACCESS_TOKEN:-}"; then
+            echo "NOT_RUN: BITQUERY_AB_FREE_TOKEN secret absent; no network requests"
+            exit 2
+          fi
+          node scripts/binrat-bitquery-ab-probe.mjs --live-readonly
