@@ -4,10 +4,12 @@ on:
     branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
     paths:
       - 'scripts/binrat-mcp-offline.mjs'
+      - 'scripts/binrat-bitquery-ab-probe.mjs'
       - 'scripts/binrat-mcp-case-offline.ts'
       - 'src/public/caseEvidence.ts'
       - 'docs/receipts/sprint-a1-2-contract/old-case-envelope.json'
       - 'test/mcpOffline.test.mjs'
+      - 'test/bitqueryAbOffline.test.mjs'
       - 'test/mcpCaseOffline.test.ts'
       - 'docs/MCP_LOCAL_PROOF_V01.md'
       - '.github/workflows/binrat-mcp-offline-proof.yml'
@@ -28,6 +30,10 @@ jobs:
         run: |
           node --check scripts/binrat-mcp-offline.mjs
           node --check test/mcpOffline.test.mjs
+          node --check scripts/binrat-bitquery-ab-probe.mjs
+          node --check test/bitqueryAbOffline.test.mjs
+          node --test test/bitqueryAbOffline.test.mjs
+          node scripts/binrat-bitquery-ab-probe.mjs --dry-run
           node --test test/mcpOffline.test.mjs
       - uses: pnpm/action-setup@v4
         with: {version: '10.15.0'}
