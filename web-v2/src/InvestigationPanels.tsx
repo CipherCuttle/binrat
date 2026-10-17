@@ -14,7 +14,7 @@ export function FindRow({ item, onOpen, compact = false }: {
   return <GlareHoverButton id={'find-' + item.id} data-case-id={item.id}
     aria-label={'Open Case ' + tokenLabel(item) + ' ' + shortAddress(item.token)}
     className={'vl-find inv-find-row' + (compact ? ' inv-find-compact' : '')} onClick={() => onOpen(item.id)}>
-    <span className="vl-find-mark" aria-hidden="true">{item.symbol.trim() ? item.symbol.trim().slice(0, 2) : <CaseSigil id={item.id} />}</span>
+    <span className="vl-find-mark" aria-hidden="true"><CaseSigil id={item.token} /></span>
     <span className="a1-find-copy"><strong>{hasName ? tokenLabel(item) : shortAddress(item.token)}</strong>
       <small className="a1-token">{hasName ? (item.symbol && item.name ? item.symbol + ' · ' : '') + shortAddress(item.token) : 'Unnamed Pons launch'}</small>
     </span>
