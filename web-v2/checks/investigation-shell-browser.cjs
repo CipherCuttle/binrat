@@ -69,6 +69,8 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
     for(const [width,height] of [[1440,900],[768,1024],[390,844],[320,800]]) {
       const ctx=await context(browser,width,height),page=await visit(ctx);
       const id=feed.launches[0].launchId;
+      const findVariant=await page.locator('[data-case-id="'+id+'"] .inv-case-sigil').getAttribute('data-splash-variant');
+      assert.ok(/^[0-7]$/.test(findVariant||''),'FIND must assign a valid decorative splash');
       await check(width+' first-screen finds, loaded art, readable body and touch targets',async()=>{
         assert.match(await page.locator('#a1-title').innerText(),/THE RAT\s+REMEMBERS/);
         assert.ok(await nav(page,width).isVisible());
@@ -174,6 +176,11 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
       await check(width+' exact Case, summary, save and keyboard tabs',async()=>{
         assert.equal(new URL(page.url()).pathname,'/bag/'+id);
         assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        const hero=page.locator('#vl-case .inv-case-splash-hero');
+        assert.equal(await hero.getAttribute('data-splash-variant'),findVariant,'FIND and Case must use token variant');
+        assert.ok((await hero.evaluate(el=>getComputedStyle(el).backgroundImage)).includes('case-splash-sprite.webp'));
+        assert.equal(await page.locator('#vl-case .inv-case-splash-figure img').count(),0,'generic neon Case art must be removed');
+        assert.match(await page.locator('#vl-case .inv-case-splash-figure figcaption').innerText(),/ILLUSTRATION ONLY · NOT EVIDENCE/);
         assert.equal(await page.locator('.inv-dossier-index').count(),1);
         assert.match(await page.locator('.inv-dossier-index').innerText(),/THREE SOURCE-BOUND VIEWS/);
         assert.equal(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).borderTopWidth),'4px');
@@ -245,6 +252,7 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.equal(new URL(page.url()).pathname,'/bag/'+id);
         await page.reload({waitUntil:'networkidle'});
         assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        assert.equal(await page.locator('.inv-case-splash-hero').getAttribute('data-splash-variant'),findVariant,'saved/deep-link/reload splash drift');
         await page.getByRole('button',{name:'BACK TO CASEBOOK'}).click();
         assert.equal(new URL(page.url()).pathname,'/saved');
       });
@@ -257,14 +265,27 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.equal(await page.locator('.inv-trails-single').evaluate(el=>el.open),false);
         assert.ok(await page.locator('.inv-deployer-group').count()>0);
         await shot(page,'deployer-groups-'+width);
+        const trailVariant=await page.locator('[data-case-id]').first().locator('.inv-case-sigil').getAttribute('data-splash-variant');
         await page.locator('[data-case-id]').first().click();
+        assert.equal(await page.locator('.inv-case-splash-hero').getAttribute('data-splash-variant'),trailVariant,'TRAILS and Case splash mismatch');
         await page.getByRole('button',{name:'BACK TO TRAILS'}).click();
         assert.equal(new URL(page.url()).pathname,'/trails');
         await routeLink(page,width,'/crew').click();
         assert.match(await page.locator('#inv-crew-heading').innerText(),/ONE RAT DIGGING/);
         assert.match(await page.locator('.inv-crew-list').innerText(),/TRIPWIRE · BUILDING/);
         assert.equal(await page.getByRole('button',{name:/EMPLOY|CONNECT WALLET|START WATCH/}).count(),0);
-        await ready(page);await shot(page,'crew-'+width);await noOverflow(page,width);
+        await ready(page);
+        const roster=await page.locator('.inv-crew-art').evaluateAll(stages=>stages.map(stage=>({
+          height:Math.round(stage.getBoundingClientRect().height),
+          loaded:stage.querySelector('img')?.naturalWidth>100,
+          fit:getComputedStyle(stage.querySelector('img')).objectFit,
+          src:stage.querySelector('img')?.getAttribute('src')
+        })));
+        assert.equal(roster.length,3);
+        assert.ok(roster.every(r=>r.loaded&&r.fit==='contain'),'all approved rat images must be fully loaded and contained');
+        assert.equal(new Set(roster.map(r=>r.height)).size,1,'Crew art stages must be equal height');
+        assert.ok(roster[0].src.includes('rat-zero.jpg'),'do not enlarge 48px Scout avatar');
+        await shot(page,'crew-'+width);await noOverflow(page,width);
         await routeLink(page,width,'/status').click();
         assert.match(await page.locator('#inv-status-heading').innerText(),/CHECK THE SOURCE/);
         assert.match(await page.locator('.inv-status-list').innerText(),/STALE_VERIFIED/);
