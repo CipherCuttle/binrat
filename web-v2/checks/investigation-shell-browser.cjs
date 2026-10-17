@@ -176,6 +176,15 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.match(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/);
         assert.match(await page.locator('.vl-case-intro').innerText(),/38 earlier indexed launches/);
         assert.equal(await page.getByRole('tab').count(),3);
+        if(width<=700) {
+          const geometry=await page.getByRole('tab').evaluateAll(tabs=>tabs.map(tab=>{
+            const label=tab.querySelector('strong')?.getBoundingClientRect();
+            const box=tab.getBoundingClientRect();
+            return {labelLeft:label?.left, labelRight:label?.right, left:box.left, right:box.right};
+          }));
+          assert.ok(geometry.every(x=>x.labelLeft>=x.left-1&&x.labelRight<=x.right+1),
+            'mobile tab label escapes filing-tab hitbox: '+JSON.stringify(geometry));
+        }
         const finding=await page.locator('.vl-case-intro').boundingBox(),returnAction=await page.locator('.inv-case-return').boundingBox();
         assert.ok(finding.y<returnAction.y,'return action displaced the finding');
         const save=await page.getByRole('button',{name:'SAVE CASE',exact:true}).boundingBox();
@@ -224,6 +233,8 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         await page.reload({waitUntil:'networkidle'});await ready(page);
         assert.equal(await page.getByRole('textbox',{name:'Research note for Case '+id}).inputValue(),'Compare receipts before drawing conclusions.');
         assert.ok(await page.locator('.inv-saved-evidence').isVisible());
+        const removal=await page.locator('.inv-casebook .inv-remove').evaluate(el=>getComputedStyle(el).color);
+        assert.equal(removal,'rgb(101, 74, 80)','remove action must not inherit illegible lilac');
         await noOverflow(page,width);
         await shot(page,'casebook-'+width);
         await page.locator('.inv-saved-open').click();
