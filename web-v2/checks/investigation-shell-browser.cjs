@@ -79,6 +79,11 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.ok(first&&first.y+first.height<=available,'first whole Case below viewport: '+JSON.stringify({first,available}));
         const sizes=await nav(page,width).locator('a[data-route]').evaluateAll(es=>es.map(e=>({h:e.getBoundingClientRect().height,w:e.getBoundingClientRect().width})));
         assert.ok(sizes.every(s=>s.h>=44&&s.w>=44),'nav touch targets');
+        if(width<=390) {
+          const second=await page.locator('[data-case-id]').nth(1).boundingBox();
+          assert.ok(second&&second.y+second.height<=available,
+            'second whole Case below mobile navigation: '+JSON.stringify({first,second,available}));
+        }
         report.metrics.push({width,height,firstFindTop:first.y,firstFindBottom:first.y+first.height,available});
         await noOverflow(page,width);
       });
@@ -92,6 +97,21 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         const heroColor=await page.locator('.inv-arrival').evaluate(el=>getComputedStyle(el).backgroundColor);
         assert.equal(heroColor,'rgb(33, 27, 43)','canonical alley hero must retain dark art');
         await noOverflow(page,width);
+      });
+      await check(width+' Paperwork V2 contrast, source sigils and usable find hierarchy',async()=>{
+        const contrast = await page.locator('[data-case-id]').first().evaluate(el => {
+          const fg=window.getComputedStyle(el.querySelector('.inv-find-next')).color;
+          const bg=window.getComputedStyle(el).backgroundColor;
+          const white=[255,254,250]; // paper ticket gradient is deliberately pale
+          const nums= s => (s.match(/[0-9.]+/g)||[]).slice(0,3).map(Number);
+          const lum = xs=>xs.map(v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)})
+            .reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+          const x=lum(nums(fg)),y=lum(white);
+          return {fg,bg,ratio:(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+        });
+        assert.ok(contrast.ratio>=4.5,'light find action under 4.5 contrast: '+JSON.stringify(contrast));
+        assert.equal(await page.locator('.inv-case-sigil').first().evaluate(el=>Math.round(el.getBoundingClientRect().width)),width<=700?(width<=390?22:26):26);
+        if(width>700)assert.equal(await page.locator('.inv-proof-thread').evaluate(el=>Math.round(el.getBoundingClientRect().width)),54);
       });
       await shot(page,'find-'+width);
       await check(width+' React Bits starter elements honor reduced motion and button semantics',async()=>{
@@ -150,6 +170,8 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
       await check(width+' exact Case, summary, save and keyboard tabs',async()=>{
         assert.equal(new URL(page.url()).pathname,'/bag/'+id);
         assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        assert.equal(await page.locator('.inv-dossier-index').count(),1);
+        assert.match(await page.locator('.inv-dossier-index').innerText(),/THREE SOURCE-BOUND VIEWS/);
         assert.equal(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).borderTopWidth),'4px');
         assert.match(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).backgroundImage),/linear-gradient/);
         assert.match(await page.locator('.vl-case-intro').innerText(),/38 earlier indexed launches/);
@@ -193,6 +215,8 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         await routeLink(page,width,'/saved').click();
         await page.reload({waitUntil:'networkidle'});await ready(page);
         assert.equal(await page.locator('.inv-saved-list li').count(),1);
+        assert.equal(await page.locator('.inv-casebook .inv-saved-open').count(),1);
+        assert.match(await page.locator('.inv-casebook .inv-saved-arrow').innerText(),/OPEN/);
         assert.match(await page.locator('.inv-saved-open').innerText(),/0xea90…daf3/);
         assert.match(await page.locator('.inv-saved-evidence').innerText(),/earlier indexed launches/i);
         const note=page.getByRole('textbox',{name:'Research note for Case '+id});
@@ -212,6 +236,10 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
       await check(width+' distinct deployer groups, return context and truthful crew/status',async()=>{
         await routeLink(page,width,'/trails').click();
         assert.match(await page.locator('#a1-finds-title').innerText(),/SMELLS FAMILIAR/);
+        assert.equal(await page.locator('.inv-trails-linked .inv-deployer-linked').count(),1);
+        assert.equal(await page.locator('.inv-trails-single').count(),1);
+        assert.ok(await page.locator('.inv-trails-single .inv-deployer-single').count()>0);
+        assert.equal(await page.locator('.inv-trails-single').evaluate(el=>el.open),false);
         assert.ok(await page.locator('.inv-deployer-group').count()>0);
         await shot(page,'deployer-groups-'+width);
         await page.locator('[data-case-id]').first().click();
