@@ -1,0 +1,30 @@
+name: BINRAT MCP offline forensic proof
+on:
+  push:
+    branches: [experiment/binrat-mcp-local-forensics-v01-20261017]
+    paths:
+      - 'scripts/binrat-mcp-offline.mjs'
+      - 'test/mcpOffline.test.mjs'
+      - 'docs/MCP_LOCAL_PROOF_V01.md'
+      - '.github/workflows/binrat-mcp-offline-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-mcp-proof:
+    if: github.repository == 'CipherCuttle/binrat'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax and pinned recorded source acceptance (no installation, external calls or secrets)
+        run: |
+          node --check scripts/binrat-mcp-offline.mjs
+          node --check test/mcpOffline.test.mjs
+          node --test test/mcpOffline.test.mjs
+      - name: Assert no deployment, arbitrary fetch or paid model API
+        run: |
+          ! grep -nE 'https://api[.]telegram[.]org|api[.]openrouter[.]ai|private_key|eth_sendRawTransaction|fetch[(]' scripts/binrat-mcp-offline.mjs
