@@ -1,0 +1,472 @@
+/*
+ * BINRAT PAPERWORK V1 — light investigation shell, dark world only inside art.
+ * Presentation only. No Case identities, endpoints, source status or Rat assets changed.
+ * Layer after investigation-shell.css and ReactBitsStarter.css.
+ */
+.inv-layout {
+  --inv-ink: #302d39;
+  --inv-line: #d3c7ba;
+  --inv-muted: #625b69;
+  --inv-cream: #2e292d;
+  --inv-cyan: #1a686d;
+  --inv-paper: #fffdf7;
+  --inv-bone: #f5f0e5;
+  --inv-soft: #ece2d5;
+  --inv-accent: #8d4a34;
+  color: #302d39;
+  background: #eee8de;
+}
+.inv-layout :focus-visible {
+  outline: 2px solid #126e78;
+  outline-offset: 2px;
+}
+.inv-layout > .visual-lab {
+  --vl-text: #302d39;
+  --vl-cream: #332e33;
+  --vl-muted: #665e6c;
+  --vl-cyan: #186a73;
+  --vl-mint: #186a60;
+  color: #302d39;
+  background:
+    radial-gradient(ellipse at 92% 0%, #e5d9f3 0%, transparent 48%),
+    linear-gradient(135deg, #f3f0e7, #eee7dd 65%, #f3eddf);
+}
+.inv-layout .vl-topbar {
+  min-height: 80px;
+  border-bottom: 1px solid #cbbfae;
+}
+.inv-layout .vl-location, .inv-layout .inv-location > span:last-child,
+.inv-layout .vl-lab-stamp b, .inv-layout .vl-lab-stamp span {
+  color: #413c49;
+}
+.inv-layout .vl-eyebrow, .inv-layout .inv-nav-heading {
+  color: #74636a;
+}
+.inv-layout .vl-command > .vl-utility,
+.inv-layout .vl-utility {
+  background: #fffcf5;
+  border: 1px solid #c5b8ae;
+  color: #484153;
+  box-shadow: 0 1px 1px #8c755517;
+  border-radius: 8px;
+}
+.inv-layout .vl-utility:hover {
+  background: #f2e3d5;
+  border-color: #a76d58;
+  color: #392931;
+}
+.inv-layout .vl-primary {
+  border: 1px solid #7b4236;
+  background: linear-gradient(110deg, #aa6348, #864b47);
+  color: #fff9ef;
+  box-shadow: inset 0 1px #f2bda64d, 0 3px 0 #512b2a30;
+}
+.inv-layout .vl-primary:hover { background: #884b3c; }
+.inv-layout .vl-workspace, .inv-layout .a1-frontdoor[data-view='case'] .vl-workspace {
+  margin-top: 21px;
+}
+/* Sidebar — cream index, sturdy typography, genuine active state. */
+.inv-layout .inv-sidebar {
+  background:
+    radial-gradient(ellipse at top left, #fffefa, transparent 56%),
+    linear-gradient(180deg, #f2ebdf, #e9dfcf);
+  border-right: 1px solid #ccbcaa;
+  box-shadow: 3px 0 14px #66504312;
+}
+.inv-layout .inv-wordmark {
+  color: #3c2831;
+  letter-spacing: -.065em;
+}
+.inv-layout .inv-wordmark img {
+  border: 2px solid #986f57;
+  box-shadow: 0 0 0 3px #dfc7ae;
+}
+.inv-layout .inv-sidebar-kicker,
+.inv-layout .inv-sidebar .inv-nav-heading {
+  color: #826257;
+}
+.inv-layout .inv-sidebar nav a {
+  border-radius: 7px;
+  color: #665c66;
+  margin-bottom: 5px;
+  min-height: 61px;
+  transition: background 170ms ease, border-color 170ms ease;
+}
+.inv-layout .inv-sidebar nav a strong {
+  color: #51464d;
+  font-weight: 700;
+}
+.inv-layout .inv-sidebar nav a small { color: #766b70; }
+.inv-layout .inv-sidebar nav a:hover {
+  background: #fdf8ef;
+  color: #472e36;
+  border-color: #dcc9b8;
+}
+.inv-layout .inv-sidebar nav a.active {
+  background: linear-gradient(110deg, #fffdf5, #f6e4d8);
+  box-shadow: 0 3px 9px #8b513119;
+  border: 1px solid #d1ad9d;
+  color: #984d37;
+}
+.inv-layout .inv-sidebar nav a.active::before {
+  width: 3px;
+  left: -13px;
+  height: 35px;
+  background: #ab5d42;
+}
+.inv-layout .inv-sidebar nav a.active strong { color: #803d2e; }
+.inv-layout .inv-sidebar nav a.active small { color: #765e56; }
+.inv-layout .inv-nav-count {
+  color: #703c34;
+  background: #e9cabb;
+  border: 1px solid #d5a995;
+}
+.inv-layout .inv-sidebar-footer {
+  border-top: 1px solid #d1bdac;
+  background: #f6eddfb0;
+}
+.inv-layout .inv-scout-presence strong { color: #3d383d; }
+.inv-layout .inv-scout-presence span { color: #855b4c; }
+.inv-layout .inv-sidebar-footer small,
+.inv-layout .inv-sidebar-footer > a { color: #716471; }
+
+/* Keep Rat Zero and the approved alley art dark. This is visual contrast,
+   not a dark operating system around all of the evidence. */
+.inv-layout .inv-arrival {
+  border: 2px solid #584253;
+  box-shadow: 0 6px 0 #d7c8b9, 0 12px 24px #846c631f;
+  border-radius: 18px 6px 18px 6px;
+  background: #211b2b;
+}
+.inv-layout .inv-arrival .vl-eyebrow { color: #bddecf; }
+.inv-layout .inv-arrival h1,
+.inv-layout .inv-arrival h1 span { color: #fff4df; }
+.inv-layout .inv-arrival h1 span { color: #d6c6f5; }
+.inv-layout .inv-arrival-copy > p { color: #eadff5; }
+.inv-layout .inv-arrival-action { color: #bbf5de; }
+
+/* Discovery is a newspaper column beside case files, not another dark panel. */
+.inv-layout .a1-discovery { color: #332f38; }
+.inv-layout .a1-discovery > header { margin-bottom: 12px; }
+.inv-layout .a1-discovery h2 {
+  color: #342a33;
+  font-weight: 790;
+  letter-spacing: -.04em;
+}
+.inv-layout .inv-count-badge {
+  background: #fdf9ef;
+  border: 1px solid #c9b7a8;
+  color: #70514e;
+  box-shadow: 2px 2px 0 #d8c9b747;
+}
+.inv-layout .inv-search { color: #645960; }
+.inv-layout .inv-search input {
+  background: #fffdf7;
+  color: #302a31;
+  border: 1px solid #bfb0a5;
+  box-shadow: inset 0 2px 5px #7562450b;
+}
+.inv-layout .inv-search input::placeholder { color: #766c78; }
+.inv-layout .a1-coverage,
+.inv-layout .inv-tool-note,
+.inv-layout .inv-source-limits,
+.inv-layout .inv-source-limits summary { color: #655c65; }
+
+/* Each find is now an individual evidence ticket, with an index strip. */
+.inv-layout .a1-find-grid {
+  display: grid;
+  gap: 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.inv-layout .a1-find-grid .vl-find {
+  position: relative;
+  border: 1px solid #d2c3b5;
+  border-left: 4px solid #ad6a51;
+  border-radius: 10px 4px 10px 4px;
+  background: linear-gradient(107deg, #fffefa 0%, #fffaf1 72%, #f4ebe1);
+  box-shadow: 0 2px 0 #d7c5b1b0, 0 4px 13px #9c847125;
+  color: #322e37;
+  min-height: 85px;
+  padding: 14px 18px;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+.inv-layout .a1-find-grid .vl-find + .vl-find {
+  border-top: 1px solid #d2c3b5;
+}
+.inv-layout .a1-find-grid .vl-find:hover {
+  background: linear-gradient(107deg, #fffefa, #f3e5d9);
+  border-color: #ae7863;
+  box-shadow: 0 3px 0 #d4bfb0, 0 7px 16px #9d786935;
+  transform: translateY(-1px);
+}
+.inv-layout .a1-find-grid .vl-find:focus-visible {
+  outline: 2px solid #1a6a74;
+  outline-offset: 2px;
+}
+.inv-layout .a1-find-grid .vl-find-mark {
+  background: #e8ece7;
+  border: 1px solid #b4c4c2;
+  color: #2f676b;
+  border-radius: 6px;
+}
+.inv-layout .a1-find-grid strong { color: #322d36; }
+.inv-layout .a1-find-grid .a1-token,
+.inv-layout .inv-find-history,
+.inv-layout .inv-find-history small { color: #6c6570; }
+.inv-layout .inv-find-history span:first-child {
+  color: #65433f;
+  font-weight: 650;
+}
+.inv-layout .a1-find-grid .a1-recurrence { color: #805039; }
+.inv-layout .a1-find-grid .a1-open {
+  color: #954d37;
+  border: 1px solid #d1ae99;
+  padding: 7px 9px;
+  border-radius: 6px;
+  background: #f6e8da;
+  font-weight: 750;
+}
+.inv-layout .inv-case-sigil rect:first-child {
+  fill: #dfe7e1;
+  stroke: #a3b8b4;
+}
+.inv-layout .inv-case-sigil rect:not(:first-child) { fill: #396e72; }
+.inv-layout .rb-glare-hover::after {
+  background: linear-gradient(115deg, transparent 29%, #fffefdaa 48%, transparent 68%);
+}
+
+/* Investigative link: a tactile field note, not a glowing status warning. */
+.inv-layout .inv-evidence-lead {
+  border: 1px solid #a8bfaf;
+  border-left: 4px solid #3c8376;
+  background: linear-gradient(110deg, #f2f7ee, #e6f0e9);
+  box-shadow: 0 3px 0 #b7c8b55e;
+  color: #2d433f;
+}
+.inv-layout .inv-evidence-lead-tag,
+.inv-layout .rb-shiny-text,
+.inv-layout .inv-evidence-lead-fact {
+  color: #306357;
+}
+.inv-layout .inv-evidence-lead-fact { color: #233e38; font-weight: 725; }
+.inv-layout .inv-evidence-lead small { color: #626e66; }
+.inv-layout .inv-evidence-lead-action {
+  background: #fffef9;
+  border: 1px solid #79a394;
+  color: #285d55;
+}
+.inv-layout .inv-evidence-lead-action:hover { background: #dfefe6; }
+.inv-layout .inv-proof-thread path { stroke: #45867a; }
+.inv-layout .inv-proof-thread circle { stroke: #43877d; fill: #e8f4e9; }
+.inv-layout .rb-shiny-text { -webkit-text-fill-color: currentColor; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .inv-layout .rb-shiny-text {
+    background-image: linear-gradient(100deg, #306357 7%, #578c7b 35%, #306357 65%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Case file = editorial dossier with inset paper facts and index tabs. */
+.inv-layout .visual-lab[data-material="pearl"] .vl-hero-surface,
+.inv-layout .a1-active-case,
+.inv-layout .vl-loading-case,
+.inv-layout .vl-missing-case {
+  color: #302c35;
+  border: 1px solid #c8b7a9;
+  border-top: 4px solid #805748;
+  border-radius: 14px 5px 14px 5px;
+  background: linear-gradient(130deg, #fffefa, #f8f0e6 85%);
+  box-shadow: 0 4px 0 #d6c8b6, 0 14px 24px #7f685524;
+  backdrop-filter: none;
+}
+.inv-layout .visual-lab[data-material="pearl"] .vl-hero-surface::before,
+.inv-layout .visual-lab[data-material="pearl"] .vl-hero-surface::after {
+  content: none;
+  display: none;
+}
+.inv-layout .vl-case-topline {
+  border-bottom: 1px solid #d5c6b9;
+  color: #665b60;
+}
+.inv-layout .vl-case-topline b,
+.inv-layout .vl-case-status { color: #764a3d; }
+.inv-layout .vl-case-intro h1,
+.inv-layout .vl-stage h2,
+.inv-layout .inv-workbench h1 {
+  color: #2f2933;
+  text-shadow: none;
+}
+.inv-layout .vl-alert { color: #975941; }
+.inv-layout .vl-case-intro p,
+.inv-layout .vl-stage p { color: #514d5b; }
+.inv-layout .vl-case-art { border: 1px solid #9f8777; box-shadow: 3px 4px 0 #d9c7b4; }
+.inv-layout .vl-chips span {
+  color: #65535f;
+  background: #f1e5da;
+  border: 1px solid #d2baa8;
+}
+.inv-layout .vl-case-steps {
+  border-block: 1px solid #d8c8b8;
+  background: #f5ebdf;
+}
+.inv-layout .vl-case-steps button {
+  color: #655c67;
+  border-right: 1px solid #d8c8b8;
+  transition: background 120ms ease;
+}
+.inv-layout .vl-case-steps button.active {
+  background: #fffdf6;
+  border-bottom: 3px solid #99604b;
+  box-shadow: inset 0 2px #d5b6a3;
+}
+.inv-layout .vl-case-steps button.active strong { color: #83422e; }
+.inv-layout .vl-case-steps small { color: #6e646f; }
+.inv-layout .vl-case-steps button:hover { background: #fffdf6; }
+.inv-layout .vl-case-steps button:hover strong { color: #553d3e; }
+.inv-layout .vl-stage h2 { color: #332d35; }
+.inv-layout .vl-stage .vl-eyebrow { color: #8b5a4e; }
+.inv-layout .inv-case-facts,
+.inv-layout .vl-evidence-surface,
+.inv-layout .vl-receipt-body {
+  border: 1px solid #d6c9bb;
+  background: #f3eee5;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.inv-layout .inv-case-facts > div { border-bottom-color: #dbcdbf; }
+.inv-layout .inv-case-facts dt { color: #756974; }
+.inv-layout .inv-case-facts dd { color: #392e34; }
+.inv-layout .inv-case-return { color: #59505c; border-top-color: #d6c9bb; }
+.inv-layout .vl-receipt { border-color: #d9cbbc; }
+.inv-layout .vl-receipt summary strong { color: #302a34; }
+.inv-layout .vl-receipt summary small { color: #665e65; }
+.inv-layout .vl-receipt pre {
+  background: #e5e8e4;
+  color: #284b49;
+  border: 1px solid #c4cdc7;
+}
+.inv-layout .a12-history-notice,
+.inv-layout .vl-provenance,
+.inv-layout .vl-case-bottom > p { color: #675d6b; }
+.inv-layout .vl-case-bottom { border-top-color: #d6c9bb; }
+
+/* Saved / Trails / Crew / Status are actual paper workbenches. */
+.inv-layout .inv-workbench {
+  background: linear-gradient(130deg, #fffefa, #f6efe4);
+  border: 1px solid #cfbdac;
+  border-top: 4px solid #ab7159;
+  border-radius: 14px 5px 14px 5px;
+  box-shadow: 0 4px 0 #d5c5b6, 0 11px 20px #9b806021;
+  color: #322d35;
+}
+.inv-layout .inv-workbench p { color: #5e5561; }
+.inv-layout .inv-local-note {
+  color: #4d6862;
+  background: #e7f0e8;
+  border: 1px solid #bbcebf;
+}
+.inv-layout .inv-saved-list li {
+  background: #fffefa;
+  border: 1px solid #d3c3b4;
+  border-left: 4px solid #aa785d;
+  box-shadow: 0 2px 0 #d6c9b5;
+}
+.inv-layout .inv-saved-open { color: #382f37; }
+.inv-layout .inv-saved-open strong { color: #302b33; }
+.inv-layout .inv-saved-open small,
+.inv-layout .inv-saved-open code { color: #675f6a; }
+.inv-layout .inv-saved-icon {
+  background: #f1e4d9;
+  border: 1px solid #d7bba7;
+  color: #7e5141;
+}
+.inv-layout .inv-saved-arrow { color: #9c5d45; }
+.inv-layout .inv-saved-evidence {
+  color: #5b5560;
+  border-top: 1px dashed #d5c7b8;
+  background: #f8f4ec;
+}
+.inv-layout .inv-saved-evidence strong { color: #765047; }
+.inv-layout .inv-note-editor { color: #645a62; }
+.inv-layout .inv-note-editor textarea {
+  border: 1px solid #c8b9a8;
+  color: #332b35;
+  background: #fffdf6;
+}
+.inv-layout .inv-note-editor textarea::placeholder { color: #7f737a; }
+.inv-layout .inv-note-editor > span { color: #786d76; }
+.inv-layout .inv-empty-state {
+  border: 1px dashed #bfa895;
+  background: #fcf4e7;
+}
+.inv-layout .inv-empty-state h2,
+.inv-layout .inv-empty-state h3 { color: #393139; }
+.inv-layout .inv-deployer-group {
+  background: #fffdf7;
+  border: 1px solid #d5bfae;
+  border-top: 4px solid #a46b55;
+  box-shadow: 0 3px 0 #d7c4b2, 0 6px 13px #a9897220;
+}
+.inv-layout .inv-deployer-group h3 { color: #453339; }
+.inv-layout .inv-deployer-group > p { color: #665a64; }
+.inv-layout .inv-group-count { color: #785f58; }
+.inv-layout .inv-crew-list article {
+  background: #fffefa;
+  border: 1px solid #d2bba9;
+  box-shadow: 0 2px 0 #d8c5b5;
+}
+.inv-layout .inv-crew-art {
+  background: radial-gradient(ellipse at center, #d7c6e2, #eee2d2);
+}
+.inv-layout .inv-crew-list h2 { color: #352d37; }
+.inv-layout .inv-crew-list p { color: #665b66; }
+.inv-layout .inv-crew-state { color: #8d5849; }
+.inv-layout .inv-status-list > div { border-color: #d8c8b9; }
+.inv-layout .inv-status-list dt { color: #6d646b; }
+.inv-layout .inv-status-list dd { color: #382f38; }
+.inv-layout .vl-footer { color: #706672; text-shadow: none; }
+.inv-layout .vl-footer a { color: #774d45; }
+.inv-layout .inv-case-navigation .vl-utility,
+.inv-layout .a1-case-navigation .vl-utility { border-color: #c7afa1; color: #684637; }
+.inv-layout .a1-case-navigation .inv-save-case {
+  color: #4e5e50;
+  background: #e8f1e7;
+  border-color: #a9c2ae;
+}
+.inv-layout .a1-case-navigation [aria-pressed='true'] {
+  color: #17635a;
+  border-color: #5b9f92;
+}
+.inv-layout .vl-chips span, .inv-layout .inv-count-badge { text-shadow: none; }
+/* Mobile nav reads like a small bone-colored index shelf. */
+@media (max-width: 1040px) {
+  .inv-layout .inv-mobile-nav {
+    background: #f7f0e4f7;
+    border-top: 1px solid #c5b7a7;
+    box-shadow: 0 -4px 15px #62564919;
+  }
+  .inv-layout .inv-mobile-nav a { color: #665b66; }
+  .inv-layout .inv-mobile-nav a.active {
+    color: #873f32;
+    background: #ebd5c6;
+  }
+  .inv-layout .inv-mobile-nav a.active svg { color: #894f3c; }
+  .inv-layout .vl-brand strong { color: #3b2e35; }
+  .inv-layout .inv-location > span:last-child { color: #51444d; }
+}
+@media (max-width: 700px) {
+  .inv-layout .a1-discovery > header { margin-bottom: 9px; }
+  .inv-layout .a1-find-grid .vl-find { padding: 12px 11px; min-height: 81px; }
+  .inv-layout .inv-arrival {
+    border-width: 1px;
+    box-shadow: 0 3px 0 #d7c8b9;
+  }
+  .inv-layout .inv-evidence-lead { box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-layout .a1-find-grid .vl-find { transition: none; transform: none; }
+}
