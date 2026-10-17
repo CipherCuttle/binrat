@@ -44,7 +44,11 @@ function mock({replace={}, codes={}, raw={}, info={}}={}) {
     assert.equal(options.headers.Authorization,`Bearer ${TOKEN}`);
     const status=codes[path]??200;
     if(Object.hasOwn(raw,path))return new Response(raw[path],{status});
-    return Response.json({success:status===200,result:replace[path]??data[path],result_info:info[path]}, {status});
+    const value=replace[path]??data[path];
+    const pageInfo=[paths[2],paths[5]].includes(path) && Array.isArray(value)
+      ? {page:1,count:value.length,total_count:value.length,per_page:100} : undefined;
+    return Response.json({success:status===200,result:value,
+      result_info:Object.hasOwn(info,path)?info[path]:pageInfo}, {status});
   };
   return {request,calls};
 }
@@ -150,4 +154,16 @@ test('hung transport is bounded even if it ignores AbortSignal',async()=>{
  const result=await inspectRecovery({account:ACCOUNT,token:TOKEN,request:()=>new Promise(()=>{}),now});
  assert.equal(result.status,'BLOCKED');assert.equal(result.reason,'TIME_LIMIT');
  assert.equal(result.requests,1);
+});
+
+test('missing or contradictory pagination metadata cannot establish unique Queue/D1 identity',async()=>{
+  for (const path of [paths[2],paths[5]]) {
+    for (const info of [null,{page:2,count:1,total_count:1},{page:1,count:2,total_count:1}]) {
+      const m=mock({info:{[path]:info}});
+      const result=await run(m);
+      assert.equal(result.status,'BLOCKED');
+      assert.equal(result.reason,path===paths[2]?'QUEUES_PAGE_INCOMPLETE':'D1_PAGE_INCOMPLETE');
+      assert.ok(m.calls.length<=LIMITS.calls);
+    }
+  }
 });
