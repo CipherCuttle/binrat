@@ -1,6 +1,6 @@
 # BINRAT × Bitquery — free-tier A/B probe V1
 
-**Execution status:** The first authorized GitHub workflow ([run #39036392483](https://github.com/CipherCuttle/binrat/actions/runs/39036392483)) **FAILED PREFLIGHT BEFORE ANY BITQUERY REQUEST** because the default checkout depth was one commit; its `git diff HEAD^ HEAD` check had no parent. Secret-using step skipped. Thus actual Bitquery A/B remains **NOT RUN (0 requests)**. Fix is staged, but a new owner grant is required before another attempt.
+**Execution status:** RETRY COMPLETE ([run #39036940032](https://github.com/CipherCuttle/binrat/actions/runs/39036940032)). The first authorized GitHub workflow ([run #39036392483](https://github.com/CipherCuttle/binrat/actions/runs/39036392483)) **FAILED PREFLIGHT BEFORE ANY BITQUERY REQUEST** because the default checkout depth was one commit; its `git diff HEAD^ HEAD` check had no parent. Secret-using step skipped. Thus actual Bitquery A/B remains **NOT RUN (0 requests)**. Fix is staged, but a new owner grant is required before another attempt.
 **Scope:** one historical Pons v2 launch already validated in the BINRAT MCP Case V0.2. No archive requests, no model inference, no wallet actions, no publication or paid plan.
 
 ## Credential custody
@@ -32,3 +32,16 @@ Original grant \`bench/bitquery-ab-grant-20261017.txt\` was consumed in a **pref
 \`NOT_RUN\`: authentication, schema, network, budget or other preflight gate failed.
 
 The long-term fair head-to-head requires two providers with the same observed time window, identical user questions, agreed evidence fields, and measured requests/credits. There is **no demonstrated Bitquery-versus-BINRAT performance winner** from this prototype.
+
+## Actual capped retry receipt — 2026-10-17
+
+**Source of record:** [GitHub Actions #39036940032](https://github.com/CipherCuttle/binrat/actions/runs/39036940032), triggered by owner's explicit regrant and marker commit `989c2109e6fd2d01b0756dfcef3686a5728de6a7`. All workflow steps PASS; no second attempt authorized.
+
+- Authorized Bitquery V2 Bearer authentication worked: the calibration realtime Pons query returned HTTP **200** with at least one Event, 801 response bytes, ~1,106 ms request time. GraphQL error handling did not report a failure.
+- The exact historical BINRAT target transaction query returned HTTP **200** and **zero Events**, 30 response bytes, ~154 ms request time.
+- Budget exhausted deliberately after **2 of 2 allowed requests**, with no paid archive request, retry, token printing, credential commit or GitHub artifact containing raw response.
+- Output: `status: NOT_COMPARABLE`, `reason: HISTORICAL_TARGET_NOT_IN_FREE_REALTIME_WINDOW`, `checks: 0`, `matched: null`, `archiveQueried: false`.
+- The reason label is the runner's coverage interpretation. **Zero Events cannot independently distinguish realtime retention limits from the query filters or field mapping.** We therefore do not claim that Bitquery lacks the onchain record, is inaccurate or inferior to BINRAT.
+- BINRAT's independently validated historical 20-record Case digest remained `c2f0e7658021bc9587c265a3d172f230d4e203cc15b2ebfd24b049e6ed6ac1a3`. The current data-plane health and price/credit accounting were not observed in this run.
+
+**Stopping rule:** STOP. No further Bitquery requests, retries, paid/archive query or new grants without separate user authorization. The next fair benchmark would need a genuinely overlapping event and aligned evidence scopes, not extrapolation from the empty historical target query.
