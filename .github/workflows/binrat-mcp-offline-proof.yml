@@ -26,7 +26,7 @@ jobs:
         with: {node-version: '22'}
       - name: Syntax and pinned recorded source acceptance (no installation, external calls or secrets)
         run: |
-          node --check scripts/binrat-mcp-offline.mjs scripts/binrat-mcp-case-offline.ts
+          node --check scripts/binrat-mcp-offline.mjs
           node --check test/mcpOffline.test.mjs
           node --test test/mcpOffline.test.mjs
       - uses: pnpm/action-setup@v4
@@ -37,4 +37,4 @@ jobs:
         run: pnpm exec tsx --test test/mcpCaseOffline.test.ts
       - name: Assert no deployment, arbitrary fetch or paid model API
         run: |
-          ! grep -nE 'https://api[.]telegram[.]org|api[.]openrouter[.]ai|private_key|eth_sendRawTransaction|fetch[(]' scripts/binrat-mcp-offline.mjs
+          ! grep -nE 'https://api[.]telegram[.]org|api[.]openrouter[.]ai|private_key|eth_sendRawTransaction|fetch[(]' scripts/binrat-mcp-offline.mjs scripts/binrat-mcp-case-offline.ts
