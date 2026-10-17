@@ -1,0 +1,29 @@
+name: BINRAT R1 inventory offline proof (no provider access)
+# Inert until a human dispatches it on the reviewed branch.
+# No secrets, no network diagnostics, no Cloudflare GETs, no production writes.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-only:
+    if: >-
+      github.repository == 'CipherCuttle/binrat' &&
+      github.ref == 'refs/heads/experiment/binrat-r1-preservation-inventory-20261017'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: No-dependency, no-provider inventory tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/binrat-recovery-readonly-inventory.mjs
+          node --check test/binratRecoveryInventory.test.mjs
+          node scripts/binrat-recovery-readonly-inventory.mjs --dry-run
+          node --test test/binratRecoveryInventory.test.mjs
