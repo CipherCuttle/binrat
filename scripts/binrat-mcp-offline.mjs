@@ -116,9 +116,15 @@ export function evaluateTool(snapshot,name,args){
     if(!Number.isSafeInteger(limit)||limit<1||limit>4)error('INVALID_RESULT_LIMIT');
     const matches=snapshot.feed.launches.filter(x=>x.deployer===a.address);
     const found=matches.slice(0,limit);
-    return envelope(snapshot,matches.length?'OK':'UNKNOWN',{reportedDeployer:a.address,launches:found,
-      capturedMatchCount:matches.length,returned:found.length,truncated:matches.length>found.length},
-      matches.length?'RECORDED_WINDOW_ONLY':'NO_MATCH_IN_RECORDED_WINDOW');
+    const truncated=matches.length>found.length;
+    // Partial historical coverage and truncated result sets cannot be reported as complete OK.
+    const incomplete=truncated||snapshot.feed.historyCoverage!=='COMPLETE';
+    return envelope(snapshot,!matches.length||incomplete?'UNKNOWN':'OK',{
+      reportedDeployer:a.address,launches:found,capturedMatchCount:matches.length,
+      returned:found.length,truncated},
+      !matches.length?'NO_MATCH_IN_RECORDED_WINDOW':
+      truncated?'MATCHES_TRUNCATED_AT_RESULT_LIMIT':
+      incomplete?'HISTORY_PARTIAL_RECORDED_WINDOW_ONLY':'RECORDED_WINDOW_ONLY');
   }catch(e){
     return envelope(snapshot,'ERROR',null,e instanceof Error?e.message:'INVALID_TOOL_ARGUMENTS');
   }
