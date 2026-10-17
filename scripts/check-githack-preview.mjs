@@ -47,7 +47,7 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    assert.ok(await p.locator('[data-case-id]').count()>0,'fixture Cases missing');
    const splash = p.locator('.inv-case-sigil').first();
    await splash.waitFor();
-   const artUrl = await splash.evaluate(el => new URL(getComputedStyle(el).backgroundImage.replace(/^url\\([\"']?|[\"']?\\)$/g,''),location.href).href);
+   const artUrl = await splash.evaluate(el => { const css = getComputedStyle(el).backgroundImage; const raw = css.slice(4,-1).replace(/^["']|["']$/g,''); return new URL(raw, location.href).href; });
    assert.ok(artUrl.includes(prefix+'case-splash-sprite.webp'), 'preview artwork URL must use GitHack base path');
    const resource = await p.request.get(artUrl);
    assert.equal(resource.status(),200, 'splash art asset HTTP ' + resource.status() + ' at ' + artUrl);
