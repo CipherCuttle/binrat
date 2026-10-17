@@ -9,7 +9,7 @@ const root=resolve('.');
 const webV2=join(root,'web-v2');
 const out=join(root,'.artifacts/githack/site');
 const PREVIEW_BRANCH=process.env.BINRAT_GITHACK_BRANCH || 'binrat-v3-githack-20261016';
-if (!/^(?:binrat-v3-githack(?:-v2(?:-r[12])?)?-20261016|binrat-v3-githack-casevalue-20261017|binrat-v3-githack-leads-20261017|binrat-v3-githack-reactbits-20261017|binrat-v3-githack-micrographics-20261017|binrat-v3-githack-paper-20261017|binrat-v3-githack-paper-v2-20261017|binrat-v3-githack-paper-v2r1-20261017|binrat-v3-githack-splash-20261017)$/.test(PREVIEW_BRANCH)) throw Error('PREVIEW_BRANCH_NOT_SCOPED');
+if (!/^(?:binrat-v3-githack(?:-v2(?:-r[12])?)?-20261016|binrat-v3-githack-casevalue-20261017|binrat-v3-githack-leads-20261017|binrat-v3-githack-reactbits-20261017|binrat-v3-githack-micrographics-20261017|binrat-v3-githack-paper-20261017|binrat-v3-githack-paper-v2-20261017|binrat-v3-githack-paper-v2r1-20261017|binrat-v3-githack-splash-20261017|binrat-v3-githack-crew-case-splash-20261017)$/.test(PREVIEW_BRANCH)) throw Error('PREVIEW_BRANCH_NOT_SCOPED');
 const prefix='/CipherCuttle/binrat/'+PREVIEW_BRANCH+'/preview/githack/';
 const feed=JSON.parse(readFileSync(join(root,'docs/receipts/sprint-a1/public-feed.json'),'utf8'));
 const status=JSON.parse(readFileSync(join(root,'docs/receipts/sprint-a1/public-status.json'),'utf8'));

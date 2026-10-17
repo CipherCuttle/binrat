@@ -169,11 +169,18 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         assert.equal(await page.locator('[data-case-id]').count(),6);
         assert.equal(report.requests.length,before);
       });
+      const listSplash=await page.locator('[data-case-id="'+id+'"] .inv-case-splash')
+        .evaluate(el=>({variant:el.getAttribute('data-splash-variant'),image:getComputedStyle(el).backgroundImage,position:getComputedStyle(el).backgroundPosition}));
       await page.locator('[data-case-id="'+id+'"]').click();
       await ready(page);
       await check(width+' exact Case, summary, save and keyboard tabs',async()=>{
         assert.equal(new URL(page.url()).pathname,'/bag/'+id);
         assert.equal(await page.locator('#vl-case').getAttribute('data-case'),id);
+        const caseSplash=await page.locator('.vl-case-art .inv-case-splash')
+          .evaluate(el=>({variant:el.getAttribute('data-splash-variant'),image:getComputedStyle(el).backgroundImage,position:getComputedStyle(el).backgroundPosition}));
+        assert.deepEqual(caseSplash,listSplash,'Opened Case must match exact address art shown in FIND');
+        assert.equal(await page.locator('.vl-case-art img').count(),0,'Unrelated rat illustration remains on Case');
+        assert.match(await page.locator('.vl-case-art figcaption').innerText(),/NOT EVIDENCE/);
         assert.equal(await page.locator('.inv-dossier-index').count(),1);
         assert.match(await page.locator('.inv-dossier-index').innerText(),/THREE SOURCE-BOUND VIEWS/);
         assert.equal(await page.locator('#vl-case').evaluate(el=>getComputedStyle(el).borderTopWidth),'4px');
@@ -263,6 +270,19 @@ assert.ok(compareCase,'frozen replay contains no comparable pair');
         await routeLink(page,width,'/crew').click();
         assert.match(await page.locator('#inv-crew-heading').innerText(),/ONE RAT DIGGING/);
         assert.match(await page.locator('.inv-crew-list').innerText(),/TRIPWIRE · BUILDING/);
+        await ready(page);
+        const crewArt=await page.locator('.inv-crew-art').evaluateAll(els=>els.map(el=>({
+          width:el.getBoundingClientRect().width,
+          height:el.getBoundingClientRect().height,
+          src:el.querySelector('img')?.getAttribute('src'),
+          naturalWidth:el.querySelector('img')?.naturalWidth,
+          artHeight:el.querySelector('img')?.getBoundingClientRect().height,
+          fit:getComputedStyle(el.querySelector('img')).objectFit
+        })));
+        assert.equal(crewArt.length,3,'all three canonical Rats must be present');
+        assert.ok(crewArt.every(x=>x.width>=150 && x.height>=180 && x.naturalWidth>100 && x.artHeight>=150 && x.fit==='contain'),
+          'Crew art is tiny, missing or stretched: '+JSON.stringify(crewArt));
+        assert.ok(crewArt[0].src.endsWith('/crew/rat-zero.jpg'),'Rat Zero must use approved full-resolution art');
         assert.equal(await page.getByRole('button',{name:/EMPLOY|CONNECT WALLET|START WATCH/}).count(),0);
         await ready(page);await shot(page,'crew-'+width);await noOverflow(page,width);
         await routeLink(page,width,'/status').click();

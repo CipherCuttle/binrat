@@ -8,7 +8,7 @@ const root=resolve('.');
 const site=join(root,'.artifacts/githack/site');
 const preview=JSON.parse(readFileSync(join(site,'GITHACK_PREVIEW.json')));
 const prefix=preview.basePath;
-assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-splash-20261017/preview/githack/');
+assert.equal(prefix, '/CipherCuttle/binrat/binrat-v3-githack-crew-case-splash-20261017/preview/githack/');
 const html=readFileSync(join(site,'index.html'),'utf8');
 assert.ok(html.includes('RECORDED PONS DATA · NOT LIVE'));
 assert.ok(html.includes(prefix+'githack-fixture.js'));
@@ -57,6 +57,10 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    const artwork = await p.evaluate(async url => {const img=new Image();img.src=url;await img.decode();return [img.naturalWidth,img.naturalHeight];},artUrl);
    assert.deepEqual(artwork,[160,80], 'preview splash artwork missing or corrupt');
    const firstVariant = await splash.getAttribute('data-splash-variant');
+   const listArt = await splash.evaluate(el=>({
+     image:getComputedStyle(el).backgroundImage,
+     position:getComputedStyle(el).backgroundPosition
+   }));
    await p.reload({waitUntil:'networkidle'});
    assert.equal(await p.locator('.inv-case-sigil').first().getAttribute('data-splash-variant'),firstVariant,'per-address splash changed after reload');
 
@@ -66,6 +70,13 @@ const report={source:preview.sourceCommit,mode:'OFFLINE_PONS_GITHACK_FIXTURE',ch
    const id=await p.locator('[data-case-id]').first().getAttribute('data-case-id');
    await p.locator('[data-case-id]').first().click();
    assert.equal(new URL(p.url()).searchParams.get('case'),id);
+   const exactCaseArt = await p.locator('.vl-case-art .inv-case-splash').evaluate(el=>({
+     image:getComputedStyle(el).backgroundImage,
+     position:getComputedStyle(el).backgroundPosition,
+     variant:el.getAttribute('data-splash-variant')
+   }));
+   assert.deepEqual(exactCaseArt,{...listArt,variant:firstVariant},'Opened Case must keep exact address splash');
+   assert.equal(await p.locator('.vl-case-art img').count(),0,'Old unrelated Case illustration remains');
    await p.getByRole('button',{name:'SAVE CASE',exact:true}).click();
    await nav.locator('a[data-route="/saved"]').click();
    assert.equal(new URL(p.url()).searchParams.get('view'),'saved');
