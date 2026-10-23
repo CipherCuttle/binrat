@@ -54,6 +54,12 @@ Never let a local branch, PR, roadmap or planning document silently promote BUIL
 4. **User-friendly Den and paid capacity** after actual jobs exist. Don't build a job-management dashboard before there are jobs.
 5. Additional Rats, general A2A/MCP mesh, arbitrary web agents, AI-driven claims, speculative historical-outcome collectors and trading all remain out of MVP.
 
+### Founder-approved future differentiation — RAT GENOME (2026-10-23)
+
+**Founder direction locked:** BINRAT will explore **behavioral launch fingerprinting, forensic motif search, and source-backed "FIND SIMILAR" investigations**, starting with **EXEMPT SWARM** on Pons V2 / Robinhood Chain 4663. The intended experience is: **"EVERY LAUNCH LEAVES FINGERPRINTS. THE RAT REMEMBERS."** A user sees *why* behavior resembles an earlier Case, the exact raw receipts/unknowns, and a useful next action—not a fabricated score or a recurrence count presented as alpha. [Bounded feature/research roadmap](RAT_GENOME_ROADMAP_V1.md).
+
+**Priority boundary:** This is an **approved strategic product direction / research candidate**, not a reprioritization or bypass of items 1–5 above. The first step is GENOME-001, an isolated offline EXEMPT SWARM archaeology proof with a frozen cohort, benign and unknown controls, a basic-case comparison, one hostile review and a clear actionability kill gate. It must not assume that BINRAT already stores complete ordered trades, exemption sets, funding graphs or economic outcomes. Follow-on SWARM/CONTRACT/NARRATIVE/LISTING Rats, Pattern Watch and Rat Lab remain **PLANNED/RESEARCH**, not live or entitled. No risk/ownership/MEV/scam/profit claims without the specific evidence authority. No paid RPC, new infrastructure, token operation, production change, signing, deployment, merge or public notification is granted by this roadmap decision.
+
 Separate parallel **token launch compliance/mechanics track** remains gated independently; don't re-open token economics in workforce tasks.
 
 ## 5. Kill criteria: stop work, not the vision
